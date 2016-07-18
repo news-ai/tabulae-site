@@ -15,6 +15,7 @@ class HomePage extends Component {
     this._deleteColumn = this._deleteColumn.bind(this);
     this._renderHeaderCell = this._renderHeaderCell.bind(this);
     this._onAddColumnNameChange = this._onAddColumnNameChange.bind(this);
+    this._addRow = this._addRow.bind(this);
     this.state = {
       newColumnName: '',
       columnDefs: [
@@ -37,6 +38,12 @@ class HomePage extends Component {
       rowBuffer: 10 // no need to set this, the default is fine for almost all scenarios
     };
   }
+  
+  // in onGridReady, store the api for later use
+  onGridReady(params) {
+    this.api = params.api;
+    this.columnApi = params.columnApi;
+  }
 
   _renderHeaderCell(params) {
     console.log(params);
@@ -58,16 +65,6 @@ class HomePage extends Component {
     this.setState({ columnDefs: columns });
   }
 
-  componentDidMount() {
-  }
-
-  componentWillUnmount() {
-  }
-  // in onGridReady, store the api for later use
-  onGridReady(params) {
-    this.api = params.api;
-    this.columnApi = params.columnApi;
-  }
 
   _addColumn() {
     // column name already exists
@@ -90,12 +87,23 @@ class HomePage extends Component {
 
   _onAddColumnNameChange(e) { this.setState({ newColumnName: e.target.value }); }
 
+  _addRow() {
+      rowData: [
+        {make: 'Toyota', model: 'Celica', price: 35000},
+        {make: 'Ford', model: 'Mondeo', price: 32000},
+        {make: 'Porsche', model: 'Boxter', price: 72000}
+      ]
+    let rows = this.state.rowData.concat({});
+    this.setState({rowData: rows});
+  }
+
   render() {
     return (
       <div>
         <input type='text' onChange={this._onAddColumnNameChange} value={this.state.newColumnName}></input>
         <button onClick={this._addColumn}>Add Column</button>
         <button onClick={(e) => this.api.deselectAll()}>Deselect All</button>
+        <button onClick={this._addRow}>Add Row</button>
         <div className='ag-fresh'>
           <AgGridReact
             // listening for events
