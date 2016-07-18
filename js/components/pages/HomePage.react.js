@@ -2,94 +2,36 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from '../../actions/AppActions';
 import ReactDataGrid from 'react-data-grid';
-import ReactDataGridPlugins from 'react-data-grid/addons';
+import { AgGridReact } from 'ag-grid-react';
 
-
-import 'react-data-grid/themes/react-data-grid.css';
-
-//helper to generate a random date
-function randomDate(start, end) {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toLocaleDateString();
-}
-
-//helper to create a fixed number of rows
-function createRows(numberOfRows){
-  var _rows = [];
-  for (var i = 1; i < numberOfRows; i++) {
-    _rows.push({
-      id: i,
-      task: 'Task ' + i,
-      complete: Math.min(100, Math.round(Math.random() * 110)),
-      priority : ['Critical', 'High', 'Medium', 'Low'][Math.floor((Math.random() * 3) + 1)],
-      issueType : ['Bug', 'Improvement', 'Epic', 'Story'][Math.floor((Math.random() * 3) + 1)],
-      startDate: randomDate(new Date(2015, 3, 1), new Date()),
-      completeDate: randomDate(new Date(), new Date(2016, 0, 1))
-    });
-  }
-  return _rows;
-}
-
-//function to retrieve a row for a given index
-var rowGetter = function(i){
-  return _rows[i];
-};
+import 'ag-grid-root/dist/styles/ag-grid.css';
+import 'ag-grid-root/dist/styles/theme-bootstrap.css';
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
-    this.rowGetter = this.rowGetter.bind(this);
-    this.handleRowUpdated = this.handleRowUpdated.bind(this);
+    this.onGridReady = this.onGridReady.bind(this);
+    this.addColumn = this.addColumn.bind(this);
     this.state = {
-      rows: createRows(1000),
-      columns: [
-        {
-          key: 'id',
-          name: 'ID',
-          width: 80
-        },
-        {
-          key: 'task',
-          name: 'Title',
-          editable : true
-        },
-        {
-          key: 'priority',
-          name: 'Priority',
-          editable : true
-        },
-        {
-          key: 'issueType',
-          name: 'Issue Type',
-          editable : true
-        },
-        {
-          key: 'complete',
-          name: '% Complete',
-          editable : true
-        },
-        {
-          key: 'startDate',
-          name: 'Start Date',
-          editable : true
-        },
-        {
-          key: 'completeDate',
-          name: 'Expected Complete',
-          editable : true
-        }
+      columnDefs: [
+        {headerName: 'Make', field: 'make', editable: true},
+        {headerName: 'Model', field: 'model'},
+        {headerName: 'Price', field: 'price'}
+      ],
+      rowData: [
+        {make: 'Toyota', model: 'Celica', price: 35000},
+        {make: 'Ford', model: 'Mondeo', price: 32000},
+        {make: 'Porsche', model: 'Boxter', price: 72000}
       ]
     }
-  }
-
-  rowGetter(rowIdx) {
-    return this.state.rows[rowIdx]
-  }
-
-  handleRowUpdated(e) {
-    //merge updated row with current row and rerender by setting state
-    var rows = this.state.rows;
-    Object.assign(rows[e.rowIdx], e.updated);
-    this.setState({rows:rows});
+    this.gridOptions = {
+      // this is how you listen for events using gridOptions
+      onModelUpdated: function() {
+          console.log('event onModelUpdated received');
+      },
+      // this is a simple property
+      rowBuffer: 10 // no need to set this, the default is fine for almost all scenarios
+    };
   }
 
   componentDidMount() {
@@ -97,19 +39,41 @@ class HomePage extends Component {
 
   componentWillUnmount() {
   }
+  // in onGridReady, store the api for later use
+  onGridReady(params) {
+    this.api = params.api;
+    this.columnApi = params.columnApi;
+  }
+
+  addColumn() {
+    let columns = this.state.columnDefs.concat({ headerName: 'Wha', field: 'whaaaaa'});
+    this.setState({ columnDefs: columns });
+  }
 
   render() {
     return (
-        <div>
-        HELLO HOMEPAGE
-        <ReactDataGrid
-        enableCellSelect={true}
-        columns={this.state.columns}
-        rowGetter={this.rowGetter}
-        rowsCount={this.state.rows.length}
-        minHeight={500}
-        onRowUpdated={this.handleRowUpdated} />
+      <div>
+        <button onClick={this.addColumn}>Add Column</button>
+        <div className='ag-bootstrap'>
+          <AgGridReact
+            // listening for events
+            onGridReady={this.onGridReady.bind(this)}
+            
+            // binding to array properties
+            columnDefs={this.state.columnDefs}
+            rowData={this.state.rowData}
+
+            // no binding, just providing harde coded strings for the properties
+            rowSelection='multiple'
+            enableColResize='true'
+            enableSorting='true'
+            enableFilter='true'
+            groupHeaders='true'
+            rowHeight='43'
+            debug='true'
+          />
         </div>
+      </div>
       );
   }
 }
