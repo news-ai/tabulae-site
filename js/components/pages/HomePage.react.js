@@ -14,16 +14,13 @@ class HomePage extends Component {
     this._addColumn = this._addColumn.bind(this);
     this._deleteColumn = this._deleteColumn.bind(this);
     this._renderHeaderCell = this._renderHeaderCell.bind(this);
+    this._onAddColumnNameChange = this._onAddColumnNameChange.bind(this);
     this.state = {
+      newColumnName: '',
       columnDefs: [
-        {
-          headerName: 'Make',
-          field: 'make',
-          editable: true,
-          headerCellTemplate: this._renderHeaderCell
-        },
+        {headerName: 'Make', field: 'make', editable: true},
         {headerName: 'Model', field: 'model', editable: true},
-        {headerName: 'Price', field: 'price'}
+        {headerName: 'Price', field: 'price', editable: true}
       ],
       rowData: [
         {make: 'Toyota', model: 'Celica', price: 35000},
@@ -73,13 +70,29 @@ class HomePage extends Component {
   }
 
   _addColumn() {
-    let columns = this.state.columnDefs.concat({ headerName: 'Wha', field: 'whaaaaa'});
-    this.setState({ columnDefs: columns });
+    // column name already exists
+    if (this.state.columnDefs.some( col => col.headerName === this.state.newColumnName)) {
+      console.log('dupe');
+      return;
+    }
+    let columns = this.state.columnDefs.concat({
+      headerName: this.state.newColumnName,
+      field: this.state.newColumnName,
+      editable: true,
+      headerCellTemplate: this._renderHeaderCell
+    });
+    this.setState({
+      columnDefs: columns,
+      newColumnName: ''
+    });
   }
+
+  _onAddColumnNameChange(e) { this.setState({ newColumnName: e.target.value }); }
 
   render() {
     return (
       <div>
+        <input type='text' onChange={this._onAddColumnNameChange} value={this.state.newColumnName}></input>
         <button onClick={this._addColumn}>Add Column</button>
         <button onClick={(e) => this.api.deselectAll()}>Deselect All</button>
         <div className='ag-fresh'>
