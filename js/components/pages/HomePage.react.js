@@ -12,6 +12,7 @@ class HomePage extends Component {
     super(props);
     this.onGridReady = this.onGridReady.bind(this);
     this._addColumn = this._addColumn.bind(this);
+    this._deleteColumn = this._deleteColumn.bind(this);
     this._renderHeaderCell = this._renderHeaderCell.bind(this);
     this.state = {
       columnDefs: [
@@ -42,44 +43,22 @@ class HomePage extends Component {
 
   _renderHeaderCell(params) {
     console.log(params);
-    const header = document.createElement('div');
-
-    //
-    const agResizeBar = document.createElement('div');
-    agResizeBar.classname = 'ag-header-cell-resize';
-
-    //
-    const agMenu = document.createElement('span');
-    agMenu.classname = 'ag-header-icon ag-header-cell-menu-button';
-
-    //
-    const agHeaderCellLabel = document.createElement('div');
-    agHeaderCellLabel.classname = 'ag-header-cell-label';
-    agHeaderCellLabel.id = 'agHeaderCellLabel';
-
-    const agSortAsc = document.createElement('span');
-    agSortAsc.id = 'agSortAsc';
-    const agSortDesc = document.createElement('span');
-    agSortDesc.id = 'agSortDesc';
-    const agNoSort = document.createElement('span');
-    agNoSort.id = 'agNoSort';
-    const agFilter = document.createElement('span');
-    agFilter.id = 'agFilter';
-    const agText = document.createElement('span');
-    agText.id = 'agText';
-
-    agHeaderCellLabel.appendChild(agSortAsc);
-    agHeaderCellLabel.appendChild(agSortDesc);
-    agHeaderCellLabel.appendChild(agNoSort);
-    agHeaderCellLabel.appendChild(agFilter);
-    agHeaderCellLabel.appendChild(agText);
-
-    //
-    header.appendChild(agResizeBar);
-    header.appendChild(agMenu);
-    header.appendChild(agHeaderCellLabel);
+    const header = document.createElement('span');
+    const title = document.createTextNode(params.column.colDef.headerName);
+    const deleteBtn = document.createElement('div');
+    deleteBtn.style.width = '5px';
+    deleteBtn.style.height = '5px';
+    deleteBtn.style.backgroundColor = 'red';
+    header.appendChild(title);
+    deleteBtn.addEventListener('click', () => this._deleteColumn(params.column.colDef.headerName));
+    header.appendChild(deleteBtn);
     
     return header
+  }
+
+  _deleteColumn(delColName) {
+    let columns = this.state.columnDefs.filter( col => col.headerName !== delColName)
+    this.setState({ columnDefs: columns });
   }
 
   componentDidMount() {
