@@ -71,13 +71,14 @@ class HomePage extends Component {
 
   _addColumn() {
     // column name already exists
-    if (this.state.columnDefs.some( col => col.headerName === this.state.newColumnName)) {
+    const newColumnName = this.state.newColumnName;
+    if (this.state.columnDefs.some( col => col.headerName === newColumnName || newColumnName.length === 0)) {
       console.log('dupe');
       return;
     }
     let columns = this.state.columnDefs.concat({
-      headerName: this.state.newColumnName,
-      field: this.state.newColumnName,
+      headerName: newColumnName,
+      field: newColumnName,
       editable: true,
       headerCellTemplate: this._renderHeaderCell
     });
