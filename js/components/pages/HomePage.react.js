@@ -16,6 +16,7 @@ class HomePage extends Component {
     this._renderHeaderCell = this._renderHeaderCell.bind(this);
     this._onAddColumnNameChange = this._onAddColumnNameChange.bind(this);
     this._addRow = this._addRow.bind(this);
+    this._exportToCsv = this._exportToCsv.bind(this);
     this.state = {
       newColumnName: '',
       columnDefs: [
@@ -97,6 +98,10 @@ class HomePage extends Component {
     this.setState({rowData: rows});
   }
 
+  _exportToCsv() {
+    this.api.exportDataAsCsv();
+  }
+
   render() {
     return (
       <div>
@@ -104,6 +109,7 @@ class HomePage extends Component {
         <button onClick={this._addColumn}>Add Column</button>
         <button onClick={(e) => this.api.deselectAll()}>Deselect All</button>
         <button onClick={this._addRow}>Add Row</button>
+        <button onClick={this._exportToCsv}>Export</button>
         <div className='ag-fresh'>
           <AgGridReact
             // listening for events
