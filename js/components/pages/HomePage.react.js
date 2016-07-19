@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as actionCreators from '../../actions/AppActions';
 import ReactDataGrid from 'react-data-grid';
 import { AgGridReact } from 'ag-grid-react';
+import _ from 'lodash';
 
 import 'ag-grid-root/dist/styles/ag-grid.css';
 import 'ag-grid-root/dist/styles/theme-fresh.css';
@@ -17,17 +18,20 @@ class HomePage extends Component {
     this._onAddColumnNameChange = this._onAddColumnNameChange.bind(this);
     this._addRow = this._addRow.bind(this);
     this._exportToCsv = this._exportToCsv.bind(this);
+    this._printSelected = this._printSelected.bind(this);
+    this._deleteSelected = this._deleteSelected.bind(this);
     this.state = {
       newColumnName: '',
       columnDefs: [
-        {headerName: 'Make', field: 'make', editable: true},
-        {headerName: 'Model', field: 'model', editable: true},
-        {headerName: 'Price', field: 'price', editable: true}
+        {headerName: 'First Name', field: 'firstname', editable: true, checkboxSelection: true},
+        {headerName: 'Last Name', field: 'lastname', editable: true},
+        {headerName: 'Email', field: 'email', editable: true},
+        {headerName: 'Position', field: 'Position', editable: true}
       ],
       rowData: [
-        {make: 'Toyota', model: 'Celica', price: 35000},
-        {make: 'Ford', model: 'Mondeo', price: 32000},
-        {make: 'Porsche', model: 'Boxter', price: 72000}
+        {firstname: 'Toyota', lastname: 'Celica', email: 35000},
+        {firstname: 'Ford', lastname: 'Mondeo', email: 32000},
+        {firstname: 'Porsche', lastname: 'Boxter', email: 72000}
       ]
     }
     this.gridOptions = {
@@ -90,9 +94,9 @@ class HomePage extends Component {
 
   _addRow() {
       rowData: [
-        {make: 'Toyota', model: 'Celica', price: 35000},
-        {make: 'Ford', model: 'Mondeo', price: 32000},
-        {make: 'Porsche', model: 'Boxter', price: 72000}
+        {firstname: 'Toyota', lastname: 'Celica', email: 35000},
+        {firstname: 'Ford', lastname: 'Mondeo', email: 32000},
+        {firstname: 'Porsche', lastname: 'Boxter', email: 72000}
       ]
     let rows = this.state.rowData.concat({});
     this.setState({rowData: rows});
@@ -102,14 +106,27 @@ class HomePage extends Component {
     this.api.exportDataAsCsv();
   }
 
+  _printSelected() {
+    console.log(this.api.getSelectedRows());
+  }
+
+  _deleteSelected() {
+    const selected = this.api.getSelectedRows();
+    const rows = this.state.rowData.filter( row => !selected.some( srow => _.isEqual(srow, row)));
+    console.log(rows);
+    this.setState({ rowData: rows });
+  }
+
   render() {
     return (
       <div>
         <input type='text' onChange={this._onAddColumnNameChange} value={this.state.newColumnName}></input>
         <button onClick={this._addColumn}>Add Column</button>
-        <button onClick={(e) => this.api.deselectAll()}>Deselect All</button>
+        <button onClick={ _ => this.api.deselectAll()}>Deselect All</button>
         <button onClick={this._addRow}>Add Row</button>
         <button onClick={this._exportToCsv}>Export</button>
+        <button onClick={this._printSelected}>Print Selected</button>
+        <button onClick={this._deleteSelected}>Delete</button>
         <div className='ag-fresh'>
           <AgGridReact
             // listening for events
