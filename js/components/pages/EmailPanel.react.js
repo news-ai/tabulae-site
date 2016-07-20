@@ -1,21 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actionCreators from '../../actions/AppActions';
-import Grid from '../pieces/Grid.react';
 
-class HomePage extends Component {
+class EmailPanel extends Component {
   constructor(props) {
-    super(props);
-    this.state = {
-    }
   }
 
   render() {
-    return (
-      <div>
-        <Grid />
-      </div>
-      );
+    return (<div>
+      
+    </div>);
   }
 }
 
@@ -31,5 +24,6 @@ const mapDispatchToProps = dispatch => {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
-)(HomePage);
+  mapDispatchToProps
+)(EmailPanel);
+
