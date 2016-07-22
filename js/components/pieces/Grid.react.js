@@ -19,6 +19,7 @@ class Grid extends Component {
     this._exportToCsv = this._exportToCsv.bind(this);
     this._printSelected = this._printSelected.bind(this);
     this._deleteSelected = this._deleteSelected.bind(this);
+    this._sendEmail = this._sendEmail.bind(this);
     this.state = {
       newColumnName: '',
       columnDefs: [
@@ -29,11 +30,7 @@ class Grid extends Component {
         {headerName: 'LinkedIn', field: 'linkedin', editable: true},
         {headerName: 'Twitter', field: 'twitter', editable: true}
       ],
-      rowData: [
-        {firstname: 'Toyota', lastname: 'Celica', email: 35000},
-        {firstname: 'Ford', lastname: 'Mondeo', email: 32000},
-        {firstname: 'Porsche', lastname: 'Boxter', email: 72000}
-      ]
+      rowData: this.props.rowData
     }
     this.gridOptions = {
       // this is how you listen for events using gridOptions
@@ -94,11 +91,6 @@ class Grid extends Component {
   _onAddColumnNameChange(e) { this.setState({ newColumnName: e.target.value }); }
 
   _addRow() {
-      rowData: [
-        {firstname: 'Toyota', lastname: 'Celica', email: 35000},
-        {firstname: 'Ford', lastname: 'Mondeo', email: 32000},
-        {firstname: 'Porsche', lastname: 'Boxter', email: 72000}
-      ]
     let rows = this.state.rowData.concat({});
     this.setState({rowData: rows});
   }
@@ -118,6 +110,10 @@ class Grid extends Component {
     this.setState({ rowData: rows });
   }
 
+  _sendEmail() {
+    console.log(this.api.getSelectedRows());
+  }
+
   render() {
     return (
       <div>
@@ -128,6 +124,7 @@ class Grid extends Component {
         <button onClick={this._exportToCsv}>Export</button>
         <button onClick={this._printSelected}>Print Selected</button>
         <button onClick={this._deleteSelected}>Delete</button>
+        <button onClick={this._sendEmail}>Email</button>
         <div className='ag-fresh'>
           <AgGridReact
             // listening for events

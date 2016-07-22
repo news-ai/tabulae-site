@@ -20,14 +20,14 @@ class App extends Component {
 const mapStateToProps = state => {
   return {
     data: state,
-    isLogin: state.personReducer.person ? true : false,
+    // isLogin: state.personReducer.person ? true : false,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     getAuth: _ => {
-      dispatch(actionCreators.fetchPerson())
+      dispatch(actionCreators.fetchPerson());
     },
   };
 };

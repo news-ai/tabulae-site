@@ -5,9 +5,11 @@
 import { combineReducers } from 'redux';
 
 import personReducer from './personReducer';
+import contactReducer from './contactReducer';
 
 const rootReducer = combineReducers({
-  personReducer
+  personReducer,
+  contactReducer
 });
 
 export default rootReducer;
