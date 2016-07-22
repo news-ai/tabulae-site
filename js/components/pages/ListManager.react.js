@@ -3,13 +3,33 @@ import * as actionCreators from '../../actions/AppActions';
 import { connect } from 'react-redux';
 
 class ListManager extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      newListName: ''
+    }
+    this._onChange = e => this.setState({ newListName: e.target.value });
+    this._onNewListClick = this._onNewListClick.bind(this);
+  }
+
   componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(actionCreators.fetchLists());
+  }
+
+  _onNewListClick() {
+    const { dispatch } = this.props;
+    actionCreators.addListWithoutContacts(this.state.newListName);
   }
 
   render() {
+    const { dispatch, lists } = this.props;
     return (
       <div className='container'>
-      LIST
+      <h1>Media Lists</h1>
+      { lists.map( list => <div>{list}</div>) }
+      <input type='text' placeholder='Untitled' onChange={this._onChange} value={this.state.newListName}></input>
+      <button onClick={this._onNewListClick}>Add New List</button>
       </div>
       );
   }
@@ -17,7 +37,17 @@ class ListManager extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
+    lists: state.listReducer.lists
   };
 };
 
-export default connect(mapStateToProps)(ListManager);
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch: action => dispatch(action)
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+  )(ListManager);

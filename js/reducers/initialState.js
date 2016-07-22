@@ -6,6 +6,7 @@ export const initialState = {
     isReceiving: false
   },
   listReducer: {
-    isReceiving: false
+    isReceiving: false,
+    lists: []
   }
 };
