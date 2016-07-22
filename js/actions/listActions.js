@@ -24,19 +24,6 @@ function requestListFail() {
   };
 }
 
-export function addListWithoutContacts(name) {
-  const listBody = {
-    name: name.length === 0 ? 'untitled' : name
-  };
-
-  return fetch(`${window.TABULAE_API_BASE}/lists`, {
-    method: 'post',
-    credentials: 'include',
-    body: JSON.stringify(listBody)
-  })
-  .then( response => console.log(response));
-}
-
 
 export function fetchLists() {
   return dispatch => {
@@ -52,5 +39,21 @@ export function fetchLists() {
         }
     });
   };
+}
+
+export function addListWithoutContacts(name) {
+  const listBody = {
+    name: name.length === 0 ? 'untitled' : name
+  };
+
+  return fetch(`${window.TABULAE_API_BASE}/lists`, {
+    method: 'post',
+    credentials: 'include',
+    body: JSON.stringify(listBody)
+  })
+  .then( response => {
+    console.log(response);
+    dispatch(fetchLists());
+  });
 }
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as actionCreators from '../../actions/AppActions';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 class ListManager extends Component {
   constructor(props) {
@@ -27,7 +28,9 @@ class ListManager extends Component {
     return (
       <div className='container'>
       <h1>Media Lists</h1>
-      { lists.map( list => <div>{list}</div>) }
+      { lists.map( (list, i) => 
+            <Link to={`/lists/${list.id}`} key={i}><p style={{ margin: '5px' }}>{list.name}</p></Link>
+            )}
       <input type='text' placeholder='Untitled' onChange={this._onChange} value={this.state.newListName}></input>
       <button onClick={this._onNewListClick}>Add New List</button>
       </div>
@@ -36,6 +39,7 @@ class ListManager extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  console.log(props);
   return {
     lists: state.listReducer.lists
   };
