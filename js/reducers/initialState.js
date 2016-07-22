@@ -4,5 +4,8 @@ export const initialState = {
   },
   contactReducer: {
     isReceiving: false
+  },
+  listReducer: {
+    isReceiving: false
   }
 };

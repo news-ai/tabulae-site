@@ -6,10 +6,12 @@ import { combineReducers } from 'redux';
 
 import personReducer from './personReducer';
 import contactReducer from './contactReducer';
+import listReducer from './listReducer';
 
 const rootReducer = combineReducers({
   personReducer,
-  contactReducer
+  contactReducer,
+  listReducer
 });
 
 export default rootReducer;
