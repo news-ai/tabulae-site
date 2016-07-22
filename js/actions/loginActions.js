@@ -35,7 +35,6 @@ export function fetchPerson() {
   return dispatch => {
     dispatch(requestLogin());
     const url = `${window.TABULAE_API_BASE}/users/me`;
-    console.log(url);
     return fetch(`${window.TABULAE_API_BASE}/users/me`, { credentials: 'include'})
       .then( response => response.status !== 200 ? false : response.text())
       .then( body => {

@@ -3,8 +3,6 @@
   "version": "0.0.2",
   "description": "Publisher platform for NewsAI data",
   "dependencies": {
-    "ag-grid": "^5.0.3",
-    "ag-grid-react": "^5.0.0",
     "axios": "^0.9.1",
     "draft-js": "^0.7.0",
     "fontfaceobserver": "^1.5.1",
