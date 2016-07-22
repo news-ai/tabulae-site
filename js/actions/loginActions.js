@@ -27,20 +27,20 @@ function loginFail() {
 }
 
 export function loginWithGoogle() {
-  const path = window.location.pathname.split('/').filter( word => word.length > 0);
-  const base = 'https://context.newsai.org/login/google-oauth2';
-  window.location.href = (path[0] === 'entities' || path[0] === 'articles') ? `${base}?next=/publisher${window.location.pathname}` : base;
+  const base = 'http://tabulae.newsai.org';
+  window.location.href = base;
 }
 
 export function fetchPerson() {
   return dispatch => {
     dispatch(requestLogin());
-    return fetch(`${window.CONTEXT_API_BASE}/users/me`, { credentials: 'include'})
+    const url = `${window.TABULAE_API_BASE}/users/me`;
+    console.log(url);
+    return fetch(`${window.TABULAE_API_BASE}/users/me`, { credentials: 'include'})
       .then( response => response.status !== 200 ? false : response.text())
       .then( body => {
         if (body) {
           const person = JSON.parse(body);
-          mixpanel.identify(String(person.id));
           return dispatch(receiveLogin(person));
         } else {
           return dispatch(loginFail());

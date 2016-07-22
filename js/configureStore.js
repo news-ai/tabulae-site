@@ -3,7 +3,7 @@ import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 import rootReducer from './reducers/rootReducer';
 
-window.CONTEXT_API_BASE = `https://context.newsai.org/api`;
+window.TABULAE_API_BASE = `http://tabulae.newsai.org/api`;
 
 export default function configureStore() {
 	const loggerMiddleware = createLogger();

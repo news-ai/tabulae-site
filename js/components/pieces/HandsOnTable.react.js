@@ -11,18 +11,31 @@ class HandsOnTable extends Component {
     this.state = {
       options: {
         data: [
-            ["2008", 10, 11, 12, 13],
-            ["2009", 20, 11, 14, 13],
-            ["2010", 30, 15, 12, 13],
+            ['Julie', 'Pan', 'julie.yc.pan@gmail.com', 'wha', 13],
+            ['2009', 20, 11, 14, 13],
+            ['2010', 30, 15, 12, 13],
          ],
-        colHeaders: ['Year', 'Maserati', 'Mazda', 'Mercedes', 'Mini'],
+        colHeaders: [
+        'First Name',
+        'Last Name',
+        'Email',
+        'LinkedIn',
+        'Twitter',
+        'Instagram'
+        ],
+        minSpareCols: 5,
+        minSpareRows: 20,
+        manualColumnMove: true,
+        manualRowMove: true,
+        afterChange: function(changes, source) {
+          console.log(this.getSettings().data);
+        }
       }
     };
   }
 
   componentDidMount() {
-    const elm = ReactDOM.findDOMNode(this);
-    this.table = new Handsontable(elm, this.state.options);
+    this.table = new Handsontable(ReactDOM.findDOMNode(this), this.state.options);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -33,6 +46,7 @@ class HandsOnTable extends Component {
   componentDidUpdate() {
     this.table.updateSettings(this.state.options);
   }
+
 
   render() {
     return (

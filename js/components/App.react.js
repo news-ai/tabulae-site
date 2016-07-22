@@ -5,13 +5,17 @@ import Login from './pages/Login.react';
 
 class App extends Component {
   componentDidMount() {
-    // this.props.getAuth();
+    this.props.getAuth();
   }
 
   render() {
+    const { isLogin } = this.props;
     return (
       <div className='wrapper'>
-        {this.props.children}
+      { isLogin ?
+        this.props.children :
+      <Login />
+      }
       </div>
       );
   }
@@ -20,7 +24,7 @@ class App extends Component {
 const mapStateToProps = state => {
   return {
     data: state,
-    // isLogin: state.personReducer.person ? true : false,
+    isLogin: state.personReducer.person ? true : false,
   };
 };
 
