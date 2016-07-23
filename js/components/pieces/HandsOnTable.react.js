@@ -2,19 +2,27 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
+import _ from 'lodash';
 
 import 'handsontable/dist/handsontable.full.css';
 
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
+    const MIN_SPARE_COLS = 5;
+    const MIN_SPARE_ROWS = 20;
+    // instantiate localData with same data representation as handsontable
+    let localData = _.range(MIN_SPARE_ROWS).map(function() {
+      return _.range(MIN_SPARE_COLS).map(function() {
+        return null;
+      });
+    });
+
+    this._printCurrentData = this._printCurrentData.bind(this);
+    this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       options: {
-        data: [
-            ['Julie', 'Pan', 'julie.yc.pan@gmail.com', 'wha', 13],
-            ['2009', 20, 11, 14, 13],
-            ['2010', 30, 15, 12, 13],
-         ],
+        data: localData, // instantiate handsontable with empty Array of Array
         colHeaders: [
         'First Name',
         'Last Name',
@@ -23,19 +31,21 @@ class HandsOnTable extends Component {
         'Twitter',
         'Instagram'
         ],
-        minSpareCols: 5,
-        minSpareRows: 20,
+        // minSpareCols: MIN_SPARE_COLS,
+        // minSpareRows: MIN_SPARE_ROWS,
         manualColumnMove: true,
         manualRowMove: true,
-        afterChange: function(changes, source) {
-          console.log(this.getSettings().data);
-        }
       }
     };
   }
 
   componentDidMount() {
-    this.table = new Handsontable(ReactDOM.findDOMNode(this), this.state.options);
+    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
+    this.table.updateSettings({
+      afterChange: (changes, source) => {
+        if (source === 'edit') this._printCurrentData();
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -47,10 +57,21 @@ class HandsOnTable extends Component {
     this.table.updateSettings(this.state.options);
   }
 
+  _printCurrentData() {
+    console.log(this.state.options.data);
+  }
+
+  _onSaveClick() {
+    console.log('ey');
+
+  }
 
   render() {
     return (
       <div>
+        <button onClick={this._onSaveClick}>Save</button>
+        <div ref='data-grid'>
+        </div>
       </div>
       );
   }

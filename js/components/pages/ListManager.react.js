@@ -39,7 +39,6 @@ class ListManager extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  console.log(props);
   return {
     lists: state.listReducer.lists
   };

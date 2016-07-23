@@ -12,6 +12,12 @@ class Table extends Component {
     }
   }
 
+  componentDidMount() {
+    const { dispatch } = this.props;
+    // dispatch(actionCreators.fetchLists());
+
+  }
+
   _onEmailClick(rowData) {
 
   }
@@ -20,15 +26,17 @@ class Table extends Component {
     return (
       <div>
         <EmailPanel />
-        <button>Save</button>
         <HandsOnTable />
       </div>
       );
   }
 }
 
-const mapStateToProps = state => {
-    return {};
+const mapStateToProps = (state, props) => {
+  const listId = parseInt(props.params.listId, 10);
+  return {
+    listId: listId
+  };
 };
 
 const mapDispatchToProps = dispatch => {
