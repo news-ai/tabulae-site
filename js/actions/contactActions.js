@@ -3,6 +3,7 @@ import {
   RECEIVE_CONTACTS,
   REQUEST_CONTACTS_FAIL
 } from '../constants/AppConstants';
+import 'isomorphic-fetch';
 
 
 function requestContacts() {

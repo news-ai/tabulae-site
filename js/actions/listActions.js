@@ -3,6 +3,7 @@ import {
   RECEIVE_LISTS,
   REQUEST_LISTS_FAIL
 } from '../constants/AppConstants';
+import 'isomorphic-fetch';
 
 
 function requestLists() {
@@ -46,14 +47,16 @@ export function addListWithoutContacts(name) {
     name: name.length === 0 ? 'untitled' : name
   };
 
-  return fetch(`${window.TABULAE_API_BASE}/lists`, {
-    method: 'post',
-    credentials: 'include',
-    body: JSON.stringify(listBody)
-  })
-  .then( response => {
-    console.log(response);
-    dispatch(fetchLists());
-  });
+  return dispatch => {
+    return fetch(`${window.TABULAE_API_BASE}/lists`, {
+      method: 'post',
+      credentials: 'include',
+      body: JSON.stringify(listBody)
+    })
+    .then( response => {
+      console.log(response);
+      return dispatch(fetchLists());
+    });
+  };
 }
 

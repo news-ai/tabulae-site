@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import _ from 'lodash';
+import 'isomorphic-fetch';
 
 import 'handsontable/dist/handsontable.full.css';
 
@@ -22,7 +23,7 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       options: {
-        data: localData, // instantiate handsontable with empty Array of Array
+        data: [[]], // instantiate handsontable with empty Array of Array
         colHeaders: [
         'First Name',
         'Last Name',
@@ -31,8 +32,8 @@ class HandsOnTable extends Component {
         'Twitter',
         'Instagram'
         ],
-        // minSpareCols: MIN_SPARE_COLS,
-        // minSpareRows: MIN_SPARE_ROWS,
+        minCols: MIN_SPARE_COLS,
+        minRows: MIN_SPARE_ROWS,
         manualColumnMove: true,
         manualRowMove: true,
       }
@@ -63,6 +64,7 @@ class HandsOnTable extends Component {
 
   _onSaveClick() {
     console.log('ey');
+    
 
   }
 
