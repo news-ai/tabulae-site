@@ -1,7 +1,7 @@
 import {
   REQUEST_LISTS,
   RECEIVE_LISTS,
-  REQUEST_LISTS_FAIL
+  REQUEST_LISTS_FAIL,
 } from '../constants/AppConstants';
 import 'isomorphic-fetch';
 
@@ -12,6 +12,12 @@ function requestLists() {
   };
 }
 
+function requestList() {
+  return {
+    type: 'REQUEST_LIST'
+  }
+}
+
 function receiveLists(lists) {
   return {
     type: RECEIVE_LISTS,
@@ -19,9 +25,28 @@ function receiveLists(lists) {
   };
 }
 
+function receiveList(listId, list) {
+  return {
+    type: 'RECEIVE_LIST',
+    listId,
+    list
+  };
+}
+
 function requestListFail() {
   return {
     type: REQUEST_LISTS_FAIL
+  };
+}
+
+export function fetchList(listId) {
+  return dispatch => {
+    dispatch(requestLists());
+    return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, { credentials: 'include'})
+    .then( response => response.status !== 200 ? false : response.text())
+    .then( body => {
+      return dispatch(receiveList(listId, JSON.parse(body)));
+    });
   };
 }
 
@@ -53,8 +78,9 @@ export function addListWithoutContacts(name) {
       credentials: 'include',
       body: JSON.stringify(listBody)
     })
-    .then( response => {
-      console.log(response);
+    .then( response => response.text())
+    .then( text => {
+      console.log(text);
       return dispatch(fetchLists());
     });
   };

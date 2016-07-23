@@ -1,7 +1,9 @@
 import {
   REQUEST_CONTACTS,
   RECEIVE_CONTACTS,
-  REQUEST_CONTACTS_FAIL
+  REQUEST_CONTACTS_FAIL,
+  ADDING_CONTACT,
+  ADDED_CONTACT
 } from '../constants/AppConstants';
 import 'isomorphic-fetch';
 
@@ -41,3 +43,37 @@ export function fetchContacts() {
     });
   };
 }
+
+export function addContact(listId, body) {
+  return dispatch => {
+    dispatch({ type: ADDING_CONTACT });
+    return fetch(`${window.TABULAE_API_BASE}/contacts`, {
+      method: 'post',
+      credentials: 'include',
+      body: JSON.stringify(body)
+    })
+    .then( response => response.text())
+    .then( text => {
+      const json = JSON.parse(text);
+      const contactId = json[0].id;
+      // TODO: collect contact object and contactId in list
+      return dispatch({
+        type: ADDED_CONTACT,
+        listId,
+        contactId
+      });
+    });
+  };
+}
+
+
+export function addContacts(listId, contactList) {
+  return dispatch => {
+    return Promise.all([
+      ...contactList.map( contact => dispatch(addContact(listId, contact)))
+      ]);
+    //.then( _ => dispatch(addTempContactsToList(listId)));
+  };
+}
+
+

@@ -26,7 +26,7 @@ class Table extends Component {
     return (
       <div>
         <EmailPanel />
-        <HandsOnTable />
+        <HandsOnTable listId={this.props.listId} />
       </div>
       );
   }
