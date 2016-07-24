@@ -6,24 +6,17 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import _ from 'lodash';
 import 'isomorphic-fetch';
 
-class Table extends Component {
+class NewTable extends Component {
   constructor(props) {
     super(props);
-    this._onEmailClick = this._onEmailClick.bind(this);
-    this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
-    }
+      name: 'untitled'
+    };
+    this._onSaveClick = this._onSaveClick.bind(this);
+    this._onNameChange = e => this.setState({ name: e.target.value });
   }
 
   componentDidMount() {
-    const { dispatch, listId } = this.props;
-    dispatch(actionCreators.fetchList(listId));
-    // dispatch(actionCreators.fetchLists());
-
-  }
-
-  _onEmailClick(rowData) {
-
   }
 
   _onSaveClick(localData, colHeaders) {
@@ -37,36 +30,24 @@ class Table extends Component {
       if (!_.isEmpty(field)) contactList.push(field);
     });
     console.log(contactList);
-    dispatch(actionCreators.addContacts(listId, contactList));
+    // dispatch(actionCreators.addContacts(listId, contactList));
+    dispatch(actionCreators.createNewSheet(this.state.name, contactList));
   }
 
   render() {
-    const { listId, listData, isReceiving } = this.props;
     return (
       <div>
-      { isReceiving || listData === undefined ? <span>LOADING..</span> :
-        <div>
-          <p>{listData.name}</p>
-          <EmailPanel />
-          <HandsOnTable
-          listId={this.props.listId}
-          _onSaveClick={this._onSaveClick}
-          listData={listData}
-          />
-        </div>
-      }
+        <span>List Name: </span><input type='text' onChange={this._onNameChange} value={this.state.name}></input>
+        <HandsOnTable
+        _onSaveClick={this._onSaveClick}
+        />
       </div>
       );
   }
 }
 
 const mapStateToProps = (state, props) => {
-  const listId = parseInt(props.params.listId, 10);
-  const isReceiving = state.listReducer.isReceiving;
   return {
-    listId: listId,
-    isReceiving: isReceiving,
-    listData: state.listReducer[listId]
   };
 };
 
@@ -79,4 +60,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Table);
+)(NewTable);

@@ -7,6 +7,7 @@ export const initialState = {
   },
   listReducer: {
     isReceiving: false,
+    tempNewList: [],
     lists: []
   }
 };

@@ -37,6 +37,7 @@ import NotFoundPage from './components/pages/NotFound.react';
 import App from './components/App.react';
 import ListManager from './components/pages/ListManager.react';
 import Table from './components/pages/Table.react';
+import NewTable from './components/pages/NewTable.react';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';
@@ -57,8 +58,8 @@ ReactDOM.render(
         <Route path='/' component={App}>
           <IndexRoute component={HomePage} />
           <Route path='/lists' component={ListManager} />
+          <Route path='/lists/new' component={NewTable} />
           <Route path='/lists/:listId' component={Table} />
-          <Route path='/lists/new' component={Table} />
         </Route>
         <Route path='*' component={NotFoundPage} />
       </Router>

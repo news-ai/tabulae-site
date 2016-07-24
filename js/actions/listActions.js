@@ -4,6 +4,7 @@ import {
   REQUEST_LISTS_FAIL,
 } from '../constants/AppConstants';
 // import 'isomorphic-fetch';
+import * as contactActions from './contactActions';
 
 
 function requestLists() {
@@ -38,7 +39,6 @@ function requestListFail() {
     type: REQUEST_LISTS_FAIL
   };
 }
-
 
 
 export function fetchList(listId) {
@@ -116,4 +116,33 @@ export function patchList(listId, name, contacts) {
     });
   };
 }
+
+export function createNewSheet(name, contactList) {
+  return dispatch => dispatch(contactActions.addContacts(contactList))
+  .then( json => {
+    const contacts = json.map( contact => contact.id );
+    const listBody = {
+      name: name,
+      contacts: contacts
+    };
+    return fetch(`${window.TABULAE_API_BASE}/lists`, {
+      method: 'POST',
+      credentials: 'include',
+      body: JSON.stringify(listBody)
+    })
+    .then( response => response.text())
+    .then( text => {
+      const json = JSON.parse(text);
+      const listId = json.id;
+      return dispatch(receiveList(listId, json));
+    });
+
+  });
+}
+
+
+
+
+
+
 

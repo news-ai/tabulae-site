@@ -41,12 +41,12 @@ function listReducer(state = initialState.listReducer, action) {
     case RECEIVE_LIST:
       obj.isReceiving = false;
       obj[action.listId] = action.list;
-      obj[action.listId].temp = [];
+      // obj[action.listId].temp = [];
       return obj;
-    case ADDED_CONTACT:
-      console.log(action);
-      obj[action.listId].temp = [ ...state[action.listId].temp, action.contactId];
-      return obj;
+    // case ADDED_CONTACT:
+    //   console.log(action);
+    //   obj[action.listId].temp = [ ...state[action.listId].temp, action.contactId];
+    //   return obj;
     default:
       return state;
   }
