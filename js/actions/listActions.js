@@ -134,7 +134,8 @@ export function createNewSheet(name, contactList) {
     .then( text => {
       const json = JSON.parse(text);
       const listId = json.id;
-      return dispatch(receiveList(listId, json));
+      dispatch(receiveList(listId, json));
+      window.location.href = window.location.origin + '/lists/' + listId;
     });
 
   });
