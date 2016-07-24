@@ -3,7 +3,7 @@ import {
   RECEIVE_LISTS,
   REQUEST_LISTS_FAIL,
 } from '../constants/AppConstants';
-import 'isomorphic-fetch';
+// import 'isomorphic-fetch';
 
 
 function requestLists() {
@@ -15,7 +15,7 @@ function requestLists() {
 function requestList() {
   return {
     type: 'REQUEST_LIST'
-  }
+  };
 }
 
 function receiveLists(lists) {
@@ -38,6 +38,8 @@ function requestListFail() {
     type: REQUEST_LISTS_FAIL
   };
 }
+
+
 
 export function fetchList(listId) {
   return dispatch => {
@@ -74,7 +76,7 @@ export function addListWithoutContacts(name) {
 
   return dispatch => {
     return fetch(`${window.TABULAE_API_BASE}/lists`, {
-      method: 'post',
+      method: 'POST',
       credentials: 'include',
       body: JSON.stringify(listBody)
     })
@@ -82,6 +84,35 @@ export function addListWithoutContacts(name) {
     .then( text => {
       console.log(text);
       return dispatch(fetchLists());
+    });
+  };
+}
+
+// NOT WORKING YET
+export function patchList(listId, name, contacts) {
+  const listBody = {};
+  if (name !== undefined) listBody.name = name;
+  if (contacts !== undefined) listBody.contacts = contacts;
+  console.log(listBody);
+  console.log(JSON.stringify(listBody));
+
+  return dispatch => {
+    return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      method: 'PATCH',
+      credentials: 'include',
+      body: JSON.stringify(listBody)
+    })
+    .then( response => response.text())
+    .then( text => {
+      console.log(text);
+      let json = JSON.parse(text);
+      console.log(json);
+      return dispatch(receiveList(listId, json));
     });
   };
 }

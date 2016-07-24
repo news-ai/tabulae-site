@@ -6,6 +6,7 @@ import {
   ADDED_CONTACT
 } from '../constants/AppConstants';
 import 'isomorphic-fetch';
+import * as listActions from './listActions';
 
 
 function requestContacts() {
@@ -48,7 +49,7 @@ export function addContact(listId, body) {
   return dispatch => {
     dispatch({ type: ADDING_CONTACT });
     return fetch(`${window.TABULAE_API_BASE}/contacts`, {
-      method: 'post',
+      method: 'POST',
       credentials: 'include',
       body: JSON.stringify(body)
     })
@@ -68,11 +69,15 @@ export function addContact(listId, body) {
 
 
 export function addContacts(listId, contactList) {
-  return dispatch => {
+  return (dispatch, getState) => {
     return Promise.all([
       ...contactList.map( contact => dispatch(addContact(listId, contact)))
-      ]);
-    //.then( _ => dispatch(addTempContactsToList(listId)));
+      ])
+    .then( _ => dispatch(listActions.patchList(
+      listId,
+      getState().listReducer[listId].name,
+      getState().listReducer[listId].temp
+      )));
   };
 }
 
