@@ -58,6 +58,7 @@ ReactDOM.render(
           <IndexRoute component={HomePage} />
           <Route path='/lists' component={ListManager} />
           <Route path='/lists/:listId' component={Table} />
+          <Route path='/lists/new' component={Table} />
         </Route>
         <Route path='*' component={NotFoundPage} />
       </Router>
