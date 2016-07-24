@@ -29,8 +29,6 @@ class NewTable extends Component {
       });
       if (!_.isEmpty(field)) contactList.push(field);
     });
-    console.log(contactList);
-    // dispatch(actionCreators.addContacts(listId, contactList));
     dispatch(actionCreators.createNewSheet(this.state.name, contactList));
   }
 

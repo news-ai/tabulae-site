@@ -46,9 +46,7 @@ export function fetchList(listId) {
     dispatch(requestLists());
     return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, { credentials: 'include'})
     .then( response => response.status !== 200 ? false : response.text())
-    .then( body => {
-      return dispatch(receiveList(listId, JSON.parse(body)));
-    });
+    .then( body => dispatch(receiveList(listId, JSON.parse(body))));
   };
 }
 

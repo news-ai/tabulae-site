@@ -1,7 +1,7 @@
 import {
-  REQUEST_CONTACTS,
-  RECEIVE_CONTACTS,
-  REQUEST_CONTACTS_FAIL,
+  REQUEST_CONTACT,
+  RECEIVE_CONTACT,
+  REQUEST_CONTACT_FAIL,
   ADDING_CONTACT,
   ADDED_CONTACT
 } from '../constants/AppConstants';
@@ -9,39 +9,45 @@ import 'isomorphic-fetch';
 import * as listActions from './listActions';
 
 
-function requestContacts() {
+function requestContact() {
   return {
-    type: REQUEST_CONTACTS
+    type: REQUEST_CONTACT
   };
 }
 
-function receiveContacts(contacts) {
+function receiveContact(contact) {
   return {
-    type: RECEIVE_CONTACTS,
-    contacts
+    type: RECEIVE_CONTACT,
+    contact
   };
 }
 
-function requestContactsFail() {
+function requestContactFail() {
   return {
-    type: REQUEST_CONTACTS_FAIL
+    type: REQUEST_CONTACT_FAIL
   };
 }
 
 
-export function fetchContacts() {
+export function fetchContact(contactId) {
   return dispatch => {
-    dispatch(requestContacts());
-    return fetch(`${window.TABULAE_API_BASE}/contacts`, { credentials: 'include'})
+    dispatch(requestContact());
+    return fetch(`${window.TABULAE_API_BASE}/contacts/${contactId}`, { credentials: 'include'})
       .then( response => response.status !== 200 ? false : response.text())
       .then( body => {
         if (body) {
-          const contacts = JSON.parse(body);
-          return dispatch(receiveContacts(contacts));
+          const contact = JSON.parse(body);
+          return dispatch(receiveContact(contact));
         } else {
-          return dispatch(requestContactsFail());
+          return dispatch(requestContactFail());
         }
     });
+  };
+}
+
+export function fetchContacts(listId) {
+  return (dispatch, getState) => {
+    return Promise.all(getState().listReducer[listId].contacts.map( contactId => dispatch(fetchContact(contactId))));
   };
 }
 
@@ -70,9 +76,6 @@ export function fetchContacts() {
 
 export function addContacts(contactList) {
   return dispatch => {
-    // return Promise.all([
-    //   ...contactList.map( contact => dispatch(addContact(listId, contact)))
-    //   ])
     dispatch({ type: ADDING_CONTACT });
     return fetch(`${window.TABULAE_API_BASE}/contacts`, {
       method: 'POST',

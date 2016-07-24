@@ -17,8 +17,8 @@ class Table extends Component {
 
   componentDidMount() {
     const { dispatch, listId } = this.props;
-    dispatch(actionCreators.fetchList(listId));
-    // dispatch(actionCreators.fetchLists());
+    dispatch(actionCreators.fetchList(listId))
+    .then( _ => dispatch(actionCreators.fetchContacts(listId)));
 
   }
 
@@ -41,7 +41,7 @@ class Table extends Component {
   }
 
   render() {
-    const { listId, listData, isReceiving } = this.props;
+    const { listId, listData, isReceiving, contacts } = this.props;
     return (
       <div>
       { isReceiving || listData === undefined ? <span>LOADING..</span> :
@@ -52,6 +52,7 @@ class Table extends Component {
           listId={this.props.listId}
           _onSaveClick={this._onSaveClick}
           listData={listData}
+          contacts={contacts}
           />
         </div>
       }
@@ -63,10 +64,18 @@ class Table extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const isReceiving = state.listReducer.isReceiving;
+  const listData = state.listReducer[listId];
+  let contactsLoaded = false;
+  if (listData !== undefined) {
+    if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
+      contactsLoaded = true;
+    }
+  }
   return {
     listId: listId,
     isReceiving: isReceiving,
-    listData: state.listReducer[listId]
+    listData: listData,
+    contacts: contactsLoaded ? listData.contacts.map( contactId => state.contactReducer[contactId]) : []
   };
 };
 

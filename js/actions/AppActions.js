@@ -12,4 +12,5 @@ export const createNewSheet = (name, contactList) => listActions.createNewSheet(
 
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);
+export const fetchContacts = listId => contactActions.fetchContacts(listId);
 
