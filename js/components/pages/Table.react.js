@@ -42,6 +42,7 @@ class Table extends Component {
 
   render() {
     const { listId, listData, isReceiving, contacts } = this.props;
+    console.log(contacts);
     return (
       <div>
       { isReceiving || listData === undefined ? <span>LOADING..</span> :
@@ -68,6 +69,7 @@ const mapStateToProps = (state, props) => {
   let contactsLoaded = false;
   if (listData !== undefined) {
     if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
+      console.log('hey');
       contactsLoaded = true;
     }
   }

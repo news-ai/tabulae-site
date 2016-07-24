@@ -6,7 +6,7 @@ import {
   ADDED_CONTACT
 } from '../constants/AppConstants';
 import 'isomorphic-fetch';
-import * as listActions from './listActions';
+// import * as listActions from './listActions';
 
 
 function requestContact() {
@@ -34,14 +34,7 @@ export function fetchContact(contactId) {
     dispatch(requestContact());
     return fetch(`${window.TABULAE_API_BASE}/contacts/${contactId}`, { credentials: 'include'})
       .then( response => response.status !== 200 ? false : response.text())
-      .then( body => {
-        if (body) {
-          const contact = JSON.parse(body);
-          return dispatch(receiveContact(contact));
-        } else {
-          return dispatch(requestContactFail());
-        }
-    });
+      .then( body => body ? dispatch(receiveContact(JSON.parse(body))) : dispatch(requestContactFail()));
   };
 }
 
