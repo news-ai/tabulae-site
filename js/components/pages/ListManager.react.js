@@ -6,21 +6,13 @@ import { Link } from 'react-router';
 class ListManager extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      newListName: ''
-    }
-    this._onChange = e => this.setState({ newListName: e.target.value });
-    this._onNewListClick = this._onNewListClick.bind(this);
+    this.state = {}
+    this._onClick = _ => { window.location.href = window.location.origin + '/lists/new'; };
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(actionCreators.fetchLists());
-  }
-
-  _onNewListClick() {
-    const { dispatch } = this.props;
-    actionCreators.addListWithoutContacts(this.state.newListName);
   }
 
   render() {
@@ -31,8 +23,7 @@ class ListManager extends Component {
       { lists.map( (list, i) => 
             <Link to={`/lists/${list.id}`} key={i}><p style={{ margin: '5px' }}>{list.name}</p></Link>
             )}
-      <input type='text' placeholder='Untitled' onChange={this._onChange} value={this.state.newListName}></input>
-      <button onClick={this._onNewListClick}>Add New List</button>
+      <button onClick={this._onClick}>Add New List</button>
       </div>
       );
   }

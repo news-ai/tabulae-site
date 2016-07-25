@@ -67,31 +67,10 @@ export function fetchLists() {
   };
 }
 
-export function addListWithoutContacts(name) {
-  const listBody = {
-    name: name.length === 0 ? 'untitled' : name
-  };
-
-  return dispatch => {
-    return fetch(`${window.TABULAE_API_BASE}/lists`, {
-      method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify(listBody)
-    })
-    .then( response => response.text())
-    .then( text => {
-      console.log(text);
-      return dispatch(fetchLists());
-    });
-  };
-}
-
-// NOT WORKING YET
 export function patchList(listId, name, contacts) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
-  console.log(JSON.stringify(listBody));
   return dispatch => {
     dispatch({ type: 'PATCH_LIST'});
     return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
@@ -132,7 +111,6 @@ export function createNewSheet(name, contactList) {
       dispatch(receiveList(listId, json));
       window.location.href = window.location.origin + '/lists/' + listId;
     });
-
   });
 }
 

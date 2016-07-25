@@ -19,7 +19,6 @@ class Table extends Component {
     const { dispatch, listId } = this.props;
     dispatch(actionCreators.fetchList(listId))
     .then( _ => dispatch(actionCreators.fetchContacts(listId)));
-
   }
 
   _onEmailClick(rowData) {
