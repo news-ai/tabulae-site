@@ -40,15 +40,22 @@ class Table extends Component {
         else addContactList.push(field)
       }
     });
-    dispatch(actionCreators.patchContacts(patchContactList));
+
+    // update existing contacts
+    const origIdList = patchContactList.map( contact => contact.id );
+    if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
+
+    // append new rows to LIST
     if (addContactList.length > 0) dispatch(actionCreators.addContacts(addContactList))
     .then( json => {
-      const origIdList = patchContactList.map( contact => contact.id );
       const appendIdList = json.map( contact => contact.id);
       const newIdList = origIdList.concat(appendIdList);
       dispatch(actionCreators.patchList(listId, undefined, newIdList))
       .then( _ => window.location.reload());
     });
+    // clean up LIST by patching only non-empty rows
+    else dispatch(actionCreators.patchList(listId, undefined, origIdList))
+      .then( _ => window.location.reload());
   }
 
   render() {
