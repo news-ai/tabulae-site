@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import _ from 'lodash';
+import validator from 'validator';
 
 import 'handsontable/dist/handsontable.full.css';
 
@@ -28,14 +29,27 @@ class HandsOnTable extends Component {
     // const contactIdTable = _.range(MIN_SPARE_ROWS).map( _ => null);
 
     this._printCurrentData = this._printCurrentData.bind(this);
+
     this.state = {
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         colHeaders: colHeaders,
+        rowHeaders: true,
         minCols: colHeaders.length,
         minRows: 20,
         manualColumnMove: true,
         manualRowMove: true,
+        minSpareRows: 10,
+        fixedColumnsLeft: 2,
+        columns: [
+        {data: 'firstname'},
+        {data: 'lastname'},
+        {data: 'email', validator: validator.isEmail, allowInvalid: false},
+        {data: 'linkedin', validator: validator.isURL, allowInvalid: false},
+        {data: 'twitter'},
+        {data: 'instagram'},
+        {data: 'id'},
+        ]
       }
     };
   }

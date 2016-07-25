@@ -78,7 +78,6 @@ export function addContacts(contactList) {
     })
     .then( response => response.text())
     .then( text => {
-      console.log(text);
       const json = JSON.parse(text);
       json.map( contact => dispatch({ type: ADDED_CONTACT, contactId: contact.id }));
       return json;

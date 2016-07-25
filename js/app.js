@@ -56,7 +56,7 @@ ReactDOM.render(
   <Provider store={store}>
       <Router onUpdate={() => window.scrollTo(0, 0)} history={createHistory()}>
         <Route path='/' component={App}>
-          <IndexRoute component={HomePage} />
+          <IndexRoute component={ListManager} />
           <Route path='/lists' component={ListManager} />
           <Route path='/lists/new' component={NewTable} />
           <Route path='/lists/:listId' component={Table} />
