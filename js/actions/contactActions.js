@@ -67,6 +67,23 @@ export function fetchContacts(listId) {
 //   };
 // }
 
+export function patchContacts(contactList) {
+  return dispatch => {
+    dispatch({ type: 'PATCH_CONTACTS' });
+    return fetch(`${window.TABULAE_API_BASE}/contacts`, {
+      method: 'PATCH',
+      credentials: 'include',
+      mode: 'cors',
+      body: JSON.stringify(contactList)
+    })
+    .then( response => response.text())
+    .then( text => {
+      const json = JSON.parse(text);
+      json.map( contact => dispatch({ type: ADDED_CONTACT, contactId: contact.id }));
+      return json;
+    });
+  };
+}
 
 export function addContacts(contactList) {
   return dispatch => {
@@ -82,11 +99,6 @@ export function addContacts(contactList) {
       json.map( contact => dispatch({ type: ADDED_CONTACT, contactId: contact.id }));
       return json;
     });
-    // .then( _ => dispatch(listActions.patchList(
-    //   listId,
-    //   getState().listReducer[listId].name,
-    //   getState().listReducer[listId].temp
-    //   )));
   };
 }
 

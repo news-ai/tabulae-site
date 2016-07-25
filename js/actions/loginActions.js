@@ -27,7 +27,7 @@ function loginFail() {
 }
 
 export function loginWithGoogle() {
-  const base = 'http://tabulae.newsai.org';
+  const base = 'http://tabulae.newsai.org/api/auth/google';
   window.location.href = base;
 }
 

@@ -41,15 +41,15 @@ class HandsOnTable extends Component {
         manualRowMove: true,
         minSpareRows: 10,
         fixedColumnsLeft: 2,
-        columns: [
-        {data: 'firstname'},
-        {data: 'lastname'},
-        {data: 'email', validator: validator.isEmail, allowInvalid: false},
-        {data: 'linkedin', validator: validator.isURL, allowInvalid: false},
-        {data: 'twitter'},
-        {data: 'instagram'},
-        {data: 'id'},
-        ]
+        // columns: [
+        // {data: 'firstname'},
+        // {data: 'lastname'},
+        // {data: 'email', validator: validator.isEmail, allowInvalid: false},
+        // {data: 'linkedin', validator: validator.isURL, allowInvalid: false},
+        // {data: 'twitter'},
+        // {data: 'instagram'},
+        // {data: 'id'},
+        // ]
       }
     };
   }

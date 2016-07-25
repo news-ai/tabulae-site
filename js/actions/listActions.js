@@ -91,10 +91,9 @@ export function patchList(listId, name, contacts) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
-  console.log(listBody);
   console.log(JSON.stringify(listBody));
-
   return dispatch => {
+    dispatch({ type: 'PATCH_LIST'});
     return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
       headers: {
         'Accept': 'application/json',
@@ -107,9 +106,7 @@ export function patchList(listId, name, contacts) {
     })
     .then( response => response.text())
     .then( text => {
-      console.log(text);
       let json = JSON.parse(text);
-      console.log(json);
       return dispatch(receiveList(listId, json));
     });
   };

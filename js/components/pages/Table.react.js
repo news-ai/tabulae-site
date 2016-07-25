@@ -28,15 +28,27 @@ class Table extends Component {
 
   _onSaveClick(localData, colHeaders) {
     const { dispatch, listId } = this.props;
-    let contactList = [];
+    let addContactList = [];
+    let patchContactList = [];
     localData.map( function(row) {
       let field = {};
       colHeaders.map( (name, i) => {
         if (row[i] !== null) field[name] = row[i];
       });
-      if (!_.isEmpty(field)) contactList.push(field);
+      if (!_.isEmpty(field)) {
+        if (field.id) patchContactList.push(field);
+        else addContactList.push(field)
+      }
     });
-    dispatch(actionCreators.addContacts(listId, contactList));
+    dispatch(actionCreators.patchContacts(patchContactList));
+    if (addContactList.length > 0) dispatch(actionCreators.addContacts(addContactList))
+    .then( json => {
+      const origIdList = patchContactList.map( contact => contact.id );
+      const appendIdList = json.map( contact => contact.id);
+      const newIdList = origIdList.concat(appendIdList);
+      dispatch(actionCreators.patchList(listId, undefined, newIdList))
+      .then( _ => window.location.reload());
+    });
   }
 
   render() {
