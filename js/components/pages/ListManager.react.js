@@ -3,19 +3,23 @@ import Radium from 'radium';
 import * as actionCreators from '../../actions/AppActions';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
+import ListItem from '../pieces/ListItem.react';
 
 class ListManager extends Component {
   constructor(props) {
     super(props);
     this.state = {
       styles: {
-        link: {
-          margin: '10px'
-        },
-        icon: {
-          color: 'lightgray',
-          ':hover': {
-            color: 'gray'
+        listItem: {
+          link: {
+            margin: '10px'
+          },
+          icon: {
+            color: 'lightgray',
+            ':hover': {
+              color: 'gray',
+              cursor: 'pointer'
+            }
           }
         }
       }
@@ -29,8 +33,10 @@ class ListManager extends Component {
     dispatch(actionCreators.fetchLists());
   }
 
-  _onArchive() {
-    console.log('ARCHIVE DIS SHIT');
+  _onArchive(listId) {
+    const { dispatch } = this.props;
+    dispatch(actionCreators.archiveList(listId))
+    .then( _ => dispatch(actionCreators.fetchLists()));
   }
 
   render() {
@@ -40,15 +46,16 @@ class ListManager extends Component {
       <h1>Media Lists</h1>
       {
         lists.map( (list, i) =>
-          <div key={i}>
-            <Link key={i} to={`/lists/${list.id}`} style={[this.state.styles.link]}>
-              <span>{list.name}</span>
-            </Link>
-            <i key={i} className='fa fa-archive' style={[this.state.styles.icon]} onClick={ _ => this._onArchive(list.id) } aria-hidden='true'></i>
-          </div>
+          <ListItem
+          list={list}
+          styles={this.state.styles.listItem}
+          _onArchive={this._onArchive}
+          key={i}
+          / >
           )
       }
       <button onClick={this._onClick}>Add New List</button>
+      <Link to={`/archive`} />
       </div>
       );
   }

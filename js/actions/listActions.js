@@ -114,7 +114,25 @@ export function createNewSheet(name, contactList) {
   });
 }
 
-
+export function archiveList(listId) {
+  return (dispatch, getState) => {
+    dispatch({ type: 'ARCHIVE_LIST' });
+    let listBody = getState().listReducer[listId];
+    listBody.archived = true;
+    return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      method: 'PATCH',
+      credentials: 'include',
+      body: JSON.stringify(listBody)
+    })
+    .then( response => response.text())
+    .then( text => console.log(JSON.parse(text)));
+  };
+}
 
 
 
