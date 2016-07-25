@@ -16,7 +16,7 @@ class HandsOnTable extends Component {
       'linkedin',
       'twitter',
       'instagram',
-      'contactId'
+      'id'
       ];
     // instantiate localData with same data representation as handsontable
     // let localData = _.range(MIN_SPARE_ROWS).map(function() {
@@ -56,7 +56,14 @@ class HandsOnTable extends Component {
   }
 
   componentDidUpdate() {
-    this.table.updateSettings(this.state.options);
+    const data = this.props.contacts.map( contact => this.state.options.colHeaders.map( header => contact[header]));
+    let options = this.state.options;
+    const newRowData = options.data.map( (row, i) => {
+      if (i < data.length) return data[i];
+      else return row;
+    });
+    options.data = newRowData;
+    this.table.updateSettings(options);
   }
 
   _printCurrentData() {

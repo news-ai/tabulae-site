@@ -40,6 +40,7 @@ export function fetchContact(contactId) {
 
 export function fetchContacts(listId) {
   return (dispatch, getState) => {
+    if (getState().listReducer[listId].contacts === null) return;
     return Promise.all(getState().listReducer[listId].contacts.map( contactId => dispatch(fetchContact(contactId))));
   };
 }
