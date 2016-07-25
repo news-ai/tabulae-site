@@ -45,28 +45,6 @@ export function fetchContacts(listId) {
   };
 }
 
-// export function addContact(listId, body) {
-//   return dispatch => {
-//     dispatch({ type: ADDING_CONTACT });
-//     return fetch(`${window.TABULAE_API_BASE}/contacts`, {
-//       method: 'POST',
-//       credentials: 'include',
-//       body: JSON.stringify(body)
-//     })
-//     .then( response => response.text())
-//     .then( text => {
-//       const json = JSON.parse(text);
-//       const contactId = json[0].id;
-//       // TODO: collect contact object and contactId in list
-//       return dispatch({
-//         type: ADDED_CONTACT,
-//         listId,
-//         contactId
-//       });
-//     });
-//   };
-// }
-
 export function patchContacts(contactList) {
   return dispatch => {
     dispatch({ type: 'PATCH_CONTACTS' });
