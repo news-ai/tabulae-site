@@ -31,10 +31,11 @@ class Table extends Component {
     let patchContactList = [];
     localData.map( function(row) {
       let field = {};
-      colHeaders.map( (name, i) => {
-        if (row[i] !== null) field[name] = row[i];
+      colHeaders.map( (name) => {
+        if (row[name] !== null) if (row[name].length !== 0) field[name] = row[name];
       });
-      if (!_.isEmpty(field)) {
+      // filter out for empty rows with only id
+      if (!_.isEmpty(field) && colHeaders.some( name => name !== 'id' && field[name])) {
         if (field.id) patchContactList.push(field);
         else addContactList.push(field)
       }

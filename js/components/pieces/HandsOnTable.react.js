@@ -41,15 +41,15 @@ class HandsOnTable extends Component {
         manualRowMove: true,
         minSpareRows: 10,
         fixedColumnsLeft: 2,
-        // columns: [
-        // {data: 'firstname'},
-        // {data: 'lastname'},
-        // {data: 'email', validator: validator.isEmail, allowInvalid: false},
-        // {data: 'linkedin', validator: validator.isURL, allowInvalid: false},
-        // {data: 'twitter'},
-        // {data: 'instagram'},
-        // {data: 'id'},
-        // ]
+        columns: [
+        {data: 'firstname'},
+        {data: 'lastname'},
+        {data: 'email'},
+        {data: 'linkedin'},
+        {data: 'twitter'},
+        {data: 'instagram'},
+        {data: 'id'},
+        ]
       }
     };
   }
@@ -70,13 +70,9 @@ class HandsOnTable extends Component {
   }
 
   componentDidUpdate() {
-    const data = this.props.contacts.map( contact => this.state.options.colHeaders.map( header => contact[header]));
     let options = this.state.options;
-    const newRowData = options.data.map( (row, i) => {
-      if (i < data.length) return data[i];
-      else return row;
-    });
-    options.data = newRowData;
+    const newRowData = this.props.contacts;
+    options.data = this.props.contacts;
     this.table.updateSettings(options);
   }
 

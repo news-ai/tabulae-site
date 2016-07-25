@@ -19,13 +19,13 @@ class NewTable extends Component {
   componentDidMount() {
   }
 
-  _onSaveClick(localData, colHeaders) {
+  _onSaveClick(localData) {
     const { dispatch, listId } = this.props;
     let contactList = [];
     localData.map( function(row) {
       let field = {};
       colHeaders.map( (name, i) => {
-        if (row[i] !== null) field[name] = row[i];
+        if (row[name] !== null || row[name].length !== 0) field[name] = row[i];
       });
       if (!_.isEmpty(field)) contactList.push(field);
     });
