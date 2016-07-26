@@ -9,20 +9,7 @@ class ListManager extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      styles: {
-        listItem: {
-          link: {
-            margin: '10px'
-          },
-          icon: {
-            color: 'lightgray',
-            ':hover': {
-              color: 'gray',
-              cursor: 'pointer'
-            }
-          }
-        }
-      }
+      styles: {}
     };
     this._onClick = _ => { window.location.href = window.location.origin + '/lists/new'; };
     this._onArchiveToggle = this._onArchiveToggle.bind(this);
@@ -48,7 +35,6 @@ class ListManager extends Component {
         lists.map( (list, i) =>
           <ListItem
           list={list}
-          styles={this.state.styles.listItem}
           _onArchiveToggle={this._onArchiveToggle}
           iconName='fa fa-archive'
           key={i}

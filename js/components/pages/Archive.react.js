@@ -10,20 +10,7 @@ class Archive extends Component {
     super(props);
     this._onArchiveToggle = this._onArchiveToggle.bind(this);
     this.state = {
-      styles: {
-        listItem: {
-          link: {
-            margin: '10px'
-          },
-          icon: {
-            color: 'lightgray',
-            ':hover': {
-              color: 'gray',
-              cursor: 'pointer'
-            }
-          }
-        }
-      }
+      styles: {}
     };
   }
 
@@ -47,7 +34,6 @@ class Archive extends Component {
         isReceiving ? <span>LOADING...</span> : lists.map( (list, i) =>
           <ListItem
           list={list}
-          styles={this.state.styles.listItem}
           _onArchiveToggle={this._onArchiveToggle}
           iconName='fa fa-arrow-left'
           key={i}
