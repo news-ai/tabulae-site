@@ -89,3 +89,6 @@
 	padding: 0.3em;
 }
 
+.invalid-cell {
+	color: orange;
+}

@@ -29,6 +29,7 @@ class HandsOnTable extends Component {
     // const contactIdTable = _.range(MIN_SPARE_ROWS).map( _ => null);
 
     this._printCurrentData = this._printCurrentData.bind(this);
+    this._onEmailInvalid = this._onEmailInvalid.bind(this);
 
     this.state = {
       options: {
@@ -44,7 +45,12 @@ class HandsOnTable extends Component {
         columns: [
         {data: 'firstname'},
         {data: 'lastname'},
-        {data: 'email'},
+        {
+          data: 'email',
+          validator: this._onEmailInvalid,
+          allowInvalid: true,
+          invalidCellClass: 'invalid-cell'
+        },
         {data: 'linkedin'},
         {data: 'twitter'},
         {data: 'instagram'},
@@ -78,6 +84,12 @@ class HandsOnTable extends Component {
 
   _printCurrentData() {
     console.log(this.state.options.data);
+  }
+
+  _onEmailInvalid(value, callback) {
+    if (value.length === 0) callback(true);
+    else if (validator.isEmail(value)) callback(true);
+    else callback(false);
   }
 
   render() {

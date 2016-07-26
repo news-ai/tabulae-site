@@ -4,11 +4,15 @@ import Radium from 'radium';
 
 function ListItem({list, key, _onArchiveToggle, iconName}) {
   const styles = {
+    parent: {
+      margin: '10px',
+    },
     link: {
       margin: '10px'
     },
     icon: {
       color: 'lightgray',
+      float: 'right',
       ':hover': {
         color: 'gray',
         cursor: 'pointer'
@@ -17,7 +21,7 @@ function ListItem({list, key, _onArchiveToggle, iconName}) {
   };
 
   return (
-    <div key={key}>
+    <div key={key} style={[styles.parent]}>
       <Link key={key} to={`/lists/${list.id}`} style={[styles.link]}>
         <span>{list.name}</span>
       </Link>
