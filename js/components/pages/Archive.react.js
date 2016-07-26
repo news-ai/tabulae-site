@@ -5,9 +5,10 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListItem from '../pieces/ListItem.react';
 
-class ListManager extends Component {
+class Archive extends Component {
   constructor(props) {
     super(props);
+    this._onArchiveToggle = this._onArchiveToggle.bind(this);
     this.state = {
       styles: {
         listItem: {
@@ -24,8 +25,6 @@ class ListManager extends Component {
         }
       }
     };
-    this._onClick = _ => { window.location.href = window.location.origin + '/lists/new'; };
-    this._onArchiveToggle = this._onArchiveToggle.bind(this);
   }
 
   componentDidMount() {
@@ -40,31 +39,31 @@ class ListManager extends Component {
   }
 
   render() {
-    const { lists } = this.props;
+    const { lists, isReceiving } = this.props;
     return (
       <div className='container'>
       <h1>Media Lists</h1>
       {
-        lists.map( (list, i) =>
+        isReceiving ? <span>LOADING...</span> : lists.map( (list, i) =>
           <ListItem
           list={list}
           styles={this.state.styles.listItem}
           _onArchiveToggle={this._onArchiveToggle}
-          iconName='fa fa-archive'
+          iconName='fa fa-arrow-left'
           key={i}
           / >
           )
       }
-      <button onClick={this._onClick}>Add New List</button>
-      <Link to={`/archive`} />
       </div>
       );
   }
 }
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = state => {
+  const lists = state.listReducer.archivedList;
   return {
-    lists: state.listReducer.lists
+    lists: lists,
+    isReceiving: lists === undefined ? true : false
   };
 };
 
@@ -74,9 +73,7 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-ListManager = Radium(ListManager);
-
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(ListManager);
+  )(Archive);

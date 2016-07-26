@@ -10,7 +10,7 @@ export const addListWithoutContacts = name => listActions.addListWithoutContacts
 export const fetchList = listId => listActions.fetchList(listId);
 export const createNewSheet = (name, contactList) => listActions.createNewSheet(name, contactList);
 export const patchList = (listId, name, contactList) => listActions.patchList(listId, name, contactList);
-export const archiveList = listId => listActions.archiveList(listId);
+export const archiveListToggle = listId => listActions.archiveListToggle(listId);
 
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);

@@ -31,11 +31,14 @@ function listReducer(state = initialState.listReducer, action) {
     case RECEIVE_LISTS:
       obj.isReceiving = false;
       let unarchivedList = [];
+      let archivedList = [];
       action.lists.map( list => {
         obj[list.id] = list;
         if (!list.archived) unarchivedList.push(list);
+        if (list.archived) archivedList.push(list);
       });
       obj.lists = unarchivedList;
+      obj.archivedList = archivedList;
       return obj;
     case REQUEST_LISTS_FAIL:
       obj.isReceiving = false;

@@ -114,11 +114,11 @@ export function createNewSheet(name, contactList) {
   });
 }
 
-export function archiveList(listId) {
+export function archiveListToggle(listId) {
   return (dispatch, getState) => {
     dispatch({ type: 'ARCHIVE_LIST' });
     let listBody = getState().listReducer[listId];
-    listBody.archived = true;
+    listBody.archived = !listBody.archived;
     return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
       headers: {
         'Accept': 'application/json',
