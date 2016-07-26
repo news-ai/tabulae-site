@@ -10,52 +10,58 @@ import 'handsontable/dist/handsontable.full.css';
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
-    const colHeaders = [
-      'firstname',
-      'lastname',
-      'email',
-      'linkedin',
-      'twitter',
-      'instagram',
-      'id'
-      ];
-    // instantiate localData with same data representation as handsontable
-    // let localData = _.range(MIN_SPARE_ROWS).map(function() {
-    //   return _.range(MIN_SPARE_COLS).map(function() {
-    //     return null;
-    //   });
-    // });
-
-    // const contactIdTable = _.range(MIN_SPARE_ROWS).map( _ => null);
+    const COLUMNS = [
+        {
+          data: 'firstname',
+          title: 'First Name'
+        },
+        {
+          data: 'lastname',
+          title: 'Last Name'
+        },
+        {
+          data: 'email',
+          title: 'Email',
+          validator: (value, callback) => this._onInvalid(value, callback, validator.isEmail),
+          allowInvalid: true,
+          invalidCellClass: 'invalid-cell'
+        },
+        {
+          data: 'linkedin',
+          title: 'LinkedIn',
+          validator: (value, callback) => this._onInvalid(value, callback, validator.isURL),
+          allowInvalid: true,
+          invalidCellClass: 'invalid-cell'
+        },
+        {
+          data: 'twitter',
+          title: 'Twitter'
+        },
+        {
+          data: 'instagram',
+          title: 'Instagram'
+        },
+        {
+          data: 'id'
+        },
+    ]
 
     this._printCurrentData = this._printCurrentData.bind(this);
     this._onInvalid = this._onInvalid.bind(this);
+    this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
+    this._addColumn = this._addColumn.bind(this);
 
     this.state = {
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
-        colHeaders: colHeaders,
         rowHeaders: true,
-        minCols: colHeaders.length,
+        minCols: COLUMNS.length,
         minRows: 20,
         manualColumnMove: true,
         manualRowMove: true,
         minSpareRows: 10,
         fixedColumnsLeft: 2,
-        columns: [
-        {data: 'firstname'},
-        {data: 'lastname'},
-        {
-          data: 'email',
-          validator: (value, callback) => this._onInvalid(value, callback, validator.isEmail),
-          allowInvalid: true,
-          invalidCellClass: 'invalid-cell'
-        },
-        {data: 'linkedin'},
-        {data: 'twitter'},
-        {data: 'instagram'},
-        {data: 'id'},
-        ]
+        columns: COLUMNS
       }
     };
   }
@@ -91,11 +97,27 @@ class HandsOnTable extends Component {
     else callback(false);
   }
 
+  _addColumn() {
+    let options = this.state.options;
+    options.columns.push({
+      data: this.state.newColumnName,
+      title: this.state.newColumnName
+    });
+    this.setState({
+      options: options,
+      newColumnName: ''
+    });
+    this.table.render();
+
+  }
+
   render() {
     const { _onSaveClick } = this.props;
     return (
       <div>
-        <button onClick={ _ => _onSaveClick(this.state.options.data, this.state.options.colHeaders)}>Save</button>
+        <button onClick={ _ => _onSaveClick(this.state.options.data, this.state.options.columns.map( column => column.data ))}>Save</button>
+        <input type='text' placeholder='Column name...' onChange={this._onNewColumnNameChange}></input>
+        <button onClick={this._addColumn}>Add Column</button>
         <div ref='data-grid'>
         </div>
       </div>
