@@ -42,7 +42,8 @@ class HandsOnTable extends Component {
           title: 'Instagram'
         },
         {
-          data: 'id'
+          data: 'id',
+          title: 'ID'
         },
     ]
 
@@ -52,6 +53,7 @@ class HandsOnTable extends Component {
     this._addColumn = this._addColumn.bind(this);
 
     this.state = {
+      newCustomFields: [],
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -76,15 +78,11 @@ class HandsOnTable extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { ...options } = nextProps;
-    this.setState({ options: Object.assign(this.state.options, options) });
-  }
-
   componentDidUpdate() {
-    let options = this.state.options;
-    const newRowData = this.props.contacts;
-    options.data = this.props.contacts;
+    const { contacts, listData } = this.props;
+    // let listCustomfields = listData.customfields;
+    const options = this.state.options;
+    options.data = contacts;
     this.table.updateSettings(options);
   }
 
@@ -98,25 +96,38 @@ class HandsOnTable extends Component {
   }
 
   _addColumn() {
-    let options = this.state.options;
-    options.columns.push({
-      data: this.state.newColumnName,
-      title: this.state.newColumnName
-    });
-    this.setState({
-      options: options,
-      newColumnName: ''
-    });
-    this.table.render();
+    const options = this.state.options;
+    const colName = this.state.newColumnName;
 
+    if (options.columns.some( col => col.data === colName)) {
+      this.setState({ newColumnName: ''});
+    } else {
+      const newCustomFields = this.state.newCustomFields.push(colName);
+      options.columns.push({
+        data: colName,
+        title: colName
+      });
+
+      this.setState({
+        options: options,
+        newColumnName: '',
+        newCustomFields: newCustomFields
+      });
+      this.table.render();
+    }
   }
 
   render() {
     const { _onSaveClick } = this.props;
+    console.log(this.props.listData);
     return (
       <div>
-        <button onClick={ _ => _onSaveClick(this.state.options.data, this.state.options.columns.map( column => column.data ))}>Save</button>
-        <input type='text' placeholder='Column name...' onChange={this._onNewColumnNameChange}></input>
+        <button onClick={ _ => _onSaveClick(
+          this.state.options.data,
+          this.state.options.columns.map( column => column.data ),
+          this.table
+          )}>Save</button>
+        <input type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
         <button onClick={this._addColumn}>Add Column</button>
         <div ref='data-grid'>
         </div>

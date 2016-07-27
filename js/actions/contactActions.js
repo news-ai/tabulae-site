@@ -57,7 +57,11 @@ export function patchContacts(contactList) {
     .then( response => response.text())
     .then( text => {
       const json = JSON.parse(text);
-      json.map( contact => dispatch({ type: ADDED_CONTACT, contactId: contact.id }));
+      json.map( contact => dispatch({
+        type: ADDED_CONTACT,
+        contactId: contact.id,
+        contact
+      }));
       return json;
     });
   };
@@ -74,7 +78,11 @@ export function addContacts(contactList) {
     .then( response => response.text())
     .then( text => {
       const json = JSON.parse(text);
-      json.map( contact => dispatch({ type: ADDED_CONTACT, contactId: contact.id }));
+      json.map( contact => dispatch({
+        type: ADDED_CONTACT,
+        contactId: contact.id,
+        contact
+      }));
       return json;
     });
   };

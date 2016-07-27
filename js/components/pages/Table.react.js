@@ -25,7 +25,7 @@ class Table extends Component {
 
   }
 
-  _onSaveClick(localData, colHeaders) {
+  _onSaveClick(localData, colHeaders, table) {
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
@@ -43,23 +43,25 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = patchContactList.map( contact => contact.id );
-    if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
+    if (patchContactList.length > 0) {
+      dispatch(actionCreators.patchContacts(patchContactList));
+    }
 
     // append new rows to LIST
     if (addContactList.length > 0) dispatch(actionCreators.addContacts(addContactList))
     .then( json => {
       const appendIdList = json.map( contact => contact.id);
       const newIdList = origIdList.concat(appendIdList);
-      dispatch(actionCreators.patchList(listId, undefined, newIdList))
-      .then( _ => window.location.reload());
+      dispatch(actionCreators.patchList(listId, undefined, newIdList));
     });
+
     // clean up LIST by patching only non-empty rows
-    else dispatch(actionCreators.patchList(listId, undefined, origIdList))
-      .then( _ => window.location.reload());
+    else dispatch(actionCreators.patchList(listId, undefined, origIdList));
   }
 
   render() {
     const { listId, listData, isReceiving, contacts } = this.props;
+    console.log(contacts);
     return (
       <div>
       { isReceiving || listData === undefined ? <span>LOADING..</span> :
@@ -71,6 +73,7 @@ class Table extends Component {
           _onSaveClick={this._onSaveClick}
           listData={listData}
           contacts={contacts}
+          isNew={false}
           />
         </div>
       }
@@ -83,17 +86,22 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const isReceiving = state.listReducer.isReceiving;
   const listData = state.listReducer[listId];
+  let contacts = [];
   let contactsLoaded = false;
   if (listData !== undefined) {
-    if (listData.contacts !== null) if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
-      contactsLoaded = true;
+    if (listData.contacts !== null) {
+      if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
+        contactsLoaded = true;
+        contacts = listData.contacts.map( contactId => state.contactReducer[contactId] );
+      }
     }
   }
+  console.log(contacts);
   return {
     listId: listId,
     isReceiving: isReceiving,
     listData: listData,
-    contacts: contactsLoaded ? listData.contacts.map( contactId => state.contactReducer[contactId]) : []
+    contacts: contactsLoaded ? contacts : []
   };
 };
 

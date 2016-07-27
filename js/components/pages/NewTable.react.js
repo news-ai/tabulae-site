@@ -19,7 +19,7 @@ class NewTable extends Component {
   componentDidMount() {
   }
 
-  _onSaveClick(localData) {
+  _onSaveClick(localData, table) {
     const { dispatch, listId } = this.props;
     let contactList = [];
     localData.map( function(row) {
@@ -38,6 +38,7 @@ class NewTable extends Component {
         <span>List Name: </span><input type='text' onChange={this._onNameChange} value={this.state.name}></input>
         <HandsOnTable
         _onSaveClick={this._onSaveClick}
+        isNew={true}
         />
       </div>
       );
