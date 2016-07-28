@@ -68,7 +68,6 @@ export function fetchLists() {
 }
 
 export function patchList(listId, name, contacts, customfields) {
-  console.log(customfields);
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;

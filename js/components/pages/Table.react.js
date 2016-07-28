@@ -25,15 +25,25 @@ class Table extends Component {
 
   }
 
-  _onSaveClick(localData, colHeaders, table) {
+  _onSaveClick(localData, colHeaders, table, customfields) {
+    console.log(customfields);
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
     localData.map( function(row) {
       let field = {};
       colHeaders.map( (name) => {
-        if (row[name] !== null) if (row[name].length !== 0) field[name] = row[name];
+        if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
       });
+
+      if (customfields.length > 0) {
+        let customRow = [];
+        customfields.map( customfield => {
+          if (row[customfield] !== null && row[customfield]) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
+        });
+        field.customfields = customRow;
+      }
+
       // filter out for empty rows with only id
       if (!_.isEmpty(field) && colHeaders.some( name => name !== 'id' && field[name])) {
         if (field.id) patchContactList.push(field);
@@ -43,6 +53,7 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = patchContactList.map( contact => contact.id );
+    console.log(patchContactList);
     if (patchContactList.length > 0) {
       dispatch(actionCreators.patchContacts(patchContactList));
     }
@@ -52,11 +63,11 @@ class Table extends Component {
     .then( json => {
       const appendIdList = json.map( contact => contact.id);
       const newIdList = origIdList.concat(appendIdList);
-      dispatch(actionCreators.patchList(listId, undefined, newIdList));
+      dispatch(actionCreators.patchList(listId, undefined, newIdList, customfields));
     });
 
     // clean up LIST by patching only non-empty rows
-    else dispatch(actionCreators.patchList(listId, undefined, origIdList));
+    else dispatch(actionCreators.patchList(listId, undefined, origIdList, customfields));
   }
 
   render() {
@@ -96,7 +107,6 @@ const mapStateToProps = (state, props) => {
       }
     }
   }
-  console.log(contacts);
   return {
     listId: listId,
     isReceiving: isReceiving,

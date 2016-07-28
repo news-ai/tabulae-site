@@ -29,6 +29,11 @@ function contactReducer(state = initialState.contactReducer, action) {
     case ADDED_CONTACT:
       obj.isReceiving = false;
       obj[action.contactId] = action.contact;
+      if (action.contact.customfields && action.contact.customfields !== null) {
+        action.contact.customfields.map( field => {
+          obj[action.contactId][field.name] = field.value;
+        });
+      }
       return obj;
     case REQUEST_CONTACT:
       obj.isReceiving = true;

@@ -78,18 +78,21 @@ class HandsOnTable extends Component {
     });
   }
 
-  componentDidUpdate() {
-    const { contacts, listData } = this.props;
+  componentWillReceiveProps(nextProps) {
+    const { contacts, listData } = nextProps;
     // let listCustomfields = listData.customfields;
+    console.log(contacts);
     const options = this.state.options;
-    options.data = contacts;
-    console.log(listData.customfields);
     if (listData.customfields) {
       listData.customfields.map( colName => {
-        if (!options.columns.some( existingColName => existingColName.data === colName)) options.columns.push({ data: colName, title: colName });
+        if (!options.columns.some( existingColName => existingColName.data === colName)) {
+          options.columns.push({ data: colName, title: colName });
+        }
+        contacts.map( (contact, i) => contacts[i][colName] = (contact.customfields !== null && contact.customfields.length > 0) ? contact.customfields.find( field => field.name === colName ).value : null);
       });
-      options.customfields = listData.customfields;
     }
+    options.data = contacts;
+    this.setState({ options: options, customfields: listData.customfields });
     this.table.updateSettings(options);
   }
 
@@ -115,32 +118,23 @@ class HandsOnTable extends Component {
       console.log('DUPLICATE COLUMN NAME');
     } else {
 
-      let newCustomFields = this.state.customfields;
+      const newCustomFields = this.state.customfields;
       newCustomFields.push(colName);
-      console.log(newCustomFields);
       dispatch(actionCreators.patchList(listData.id, undefined, undefined, newCustomFields));
-      // options.columns.push({
-      //   data: colName,
-      //   title: colName
-      // });
-
-      // this.setState({
-      //   options: options,
-      //   newColumnName: '',
-      //   customfields: newCustomFields
-      // });
     }
     this.setState({ newColumnName: ''});
   }
 
   render() {
+    console.log(this.state.customfields);
     const { _onSaveClick } = this.props;
     return (
       <div>
         <button onClick={ _ => _onSaveClick(
           this.state.options.data,
           this.state.options.columns.map( column => column.data ),
-          this.table
+          this.table,
+          this.state.customfields
           )}>Save</button>
         <input type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
         <button onClick={this._addColumn}>Add Column</button>

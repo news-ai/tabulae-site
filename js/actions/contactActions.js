@@ -46,6 +46,7 @@ export function fetchContacts(listId) {
 }
 
 export function patchContacts(contactList) {
+  console.log(contactList);
   return dispatch => {
     dispatch({ type: 'PATCH_CONTACTS' });
     return fetch(`${window.TABULAE_API_BASE}/contacts`, {
@@ -57,11 +58,12 @@ export function patchContacts(contactList) {
     .then( response => response.text())
     .then( text => {
       const json = JSON.parse(text);
-      json.map( contact => dispatch({
-        type: ADDED_CONTACT,
-        contactId: contact.id,
-        contact
-      }));
+      // json.map( contact => dispatch({
+      //   type: ADDED_CONTACT,
+      //   contactId: contact.id,
+      //   contact
+      // }));
+      console.log(json);
       return json;
     });
   };
