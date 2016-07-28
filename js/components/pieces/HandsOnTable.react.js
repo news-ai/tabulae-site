@@ -88,7 +88,14 @@ class HandsOnTable extends Component {
         if (!options.columns.some( existingColName => existingColName.data === colName)) {
           options.columns.push({ data: colName, title: colName });
         }
-        contacts.map( (contact, i) => contacts[i][colName] = (contact.customfields !== null && contact.customfields.length > 0) ? contact.customfields.find( field => field.name === colName ).value : null);
+        // place customfields in options.data obj for table to pick it up
+        contacts.map( (contact, i) => {
+          if (contact.customfields !== null && contact.customfields.length > 0) {
+            if (contact.customfields.some( field => field.name === colName)) {
+              contacts[i][colName] = contact.customfields.find( field => field.name === colName ).value;
+            }
+          }
+        });
       });
     }
     options.data = contacts;
