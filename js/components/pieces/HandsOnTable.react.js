@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
-import _ from 'lodash';
+import * as actionCreators from '../../actions/AppActions';
 import validator from 'validator';
 
 import 'handsontable/dist/handsontable.full.css';
@@ -11,41 +11,41 @@ class HandsOnTable extends Component {
   constructor(props) {
     super(props);
     const COLUMNS = [
-        {
-          data: 'firstname',
-          title: 'First Name'
-        },
-        {
-          data: 'lastname',
-          title: 'Last Name'
-        },
-        {
-          data: 'email',
-          title: 'Email',
-          validator: (value, callback) => this._onInvalid(value, callback, validator.isEmail),
-          allowInvalid: true,
-          invalidCellClass: 'invalid-cell'
-        },
-        {
-          data: 'linkedin',
-          title: 'LinkedIn',
-          validator: (value, callback) => this._onInvalid(value, callback, validator.isURL),
-          allowInvalid: true,
-          invalidCellClass: 'invalid-cell'
-        },
-        {
-          data: 'twitter',
-          title: 'Twitter'
-        },
-        {
-          data: 'instagram',
-          title: 'Instagram'
-        },
-        {
-          data: 'id',
-          title: 'ID'
-        },
-    ]
+      {
+        data: 'firstname',
+        title: 'First Name'
+      },
+      {
+        data: 'lastname',
+        title: 'Last Name'
+      },
+      {
+        data: 'email',
+        title: 'Email',
+        validator: (value, callback) => this._onInvalid(value, callback, validator.isEmail),
+        allowInvalid: true,
+        invalidCellClass: 'invalid-cell'
+      },
+      {
+        data: 'linkedin',
+        title: 'LinkedIn',
+        validator: (value, callback) => this._onInvalid(value, callback, validator.isURL),
+        allowInvalid: true,
+        invalidCellClass: 'invalid-cell'
+      },
+      {
+        data: 'twitter',
+        title: 'Twitter'
+      },
+      {
+        data: 'instagram',
+        title: 'Instagram'
+      },
+      {
+        data: 'id',
+        title: 'ID'
+      },
+    ];
 
     this._printCurrentData = this._printCurrentData.bind(this);
     this._onInvalid = this._onInvalid.bind(this);
@@ -53,7 +53,7 @@ class HandsOnTable extends Component {
     this._addColumn = this._addColumn.bind(this);
 
     this.state = {
-      newCustomFields: [],
+      customfields: [],
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -83,6 +83,13 @@ class HandsOnTable extends Component {
     // let listCustomfields = listData.customfields;
     const options = this.state.options;
     options.data = contacts;
+    console.log(listData.customfields);
+    if (listData.customfields) {
+      listData.customfields.map( colName => {
+        if (!options.columns.some( existingColName => existingColName.data === colName)) options.columns.push({ data: colName, title: colName });
+      });
+      options.customfields = listData.customfields;
+    }
     this.table.updateSettings(options);
   }
 
@@ -90,36 +97,44 @@ class HandsOnTable extends Component {
     console.log(this.state.options.data);
   }
 
-  _onInvalid(value, callback, validator) {
-    if (value.length === 0 || validator(value)) callback(true);
+  _onInvalid(value, callback, validate) {
+    if (value.length === 0 || validate(value)) callback(true);
     else callback(false);
   }
 
   _addColumn() {
+    const { isNew, dispatch, listData } = this.props;
+    if (isNew) {
+      console.log('PLEASE SAVE LIST FIRST');
+      return;
+    }
     const options = this.state.options;
     const colName = this.state.newColumnName;
 
     if (options.columns.some( col => col.data === colName)) {
-      this.setState({ newColumnName: ''});
+      console.log('DUPLICATE COLUMN NAME');
     } else {
-      const newCustomFields = this.state.newCustomFields.push(colName);
-      options.columns.push({
-        data: colName,
-        title: colName
-      });
 
-      this.setState({
-        options: options,
-        newColumnName: '',
-        newCustomFields: newCustomFields
-      });
-      this.table.render();
+      let newCustomFields = this.state.customfields;
+      newCustomFields.push(colName);
+      console.log(newCustomFields);
+      dispatch(actionCreators.patchList(listData.id, undefined, undefined, newCustomFields));
+      // options.columns.push({
+      //   data: colName,
+      //   title: colName
+      // });
+
+      // this.setState({
+      //   options: options,
+      //   newColumnName: '',
+      //   customfields: newCustomFields
+      // });
     }
+    this.setState({ newColumnName: ''});
   }
 
   render() {
     const { _onSaveClick } = this.props;
-    console.log(this.props.listData);
     return (
       <div>
         <button onClick={ _ => _onSaveClick(
