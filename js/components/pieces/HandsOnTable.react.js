@@ -12,6 +12,11 @@ class HandsOnTable extends Component {
     super(props);
     const COLUMNS = [
       {
+        data: 'selected',
+        title: 'Selected',
+        type: 'checkbox'
+      },
+      {
         data: 'firstname',
         title: 'First Name'
       },
@@ -51,6 +56,7 @@ class HandsOnTable extends Component {
     this._onInvalid = this._onInvalid.bind(this);
     this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
     this._addColumn = this._addColumn.bind(this);
+    this._cleanUpURL = this._cleanUpURL.bind(this);
 
     this.state = {
       customfields: [],
@@ -63,17 +69,28 @@ class HandsOnTable extends Component {
         manualRowMove: true,
         minSpareRows: 10,
         fixedColumnsLeft: 2,
-        columns: COLUMNS
+        columns: COLUMNS,
+        contextMenu: [
+          'row_above',
+          'row_below',
+          'hsep1',
+          'hsep2',
+          'remove_row',
+          'undo',
+          'redo',
+        ]
       }
     };
   }
 
-
   componentDidMount() {
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
     this.table.updateSettings({
-      afterChange: (changes, source) => {
-        if (source === 'edit') this._printCurrentData();
+      beforeChange: (changes, source) => {
+        // if (source === 'edit') this._printCurrentData();
+        for (let i = changes.length - 1; i >= 0; i--) {
+          if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
+        }
       }
     });
   }
@@ -81,7 +98,6 @@ class HandsOnTable extends Component {
   componentWillReceiveProps(nextProps) {
     const { contacts, listData } = nextProps;
     // let listCustomfields = listData.customfields;
-    console.log(contacts);
     const options = this.state.options;
     if (listData.customfields) {
       listData.customfields.map( colName => {
@@ -132,8 +148,13 @@ class HandsOnTable extends Component {
     this.setState({ newColumnName: ''});
   }
 
+  _cleanUpURL(url) {
+    const parser = document.createElement('a');
+    parser.href = url;
+    return parser.origin + parser.pathname;
+  }
+
   render() {
-    console.log(this.state.customfields);
     const { _onSaveClick } = this.props;
     return (
       <div>
