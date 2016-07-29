@@ -56,6 +56,7 @@ class HandsOnTable extends Component {
     this._onInvalid = this._onInvalid.bind(this);
     this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
     this._addColumn = this._addColumn.bind(this);
+    this._removeColumn = this._removeColumn.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
 
     this.state = {
@@ -70,15 +71,28 @@ class HandsOnTable extends Component {
         minSpareRows: 10,
         fixedColumnsLeft: 2,
         columns: COLUMNS,
-        contextMenu: [
-          'row_above',
-          'row_below',
-          'hsep1',
-          'hsep2',
-          'remove_row',
-          'undo',
-          'redo',
-        ]
+        contextMenu: {
+          callback: (key, options) => {
+            if (key === 'remove_column') {
+              console.log(key);
+              console.log(options);
+              for (let i = options.start.col; i <= options.end.col ; i++) {
+                this._removeColumn(this.state.options.columns, this.state.customfields, i);
+              }
+            }
+          },
+          items: {
+            row_above: {},
+            row_below: {},
+            remove_row: {},
+            undo: {},
+            redo: {},
+            remove_column: {
+              name: 'Remove column',
+            }
+
+          }
+        }
       }
     };
   }
@@ -126,6 +140,24 @@ class HandsOnTable extends Component {
   _onInvalid(value, callback, validate) {
     if (value.length === 0 || validate(value)) callback(true);
     else callback(false);
+  }
+
+  _removeColumn(columns, customfields, colNum) {
+    const columnName = columns[colNum].data;
+    // make sure column being deleted is custom
+    if (customfields.some( field => field === columnName )) {
+      const newColumns = columns.filter( (col, i) => i !== colNum );
+      const newCustomFields = customfields.filter( field => field !== columnName );
+      const options = this.state.options;
+      options.columns = newColumns;
+      this.setState({
+        options: options,
+        customfields: newCustomFields
+      });
+      this.table.updateSettings(options);
+    } else {
+      console.log(columnName + 'CANNOT BE DELETED');
+    }
   }
 
   _addColumn() {
