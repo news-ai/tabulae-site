@@ -3,30 +3,66 @@ import { connect } from 'react-redux';
 import * as actionCreators from '../../actions/AppActions';
 import EmailPanel from '../pieces/EmailPanel.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
+import Radium from 'radium';
 import _ from 'lodash';
 import 'isomorphic-fetch';
+import { globalStyles } from '../../constants/StyleConstants';
+
+const styles = {
+  nameBlock: {
+    parent: {
+      margin: '15px',
+    },
+    title: {
+      marginLeft: '5px',
+      marginRight: '5px'
+    }
+  }
+};
 
 class Table extends Component {
   constructor(props) {
     super(props);
+    const { listData } = this.props;
+    this.state = {
+      name: null,
+      onTitleEdit: false
+    }
     this._onEmailClick = this._onEmailClick.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
-    this.state = {
-    }
+    this._getCustomRow = this._getCustomRow.bind(this);
+    this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
+    this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
   }
 
   componentDidMount() {
-    const { dispatch, listId } = this.props;
+    const { dispatch, listId, listData } = this.props;
     dispatch(actionCreators.fetchList(listId))
     .then( _ => dispatch(actionCreators.fetchContacts(listId)));
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { name } = this.props;
+    this.setState({ name: name });
   }
 
   _onEmailClick(rowData) {
 
   }
 
+  _whichContactList() {
+    // break down data to addContactList and patchContactList to POST/PATCH diff endpoints
+  }
+
+  _getCustomRow(row, customfields) {
+    let customRow = [];
+    customfields.map( customfield => {
+      if (row[customfield] !== null && row[customfield]) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
+    });
+    return customRow;
+  }
+
   _onSaveClick(localData, colHeaders, table, customfields) {
-    console.log(customfields);
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
@@ -53,7 +89,6 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = patchContactList.map( contact => contact.id );
-    console.log(patchContactList);
     if (patchContactList.length > 0) {
       dispatch(actionCreators.patchContacts(patchContactList));
     }
@@ -67,17 +102,33 @@ class Table extends Component {
     });
 
     // clean up LIST by patching only non-empty rows
-    else dispatch(actionCreators.patchList(listId, undefined, origIdList, customfields));
+    else dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
   }
 
   render() {
     const { listId, listData, isReceiving, contacts } = this.props;
-    console.log(contacts);
     return (
       <div>
       { isReceiving || listData === undefined ? <span>LOADING..</span> :
         <div>
-          <p>{listData.name}</p>
+          <div style={[styles.nameBlock.parent]}>
+            <div className='three columns'>
+            { this.state.onTitleEdit ? 
+              <input
+              className='u-full-width'
+              type='text'
+              onBlur={this._toggleTitleEdit}
+              value={this.state.name}
+              onChange={this._updateName}
+              autoFocus
+              /> :
+              <span
+              style={[styles.nameBlock.title]}
+              onClick={this._toggleTitleEdit}
+              >{this.state.name}</span>
+            }
+            </div>
+          </div>
           <EmailPanel />
           <HandsOnTable
           listId={this.props.listId}
@@ -111,7 +162,8 @@ const mapStateToProps = (state, props) => {
     listId: listId,
     isReceiving: isReceiving,
     listData: listData,
-    contacts: contactsLoaded ? contacts : []
+    contacts: contactsLoaded ? contacts : [],
+    name: listData ? listData.name : null
   };
 };
 
@@ -124,4 +176,5 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Table);
+)(Radium(Table));
+
