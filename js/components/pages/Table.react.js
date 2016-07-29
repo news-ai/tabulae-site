@@ -42,7 +42,7 @@ class Table extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { name } = this.props;
+    const { name } = nextProps;
     this.setState({ name: name });
   }
 
@@ -98,7 +98,7 @@ class Table extends Component {
     .then( json => {
       const appendIdList = json.map( contact => contact.id);
       const newIdList = origIdList.concat(appendIdList);
-      dispatch(actionCreators.patchList(listId, undefined, newIdList, customfields));
+      dispatch(actionCreators.patchList(listId, this.state.name, newIdList, customfields));
     });
 
     // clean up LIST by patching only non-empty rows
