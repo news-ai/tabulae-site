@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-
 class StyleButton extends Component {
   constructor() {
     super();
