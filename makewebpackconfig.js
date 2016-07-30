@@ -102,8 +102,8 @@ return {
   resolve: {
     extensions: ['', '.json', '.jsx', '.js'],
     alias: {
-      'ag-grid-root': __dirname + '/node_modules/ag-grid',
-      'handsontable': __dirname + '/node_modules/handsontable'
+      'handsontable': __dirname + '/node_modules/handsontable',
+      'draft-js': __dirname + '/node_modules/draft-js'
     }
   },
   plugins: plugins,

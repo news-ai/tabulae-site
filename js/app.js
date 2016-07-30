@@ -39,6 +39,7 @@ import ListManager from './components/pages/ListManager.react';
 import Table from './components/pages/Table.react';
 import NewTable from './components/pages/NewTable.react';
 import Archive from './components/pages/Archive.react';
+import EmailPanel from './components/pieces/EmailPanel.react';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';
@@ -62,6 +63,7 @@ ReactDOM.render(
           <Route path='/lists/new' component={NewTable} />
           <Route path='/lists/:listId' component={Table} />
           <Route path='/archive' component={Archive} />
+          <Route path='/email' component={EmailPanel} />
         </Route>
         <Route path='*' component={NotFoundPage} />
       </Router>

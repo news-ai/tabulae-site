@@ -63,7 +63,6 @@ export function patchContacts(contactList) {
       //   contactId: contact.id,
       //   contact
       // }));
-      console.log(json);
       return json;
     });
   };

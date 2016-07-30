@@ -8,6 +8,7 @@ import _ from 'lodash';
 import 'isomorphic-fetch';
 import { globalStyles } from '../../constants/StyleConstants';
 
+
 const styles = {
   nameBlock: {
     parent: {
