@@ -151,8 +151,8 @@ const mapStateToProps = (state, props) => {
   const listData = state.listReducer[listId];
   let contacts = [];
   let contactsLoaded = false;
-  if (listData !== undefined) {
-    if (listData.contacts !== null) {
+  if (listData) {
+    if (listData.contacts !== null && listData.contacts) {
       if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
         contactsLoaded = true;
         contacts = listData.contacts.map( contactId => state.contactReducer[contactId] );
