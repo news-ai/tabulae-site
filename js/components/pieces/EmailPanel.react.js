@@ -9,8 +9,6 @@ import {
   DefaultDraftBlockRenderMap,
 } from 'draft-js';
 
-import { Map } from 'immutable';
-
 // Custom overrides for 'code' style.
 const styleMap = {
   CODE: {
@@ -57,7 +55,7 @@ class EmailPanel extends Component {
   _toggleBlockType(blockType) {
     this.onChange(
       RichUtils.toggleBlockType(
-        // this.state.editorState,
+        this.state.editorState,
         blockType
       )
     );
