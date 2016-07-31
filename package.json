@@ -5,6 +5,8 @@
   "dependencies": {
     "axios": "^0.9.1",
     "draft-js": "^0.7.0",
+    "draft-js-mention-plugin": "^1.1.2",
+    "draft-js-plugins-editor": "^1.1.0",
     "fontfaceobserver": "^1.5.1",
     "fuzzy": "^0.1.1",
     "handsontable": "^0.26.0",

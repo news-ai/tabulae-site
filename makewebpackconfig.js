@@ -103,7 +103,8 @@ return {
     extensions: ['', '.json', '.jsx', '.js'],
     alias: {
       'handsontable': __dirname + '/node_modules/handsontable',
-      'draft-js': __dirname + '/node_modules/draft-js'
+      'draft-js': __dirname + '/node_modules/draft-js',
+      'draft-js-mention-plugin': __dirname + '/node_modules/draft-js-mention-plugin'
     }
   },
   plugins: plugins,

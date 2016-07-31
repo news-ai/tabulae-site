@@ -1,13 +1,41 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { fromJS } from 'immutable';
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
+// import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin';
 import {
-  Editor,
+  convertFromRaw,
+  convertToRaw,
+  Entity,
   EditorState,
   RichUtils,
   DefaultDraftBlockRenderMap,
+  Editor,
+  CompositeDecorator
 } from 'draft-js';
+// import Editor from 'draft-js-plugins-editor';
+
+// import 'draft-js-mention-plugin/lib/plugin.css';
+const CURLY_REGEX = /{([^}]+)}/g;
+
+const CurlySpan = (props) => {
+  return <span {...props} style={{ color: 'red' }}>{props.children}</span>;
+};
+
+function findWithRegex(regex, contentBlock, callback) {
+  const text = contentBlock.getText();
+  let matchArr, start;
+  while ((matchArr = regex.exec(text)) !== null) {
+    console.log(matchArr);
+    start = matchArr.index;
+    callback(start, start + matchArr[0].length);
+  }
+}
+
+function curlyStrategy(contentBlock, callback) {
+  findWithRegex(CURLY_REGEX, contentBlock, callback);
+}
 
 // Custom overrides for 'code' style.
 const styleMap = {
@@ -30,17 +58,28 @@ class EmailPanel extends Component {
   constructor(props) {
     super(props);
 
+    const compositeDecorator = new CompositeDecorator([{
+      strategy: curlyStrategy,
+      component: CurlySpan
+    }]);
+
     this.state = {
-      editorState: EditorState.createEmpty(),
+      editorState: EditorState.createEmpty(compositeDecorator),
     };
 
     this.focus = () => this.refs.editor.focus();
-    this.onChange = (editorState) => this.setState({editorState});
+    this.onChange = (editorState) => {
+      const content = editorState.getCurrentContent();
+      console.log(editorState.toJS());
+      console.log(convertToRaw(content));
+      this.setState({editorState});
+    };
 
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
   }
+
 
   _handleKeyCommand(command) {
     const {editorState} = this.state;
@@ -71,12 +110,12 @@ class EmailPanel extends Component {
   }
 
   render() {
-    const {editorState} = this.state;
+    const { editorState } = this.state;
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
     let className = 'RichEditor-editor';
-    var contentState = editorState.getCurrentContent();
+    const contentState = editorState.getCurrentContent();
     if (!contentState.hasText()) {
       if (contentState.getBlockMap().first().getType() !== 'unstyled') {
         className += ' RichEditor-hidePlaceholder';
