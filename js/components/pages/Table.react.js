@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from '../../actions/AppActions';
-import EmailPanel from '../pieces/EmailPanel.react';
+import EmailPanelWrapper from '../pieces/EmailPanelWrapper.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import Radium from 'radium';
 import _ from 'lodash';
@@ -18,6 +18,14 @@ const styles = {
       marginLeft: '5px',
       marginRight: '5px'
     }
+  },
+  emailPanel: {
+    position: 'fixed',
+    bottom: 0,
+    right: 0,
+    zIndex: 100,
+    height: '500px',
+    width: '600px'
   }
 };
 
@@ -27,13 +35,17 @@ class Table extends Component {
     const { listData } = this.props;
     this.state = {
       name: null,
-      onTitleEdit: false
+      onTitleEdit: false,
+      emailPanelOpen: false,
+      selectedContacts: []
     }
     this._onEmailClick = this._onEmailClick.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
     this._getCustomRow = this._getCustomRow.bind(this);
     this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
+    this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
+    this._getSelectedRows = this._getSelectedRows.bind(this);
   }
 
   componentDidMount() {
@@ -51,16 +63,18 @@ class Table extends Component {
 
   }
 
-  _whichContactList() {
-    // break down data to addContactList and patchContactList to POST/PATCH diff endpoints
-  }
-
   _getCustomRow(row, customfields) {
     let customRow = [];
     customfields.map( customfield => {
       if (row[customfield] !== null && row[customfield]) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
     });
     return customRow;
+  }
+
+  _getSelectedRows(contacts) {
+    console.log(contacts);
+    // const contactsWithEmails = contacts.filter( contact => contact.email.length > 4 );
+    this.setState({ selectedContacts: contacts });
   }
 
   _onSaveClick(localData, colHeaders, table, customfields) {
@@ -107,9 +121,10 @@ class Table extends Component {
   }
 
   render() {
-    const { listId, listData, isReceiving, contacts } = this.props;
+    const { listId, listData, isReceiving, contactIsReceiving, contacts } = this.props;
     return (
       <div>
+      { contactIsReceiving ? <img src='/img/default_loading.gif' /> : null }
       { isReceiving || listData === undefined ? <span>LOADING..</span> :
         <div>
           <div style={[styles.nameBlock.parent]}>
@@ -130,13 +145,22 @@ class Table extends Component {
             }
             </div>
           </div>
-          <EmailPanel />
+          <button onClick={this._toggleEmailPanel}>Email</button>
+          { this.state.emailPanelOpen ? 
+            <div>
+            <EmailPanelWrapper
+            selectedContacts={this.state.selectedContacts}
+            customfields={listData.customfields}
+            />
+            </div>
+            : null }
           <HandsOnTable
           listId={this.props.listId}
           _onSaveClick={this._onSaveClick}
           listData={listData}
           contacts={contacts}
           isNew={false}
+          _getSelectedRows={this._getSelectedRows}
           />
         </div>
       }
@@ -148,6 +172,7 @@ class Table extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const isReceiving = state.listReducer.isReceiving;
+  const contactIsReceiving = state.contactReducer.isReceiving;
   const listData = state.listReducer[listId];
   let contacts = [];
   let contactsLoaded = false;
@@ -164,7 +189,8 @@ const mapStateToProps = (state, props) => {
     isReceiving: isReceiving,
     listData: listData,
     contacts: contactsLoaded ? contacts : [],
-    name: listData ? listData.name : null
+    name: listData ? listData.name : null,
+    contactIsReceiving: contactIsReceiving
   };
 };
 

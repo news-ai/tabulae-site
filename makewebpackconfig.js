@@ -104,7 +104,8 @@ return {
     alias: {
       'handsontable': __dirname + '/node_modules/handsontable',
       'draft-js': __dirname + '/node_modules/draft-js',
-      'draft-js-mention-plugin': __dirname + '/node_modules/draft-js-mention-plugin'
+      'draft-js-mention-plugin': __dirname + '/node_modules/draft-js-mention-plugin',
+      'img': __dirname + '/img'
     }
   },
   plugins: plugins,

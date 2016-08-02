@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
+import Subject from './Subject.react';
 // import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin';
 import {
   convertFromRaw,
   convertToRaw,
-  Entity,
   EditorState,
   RichUtils,
-  DefaultDraftBlockRenderMap,
   Editor,
   CompositeDecorator
 } from 'draft-js';
@@ -69,12 +67,12 @@ class EmailPanel extends Component {
 
     this.focus = () => this.refs.editor.focus();
     this.onChange = (editorState) => {
-      const content = editorState.getCurrentContent();
-      console.log(editorState.toJS());
-      console.log(convertToRaw(content));
+      const { _setBody } = this.props;
+      // save text body to send
+      // const content = editorState.getCurrentContent();
+      _setBody(editorState);
       this.setState({editorState});
     };
-
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
@@ -82,10 +80,20 @@ class EmailPanel extends Component {
 
 
   _handleKeyCommand(command) {
-    const {editorState} = this.state;
+    const { editorState } = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       this.onChange(newState);
+      return true;
+    }
+    return false;
+  }
+
+  _handleSubjectKeyCommand(command) {
+    const { subjectEditorState } = this.state;
+    const newState = RichUtils.handleKeyCommand(subjectEditorState, command);
+    if (newState) {
+      this.onSubjectChange(newState);
       return true;
     }
     return false;
@@ -111,6 +119,7 @@ class EmailPanel extends Component {
 
   render() {
     const { editorState } = this.state;
+    const { _setSubjectLine } = this.props;
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
@@ -123,15 +132,20 @@ class EmailPanel extends Component {
     }
 
     return (
-      <div className='RichEditor-root'>
+      <div className='RichEditor-root' style={this.props.style}>
         <BlockStyleControls
-          editorState={editorState}
-          onToggle={this.toggleBlockType}
+            editorState={editorState}
+            onToggle={this.toggleBlockType}
         />
         <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
         />
+        <div>
+          <Subject
+            _setSubjectLine={_setSubjectLine}
+          />
+        </div>
         <div className={className} onClick={this.focus}>
           <Editor
             blockStyleFn={getBlockStyle}

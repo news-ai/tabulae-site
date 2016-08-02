@@ -68,14 +68,13 @@ class HandsOnTable extends Component {
         minRows: 20,
         manualColumnMove: true,
         manualRowMove: true,
+        observeChanges: true,
         minSpareRows: 10,
-        fixedColumnsLeft: 2,
+        fixedColumnsLeft: 3,
         columns: COLUMNS,
         contextMenu: {
           callback: (key, options) => {
             if (key === 'remove_column') {
-              console.log(key);
-              console.log(options);
               for (let i = options.start.col; i <= options.end.col ; i++) {
                 this._removeColumn(this.state.options.columns, this.state.customfields, i);
               }
@@ -101,9 +100,14 @@ class HandsOnTable extends Component {
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
     this.table.updateSettings({
       beforeChange: (changes, source) => {
-        // if (source === 'edit') this._printCurrentData();
         for (let i = changes.length - 1; i >= 0; i--) {
           if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
+        }
+      },
+      afterChange: (changes, source) => {
+        if (source === 'edit') {
+          const selectedRows = this.state.options.data.filter( row => row.selected );
+          this.props._getSelectedRows(selectedRows);
         }
       }
     });

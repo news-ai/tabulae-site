@@ -3,7 +3,6 @@ import {
   RECEIVE_CONTACT,
   REQUEST_CONTACT_FAIL,
   ADDING_CONTACT,
-  ADDED_CONTACT
 } from '../constants/AppConstants';
 import 'isomorphic-fetch';
 // import * as listActions from './listActions';
@@ -46,7 +45,6 @@ export function fetchContacts(listId) {
 }
 
 export function patchContacts(contactList) {
-  console.log(contactList);
   return dispatch => {
     dispatch({ type: 'PATCH_CONTACTS' });
     return fetch(`${window.TABULAE_API_BASE}/contacts`, {
@@ -58,11 +56,7 @@ export function patchContacts(contactList) {
     .then( response => response.text())
     .then( text => {
       const json = JSON.parse(text);
-      // json.map( contact => dispatch({
-      //   type: ADDED_CONTACT,
-      //   contactId: contact.id,
-      //   contact
-      // }));
+      
       return json;
     });
   };
@@ -80,7 +74,7 @@ export function addContacts(contactList) {
     .then( text => {
       const json = JSON.parse(text);
       json.map( contact => dispatch({
-        type: ADDED_CONTACT,
+        type: RECEIVE_CONTACT,
         contactId: contact.id,
         contact
       }));
