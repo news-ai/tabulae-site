@@ -9,5 +9,8 @@ export const initialState = {
     isReceiving: false,
     tempNewList: [],
     lists: []
+  },
+  stagingReducer: {
+    isReceiving: false
   }
 };

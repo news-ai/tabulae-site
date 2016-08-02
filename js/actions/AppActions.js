@@ -1,6 +1,7 @@
 import * as loginActions from './loginActions';
 import * as listActions from './listActions';
 import * as contactActions from './contactActions';
+import * as stagingActions from './stagingActions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const fetchPerson = _ => loginActions.fetchPerson();
@@ -17,3 +18,4 @@ export const addContacts = (listId, contactList) => contactActions.addContacts(l
 export const patchContacts = (listId, contactList) => contactActions.patchContacts(listId, contactList);
 export const fetchContacts = listId => contactActions.fetchContacts(listId);
 
+export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);

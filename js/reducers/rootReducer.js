@@ -7,11 +7,13 @@ import { combineReducers } from 'redux';
 import personReducer from './personReducer';
 import contactReducer from './contactReducer';
 import listReducer from './listReducer';
+import stagingReducer from './stagingReducer';
 
 const rootReducer = combineReducers({
   personReducer,
   contactReducer,
-  listReducer
+  listReducer,
+  stagingReducer
 });
 
 export default rootReducer;
