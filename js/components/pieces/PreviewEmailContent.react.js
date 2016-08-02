@@ -26,7 +26,7 @@ function createMarkUp(html) {
   return { __html: html };
 }
 
-function PreviewEmailContent({id, to, subject, body, sendEmail}) {
+function PreviewEmailContent({id, to, subject, body, sendEmail, issent}) {
   return (
     <div style={styles.contentBox}>
       <div style={styles.content}>
@@ -34,6 +34,9 @@ function PreviewEmailContent({id, to, subject, body, sendEmail}) {
         <span style={styles.span}>{to}</span>
         <label>subject</label>
         <span style={styles.span}>{subject}</span>
+
+        <label>Sent</label>
+        <span style={styles.span}>{String(issent)}</span>
         <label>body</label>
         <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
       </div>
@@ -46,3 +49,5 @@ PreviewEmailContent.PropTypes = {
 };
 
 export default PreviewEmailContent;
+
+

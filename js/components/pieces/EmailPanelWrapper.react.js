@@ -38,6 +38,7 @@ class EmailPanelWrapper extends Component {
     this._replaceAll = this._replaceAll.bind(this);
     this._processEmails = this._processEmails.bind(this);
     this._sendAllEmails = this._sendAllEmails.bind(this);
+    this._sendEmail = this._sendEmail.bind(this);
     this._setSubjectLine = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({ subject });
@@ -94,14 +95,18 @@ class EmailPanelWrapper extends Component {
     const { previewEmails, dispatch } = this.props;
     previewEmails.map( email => {
       if (email.body.length > 0 && !email.issent) {
-        dispatch(actionCreators.sendEmail(email.id));
+        this._sendEmail(email.id);
       }
     });
   }
 
+  _sendEmail(id) {
+    const { dispatch } = this.props;
+    dispatch(actionCreators.sendEmail(id));
+  }
+
   render() {
     const { previewEmails, isReceiving, dispatch, stagingReducer } = this.props;
-    console.log(previewEmails);
     return (
       <div>
         <EmailPanel
@@ -120,15 +125,16 @@ class EmailPanelWrapper extends Component {
             <div>
               <button onClick={this._sendAllEmails}>Send All</button>
             {
-              previewEmails.map( pEmail => {
+              previewEmails.map( (pEmail, i) => {
                 const email = stagingReducer[pEmail.id];
 
                 if (email.body.length === 0 || email.issent) return null;
                 return (
                   <div>
                     <PreviewEmailContent
+                    key={i}
                     {...email}
-                    sendEmail={ _ => dispatch(actionCreators.sendEmail(email.id))}
+                    sendEmail={ _ => this._sendEmail(email.id)}
                     />
                   </div>
                   );

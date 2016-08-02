@@ -1,6 +1,7 @@
 import {
   RECEIVE_STAGED_EMAILS,
-  SENDING_STAGED_EMAILS
+  SENDING_STAGED_EMAILS,
+  RECEIVE_EMAIL
 } from '../constants/AppConstants';
 
 import { assignToEmpty } from '../utils/assign';
@@ -11,7 +12,8 @@ function stagingReducer(state = initialState.stagingReducer, action) {
   let accessing = false;
   if (
     action.type === RECEIVE_STAGED_EMAILS ||
-    action.type === SENDING_STAGED_EMAILS
+    action.type === SENDING_STAGED_EMAILS ||
+    action.type === RECEIVE_EMAIL
     ) accessing = true;
   else return state;
 
@@ -25,8 +27,10 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.previewEmails = action.json;
       action.json.map( email => obj[email.id] = email);
       return obj;
-    case 'RECEIVE_EMAIL':
-      obj[action.json.id] = json;
+    case RECEIVE_EMAIL:
+      obj[action.json.id] = action.json;
+      console.log(obj[action.json.id]);
+      return obj;
     default:
       return state;
   }
