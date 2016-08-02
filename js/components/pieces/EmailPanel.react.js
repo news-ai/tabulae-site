@@ -132,31 +132,33 @@ class EmailPanel extends Component {
     }
 
     return (
-      <div className='RichEditor-root' style={this.props.style}>
-        <BlockStyleControls
-            editorState={editorState}
-            onToggle={this.toggleBlockType}
-        />
-        <InlineStyleControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-        />
-        <div>
-          <Subject
-            _setSubjectLine={_setSubjectLine}
+      <div>
+        <div className='RichEditor-root' style={this.props.style}>
+          <BlockStyleControls
+              editorState={editorState}
+              onToggle={this.toggleBlockType}
           />
-        </div>
-        <div className={className} onClick={this.focus}>
-          <Editor
-            blockStyleFn={getBlockStyle}
-            customStyleMap={styleMap}
-            editorState={editorState}
-            handleKeyCommand={this.handleKeyCommand}
-            onChange={this.onChange}
-            placeholder='Tell a story...'
-            ref='editor'
-            spellCheck={true}
+          <InlineStyleControls
+              editorState={editorState}
+              onToggle={this.toggleInlineStyle}
           />
+          <div>
+            <Subject
+              _setSubjectLine={_setSubjectLine}
+            />
+          </div>
+          <div className={className} onClick={this.focus}>
+            <Editor
+              blockStyleFn={getBlockStyle}
+              customStyleMap={styleMap}
+              editorState={editorState}
+              handleKeyCommand={this.handleKeyCommand}
+              onChange={this.onChange}
+              placeholder='Tell a story...'
+              ref='editor'
+              spellCheck={true}
+            />
+          </div>
         </div>
       </div>
     );

@@ -19,3 +19,5 @@ export const patchContacts = (listId, contactList) => contactActions.patchContac
 export const fetchContacts = listId => contactActions.fetchContacts(listId);
 
 export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);
+export const sendEmail = id => stagingActions.sendEmail(id);
+export const getStagedEmails = _ => stagingActions.getStagedEmails();

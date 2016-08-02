@@ -145,7 +145,13 @@ class Table extends Component {
             }
             </div>
           </div>
-          <button onClick={this._toggleEmailPanel}>Email</button>
+          <button style={{
+            position: 'fixed',
+            top: 15,
+            right: 30,
+            zIndex: 150,
+            backgroundColor: this.state.emailPanelOpen ? 'lightgray' : 'white'
+          }} onClick={this._toggleEmailPanel}>Email</button>
           { this.state.emailPanelOpen ? 
             <div>
             <EmailPanelWrapper

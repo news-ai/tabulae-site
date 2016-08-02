@@ -11,6 +11,7 @@ export const initialState = {
     lists: []
   },
   stagingReducer: {
-    isReceiving: false
+    isReceiving: false,
+    previewEmails: []
   }
 };
