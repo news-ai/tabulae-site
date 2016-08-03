@@ -7,12 +7,20 @@ import validator from 'validator';
 
 import 'handsontable/dist/handsontable.full.css';
 
-function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
-  Handsontable.renderers.TextRenderer.apply(this, arguments);
-  td.style.fontWeight = 'bold';
-  td.style.color = 'green';
-  td.style.background = '#CEC';
+function outdatedRenderer(instance, td, row, col, prop, value, cellProperties) {
+  if (col === 0) Handsontable.renderers.CheckboxRenderer.apply(this, arguments);
+  else Handsontable.renderers.TextRenderer.apply(this, arguments);
+  // td.style.fontWeight = 'bold';
+  // td.style.color = 'green';
+  td.style.backgroundColor = '#CEC';
+  return td;
 }
+
+
+// function outdatedHtmlRenderer(instance, td, row, col, prop, value, cellProperties) {
+//   if (col === 1) td.innerHTML = value ? '<input type="checkbox"></input>' : '';
+//   return td;
+// }
 
 class HandsOnTable extends Component {
   constructor(props) {
@@ -23,6 +31,10 @@ class HandsOnTable extends Component {
         title: 'Selected',
         type: 'checkbox'
       },
+      // {
+      //   data: 'isoutdated',
+      //   title: 'Update',
+      // },
       {
         data: 'firstname',
         title: 'First Name'
@@ -82,7 +94,7 @@ class HandsOnTable extends Component {
         cells: (row, col, prop) => {
           let cellProperties = {};
           if (this.state.options.data[row].isoutdated) {
-            cellProperties.renderer = firstRowRenderer;
+            cellProperties.renderer = outdatedRenderer;
           }
           return cellProperties;
         },
@@ -131,7 +143,6 @@ class HandsOnTable extends Component {
     // let listCustomfields = listData.customfields;
     const options = this.state.options;
     if (listData.customfields) {
-      customfieldsLength = listData.customfields.length;
       listData.customfields.map( colName => {
         if (!options.columns.some( existingColName => existingColName.data === colName)) {
           options.columns.push({ data: colName, title: colName });
@@ -191,7 +202,8 @@ class HandsOnTable extends Component {
       console.log('DUPLICATE COLUMN NAME');
     } else {
 
-      const newCustomFields = this.state.customfields;
+      let newCustomFields = this.state.customfields;
+      if (newCustomFields === null) newCustomFields = [];
       newCustomFields.push(colName);
       dispatch(actionCreators.patchList(listData.id, undefined, undefined, newCustomFields));
     }
