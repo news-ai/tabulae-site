@@ -71,7 +71,7 @@ export function patchList(listId, name, contacts, customfields) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
-  if (customfields.length > 0) listBody.customfields = customfields;
+  if (customfields !== null && customfields) if (customfields.length > 0) listBody.customfields = customfields;
   return dispatch => {
     dispatch({ type: 'PATCH_LIST'});
     return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {

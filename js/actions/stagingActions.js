@@ -34,7 +34,6 @@ export function sendEmail(id) {
     return fetch(`${window.TABULAE_API_BASE}/emails/${id}/send`, { credentials: 'include'})
     .then( response => response.status !== 200 ? false : response.text())
     .then( text => {
-      console.log(text);
       const json = JSON.parse(text);
       dispatch({ type: RECEIVE_EMAIL, json });
       // console.log(json);

@@ -87,7 +87,7 @@ class Table extends Component {
         if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
       });
 
-      if (customfields.length > 0) {
+      if (customfields !== null && customfields) if (customfields.length > 0) {
         let customRow = [];
         customfields.map( customfield => {
           if (row[customfield] !== null && row[customfield]) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})

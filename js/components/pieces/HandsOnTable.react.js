@@ -7,6 +7,13 @@ import validator from 'validator';
 
 import 'handsontable/dist/handsontable.full.css';
 
+function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
+  Handsontable.renderers.TextRenderer.apply(this, arguments);
+  td.style.fontWeight = 'bold';
+  td.style.color = 'green';
+  td.style.background = '#CEC';
+}
+
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
@@ -72,6 +79,13 @@ class HandsOnTable extends Component {
         minSpareRows: 10,
         fixedColumnsLeft: 3,
         columns: COLUMNS,
+        cells: (row, col, prop) => {
+          let cellProperties = {};
+          if (this.state.options.data[row].isoutdated) {
+            cellProperties.renderer = firstRowRenderer;
+          }
+          return cellProperties;
+        },
         contextMenu: {
           callback: (key, options) => {
             if (key === 'remove_column') {
@@ -89,7 +103,6 @@ class HandsOnTable extends Component {
             remove_column: {
               name: 'Remove column',
             }
-
           }
         }
       }
@@ -105,7 +118,7 @@ class HandsOnTable extends Component {
         }
       },
       afterChange: (changes, source) => {
-        if (source === 'edit') {
+        if (!this.props.isNew && source === 'edit') {
           const selectedRows = this.state.options.data.filter( row => row.selected );
           this.props._getSelectedRows(selectedRows);
         }
@@ -118,6 +131,7 @@ class HandsOnTable extends Component {
     // let listCustomfields = listData.customfields;
     const options = this.state.options;
     if (listData.customfields) {
+      customfieldsLength = listData.customfields.length;
       listData.customfields.map( colName => {
         if (!options.columns.some( existingColName => existingColName.data === colName)) {
           options.columns.push({ data: colName, title: colName });

@@ -19,17 +19,24 @@ class NewTable extends Component {
   componentDidMount() {
   }
 
-  _onSaveClick(localData, table) {
+  _onSaveClick(localData, colHeaders, table) {
+    console.log(localData);
     const { dispatch, listId } = this.props;
-    let contactList = [];
+
+    let addContactList = [];
     localData.map( function(row) {
       let field = {};
-      colHeaders.map( (name, i) => {
-        if (row[name] !== null || row[name].length !== 0) field[name] = row[i];
+      colHeaders.map( (name) => {
+        if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
       });
-      if (!_.isEmpty(field)) contactList.push(field);
+
+
+      // filter out for empty rows with only id
+      if (!_.isEmpty(field) && colHeaders.some( name => name !== 'id' && field[name])) {
+        addContactList.push(field);
+      }
     });
-    dispatch(actionCreators.createNewSheet(this.state.name, contactList));
+    dispatch(actionCreators.createNewSheet(this.state.name, addContactList));
   }
 
   render() {
