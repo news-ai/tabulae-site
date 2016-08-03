@@ -77,7 +77,8 @@ class HandsOnTable extends Component {
       },
       {
         data: 'id',
-        title: 'ID'
+        title: 'ID',
+        pass: true
       },
       {
         data: 'parent',
@@ -234,14 +235,16 @@ class HandsOnTable extends Component {
     const { _onSaveClick } = this.props;
     return (
       <div>
-        <button onClick={ _ => _onSaveClick(
-          this.state.options.data,
-          this.state.options.columns,
-          this.table,
-          this.state.customfields
-          )}>Save</button>
-        <input type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
-        <button onClick={this._addColumn}>Add Column</button>
+        <div style={{margin: '20px'}}>
+          <button style={{marginLeft: '30px', marginRight: '30px'}} onClick={ _ => _onSaveClick(
+            this.state.options.data,
+            this.state.options.columns,
+            this.table,
+            this.state.customfields
+            )}>Save</button>
+          <input style={{width: '400px'}} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
+          <button onClick={this._addColumn}>Add Column</button>
+        </div>
         <div ref='data-grid'>
         </div>
       </div>

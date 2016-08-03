@@ -17,7 +17,8 @@ const styles = {
     title: {
       marginLeft: '5px',
       marginRight: '5px',
-      width: '500px'
+      width: '500px',
+      fontSize: '1.2em'
     }
   },
   emailPanel: {
@@ -109,6 +110,10 @@ class Table extends Component {
         else addContactList.push(field)
       }
     });
+
+    console.log(patchContactList);
+    console.log(addContactList);
+
 
     // update existing contacts
     const origIdList = patchContactList.map( contact => contact.id );
