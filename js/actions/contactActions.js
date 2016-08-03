@@ -15,9 +15,18 @@ function requestContact() {
 }
 
 function receiveContact(contact) {
-  return {
-    type: RECEIVE_CONTACT,
-    contact
+  return (dispatch, getState) => {
+    if (contact.employers !== null) {
+      const publications = getState().publicationReducer;
+      // const employerString = contact.employers
+      // .map( id => publications[id])
+      // .map( pub => pub.name).join(', ');
+      // contact.employerString = employerString;
+    }
+    return dispatch({
+      type: RECEIVE_CONTACT,
+      contact
+    });
   };
 }
 
@@ -41,6 +50,14 @@ export function fetchContacts(listId) {
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
     return Promise.all(getState().listReducer[listId].contacts.map( contactId => dispatch(fetchContact(contactId))));
+  };
+}
+
+export function updateContact(id) {
+  return (dispatch, getState) => {
+    return fetch(`${window.TABULAE_API_BASE}/contacts/${id}/update`, { credentials: 'include'})
+    .then( response => response.status !== 200 ? false : response.text())
+    .then( body => body ? dispatch(receiveContact(JSON.parse(body))) : dispatch(requestContactFail()));
   };
 }
 

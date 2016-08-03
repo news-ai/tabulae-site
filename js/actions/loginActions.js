@@ -31,6 +31,7 @@ export function loginWithGoogle() {
   window.location.href = base;
 }
 
+// FIX JANK CODE LATER
 export function fetchPerson() {
   return dispatch => {
     dispatch(requestLogin());
@@ -43,6 +44,14 @@ export function fetchPerson() {
         } else {
           return dispatch(loginFail());
         }
+    }).then( _ => {
+      dispatch({ type: 'REQUEST_PUBLICATIONS'});
+      return fetch(`${window.TABULAE_API_BASE}/publications`, { credentials: 'include'})
+      .then( response => response.status !== 200 ? false : response.text())
+      .then( body => {
+        const json = JSON.parse(body);
+        return dispatch({ type: 'RECEIVE_PUBLICATIONS', json});
+      });
     });
   };
 }

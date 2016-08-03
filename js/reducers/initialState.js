@@ -13,5 +13,8 @@ export const initialState = {
   stagingReducer: {
     isReceiving: false,
     previewEmails: []
+  },
+  publicationReducer: {
+    isReceiving: false
   }
 };

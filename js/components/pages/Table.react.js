@@ -46,6 +46,7 @@ class Table extends Component {
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
     this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
     this._getSelectedRows = this._getSelectedRows.bind(this);
+    this._updateContacts = this._updateContacts.bind(this);
   }
 
   componentDidMount() {
@@ -75,6 +76,13 @@ class Table extends Component {
     console.log(contacts);
     // const contactsWithEmails = contacts.filter( contact => contact.email.length > 4 );
     this.setState({ selectedContacts: contacts });
+  }
+  
+  _updateContacts() {
+    const { dispatch } = this.state.selectedContacts;
+    const selected = this.state.selectedContacts
+    .filter( contact => contact.isoutdated )
+    .map( contact => dispatch(actionCreators.updateContact(contact.id)));
   }
 
   _onSaveClick(localData, colHeaders, table, customfields) {
@@ -120,6 +128,7 @@ class Table extends Component {
     else dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
   }
 
+
   render() {
     const { listId, listData, isReceiving, contactIsReceiving, contacts } = this.props;
     return (
@@ -152,6 +161,13 @@ class Table extends Component {
             zIndex: 150,
             backgroundColor: this.state.emailPanelOpen ? 'lightgray' : 'white'
           }} onClick={this._toggleEmailPanel}>Email</button>
+          <button style={{
+            position: 'fixed',
+            top: 60,
+            right: 30,
+            zIndex: 150,
+            backgroundColor: 'white'
+          }} onClick={this._updateContacts}>Update Contacts</button>
           { this.state.emailPanelOpen ? 
             <div>
             <EmailPanelWrapper

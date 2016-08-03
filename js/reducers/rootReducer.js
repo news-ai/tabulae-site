@@ -8,12 +8,14 @@ import personReducer from './personReducer';
 import contactReducer from './contactReducer';
 import listReducer from './listReducer';
 import stagingReducer from './stagingReducer';
+import publicationReducer from './publicationReducer';
 
 const rootReducer = combineReducers({
   personReducer,
   contactReducer,
   listReducer,
-  stagingReducer
+  stagingReducer,
+  publicationReducer
 });
 
 export default rootReducer;
