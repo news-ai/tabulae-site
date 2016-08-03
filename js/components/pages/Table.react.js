@@ -79,7 +79,7 @@ class Table extends Component {
   }
   
   _updateContacts() {
-    const { dispatch } = this.state.selectedContacts;
+    const { dispatch } = this.props;
     const selected = this.state.selectedContacts
     .filter( contact => contact.isoutdated )
     .map( contact => dispatch(actionCreators.updateContact(contact.id)));

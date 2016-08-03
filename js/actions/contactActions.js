@@ -18,10 +18,13 @@ function receiveContact(contact) {
   return (dispatch, getState) => {
     if (contact.employers !== null) {
       const publications = getState().publicationReducer;
-      // const employerString = contact.employers
-      // .map( id => publications[id])
-      // .map( pub => pub.name).join(', ');
-      // contact.employerString = employerString;
+      console.log(contact.id);
+      const employerString = contact.employers
+      .map( id => publications[id])
+      .filter( pub => pub )
+      .map( pub => pub.name );
+      console.log(employerString);
+      contact.employerString = employerString;
     }
     return dispatch({
       type: RECEIVE_CONTACT,

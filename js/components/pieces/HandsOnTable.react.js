@@ -51,6 +51,10 @@ class HandsOnTable extends Component {
         invalidCellClass: 'invalid-cell'
       },
       {
+        data: 'employerString',
+        title: 'Employer(s)'
+      },
+      {
         data: 'linkedin',
         title: 'LinkedIn',
         validator: (value, callback) => this._onInvalid(value, callback, validator.isURL),
