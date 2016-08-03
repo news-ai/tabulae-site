@@ -235,7 +235,12 @@ class HandsOnTable extends Component {
     const { _onSaveClick } = this.props;
     return (
       <div>
-        <div style={{margin: '20px'}}>
+        <div style={{
+          marginLeft: '20px',
+          marginRight: '20px',
+          marginBottom: '20px',
+          marginTop: '30px'
+        }}>
           <button style={{marginLeft: '30px', marginRight: '30px'}} onClick={ _ => _onSaveClick(
             this.state.options.data,
             this.state.options.columns,
