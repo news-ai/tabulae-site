@@ -18,7 +18,6 @@ function receiveContact(contact) {
   return (dispatch, getState) => {
     if (contact.employers !== null) {
       const publications = getState().publicationReducer;
-      console.log(contact.id);
       const employerString = contact.employers
       .map( id => publications[id])
       .filter( pub => pub )

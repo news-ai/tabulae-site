@@ -92,8 +92,10 @@ class Table extends Component {
     localData.map( function(row) {
       let field = {};
       colHeaders.map( (name) => {
-        if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
+        if (row[name] !== null && row[name]) if (row[name].length !== 0) if (name !== 'employerString') field[name] = row[name];
       });
+      // JANK EMPLOYER CODE
+      if (row.employers) field.employers = row.employers;
 
       if (customfields !== null && customfields) if (customfields.length > 0) {
         let customRow = [];
@@ -102,6 +104,7 @@ class Table extends Component {
         });
         field.customfields = customRow;
       }
+      console.log(field);
 
       // filter out for empty rows with only id
       if (!_.isEmpty(field) && colHeaders.some( name => name !== 'id' && field[name])) {

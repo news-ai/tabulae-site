@@ -69,10 +69,14 @@ class HandsOnTable extends Component {
         data: 'instagram',
         title: 'Instagram'
       },
-      {
-        data: 'id',
-        title: 'ID'
-      },
+      // {
+      //   data: 'id',
+      //   title: 'ID'
+      // },
+      // {
+      //   data: 'parent',
+      //   title: 'Parent'
+      // }
     ];
 
     this._printCurrentData = this._printCurrentData.bind(this);
