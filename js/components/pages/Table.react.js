@@ -16,7 +16,8 @@ const styles = {
     },
     title: {
       marginLeft: '5px',
-      marginRight: '5px'
+      marginRight: '5px',
+      width: '500px'
     }
   },
   emailPanel: {
