@@ -23,6 +23,7 @@ function receiveContact(contact) {
       .filter( pub => pub )
       .map( pub => pub.name );
       console.log(employerString);
+      console.log('JANK CODE FIX EMPLOYERS AFTER SLP DEMO');
       contact.employerString = employerString;
     }
     return dispatch({

@@ -29,7 +29,7 @@ class HandsOnTable extends Component {
       {
         data: 'selected',
         title: 'Selected',
-        type: 'checkbox'
+        type: 'checkbox',
       },
       // {
       //   data: 'isoutdated',
@@ -37,18 +37,21 @@ class HandsOnTable extends Component {
       // },
       {
         data: 'firstname',
-        title: 'First Name'
+        title: 'First Name',
+        pass: true
       },
       {
         data: 'lastname',
-        title: 'Last Name'
+        title: 'Last Name',
+        pass: true
       },
       {
         data: 'email',
         title: 'Email',
         validator: (value, callback) => this._onInvalid(value, callback, validator.isEmail),
         allowInvalid: true,
-        invalidCellClass: 'invalid-cell'
+        invalidCellClass: 'invalid-cell',
+        pass: true
       },
       {
         data: 'employerString',
@@ -59,24 +62,27 @@ class HandsOnTable extends Component {
         title: 'LinkedIn',
         validator: (value, callback) => this._onInvalid(value, callback, validator.isURL),
         allowInvalid: true,
-        invalidCellClass: 'invalid-cell'
+        invalidCellClass: 'invalid-cell', 
+        pass: true
       },
       {
         data: 'twitter',
-        title: 'Twitter'
+        title: 'Twitter',
+        pass: true
       },
       {
         data: 'instagram',
-        title: 'Instagram'
+        title: 'Instagram',
+        pass: true
       },
-      // {
-      //   data: 'id',
-      //   title: 'ID'
-      // },
-      // {
-      //   data: 'parent',
-      //   title: 'Parent'
-      // }
+      {
+        data: 'id',
+        title: 'ID'
+      },
+      {
+        data: 'parent',
+        title: 'Parent'
+      }
     ];
 
     this._printCurrentData = this._printCurrentData.bind(this);
@@ -230,7 +236,7 @@ class HandsOnTable extends Component {
       <div>
         <button onClick={ _ => _onSaveClick(
           this.state.options.data,
-          this.state.options.columns.map( column => column.data ),
+          this.state.options.columns,
           this.table,
           this.state.customfields
           )}>Save</button>

@@ -26,7 +26,8 @@ class NewTable extends Component {
     let addContactList = [];
     localData.map( function(row) {
       let field = {};
-      colHeaders.map( (name) => {
+      colHeaders.map( (header) => {
+        const name = header.data;
         if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
       });
 

@@ -74,7 +74,6 @@ class Table extends Component {
   }
 
   _getSelectedRows(contacts) {
-    console.log(contacts);
     // const contactsWithEmails = contacts.filter( contact => contact.email.length > 4 );
     this.setState({ selectedContacts: contacts });
   }
@@ -92,11 +91,10 @@ class Table extends Component {
     let patchContactList = [];
     localData.map( function(row) {
       let field = {};
-      colHeaders.map( (name) => {
-        if (row[name] !== null && row[name]) if (row[name].length !== 0) if (name !== 'employerString') field[name] = row[name];
+      colHeaders.map( (header) => {
+        const name = header.data;
+        if (header.pass) if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
       });
-      // JANK EMPLOYER CODE
-      if (row.employers) field.employers = row.employers;
 
       if (customfields !== null && customfields) if (customfields.length > 0) {
         let customRow = [];
@@ -105,10 +103,8 @@ class Table extends Component {
         });
         field.customfields = customRow;
       }
-      console.log(field);
-
       // filter out for empty rows with only id
-      if (!_.isEmpty(field) && colHeaders.some( name => name !== 'id' && field[name])) {
+      if (!_.isEmpty(field) && colHeaders.some( header => header.data !== 'id' && field[header.data])) {
         if (field.id) patchContactList.push(field);
         else addContactList.push(field)
       }
