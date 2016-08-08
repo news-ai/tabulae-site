@@ -191,6 +191,7 @@ const mapStateToProps = (state, props) => {
   const isReceiving = state.listReducer.isReceiving;
   const contactIsReceiving = state.contactReducer.isReceiving;
   const listData = state.listReducer[listId];
+  const publicationReducer = state.publicationReducer;
   let contacts = [];
   let contactsLoaded = false;
   if (listData) {
@@ -201,6 +202,15 @@ const mapStateToProps = (state, props) => {
       }
     }
   }
+  contacts.map( (contact, i) => {
+    if (contact.employers !== null && contact.employers) {
+      const employerString = contact.employers
+      .filter( employerId => publicationReducer[employerId] )
+      .map( eId => publicationReducer[eId].name )
+      .join(', ');
+      contacts[i].employerString = employerString;
+    }
+  })
   return {
     listId: listId,
     isReceiving: isReceiving,

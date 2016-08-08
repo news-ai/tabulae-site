@@ -24,11 +24,6 @@ function publicationReducer(state = initialState.publicationReducer, action) {
       obj.isReceiving = false;
       obj[action.publication.id] = action.publication;
       return obj;
-    case 'RECEIVE_PUBLICATIONS':
-      action.json.map( pub => {
-        obj[pub.id] = pub;
-      });
-      return obj;
     default:
       return state;
   }

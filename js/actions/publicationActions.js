@@ -4,7 +4,6 @@ import {
 } from '../constants/AppConstants';
 import * as api from './api';
 
-
 function requestPublication() {
   return {
     type: REQUEST_PUBLICATION

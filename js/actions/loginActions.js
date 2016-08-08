@@ -47,19 +47,11 @@ export function logout() {
   window.location.href = base;
 }
 
-// FIX JANK CODE LATER
 export function fetchPerson() {
   return dispatch => {
     dispatch(requestLogin());
-
     return api.get('/users/me')
-    .then( response => dispatch(receiveLogin(response))
-      .then( _ => {
-        dispatch({ type: 'REQUEST_PUBLICATIONS'});
-        api.get('/publications')
-        .then( json => dispatch({ type: 'RECEIVE_PUBLICATIONS', json }))
-        .catch( message => console.log(message));
-      }))
+    .then( response => dispatch(receiveLogin(response)))
     .catch( message => dispatch(loginFail()));
   };
 }

@@ -5,8 +5,7 @@ import {
   ADDING_CONTACT,
 } from '../constants/AppConstants';
 import * as api from './api';
-// import * as listActions from './listActions';
-
+import * as publicationActions from './publicationActions';
 
 function requestContact() {
   return {
@@ -15,17 +14,8 @@ function requestContact() {
 }
 
 function receiveContact(contact) {
-  return (dispatch, getState) => {
-    if (contact.employers !== null) {
-      const publications = getState().publicationReducer;
-      const employerString = contact.employers
-      .map( id => publications[id])
-      .filter( pub => pub )
-      .map( pub => pub.name );
-      console.log(employerString);
-      console.log('JANK CODE FIX EMPLOYERS AFTER SLP DEMO');
-      contact.employerString = employerString;
-    }
+  return dispatch => {
+    if (contact.employers !== null) contact.employers.map( pubId => dispatch(publicationActions.fetchPublication(pubId)));
     return dispatch({
       type: RECEIVE_CONTACT,
       contact
