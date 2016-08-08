@@ -8,7 +8,6 @@ import _ from 'lodash';
 import 'isomorphic-fetch';
 import { globalStyles } from 'constants/StyleConstants';
 
-
 const styles = {
   nameBlock: {
     parent: {
@@ -41,7 +40,6 @@ class Table extends Component {
       emailPanelOpen: false,
       selectedContacts: []
     }
-    this._onEmailClick = this._onEmailClick.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
     this._getCustomRow = this._getCustomRow.bind(this);
     this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
@@ -60,10 +58,6 @@ class Table extends Component {
   componentWillReceiveProps(nextProps) {
     const { name } = nextProps;
     this.setState({ name: name });
-  }
-
-  _onEmailClick(rowData) {
-
   }
 
   _getCustomRow(row, customfields) {
@@ -110,10 +104,6 @@ class Table extends Component {
         else addContactList.push(field)
       }
     });
-
-    console.log(patchContactList);
-    console.log(addContactList);
-
 
     // update existing contacts
     const origIdList = patchContactList.map( contact => contact.id );

@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import { Notification } from 'react-notification';
 import * as actionCreators from 'actions/AppActions';
-import { COLUMNS } from 'constants/COLUMN_CONFIG';
+import { COLUMNS } from 'constants/ColumnConfigs';
+import validator from 'validator';
 
 import 'handsontable/dist/handsontable.full.css';
 
@@ -24,7 +25,6 @@ const styles = {
   columnInput: {
     width: '400px'
   }
-
 };
 
 function outdatedRenderer(instance, td, row, col, prop, value, cellProperties) {
@@ -136,7 +136,6 @@ class HandsOnTable extends Component {
     console.log(this.state.options.data);
   }
 
-
   _removeColumn(columns, customfields, colNum) {
     const columnName = columns[colNum].data;
     // make sure column being deleted is custom
@@ -203,9 +202,9 @@ class HandsOnTable extends Component {
         message={this.state.noticeMessage}
         action='Dismiss'
         dismissAfter={15000}
-        barStyle={{zIndex: 1400}}
-        activeBarStyle={{zIndex: 1400}}
-        actionStyle={{zIndex: 1400}}
+        barStyle={{zIndex: 140}}
+        activeBarStyle={{zIndex: 140}}
+        actionStyle={{zIndex: 140}}
         onDismiss={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
         onClick={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
       />

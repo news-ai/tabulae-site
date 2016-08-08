@@ -32,6 +32,7 @@
     "react-skylight": "^0.4.0",
     "redux": "^3.0.0",
     "redux-router": "^0.1.0",
+    "redux-saga": "^0.11.0",
     "redux-thunk": "^1.0.3",
     "validator": "^5.5.0",
     "zeroclipboard": "^2.2.0"

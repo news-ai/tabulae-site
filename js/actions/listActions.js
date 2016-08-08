@@ -5,6 +5,7 @@ import {
 } from '../constants/AppConstants';
 // import 'isomorphic-fetch';
 import * as contactActions from './contactActions';
+import * as api from './api';
 
 
 function requestLists() {
@@ -34,9 +35,10 @@ function receiveList(listId, list) {
   };
 }
 
-function requestListFail() {
+function requestListFail(message) {
   return {
-    type: REQUEST_LISTS_FAIL
+    type: REQUEST_LISTS_FAIL,
+    message
   };
 }
 
@@ -44,9 +46,9 @@ function requestListFail() {
 export function fetchList(listId) {
   return dispatch => {
     dispatch(requestLists());
-    return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, { credentials: 'include'})
-    .then( response => response.status !== 200 ? false : response.text())
-    .then( body => dispatch(receiveList(listId, JSON.parse(body))));
+    return api.get('/lists/' + listId)
+    .then( response => dispatch(receiveList(response)))
+    .catch( message => dispatch(requestListFail(message)));
   };
 }
 
@@ -54,16 +56,9 @@ export function fetchList(listId) {
 export function fetchLists() {
   return dispatch => {
     dispatch(requestLists());
-    return fetch(`${window.TABULAE_API_BASE}/lists`, { credentials: 'include'})
-      .then( response => response.status !== 200 ? false : response.text())
-      .then( body => {
-        if (body) {
-          const lists = JSON.parse(body);
-          return dispatch(receiveLists(lists));
-        } else {
-          return dispatch(requestListFail());
-        }
-    });
+    return api.get('/lists')
+    .then( response => dispatch(receiveLists(response)))
+    .catch( message => console.log(message));
   };
 }
 
@@ -74,44 +69,27 @@ export function patchList(listId, name, contacts, customfields) {
   if (customfields !== null && customfields) if (customfields.length > 0) listBody.customfields = customfields;
   return dispatch => {
     dispatch({ type: 'PATCH_LIST'});
-    return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      method: 'PATCH',
-      credentials: 'include',
-      body: JSON.stringify(listBody)
-    })
-    .then( response => response.text())
-    .then( text => {
-      let json = JSON.parse(text);
-      return dispatch(receiveList(listId, json));
-    });
+    return api.patch('/lists/' + listId, listBody)
+    .then( response => dispatch(receiveList(response)))
+    .catch( message => dispatch({ type: 'PATCH_LIST_FAIL', message }));
   };
 }
 
 export function createNewSheet(name, contactList) {
-  return dispatch => dispatch(contactActions.addContacts(contactList))
+  return dispatch =>
+  dispatch(contactActions.addContacts(contactList))
   .then( json => {
     const contacts = json.map( contact => contact.id );
     const listBody = {
       name: name,
       contacts: contacts
     };
-    return fetch(`${window.TABULAE_API_BASE}/lists`, {
-      method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify(listBody)
+    return api.post('/lists', listBody)
+    .then( response => {
+      dispatch(receiveList(response));
+      window.location.href = window.location.origin + '/lists/' + response.id;
     })
-    .then( response => response.text())
-    .then( text => {
-      const json = JSON.parse(text);
-      const listId = json.id;
-      dispatch(receiveList(listId, json));
-      window.location.href = window.location.origin + '/lists/' + listId;
-    });
+    .catch( message => console.log(message));
   });
 }
 
@@ -120,18 +98,9 @@ export function archiveListToggle(listId) {
     dispatch({ type: 'ARCHIVE_LIST' });
     let listBody = getState().listReducer[listId];
     listBody.archived = !listBody.archived;
-    return fetch(`${window.TABULAE_API_BASE}/lists/${listId}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      mode: 'cors',
-      method: 'PATCH',
-      credentials: 'include',
-      body: JSON.stringify(listBody)
-    })
-    .then( response => response.text())
-    .then( text => console.log(JSON.parse(text)));
+    return api.patch('/lists/' + listId, listBody)
+    .then( response => dispatch(receiveList(response)))
+    .catch( message => console.log(message));
   };
 }
 

@@ -48,7 +48,7 @@ function listReducer(state = initialState.listReducer, action) {
       return obj;
     case RECEIVE_LIST:
       obj.isReceiving = false;
-      obj[action.listId] = action.list;
+      obj[action.list.id] = action.list;
       return obj;
     default:
       return state;

@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import * as api from './api';
 
 import {
   LOGIN_FAIL,
@@ -61,12 +62,15 @@ export function fetchPerson() {
         }
     }).then( _ => {
       dispatch({ type: 'REQUEST_PUBLICATIONS'});
-      return fetch(`${window.TABULAE_API_BASE}/publications`, { credentials: 'include'})
-      .then( response => response.status !== 200 ? false : response.text())
-      .then( body => {
-        const json = JSON.parse(body);
-        return dispatch({ type: 'RECEIVE_PUBLICATIONS', json});
-      });
+      // return fetch(`${window.TABULAE_API_BASE}/publications`, { credentials: 'include'})
+      // .then( response => response.status !== 200 ? false : response.text())
+      // .then( body => {
+      //   const json = JSON.parse(body);
+      //   return dispatch({ type: 'RECEIVE_PUBLICATIONS', json});
+      // });
+      api.get('/publications')
+      .then( response => dispatch({ type: 'RECEIVE_PUBLICATIONS', json: response }))
+      .catch( message => console.log(message));
     });
   };
 }

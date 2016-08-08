@@ -2,6 +2,7 @@ import {
   REQUEST_PUBLICATION,
   RECEIVE_PUBLICATION,
 } from '../constants/AppConstants';
+import * as api from './api';
 
 
 function requestPublication() {
@@ -21,9 +22,8 @@ export function fetchPublication(id) {
   return (dispatch, getState) => {
     if (getState().publicationReducer[id]) return;
     dispatch(requestPublication());
-    console.log(id);
-    return fetch(`${window.TABULAE_API_BASE}/publications/${id}`, { credentials: 'include'})
-      .then( response => response.status !== 200 ? false : response.text())
-      .then( body => dispatch(receivePublication(JSON.parse(body))));
+    return api.get('/publications/' + id)
+    .then( response => dispatch(receivePublication(response)))
+    .catch( message => console.log(message));
   };
 }
