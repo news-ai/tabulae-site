@@ -4,6 +4,9 @@ import * as contactActions from './contactActions';
 import * as stagingActions from './stagingActions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
+export const register = _ => loginActions.register();
+export const logout = _ => loginActions.logout();
+export const login = _ => loginActions.login();
 export const fetchPerson = _ => loginActions.fetchPerson();
 
 export const fetchLists = _ => listActions.fetchLists();

@@ -4,9 +4,12 @@ import * as actionCreators from '../../actions/AppActions';
 
 class Login extends Component {
 	render() {
+		const { loginWithGoogleClick, loginClick, registerClick } = this.props;
 		return (
 			<div className='container'>
-				<button onClick={this.props.loginClick}>Login with Google</button>
+				<button onClick={loginWithGoogleClick}>Login with Google</button>
+				<button onClick={registerClick}>Register</button>
+				<button onClick={loginClick}>Login</button>
 			</div>
 			);
 	}
@@ -21,7 +24,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		loginClick: _ => dispatch(actionCreators.loginWithGoogle())
+		loginWithGoogleClick: _ => dispatch(actionCreators.loginWithGoogle()),
+		registerClick: _ => dispatch(actionCreators.register()),
+		loginClick: _ => dispatch(actionCreators.login())
 	};
 };
 

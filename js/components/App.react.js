@@ -9,11 +9,14 @@ class App extends Component {
   }
 
   render() {
-    const { isLogin } = this.props;
+    const { isLogin, logoutClick } = this.props;
     return (
       <div className='wrapper'>
       { isLogin ?
-        this.props.children :
+        <div>
+          <button onClick={logoutClick}>Logout</button>
+          {this.props.children}
+        </div> :
       <Login />
       }
       </div>
@@ -30,9 +33,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getAuth: _ => {
-      dispatch(actionCreators.fetchPerson());
-    },
+    getAuth: _ => dispatch(actionCreators.fetchPerson()),
+    logoutClick: _ => dispatch(actionCreators.logout()),
   };
 };
 

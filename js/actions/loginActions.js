@@ -27,7 +27,22 @@ function loginFail() {
 }
 
 export function loginWithGoogle() {
-  const base = 'http://tabulae.newsai.org/api/auth/google';
+  const base = `http://tabulae.newsai.org/api/auth/google?next=${window.location}`;
+  window.location.href = base;
+}
+
+export function login() {
+  const base = `http://tabulae.newsai.org/api/auth?next=${window.location}`;
+  window.location.href = base;
+}
+
+export function register() {
+  const base = `http://tabulae.newsai.org/api/auth/registration?next=${window.location}`;
+  window.location.href = base;
+}
+
+export function logout() {
+  const base = `http://tabulae.newsai.org/api/auth/logout?next=${window.location}`;
   window.location.href = base;
 }
 
