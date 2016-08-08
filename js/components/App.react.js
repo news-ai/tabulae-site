@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actionCreators from '../actions/AppActions';
+import * as actionCreators from 'actions/AppActions';
 import Login from './pages/Login.react';
 
 class App extends Component {

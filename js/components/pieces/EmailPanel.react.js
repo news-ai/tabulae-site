@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
 import Subject from './Subject.react';
-// import createMentionPlugin, { defaultSuggestionsFilter } from 'draft-js-mention-plugin';
 import {
   convertFromRaw,
   convertToRaw,

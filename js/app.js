@@ -33,7 +33,7 @@ import configureStore from './configureStore';
 
 // Import the pages
 import HomePage from './components/pages/HomePage.react';
-import NotFoundPage from './components/pages/NotFound.react';
+import NotFound from './components/pages/NotFound.react';
 import App from './components/App.react';
 import ListManager from './components/pages/ListManager.react';
 import Table from './components/pages/Table.react';
@@ -64,8 +64,8 @@ ReactDOM.render(
           <Route path='/lists/:listId' component={Table} />
           <Route path='/archive' component={Archive} />
           <Route path='/email' component={EmailPanel} />
+          <Route path='*' component={NotFound} />
         </Route>
-        <Route path='*' component={NotFoundPage} />
       </Router>
     </Provider>,
   document.getElementById('app')

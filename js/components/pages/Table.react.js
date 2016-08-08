@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actionCreators from '../../actions/AppActions';
+import * as actionCreators from 'actions/AppActions';
 import EmailPanelWrapper from '../pieces/EmailPanelWrapper.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import Radium from 'radium';
 import _ from 'lodash';
 import 'isomorphic-fetch';
-import { globalStyles } from '../../constants/StyleConstants';
+import { globalStyles } from 'constants/StyleConstants';
 
 
 const styles = {

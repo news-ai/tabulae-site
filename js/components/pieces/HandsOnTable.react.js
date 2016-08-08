@@ -2,92 +2,24 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
-import * as actionCreators from '../../actions/AppActions';
-import validator from 'validator';
+import * as actionCreators from 'actions/AppActions';
+import { COLUMNS } from 'constants/COLUMN_CONFIG';
 
 import 'handsontable/dist/handsontable.full.css';
 
 function outdatedRenderer(instance, td, row, col, prop, value, cellProperties) {
+  // different default renderer for each row that is not text-only
   if (col === 0) Handsontable.renderers.CheckboxRenderer.apply(this, arguments);
   else Handsontable.renderers.TextRenderer.apply(this, arguments);
-  // td.style.fontWeight = 'bold';
-  // td.style.color = 'green';
   td.style.backgroundColor = '#CEC';
   return td;
 }
 
 
-// function outdatedHtmlRenderer(instance, td, row, col, prop, value, cellProperties) {
-//   if (col === 1) td.innerHTML = value ? '<input type="checkbox"></input>' : '';
-//   return td;
-// }
-
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
-    const COLUMNS = [
-      {
-        data: 'selected',
-        title: 'Selected',
-        type: 'checkbox',
-      },
-      // {
-      //   data: 'isoutdated',
-      //   title: 'Update',
-      // },
-      {
-        data: 'firstname',
-        title: 'First Name',
-        pass: true
-      },
-      {
-        data: 'lastname',
-        title: 'Last Name',
-        pass: true
-      },
-      {
-        data: 'email',
-        title: 'Email',
-        validator: (value, callback) => this._onInvalid(value, callback, validator.isEmail),
-        allowInvalid: true,
-        invalidCellClass: 'invalid-cell',
-        pass: true
-      },
-      {
-        data: 'employerString',
-        title: 'Employer(s)'
-      },
-      {
-        data: 'linkedin',
-        title: 'LinkedIn',
-        validator: (value, callback) => this._onInvalid(value, callback, validator.isURL),
-        allowInvalid: true,
-        invalidCellClass: 'invalid-cell', 
-        pass: true
-      },
-      {
-        data: 'twitter',
-        title: 'Twitter',
-        pass: true
-      },
-      {
-        data: 'instagram',
-        title: 'Instagram',
-        pass: true
-      },
-      {
-        data: 'id',
-        title: 'ID',
-        pass: true
-      },
-      {
-        data: 'parent',
-        title: 'Parent'
-      }
-    ];
-
     this._printCurrentData = this._printCurrentData.bind(this);
-    this._onInvalid = this._onInvalid.bind(this);
     this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
@@ -107,7 +39,8 @@ class HandsOnTable extends Component {
         fixedColumnsLeft: 3,
         columns: COLUMNS,
         cells: (row, col, prop) => {
-          let cellProperties = {};
+          // apply different colored renderer for outdated contacts
+          const cellProperties = {};
           if (this.state.options.data[row].isoutdated) {
             cellProperties.renderer = outdatedRenderer;
           }
@@ -116,7 +49,7 @@ class HandsOnTable extends Component {
         contextMenu: {
           callback: (key, options) => {
             if (key === 'remove_column') {
-              for (let i = options.start.col; i <= options.end.col ; i++) {
+              for (let i = options.start.col; i <= options.end.col; i++) {
                 this._removeColumn(this.state.options.columns, this.state.customfields, i);
               }
             }
@@ -145,6 +78,7 @@ class HandsOnTable extends Component {
         }
       },
       afterChange: (changes, source) => {
+        // save selected rows
         if (!this.props.isNew && source === 'edit') {
           const selectedRows = this.state.options.data.filter( row => row.selected );
           this.props._getSelectedRows(selectedRows);
@@ -155,7 +89,6 @@ class HandsOnTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     const { contacts, listData } = nextProps;
-    // let listCustomfields = listData.customfields;
     const options = this.state.options;
     if (listData.customfields) {
       listData.customfields.map( colName => {
@@ -181,10 +114,6 @@ class HandsOnTable extends Component {
     console.log(this.state.options.data);
   }
 
-  _onInvalid(value, callback, validate) {
-    if (value.length === 0 || validate(value)) callback(true);
-    else callback(false);
-  }
 
   _removeColumn(columns, customfields, colNum) {
     const columnName = columns[colNum].data;
@@ -216,13 +145,12 @@ class HandsOnTable extends Component {
     if (options.columns.some( col => col.data === colName)) {
       console.log('DUPLICATE COLUMN NAME');
     } else {
-
       let newCustomFields = this.state.customfields;
       if (newCustomFields === null) newCustomFields = [];
       newCustomFields.push(colName);
       dispatch(actionCreators.patchList(listData.id, undefined, undefined, newCustomFields));
     }
-    this.setState({ newColumnName: ''});
+    this.setState({ newColumnName: '' });
   }
 
   _cleanUpURL(url) {

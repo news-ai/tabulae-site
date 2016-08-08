@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import EmailPanel from './EmailPanel.react';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
-import * as actionCreators from '../../actions/AppActions';
+import * as actionCreators from 'actions/AppActions';
 import PreviewEmailContent from './PreviewEmailContent.react';
 
 const styles = {

@@ -4,7 +4,7 @@ import {
   LOGIN_FAIL,
   REQUEST_LOGIN,
   RECEIVE_LOGIN,
-} from '../constants/AppConstants';
+} from 'constants/AppConstants';
 
 
 function requestLogin() {

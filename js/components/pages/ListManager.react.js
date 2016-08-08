@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Radium from 'radium';
-import * as actionCreators from '../../actions/AppActions';
+import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import ListItem from '../pieces/ListItem.react';
