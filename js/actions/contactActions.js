@@ -5,6 +5,7 @@ import {
   ADDING_CONTACT,
 } from '../constants/AppConstants';
 import 'isomorphic-fetch';
+import * as api from './api';
 // import * as listActions from './listActions';
 
 
@@ -43,63 +44,53 @@ function requestContactFail() {
 export function fetchContact(contactId) {
   return dispatch => {
     dispatch(requestContact());
-    return fetch(`${window.TABULAE_API_BASE}/contacts/${contactId}`, { credentials: 'include'})
-      .then( response => response.status !== 200 ? false : response.text())
-      .then( body => body ? dispatch(receiveContact(JSON.parse(body))) : dispatch(requestContactFail()));
+    return api.get('/contacts/' + contactId)
+    .then( response => dispatch(receiveContact(response)))
+    .catch( message => dispatch(requestContactFail(message)));
   };
 }
 
 export function fetchContacts(listId) {
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
-    return Promise.all(getState().listReducer[listId].contacts.map( contactId => dispatch(fetchContact(contactId))));
+    return Promise.all(
+      getState().listReducer[listId].contacts.map( contactId => dispatch(fetchContact(contactId)))
+      );
   };
 }
 
 export function updateContact(id) {
   return (dispatch, getState) => {
-    return fetch(`${window.TABULAE_API_BASE}/contacts/${id}/update`, { credentials: 'include'})
-    .then( response => response.status !== 200 ? false : response.text())
-    .then( body => body ? dispatch(receiveContact(JSON.parse(body))) : dispatch(requestContactFail()));
+    return api.get('/contacts/' + id + '/update')
+    .then( response => dispatch(receiveContact(response)))
+    .catch( message => dispatch(requestContactFail(message)));
   };
 }
 
 export function patchContacts(contactList) {
   return dispatch => {
     dispatch({ type: 'PATCH_CONTACTS' });
-    return fetch(`${window.TABULAE_API_BASE}/contacts`, {
-      method: 'PATCH',
-      credentials: 'include',
-      mode: 'cors',
-      body: JSON.stringify(contactList)
-    })
-    .then( response => response.text())
-    .then( text => {
-      const json = JSON.parse(text);
-      
-      return json;
-    });
+
+    return api.patch('/contacts', contactList)
+    .then( response => response)
+    .catch( message => console.log(message));
   };
 }
 
 export function addContacts(contactList) {
   return dispatch => {
     dispatch({ type: ADDING_CONTACT });
-    return fetch(`${window.TABULAE_API_BASE}/contacts`, {
-      method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify(contactList)
-    })
-    .then( response => response.text())
-    .then( text => {
-      const json = JSON.parse(text);
-      json.map( contact => dispatch({
+
+    return api.post('/contacts', contactList)
+    .then( response => {
+      response.map( contact => dispatch({
         type: RECEIVE_CONTACT,
         contactId: contact.id,
         contact
       }));
-      return json;
-    });
+      return response;
+    })
+    .catch( message => console.log(message));
   };
 }
 

@@ -51,27 +51,16 @@ export function logout() {
 export function fetchPerson() {
   return dispatch => {
     dispatch(requestLogin());
-    return fetch(`${window.TABULAE_API_BASE}/users/me`, { credentials: 'include'})
-      .then( response => response.status !== 200 ? false : response.text())
-      .then( body => {
-        if (body) {
-          const person = JSON.parse(body);
-          return dispatch(receiveLogin(person));
-        } else {
-          return dispatch(loginFail());
-        }
-    }).then( _ => {
-      dispatch({ type: 'REQUEST_PUBLICATIONS'});
-      // return fetch(`${window.TABULAE_API_BASE}/publications`, { credentials: 'include'})
-      // .then( response => response.status !== 200 ? false : response.text())
-      // .then( body => {
-      //   const json = JSON.parse(body);
-      //   return dispatch({ type: 'RECEIVE_PUBLICATIONS', json});
-      // });
-      api.get('/publications')
-      .then( response => dispatch({ type: 'RECEIVE_PUBLICATIONS', json: response }))
-      .catch( message => console.log(message));
-    });
+
+    return api.get('/users/me')
+    .then( response => dispatch(receiveLogin(response))
+      .then( _ => {
+        dispatch({ type: 'REQUEST_PUBLICATIONS'});
+        api.get('/publications')
+        .then( json => dispatch({ type: 'RECEIVE_PUBLICATIONS', json }))
+        .catch( message => console.log(message));
+      }))
+    .catch( message => dispatch(loginFail()));
   };
 }
 

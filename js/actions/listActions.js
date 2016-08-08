@@ -27,10 +27,9 @@ function receiveLists(lists) {
   };
 }
 
-function receiveList(listId, list) {
+function receiveList(list) {
   return {
     type: 'RECEIVE_LIST',
-    listId,
     list
   };
 }
