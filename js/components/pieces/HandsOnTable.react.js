@@ -2,10 +2,30 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
+import { Notification } from 'react-notification';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/COLUMN_CONFIG';
 
 import 'handsontable/dist/handsontable.full.css';
+
+const styles = {
+  buttons: {
+    group: {
+      marginLeft: '20px',
+      marginRight: '20px',
+      marginBottom: '20px',
+      marginTop: '30px'
+    },
+    save: {
+      marginLeft: '30px',
+      marginRight: '30px'
+    }
+  },
+  columnInput: {
+    width: '400px'
+  }
+
+};
 
 function outdatedRenderer(instance, td, row, col, prop, value, cellProperties) {
   // different default renderer for each row that is not text-only
@@ -27,6 +47,8 @@ class HandsOnTable extends Component {
 
     this.state = {
       customfields: [],
+      noticeMessage: 'DEFAULT',
+      noticeIsActive: false,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -130,6 +152,10 @@ class HandsOnTable extends Component {
       this.table.updateSettings(options);
     } else {
       console.log(columnName + 'CANNOT BE DELETED');
+      this.setState({
+        noticeIsActive: true,
+        noticeMessage: `Column "${columnName}" is a default column and, therefore, cannot be deleted.`
+      });
     }
   }
 
@@ -137,6 +163,10 @@ class HandsOnTable extends Component {
     const { isNew, dispatch, listData } = this.props;
     if (isNew) {
       console.log('PLEASE SAVE LIST FIRST');
+      this.setState({
+        noticeIsActive: true,
+        noticeMessage: 'Please save list first before adding custom columns.'
+      });
       return;
     }
     const options = this.state.options;
@@ -144,6 +174,10 @@ class HandsOnTable extends Component {
 
     if (options.columns.some( col => col.data === colName)) {
       console.log('DUPLICATE COLUMN NAME');
+      this.setState({
+        noticeIsActive: true,
+        noticeMessage: 'Duplicate column name. Please use another one.'
+      });
     } else {
       let newCustomFields = this.state.customfields;
       if (newCustomFields === null) newCustomFields = [];
@@ -163,19 +197,25 @@ class HandsOnTable extends Component {
     const { _onSaveClick } = this.props;
     return (
       <div>
-        <div style={{
-          marginLeft: '20px',
-          marginRight: '20px',
-          marginBottom: '20px',
-          marginTop: '30px'
-        }}>
-          <button style={{marginLeft: '30px', marginRight: '30px'}} onClick={ _ => _onSaveClick(
+        <div style={styles.buttons.group}>
+        <Notification
+        isActive={this.state.noticeIsActive}
+        message={this.state.noticeMessage}
+        action='Dismiss'
+        dismissAfter={15000}
+        barStyle={{zIndex: 1400}}
+        activeBarStyle={{zIndex: 1400}}
+        actionStyle={{zIndex: 1400}}
+        onDismiss={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
+        onClick={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
+      />
+          <button style={styles.buttons.save} onClick={ _ => _onSaveClick(
             this.state.options.data,
             this.state.options.columns,
             this.table,
             this.state.customfields
             )}>Save</button>
-          <input style={{width: '400px'}} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
+          <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
           <button onClick={this._addColumn}>Add Column</button>
         </div>
         <div ref='data-grid'>
