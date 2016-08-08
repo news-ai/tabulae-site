@@ -4,7 +4,6 @@ import {
   REQUEST_CONTACT_FAIL,
   ADDING_CONTACT,
 } from '../constants/AppConstants';
-import 'isomorphic-fetch';
 import * as api from './api';
 // import * as listActions from './listActions';
 

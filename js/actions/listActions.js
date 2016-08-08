@@ -3,7 +3,6 @@ import {
   RECEIVE_LISTS,
   REQUEST_LISTS_FAIL,
 } from '../constants/AppConstants';
-// import 'isomorphic-fetch';
 import * as contactActions from './contactActions';
 import * as api from './api';
 
@@ -102,7 +101,3 @@ export function archiveListToggle(listId) {
     .catch( message => console.log(message));
   };
 }
-
-
-
-

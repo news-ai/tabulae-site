@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import {
   RECEIVE_STAGED_EMAILS,
   SENDING_STAGED_EMAILS,
