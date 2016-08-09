@@ -61,9 +61,9 @@ class HandsOnTable extends Component {
         fixedColumnsLeft: 3,
         columns: COLUMNS,
         cells: (row, col, prop) => {
-          // apply different colored renderer for outdated contacts
           const cellProperties = {};
           if (this.state.options.data[row].isoutdated) {
+            // apply different colored renderer for outdated contacts
             cellProperties.renderer = outdatedRenderer;
           }
           return cellProperties;
@@ -98,6 +98,14 @@ class HandsOnTable extends Component {
         for (let i = changes.length - 1; i >= 0; i--) {
           if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
         }
+        console.log(changes);
+        console.log(source);
+
+        if (!this.props.isNew && source === 'edit') {
+          if (changes[0][1] === 'employerString') {
+
+          }
+        }
       },
       afterChange: (changes, source) => {
         // save selected rows
@@ -110,7 +118,7 @@ class HandsOnTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { contacts, listData } = nextProps;
+    const { contacts, listData, pubArrayByName } = nextProps;
     const options = this.state.options;
     if (listData.customfields) {
       listData.customfields.map( colName => {
@@ -127,7 +135,24 @@ class HandsOnTable extends Component {
         });
       });
     }
+    // const newColumns = options.columns.map( column => {
+    //   if (column.data === 'employerString') {
+    //     return {
+    //       data: 'employerString',
+    //       title: 'Employer(s)',
+    //       type: {
+    //         renderer: myAutocompleteRenderer,
+    //         editor: Handsontable.AutocompleteEditor
+    //       },
+    //       strict: false,
+    //       source: ["Mouse", "Rat", "Human", "C.elegans", "Dyctioselium"]
+    //     };
+    //   } else {
+    //     return column;
+    //   }
+    // });
     options.data = contacts;
+    // options.columns = newColumns;
     this.setState({ options: options, customfields: listData.customfields });
     this.table.updateSettings(options);
   }

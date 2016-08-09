@@ -69,7 +69,6 @@ class Table extends Component {
   }
 
   _getSelectedRows(contacts) {
-    // const contactsWithEmails = contacts.filter( contact => contact.email.length > 4 );
     this.setState({ selectedContacts: contacts });
   }
   
@@ -125,7 +124,7 @@ class Table extends Component {
 
 
   render() {
-    const { listId, listData, isReceiving, contactIsReceiving, contacts } = this.props;
+    const { listId, listData, isReceiving, contactIsReceiving, contacts, pubMapByName, pubArrayByName } = this.props;
     return (
       <div>
       { contactIsReceiving ? <img src='/img/default_loading.gif' /> : null }
@@ -178,6 +177,8 @@ class Table extends Component {
           contacts={contacts}
           isNew={false}
           _getSelectedRows={this._getSelectedRows}
+          pubMapByName={pubMapByName}
+          pubArrayByName={pubArrayByName}
           />
         </div>
       }
@@ -202,12 +203,21 @@ const mapStateToProps = (state, props) => {
       }
     }
   }
+  let pubMapByName = {};
+  let pubArrayByName = [];
   contacts.map( (contact, i) => {
     if (contact.employers !== null && contact.employers) {
+      // generate string to be rendered by custom cell in table
       const employerString = contact.employers
-      .filter( employerId => publicationReducer[employerId] )
-      .map( eId => publicationReducer[eId].name )
-      .join(', ');
+      .filter( employerId => publicationReducer[employerId])
+      .map( eId => {
+        const name = publicationReducer[eId].name;
+        if (!pubMapByName[name]) {
+          pubMapByName[name] = eId;
+          pubArrayByName.push(name);
+        }
+        return name;
+      }).join(',');
       contacts[i].employerString = employerString;
     }
   })
@@ -217,7 +227,9 @@ const mapStateToProps = (state, props) => {
     listData: listData,
     contacts: contactsLoaded ? contacts : [],
     name: listData ? listData.name : null,
-    contactIsReceiving: contactIsReceiving
+    contactIsReceiving: contactIsReceiving,
+    pubMapByName: pubMapByName,
+    pubArrayByName: pubArrayByName
   };
 };
 
