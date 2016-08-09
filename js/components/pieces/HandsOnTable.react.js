@@ -58,7 +58,7 @@ class HandsOnTable extends Component {
         manualRowMove: true,
         observeChanges: true,
         minSpareRows: 10,
-        fixedColumnsLeft: 3,
+        // fixedColumnsLeft: 3,
         columns: COLUMNS,
         cells: (row, col, prop) => {
           const cellProperties = {};

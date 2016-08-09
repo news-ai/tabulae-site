@@ -16,10 +16,13 @@ function outdatedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
 function multiselectRenderer(instance, td, row, col, prop, value, cellProperties) {
   let valueStr = Handsontable.helper.stringify(value);
-  if (value === null) return td;
+  if (value === null || value.length === 0) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    return td;
+  }
   let valueArray = valueStr.split(',');
   let htmlString = valueArray.map( value =>
-    '<div style="border:1px solid lightgray;border-radius:25px;text-align:center;margin:4px;padding:3px;"><span>' + value + '</span></div>'
+    '<div style="border:1px solid lightgray;border-radius:20px;text-align:center;margin:4px;padding-left:3px;padding-right:3px;"><span>' + value + '</span></div>'
     ).join('');
   td.innerHTML = htmlString;
   return td;
