@@ -3,10 +3,7 @@ import 'isomorphic-fetch';
 export function get(endpoint) {
   return fetch(`${window.TABULAE_API_BASE}${endpoint}`, { credentials: 'include'})
     .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => {
-      const json = JSON.parse(text);
-      return json;
-    });
+    .then( text => JSON.parse(text));
 }
 
 export function post(endpoint, body) {
@@ -16,10 +13,7 @@ export function post(endpoint, body) {
     body: JSON.stringify(body)
   })
     .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => {
-      const json = JSON.parse(text);
-      return json;
-    });
+    .then( text => JSON.parse(text));
 }
 
 export function patch(endpoint, body) {
@@ -34,9 +28,6 @@ export function patch(endpoint, body) {
     body: JSON.stringify(body)
   })
     .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => {
-      const json = JSON.parse(text);
-      return json;
-    });
+    .then( text => JSON.parse(text));
 }
 

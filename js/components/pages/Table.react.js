@@ -7,7 +7,6 @@ import Radium from 'radium';
 import _ from 'lodash';
 import 'isomorphic-fetch';
 import { globalStyles } from 'constants/StyleConstants';
-import { notEmpty } from 'utils';
 
 const styles = {
   nameBlock: {
@@ -65,7 +64,7 @@ class Table extends Component {
   _getCustomRow(row, customfields) {
     let customRow = [];
     customfields.map( customfield => {
-      if (notEmpty(row[customfield])) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
+      if (!_.isEmpty(row[customfield])) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
     });
     return customRow;
   }
@@ -81,7 +80,7 @@ class Table extends Component {
     let field = {};
     colHeaders.map( (header) => {
       const name = header.data;
-      if (notEmpty(row[name])) {
+      if (!_.isEmpty(row[name])) {
         // only columns labeled as pass can send data to api
         if (header.pass) {
           field[name] = row[name];
@@ -103,19 +102,18 @@ class Table extends Component {
     let patchContactList = [];
     localData.map( row => {
       let field = this._handleNormalField(colHeaders, row);
-      console.log(field);
 
       // handle customfields
-      if (notEmpty(customfields)) {
+      if (!_.isEmpty(customfields)) {
         let customRow = [];
         customfields.map( customfield => {
-          if (notEmpty(row[customfield])) customRow.push({ name: customfield, value: row[customfield]})
+          if (!_.isEmpty(row[customfield])) customRow.push({ name: customfield, value: row[customfield]})
         });
         field.customfields = customRow;
       }
 
       // filter out for empty rows with only id
-      if (!_.isEmpty(field) && colHeaders.some(header => header.pass && notEmpty(field[header.data]))) {
+      if (!_.isEmpty(field) && colHeaders.some(header => header.pass && !_.isEmpty(field[header.data]))) {
         if (field.id) patchContactList.push(field);
         else addContactList.push(field)
       }
@@ -139,7 +137,6 @@ class Table extends Component {
       // clean up LIST by patching only non-empty rows
       dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
     }
-
   }
 
 
@@ -225,7 +222,7 @@ const mapStateToProps = (state, props) => {
   let contacts = [];
   let contactsLoaded = false;
   if (listData) {
-    if (notEmpty(listData.contacts)) {
+    if (!_.isEmpty(listData.contacts)) {
       if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
         contactsLoaded = true;
         contacts = listData.contacts.map( contactId => state.contactReducer[contactId] );
@@ -236,7 +233,7 @@ const mapStateToProps = (state, props) => {
   let pubArrayByName = [];
   // make employerString for table renderer
   contacts.map( (contact, i) => {
-    if (notEmpty(contact.employers)) {
+    if (!_.isEmpty(contact.employers)) {
       // generate string to be rendered by custom cell in table
       const employerString = contact.employers
       .filter( employerId => publicationReducer[employerId])

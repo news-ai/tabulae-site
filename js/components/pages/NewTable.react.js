@@ -20,7 +20,6 @@ class NewTable extends Component {
   }
 
   _onSaveClick(localData, colHeaders, table) {
-    console.log(localData);
     const { dispatch, listId } = this.props;
 
     let addContactList = [];
@@ -31,9 +30,8 @@ class NewTable extends Component {
         if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
       });
 
-
       // filter out for empty rows with only id
-      if (!_.isEmpty(field) && colHeaders.some( name => name !== 'id' && field[name])) {
+      if (!_.isEmpty(field) && colHeaders.some(header => header.pass && !_.isEmpty(field[header.data]))) {
         addContactList.push(field);
       }
     });
