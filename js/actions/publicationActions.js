@@ -26,3 +26,12 @@ export function fetchPublication(id) {
     .catch( message => console.log(message));
   };
 }
+
+export function createPublication(data) {
+  return (dispatch) => {
+    dispatch(requestPublication());
+    return api.post('/publications', data)
+    .then( response => dispatch(receivePublication(response)))
+    .catch( message => console.log(message));
+  };
+}

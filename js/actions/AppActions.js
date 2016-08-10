@@ -2,6 +2,7 @@ import * as loginActions from './loginActions';
 import * as listActions from './listActions';
 import * as contactActions from './contactActions';
 import * as stagingActions from './stagingActions';
+import * as publicationActions from './publicationActions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const register = _ => loginActions.register();
@@ -25,3 +26,6 @@ export const updateContact = id => contactActions.updateContact(id);
 export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);
 export const sendEmail = id => stagingActions.sendEmail(id);
 export const getStagedEmails = _ => stagingActions.getStagedEmails();
+
+export const fetchPublication = id => publicationActions.fetchPublication(id);
+export const createPublication = data => publicationActions.createPublication(data);

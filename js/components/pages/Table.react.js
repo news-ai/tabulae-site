@@ -7,6 +7,7 @@ import Radium from 'radium';
 import _ from 'lodash';
 import 'isomorphic-fetch';
 import { globalStyles } from 'constants/StyleConstants';
+import { notEmpty } from 'utils';
 
 const styles = {
   nameBlock: {
@@ -45,8 +46,9 @@ class Table extends Component {
     this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
     this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
-    this._getSelectedRows = this._getSelectedRows.bind(this);
+    this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
+    this._handleNormalField = this._handleNormalField.bind(this);
   }
 
   componentDidMount() {
@@ -63,15 +65,11 @@ class Table extends Component {
   _getCustomRow(row, customfields) {
     let customRow = [];
     customfields.map( customfield => {
-      if (row[customfield] !== null && row[customfield]) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
+      if (notEmpty(row[customfield])) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
     });
     return customRow;
   }
 
-  _getSelectedRows(contacts) {
-    this.setState({ selectedContacts: contacts });
-  }
-  
   _updateContacts() {
     const { dispatch } = this.props;
     const selected = this.state.selectedContacts
@@ -79,26 +77,45 @@ class Table extends Component {
     .map( contact => dispatch(actionCreators.updateContact(contact.id)));
   }
 
+  _handleNormalField(colHeaders, row) {
+    let field = {};
+    colHeaders.map( (header) => {
+      const name = header.data;
+      if (notEmpty(row[name])) {
+        // only columns labeled as pass can send data to api
+        if (header.pass) {
+          field[name] = row[name];
+        } else {
+          if (name === 'employerString') {
+
+          }
+
+        }
+      }
+    });
+    if (row.id) field.id = row.id;
+    return field;
+  }
+
   _onSaveClick(localData, colHeaders, table, customfields) {
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
-    localData.map( function(row) {
-      let field = {};
-      colHeaders.map( (header) => {
-        const name = header.data;
-        if (header.pass) if (row[name] !== null && row[name]) if (row[name].length !== 0) field[name] = row[name];
-      });
+    localData.map( row => {
+      let field = this._handleNormalField(colHeaders, row);
+      console.log(field);
 
-      if (customfields !== null && customfields) if (customfields.length > 0) {
+      // handle customfields
+      if (notEmpty(customfields)) {
         let customRow = [];
         customfields.map( customfield => {
-          if (row[customfield] !== null && row[customfield]) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
+          if (notEmpty(row[customfield])) customRow.push({ name: customfield, value: row[customfield]})
         });
         field.customfields = customRow;
       }
+
       // filter out for empty rows with only id
-      if (!_.isEmpty(field) && colHeaders.some( header => header.data !== 'id' && field[header.data])) {
+      if (!_.isEmpty(field) && colHeaders.some(header => header.pass && notEmpty(field[header.data]))) {
         if (field.id) patchContactList.push(field);
         else addContactList.push(field)
       }
@@ -106,25 +123,37 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = patchContactList.map( contact => contact.id );
-    if (patchContactList.length > 0) {
-      dispatch(actionCreators.patchContacts(patchContactList));
+    // console.log(patchContactList);
+    // console.log(addContactList);
+
+    if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
+
+    // create new contacts and append new rows to LIST
+    if (addContactList.length > 0) {
+        dispatch(actionCreators.addContacts(addContactList)).then( json => {
+        const appendIdList = json.map( contact => contact.id);
+        const newIdList = origIdList.concat(appendIdList);
+        dispatch(actionCreators.patchList(listId, this.state.name, newIdList, customfields));
+      });
+    } else {
+      // clean up LIST by patching only non-empty rows
+      dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
     }
 
-    // append new rows to LIST
-    if (addContactList.length > 0) dispatch(actionCreators.addContacts(addContactList))
-    .then( json => {
-      const appendIdList = json.map( contact => contact.id);
-      const newIdList = origIdList.concat(appendIdList);
-      dispatch(actionCreators.patchList(listId, this.state.name, newIdList, customfields));
-    });
-
-    // clean up LIST by patching only non-empty rows
-    else dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
   }
 
 
   render() {
-    const { listId, listData, isReceiving, contactIsReceiving, contacts, pubMapByName, pubArrayByName } = this.props;
+    const {
+      listId,
+      listData,
+      isReceiving,
+      contactIsReceiving,
+      contacts,
+      pubMapByName,
+      pubArrayByName
+    } = this.props;
+
     return (
       <div>
       { contactIsReceiving ? <img src='/img/default_loading.gif' /> : null }
@@ -196,7 +225,7 @@ const mapStateToProps = (state, props) => {
   let contacts = [];
   let contactsLoaded = false;
   if (listData) {
-    if (listData.contacts !== null && listData.contacts) {
+    if (notEmpty(listData.contacts)) {
       if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
         contactsLoaded = true;
         contacts = listData.contacts.map( contactId => state.contactReducer[contactId] );
@@ -205,8 +234,9 @@ const mapStateToProps = (state, props) => {
   }
   let pubMapByName = {};
   let pubArrayByName = [];
+  // make employerString for table renderer
   contacts.map( (contact, i) => {
-    if (contact.employers !== null && contact.employers) {
+    if (notEmpty(contact.employers)) {
       // generate string to be rendered by custom cell in table
       const employerString = contact.employers
       .filter( employerId => publicationReducer[employerId])
@@ -221,6 +251,7 @@ const mapStateToProps = (state, props) => {
       contacts[i].employerString = employerString;
     }
   })
+
   return {
     listId: listId,
     isReceiving: isReceiving,

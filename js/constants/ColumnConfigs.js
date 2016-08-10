@@ -60,7 +60,8 @@ export const COLUMNS = [
     data: 'employerString',
     title: 'Employer(s)',
     strict: false,
-    renderer: multiselectRenderer
+    renderer: multiselectRenderer,
+    pass: false
   },
   {
     data: 'linkedin',

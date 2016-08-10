@@ -108,6 +108,7 @@ return {
       'img': __dirname + '/img',
       'constants': __dirname + '/js/constants',
       'actions': __dirname + '/js/actions',
+      'utils': __dirname + '/js/utils/assign',
     }
   },
   plugins: plugins,
