@@ -48,6 +48,7 @@ class Table extends Component {
     this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
     this._handleNormalField = this._handleNormalField.bind(this);
+    this._passDataUp = this._passDataUp.bind(this);
   }
 
   componentDidMount() {
@@ -96,7 +97,7 @@ class Table extends Component {
     return field;
   }
 
-  _onSaveClick(localData, colHeaders, table, customfields) {
+  _onSaveClick(localData, colHeaders, customfields) {
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
@@ -137,6 +138,9 @@ class Table extends Component {
       // clean up LIST by patching only non-empty rows
       dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
     }
+  }
+
+  _passDataUp() {
   }
 
 
@@ -193,10 +197,11 @@ class Table extends Component {
           <HandsOnTable
           listId={this.props.listId}
           _onSaveClick={this._onSaveClick}
+          _getSelectedRows={this._getSelectedRows}
+          _passDataUp={this._passDataUp}
           listData={listData}
           contacts={contacts}
           isNew={false}
-          _getSelectedRows={this._getSelectedRows}
           pubMapByName={pubMapByName}
           pubArrayByName={pubArrayByName}
           />

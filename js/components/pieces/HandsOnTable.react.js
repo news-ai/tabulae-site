@@ -236,7 +236,6 @@ class HandsOnTable extends Component {
           <button style={styles.buttons.save} onClick={ _ => _onSaveClick(
             this.state.options.data,
             this.state.options.columns,
-            this.table,
             this.state.customfields
             )}>Save</button>
           <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>

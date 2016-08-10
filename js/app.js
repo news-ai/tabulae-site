@@ -57,13 +57,14 @@ if (module.hot) {
 ReactDOM.render(
   <Provider store={store}>
       <Router onUpdate={() => window.scrollTo(0, 0)} history={createHistory()}>
-        <Route path='/' component={App}>
+        <Route path='/' name='Home' component={App}>
           <IndexRoute component={ListManager} />
-          <Route path='/lists' component={ListManager} />
-          <Route path='/lists/new' component={NewTable} />
-          <Route path='/lists/:listId' component={Table} />
-          <Route path='/archive' component={Archive} />
-          <Route path='/email' component={EmailPanel} />
+          <Route path='lists' name='List Manager' component={ListManager}>
+            <Route path='new' name='New Sheet' component={NewTable} />
+            <Route path=':listId' component={Table} />
+          </Route>
+          <Route path='archive' name='Archive' component={Archive} />
+          <Route path='email' name='Email' component={EmailPanel} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

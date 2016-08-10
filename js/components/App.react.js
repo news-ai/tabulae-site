@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Login from './pages/Login.react';
+import Breadcrumbs from 'react-breadcrumbs';
 
 class App extends Component {
   componentDidMount() {
@@ -15,6 +16,10 @@ class App extends Component {
       { isLogin ?
         <div>
           <button onClick={logoutClick}>Logout</button>
+          <Breadcrumbs
+          routes={this.props.routes}
+          params={this.props.params}
+          />
           {this.props.children}
         </div> :
       <Login />

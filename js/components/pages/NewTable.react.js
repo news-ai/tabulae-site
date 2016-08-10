@@ -19,7 +19,7 @@ class NewTable extends Component {
   componentDidMount() {
   }
 
-  _onSaveClick(localData, colHeaders, table) {
+  _onSaveClick(localData, colHeaders) {
     const { dispatch, listId } = this.props;
 
     let addContactList = [];
