@@ -61,8 +61,8 @@ ReactDOM.render(
           <IndexRoute component={ListManager} />
           <Route path='lists' name='List Manager' component={ListManager}>
             <Route path='new' name='New Sheet' component={NewTable} />
-            <Route path=':listId' component={Table} />
           </Route>
+          <Route path='lists/:listId' component={Table} />
           <Route path='archive' name='Archive' component={Archive} />
           <Route path='email' name='Email' component={EmailPanel} />
           <Route path='*' component={NotFound} />
