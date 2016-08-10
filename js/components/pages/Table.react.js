@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import EmailPanelWrapper from '../pieces/EmailPanelWrapper.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
+import ButtonMenu from '../pieces/ButtonMenu.react';
 import Radium from 'radium';
 import _ from 'lodash';
-import 'isomorphic-fetch';
 import { globalStyles } from 'constants/StyleConstants';
 
 const styles = {
@@ -174,20 +174,14 @@ class Table extends Component {
             }
             </div>
           </div>
-          <button style={{
-            position: 'fixed',
-            top: 15,
-            right: 30,
-            zIndex: 150,
-            backgroundColor: this.state.emailPanelOpen ? 'lightgray' : 'white'
-          }} onClick={this._toggleEmailPanel}>Email</button>
-          <button style={{
-            position: 'fixed',
-            top: 60,
-            right: 30,
-            zIndex: 150,
-            backgroundColor: 'white'
-          }} onClick={this._updateContacts}>Update Contacts</button>
+          <ButtonMenu>
+            <button style={{
+              backgroundColor: this.state.emailPanelOpen ? 'lightgray' : 'white'
+            }} onClick={this._toggleEmailPanel}>Email</button>
+            <button style={{
+              backgroundColor: 'white'
+            }} onClick={this._updateContacts}>Update Contacts</button>
+          </ButtonMenu>
           { this.state.emailPanelOpen ? 
             <div>
             <EmailPanelWrapper
