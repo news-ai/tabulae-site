@@ -23,6 +23,7 @@ function publicationReducer(state = initialState.publicationReducer, action) {
     case RECEIVE_PUBLICATION:
       obj.isReceiving = false;
       obj[action.publication.id] = action.publication;
+      obj[action.publication.name] = action.publication.id;
       return obj;
     default:
       return state;

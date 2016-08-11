@@ -48,7 +48,8 @@ class Table extends Component {
     this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
     this._handleNormalField = this._handleNormalField.bind(this);
-    this._passDataUp = this._passDataUp.bind(this);
+    this._createPublicationPromises = this._createPublicationPromises.bind(this);
+    this._saveOperations = this._saveOperations.bind(this);
   }
 
   componentDidMount() {
@@ -74,33 +75,55 @@ class Table extends Component {
     const { dispatch } = this.props;
     const selected = this.state.selectedContacts
     .filter( contact => contact.isoutdated )
-    .map( contact => dispatch(actionCreators.updateContact(contact.id)));
+    .map( contact => dispatch(actionCreators.updateContact(contact.id)) );
   }
 
   _handleNormalField(colHeaders, row) {
+    const { pubMapByName, pubArrayByName, publicationReducer } = this.props;
     let field = {};
-    colHeaders.map( (header) => {
+    console.log(row.employerString);
+    colHeaders.map( header => {
       const name = header.data;
       if (!_.isEmpty(row[name])) {
         // only columns labeled as pass can send data to api
-        if (header.pass) {
-          field[name] = row[name];
-        } else {
-          if (name === 'employerString') {
-
-          }
-
-        }
+        if (header.pass) field[name] = row[name];
       }
     });
+    if (!_.isEmpty(row.employerString)) {
+      const employerNames = row.employerString.split(',');
+      const employers = employerNames.map( eName => pubMapByName[eName] );
+      field.employers = employers;
+    }
     if (row.id) field.id = row.id;
     return field;
   }
 
-  _onSaveClick(localData, colHeaders, customfields) {
+  _createPublicationPromises(localData, colHeaders) {
+    const { publicationReducer, dispatch } = this.props;
+    let promises = [];
+    localData.map( row => {
+      colHeaders.map( header => {
+        const name = header.data;
+        if (!_.isEmpty(row[name])) {
+          // only columns labeled as pass can send data to api
+          if (!header.pass && name === 'employerString') {
+              const employerNames = row[name].split(',');
+              const createPubNameList = employerNames.filter( eName => !publicationReducer[eName]);
+              createPubNameList.map( eName =>
+                promises.push(dispatch(actionCreators.createPublication({ name: eName })))
+                );
+          }
+        }
+      });
+    });
+    return promises;
+  }
+
+  _saveOperations(localData, colHeaders, customfields) {
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
+
     localData.map( row => {
       let field = this._handleNormalField(colHeaders, row);
 
@@ -140,7 +163,12 @@ class Table extends Component {
     }
   }
 
-  _passDataUp() {
+  _onSaveClick(localData, colHeaders, customfields) {
+    // create publications for later usage
+    Promise.all(this._createPublicationPromises(localData, colHeaders))
+    .then( _ => {
+      this._saveOperations(localData, colHeaders, customfields);
+    })
   }
 
 
@@ -198,7 +226,6 @@ class Table extends Component {
           listId={this.props.listId}
           _onSaveClick={this._onSaveClick}
           _getSelectedRows={this._getSelectedRows}
-          _passDataUp={this._passDataUp}
           listData={listData}
           contacts={contacts}
           isNew={false}
@@ -228,8 +255,7 @@ const mapStateToProps = (state, props) => {
       }
     }
   }
-  let pubMapByName = {};
-  let pubArrayByName = [];
+
   // make employerString for table renderer
   contacts.map( (contact, i) => {
     if (!_.isEmpty(contact.employers)) {
@@ -238,10 +264,6 @@ const mapStateToProps = (state, props) => {
       .filter( employerId => publicationReducer[employerId])
       .map( eId => {
         const name = publicationReducer[eId].name;
-        if (!pubMapByName[name]) {
-          pubMapByName[name] = eId;
-          pubArrayByName.push(name);
-        }
         return name;
       }).join(',');
       contacts[i].employerString = employerString;
@@ -255,8 +277,8 @@ const mapStateToProps = (state, props) => {
     contacts: contactsLoaded ? contacts : [],
     name: listData ? listData.name : null,
     contactIsReceiving: contactIsReceiving,
-    pubMapByName: pubMapByName,
-    pubArrayByName: pubArrayByName
+    pubMapByName: publicationReducer,
+    publicationReducer: publicationReducer
   };
 };
 

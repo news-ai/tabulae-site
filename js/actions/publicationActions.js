@@ -31,7 +31,11 @@ export function createPublication(data) {
   return (dispatch) => {
     dispatch(requestPublication());
     return api.post('/publications', data)
-    .then( response => dispatch(receivePublication(response)))
+    .then( response => {
+      console.log(response);
+      dispatch(receivePublication(response));
+      return response;
+    })
     .catch( message => console.log(message));
   };
 }

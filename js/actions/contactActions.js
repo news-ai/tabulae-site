@@ -58,10 +58,12 @@ export function updateContact(id) {
 
 export function patchContacts(contactList) {
   return dispatch => {
-    dispatch({ type: 'PATCH_CONTACTS' });
+    dispatch({ type: 'PATCH_CONTACTS', contactList });
 
     return api.patch('/contacts', contactList)
-    .then( response => response)
+    .then( response => {
+      response.map( contact => dispatch(receiveContact(contact)));
+    })
     .catch( message => console.log(message));
   };
 }
