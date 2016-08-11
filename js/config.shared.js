@@ -1,1 +1,1 @@
-window.CONTEXT_API_BASE = `https://context.newsai.org/api`;
+window.TABULAE_API_BASE = `https://tabulae.newsai.org/api`;

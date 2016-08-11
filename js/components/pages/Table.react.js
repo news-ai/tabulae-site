@@ -81,7 +81,6 @@ class Table extends Component {
   _handleNormalField(colHeaders, row) {
     const { pubMapByName, pubArrayByName, publicationReducer } = this.props;
     let field = {};
-    console.log(row.employerString);
     colHeaders.map( header => {
       const name = header.data;
       if (!_.isEmpty(row[name])) {

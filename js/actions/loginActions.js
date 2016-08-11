@@ -21,9 +21,10 @@ function receiveLogin(person) {
   };
 }
 
-function loginFail() {
+function loginFail(message) {
   return {
-    type: LOGIN_FAIL
+    type: LOGIN_FAIL,
+    message
   };
 }
 
@@ -52,7 +53,7 @@ export function fetchPerson() {
     dispatch(requestLogin());
     return api.get('/users/me')
     .then( response => dispatch(receiveLogin(response)))
-    .catch( message => dispatch(loginFail()));
+    .catch( message => dispatch(loginFail(message)));
   };
 }
 

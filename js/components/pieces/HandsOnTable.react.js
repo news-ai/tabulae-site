@@ -6,6 +6,7 @@ import { Notification } from 'react-notification';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
+import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
 
 import 'handsontable/dist/handsontable.full.css';
 
@@ -26,15 +27,6 @@ const styles = {
     width: '400px'
   }
 };
-
-function outdatedRenderer(instance, td, row, col, prop, value, cellProperties) {
-  // different default renderer for each row that is not text-only
-  if (col === 0) Handsontable.renderers.CheckboxRenderer.apply(this, arguments);
-  else Handsontable.renderers.TextRenderer.apply(this, arguments);
-  td.style.backgroundColor = '#CEC';
-  return td;
-}
-
 
 class HandsOnTable extends Component {
   constructor(props) {
@@ -135,24 +127,8 @@ class HandsOnTable extends Component {
         });
       });
     }
-    // const newColumns = options.columns.map( column => {
-    //   if (column.data === 'employerString') {
-    //     return {
-    //       data: 'employerString',
-    //       title: 'Employer(s)',
-    //       type: {
-    //         renderer: myAutocompleteRenderer,
-    //         editor: Handsontable.AutocompleteEditor
-    //       },
-    //       strict: false,
-    //       source: ["Mouse", "Rat", "Human", "C.elegans", "Dyctioselium"]
-    //     };
-    //   } else {
-    //     return column;
-    //   }
-    // });
+    
     options.data = contacts;
-    // options.columns = newColumns;
     this.setState({ options: options, customfields: listData.customfields });
     this.table.updateSettings(options);
   }
