@@ -32,7 +32,6 @@ export function createPublication(data) {
     dispatch(requestPublication());
     return api.post('/publications', data)
     .then( response => {
-      console.log(response);
       dispatch(receivePublication(response));
       return response;
     })

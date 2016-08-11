@@ -61,7 +61,7 @@ ReactDOM.render(
       <Router onUpdate={() => window.scrollTo(0, 0)} history={createHistory()}>
         <Route path='/' name='Home' component={App}>
           <IndexRoute component={ListManager} />
-          <Route path='lists' name='List Manager' component={ListManager}>
+            <Route path='lists' name='List Manager' component={ListManager}>
           </Route>
           <Route path='lists/new' name='New Sheet' component={NewTable} />
           <Route path='lists/:listId' component={Table} />
