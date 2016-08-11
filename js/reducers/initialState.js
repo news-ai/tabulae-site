@@ -1,6 +1,7 @@
 export const initialState = {
   personReducer: {
-    isReceiving: false
+    isReceiving: false,
+    didInvalidate: false
   },
   contactReducer: {
     isReceiving: false

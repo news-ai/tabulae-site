@@ -23,9 +23,10 @@ export function outdatedRenderer(instance, td, row, col, prop, value, cellProper
     const valueStr = Handsontable.helper.stringify(value);
     if (value === null || valueStr.length === 0) {
       Handsontable.renderers.TextRenderer.apply(this, arguments);
+    } else {
+      const htmlString = valueStr.split(',').map( value => roundedCellStringHelper(value)).join('');
+      td.innerHTML = htmlString;
     }
-    const htmlString = valueStr.split(',').map( value => roundedCellStringHelper(value)).join('');
-    td.innerHTML = htmlString;
   }
   else Handsontable.renderers.TextRenderer.apply(this, arguments);
 
