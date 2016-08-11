@@ -4,6 +4,7 @@ import * as actionCreators from 'actions/AppActions';
 import Login from './pages/Login.react';
 import Breadcrumbs from 'react-breadcrumbs';
 import { Notification } from 'react-notification';
+import Navigation from './pieces/Navigation.react';
 
 class App extends Component {
   constructor(props) {
@@ -38,25 +39,21 @@ class App extends Component {
       />
       { isLogin ?
         <div>
-          <div className='u-full-width row' style={{
-            position: 'fixed',
-            height: '60px',
-            backgroundColor: 'red',
-            top: 0,
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <div className='offset-by-one nine columns'>
+          <Navigation>
+            <div className='offset-by-one two columns'>
+              <span style={{color: 'gray'}}>You are at: </span>
+            </div>
+            <div className='seven columns'>
               <Breadcrumbs
               routes={this.props.routes}
               params={this.props.params}
+              separator=' > '
               />
             </div>
             <div className='three columns'>
               <button onClick={logoutClick}>Logout</button>
             </div>
-          </div>
-          <div style={{height: '80px'}}></div>
+          </Navigation>
           <div>
           {this.props.children}
           </div>

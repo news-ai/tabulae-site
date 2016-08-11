@@ -21,7 +21,6 @@ class HomePage extends Component {
     return (
       <div>
         <EmailPanel />
-        <button>Save</button>
         <HandsOnTable />
       </div>
       );
