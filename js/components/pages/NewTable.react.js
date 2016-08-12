@@ -6,6 +6,16 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import _ from 'lodash';
 import 'isomorphic-fetch';
 
+const styles {
+  icon: {
+    color: 'lightgray',
+    ':hover': {
+      color: 'gray',
+      cursor: 'pointer'
+    }
+  }
+};
+
 class NewTable extends Component {
   constructor(props) {
     super(props);
@@ -54,7 +64,6 @@ class NewTable extends Component {
         _onSaveClick={this._onSaveClick}
         isNew={true}
         />
-        <i className='fa fa-camera' aria-hidden='true'></i>
       </div>
       );
   }

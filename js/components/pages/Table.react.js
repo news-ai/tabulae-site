@@ -27,6 +27,13 @@ const styles = {
     zIndex: 100,
     height: '500px',
     width: '600px'
+  },
+  icon: {
+    color: 'lightgray',
+    ':hover': {
+      color: 'gray',
+      cursor: 'pointer'
+    }
   }
 };
 
@@ -198,10 +205,15 @@ class Table extends Component {
               onChange={this._updateName}
               autoFocus
               /> :
-              <span
-              style={[styles.nameBlock.title]}
-              onClick={this._toggleTitleEdit}
-              >{this.state.name}</span>
+              <div onClick={this._toggleTitleEdit}>
+                <span
+                style={[styles.nameBlock.title]}
+                >{this.state.name}</span>
+                <i
+                className='fa fa-pencil-square-o'
+                style={[styles.icon]}
+                aria-hidden='true'></i>
+              </div>
             }
             </div>
           </div>
