@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import EmailPanel from '../pieces/EmailPanel.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
+import ButtonMenu from '../pieces/ButtonMenu.react';
 import _ from 'lodash';
 import Radium from 'radium';
 

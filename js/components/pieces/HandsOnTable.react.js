@@ -127,7 +127,6 @@ class HandsOnTable extends Component {
         });
       });
     }
-    
     options.data = contacts;
     this.setState({ options: options, customfields: listData.customfields });
     this.table.updateSettings(options);
@@ -209,13 +208,16 @@ class HandsOnTable extends Component {
         onDismiss={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
         onClick={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
       />
-          <button style={styles.buttons.save} onClick={ _ => _onSaveClick(
+          <button
+          className='button-primary'
+          style={styles.buttons.save}
+          onClick={ _ => _onSaveClick(
             this.state.options.data,
             this.state.options.columns,
             this.state.customfields
             )}>Save</button>
           <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
-          <button onClick={this._addColumn}>Add Column</button>
+          <button className='button' onClick={this._addColumn}>Add Column</button>
         </div>
         <div ref='data-grid'>
         </div>

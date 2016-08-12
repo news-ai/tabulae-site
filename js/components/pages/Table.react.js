@@ -30,6 +30,7 @@ const styles = {
   },
   icon: {
     color: 'lightgray',
+    marginLeft: '5px',
     ':hover': {
       color: 'gray',
       cursor: 'pointer'
@@ -218,10 +219,10 @@ class Table extends Component {
             </div>
           </div>
           <ButtonMenu>
-            <button style={{
+            <button className='button' style={{
               backgroundColor: this.state.emailPanelOpen ? 'lightgray' : 'white'
             }} onClick={this._toggleEmailPanel}>Email</button>
-            <button style={{
+            <button className='button' style={{
               backgroundColor: 'white'
             }} onClick={this._updateContacts}>Update Contacts</button>
           </ButtonMenu>
