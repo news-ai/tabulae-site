@@ -4,17 +4,7 @@ import * as actionCreators from 'actions/AppActions';
 import EmailPanel from '../pieces/EmailPanel.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import _ from 'lodash';
-import 'isomorphic-fetch';
-
-const styles {
-  icon: {
-    color: 'lightgray',
-    ':hover': {
-      color: 'gray',
-      cursor: 'pointer'
-    }
-  }
-};
+import Radium from 'radium';
 
 class NewTable extends Component {
   constructor(props) {

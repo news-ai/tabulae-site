@@ -182,7 +182,7 @@ class Table extends Component {
     const {
       listId,
       listData,
-      isReceiving,
+      listIsReceiving,
       contactIsReceiving,
       contacts,
       pubMapByName,
@@ -192,7 +192,7 @@ class Table extends Component {
     return (
       <div>
       { contactIsReceiving ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> : null }
-      { isReceiving || listData === undefined ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
+      { listData === undefined ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
         <div>
           <div style={[styles.nameBlock.parent]}>
             <div className='three columns'>
@@ -252,7 +252,6 @@ class Table extends Component {
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
-  const isReceiving = state.listReducer.isReceiving;
   const contactIsReceiving = state.contactReducer.isReceiving;
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
@@ -283,7 +282,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     listId: listId,
-    isReceiving: isReceiving,
+    listIsReceiving: state.listReducer.isReceiving,
     listData: listData,
     contacts: contactsLoaded ? contacts : [],
     name: listData ? listData.name : null,
