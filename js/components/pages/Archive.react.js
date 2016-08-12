@@ -31,14 +31,23 @@ class Archive extends Component {
       <div className='container'>
       <h1>Media Lists</h1>
       {
-        isReceiving ? <span>LOADING...</span> : lists.map( (list, i) =>
+        isReceiving ? <i className='fa fa-spinner fa-spin fa-3x'></i> :
+        <div>
+        {
+          lists.length === 0 ? <span>
+          It looks like you haven't archived any list. This is where lists go when you archive them.
+          </span> : null
+        }
+        {
+          lists.map( (list, i) =>
           <ListItem
           list={list}
           _onArchiveToggle={this._onArchiveToggle}
           iconName='fa fa-arrow-left'
           key={i}
-          / >
-          )
+          />)
+        }
+        </div>
       }
       </div>
       );

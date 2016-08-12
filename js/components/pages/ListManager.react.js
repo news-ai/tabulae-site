@@ -42,6 +42,11 @@ class ListManager extends Component {
           marginTop: '50px'
         }}>
           {
+            lists.length === 0 ? <span>
+            It looks like you haven't created any list. Go ahead and make one!
+            </span> : null
+          }
+          {
             lists.map( (list, i) =>
               <ListItem
               list={list}

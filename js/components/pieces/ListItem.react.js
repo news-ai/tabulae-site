@@ -30,6 +30,7 @@ function ListItem({list, key, _onArchiveToggle, iconName}) {
       </div>
       <div className='six columns'>
         <i
+        alt='archive'
         key={key}
         className={iconName}
         style={[globalStyles.icon]}

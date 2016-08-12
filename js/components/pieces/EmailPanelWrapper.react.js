@@ -106,7 +106,9 @@ class EmailPanelWrapper extends Component {
   }
 
   render() {
-    const { previewEmails, isReceiving, dispatch, stagingReducer } = this.props;
+    const { previewEmails, isReceiving, stagingReducer } = this.props;
+    // add this button to fetch all staged emails for debugging purposes
+    // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
     return (
       <div>
         <EmailPanel
@@ -118,7 +120,6 @@ class EmailPanelWrapper extends Component {
         style={styles.sendButton}
         onClick={this._processEmails}
         >Preview</button>
-        <button onClick={this._showStagingEmails}>Show Staging Emails</button>
         <SkyLight hideOnOverlayClicked ref='preview' title='Preview'>
           {
             (isReceiving || previewEmails.length === 0) ? <span>LOADING..</span> :
