@@ -50,6 +50,9 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = false;
       obj[action.list.id] = action.list;
       return obj;
+    case PATCH_LIST:
+       obj.isReceiving = true;
+       return obj;
     default:
       return state;
   }

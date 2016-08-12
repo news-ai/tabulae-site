@@ -10,7 +10,7 @@ class NewTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: 'untitled'
+      name: ''
     };
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onNameChange = e => this.setState({ name: e.target.value });
@@ -35,17 +35,26 @@ class NewTable extends Component {
         addContactList.push(field);
       }
     });
-    dispatch(actionCreators.createNewSheet(this.state.name, addContactList));
+    let name = this.state.name || 'untitled';
+    dispatch(actionCreators.createNewSheet(name, addContactList));
   }
 
   render() {
     return (
       <div>
-        <span>List Name: </span><input type='text' onChange={this._onNameChange} value={this.state.name}></input>
+        <div className='three columns' style={{marginLeft: '20px'}}>
+          <input
+          type='text'
+          className='u-full-width'
+          onChange={this._onNameChange}
+          placeholder='list name'
+          value={this.state.name}></input>
+        </div>
         <HandsOnTable
         _onSaveClick={this._onSaveClick}
         isNew={true}
         />
+        <i className='fa fa-camera' aria-hidden='true'></i>
       </div>
       );
   }
