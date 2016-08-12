@@ -5,14 +5,14 @@ import Radium from 'radium';
 
 const styles = {
   parent: {
-    margin: '10px',
+    marginBottom: '10px'
   },
   link: {
     margin: '10px'
   },
   icon: {
     color: 'lightgray',
-    float: 'right',
+    float: 'left',
     ':hover': {
       color: 'gray',
       cursor: 'pointer'
@@ -22,16 +22,20 @@ const styles = {
 
 function ListItem({list, key, _onArchiveToggle, iconName}) {
   return (
-    <div key={key} style={[styles.parent]}>
-      <Link key={key} to={`/lists/${list.id}`} style={[styles.link]}>
-        <span>{list.name}</span>
-      </Link>
-      <i
-      key={key}
-      className={iconName}
-      style={[globalStyles.icon]}
-      onClick={ _ => _onArchiveToggle(list.id) }
-      aria-hidden='true'></i>
+    <div className='row' style={[styles.parent]} key={key}>
+      <div className='six columns'>
+        <Link key={key} to={`/lists/${list.id}`} style={[styles.link]}>
+          <span>{list.name}</span>
+        </Link>
+      </div>
+      <div className='six columns'>
+        <i
+        key={key}
+        className={iconName}
+        style={[globalStyles.icon]}
+        onClick={ _ => _onArchiveToggle(list.id) }
+        aria-hidden='true'></i>
+      </div>
     </div>
     );
 }

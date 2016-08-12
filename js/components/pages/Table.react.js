@@ -184,8 +184,8 @@ class Table extends Component {
 
     return (
       <div>
-      { contactIsReceiving ? <img src='/img/default_loading.gif' /> : null }
-      { isReceiving || listData === undefined ? <span>LOADING..</span> :
+      { contactIsReceiving ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> : null }
+      { isReceiving || listData === undefined ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
         <div>
           <div style={[styles.nameBlock.parent]}>
             <div className='three columns'>

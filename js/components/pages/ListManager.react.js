@@ -30,19 +30,30 @@ class ListManager extends Component {
     const { lists } = this.props;
     return (
       <div className='container'>
-      <h1>Media Lists</h1>
-      {
-        lists.map( (list, i) =>
-          <ListItem
-          list={list}
-          _onArchiveToggle={this._onArchiveToggle}
-          iconName='fa fa-archive'
-          key={i}
-          / >
-          )
-      }
-      <button onClick={this._onClick}>Add New List</button>
-      <Link to={`/archive`} />
+        <div style={{marginTop: '20px'}}>
+          <span style={{fontSize: '2em', marginRight: '10px'}}>Media Lists</span>
+          <Link to='/archive'>
+            <span>Archive</span>
+            <i className='fa fa-angle-right fa-fw' aria-hidden='true'></i>
+          </Link>
+        </div>
+        <div style={{
+          marginBottom: '50px',
+          marginTop: '50px'
+        }}>
+          {
+            lists.map( (list, i) =>
+              <ListItem
+              list={list}
+              _onArchiveToggle={this._onArchiveToggle}
+              iconName='fa fa-archive'
+              key={i}
+              />
+              )
+          }
+        </div>
+        <button onClick={this._onClick}>Add New List</button>
+        <Link to={`/archive`} />
       </div>
       );
   }
