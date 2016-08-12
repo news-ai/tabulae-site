@@ -60,13 +60,13 @@ export const COLUMNS = [
     title: 'Instagram',
     pass: true
   },
-  {
-    data: 'id',
-    title: 'ID',
-    pass: true
-  },
-  {
-    data: 'parent',
-    title: 'Parent'
-  }
+  // {
+  //   data: 'id',
+  //   title: 'ID',
+  //   pass: true
+  // },
+  // {
+  //   data: 'parent',
+  //   title: 'Parent'
+  // }
 ];

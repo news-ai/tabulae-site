@@ -4,7 +4,7 @@ import {
   REQUEST_LIST,
   RECEIVE_LIST,
   REQUEST_LISTS_FAIL,
-  ADDED_CONTACT
+  PATCH_LIST
 } from '../constants/AppConstants';
 
 import { assignToEmpty } from '../utils/assign';
@@ -19,7 +19,7 @@ function listReducer(state = initialState.listReducer, action) {
     action.type === REQUEST_LIST ||
     action.type === RECEIVE_LIST ||
     action.type === REQUEST_LISTS_FAIL ||
-    action.type === ADDED_CONTACT
+    action.type === PATCH_LIST
     ) accessing = true;
   else return state;
 

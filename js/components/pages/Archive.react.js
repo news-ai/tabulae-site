@@ -29,26 +29,34 @@ class Archive extends Component {
     const { lists, isReceiving } = this.props;
     return (
       <div className='container'>
-      <h1>Media Lists</h1>
-      {
-        isReceiving ? <i className='fa fa-spinner fa-spin fa-3x'></i> :
-        <div>
-        {
-          lists.length === 0 ? <span>
-          It looks like you haven't archived any list. This is where lists go when you archive them.
-          </span> : null
-        }
-        {
-          lists.map( (list, i) =>
-          <ListItem
-          list={list}
-          _onArchiveToggle={this._onArchiveToggle}
-          iconName='fa fa-arrow-left'
-          key={i}
-          />)
-        }
+        <div style={{marginTop: '20px'}}>
+          <span style={{fontSize: '2em', marginRight: '10px'}}>
+          List Archive
+          </span>
+          <Link to='/'>
+            <span>Media Lists</span>
+            <i className='fa fa-angle-right fa-fw' aria-hidden='true'></i>
+          </Link>
         </div>
-      }
+        <div style={{
+          marginBottom: '50px',
+          marginTop: '50px'
+        }}>
+          {
+            lists.length === 0 ? <span>
+            It looks like you haven't archived any list. This is where lists go when you archive them.
+            </span> : null
+          }
+          {
+            lists.map( (list, i) =>
+            <ListItem
+            list={list}
+            _onArchiveToggle={this._onArchiveToggle}
+            iconName='fa fa-arrow-left'
+            key={i}
+            />)
+          }
+        </div>
       </div>
       );
   }

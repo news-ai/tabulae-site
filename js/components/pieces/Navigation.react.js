@@ -15,7 +15,7 @@ function Navigation({children}) {
       }}>
         {children}
       </div>
-      <div style={{height: '50px'}}></div>
+      <div style={{height: '60px'}}></div>
     </div>
     );
 }
