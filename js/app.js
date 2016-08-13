@@ -64,7 +64,7 @@ ReactDOM.render(
             <Route path='lists' name='List Manager' component={ListManager}>
           </Route>
           <Route path='lists/new' name='New Sheet' component={NewTable} />
-          <Route path='lists/:listId' name='Sheet' component={Table} />
+          <Route path='lists/:listId' staticName={true} name='Sheet' component={Table} />
           <Route path='archive' name='Archive' component={Archive} />
           <Route path='email' name='Email' component={EmailPanel} />
           <Route path='*' component={NotFound} />
