@@ -7,6 +7,8 @@ import ButtonMenu from '../pieces/ButtonMenu.react';
 import Radium from 'radium';
 import _ from 'lodash';
 import { globalStyles } from 'constants/StyleConstants';
+import SkyLight from 'react-skylight';
+import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 
 const styles = {
   nameBlock: {
@@ -197,27 +199,20 @@ class Table extends Component {
         <div>
           <div style={[styles.nameBlock.parent]}>
             <div className='three columns'>
-            { this.state.onTitleEdit ? 
-              <input
-              className='u-full-width'
-              type='text'
-              onBlur={this._toggleTitleEdit}
-              value={this.state.name}
-              onChange={this._updateName}
-              autoFocus
-              /> :
-              <div onClick={this._toggleTitleEdit}>
-                <span
-                style={[styles.nameBlock.title]}
-                >{this.state.name}</span>
-                <i
-                className='fa fa-pencil-square-o'
-                style={[styles.icon]}
-                aria-hidden='true'></i>
-              </div>
-            }
+            <ToggleableEditInput
+            name={this.state.name}
+            updateName={this._updateName}
+            toggleTitleEdit={this._toggleTitleEdit}
+            onTitleEdit={this.state.onTitleEdit}
+            />
             </div>
           </div>
+          <SkyLight hideOnOverlayClicked ref='input' title='Preview'>
+            <form action={'https://tabulae.newsai.org/api/lists/' + listId + '/upload'} method='POST' enctype='multipart/form-data'>
+                Upload File: <input type='file' name='file'></input>
+                <input className='button' type='submit' name='submit' value='Submit'></input>
+            </form>
+          </SkyLight>
           <ButtonMenu>
             <button className='button' style={{
               backgroundColor: this.state.emailPanelOpen ? 'lightgray' : 'white'
@@ -225,6 +220,10 @@ class Table extends Component {
             <button className='button' style={{
               backgroundColor: 'white'
             }} onClick={this._updateContacts}>Update Contacts</button>
+            <button
+            className='button'
+            onClick={ _ => this.refs.input.show() }>
+            Upload from File</button>
           </ButtonMenu>
           { this.state.emailPanelOpen ? 
             <div>

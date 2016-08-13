@@ -153,7 +153,7 @@ class HandsOnTable extends Component {
       console.log(columnName + 'CANNOT BE DELETED');
       this.setState({
         noticeIsActive: true,
-        noticeMessage: `Column "${columnName}" is a default column and, therefore, cannot be deleted.`
+        noticeMessage: `Column '${columnName}' is a default column and, therefore, cannot be deleted.`
       });
     }
   }

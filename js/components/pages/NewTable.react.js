@@ -51,6 +51,7 @@ class NewTable extends Component {
           placeholder='list name'
           value={this.state.name}></input>
         </div>
+
         <HandsOnTable
         _onSaveClick={this._onSaveClick}
         isNew={true}
