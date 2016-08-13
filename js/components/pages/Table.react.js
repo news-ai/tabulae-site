@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import SkyLight from 'react-skylight';
+import Radium from 'radium';
+import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
+import { globalStyles } from 'constants/StyleConstants';
 import EmailPanelWrapper from '../pieces/EmailPanelWrapper.react';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ButtonMenu from '../pieces/ButtonMenu.react';
-import Radium from 'radium';
-import _ from 'lodash';
-import { globalStyles } from 'constants/StyleConstants';
-import SkyLight from 'react-skylight';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
+import DropFile from '../pieces/DropFile.react';
 
 const styles = {
   nameBlock: {
@@ -207,11 +208,8 @@ class Table extends Component {
             />
             </div>
           </div>
-          <SkyLight hideOnOverlayClicked ref='input' title='Preview'>
-            <form action={'https://tabulae.newsai.org/api/lists/' + listId + '/upload'} method='POST' enctype='multipart/form-data'>
-                Upload File: <input type='file' name='file'></input>
-                <input className='button' type='submit' name='submit' value='Submit'></input>
-            </form>
+          <SkyLight hideOnOverlayClicked ref='input' title='File Drop'>
+            <DropFile />
           </SkyLight>
           <ButtonMenu>
             <button className='button' style={{
@@ -226,13 +224,10 @@ class Table extends Component {
             Upload from File</button>
           </ButtonMenu>
           { this.state.emailPanelOpen ? 
-            <div>
             <EmailPanelWrapper
             selectedContacts={this.state.selectedContacts}
             customfields={listData.customfields}
-            />
-            </div>
-            : null }
+            /> : null }
           <HandsOnTable
           listId={this.props.listId}
           _onSaveClick={this._onSaveClick}
