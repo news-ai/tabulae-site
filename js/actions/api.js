@@ -1,5 +1,4 @@
 import fetch from 'isomorphic-fetch';
-import request from 'superagent';
 
 export function get(endpoint) {
   return fetch(`${window.TABULAE_API_BASE}${endpoint}`, { credentials: 'include'})
