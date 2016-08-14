@@ -4,18 +4,26 @@ export const initialState = {
     didInvalidate: false
   },
   contactReducer: {
-    isReceiving: false
+    isReceiving: false,
+    didInvalidate: false
   },
   listReducer: {
     isReceiving: false,
+    didInvalidate: false,
     tempNewList: [],
     lists: []
   },
   stagingReducer: {
     isReceiving: false,
+    didInvalidate: false,
     previewEmails: []
   },
   publicationReducer: {
-    isReceiving: false
+    isReceiving: false,
+    didInvalidate: false
+  },
+  fileReducer: {
+    isReceiving: false,
+    didInvalidate: false
   }
 };

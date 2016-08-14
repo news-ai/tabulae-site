@@ -3,6 +3,7 @@ import * as listActions from './listActions';
 import * as contactActions from './contactActions';
 import * as stagingActions from './stagingActions';
 import * as publicationActions from './publicationActions';
+import * as fileActions from './fileActions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const register = _ => loginActions.register();
@@ -16,7 +17,6 @@ export const fetchList = listId => listActions.fetchList(listId);
 export const createNewSheet = (name, contactList) => listActions.createNewSheet(name, contactList);
 export const patchList = (listId, name, contactList, customfields) => listActions.patchList(listId, name, contactList, customfields);
 export const archiveListToggle = listId => listActions.archiveListToggle(listId);
-export const uploadFile = (listId, file) => listActions.uploadFile(listId, file);
 
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);
@@ -30,3 +30,5 @@ export const getStagedEmails = _ => stagingActions.getStagedEmails();
 
 export const fetchPublication = id => publicationActions.fetchPublication(id);
 export const createPublication = data => publicationActions.createPublication(data);
+
+export const uploadFile = (listId, file) => fileActions.uploadFile(listId, file);

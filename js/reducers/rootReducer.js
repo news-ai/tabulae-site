@@ -9,13 +9,15 @@ import contactReducer from './contactReducer';
 import listReducer from './listReducer';
 import stagingReducer from './stagingReducer';
 import publicationReducer from './publicationReducer';
+import fileReducer from './fileReducer';
 
 const rootReducer = combineReducers({
   personReducer,
   contactReducer,
   listReducer,
   stagingReducer,
-  publicationReducer
+  publicationReducer,
+  fileReducer
 });
 
 export default rootReducer;
