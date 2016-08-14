@@ -1,4 +1,5 @@
-import 'isomorphic-fetch';
+import fetch from 'isomorphic-fetch';
+import request from 'superagent';
 
 export function get(endpoint) {
   return fetch(`${window.TABULAE_API_BASE}${endpoint}`, { credentials: 'include'})
@@ -13,6 +14,20 @@ export function post(endpoint, body) {
     body: JSON.stringify(body)
   })
     .then( response => response.status === 200 ? response.text() : Promise.reject(response))
+    .then( text => JSON.parse(text));
+}
+
+export function postFile(endpoint, file) {
+  return fetch(`${window.TABULAE_API_BASE}${endpoint}`, {
+    method: 'POST',
+    // headers: {
+    //   'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+    //   'Content-Type': 'multipart/form-data; boundary=' + boundary,
+    // },
+    credentials: 'include',
+    body: file
+  })
+    .then( response => response.status === 200 ? response.text() : Promise.reject(response.text()))
     .then( text => JSON.parse(text));
 }
 

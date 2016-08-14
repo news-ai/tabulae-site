@@ -209,7 +209,9 @@ class Table extends Component {
             </div>
           </div>
           <SkyLight hideOnOverlayClicked ref='input' title='File Drop'>
-            <DropFile />
+            <DropFile
+            listId={listId}
+            />
           </SkyLight>
           <ButtonMenu>
             <button className='button' style={{
@@ -220,6 +222,7 @@ class Table extends Component {
             }} onClick={this._updateContacts}>Update Contacts</button>
             <button
             className='button'
+            style={{backgroundColor: 'white'}}
             onClick={ _ => this.refs.input.show() }>
             Upload from File</button>
           </ButtonMenu>
