@@ -32,3 +32,4 @@ export const fetchPublication = id => publicationActions.fetchPublication(id);
 export const createPublication = data => publicationActions.createPublication(data);
 
 export const uploadFile = (listId, file) => fileActions.uploadFile(listId, file);
+export const fetchHeaders = (listId, fileId) => fileActions.fetchHeaders(listId, fileId);

@@ -32,14 +32,16 @@ function fileReducer(state = initialState.fileReducer, action) {
       return obj;
     case RECEIVE_FILE:
       obj.isReceiving = false;
-      obj[action.file.id] = action.file;
+      // file belongs to list
+      obj[action.listId] = action.file;
       return obj;
     case REQUEST_HEADERS:
       obj.isReceiving = true;
       return obj;
     case RECEIVE_HEADERS:
       obj.isReceiving = false;
-      obj[action.fileId].headers = action.headers;
+      if (!obj[action.listId]) obj[action.listId] = {};
+      obj[action.listId].headers = action.headers;
       return obj;
     default:
       return state;

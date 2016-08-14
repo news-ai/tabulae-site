@@ -44,22 +44,6 @@ function requestListFail(message) {
   };
 }
 
-function receiveFile(file) {
-  return {
-    type: 'RECEIVE_FILE',
-    file
-  };
-}
-
-export function uploadFile(listId, file) {
-  return dispatch => {
-    dispatch({ type: 'UPLOAD_FILE', listId, file});
-    return api.postFile('/lists/' + listId + '/upload', file)
-    .then( response => dispatch(receiveFile(response)))
-    .catch( message => dispatch({ type: 'UPLOAD_FILE_FAIL', message }));
-  };
-}
-
 
 export function fetchList(listId) {
   return dispatch => {
