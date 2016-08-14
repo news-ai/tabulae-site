@@ -20,10 +20,6 @@ export function post(endpoint, body) {
 export function postFile(endpoint, file) {
   return fetch(`${window.TABULAE_API_BASE}${endpoint}`, {
     method: 'POST',
-    // headers: {
-    //   'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
-    //   'Content-Type': 'multipart/form-data; boundary=' + boundary,
-    // },
     credentials: 'include',
     body: file
   })

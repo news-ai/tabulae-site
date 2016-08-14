@@ -44,8 +44,11 @@ function requestListFail(message) {
   };
 }
 
-function receiveFile(fileObj) {
-  console.log(fileObj);
+function receiveFile(file) {
+  return {
+    type: 'RECEIVE_FILE',
+    file
+  };
 }
 
 export function uploadFile(listId, file) {

@@ -13,31 +13,17 @@ class DropFile extends Component {
     };
     this._onDrop = this._onDrop.bind(this);
     this._submit = this._submit.bind(this);
-    this._log = this._log.bind(this);
   }
 
   _onDrop(files) {
-    console.log(files);
     this.setState({ file: files[0] });
   }
 
   _submit() {
     const {dispatch, listId} = this.props;
-    console.log(this.state.file);
     let data = new FormData();
     data.append('file', this.state.file);
-    console.log(data);
     dispatch(actionCreators.uploadFile(listId, data));
-    // dispatch(actionCreators.uploadFile(listId, this.state.file));
-
-  }
-
-  _log() {
-    var form = document.querySelector('form');
-    var formData = new FormData(form);
-    for (var [key, value] of formData.entries()) { 
-      console.log(key, value);
-    }
   }
 
   render() {
