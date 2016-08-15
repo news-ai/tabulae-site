@@ -20,6 +20,7 @@ class Headers extends Component {
         {value: 'instagram', label: 'Instagram'},
         {value: 'website', label: 'Website'},
         {value: 'blog', label: 'Blog'},
+        {value: '_', label: '[leave me blank]'},
       ],
       optionSelected: {
         firstname: false,
@@ -37,9 +38,11 @@ class Headers extends Component {
     };
     this._logChange = this._logChange.bind(this);
     this._createCustom = this._createCustom.bind(this);
+    this._sendHeaderNames = this._sendHeaderNames.bind(this);
   }
 
   _createCustom(options, filterValue, excludeOptions) {
+    // TODO: flag input when custom values are being created
     const lowerFilterValue = filterValue.toLowerCase();
     const filteredOptions = options.filter( option => {
       if (option.value.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
@@ -50,8 +53,6 @@ class Headers extends Component {
     if (filteredOptions.length === 0 && filterValue.length > 0) {
       filteredOptions.push({ value: filterValue, label: filterValue, create: true });
     }
-    console.log(options);
-    console.log(filterValue);
 
     return filteredOptions;
   }
@@ -93,6 +94,13 @@ class Headers extends Component {
     });
   }
 
+  _sendHeaderNames() {
+    const { headers } = this.state;
+    console.log(headers);
+    const order = headers.map( header => !header.value ? '' : header.value.value === '_' ? '' : header.value.value);
+    console.log(order);
+  }
+
   render() {
     const { headers, defaultOptions } = this.state;
     const options = defaultOptions;
@@ -113,6 +121,7 @@ class Headers extends Component {
             </ul>
           </div>);
       })}
+        <button className='button' onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>
     );
   }
