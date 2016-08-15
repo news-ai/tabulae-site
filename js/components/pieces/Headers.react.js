@@ -36,6 +36,24 @@ class Headers extends Component {
       }
     };
     this._logChange = this._logChange.bind(this);
+    this._createCustom = this._createCustom.bind(this);
+  }
+
+  _createCustom(options, filterValue, excludeOptions) {
+    const lowerFilterValue = filterValue.toLowerCase();
+    const filteredOptions = options.filter( option => {
+      if (option.value.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
+      else if (option.label.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
+      else return false;
+    });
+
+    if (filteredOptions.length === 0 && filterValue.length > 0) {
+      filteredOptions.push({ value: filterValue, label: filterValue, create: true });
+    }
+    console.log(options);
+    console.log(filterValue);
+
+    return filteredOptions;
   }
 
   _logChange(obj, i) {
@@ -44,26 +62,30 @@ class Headers extends Component {
     let newOptionSelected = optionSelected;
     let newDefaultOptions = defaultOptions;
     let newHeaders = headers;
-    console.log('--------');
-    console.log(obj);
 
     if (optionSelected[value] !== undefined) {
-      console.log('EXIST');
       if (headers[i].value) {
+        // if field is set, turn that original value back on before setting new one
         const currObj = headers[i].value;
         newOptionSelected[currObj.value] = false;
+        newDefaultOptions = newDefaultOptions.map( option => {
+          if (option.value === currObj.value) option.disabled = false;
+          return option;
+        });
       }
+      // turn value on and set the field
       newOptionSelected[value] = true;
+      newDefaultOptions = newDefaultOptions.map( option => {
+        if (option.value === value) option.disabled = true;
+        return option;
+      });
     } else {
-      console.log('DOESNT EXIST');
-      newOptionSelected[value] = true;
-      newDefaultOptions.push({ value, label: value });
+      if (obj.create) {
+        newOptionSelected[value] = true;
+        newDefaultOptions.push({ value, label: value, disabled: true});
+      }
     }
     newHeaders[i].value = obj;
-    console.log(newHeaders);
-    console.log(newOptionSelected);
-    console.log(newDefaultOptions);
-    console.log('--------');
     this.setState({
       headers: newHeaders,
       optionSelected: newOptionSelected,
@@ -72,9 +94,8 @@ class Headers extends Component {
   }
 
   render() {
-    const { headers, defaultOptions, optionSelected } = this.state;
-    const options = defaultOptions.filter( option => !optionSelected[option.value]);
-    console.log(options);
+    const { headers, defaultOptions } = this.state;
+    const options = defaultOptions;
     return (
       <div>
       {headers.map( (header, i) => {
@@ -85,7 +106,7 @@ class Headers extends Component {
             options={options}
             onChange={ val => this._logChange(val, i)}
             value={header.value}
-            allowCreate
+            filterOptions={this._createCustom}
             />
             <ul>
             {header.rows.map( (item, j) => <li key={j}>{item}</li>)}
