@@ -4,6 +4,7 @@ import * as actionCreators from 'actions/AppActions';
 import Dropzone from 'react-dropzone';
 import Headers from './Headers.react';
 import _ from 'lodash';
+import Radium from 'radium';
 
 function Waiting({}) {
   return (
@@ -13,6 +14,38 @@ function Waiting({}) {
     </div>
     );
 }
+
+
+const styles = {
+  dropzone: {
+    borderWidth: 2,
+    borderColor: 'black',
+    borderStyle: 'dashed',
+    borderRadius: 4,
+    margin: 30,
+    padding: 30,
+    width: 200,
+    transition: 'all 0.5s',
+  },
+  icon: {
+    color: 'lightgray',
+    marginLeft: '7px',
+    ':hover': {
+      color: 'gray',
+      cursor: 'pointer'
+    }
+  }
+};
+
+const activeStyle = {
+    borderStyle: 'solid',
+    borderColor: '#4FC47F'
+};
+
+const rejectStyle = {
+    borderStyle: 'solid',
+    borderColor: '#DD3A0A'
+};
 
 class DropFile extends Component {
   constructor(props) {
@@ -27,16 +60,8 @@ class DropFile extends Component {
     this._processHeaders = this._processHeaders.bind(this);
   }
 
-  componentDidMount() {
-    // TESTING USE ONLU
-    const { dispatch, listId } = this.props;
-    const fileId = 4869890812936192;
-    dispatch(actionCreators.fetchHeaders(listId, fileId));
-    console.log('REMOVE THIS AFTER TESTING');
-  }
-
   _onDrop(files) {
-    this.setState({ file: files[0], isFileDropped: true });
+    this.setState({ file: files[files.length - 1], isFileDropped: true });
   }
 
   _submit() {
@@ -50,8 +75,7 @@ class DropFile extends Component {
 
   _processHeaders(order) {
     const { dispatch, listId } = this.props;
-    const fileId = 4869890812936192;
-    dispatch(actionCreators.addHeaders(listId, order, fileId))
+    dispatch(actionCreators.addHeaders(listId, order))
     .then( _ => dispatch(actionCreators.waitForServerProcess(listId)));
   }
 
@@ -63,7 +87,6 @@ class DropFile extends Component {
     if (isProcessWaiting) {
       renderNode = <Waiting />;
     } else {
-     
       if (isFileDropped) {
         if (fileSubmitted) {
           renderNode = (fileIsReceiving || !headers) ? 
@@ -74,8 +97,9 @@ class DropFile extends Component {
         } else {
           renderNode = (
             <div>
-              <div className='row'>
-                <span>{this.state.file.name}</span>
+              <div className='row' style={{marginBottom: '20px'}}>
+                <span>{file.name} -- {file.size} bytes</span>
+                <i style={[styles.icon]} onClick={ _ => this.setState({ file: null, isFileDropped: false })} className='fa fa-close' aria-hidden='true'></i>
               </div>
               <div className='row'>
                 <button
@@ -87,22 +111,27 @@ class DropFile extends Component {
           );
         }
       } else {
-      // TEMP TEST USE
-      renderNode = (fileIsReceiving || !headers) ? 
-          <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
-          <Headers
-          headers={headers}
-          onProcessHeaders={this._processHeaders} />;
-      // END TEMP TEST USE
-        // renderNode = (
-        //   <Dropzone onDrop={this._onDrop}>
-        //     <div>Try dropping some files here, or click to select files to upload.</div>
-        //   </Dropzone>);
+      
+        renderNode = (
+          <Dropzone
+          accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          style={styles.dropzone}
+          activeStyle={activeStyle}
+          rejectStyle={rejectStyle}
+          onDrop={this._onDrop}
+          multiple={false}
+          >
+            <div>Try dropping some files here, or click to select files to upload.</div>
+          </Dropzone>);
       }
     }
 
     return (
-      <div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
       {renderNode}
       </div>
       );
@@ -113,7 +142,7 @@ const mapStateToProps = (state, props) => {
   return {
     fileReducer: state.fileReducer,
     fileIsReceiving: state.fileReducer.isReceiving,
-    headersWaiting: state.fileReducer.isProcessWaiting
+    isProcessWaiting: state.fileReducer.isProcessWaiting
   };
 };
 
@@ -126,4 +155,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(DropFile);
+)(Radium(DropFile));

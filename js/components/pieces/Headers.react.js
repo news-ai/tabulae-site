@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Select from 'react-select';
 import * as actionCreators from 'actions/AppActions';
 import 'react-select/dist/react-select.css';
+import Radium from 'radium';
 
 class Headers extends Component {
   constructor(props) {
@@ -142,4 +143,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(Headers);
+  )(Radium(Headers));

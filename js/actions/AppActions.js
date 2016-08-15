@@ -32,6 +32,6 @@ export const fetchPublication = id => publicationActions.fetchPublication(id);
 export const createPublication = data => publicationActions.createPublication(data);
 
 export const uploadFile = (listId, file) => fileActions.uploadFile(listId, file);
-export const fetchHeaders = (listId, fileId) => fileActions.fetchHeaders(listId, fileId);
-export const addHeaders = (listId, order, fileId) => fileActions.addHeaders(listId, order, fileId);
+export const fetchHeaders = listId => fileActions.fetchHeaders(listId);
+export const addHeaders = (listId, order) => fileActions.addHeaders(listId, order);
 export const waitForServerProcess = listId => fileActions.waitForServerProcess(listId);

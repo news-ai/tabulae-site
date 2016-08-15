@@ -28,12 +28,9 @@ export function uploadFile(listId, file) {
   };
 }
 
-export function fetchHeaders(listId, fId) {
-  console.log('TAKE OUT fId WHEN DONE DEBUGGING');
+export function fetchHeaders(listId) {
   return (dispatch, getState) => {
-    let fileId;
-    if (!getState().fileReducer[listId]) fileId = fId;
-    else fileId = getState().fileReducer[listId].file.id;
+    let fileId = getState().fileReducer[listId].id;
     dispatch({ type: REQUEST_HEADERS, listId });
     return api.get('/files/' + fileId + '/headers')
     .then( response => dispatch({ type: RECEIVE_HEADERS, headers: response, listId }))
@@ -52,12 +49,10 @@ export function waitForServerProcess(listId) {
   };
 }
 
-export function addHeaders(listId, order, fileId) {
-  console.log('TAKE OUT fId WHEN DONE DEBUGGING');
+export function addHeaders(listId, order) {
   return (dispatch, getState) => {
     dispatch({ type: 'ADDING_HEADER', order });
-    // if (!getState().fileReducer[listId]) fileId = fId;
-    // else fileId = getState().fileReducer[listId].file.id;
+    let fileId = getState().fileReducer[listId].id;
 
     return api.post('/files/' + fileId + '/headers', {order: order})
     .then( response => dispatch({ type: 'ADDED_HEADER', response }))
