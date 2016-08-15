@@ -18,14 +18,24 @@ function Waiting({}) {
 
 const styles = {
   dropzone: {
-    borderWidth: 2,
-    borderColor: 'black',
-    borderStyle: 'dashed',
-    borderRadius: 4,
-    margin: 30,
-    padding: 30,
-    width: 200,
-    transition: 'all 0.5s',
+    default: {
+      borderWidth: 2,
+      borderColor: 'black',
+      borderStyle: 'dashed',
+      borderRadius: 4,
+      margin: 30,
+      padding: 30,
+      width: 200,
+      transition: 'all 0.4s',
+    },
+    active: {
+      borderStyle: 'solid',
+      borderColor: '#4FC47F'
+    },
+    reject: {
+      borderStyle: 'solid',
+      borderColor: '#DD3A0A'
+    }
   },
   icon: {
     color: 'lightgray',
@@ -35,16 +45,6 @@ const styles = {
       cursor: 'pointer'
     }
   }
-};
-
-const activeStyle = {
-    borderStyle: 'solid',
-    borderColor: '#4FC47F'
-};
-
-const rejectStyle = {
-    borderStyle: 'solid',
-    borderColor: '#DD3A0A'
 };
 
 class DropFile extends Component {
@@ -81,8 +81,13 @@ class DropFile extends Component {
 
   render() {
     const { listId, fileIsReceiving, fileReducer, isProcessWaiting } = this.props;
-    const { file, isFileDropped, fileSubmitted } = this.state;
-    const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
+    // const { file, isFileDropped, fileSubmitted } = this.state;
+    // const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
+    // START
+    const headers = [];
+    const isFileDropped = true;
+    const fileSubmitted = true;
+    // END
     let renderNode;
     if (isProcessWaiting) {
       renderNode = <Waiting />;
@@ -115,13 +120,13 @@ class DropFile extends Component {
         renderNode = (
           <Dropzone
           accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          style={styles.dropzone}
-          activeStyle={activeStyle}
-          rejectStyle={rejectStyle}
+          style={styles.dropzone.default}
+          activeStyle={styles.dropzone.active}
+          rejectStyle={styles.dropzone.reject}
           onDrop={this._onDrop}
           multiple={false}
           >
-            <div>Try dropping some files here, or click to select files to upload.</div>
+            <div>Try dropping an Excel (.xlsx) file here, or click to select file to upload.</div>
           </Dropzone>);
       }
     }

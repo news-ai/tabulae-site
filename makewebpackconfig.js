@@ -106,6 +106,7 @@ return {
       'handsontable': __dirname + '/node_modules/handsontable',
       'draft-js': __dirname + '/node_modules/draft-js',
       'react-select': __dirname + '/node_modules/react-select',
+      'fixed-data-table': __dirname + '/node_modules/fixed-data-table',
       'img': __dirname + '/img',
       'constants': __dirname + '/js/constants',
       'actions': __dirname + '/js/actions',

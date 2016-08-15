@@ -2,14 +2,36 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import * as actionCreators from 'actions/AppActions';
-import 'react-select/dist/react-select.css';
 import Radium from 'radium';
+// import {Table, Column, Cell} from 'fixed-data-table';
+import 'react-select/dist/react-select.css';
+// import 'fixed-data-table/dist/fixed-data-table.css';
+
+const TEST_HEADERS = [{
+  "rows": ["Erin", "Hector", "Dena", "Georgia Alexia", "Cheryl", "Renata", "Courtney", "Lauren", "Gina Rose", "Christina", "Don", "Jasmine", "Alex", "Martin", "Sarah"]
+}, {
+  "rows": ["Turon", "Castro", "Giannini", "Benjou", "Locke", "Gar", "Ignelzie", "Parker", "Sirico", "Sulpizio", "West", "Lombardi", "White", "Brown", "Stallmann"]
+}, {
+  "rows": ["Erin turon, Stylist, Inc.", "10 and 10 Men Magazine", "1st Styling Assistant To Edward Enninful", "5280 Magazine", "7x7", "Abtp, Freelance", "Accessories Magazine", "Accessories Magazine", "Accessories Magazine", "Aeri Yun", "Agency Gerard Management", "Ala Moana Shopping Magazine And Modern Luxury Hawaii", "Alex White Edits", "Alicia Lombardini's Studio", "Alive Magazine"]
+}, {
+  "rows": ["Stylist", "Senior Fashion Editor", "", "Fashion Editor", "Contributing Editor", "Photo Stylist", "Trend Director", "Editor", "Fashion Market Editor", "Fashion Assistant", "Fashion Stylist", "Editor In Chief, Ala Moana Shopping Magazine", "Stylist", "Assistant", "Fashion Editor"]
+}, {
+  "rows": ["", "Rtw Accessories Mens and Womans", "", "Rtw, Accessories, Fine Jewelry, And Beauty", "Costume Jewelry, Fine Jewelry, Shoes, Bags, Rtw, Home, and Beauty", "", "Costume Jewelry, Fine Jewelry, Shoes, Bags, and Rtw", "Costume Jewelry, Shoes, Bags, and Rtw", "", "Ready to Wear and Accessories", "", "Costume Jewelry, Fine Jewelry, Shoes, Bags, Rtw, Home, and Beauty", "", "Costume Jewelry, Fine Jewelry, Shoes, Bags, and Rtw", "Costume Jewelry, Fine Jewelry, Shoes, Bags, Rtw, Bridal, Home, and Beauty"]
+}, {
+  "rows": ["erin_turon@yahoo.com", "studio@hector-castro.com", "dena.giannini@gmail.com", "gab@georgiaalexiabenjou.com", "cheryl@7x7.com", "g.renata11@yahoo.com", "courtneyi@busjour.com", "fashion2@busjour.com", "GinaS@busjour.com", "christina.sulpizio@me.com", "donweststylist@gmail.com", "jlombardi@modernluxury.com", "white.alex@me.com", "martin@martinbrownstudio.com", "sarah@alivemag.com"]
+}, {
+  "rows": ["", "", "", "", "", "http://www.renatagar.com", "http://www.accessoriesmag.com", "", "", "", "", "", "", "", "http://www.alivemag.com"]
+}, {
+  "rows": ["", "", "8/17 - email", "", "", "", "8/17 - email", "", "", "", "", "", "", "", "8/17 - email"]
+}];
 
 class Headers extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      headers: this.props.headers,
+      // headers: this.props.headers,
+      headers: TEST_HEADERS,
+      // dataList: TEST_HEADERS.map( item => item.rows ),
       defaultOptions: [
         {value: '_', label: '[leave me blank]'},
         {value: 'firstname', label: 'First Name'},
@@ -105,25 +127,42 @@ class Headers extends Component {
   }
 
   render() {
-    const { headers, defaultOptions } = this.state;
+    const { headers, defaultOptions, dataList } = this.state;
+     
     const options = defaultOptions;
     return (
       <div>
-      {headers.map( (header, i) => {
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between'
+        }}>
+        {headers.map( (header, i) => {
         return (
-          <div key={i}>
+          <div key={i} style={{width: '180px'}}>
             <Select
             name={'row-' + i}
             options={options}
             onChange={ val => this._logChange(val, i)}
             value={header.value}
             filterOptions={this._createCustom}
+            width='100px'
             />
-            <ul>
-            {header.rows.map( (item, j) => <li key={j}>{item}</li>)}
+            <ul style={{listStyleType: 'none'}}>
+            {header.rows.map( (item, j) => <li
+              key={j}
+              style={{
+                borderTop: '1px solid lightgray',
+                margin: '0 0 0 0',
+                textAlign: 'center',
+                height: '23px',
+                overflow: 'auto'
+              }}
+              >{item}</li>)}
             </ul>
           </div>);
       })}
+        </div>
         <button className='button' onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>
     );
