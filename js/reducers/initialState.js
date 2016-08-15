@@ -24,6 +24,7 @@ export const initialState = {
   },
   fileReducer: {
     isReceiving: false,
-    didInvalidate: false
+    didInvalidate: false,
+    isProcessWaiting: false
   }
 };

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 import * as actionCreators from 'actions/AppActions';
-import '../../../node_modules/react-select/dist/react-select.css';
+import 'react-select/dist/react-select.css';
 
 class Headers extends Component {
   constructor(props) {
@@ -10,6 +10,7 @@ class Headers extends Component {
     this.state = {
       headers: this.props.headers,
       defaultOptions: [
+        {value: '_', label: '[leave me blank]'},
         {value: 'firstname', label: 'First Name'},
         {value: 'lastname', label: 'Last Name'},
         {value: 'email', label: 'Email'},
@@ -20,7 +21,6 @@ class Headers extends Component {
         {value: 'instagram', label: 'Instagram'},
         {value: 'website', label: 'Website'},
         {value: 'blog', label: 'Blog'},
-        {value: '_', label: '[leave me blank]'},
       ],
       optionSelected: {
         firstname: false,
@@ -96,9 +96,11 @@ class Headers extends Component {
 
   _sendHeaderNames() {
     const { headers } = this.state;
+    const { dispatch, onProcessHeaders } = this.props;
     console.log(headers);
     const order = headers.map( header => !header.value ? '' : header.value.value === '_' ? '' : header.value.value);
     console.log(order);
+    onProcessHeaders(order);
   }
 
   render() {
