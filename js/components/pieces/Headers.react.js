@@ -127,15 +127,20 @@ class Headers extends Component {
   }
 
   render() {
-    const { headers, defaultOptions, dataList } = this.state;
-     
+    const { headers, defaultOptions } = this.state;
+    
     const options = defaultOptions;
     return (
       <div>
+        <div style={{marginBottom: '30px'}}>
+          <span>By setting the columns, you can do things like, emailing from template, sync up contact to their LinkedIn/Twitter, etc.</span><br />
+          <span>You can custom set column names by typing the name in the dropdown bar as well.</span>
+        </div>
         <div style={{
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          marginBottom: '30px'
         }}>
         {headers.map( (header, i) => {
         return (
