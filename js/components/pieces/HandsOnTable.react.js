@@ -118,20 +118,23 @@ class HandsOnTable extends Component {
         const visibleRows = this.table.countVisibleRows();
         let lastRow = rowOffset + (visibleRows * 1);
         const lastVisibleRow = rowOffset + visibleRows + (visibleRows / 2);
-        const threshold = 15;
+        const threshold = this.state.lazyLoadingThreshold;
 
         if (lastVisibleRow > (lastFetchedIndex - threshold)) {
           console.log(rowCount);
           console.log(lastFetchedIndex);
           console.log('FETCH');
-          if (!contactIsReceiving) dispatch(actionCreators.fetchContacts(listId, lastFetchedIndex, lastFetchedIndex + 30));
+          if (!contactIsReceiving) {
+            dispatch(actionCreators.fetchContacts(listId, lastFetchedIndex, lastFetchedIndex + 30));
+            console.log(this.state.options);
+          }
         }
       }
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    const { contacts, listData } = nextProps;
+    const { contacts, listData, lastFetchedIndex } = nextProps;
     const options = this.state.options;
     if (listData.customfields) {
       listData.customfields.map( colName => {
@@ -148,9 +151,18 @@ class HandsOnTable extends Component {
         });
       });
     }
-    options.data = contacts;
-    this.setState({ options: options, customfields: listData.customfields });
-    this.table.updateSettings(options);
+    // options.data = contacts;
+    console.log(lastFetchedIndex);
+    console.log(this.state.lastFetchedIndex);
+    if ( lastFetchedIndex - this.state.lastFetchedIndex > 20 || lastFetchedIndex === 59) {
+      this.table.loadData(contacts);
+      this.setState({
+        options,
+        customfields: listData.customfields,
+        lastFetchedIndex
+      });
+    }
+    // this.table.updateSettings(options);
   }
 
   _printCurrentData() {

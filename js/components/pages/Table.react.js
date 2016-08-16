@@ -67,7 +67,7 @@ class Table extends Component {
     const { dispatch, listId, listData } = this.props;
     dispatch(actionCreators.fetchList(listId))
     .then( _ => {
-      dispatch(actionCreators.fetchContacts(listId, 0, 36));
+      dispatch(actionCreators.fetchContacts(listId, 0, 60));
     });
   }
 
