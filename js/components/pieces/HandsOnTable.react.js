@@ -121,9 +121,10 @@ class HandsOnTable extends Component {
         const threshold = this.state.lazyLoadingThreshold;
 
         if (lastVisibleRow > (lastFetchedIndex - threshold)) {
-          console.log(rowCount);
+          console.log(lastVisibleRow);
           console.log(lastFetchedIndex);
           console.log('FETCH');
+          if (!contactIsReceiving) dispatch(actionCreators.fetchContacts(listId));
         }
       }
     });

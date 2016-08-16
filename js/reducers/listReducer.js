@@ -53,8 +53,8 @@ function listReducer(state = initialState.listReducer, action) {
       obj[action.list.id].offset = 0;
       return obj;
     case PATCH_LIST:
-       obj.isReceiving = true;
-       return obj;
+      obj.isReceiving = true;
+      return obj;
     case 'SET_OFFSET':
       obj[action.listId].offset = action.offset;
       return obj;
