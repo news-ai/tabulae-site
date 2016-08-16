@@ -124,10 +124,6 @@ class HandsOnTable extends Component {
           console.log(rowCount);
           console.log(lastFetchedIndex);
           console.log('FETCH');
-          if (!contactIsReceiving) {
-            dispatch(actionCreators.fetchContacts(listId, lastFetchedIndex, lastFetchedIndex + 30));
-            console.log(this.state.options);
-          }
         }
       }
     });
@@ -151,18 +147,13 @@ class HandsOnTable extends Component {
         });
       });
     }
-    // options.data = contacts;
-    console.log(lastFetchedIndex);
-    console.log(this.state.lastFetchedIndex);
-    if ( lastFetchedIndex - this.state.lastFetchedIndex > 20 || lastFetchedIndex === 59) {
-      this.table.loadData(contacts);
-      this.setState({
-        options,
-        customfields: listData.customfields,
-        lastFetchedIndex
-      });
-    }
-    // this.table.updateSettings(options);
+    options.data = contacts;
+    this.setState({
+      options,
+      customfields: listData.customfields,
+      lastFetchedIndex
+    });
+    this.table.updateSettings(options);
   }
 
   _printCurrentData() {

@@ -52,7 +52,7 @@ function fileReducer(state = initialState.fileReducer, action) {
       return obj;
     case TURN_OFF_PROCESS_WAIT:
       obj.isProcessWaiting = false;
-      return obj
+      return obj;
     default:
       return state;
   }

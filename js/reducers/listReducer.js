@@ -19,7 +19,8 @@ function listReducer(state = initialState.listReducer, action) {
     action.type === REQUEST_LIST ||
     action.type === RECEIVE_LIST ||
     action.type === REQUEST_LISTS_FAIL ||
-    action.type === PATCH_LIST
+    action.type === PATCH_LIST ||
+    action.type === 'SET_OFFSET'
     ) accessing = true;
   else return state;
 
@@ -49,10 +50,14 @@ function listReducer(state = initialState.listReducer, action) {
     case RECEIVE_LIST:
       obj.isReceiving = false;
       obj[action.list.id] = action.list;
+      obj[action.list.id].offset = 0;
       return obj;
     case PATCH_LIST:
        obj.isReceiving = true;
        return obj;
+    case 'SET_OFFSET':
+      obj[action.listId].offset = action.offset;
+      return obj;
     default:
       return state;
   }

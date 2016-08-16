@@ -77,6 +77,7 @@ export function patchList(listId, name, contacts, customfields) {
   };
 }
 
+
 export function createNewSheet(name, contactList) {
   return dispatch =>
   dispatch(contactActions.addContacts(contactList))

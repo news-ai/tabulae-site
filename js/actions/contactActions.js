@@ -50,6 +50,25 @@ export function fetchContacts(listId, rangeStart, rangeEnd) {
   };
 }
 
+export function fetchPaginatedContacts(listId) {
+  const PAGE_LIMIT = 30;
+  return (dispatch, getState) => {
+    if (getState().listReducer[listId].contacts === null) return;
+    const offset = getState().listReducer[listId].offset;
+    return api.get(`/lists/${listId}/contacts/?limit=${PAGE_LIMIT}&offset=${offset}`)
+    .then( response => {
+      const newOffset = offset + PAGE_LIMIT;
+      dispatch({
+        type: 'SET_OFFSET',
+        offset: newOffset,
+        listId
+      });
+      response.map( contact => dispatch(receiveContact(contact)));
+    })
+    .catch( message => dispatch(requestContactFail(message)));
+  };
+}
+
 export function updateContact(id) {
   return dispatch => {
     return api.get('/contacts/' + id + '/update')
