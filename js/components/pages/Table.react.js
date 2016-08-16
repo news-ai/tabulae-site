@@ -66,7 +66,9 @@ class Table extends Component {
   componentDidMount() {
     const { dispatch, listId, listData } = this.props;
     dispatch(actionCreators.fetchList(listId))
-    .then( _ => dispatch(actionCreators.fetchContacts(listId)));
+    .then( _ => {
+      dispatch(actionCreators.fetchContacts(listId, 0, 36));
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -90,7 +92,7 @@ class Table extends Component {
   }
 
   _handleNormalField(colHeaders, row) {
-    const { pubMapByName, pubArrayByName, publicationReducer } = this.props;
+    const { pubMapByName, publicationReducer } = this.props;
     let field = {};
     colHeaders.map( header => {
       const name = header.data;
@@ -189,8 +191,7 @@ class Table extends Component {
       listIsReceiving,
       contactIsReceiving,
       contacts,
-      pubMapByName,
-      pubArrayByName
+      lastFetchedIndex
     } = this.props;
 
     return (
@@ -245,8 +246,7 @@ class Table extends Component {
           listData={listData}
           contacts={contacts}
           isNew={false}
-          pubMapByName={pubMapByName}
-          pubArrayByName={pubArrayByName}
+          lastFetchedIndex={lastFetchedIndex}
           />
         </div>
       }
@@ -256,18 +256,22 @@ class Table extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  let lastFetchedIndex = -1;
   const listId = parseInt(props.params.listId, 10);
   const contactIsReceiving = state.contactReducer.isReceiving;
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
   let contacts = [];
-  let contactsLoaded = false;
+
   if (listData) {
     if (!_.isEmpty(listData.contacts)) {
-      if (listData.contacts.every( contactId => state.contactReducer[contactId] )) {
-        contactsLoaded = true;
-        contacts = listData.contacts.map( contactId => state.contactReducer[contactId] );
-      }
+      contacts = listData.contacts.map( (contactId, i) => {
+        if (state.contactReducer[contactId]) {
+          lastFetchedIndex = i;
+          return state.contactReducer[contactId];
+        }
+        else return {};
+      });
     }
   }
 
@@ -285,15 +289,17 @@ const mapStateToProps = (state, props) => {
     }
   })
 
+
   return {
     listId: listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData: listData,
-    contacts: contactsLoaded ? contacts : [],
+    contacts: contacts,
     name: listData ? listData.name : null,
     contactIsReceiving: contactIsReceiving,
     pubMapByName: publicationReducer,
-    publicationReducer: publicationReducer
+    publicationReducer,
+    lastFetchedIndex
   };
 };
 

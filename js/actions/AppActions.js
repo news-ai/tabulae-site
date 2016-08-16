@@ -21,7 +21,7 @@ export const archiveListToggle = listId => listActions.archiveListToggle(listId)
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);
 export const patchContacts = (listId, contactList) => contactActions.patchContacts(listId, contactList);
-export const fetchContacts = listId => contactActions.fetchContacts(listId);
+export const fetchContacts = (listId, start, end) => contactActions.fetchContacts(listId, start, end);
 export const updateContact = id => contactActions.updateContact(id);
 
 export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);

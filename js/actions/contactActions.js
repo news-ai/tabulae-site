@@ -39,17 +39,19 @@ export function fetchContact(contactId) {
   };
 }
 
-export function fetchContacts(listId) {
+export function fetchContacts(listId, rangeStart, rangeEnd) {
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
-    return Promise.all(
-      getState().listReducer[listId].contacts.map( contactId => dispatch(fetchContact(contactId)))
-      );
+    getState().listReducer[listId].contacts.map( (contactId, i) => {
+      if (rangeStart <= i && i < rangeEnd) {
+        dispatch(fetchContact(contactId));
+      }
+    });
   };
 }
 
 export function updateContact(id) {
-  return (dispatch, getState) => {
+  return dispatch => {
     return api.get('/contacts/' + id + '/update')
     .then( response => dispatch(receiveContact(response)))
     .catch( message => dispatch(requestContactFail(message)));

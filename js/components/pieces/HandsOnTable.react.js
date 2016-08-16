@@ -28,6 +28,8 @@ const styles = {
   }
 };
 
+const MIN_ROWS = 20;
+
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
@@ -41,11 +43,12 @@ class HandsOnTable extends Component {
       customfields: [],
       noticeMessage: 'DEFAULT',
       noticeIsActive: false,
+      lazyLoadingThreshold: 20,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
         minCols: COLUMNS.length,
-        minRows: 20,
+        minRows: MIN_ROWS,
         manualColumnMove: true,
         manualRowMove: true,
         observeChanges: true,
@@ -54,9 +57,11 @@ class HandsOnTable extends Component {
         columns: COLUMNS,
         cells: (row, col, prop) => {
           const cellProperties = {};
-          if (this.state.options.data[row].isoutdated) {
-            // apply different colored renderer for outdated contacts
-            cellProperties.renderer = outdatedRenderer;
+          if (this.state.options.data[row]) {
+            if (this.state.options.data[row].isoutdated) {
+              // apply different colored renderer for outdated contacts
+              cellProperties.renderer = outdatedRenderer;
+            }
           }
           return cellProperties;
         },
@@ -105,12 +110,28 @@ class HandsOnTable extends Component {
           const selectedRows = this.state.options.data.filter( row => row.selected );
           this.props._getSelectedRows(selectedRows);
         }
+      },
+      afterScrollVertically: (e) => {
+        const { lastFetchedIndex, contactIsReceiving, dispatch, listId } = this.props;
+        const rowCount = this.table.countRows();
+        const rowOffset = this.table.rowOffset();
+        const visibleRows = this.table.countVisibleRows();
+        let lastRow = rowOffset + (visibleRows * 1);
+        const lastVisibleRow = rowOffset + visibleRows + (visibleRows / 2);
+        const threshold = 15;
+
+        if (lastVisibleRow > (lastFetchedIndex - threshold)) {
+          console.log(rowCount);
+          console.log(lastFetchedIndex);
+          console.log('FETCH');
+          if (!contactIsReceiving) dispatch(actionCreators.fetchContacts(listId, lastFetchedIndex, lastFetchedIndex + 30));
+        }
       }
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    const { contacts, listData, pubArrayByName } = nextProps;
+    const { contacts, listData } = nextProps;
     const options = this.state.options;
     if (listData.customfields) {
       listData.customfields.map( colName => {
@@ -119,7 +140,7 @@ class HandsOnTable extends Component {
         }
         // place customfields in options.data obj for table to pick it up
         contacts.map( (contact, i) => {
-          if (contact.customfields !== null && contact.customfields.length > 0) {
+          if (!_.isEmpty(contact.customfields)) {
             if (contact.customfields.some( field => field.name === colName)) {
               contacts[i][colName] = contact.customfields.find( field => field.name === colName ).value;
             }
@@ -194,6 +215,7 @@ class HandsOnTable extends Component {
 
   render() {
     const { _onSaveClick } = this.props;
+    const { options, customfields } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
@@ -212,9 +234,9 @@ class HandsOnTable extends Component {
           className='button-primary'
           style={styles.buttons.save}
           onClick={ _ => _onSaveClick(
-            this.state.options.data,
-            this.state.options.columns,
-            this.state.customfields
+            options.data,
+            options.columns,
+            customfields
             )}>Save</button>
           <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
           <button className='button' onClick={this._addColumn}>Add Column</button>
@@ -228,6 +250,7 @@ class HandsOnTable extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
+    contactIsReceiving: state.contactReducer.isReceiving
   };
 };
 
