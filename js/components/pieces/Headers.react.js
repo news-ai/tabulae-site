@@ -168,7 +168,7 @@ class Headers extends Component {
           </div>);
       })}
         </div>
-        <button className='button' onClick={this._sendHeaderNames}>Set Column Names</button>
+        <button className='button' style={{ float: 'right' }} onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>
     );
   }

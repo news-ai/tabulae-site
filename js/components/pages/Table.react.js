@@ -208,7 +208,14 @@ class Table extends Component {
             />
             </div>
           </div>
-          <SkyLight dialogStyles={{ height: '400px', width: '850px'}} hideOnOverlayClicked ref='input' title='File Drop'>
+          <SkyLight dialogStyles={{
+            height: '400px',
+            width: '850px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginTop: 'auto',
+            transform: 'translate(-50%, -50%)'
+          }} hideOnOverlayClicked ref='input' title='File Drop'>
             <DropFile
             listId={listId}
             />

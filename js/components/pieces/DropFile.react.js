@@ -81,12 +81,12 @@ class DropFile extends Component {
 
   render() {
     const { listId, fileIsReceiving, fileReducer, isProcessWaiting } = this.props;
-    // const { file, isFileDropped, fileSubmitted } = this.state;
-    // const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
+    const { file, isFileDropped, fileSubmitted } = this.state;
+    const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
     // START
-    const headers = [];
-    const isFileDropped = true;
-    const fileSubmitted = true;
+    // const headers = [];
+    // const isFileDropped = true;
+    // const fileSubmitted = true;
     // END
     let renderNode;
     if (isProcessWaiting) {
