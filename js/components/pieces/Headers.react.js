@@ -7,33 +7,14 @@ import Radium from 'radium';
 import 'react-select/dist/react-select.css';
 // import 'fixed-data-table/dist/fixed-data-table.css';
 
-const TEST_HEADERS = [{
-  "rows": ["Erin", "Hector", "Dena", "Georgia Alexia", "Cheryl", "Renata", "Courtney", "Lauren", "Gina Rose", "Christina", "Don", "Jasmine", "Alex", "Martin", "Sarah"]
-}, {
-  "rows": ["Turon", "Castro", "Giannini", "Benjou", "Locke", "Gar", "Ignelzie", "Parker", "Sirico", "Sulpizio", "West", "Lombardi", "White", "Brown", "Stallmann"]
-}, {
-  "rows": ["Erin turon, Stylist, Inc.", "10 and 10 Men Magazine", "1st Styling Assistant To Edward Enninful", "5280 Magazine", "7x7", "Abtp, Freelance", "Accessories Magazine", "Accessories Magazine", "Accessories Magazine", "Aeri Yun", "Agency Gerard Management", "Ala Moana Shopping Magazine And Modern Luxury Hawaii", "Alex White Edits", "Alicia Lombardini's Studio", "Alive Magazine"]
-}, {
-  "rows": ["Stylist", "Senior Fashion Editor", "", "Fashion Editor", "Contributing Editor", "Photo Stylist", "Trend Director", "Editor", "Fashion Market Editor", "Fashion Assistant", "Fashion Stylist", "Editor In Chief, Ala Moana Shopping Magazine", "Stylist", "Assistant", "Fashion Editor"]
-}, {
-  "rows": ["", "Rtw Accessories Mens and Womans", "", "Rtw, Accessories, Fine Jewelry, And Beauty", "Costume Jewelry, Fine Jewelry, Shoes, Bags, Rtw, Home, and Beauty", "", "Costume Jewelry, Fine Jewelry, Shoes, Bags, and Rtw", "Costume Jewelry, Shoes, Bags, and Rtw", "", "Ready to Wear and Accessories", "", "Costume Jewelry, Fine Jewelry, Shoes, Bags, Rtw, Home, and Beauty", "", "Costume Jewelry, Fine Jewelry, Shoes, Bags, and Rtw", "Costume Jewelry, Fine Jewelry, Shoes, Bags, Rtw, Bridal, Home, and Beauty"]
-}, {
-  "rows": ["erin_turon@yahoo.com", "studio@hector-castro.com", "dena.giannini@gmail.com", "gab@georgiaalexiabenjou.com", "cheryl@7x7.com", "g.renata11@yahoo.com", "courtneyi@busjour.com", "fashion2@busjour.com", "GinaS@busjour.com", "christina.sulpizio@me.com", "donweststylist@gmail.com", "jlombardi@modernluxury.com", "white.alex@me.com", "martin@martinbrownstudio.com", "sarah@alivemag.com"]
-}, {
-  "rows": ["", "", "", "", "", "http://www.renatagar.com", "http://www.accessoriesmag.com", "", "", "", "", "", "", "", "http://www.alivemag.com"]
-}, {
-  "rows": ["", "", "8/17 - email", "", "", "", "8/17 - email", "", "", "", "", "", "", "", "8/17 - email"]
-}];
-
 class Headers extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // headers: this.props.headers,
-      headers: TEST_HEADERS,
-      // dataList: TEST_HEADERS.map( item => item.rows ),
+      headers: this.props.headers,
       defaultOptions: [
         {value: '_', label: '[leave me blank]'},
+        {value: 'ignore_column', label: '[Ignore this column]'},
         {value: 'firstname', label: 'First Name'},
         {value: 'lastname', label: 'Last Name'},
         {value: 'email', label: 'Email'},
@@ -120,9 +101,15 @@ class Headers extends Component {
   _sendHeaderNames() {
     const { headers } = this.state;
     const { dispatch, onProcessHeaders } = this.props;
-    console.log(headers);
-    const order = headers.map( header => !header.value ? '' : header.value.value === '_' ? '' : header.value.value);
-    console.log(order);
+    let untitledCount = 0;
+    const order = headers.map( header => {
+      if (!header.value || header.value.value === '_') {
+        untitledCount++;
+        return 'untitled-' + untitledCount;
+      } else {
+        return header.value.value;
+      }
+    });
     onProcessHeaders(order);
   }
 

@@ -64,13 +64,13 @@ export function fetchLists() {
   };
 }
 
-export function patchList(listId, name, contacts, customfields) {
+export function patchList({listId, name, contacts, fieldsmap}) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
-  if (customfields !== null && customfields) if (customfields.length > 0) listBody.customfields = customfields;
+  listBody.fieldsmap = fieldsmap;
   return dispatch => {
-    dispatch({ type: PATCH_LIST});
+    dispatch({ type: PATCH_LIST });
     return api.patch('/lists/' + listId, listBody)
     .then( response => dispatch(receiveList(response)))
     .catch( message => dispatch({ type: 'PATCH_LIST_FAIL', message }));

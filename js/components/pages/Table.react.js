@@ -50,6 +50,24 @@ const styles = {
 class Table extends Component {
   constructor(props) {
     super(props);
+    window.addEventListener('mousewheel', function(event) {
+      // We don't want to scroll below zero or above the width and height
+      var maxX = this.scrollWidth - this.offsetWidth;
+      var maxY = this.scrollHeight - this.offsetHeight;
+
+      // If this event looks like it will scroll beyond the bounds of the element, prevent it and set the scroll to the boundary manually
+      if (this.scrollLeft + event.deltaX < 0 ||
+         this.scrollLeft + event.deltaX > maxX ||
+         this.scrollTop + event.deltaY < 0  ||
+         this.scrollTop + event.deltaY > maxY) {
+
+        event.preventDefault();
+
+        // Manually set the scroll to the boundary
+        this.scrollLeft = Math.max(0, Math.min(maxX, this.scrollLeft + event.deltaX));
+        this.scrollTop = Math.max(0, Math.min(maxY, this.scrollTop + event.deltaY));
+      }
+    }, false);
     const { listData } = this.props;
     this.state = {
       name: null,
@@ -58,7 +76,6 @@ class Table extends Component {
       selectedContacts: []
     }
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._getCustomRow = this._getCustomRow.bind(this);
     this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
     this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
@@ -80,14 +97,6 @@ class Table extends Component {
   componentWillReceiveProps(nextProps) {
     const { name } = nextProps;
     this.setState({ name: name });
-  }
-
-  _getCustomRow(row, customfields) {
-    let customRow = [];
-    customfields.map( customfield => {
-      if (!_.isEmpty(row[customfield])) if (row[customfield].length !== 0) customRow.push({ name: customfield, value: row[customfield]})
-    });
-    return customRow;
   }
 
   _updateContacts() {
@@ -137,7 +146,7 @@ class Table extends Component {
     return promises;
   }
 
-  _saveOperations(localData, colHeaders, customfields) {
+  _saveOperations(localData, colHeaders, fieldsmap) {
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
@@ -146,13 +155,11 @@ class Table extends Component {
       let field = this._handleNormalField(colHeaders, row);
 
       // handle customfields
-      if (!_.isEmpty(customfields)) {
-        let customRow = [];
-        customfields.map( customfield => {
-          if (!_.isEmpty(row[customfield])) customRow.push({ name: customfield, value: row[customfield]})
-        });
-        field.customfields = customRow;
-      }
+      let customRow = [];
+      fieldsmap.map( fieldObj => {
+        if (!_.isEmpty(row[fieldObj.value])) customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
+      })
+      field.customfields = customRow;
 
       // filter out for empty rows with only id
       if (!_.isEmpty(field) && colHeaders.some(header => header.pass && !_.isEmpty(field[header.data]))) {
@@ -170,22 +177,32 @@ class Table extends Component {
 
     // create new contacts and append new rows to LIST
     if (addContactList.length > 0) {
-        dispatch(actionCreators.addContacts(addContactList)).then( json => {
-        const appendIdList = json.map( contact => contact.id);
-        const newIdList = origIdList.concat(appendIdList);
-        dispatch(actionCreators.patchList(listId, this.state.name, newIdList, customfields));
+      dispatch(actionCreators.addContacts(addContactList)).then( json => {
+      const appendIdList = json.map( contact => contact.id );
+      const newIdList = origIdList.concat(appendIdList);
+      dispatch(actionCreators.patchList({
+        listId,
+        name: this.state.name,
+        contacts: newIdList,
+        fieldsmap
+      }));
       });
     } else {
       // clean up LIST by patching only non-empty rows
-      dispatch(actionCreators.patchList(listId, this.state.name, origIdList, customfields));
+      dispatch(actionCreators.patchList({
+        listId,
+        name: this.state.name,
+        contacts: origIdList,
+        fieldsmap
+      }));
     }
   }
 
-  _onSaveClick(localData, colHeaders, customfields) {
+  _onSaveClick(localData, colHeaders, fieldsmap) {
     // create publications for later usage
     Promise.all(this._createPublicationPromises(localData, colHeaders))
     .then( _ => {
-      this._saveOperations(localData, colHeaders, customfields);
+      this._saveOperations(localData, colHeaders, fieldsmap);
     })
   }
 
@@ -220,12 +237,25 @@ class Table extends Component {
             />
             </div>
           </div>
-          <SkyLight dialogStyles={{
-            height: '400px',
-            width: '850px',
+          <SkyLight
+          overlayStyles={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 999,
+            backgroundColor: 'rgba(0,0,0,0.3)'
+          }}
+          dialogStyles={{
+            height: '600px',
+            width: '900px',
             marginLeft: 'auto',
             marginRight: 'auto',
             marginTop: 'auto',
+            padding: '10px',
+            zIndex: 1000,
+            overflow: 'scroll',
             transform: 'translate(-50%, -50%)'
           }} hideOnOverlayClicked ref='input' title='File Drop'>
             <DropFile

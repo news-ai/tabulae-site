@@ -7,6 +7,7 @@ import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
 import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
+import _ from 'lodash';
 
 import 'handsontable/dist/handsontable.full.css';
 
@@ -33,18 +34,18 @@ const MIN_ROWS = 20;
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
-    this._printCurrentData = this._printCurrentData.bind(this);
     this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
+    this._changeColumnName = this._changeColumnName.bind(this);
 
     this.state = {
-      customfields: [],
       noticeMessage: 'DEFAULT',
       noticeIsActive: false,
       lazyLoadingThreshold: 20,
       lastFetchedIndex: -1,
+      fieldsmap: [],
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -55,6 +56,7 @@ class HandsOnTable extends Component {
         manualColumnResize: true,
         manualRowResize: true,
         observeChanges: true,
+        persistentState: true,
         // colWidths: 200,
         // wordWrap: false,
         rowHeights: 23,
@@ -75,7 +77,19 @@ class HandsOnTable extends Component {
           callback: (key, options) => {
             if (key === 'remove_column') {
               for (let i = options.start.col; i <= options.end.col; i++) {
-                this._removeColumn(this.state.options.columns, this.state.customfields, i);
+                this._removeColumn(this.state.options.columns, i);
+              }
+            }
+
+            if (key === 'change_col_name') {
+              if (options.start.col !== options.end.col) {
+                console.log('CAN ONLY CHANGE NAME OF ONE COLUMN AT A TIME');
+                this.setState({
+                  noticeIsActive: true,
+                  noticeMessage: 'To change column name, only select one column at a time.'
+                });
+              } else {
+                this._changeColumnName(options.start.col);
               }
             }
           },
@@ -87,6 +101,9 @@ class HandsOnTable extends Component {
             redo: {},
             remove_column: {
               name: 'Remove column',
+            },
+            change_col_name: {
+              name: 'Change column name'
             }
           }
         }
@@ -138,56 +155,63 @@ class HandsOnTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.isNew) return;
     const { contacts, listData, lastFetchedIndex } = nextProps;
     const options = this.state.options;
-    if (listData.customfields) {
-      listData.customfields.map( colName => {
-        if (!options.columns.some( existingColName => existingColName.data === colName)) {
-          options.columns.push({ data: colName, title: colName });
-        }
-        // place customfields in options.data obj for table to pick it up
+    const fieldsmap = listData.fieldsmap;
+
+    fieldsmap.map( fieldObj => {
+      if (fieldObj.customfield && !fieldObj.hidden && !options.columns.some( col => col.data === fieldObj.value )) {
+        options.columns.push({ data: fieldObj.value, title: fieldObj.name });
+        // match contacts customfield name to list column value
         contacts.map( (contact, i) => {
           if (!_.isEmpty(contact.customfields)) {
-            if (contact.customfields.some( field => field.name === colName)) {
-              contacts[i][colName] = contact.customfields.find( field => field.name === colName ).value;
+            if (contact.customfields.some( field => field.name === fieldObj.value)) {
+              contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
             }
           }
         });
-      });
-    }
-    if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1) {
-      options.data = contacts;
-      this.setState({
-        options,
-        customfields: listData.customfields,
-        lastFetchedIndex
-      });
-      this.table.updateSettings(options);
+      }
+    });
+
+
+    if (!_.isEmpty(listData.contacts)) {
+      if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1) {
+        options.data = contacts;
+        options.persistentState = true;
+        this.setState({
+          options,
+          fieldsmap,
+          lastFetchedIndex
+        });
+        this.table.updateSettings(options);
+      }
     }
   }
 
-  _printCurrentData() {
-    console.log(this.state.options.data);
+  _changeColumnName(col) {
+    console.log(col);
+    console.log(this.state.options.columns);
   }
 
-  _removeColumn(columns, customfields, colNum) {
-    const columnName = columns[colNum].data;
-    // make sure column being deleted is custom
-    if (customfields.some( field => field === columnName )) {
+  _removeColumn(columns, colNum) {
+    const { fieldsmap, options } = this.state;
+    const columnValue = columns[colNum].data;
+    console.log(columnValue);
+    if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield )) {
       const newColumns = columns.filter( (col, i) => i !== colNum );
-      const newCustomFields = customfields.filter( field => field !== columnName );
-      const options = this.state.options;
+      const newFieldsmap = fieldsmap.filter( fieldObj => fieldObj.value !== columnValue );
       options.columns = newColumns;
       this.setState({
         options: options,
-        customfields: newCustomFields
+        fieldsmap: newFieldsmap
       });
       this.table.updateSettings(options);
     } else {
-      console.log(columnName + 'CANNOT BE DELETED');
+      console.log(columnValue + 'CANNOT BE DELETED');
       this.setState({
         noticeIsActive: true,
-        noticeMessage: `Column '${columnName}' is a default column and, therefore, cannot be deleted.`
+        noticeMessage: `Column '${columnValue}' is a default column and, therefore, cannot be deleted.`
       });
     }
   }
@@ -202,21 +226,29 @@ class HandsOnTable extends Component {
       });
       return;
     }
-    const options = this.state.options;
-    const colName = this.state.newColumnName;
+    console.log('wha');
 
-    if (options.columns.some( col => col.data === colName)) {
-      console.log('DUPLICATE COLUMN NAME');
-      this.setState({
-        noticeIsActive: true,
-        noticeMessage: 'Duplicate column name. Please use another one.'
-      });
-    } else {
-      let newCustomFields = this.state.customfields;
-      if (newCustomFields === null) newCustomFields = [];
-      newCustomFields.push(colName);
-      dispatch(actionCreators.patchList(listData.id, undefined, undefined, newCustomFields));
-    }
+    // const { options, newColumnName, fieldsmap } = this.state;
+    // if (options.columns.some( col => col.data === newColumnName)) {
+    //   console.log('DUPLICATE COLUMN NAME');
+    //   this.setState({
+    //     noticeIsActive: true,
+    //     noticeMessage: 'Duplicate column name. Please use another one.'
+    //   });
+    // } else {
+    //   console.log('ey');
+    //   let newFieldsmap = fieldsmap;
+    //   newFieldsmap.push({
+    //     name: newColumnName,
+    //     value: newColumnName,
+    //     customfield: true,
+    //     hidden: false
+    //   });
+    //   dispatch(actionCreators.patchList({
+    //     listId: listData.id,
+    //     fieldsmap: newFieldsmap
+    //   }));
+    // }
     this.setState({ newColumnName: '' });
   }
 
@@ -228,7 +260,7 @@ class HandsOnTable extends Component {
 
   render() {
     const { _onSaveClick } = this.props;
-    const { options, customfields } = this.state;
+    const { options, fieldsmap } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
@@ -249,7 +281,7 @@ class HandsOnTable extends Component {
           onClick={ _ => _onSaveClick(
             options.data,
             options.columns,
-            customfields
+            fieldsmap
             )}>Save</button>
           <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
           <button className='button' onClick={this._addColumn}>Add Column</button>
