@@ -197,7 +197,6 @@ class HandsOnTable extends Component {
   _removeColumn(columns, colNum) {
     const { fieldsmap, options } = this.state;
     const columnValue = columns[colNum].data;
-    console.log(columnValue);
     if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield )) {
       const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter( fieldObj => fieldObj.value !== columnValue );
@@ -208,7 +207,7 @@ class HandsOnTable extends Component {
       });
       this.table.updateSettings(options);
     } else {
-      console.log(columnValue + 'CANNOT BE DELETED');
+      console.log(columnValue + ' CANNOT BE DELETED');
       this.setState({
         noticeIsActive: true,
         noticeMessage: `Column '${columnValue}' is a default column and, therefore, cannot be deleted.`
@@ -226,29 +225,26 @@ class HandsOnTable extends Component {
       });
       return;
     }
-    console.log('wha');
-
-    // const { options, newColumnName, fieldsmap } = this.state;
-    // if (options.columns.some( col => col.data === newColumnName)) {
-    //   console.log('DUPLICATE COLUMN NAME');
-    //   this.setState({
-    //     noticeIsActive: true,
-    //     noticeMessage: 'Duplicate column name. Please use another one.'
-    //   });
-    // } else {
-    //   console.log('ey');
-    //   let newFieldsmap = fieldsmap;
-    //   newFieldsmap.push({
-    //     name: newColumnName,
-    //     value: newColumnName,
-    //     customfield: true,
-    //     hidden: false
-    //   });
-    //   dispatch(actionCreators.patchList({
-    //     listId: listData.id,
-    //     fieldsmap: newFieldsmap
-    //   }));
-    // }
+    const { options, newColumnName, fieldsmap } = this.state;
+    if (options.columns.some( col => col.data === newColumnName)) {
+      console.log('DUPLICATE COLUMN NAME');
+      this.setState({
+        noticeIsActive: true,
+        noticeMessage: 'Duplicate column name. Please use another one.'
+      });
+    } else {
+      let newFieldsmap = fieldsmap;
+      newFieldsmap.push({
+        name: newColumnName,
+        value: newColumnName,
+        customfield: true,
+        hidden: false
+      });
+      dispatch(actionCreators.patchList({
+        listId: listData.id,
+        fieldsmap: newFieldsmap
+      }));
+    }
     this.setState({ newColumnName: '' });
   }
 
