@@ -183,7 +183,6 @@ class Table extends Component {
     })
   }
 
-
   render() {
     const {
       listId,
@@ -193,10 +192,10 @@ class Table extends Component {
       contacts,
       lastFetchedIndex
     } = this.props;
+      // { contactIsReceiving ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> : null }
 
     return (
       <div>
-      { contactIsReceiving ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> : null }
       { listData === undefined ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
         <div>
           <div style={[styles.nameBlock.parent]}>

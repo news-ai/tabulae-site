@@ -44,6 +44,7 @@ class HandsOnTable extends Component {
       noticeMessage: 'DEFAULT',
       noticeIsActive: false,
       lazyLoadingThreshold: 20,
+      lastFetchedIndex: -1,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -51,7 +52,12 @@ class HandsOnTable extends Component {
         minRows: MIN_ROWS,
         manualColumnMove: true,
         manualRowMove: true,
+        manualColumnResize: true,
+        manualRowResize: true,
         observeChanges: true,
+        colWidths: 200,
+        wordWrap: false,
+        rowHeights: 23,
         minSpareRows: 10,
         // fixedColumnsLeft: 3,
         columns: COLUMNS,
@@ -112,7 +118,8 @@ class HandsOnTable extends Component {
         }
       },
       afterScrollVertically: (e) => {
-        const { lastFetchedIndex, contactIsReceiving, dispatch, listId } = this.props;
+        const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
+        if (lastFetchedIndex === listData.contacts.length - 1) return;
         const rowCount = this.table.countRows();
         const rowOffset = this.table.rowOffset();
         const visibleRows = this.table.countVisibleRows();
@@ -148,13 +155,15 @@ class HandsOnTable extends Component {
         });
       });
     }
-    options.data = contacts;
-    this.setState({
-      options,
-      customfields: listData.customfields,
-      lastFetchedIndex
-    });
-    this.table.updateSettings(options);
+    if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1) {
+      options.data = contacts;
+      this.setState({
+        options,
+        customfields: listData.customfields,
+        lastFetchedIndex
+      });
+      this.table.updateSettings(options);
+    }
   }
 
   _printCurrentData() {

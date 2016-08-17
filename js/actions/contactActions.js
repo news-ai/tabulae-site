@@ -64,7 +64,6 @@ export function fetchPaginatedContacts(listId) {
         offset: newOffset,
         listId
       });
-      console.log(response);
       response.map( contact => dispatch(receiveContact(contact)));
     })
     .catch( message => dispatch(requestContactFail(message)));
