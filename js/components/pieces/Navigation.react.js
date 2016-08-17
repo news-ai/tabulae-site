@@ -4,7 +4,7 @@ function Navigation({children}) {
   return (
     <div>
       <div className='u-full-width row' style={{
-        position: 'absolute',
+        position: 'fixed',
         height: '50px',
         backgroundColor: 'white',
         // border: '1px dotted black',

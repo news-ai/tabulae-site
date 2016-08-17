@@ -38,6 +38,12 @@ const styles = {
       color: 'gray',
       cursor: 'pointer'
     }
+  },
+  loading: {
+    zIndex: 160,
+    bottom: 10,
+    right: 10,
+    position: 'fixed'
   }
 };
 
@@ -192,11 +198,17 @@ class Table extends Component {
       contacts,
       lastFetchedIndex
     } = this.props;
-      // { contactIsReceiving ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> : null }
 
     return (
       <div>
-      { listData === undefined ? <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
+      {
+        contactIsReceiving ? <i
+        style={styles.loading}
+        className='fa fa-spinner fa-spin fa-3x'
+        aria-hidden='true'></i> : null
+      }
+      {
+        listData === undefined ? <i style={styles.loading} className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
         <div>
           <div style={[styles.nameBlock.parent]}>
             <div className='three columns'>
