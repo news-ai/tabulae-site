@@ -20,8 +20,8 @@ class App extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { loginDidInvalidate } = nextProps;
-    this.setState({ noticeIsActive: loginDidInvalidate });
+    // const { loginDidInvalidate } = nextProps;
+    // this.setState({ noticeIsActive: loginDidInvalidate });
   }
 
   render() {
