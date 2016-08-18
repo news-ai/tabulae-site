@@ -16,11 +16,3 @@ export function isJsonString(str) {
   }
   return true;
 }
-
-export function notEmpty(obj) {
-  if (obj !== null && obj) {
-    if (obj.length > 0) return true;
-  } else {
-    return false;
-  }
-}

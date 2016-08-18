@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import SkyLight from 'react-skylight';
+import { withRouter } from 'react-router';
 import { Notification } from 'react-notification';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
@@ -145,7 +146,15 @@ class HandsOnTable extends Component {
     };
   }
 
+  routerWillLeave(nextLocation) {
+    console.log(nextLocation);
+    return 'Your work is not saved! Are you sure you want to leave?';
+  }
+
   componentDidMount() {
+    this.props.router.setRouteLeaveHook(this.props.route, () => {
+      return 'You have unsaved information, are you sure you want to leave this page?'
+    });
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
     this.table.updateSettings({
       beforeChange: (changes, source) => {
@@ -173,16 +182,16 @@ class HandsOnTable extends Component {
           this.props._getSelectedRows(selectedRows);
         }
       },
-      // afterRemoveRow: (index, amount) => {
-      //   console.log('row removed');
-      //   console.log(index);
-      //   console.log(amount);
-      // },
-      // afterCreateRow: (index, amount) => {
-      //   console.log('row created');
-      //   console.log(index);
-      //   console.log(amount);
-      // },
+      afterRemoveRow: (index, amount) => {
+        console.log('row removed');
+        console.log(index);
+        console.log(amount);
+      },
+      afterCreateRow: (index, amount) => {
+        console.log('row created');
+        console.log(index);
+        console.log(amount);
+      },
       afterScrollVertically: (e) => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
@@ -386,4 +395,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(HandsOnTable);
+)(withRouter(HandsOnTable));

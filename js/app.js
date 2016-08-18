@@ -27,8 +27,7 @@ import 'file?name=[name].[ext]!../.htaccess';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router, Route, IndexRoute } from 'react-router';
-import createHistory from 'history/lib/createBrowserHistory';
+import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import configureStore from './configureStore';
 
 // Import the pages
@@ -58,7 +57,7 @@ if (module.hot) {
 
 ReactDOM.render(
   <Provider store={store}>
-      <Router onUpdate={() => window.scrollTo(0, 0)} history={createHistory()}>
+      <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
         <Route path='/' name='Home' component={App}>
           <IndexRoute component={ListManager} />
             <Route path='lists' name='List Manager' component={ListManager}>
