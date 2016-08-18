@@ -71,6 +71,7 @@ class HandsOnTable extends Component {
       lazyLoadingThreshold: 20,
       lastFetchedIndex: -1,
       fieldsmap: [],
+      dirtyRows: [],
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -154,9 +155,14 @@ class HandsOnTable extends Component {
         console.log(changes);
         console.log(source);
 
-        if (!this.props.isNew && source === 'edit') {
-          if (changes[0][1] === 'employerString') {
-
+        if (!this.props.isNew) {
+            // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
+          const rowNum = changes[0][0];
+          const rowId = this.state.options.data[rowNum].id;
+          const dirtyRows = this.state.dirtyRows;
+          if (!dirtyRows.some( rnum => rnum === rowId)) {
+            dirtyRows.push(rowId);
+            this.setState({ dirtyRows });
           }
         }
       },
@@ -167,6 +173,16 @@ class HandsOnTable extends Component {
           this.props._getSelectedRows(selectedRows);
         }
       },
+      // afterRemoveRow: (index, amount) => {
+      //   console.log('row removed');
+      //   console.log(index);
+      //   console.log(amount);
+      // },
+      // afterCreateRow: (index, amount) => {
+      //   console.log('row created');
+      //   console.log(index);
+      //   console.log(amount);
+      // },
       afterScrollVertically: (e) => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
@@ -303,7 +319,7 @@ class HandsOnTable extends Component {
 
   render() {
     const { _onSaveClick } = this.props;
-    const { options, fieldsmap, skylightTitle, skylightButton } = this.state;
+    const { options, fieldsmap, skylightTitle, skylightButton, dirtyRows } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
@@ -342,7 +358,8 @@ class HandsOnTable extends Component {
           onClick={ _ => _onSaveClick(
             options.data,
             options.columns,
-            fieldsmap
+            fieldsmap,
+            dirtyRows
             )}>Save</button>
           <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
           <button className='button' onClick={this._addColumn}>Add Column</button>

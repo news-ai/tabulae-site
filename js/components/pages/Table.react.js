@@ -117,13 +117,14 @@ class Table extends Component {
   }
 
   _handleNormalField(colHeaders, row) {
-    const { pubMapByName, publicationReducer } = this.props;
+    const { pubMapByName, publicationReducer, listData} = this.props;
     let field = {};
+    const fieldsmap = listData.fieldsmap;
     colHeaders.map( header => {
       const name = header.data;
       if (!_.isEmpty(row[name])) {
         // only columns labeled as pass can send data to api
-        if (header.pass) field[name] = row[name];
+        if (fieldsmap.some( fieldObj => fieldObj.value === name && !fieldObj.customfield)) field[name] = row[name];
       }
     });
     if (!_.isEmpty(row.employerString)) {
@@ -156,7 +157,7 @@ class Table extends Component {
     return promises;
   }
 
-  _saveOperations(localData, colHeaders, fieldsmap) {
+  _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
     const { dispatch, listId } = this.props;
     let addContactList = [];
     let patchContactList = [];
@@ -167,14 +168,17 @@ class Table extends Component {
       // handle customfields
       let customRow = [];
       fieldsmap.map( fieldObj => {
-        if (!_.isEmpty(row[fieldObj.value])) customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
+        if (!_.isEmpty(row[fieldObj.value] && fieldObj.customfield)) customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
       })
       field.customfields = customRow;
 
       // filter out for empty rows with only id
       if (!_.isEmpty(field) && colHeaders.some(header => header.pass && !_.isEmpty(field[header.data]))) {
-        if (field.id) patchContactList.push(field);
-        else addContactList.push(field)
+        if (field.id) {
+          if (dirtyRows.some( rowId => rowId === field.id )) patchContactList.push(field);
+        } else {
+          addContactList.push(field);
+        }
       }
     });
 
@@ -197,22 +201,14 @@ class Table extends Component {
         fieldsmap
       }));
       });
-    } else {
-      // clean up LIST by patching only non-empty rows
-      dispatch(actionCreators.patchList({
-        listId,
-        name: this.state.name,
-        contacts: origIdList,
-        fieldsmap
-      }));
     }
   }
 
-  _onSaveClick(localData, colHeaders, fieldsmap) {
+  _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
     // create publications for later usage
     Promise.all(this._createPublicationPromises(localData, colHeaders))
     .then( _ => {
-      this._saveOperations(localData, colHeaders, fieldsmap);
+      this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
     })
   }
 
