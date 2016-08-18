@@ -129,9 +129,9 @@ class HandsOnTable extends Component {
             }
           },
           items: {
-            row_above: {},
-            row_below: {},
-            remove_row: {},
+            // row_above: {},
+            // row_below: {},
+            // remove_row: {},
             undo: {},
             redo: {},
             remove_column: {
@@ -176,16 +176,16 @@ class HandsOnTable extends Component {
           this.props._getSelectedRows(selectedRows);
         }
       },
-      afterRemoveRow: (index, amount) => {
-        console.log('row removed');
-        console.log(index);
-        console.log(amount);
-      },
-      afterCreateRow: (index, amount) => {
-        console.log('row created');
-        console.log(index);
-        console.log(amount);
-      },
+      // afterRemoveRow: (index, amount) => {
+      //   console.log('row removed');
+      //   console.log(index);
+      //   console.log(amount);
+      // },
+      // afterCreateRow: (index, amount) => {
+      //   console.log('row created');
+      //   console.log(index);
+      //   console.log(amount);
+      // },
       afterScrollVertically: (e) => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
         if (lastFetchedIndex === listData.contacts.length - 1) return;

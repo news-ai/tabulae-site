@@ -171,7 +171,7 @@ class Table extends Component {
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
-    const { dispatch, listId } = this.props;
+    const { dispatch, listId, listData } = this.props;
     let addContactList = [];
     let patchContactList = [];
 
@@ -196,7 +196,7 @@ class Table extends Component {
     });
 
     // update existing contacts
-    const origIdList = patchContactList.map( contact => contact.id );
+    const origIdList = listData.contacts;
     // console.log(patchContactList);
     // console.log(addContactList);
 
@@ -204,15 +204,16 @@ class Table extends Component {
 
     // create new contacts and append new rows to LIST
     if (addContactList.length > 0) {
-      dispatch(actionCreators.addContacts(addContactList)).then( json => {
-      const appendIdList = json.map( contact => contact.id );
-      const newIdList = origIdList.concat(appendIdList);
-      dispatch(actionCreators.patchList({
-        listId,
-        name: this.state.name,
-        contacts: newIdList,
-        fieldsmap
-      }));
+      dispatch(actionCreators.addContacts(addContactList))
+      .then( json => {
+        const appendIdList = json.map( contact => contact.id );
+        const newIdList = origIdList.concat(appendIdList);
+        dispatch(actionCreators.patchList({
+          listId,
+          name: this.state.name,
+          contacts: newIdList,
+          fieldsmap
+        }));
       });
     }
     this.setState({ isSaved: true });
