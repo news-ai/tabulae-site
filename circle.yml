@@ -7,6 +7,10 @@ machine:
   timezone:
     America/Los_Angeles
 
+dependencies:
+  override:
+   - echo "No tests are needed"
+
 test:
   override:
     - echo "No tests are needed"
