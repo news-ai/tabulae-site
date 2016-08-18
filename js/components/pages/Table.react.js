@@ -79,7 +79,8 @@ class Table extends Component {
       name: null,
       onTitleEdit: false,
       emailPanelOpen: false,
-      selectedContacts: []
+      selectedContacts: [],
+      isSaved: true, // table without change
     }
     this._onSaveClick = this._onSaveClick.bind(this);
     this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
@@ -91,11 +92,13 @@ class Table extends Component {
     this._createPublicationPromises = this._createPublicationPromises.bind(this);
     this._saveOperations = this._saveOperations.bind(this);
     this._fetchOperations = this._fetchOperations.bind(this);
+    this._isDirty = _ => this.setState({ isSaved: false });
     this.routerWillLeave = this.routerWillLeave.bind(this);
   }
 
   componentDidMount() {
     this._fetchOperations();
+    console.log(this.props.router);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
@@ -107,7 +110,8 @@ class Table extends Component {
   routerWillLeave(nextLocation) {
     // return false to prevent a transition w/o prompting the user,
     // or return a string to allow the user to decide:
-    return 'Your work is not saved! Are you sure you want to leave?'
+    if (!this.state.isSaved) return 'Your work is not saved! Are you sure you want to leave?'
+      return 'Are you sure you want to leave this page?'
   }
 
   _fetchOperations() {
@@ -211,9 +215,11 @@ class Table extends Component {
       }));
       });
     }
+    this.setState({ isSaved: true });
   }
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
+    this.setState({ isSaved: true });
     // create publications for later usage
     Promise.all(this._createPublicationPromises(localData, colHeaders))
     .then( _ => {
@@ -280,12 +286,13 @@ class Table extends Component {
             /> : null }
           <HandsOnTable
           listId={this.props.listId}
-          _onSaveClick={this._onSaveClick}
+          onSaveClick={this._onSaveClick}
           _getSelectedRows={this._getSelectedRows}
           listData={listData}
           contacts={contacts}
           isNew={false}
           lastFetchedIndex={lastFetchedIndex}
+          isDirty={this._isDirty}
           />
         </div>
       }

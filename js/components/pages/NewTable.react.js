@@ -53,7 +53,7 @@ class NewTable extends Component {
         </div>
 
         <HandsOnTable
-        _onSaveClick={this._onSaveClick}
+        onSaveClick={this._onSaveClick}
         isNew={true}
         />
       </div>

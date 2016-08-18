@@ -62,6 +62,7 @@ class HandsOnTable extends Component {
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onPromptChange = e => this.setState({ promptInput: e.target.value });
     this._changeColumnName = this._changeColumnName.bind(this);
+    this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       noticeMessage: 'DEFAULT',
       noticeIsActive: false,
@@ -158,6 +159,7 @@ class HandsOnTable extends Component {
 
         if (!this.props.isNew) {
             // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
+          this.props.isDirty();
           const rowNum = changes[0][0];
           const rowId = this.state.options.data[rowNum].id;
           const dirtyRows = this.state.dirtyRows;
@@ -318,9 +320,15 @@ class HandsOnTable extends Component {
     return parser.origin + parser.pathname;
   }
 
+  _onSaveClick(localData, columns) {
+    const { onSaveClick } = this.props;
+    const { fieldsmap, dirtyRows } = this.state;
+    onSaveClick(localData, columns, fieldsmap, dirtyRows);
+    this.setState({ dirtyRows: [] });
+  }
+
   render() {
-    const { _onSaveClick } = this.props;
-    const { options, fieldsmap, skylightTitle, skylightButton, dirtyRows } = this.state;
+    const { options, skylightTitle, skylightButton } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
@@ -356,12 +364,7 @@ class HandsOnTable extends Component {
           <button
           className='button-primary'
           style={styles.buttons.save}
-          onClick={ _ => _onSaveClick(
-            options.data,
-            options.columns,
-            fieldsmap,
-            dirtyRows
-            )}>Save</button>
+          onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
           <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
           <button className='button' onClick={this._addColumn}>Add Column</button>
         </div>
