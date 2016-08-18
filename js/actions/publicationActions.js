@@ -10,7 +10,7 @@ function requestPublication() {
   };
 }
 
-function receivePublication(publication) {
+export function receivePublication(publication) {
   return {
     type: RECEIVE_PUBLICATION,
     publication

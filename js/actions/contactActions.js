@@ -15,7 +15,7 @@ function requestContact() {
 
 function receiveContact(contact) {
   return dispatch => {
-    if (contact.employers !== null) contact.employers.map( pubId => dispatch(publicationActions.fetchPublication(pubId)));
+    // if (contact.employers !== null) contact.employers.map( pubId => dispatch(publicationActions.fetchPublication(pubId)));
     return dispatch({
       type: RECEIVE_CONTACT,
       contact
@@ -23,9 +23,10 @@ function receiveContact(contact) {
   };
 }
 
-function requestContactFail() {
+function requestContactFail(message) {
   return {
-    type: REQUEST_CONTACT_FAIL
+    type: REQUEST_CONTACT_FAIL,
+    message
   };
 }
 
@@ -64,7 +65,9 @@ export function fetchPaginatedContacts(listId) {
         offset: newOffset,
         listId
       });
-      response.map( contact => dispatch(receiveContact(contact)));
+      console.log(response);
+      response.includes.map( publication => dispatch(publicationActions.receivePublication(publication)));
+      response.results.map( contact => dispatch(receiveContact(contact)));
     })
     .catch( message => dispatch(requestContactFail(message)));
   };

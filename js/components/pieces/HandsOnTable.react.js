@@ -146,15 +146,11 @@ class HandsOnTable extends Component {
     };
   }
 
-  routerWillLeave(nextLocation) {
-    console.log(nextLocation);
-    return 'Your work is not saved! Are you sure you want to leave?';
-  }
 
   componentDidMount() {
-    this.props.router.setRouteLeaveHook(this.props.route, () => {
-      return 'You have unsaved information, are you sure you want to leave this page?'
-    });
+    // this.props.router.setRouteLeaveHook(this.props.route, () => {
+    //   return 'You have unsaved information, are you sure you want to leave this page?'
+    // });
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
     this.table.updateSettings({
       beforeChange: (changes, source) => {

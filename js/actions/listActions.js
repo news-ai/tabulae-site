@@ -17,9 +17,10 @@ function requestLists() {
   };
 }
 
-function requestList() {
+function requestList(listId) {
   return {
-    type: REQUEST_LIST
+    type: REQUEST_LIST,
+    listId
   };
 }
 
@@ -47,7 +48,7 @@ function requestListFail(message) {
 
 export function fetchList(listId) {
   return dispatch => {
-    dispatch(requestLists());
+    dispatch(requestList(listId));
     return api.get('/lists/' + listId)
     .then( response => dispatch(receiveList(response)))
     .catch( message => dispatch(requestListFail(message)));
