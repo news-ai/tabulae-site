@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
+import SkyLight from 'react-skylight';
 import { Notification } from 'react-notification';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
@@ -29,6 +30,27 @@ const styles = {
   }
 };
 
+const skylightStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 999,
+    backgroundColor: 'rgba(0,0,0,0.3)'
+  },
+  dialog: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 'auto',
+    padding: '10px',
+    zIndex: 1000,
+    overflow: 'scroll',
+    transform: 'translate(-50%, -50%)'
+  }
+};
+
 const MIN_ROWS = 20;
 
 class HandsOnTable extends Component {
@@ -38,11 +60,14 @@ class HandsOnTable extends Component {
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
+    this._onPromptChange = e => this.setState({ promptInput: e.target.value });
     this._changeColumnName = this._changeColumnName.bind(this);
-
     this.state = {
       noticeMessage: 'DEFAULT',
       noticeIsActive: false,
+      skylightTitle: '',
+      promptInput: '',
+      skylightButton: null,
       lazyLoadingThreshold: 20,
       lastFetchedIndex: -1,
       fieldsmap: [],
@@ -89,7 +114,15 @@ class HandsOnTable extends Component {
                   noticeMessage: 'To change column name, only select one column at a time.'
                 });
               } else {
-                this._changeColumnName(options.start.col);
+                this.setState({
+                  skylightButton: (
+                    <button className='button' onClick={ _ =>
+                    this._changeColumnName(
+                    this.state.options.columns,
+                    options.start.col
+                    )}>Change column name</button>)
+                });
+                this.refs.prompt.show();
               }
             }
           },
@@ -189,9 +222,23 @@ class HandsOnTable extends Component {
     }
   }
 
-  _changeColumnName(col) {
-    console.log(col);
-    console.log(this.state.options.columns);
+  _changeColumnName(columns, colNum) {
+    const { promptInput, options, fieldsmap } = this.state;
+    const columnValue = columns[colNum].data;
+    const newFieldsmap = fieldsmap.map( fieldObj => {
+      if (fieldObj.value === columnValue && fieldObj.customfield) {
+        fieldObj.name = promptInput;
+      }
+      return fieldObj;
+    });
+    columns[colNum].title = promptInput;
+    this.setState({
+      columnInput: '',
+      fieldsmap: newFieldsmap
+    });
+    options.columns = columns;
+    this.table.updateSettings(options);
+    this.refs.prompt.hide();
   }
 
   _removeColumn(columns, colNum) {
@@ -256,7 +303,7 @@ class HandsOnTable extends Component {
 
   render() {
     const { _onSaveClick } = this.props;
-    const { options, fieldsmap } = this.state;
+    const { options, fieldsmap, skylightTitle, skylightButton } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
@@ -271,6 +318,24 @@ class HandsOnTable extends Component {
         onDismiss={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
         onClick={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
       />
+        <SkyLight
+        hideOnOverlayClicked
+        overlayStyles={skylightStyles.overlay}
+        dialogStyles={skylightStyles.dialog}
+        ref='prompt'
+        title={skylightTitle}
+        >
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div>
+            <input type='text' value={this.state.promptInput} onChange={this._onPromptChange} />
+            {skylightButton}
+          </div>
+        </div>
+        </SkyLight> 
           <button
           className='button-primary'
           style={styles.buttons.save}
