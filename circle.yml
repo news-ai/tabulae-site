@@ -19,4 +19,4 @@ deployment:
   production:
     branch: master
     commands:
-      - ssh $SSHU "cd $DIR && git pull origin master && npm install && npm run build && forever restartall"
+      - ssh $SSHU "cd $DIR && git pull origin master && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/npm install && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/npm run build && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/forever restartall"
