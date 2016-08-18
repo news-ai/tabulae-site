@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import SkyLight from 'react-skylight';
-import { withRouter } from 'react-router';
 import { Notification } from 'react-notification';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
@@ -148,9 +147,6 @@ class HandsOnTable extends Component {
 
 
   componentDidMount() {
-    // this.props.router.setRouteLeaveHook(this.props.route, () => {
-    //   return 'You have unsaved information, are you sure you want to leave this page?'
-    // });
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
     this.table.updateSettings({
       beforeChange: (changes, source) => {
@@ -391,4 +387,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(HandsOnTable));
+)(HandsOnTable);

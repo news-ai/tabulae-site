@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import SkyLight from 'react-skylight';
+import { withRouter } from 'react-router';
 import Radium from 'radium';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
@@ -90,15 +91,23 @@ class Table extends Component {
     this._createPublicationPromises = this._createPublicationPromises.bind(this);
     this._saveOperations = this._saveOperations.bind(this);
     this._fetchOperations = this._fetchOperations.bind(this);
+    this.routerWillLeave = this.routerWillLeave.bind(this);
   }
 
   componentDidMount() {
     this._fetchOperations();
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   componentWillReceiveProps(nextProps) {
     const { name } = nextProps;
     this.setState({ name: name });
+  }
+
+  routerWillLeave(nextLocation) {
+    // return false to prevent a transition w/o prompting the user,
+    // or return a string to allow the user to decide:
+    return 'Your work is not saved! Are you sure you want to leave?'
   }
 
   _fetchOperations() {
@@ -329,7 +338,7 @@ const mapStateToProps = (state, props) => {
     contactIsReceiving: contactIsReceiving,
     pubMapByName: publicationReducer,
     publicationReducer,
-    lastFetchedIndex
+    lastFetchedIndex,
   };
 };
 
@@ -342,5 +351,5 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Radium(Table));
+)(withRouter(Radium(Table)));
 
