@@ -1,0 +1,18 @@
+general:
+  branches:
+    only:
+      - master
+
+machine:
+  timezone:
+    America/Los_Angeles
+
+test:
+  override:
+    - echo "No tests are needed"
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - ssh $SSHU "cd $DIR && git pull origin master && npm install && npm run build && forever restartall"
