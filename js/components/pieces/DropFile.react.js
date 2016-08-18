@@ -10,7 +10,7 @@ function Waiting({}) {
   return (
     <div>
       <i className='fa fa-spinner fa-spin fa-4x' aria-hidden='true'></i>
-      <span>Waiting for Columns to be processed...</span>
+      <p>Waiting for Columns to be processed...</p>
     </div>
     );
 }
@@ -74,20 +74,17 @@ class DropFile extends Component {
   }
 
   _processHeaders(order) {
-    const { dispatch, listId } = this.props;
+    const { dispatch, listId, _forceRefresh } = this.props;
     dispatch(actionCreators.addHeaders(listId, order))
-    .then( _ => dispatch(actionCreators.waitForServerProcess(listId)));
+    .then( _ => dispatch(actionCreators.waitForServerProcess(listId)))
+    .then( _ => window.location.reload());
+    // must reload to set up handsontable again, think of a better way later maybe
   }
 
   render() {
     const { listId, fileIsReceiving, fileReducer, isProcessWaiting } = this.props;
     const { file, isFileDropped, fileSubmitted } = this.state;
     const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
-    // START
-    // const headers = [];
-    // const isFileDropped = true;
-    // const fileSubmitted = true;
-    // END
     let renderNode;
     if (isProcessWaiting) {
       renderNode = <Waiting />;

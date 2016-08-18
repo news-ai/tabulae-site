@@ -115,7 +115,6 @@ class Headers extends Component {
 
   render() {
     const { headers, defaultOptions } = this.state;
-    
     const options = defaultOptions;
     return (
       <div>

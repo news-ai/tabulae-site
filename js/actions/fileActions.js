@@ -40,7 +40,6 @@ export function fetchHeaders(listId) {
 
 export function waitForServerProcess(listId) {
   return dispatch => {
-    dispatch({ type: TURN_ON_PROCESS_WAIT });
     setTimeout( _ => {
       dispatch({ type: TURN_OFF_PROCESS_WAIT});
       return dispatch(listActions.fetchList(listId))
@@ -52,6 +51,7 @@ export function waitForServerProcess(listId) {
 export function addHeaders(listId, order) {
   return (dispatch, getState) => {
     dispatch({ type: 'ADDING_HEADER', order });
+    dispatch({ type: TURN_ON_PROCESS_WAIT });
     let fileId = getState().fileReducer[listId].id;
 
     return api.post('/files/' + fileId + '/headers', {order: order})
