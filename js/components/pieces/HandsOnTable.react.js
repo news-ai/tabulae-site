@@ -154,8 +154,8 @@ class HandsOnTable extends Component {
         for (let i = changes.length - 1; i >= 0; i--) {
           if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
         }
-        console.log(changes);
-        console.log(source);
+        // console.log(changes);
+        // console.log(source);
 
         if (!this.props.isNew) {
             // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]

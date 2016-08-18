@@ -197,8 +197,8 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
-    console.log(patchContactList);
-    console.log(addContactList);
+    // console.log(patchContactList);
+    // console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
