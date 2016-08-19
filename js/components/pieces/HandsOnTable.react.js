@@ -110,9 +110,8 @@ class HandsOnTable extends Component {
         },
         contextMenu: {
           callback: (key, options) => {
+            const { dispatch, listData } = this.props;
             if (key === 'insert_row_above') {
-              // NEED TO REFRESH TABLE TO SEE CHANGE
-              const { dispatch, listData } = this.props;
               const index = options.start.row;
               dispatch(actionCreators.addContacts([{ }]))
               .then( contacts => {
@@ -126,6 +125,36 @@ class HandsOnTable extends Component {
                   fieldsmap: this.state.fieldsmap
                 }));
               });
+            }
+
+            if (key === 'insert_row_below') {
+              const index = options.start.row;
+              dispatch(actionCreators.addContacts([{ }]))
+              .then( contacts => {
+                const newListContacts = listData.contacts;
+                newListContacts.splice(index + 1, 0, contacts[0].id);
+                this.setState({ addedRow: true });
+                dispatch(actionCreators.patchList({
+                  listId: listData.id,
+                  contacts: newListContacts,
+                  name: listData.name,
+                  fieldsmap: this.state.fieldsmap
+                }));
+              });
+            }
+
+            if (key === 'remove_these_rows') {
+              const low = options.start.row <= options.end.row ? options.start.row : options.end.row;
+              const hi = low === options.start.row ? options.end.row : options.end.row;
+              const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map( row => row.id );
+              const newListContacts = _.difference(listData.contacts, removeIdList);
+              this.setState({ addedRow: true });
+              dispatch(actionCreators.patchList({
+                listId: listData.id,
+                contacts: newListContacts,
+                name: listData.name,
+                fieldsmap: this.state.fieldsmap
+              }));
             }
 
             if (key === 'remove_column') {
@@ -161,13 +190,19 @@ class HandsOnTable extends Component {
             insert_row_above: {
               name: 'Insert Row Above'
             },
+            insert_row_below: {
+              name: 'Insert Row Below'
+            },
+            remove_these_rows: {
+              name: 'Remove Row'
+            },
             undo: {},
             redo: {},
             remove_column: {
-              name: 'Remove column',
+              name: 'Remove Column',
             },
             change_col_name: {
-              name: 'Change column name'
+              name: 'Change Column Name'
             }
           }
         }
@@ -244,17 +279,7 @@ class HandsOnTable extends Component {
 
 
     if (!_.isEmpty(listData.contacts)) {
-      if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1) {
-        options.data = contacts;
-        this.setState({
-          options,
-          fieldsmap,
-          lastFetchedIndex
-        });
-        this.table.updateSettings(options);
-      }
-
-      if (lastFetchedIndex - this.state.lastFetchedIndex === 1 && this.state.addedRow) {
+      if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1 || this.state.addedRow) {
         options.data = contacts;
         this.setState({
           options,
