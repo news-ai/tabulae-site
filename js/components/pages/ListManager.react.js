@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
-import Lists from '../pieces/Lists.react';
+import Lists from '../Lists';
 
 class ListManager extends Component {
   constructor(props) {
