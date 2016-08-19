@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
-import EmailPanel from './EmailPanel.react';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
+
 import PreviewEmailContent from './PreviewEmailContent.react';
+import EmailEditor from './EmailEditor.react';
 
 const styles = {
   emailPanel: {
@@ -25,7 +26,7 @@ const styles = {
 };
 
 
-class EmailPanelWrapper extends Component {
+class EmailPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -111,7 +112,7 @@ class EmailPanelWrapper extends Component {
     // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
     return (
       <div>
-        <EmailPanel
+        <EmailEditor
         style={styles.emailPanel}
         _setSubjectLine={this._setSubjectLine}
         _setBody={this._setBody}
@@ -166,4 +167,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(EmailPanelWrapper);
+)(EmailPanel);

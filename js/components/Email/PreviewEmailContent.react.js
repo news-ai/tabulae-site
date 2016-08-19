@@ -1,7 +1,4 @@
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
-import { globalStyles } from 'constants/StyleConstants';
-import Radium from 'radium';
 
 const styles = {
   contentBox: {

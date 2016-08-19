@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
-import EmailPanel from '../pieces/EmailPanel.react';
-import HandsOnTable from '../pieces/HandsOnTable.react';
-import ButtonMenu from '../pieces/ButtonMenu.react';
 import _ from 'lodash';
 import Radium from 'radium';
+
+import HandsOnTable from '../pieces/HandsOnTable.react';
+import ButtonMenu from '../pieces/ButtonMenu.react';
 
 class NewTable extends Component {
   constructor(props) {
@@ -15,9 +15,6 @@ class NewTable extends Component {
     };
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onNameChange = e => this.setState({ name: e.target.value });
-  }
-
-  componentDidMount() {
   }
 
   _onSaveClick(localData, colHeaders) {

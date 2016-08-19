@@ -6,7 +6,8 @@ import Radium from 'radium';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import { globalStyles } from 'constants/StyleConstants';
-import EmailPanelWrapper from '../pieces/EmailPanelWrapper.react';
+
+import EmailPanel from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
@@ -280,7 +281,7 @@ class Table extends Component {
             Upload from File</button>
           </ButtonMenu>
           { this.state.emailPanelOpen ? 
-            <EmailPanelWrapper
+            <EmailPanel
             selectedContacts={this.state.selectedContacts}
             customfields={listData.customfields}
             /> : null }

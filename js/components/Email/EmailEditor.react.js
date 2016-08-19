@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import InlineStyleControls from './InlineStyleControls.react';
-import BlockStyleControls from './BlockStyleControls.react';
-import Subject from './Subject.react';
 import {
   EditorState,
   RichUtils,
   Editor,
   CompositeDecorator
 } from 'draft-js';
+
+import InlineStyleControls from './InlineStyleControls.react';
+import BlockStyleControls from './BlockStyleControls.react';
+import Subject from './Subject.react';
 
 const CURLY_REGEX = /{([^}]+)}/g;
 
@@ -45,7 +46,7 @@ function getBlockStyle(block) {
   }
 }
 
-class EmailPanel extends Component {
+class EmailEditor extends Component {
   constructor(props) {
     super(props);
 
@@ -158,5 +159,5 @@ class EmailPanel extends Component {
   }
 }
 
-export default EmailPanel;
+export default EmailEditor;
 
