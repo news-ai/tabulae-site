@@ -8,7 +8,7 @@ import * as fileActions from './fileActions';
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const register = _ => loginActions.register();
 export const logout = _ => loginActions.logout();
-export const login = _ => loginActions.login();
+export const onLogin = _ => loginActions.onLogin();
 export const fetchPerson = _ => loginActions.fetchPerson();
 
 export const fetchLists = _ => listActions.fetchLists();
