@@ -1,19 +1,14 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
 import Subject from './Subject.react';
 import {
-  convertFromRaw,
-  convertToRaw,
   EditorState,
   RichUtils,
   Editor,
   CompositeDecorator
 } from 'draft-js';
-// import Editor from 'draft-js-plugins-editor';
 
-// import 'draft-js-mention-plugin/lib/plugin.css';
 const CURLY_REGEX = /{([^}]+)}/g;
 
 const CurlySpan = (props) => {
@@ -25,7 +20,6 @@ function findWithRegex(regex, contentBlock, callback) {
   let matchArr, start;
   while ((matchArr = regex.exec(text)) !== null) {
     start = matchArr.index;
-    // console.log(matchArr);
     callback(start, start + matchArr[0].length);
   }
 }
@@ -164,19 +158,5 @@ class EmailPanel extends Component {
   }
 }
 
-
-const mapStateToProps = state => {
-    return {};
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    dispatch: action => dispatch(action)
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EmailPanel);
+export default EmailPanel;
 

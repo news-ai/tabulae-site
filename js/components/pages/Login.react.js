@@ -2,17 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 
-class Login extends Component {
-	render() {
-		const { loginWithGoogleClick, loginClick, registerClick } = this.props;
-		return (
-			<div className='container'>
-				<button onClick={loginWithGoogleClick}>Login with Google</button>
-				<button onClick={registerClick}>Register</button>
-				<button onClick={loginClick}>Login</button>
-			</div>
-			);
-	}
+function Login({ loginWithGoogleClick, loginClick, registerClick }) {
+	return (
+		<div className='container'>
+			<button onClick={loginWithGoogleClick}>Login with Google</button>
+			<button onClick={registerClick}>Register</button>
+			<button onClick={loginClick}>Login</button>
+		</div>
+		);
 }
 
 const mapStateToProps = state => {
