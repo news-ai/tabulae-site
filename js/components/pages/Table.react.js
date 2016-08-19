@@ -234,8 +234,7 @@ class Table extends Component {
       listIsReceiving,
       contactIsReceiving,
       contacts,
-      lastFetchedIndex,
-      pubMapByName
+      lastFetchedIndex
     } = this.props;
 
     return (
@@ -294,7 +293,6 @@ class Table extends Component {
           isNew={false}
           lastFetchedIndex={lastFetchedIndex}
           isDirty={this._isDirty}
-          pubMapByName={pubMapByName}
           />
         </div>
       }
