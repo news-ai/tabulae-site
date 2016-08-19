@@ -30,6 +30,12 @@ const styles = {
   }
 };
 
+const center = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+};
+
 const skylightStyles = {
   overlay: {
     position: 'fixed',
@@ -65,6 +71,7 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       noticeMessage: 'DEFAULT',
+      update: false,
       noticeIsActive: false,
       skylightTitle: '',
       promptInput: '',
@@ -102,6 +109,23 @@ class HandsOnTable extends Component {
         },
         contextMenu: {
           callback: (key, options) => {
+            if (key === 'insert_row_above') {
+              // NEED TO REFRESH TABLE TO SEE CHANGE
+              const { dispatch, listData } = this.props;
+              const index = options.start.row;
+              dispatch(actionCreators.addContacts([{ }]))
+              .then( contacts => {
+                const newListContacts = listData.contacts;
+                newListContacts.splice(index, 0, contacts[0].id);
+                dispatch(actionCreators.patchList({
+                  listId: listData.id,
+                  contacts: newListContacts,
+                  name: listData.name,
+                  fieldsmap: this.state.fieldsmap
+                }));
+              });
+            }
+
             if (key === 'remove_column') {
               for (let i = options.start.col; i <= options.end.col; i++) {
                 this._removeColumn(this.state.options.columns, i);
@@ -120,9 +144,9 @@ class HandsOnTable extends Component {
                   skylightButton: (
                     <button className='button' onClick={ _ =>
                     this._changeColumnName(
-                    this.state.options.columns,
-                    options.start.col
-                    )}>Change column name</button>)
+                      this.state.options.columns,
+                      options.start.col
+                      )}>Change column name</button>)
                 });
                 this.refs.prompt.show();
               }
@@ -132,6 +156,9 @@ class HandsOnTable extends Component {
             // row_above: {},
             // row_below: {},
             // remove_row: {},
+            // insert_row_above: {
+            //   name: 'Insert Row Above'
+            // },
             undo: {},
             redo: {},
             remove_column: {
@@ -176,16 +203,6 @@ class HandsOnTable extends Component {
           this.props._getSelectedRows(selectedRows);
         }
       },
-      // afterRemoveRow: (index, amount) => {
-      //   console.log('row removed');
-      //   console.log(index);
-      //   console.log(amount);
-      // },
-      // afterCreateRow: (index, amount) => {
-      //   console.log('row created');
-      //   console.log(index);
-      //   console.log(amount);
-      // },
       afterScrollVertically: (e) => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
@@ -197,9 +214,6 @@ class HandsOnTable extends Component {
         const threshold = this.state.lazyLoadingThreshold;
 
         if (lastVisibleRow > (lastFetchedIndex - threshold)) {
-          console.log(lastVisibleRow);
-          console.log(lastFetchedIndex);
-          console.log('FETCH');
           if (!contactIsReceiving) dispatch(actionCreators.fetchContacts(listId));
         }
       }
@@ -211,6 +225,8 @@ class HandsOnTable extends Component {
     const { contacts, listData, lastFetchedIndex } = nextProps;
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
+
+    console.log(listData.contacts[0]);
 
     fieldsmap.map( fieldObj => {
       if (fieldObj.customfield && !fieldObj.hidden && !options.columns.some( col => col.data === fieldObj.value )) {
@@ -350,17 +366,13 @@ class HandsOnTable extends Component {
         ref='prompt'
         title={skylightTitle}
         >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
+        <div style={center}>
           <div>
             <input type='text' value={this.state.promptInput} onChange={this._onPromptChange} />
             {skylightButton}
           </div>
         </div>
-        </SkyLight> 
+        </SkyLight>
           <button
           className='button-primary'
           style={styles.buttons.save}
