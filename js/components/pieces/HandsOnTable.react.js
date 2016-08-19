@@ -117,6 +117,7 @@ class HandsOnTable extends Component {
               .then( contacts => {
                 const newListContacts = listData.contacts;
                 newListContacts.splice(index, 0, contacts[0].id);
+                this.setState({ lastFetchedIndex: this.state.lastFetchedIndex + 1});
                 dispatch(actionCreators.patchList({
                   listId: listData.id,
                   contacts: newListContacts,
@@ -226,8 +227,6 @@ class HandsOnTable extends Component {
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
 
-    console.log(listData.contacts[0]);
-
     fieldsmap.map( fieldObj => {
       if (fieldObj.customfield && !fieldObj.hidden && !options.columns.some( col => col.data === fieldObj.value )) {
         options.columns.push({ data: fieldObj.value, title: fieldObj.name });
@@ -246,7 +245,6 @@ class HandsOnTable extends Component {
     if (!_.isEmpty(listData.contacts)) {
       if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1) {
         options.data = contacts;
-        options.persistentState = true;
         this.setState({
           options,
           fieldsmap,
