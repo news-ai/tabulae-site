@@ -26,6 +26,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.isReceiving = false;
       obj.previewEmails = action.json;
       action.json.map( email => obj[email.id] = email);
+      console.log(action.json);
       return obj;
     case RECEIVE_EMAIL:
       obj[action.json.id] = action.json;

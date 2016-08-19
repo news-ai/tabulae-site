@@ -25,6 +25,28 @@ const styles = {
   }
 };
 
+const skylightStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 999,
+    backgroundColor: 'rgba(0,0,0,0.3)'
+  },
+  dialog: {
+    height: '600px',
+    width: '900px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 'auto',
+    padding: '10px',
+    zIndex: 1000,
+    overflow: 'scroll',
+    transform: 'translate(-50%, -50%)'
+  }
+}
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -121,7 +143,11 @@ class EmailPanel extends Component {
         style={styles.sendButton}
         onClick={this._processEmails}
         >Preview</button>
-        <SkyLight hideOnOverlayClicked ref='preview' title='Preview'>
+        <SkyLight
+        overlayStyles={skylightStyles.overlay}
+        dialogStyles={skylightStyles.dialog}
+        hideOnOverlayClicked
+        ref='preview' title='Preview'>
           {
             (isReceiving || previewEmails.length === 0) ? <span>LOADING..</span> :
             <div>

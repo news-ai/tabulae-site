@@ -8,9 +8,8 @@ import * as api from './api';
 export function postBatchEmails(emails) {
   console.log(JSON.stringify(emails));
   return (dispatch) => {
-    dispatch({ type: SENDING_STAGED_EMAILS });
-
-    return api.post('/emails')
+    dispatch({ type: SENDING_STAGED_EMAILS, emails });
+    return api.post('/emails', emails)
     .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response }))
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };
