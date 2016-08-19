@@ -1,28 +1,23 @@
 import * as api from './api';
-
-import {
-  LOGIN_FAIL,
-  REQUEST_LOGIN,
-  RECEIVE_LOGIN,
-} from 'constants/AppConstants';
+import { loginConstant } from 'constants/AppConstants';
 
 
 function requestLogin() {
   return {
-    type: REQUEST_LOGIN
+    type: loginConstant.REQUEST
   };
 }
 
 function receiveLogin(person) {
   return {
-    type: RECEIVE_LOGIN,
+    type: loginConstant.RECEIVE,
     person
   };
 }
 
 function loginFail(message) {
   return {
-    type: LOGIN_FAIL,
+    type: loginConstant.REQUEST_FAIL,
     message
   };
 }
@@ -32,7 +27,7 @@ export function loginWithGoogle() {
   window.location.href = base;
 }
 
-export function login() {
+export function onLogin() {
   const base = `http://tabulae.newsai.org/api/auth?next=${window.location}`;
   window.location.href = base;
 }

@@ -1,11 +1,9 @@
 import {
-  UPLOAD_FILE,
-  UPLOAD_FILE_FAIL,
-  RECEIVE_FILE,
   REQUEST_HEADERS,
   RECEIVE_HEADERS,
   TURN_ON_PROCESS_WAIT,
-  TURN_OFF_PROCESS_WAIT
+  TURN_OFF_PROCESS_WAIT,
+  fileConstant
 } from '../constants/AppConstants';
 import * as api from './api';
 import * as listActions from './listActions';
@@ -13,7 +11,7 @@ import * as contactActions from './contactActions';
 
 function receiveFile(file, listId) {
   return {
-    type: RECEIVE_FILE,
+    type: fileConstant.RECEIVE,
     file,
     listId
   };
@@ -21,10 +19,10 @@ function receiveFile(file, listId) {
 
 export function uploadFile(listId, file) {
   return dispatch => {
-    dispatch({ type: UPLOAD_FILE, listId, file});
+    dispatch({ type: fileConstant.REQUEST, listId, file});
     return api.postFile('/lists/' + listId + '/upload', file)
     .then( response => dispatch(receiveFile(response, listId)))
-    .catch( message => dispatch({ type: UPLOAD_FILE_FAIL, message }));
+    .catch( message => dispatch({ type: fileConstant.REQUEST_FAIL, message }));
   };
 }
 

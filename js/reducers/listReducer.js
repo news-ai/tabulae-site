@@ -1,10 +1,8 @@
 import {
   REQUEST_LISTS,
   RECEIVE_LISTS,
-  REQUEST_LIST,
-  RECEIVE_LIST,
-  REQUEST_LISTS_FAIL,
-  PATCH_LIST
+  listConstant,
+  SET_OFFSET
 } from '../constants/AppConstants';
 
 import { assignToEmpty } from '../utils/assign';
@@ -16,11 +14,12 @@ function listReducer(state = initialState.listReducer, action) {
   if (
     action.type === REQUEST_LISTS ||
     action.type === RECEIVE_LISTS ||
-    action.type === REQUEST_LIST ||
-    action.type === RECEIVE_LIST ||
-    action.type === REQUEST_LISTS_FAIL ||
-    action.type === PATCH_LIST ||
-    action.type === 'SET_OFFSET'
+    action.type === listConstant.REQUEST ||
+    action.type === listConstant.RECEIVE ||
+    action.type === listConstant.REQUEST_FAIL ||
+    action.type === listConstant.PATCH ||
+    action.type === listConstant.PATCH_FAIL ||
+    action.type === SET_OFFSET
     ) accessing = true;
   else return state;
 
@@ -41,21 +40,25 @@ function listReducer(state = initialState.listReducer, action) {
       obj.lists = unarchivedList;
       obj.archivedList = archivedList;
       return obj;
-    case REQUEST_LISTS_FAIL:
+    case listConstant.REQUEST_FAIL:
       obj.isReceiving = false;
+      obj.didInvalidate = true;
       return obj;
-    case REQUEST_LIST:
+    case listConstant.REQUEST:
       obj.isReceiving = true;
       return obj;
-    case RECEIVE_LIST:
+    case listConstant.RECEIVE:
       obj.isReceiving = false;
       obj[action.list.id] = action.list;
       obj[action.list.id].offset = 0;
       return obj;
-    case PATCH_LIST:
+    case listConstant.PATCH:
       obj.isReceiving = true;
       return obj;
-    case 'SET_OFFSET':
+    case listConstant.PATCH_FAIL:
+      obj.isReceiving = false;
+      return obj;
+    case SET_OFFSET:
       obj[action.listId].offset = action.offset;
       return obj;
     default:

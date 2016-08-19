@@ -1,11 +1,9 @@
 import {
-  UPLOAD_FILE,
-  UPLOAD_FILE_FAIL,
-  RECEIVE_FILE,
   REQUEST_HEADERS,
   RECEIVE_HEADERS,
   TURN_ON_PROCESS_WAIT,
-  TURN_OFF_PROCESS_WAIT
+  TURN_OFF_PROCESS_WAIT,
+  fileConstant
 } from '../constants/AppConstants';
 
 import { assignToEmpty } from '../utils/assign';
@@ -15,9 +13,9 @@ function fileReducer(state = initialState.fileReducer, action) {
   if (window.isDev) Object.freeze(state);
   let accessing = false;
   if (
-    action.type === UPLOAD_FILE ||
-    action.type === UPLOAD_FILE_FAIL ||
-    action.type === RECEIVE_FILE ||
+    action.type === fileConstant.REQUEST ||
+    action.type === fileConstant.RECEIVE ||
+    action.type === fileConstant.REQUEST_FAIL ||
     action.type === REQUEST_HEADERS ||
     action.type === RECEIVE_HEADERS ||
     action.type === TURN_OFF_PROCESS_WAIT ||
@@ -27,14 +25,14 @@ function fileReducer(state = initialState.fileReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
-    case UPLOAD_FILE:
+    case fileConstant.REQUEST:
       obj.isReceiving = true;
       return obj;
-    case UPLOAD_FILE_FAIL:
+    case fileConstant.REQUEST_FAIL:
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;
-    case RECEIVE_FILE:
+    case fileConstant.RECEIVE:
       obj.isReceiving = false;
       // file belongs to list
       obj[action.listId] = action.file;

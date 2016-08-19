@@ -98,7 +98,6 @@ class Table extends Component {
 
   componentDidMount() {
     this._fetchOperations();
-    console.log(this.props.router);
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 

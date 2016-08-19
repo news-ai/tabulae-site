@@ -1,15 +1,14 @@
 import {
-  REQUEST_CONTACT,
-  RECEIVE_CONTACT,
-  REQUEST_CONTACT_FAIL,
   ADDING_CONTACT,
+  SET_OFFSET,
+  contactConstant
 } from '../constants/AppConstants';
 import * as api from './api';
 import * as publicationActions from './publicationActions';
 
 function requestContact() {
   return {
-    type: REQUEST_CONTACT
+    type: contactConstant.REQUEST
   };
 }
 
@@ -17,7 +16,7 @@ function receiveContact(contact) {
   return dispatch => {
     // if (contact.employers !== null) contact.employers.map( pubId => dispatch(publicationActions.fetchPublication(pubId)));
     return dispatch({
-      type: RECEIVE_CONTACT,
+      type: contactConstant.RECEIVE,
       contact
     });
   };
@@ -25,7 +24,7 @@ function receiveContact(contact) {
 
 function requestContactFail(message) {
   return {
-    type: REQUEST_CONTACT_FAIL,
+    type: contactConstant.REQUEST_FAIL,
     message
   };
 }
@@ -61,7 +60,7 @@ export function fetchPaginatedContacts(listId) {
     .then( response => {
       const newOffset = offset + PAGE_LIMIT;
       dispatch({
-        type: 'SET_OFFSET',
+        type: SET_OFFSET,
         offset: newOffset,
         listId
       });
@@ -100,7 +99,7 @@ export function addContacts(contactList) {
     return api.post('/contacts', contactList)
     .then( response => {
       response.map( contact => dispatch({
-        type: RECEIVE_CONTACT,
+        type: contactConstant.RECEIVE,
         contactId: contact.id,
         contact
       }));

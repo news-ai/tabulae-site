@@ -1,18 +1,17 @@
 import {
-  REQUEST_PUBLICATION,
-  RECEIVE_PUBLICATION,
+  publicationConstant
 } from '../constants/AppConstants';
 import * as api from './api';
 
 function requestPublication() {
   return {
-    type: REQUEST_PUBLICATION
+    type: publicationConstant.REQUEST
   };
 }
 
 export function receivePublication(publication) {
   return {
-    type: RECEIVE_PUBLICATION,
+    type: publicationConstant.RECEIVE,
     publication
   };
 }

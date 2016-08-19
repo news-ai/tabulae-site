@@ -25,7 +25,7 @@ const mapDispatchToProps = dispatch => {
 	return {
 		loginWithGoogleClick: _ => dispatch(actionCreators.loginWithGoogle()),
 		registerClick: _ => dispatch(actionCreators.register()),
-		loginClick: _ => dispatch(actionCreators.login())
+		loginClick: _ => dispatch(actionCreators.onLogin())
 	};
 };
 

@@ -1,11 +1,8 @@
 import {
   REQUEST_LISTS,
   RECEIVE_LISTS,
-  REQUEST_LISTS_FAIL,
-  PATCH_LIST,
-  RECEIVE_LIST,
-  REQUEST_LIST,
-  ARCHIVE_LIST
+  ARCHIVE_LIST,
+  listConstant,
 } from '../constants/AppConstants';
 import * as contactActions from './contactActions';
 import * as api from './api';
@@ -19,7 +16,7 @@ function requestLists() {
 
 function requestList(listId) {
   return {
-    type: REQUEST_LIST,
+    type: listConstant.REQUEST,
     listId
   };
 }
@@ -33,14 +30,14 @@ function receiveLists(lists) {
 
 function receiveList(list) {
   return {
-    type: RECEIVE_LIST,
+    type: listConstant.RECEIVE,
     list
   };
 }
 
 function requestListFail(message) {
   return {
-    type: REQUEST_LISTS_FAIL,
+    type: listConstant.REQUEST_FAIL,
     message
   };
 }
@@ -71,10 +68,10 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   if (contacts !== undefined) listBody.contacts = contacts;
   listBody.fieldsmap = fieldsmap;
   return dispatch => {
-    dispatch({ type: PATCH_LIST });
+    dispatch({ type: listConstant.PATCH, listId });
     return api.patch('/lists/' + listId, listBody)
     .then( response => dispatch(receiveList(response)))
-    .catch( message => dispatch({ type: 'PATCH_LIST_FAIL', message }));
+    .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));
   };
 }
 

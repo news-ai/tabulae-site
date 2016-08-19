@@ -1,8 +1,6 @@
 import {
   ADDING_CONTACT,
-  REQUEST_CONTACT,
-  RECEIVE_CONTACT,
-  REQUEST_CONTACT_FAIL
+  contactConstant
 } from '../constants/AppConstants';
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
@@ -12,9 +10,9 @@ function contactReducer(state = initialState.contactReducer, action) {
   let accessing = false;
   if (
     action.type === ADDING_CONTACT ||
-    action.type === REQUEST_CONTACT ||
-    action.type === RECEIVE_CONTACT ||
-    action.type === REQUEST_CONTACT_FAIL
+    action.type === contactConstant.REQUEST ||
+    action.type === contactConstant.RECEIVE ||
+    action.type === contactConstant.REQUEST_FAIL
     ) accessing = true;
   else return state;
 
@@ -23,10 +21,10 @@ function contactReducer(state = initialState.contactReducer, action) {
     case ADDING_CONTACT:
       obj.isReceiving = true;
       return obj;
-    case REQUEST_CONTACT:
+    case contactConstant.REQUEST:
       obj.isReceiving = true;
       return obj;
-    case RECEIVE_CONTACT:
+    case contactConstant.RECEIVE:
       obj.isReceiving = false;
       obj[action.contact.id] = action.contact;
       if (action.contact.customfields && action.contact.customfields !== null) {
