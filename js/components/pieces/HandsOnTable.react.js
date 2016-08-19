@@ -70,6 +70,7 @@ class HandsOnTable extends Component {
     this._changeColumnName = this._changeColumnName.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
+      addedRow: false,
       noticeMessage: 'DEFAULT',
       update: false,
       noticeIsActive: false,
@@ -117,7 +118,7 @@ class HandsOnTable extends Component {
               .then( contacts => {
                 const newListContacts = listData.contacts;
                 newListContacts.splice(index, 0, contacts[0].id);
-                this.setState({ lastFetchedIndex: this.state.lastFetchedIndex + 1});
+                this.setState({ addedRow: true });
                 dispatch(actionCreators.patchList({
                   listId: listData.id,
                   contacts: newListContacts,
@@ -157,9 +158,9 @@ class HandsOnTable extends Component {
             // row_above: {},
             // row_below: {},
             // remove_row: {},
-            // insert_row_above: {
-            //   name: 'Insert Row Above'
-            // },
+            insert_row_above: {
+              name: 'Insert Row Above'
+            },
             undo: {},
             redo: {},
             remove_column: {
@@ -249,6 +250,17 @@ class HandsOnTable extends Component {
           options,
           fieldsmap,
           lastFetchedIndex
+        });
+        this.table.updateSettings(options);
+      }
+
+      if (lastFetchedIndex - this.state.lastFetchedIndex === 1 && this.state.addedRow) {
+        options.data = contacts;
+        this.setState({
+          options,
+          fieldsmap,
+          lastFetchedIndex,
+          addedRow: false
         });
         this.table.updateSettings(options);
       }
