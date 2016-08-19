@@ -16,6 +16,7 @@ function receiveLogin(person) {
 }
 
 function loginFail(message) {
+  console.log(message);
   return {
     type: loginConstant.REQUEST_FAIL,
     message
@@ -47,7 +48,8 @@ export function fetchPerson() {
     dispatch(requestLogin());
     return api.get('/users/me')
     .then( response => dispatch(receiveLogin(response)))
-    .catch( message => dispatch(loginFail(message)));
+    .catch( message => console.log(message));
+    // .catch( message => dispatch(loginFail(message)));
   };
 }
 

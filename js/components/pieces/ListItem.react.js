@@ -20,7 +20,7 @@ const styles = {
   }
 };
 
-function ListItem({list, key, _onArchiveToggle, iconName}) {
+function ListItem({list, key, onArchiveToggle, iconName}) {
   return (
     <div className='row' style={[styles.parent]} key={key}>
       <div className='six columns'>
@@ -34,7 +34,7 @@ function ListItem({list, key, _onArchiveToggle, iconName}) {
         key={key}
         className={iconName}
         style={[globalStyles.icon]}
-        onClick={ _ => _onArchiveToggle(list.id) }
+        onClick={ _ => onArchiveToggle(list.id) }
         aria-hidden='true'></i>
       </div>
     </div>
