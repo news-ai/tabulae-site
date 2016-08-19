@@ -9,12 +9,9 @@ import {
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
 import Subject from './Subject.react';
+import CurlySpan from './CurlySpan.react';
 
 const CURLY_REGEX = /{([^}]+)}/g;
-
-const CurlySpan = (props) => {
-  return <span {...props} style={{ color: 'red' }}>{props.children}</span>;
-};
 
 function findWithRegex(regex, contentBlock, callback) {
   const text = contentBlock.getText();
@@ -160,4 +157,3 @@ class EmailEditor extends Component {
 }
 
 export default EmailEditor;
-
