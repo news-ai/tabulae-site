@@ -12,6 +12,7 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../pieces/DropFile.react';
+import Waiting from '../pieces/Waiting.react.js';
 
 const styles = {
   nameBlock: {
@@ -240,23 +241,18 @@ class Table extends Component {
 
     return (
       <div>
+      <Waiting isReceiving={contactIsReceiving || listData === undefined} style={styles.loading} />
       {
-        contactIsReceiving ? <i
-        style={styles.loading}
-        className='fa fa-spinner fa-spin fa-3x'
-        aria-hidden='true'></i> : null
-      }
-      {
-        listData === undefined ? <i style={styles.loading} className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
+        listData ?
         <div>
           <div style={[styles.nameBlock.parent]}>
             <div className='three columns'>
-            <ToggleableEditInput
-            name={this.state.name}
-            updateName={this._updateName}
-            toggleTitleEdit={this._toggleTitleEdit}
-            onTitleEdit={this.state.onTitleEdit}
-            />
+              <ToggleableEditInput
+              name={this.state.name}
+              updateName={this._updateName}
+              toggleTitleEdit={this._toggleTitleEdit}
+              onTitleEdit={this.state.onTitleEdit}
+              />
             </div>
           </div>
           <SkyLight
@@ -295,7 +291,7 @@ class Table extends Component {
           lastFetchedIndex={lastFetchedIndex}
           isDirty={this._isDirty}
           />
-        </div>
+        </div> : null
       }
       </div>
       );
