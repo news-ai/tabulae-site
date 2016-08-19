@@ -1,31 +1,28 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Select from 'react-select';
-import * as actionCreators from 'actions/AppActions';
-import Radium from 'radium';
-// import {Table, Column, Cell} from 'fixed-data-table';
 import 'react-select/dist/react-select.css';
-// import 'fixed-data-table/dist/fixed-data-table.css';
+
+const defaultSelectableOptions = [
+  {value: '_', label: '[leave me blank]'},
+  {value: 'ignore_column', label: '[Ignore this column]'},
+  {value: 'firstname', label: 'First Name'},
+  {value: 'lastname', label: 'Last Name'},
+  {value: 'email', label: 'Email'},
+  {value: 'employers', label: 'Employer(s)'},
+  {value: 'pastemployers', label: 'Past Employer(s)'},
+  {value: 'linkedin', label: 'LinkedIn'},
+  {value: 'twitter', label: 'Twitter'},
+  {value: 'instagram', label: 'Instagram'},
+  {value: 'website', label: 'Website'},
+  {value: 'blog', label: 'Blog'},
+];
 
 class Headers extends Component {
   constructor(props) {
     super(props);
     this.state = {
       headers: this.props.headers,
-      defaultOptions: [
-        {value: '_', label: '[leave me blank]'},
-        {value: 'ignore_column', label: '[Ignore this column]'},
-        {value: 'firstname', label: 'First Name'},
-        {value: 'lastname', label: 'Last Name'},
-        {value: 'email', label: 'Email'},
-        {value: 'employers', label: 'Employer(s)'},
-        {value: 'pastemployers', label: 'Past Employer(s)'},
-        {value: 'linkedin', label: 'LinkedIn'},
-        {value: 'twitter', label: 'Twitter'},
-        {value: 'instagram', label: 'Instagram'},
-        {value: 'website', label: 'Website'},
-        {value: 'blog', label: 'Blog'},
-      ],
+      defaultOptions: defaultSelectableOptions,
       optionSelected: {
         firstname: false,
         lastname: false,
@@ -100,7 +97,7 @@ class Headers extends Component {
 
   _sendHeaderNames() {
     const { headers } = this.state;
-    const { dispatch, onProcessHeaders } = this.props;
+    const { onProcessHeaders } = this.props;
     let untitledCount = 0;
     const order = headers.map( header => {
       if (!header.value || header.value.value === '_') {
@@ -160,17 +157,4 @@ class Headers extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  return {};
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    dispatch: action => dispatch(action)
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(Radium(Headers));
+export default Headers;
