@@ -36,6 +36,8 @@ const styleMap = {
   },
 };
 
+const placeholder = 'Tip: Did you know you can use the column names as variables in your template email? E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
+
 function getBlockStyle(block) {
   switch (block.getType()) {
     case 'blockquote': return 'RichEditor-blockquote';
@@ -145,7 +147,7 @@ class EmailEditor extends Component {
               editorState={editorState}
               handleKeyCommand={this.handleKeyCommand}
               onChange={this.onChange}
-              placeholder='Tell a story...'
+              placeholder={placeholder}
               ref='editor'
               spellCheck={true}
             />
