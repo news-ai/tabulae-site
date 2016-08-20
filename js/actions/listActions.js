@@ -36,6 +36,7 @@ function receiveList(list) {
 }
 
 function requestListFail(message) {
+  window.location.href = `${window.location.origin}/NotFound`;
   return {
     type: listConstant.REQUEST_FAIL,
     message
@@ -88,7 +89,7 @@ export function createNewSheet(name, contactList) {
     return api.post('/lists', listBody)
     .then( response => {
       dispatch(receiveList(response));
-      window.location.href = window.location.origin + '/lists/' + response.id;
+      window.location.href = `${window.location.origin}/lists/${response.id}`;
     })
     .catch( message => console.log(message));
   });
