@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Publisher platform for NewsAI data",
   "dependencies": {
+    "alertifyjs": "^1.8.0",
     "axios": "^0.9.1",
     "draft-js": "^0.7.0",
     "draft-js-export-html": "^0.4.0",

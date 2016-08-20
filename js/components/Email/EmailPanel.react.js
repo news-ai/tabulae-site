@@ -4,6 +4,9 @@ import { connect } from 'react-redux';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
+import alertify from 'alertifyjs';
+
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 import PreviewEmailContent from './PreviewEmailContent.react';
 import EmailEditor from './EmailEditor.react';
@@ -46,7 +49,9 @@ const skylightStyles = {
     overflow: 'scroll',
     transform: 'translate(-50%, -50%)'
   }
-}
+};
+
+alertify.defaults.glossary.title = 'Warnings';
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -59,9 +64,9 @@ class EmailPanel extends Component {
     this._showStagingEmails = this._showStagingEmails.bind(this);
     this._convertToHtml = this._convertToHtml.bind(this);
     this._replaceAll = this._replaceAll.bind(this);
-    this._processEmails = this._processEmails.bind(this);
-    this._sendAllEmails = this._sendAllEmails.bind(this);
-    this._sendEmail = this._sendEmail.bind(this);
+    this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
+    this._onSendAllEmailsClick = this._onSendAllEmailsClick.bind(this);
+    this._onSendEmailClick = this._onSendEmailClick.bind(this);
     this._setSubjectLine = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({ subject });
@@ -69,6 +74,7 @@ class EmailPanel extends Component {
     this._setBody = (editorState) => {
       this.setState({ body: this._convertToHtml(editorState) });
     };
+    this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
   }
 
   _convertToHtml(editorState) {
@@ -88,24 +94,45 @@ class EmailPanel extends Component {
     return newHtml;
   }
 
-  _processEmails() {
-    const { selectedContacts, dispatch } = this.props;
+  _getGeneratedHtmlEmails(selectedContacts, subject, body) {
     let contactEmails = [];
     selectedContacts.map( (contact, i) => {
       if (contact && contact !== null) {
-        const subject = this.state.subject;
-        const body = this._replaceAll(this.state.body, selectedContacts[i]);
+        const replacedBody = this._replaceAll(body, selectedContacts[i]);
         contactEmails.push({
           to: contact.email,
           subject: subject,
-          body: body
+          body: replacedBody
         });
       }
     });
-    // return contactEmails;
-    dispatch(actionCreators.postBatchEmails(contactEmails))
+    return contactEmails;
+  }
+
+  _sendGeneratedEmails(contactEmails) {
+    this.props.dispatch(actionCreators.postBatchEmails(contactEmails))
     .then( _ => this.refs.preview.show());
-    // console.log(contactEmails);
+  }
+
+  _onPreviewEmailsClick() {
+    const { selectedContacts, dispatch } = this.props;
+    const { subject, body } = this.state;
+    const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
+    if (subject.length === 0) {
+      alertify
+      .confirm(
+        'Your Subject line is empty. Are you sure you want to send this email?',
+        function() {
+          // OK
+          this._sendGeneratedEmails(contactEmails);
+        },
+        function() {
+          // Cancel, do nothing
+        }
+      );
+    } else {
+      this._sendGeneratedEmails(contactEmails);
+    }
   }
 
   _showStagingEmails() {
@@ -114,16 +141,16 @@ class EmailPanel extends Component {
     .then( _ => this.refs.preview.show());
   }
 
-  _sendAllEmails() {
-    const { previewEmails, dispatch } = this.props;
+  _onSendAllEmailsClick() {
+    const { previewEmails } = this.props;
     previewEmails.map( email => {
       if (email.body.length > 0 && !email.issent) {
-        this._sendEmail(email.id);
+        this._onSendEmailClick(email.id);
       }
     });
   }
 
-  _sendEmail(id) {
+  _onSendEmailClick(id) {
     const { dispatch } = this.props;
     dispatch(actionCreators.sendEmail(id));
   }
@@ -141,17 +168,18 @@ class EmailPanel extends Component {
         />
         <button
         style={styles.sendButton}
-        onClick={this._processEmails}
+        onClick={this._onPreviewEmailsClick}
         >Preview</button>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
         dialogStyles={skylightStyles.dialog}
         hideOnOverlayClicked
-        ref='preview' title='Preview'>
+        ref='preview'
+        title='Preview'>
           {
             (isReceiving || previewEmails.length === 0) ? <span>LOADING..</span> :
             <div>
-              <button onClick={this._sendAllEmails}>Send All</button>
+              <button onClick={this._onSendAllEmailsClick}>Send All</button>
             {
               previewEmails.map( (pEmail, i) => {
                 const email = stagingReducer[pEmail.id];
@@ -162,7 +190,7 @@ class EmailPanel extends Component {
                     <PreviewEmailContent
                     key={i}
                     {...email}
-                    sendEmail={ _ => this._sendEmail(email.id)}
+                    sendEmail={ _ => this._onSendEmailClick(email.id)}
                     />
                   </div>
                   );
