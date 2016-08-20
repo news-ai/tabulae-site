@@ -148,13 +148,13 @@ class HandsOnTable extends Component {
               const hi = low === options.start.row ? options.end.row : options.end.row;
               const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map( row => row.id );
               const newListContacts = _.difference(listData.contacts, removeIdList);
-              this.setState({ addedRow: true });
               dispatch(actionCreators.patchList({
                 listId: listData.id,
                 contacts: newListContacts,
                 name: listData.name,
                 fieldsmap: this.state.fieldsmap
               }));
+              this.setState({ addedRow: true, lastFetchedIndex: this.state.lastFetchedIndex - (hi - low + 1) });
             }
 
             if (key === 'remove_column') {
@@ -209,7 +209,6 @@ class HandsOnTable extends Component {
       }
     };
   }
-
 
   componentDidMount() {
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
