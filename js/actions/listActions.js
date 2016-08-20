@@ -47,7 +47,7 @@ function requestListFail(message) {
 export function fetchList(listId) {
   return dispatch => {
     dispatch(requestList(listId));
-    return api.get('/lists/' + listId)
+    return api.get(`/lists/${listId}`)
     .then( response => dispatch(receiveList(response)))
     .catch( message => dispatch(requestListFail(message)));
   };
@@ -57,7 +57,7 @@ export function fetchList(listId) {
 export function fetchLists() {
   return dispatch => {
     dispatch(requestLists());
-    return api.get('/lists')
+    return api.get(`/lists`)
     .then( response => dispatch(receiveLists(response)))
     .catch( message => console.log(message));
   };
@@ -70,7 +70,7 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   listBody.fieldsmap = fieldsmap;
   return dispatch => {
     dispatch({ type: listConstant.PATCH, listId });
-    return api.patch('/lists/' + listId, listBody)
+    return api.patch(`/lists/${listId}`, listBody)
     .then( response => dispatch(receiveList(response)))
     .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));
   };
@@ -86,7 +86,7 @@ export function createNewSheet(name, contactList) {
       name: name,
       contacts: contacts
     };
-    return api.post('/lists', listBody)
+    return api.post(`/lists`, listBody)
     .then( response => {
       dispatch(receiveList(response));
       window.location.href = `${window.location.origin}/lists/${response.id}`;
@@ -100,7 +100,7 @@ export function archiveListToggle(listId) {
     dispatch({ type: ARCHIVE_LIST });
     let listBody = getState().listReducer[listId];
     listBody.archived = !listBody.archived;
-    return api.patch('/lists/' + listId, listBody)
+    return api.patch(`/lists/${listId}`, listBody)
     .then( response => dispatch(receiveList(response)))
     .catch( message => console.log(message));
   };

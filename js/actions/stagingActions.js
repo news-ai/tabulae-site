@@ -6,10 +6,9 @@ import {
 import * as api from './api';
 
 export function postBatchEmails(emails) {
-  console.log(JSON.stringify(emails));
-  return (dispatch) => {
+  return dispatch => {
     dispatch({ type: SENDING_STAGED_EMAILS, emails });
-    return api.post('/emails', emails)
+    return api.post(`/emails`, emails)
     .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response }))
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };
@@ -18,7 +17,7 @@ export function postBatchEmails(emails) {
 export function sendEmail(id) {
   return dispatch => {
     dispatch({ type: 'SEND_EMAIL', id });
-    return api.get('/emails/' + id + '/send')
+    return api.get(`/emails/${id}/send`)
     .then( response => dispatch({ type: RECEIVE_EMAIL, json: response }))
     .catch( message => dispatch({ type: 'SEND_EMAILS_FAIL', message }));
   };
@@ -26,7 +25,7 @@ export function sendEmail(id) {
 
 export function getStagedEmails() {
   return dispatch => {
-    return api.get('/emails')
+    return api.get(`/emails`)
     .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response }))
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };

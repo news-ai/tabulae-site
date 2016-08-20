@@ -20,7 +20,7 @@ function receiveFile(file, listId) {
 export function uploadFile(listId, file) {
   return dispatch => {
     dispatch({ type: fileConstant.REQUEST, listId, file});
-    return api.postFile('/lists/' + listId + '/upload', file)
+    return api.postFile(`/lists/${listId}/upload`, file)
     .then( response => dispatch(receiveFile(response, listId)))
     .catch( message => dispatch({ type: fileConstant.REQUEST_FAIL, message }));
   };
@@ -28,9 +28,9 @@ export function uploadFile(listId, file) {
 
 export function fetchHeaders(listId) {
   return (dispatch, getState) => {
-    let fileId = getState().fileReducer[listId].id;
+    const fileId = getState().fileReducer[listId].id;
     dispatch({ type: REQUEST_HEADERS, listId });
-    return api.get('/files/' + fileId + '/headers')
+    return api.get(`/files/${fileId}/headers`)
     .then( response => dispatch({ type: RECEIVE_HEADERS, headers: response, listId }))
     .catch( message => dispatch({ type: 'REQUEST_HEADERS_FAIL', message }));
   };
@@ -52,7 +52,7 @@ export function addHeaders(listId, order) {
     dispatch({ type: TURN_ON_PROCESS_WAIT });
     let fileId = getState().fileReducer[listId].id;
 
-    return api.post('/files/' + fileId + '/headers', {order: order})
+    return api.post(`/files/${fileId}/headers`, {order: order})
     .then( response => dispatch({ type: 'ADDED_HEADER', response }))
     .catch( message => dispatch({ type: 'REQUEST_HEADERS_FAIL', message }));
   };

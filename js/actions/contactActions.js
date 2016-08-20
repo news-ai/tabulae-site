@@ -33,7 +33,7 @@ function requestContactFail(message) {
 export function fetchContact(contactId) {
   return dispatch => {
     dispatch(requestContact());
-    return api.get('/contacts/' + contactId)
+    return api.get(`/contacts/${contactId}`)
     .then( response => dispatch(receiveContact(response)))
     .catch( message => dispatch(requestContactFail(message)));
   };
@@ -73,7 +73,7 @@ export function fetchPaginatedContacts(listId) {
 
 export function updateContact(id) {
   return dispatch => {
-    return api.get('/contacts/' + id + '/update')
+    return api.get(`/contacts/${id}/update`)
     .then( response => dispatch(receiveContact(response)))
     .catch( message => dispatch(requestContactFail(message)));
   };
@@ -83,7 +83,7 @@ export function patchContacts(contactList) {
   return dispatch => {
     dispatch({ type: 'PATCH_CONTACTS', contactList });
 
-    return api.patch('/contacts', contactList)
+    return api.patch(`/contacts`, contactList)
     .then( response => {
       response.map( contact => dispatch(receiveContact(contact)));
     })
@@ -95,7 +95,7 @@ export function addContacts(contactList) {
   return dispatch => {
     dispatch({ type: ADDING_CONTACT });
 
-    return api.post('/contacts', contactList)
+    return api.post(`/contacts`, contactList)
     .then( response => {
       response.map( contact => dispatch({
         type: contactConstant.RECEIVE,
