@@ -7,21 +7,19 @@ import {
 
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
+import { canAccessReducer } from './utils';
+import _ from 'lodash';
+
+const types = _.values(listConstant);
+types.push(
+  REQUEST_LISTS,
+  RECEIVE_LISTS,
+  SET_OFFSET
+  );
 
 function listReducer(state = initialState.listReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let accessing = false;
-  if (
-    action.type === REQUEST_LISTS ||
-    action.type === RECEIVE_LISTS ||
-    action.type === listConstant.REQUEST ||
-    action.type === listConstant.RECEIVE ||
-    action.type === listConstant.REQUEST_FAIL ||
-    action.type === listConstant.PATCH ||
-    action.type === listConstant.PATCH_FAIL ||
-    action.type === SET_OFFSET
-    ) accessing = true;
-  else return state;
+  if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {

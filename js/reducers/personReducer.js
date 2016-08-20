@@ -1,17 +1,14 @@
 import { loginConstant } from '../constants/AppConstants';
-
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
+import { canAccessReducer } from './utils';
+import _ from 'lodash';
+
+const types = _.values(loginConstant);
 
 function personReducer(state = initialState.personReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let accessing = false;
-  if (
-    action.type === loginConstant.REQUEST ||
-    action.type === loginConstant.REQUEST_FAIL ||
-    action.type === loginConstant.RECEIVE
-    ) accessing = true;
-  else return state;
+  if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {

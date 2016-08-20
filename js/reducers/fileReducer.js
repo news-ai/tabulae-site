@@ -8,20 +8,20 @@ import {
 
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
+import { canAccessReducer } from './utils';
+import _ from 'lodash';
+
+const types = _.values(fileConstant);
+types.push(
+  REQUEST_HEADERS,
+  RECEIVE_HEADERS,
+  TURN_ON_PROCESS_WAIT,
+  TURN_OFF_PROCESS_WAIT
+  );
 
 function fileReducer(state = initialState.fileReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let accessing = false;
-  if (
-    action.type === fileConstant.REQUEST ||
-    action.type === fileConstant.RECEIVE ||
-    action.type === fileConstant.REQUEST_FAIL ||
-    action.type === REQUEST_HEADERS ||
-    action.type === RECEIVE_HEADERS ||
-    action.type === TURN_OFF_PROCESS_WAIT ||
-    action.type === TURN_ON_PROCESS_WAIT
-    ) accessing = true;
-  else return state;
+  if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {

@@ -1,18 +1,14 @@
-import {
-  publicationConstant
-} from '../constants/AppConstants';
-
+import { publicationConstant } from '../constants/AppConstants';
+import { canAccessReducer } from './utils';
+import _ from 'lodash';
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
 
+const types = _.values(publicationConstant);
+
 function publicationReducer(state = initialState.publicationReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let accessing = false;
-  if (
-    action.type === publicationConstant.REQUEST ||
-    action.type === publicationConstant.RECEIVE
-    ) accessing = true;
-  else return state;
+  if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {

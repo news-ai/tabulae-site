@@ -12,7 +12,8 @@ const commonUtilNames = [
   'RECEIVE',
   'REQUEST_FAIL',
   'PATCH',
-  'PATCH_FAIL'
+  'PATCH_FAIL',
+  'LAST_USED',
 ];
 
 // generate common action constants like ACTION_REQUEST, ACTION_RECEIVE, ACTION_REQUEST_FAIL

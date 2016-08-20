@@ -35,6 +35,13 @@ function receiveList(list) {
   };
 }
 
+export function listLastUsed() {
+  return {
+    type: listConstant.LAST_USED,
+    time: Date.now()
+  };
+}
+
 function requestListFail(message) {
   window.location.href = `${window.location.origin}/NotFound`;
   return {
@@ -42,7 +49,6 @@ function requestListFail(message) {
     message
   };
 }
-
 
 export function fetchList(listId) {
   return dispatch => {
@@ -52,7 +58,6 @@ export function fetchList(listId) {
     .catch( message => dispatch(requestListFail(message)));
   };
 }
-
 
 export function fetchLists() {
   return dispatch => {
@@ -75,7 +80,6 @@ export function patchList({listId, name, contacts, fieldsmap}) {
     .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));
   };
 }
-
 
 export function createNewSheet(name, contactList) {
   return dispatch =>

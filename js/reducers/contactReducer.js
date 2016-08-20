@@ -4,17 +4,17 @@ import {
 } from '../constants/AppConstants';
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
+import { canAccessReducer } from './utils';
+import _ from 'lodash';
+
+const types = _.values(contactConstant);
+types.push(
+  ADDING_CONTACT
+  );
 
 function contactReducer(state = initialState.contactReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let accessing = false;
-  if (
-    action.type === ADDING_CONTACT ||
-    action.type === contactConstant.REQUEST ||
-    action.type === contactConstant.RECEIVE ||
-    action.type === contactConstant.REQUEST_FAIL
-    ) accessing = true;
-  else return state;
+  if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {

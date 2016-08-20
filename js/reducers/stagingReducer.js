@@ -6,16 +6,18 @@ import {
 
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
+import { canAccessReducer } from './utils';
+import _ from 'lodash';
+
+const types = [
+  RECEIVE_STAGED_EMAILS,
+  SENDING_STAGED_EMAILS,
+  RECEIVE_EMAIL
+];
 
 function stagingReducer(state = initialState.stagingReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let accessing = false;
-  if (
-    action.type === RECEIVE_STAGED_EMAILS ||
-    action.type === SENDING_STAGED_EMAILS ||
-    action.type === RECEIVE_EMAIL
-    ) accessing = true;
-  else return state;
+  if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
