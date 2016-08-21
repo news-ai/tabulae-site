@@ -26,15 +26,9 @@ function createMarkUp(html) {
 function PreviewEmailContent({id, to, subject, body, sendEmail, issent}) {
   return (
     <div style={styles.contentBox}>
-      <div style={styles.content}>
-        <label>email</label>
-        <span style={styles.span}>{to}</span>
-        <label>subject</label>
-        <span style={styles.span}>{subject}</span>
-
-        <label>Sent</label>
-        <span style={styles.span}>{String(issent)}</span>
-        <label>body</label>
+      <div className='u-full-width' style={styles.content}>
+        <p style={styles.span}><strong style={{color: 'gray', marginRight: '15px'}}>To</strong>{to}</p>
+        <p style={styles.span}><strong style={{color: 'gray', marginRight: '15px'}}>Subject</strong>{subject}</p>
         <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
       </div>
       <button style={styles.sendButton} onClick={sendEmail}>Send</button>
