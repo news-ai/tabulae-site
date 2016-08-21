@@ -218,6 +218,7 @@ class HandsOnTable extends Component {
       },
       afterScrollVertically: (e) => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
+        if (listData.contacts.length < 50) return;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
         const rowCount = this.table.countRows();
         const rowOffset = this.table.rowOffset();
@@ -255,7 +256,12 @@ class HandsOnTable extends Component {
 
 
     if (!_.isEmpty(listData.contacts)) {
-      if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || lastFetchedIndex === listData.contacts.length - 1 || this.state.addedRow) {
+      if (this.state.lastFetchedIndex === -1) {
+        options.minRows = listData.contacts.length + 5;
+        this.setState({ options });
+        this.table.updateSettings(options);
+      }
+      if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || listData.contacts.length <= 50 || lastFetchedIndex === listData.contacts.length - 1 || this.state.addedRow) {
         options.data = contacts;
         this.setState({
           options,
