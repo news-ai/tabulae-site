@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
+import { skylightStyles } from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -25,29 +25,6 @@ const styles = {
     zIndex: 1100,
     bottom: 20,
     right: 30
-  }
-};
-
-const skylightStyles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: 999,
-    backgroundColor: 'rgba(0,0,0,0.3)'
-  },
-  dialog: {
-    height: '600px',
-    width: '900px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 'auto',
-    padding: '10px',
-    zIndex: 1000,
-    overflow: 'scroll',
-    transform: 'translate(-50%, -50%)'
   }
 };
 
@@ -75,6 +52,7 @@ class EmailPanel extends Component {
       this.setState({ body: this._convertToHtml(editorState) });
     };
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
+    this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
   }
 
   _convertToHtml(editorState) {
@@ -122,11 +100,11 @@ class EmailPanel extends Component {
       alertify
       .confirm(
         'Your Subject line is empty. Are you sure you want to send this email?',
-        function() {
+        _ => {
           // OK
           this._sendGeneratedEmails(contactEmails);
         },
-        function() {
+        _ => {
           // Cancel, do nothing
         }
       );
