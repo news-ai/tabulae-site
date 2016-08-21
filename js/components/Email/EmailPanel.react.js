@@ -93,13 +93,14 @@ class EmailPanel extends Component {
   }
 
   _onPreviewEmailsClick() {
-    const { selectedContacts, dispatch } = this.props;
+    const { selectedContacts } = this.props;
     const { subject, body } = this.state;
     const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
-    if (subject.length === 0) {
+    if (subject.length === 0 || body.length === 0) {
+      const warningType = subject.length === 0 ? `subject` : `body`;
       alertify
       .confirm(
-        'Your Subject line is empty. Are you sure you want to send this email?',
+        `Your ${warningType} is empty. Are you sure you want to send this email?`,
         _ => {
           // OK
           this._sendGeneratedEmails(contactEmails);
