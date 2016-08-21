@@ -28,7 +28,7 @@ const styles = {
   }
 };
 
-alertify.defaults.glossary.title = 'Warnings';
+alertify.defaults.glossary.title = 'Oops';
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -96,18 +96,17 @@ class EmailPanel extends Component {
     const { selectedContacts } = this.props;
     const { subject, body } = this.state;
     const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
+    if (selectedContacts.length === 0) {
+      alertify.alert(`You didn't select any contact to send this email to.`);
+      return;
+    }
     if (subject.length === 0 || body.length === 0) {
       const warningType = subject.length === 0 ? `subject` : `body`;
       alertify
       .confirm(
         `Your ${warningType} is empty. Are you sure you want to send this email?`,
-        _ => {
-          // OK
-          this._sendGeneratedEmails(contactEmails);
-        },
-        _ => {
-          // Cancel, do nothing
-        }
+        _ => this._sendGeneratedEmails(contactEmails), // on OK
+        _ => { } // on Cancel
       );
     } else {
       this._sendGeneratedEmails(contactEmails);
