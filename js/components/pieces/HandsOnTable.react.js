@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import SkyLight from 'react-skylight';
-import { Notification } from 'react-notification';
+import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
@@ -12,6 +12,7 @@ import { skylightStyles } from 'constants/StyleConstants';
 import _ from 'lodash';
 
 import 'node_modules/handsontable/dist/handsontable.full.css';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
   buttons: {
@@ -38,6 +39,7 @@ const center = {
 };
 
 const MIN_ROWS = 20;
+alertify.defaults.glossary.title = 'Oops';
 
 class HandsOnTable extends Component {
   constructor(props) {
@@ -51,9 +53,7 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       addedRow: false,
-      noticeMessage: 'DEFAULT',
       update: false,
-      noticeIsActive: false,
       skylightTitle: '',
       promptInput: '',
       skylightButton: null,
@@ -146,10 +146,7 @@ class HandsOnTable extends Component {
             if (key === 'change_col_name') {
               if (options.start.col !== options.end.col) {
                 console.log('CAN ONLY CHANGE NAME OF ONE COLUMN AT A TIME');
-                this.setState({
-                  noticeIsActive: true,
-                  noticeMessage: 'To change column name, only select one column at a time.'
-                });
+                alertify.alert(`To change column name, only select one column at a time.`);
               } else {
                 this.setState({
                   skylightButton: (
@@ -304,10 +301,7 @@ class HandsOnTable extends Component {
       this.table.updateSettings(options);
     } else {
       console.log(columnValue + ' CANNOT BE DELETED');
-      this.setState({
-        noticeIsActive: true,
-        noticeMessage: `Column '${columnValue}' is a default column and, therefore, cannot be deleted.`
-      });
+      alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
 
@@ -315,19 +309,13 @@ class HandsOnTable extends Component {
     const { isNew, dispatch, listData } = this.props;
     if (isNew) {
       console.log('PLEASE SAVE LIST FIRST');
-      this.setState({
-        noticeIsActive: true,
-        noticeMessage: 'Please save list first before adding custom columns.'
-      });
+      alertify.alert(`Please save list first before adding custom columns.`);
       return;
     }
     const { options, newColumnName, fieldsmap } = this.state;
     if (options.columns.some( col => col.data === newColumnName)) {
       console.log('DUPLICATE COLUMN NAME');
-      this.setState({
-        noticeIsActive: true,
-        noticeMessage: 'Duplicate column name. Please use another one.'
-      });
+      alertify.alert(`Duplicate column name. Please use another one.`);
     } else {
       let newFieldsmap = fieldsmap;
       newFieldsmap.push({
@@ -362,17 +350,6 @@ class HandsOnTable extends Component {
     return (
       <div>
         <div style={styles.buttons.group}>
-        <Notification
-        isActive={this.state.noticeIsActive}
-        message={this.state.noticeMessage}
-        action='Dismiss'
-        dismissAfter={15000}
-        barStyle={{zIndex: 140}}
-        activeBarStyle={{zIndex: 140}}
-        actionStyle={{zIndex: 140}}
-        onDismiss={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
-        onClick={ _ => this.setState({ noticeIsActive: false, noticeMessage: 'DEFAULT' })}
-      />
         <SkyLight
         hideOnOverlayClicked
         overlayStyles={skylightStyles.overlay}
