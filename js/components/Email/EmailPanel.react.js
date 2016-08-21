@@ -130,7 +130,8 @@ class EmailPanel extends Component {
 
   _onSendEmailClick(id) {
     const { dispatch } = this.props;
-    dispatch(actionCreators.sendEmail(id));
+    dispatch(actionCreators.sendEmail(id))
+    .then( _ => alertify.success(`Email sent.`));
   }
 
   render() {
