@@ -100,6 +100,10 @@ class EmailPanel extends Component {
       alertify.alert(`You didn't select any contact to send this email to.`);
       return;
     }
+    if (selectedContacts.some( contact => contact.email.length === 0 || contact.email === null)) {
+      alertify.alert(`You selected contacts without email field filled. We can't send emails to contacts with empty email field.`);
+      return;
+    }
     if (subject.length === 0 || body.length === 0) {
       const warningType = subject.length === 0 ? `subject` : `body`;
       alertify
