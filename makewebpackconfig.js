@@ -103,9 +103,6 @@ return {
   resolve: {
     extensions: ['', '.json', '.jsx', '.js'],
     alias: {
-      'handsontable': __dirname + '/node_modules/handsontable',
-      'draft-js': __dirname + '/node_modules/draft-js',
-      'react-select': __dirname + '/node_modules/react-select',
       'node_modules': __dirname + '/node_modules',
       'img': __dirname + '/img',
       'constants': __dirname + '/js/constants',

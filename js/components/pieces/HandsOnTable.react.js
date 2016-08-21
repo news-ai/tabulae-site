@@ -11,7 +11,7 @@ import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers
 import { skylightStyles } from 'constants/StyleConstants';
 import _ from 'lodash';
 
-import 'handsontable/dist/handsontable.full.css';
+import 'node_modules/handsontable/dist/handsontable.full.css';
 
 const styles = {
   buttons: {

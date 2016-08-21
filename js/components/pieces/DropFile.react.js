@@ -15,7 +15,6 @@ function Waiting({}) {
     );
 }
 
-
 const styles = {
   dropzone: {
     default: {
