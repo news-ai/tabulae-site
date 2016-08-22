@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
-import Login from './pages/Login.react';
+import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import Navigation from './pieces/Navigation.react';
 

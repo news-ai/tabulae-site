@@ -1,5 +1,5 @@
-import * as api from './api';
-import { loginConstant } from 'constants/AppConstants';
+import * as api from '../../actions/api';
+import { loginConstant } from './constants';
 
 
 function requestLogin() {
@@ -52,5 +52,3 @@ export function fetchPerson() {
     // .catch( message => dispatch(loginFail(message)));
   };
 }
-
-

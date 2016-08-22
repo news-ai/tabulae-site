@@ -4,7 +4,7 @@
  */
 import { combineReducers } from 'redux';
 
-import personReducer from './personReducer';
+import personReducer from '../components/Login/reducer';
 import contactReducer from './contactReducer';
 import listReducer from './listReducer';
 import stagingReducer from '../components/Email/reducer';

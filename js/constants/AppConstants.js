@@ -1,13 +1,6 @@
-/*
- * AppConstants
- * These are the variables that determine what our central data store (reducer.js)
- * changes in our state. When you add a new action, you have to add a new constant here
- *
- * Follow this format:
- * export const YOUR_ACTION_CONSTANT = 'YOUR_ACTION_CONSTANT';
- */
+import { generateConstants } from './generateConstants';
 
-const commonUtilNames = [
+export const commonTypes = [
   'REQUEST',
   'RECEIVE',
   'REQUEST_FAIL',
@@ -16,18 +9,10 @@ const commonUtilNames = [
   'LAST_USED',
 ];
 
-// generate common action constants like ACTION_REQUEST, ACTION_RECEIVE, ACTION_REQUEST_FAIL
-function generateConstants(parentName) {
-  const obj = {};
-  commonUtilNames.map( name => obj[name] = `${parentName}_${name}`);
-  return obj;
-}
-
-export const loginConstant = generateConstants('LOGIN');
-export const listConstant = generateConstants('LIST');
-export const contactConstant = generateConstants('CONTACT');
-export const publicationConstant = generateConstants('PUBLICATION');
-export const fileConstant = generateConstants('UPLOAD_FILE');
+export const listConstant = generateConstants(commonTypes, 'LIST');
+export const contactConstant = generateConstants(commonTypes, 'CONTACT');
+export const publicationConstant = generateConstants(commonTypes, 'PUBLICATION');
+export const fileConstant = generateConstants(commonTypes, 'UPLOAD_FILE');
 
 // custom action types
 export const REQUEST_LISTS = 'REQUEST_LISTS';

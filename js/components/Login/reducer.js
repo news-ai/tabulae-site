@@ -1,8 +1,8 @@
-import { loginConstant } from '../constants/AppConstants';
-import { assignToEmpty } from '../utils/assign';
-import { initialState } from './initialState';
-import { canAccessReducer } from './utils';
+import { loginConstant } from './constants';
+import { initialState } from '../../reducers/initialState';
+import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 import _ from 'lodash';
+
 
 const types = _.values(loginConstant);
 
