@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 class ButtonMenu extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isOpen: false
+    };
   }
 
   render() {
@@ -12,13 +15,23 @@ class ButtonMenu extends Component {
         position: 'fixed',
         zIndex: 150,
         right: 30,
+        textAlign: 'center'
       }}>
-      { this.props.children.map( (child, i) =>
+      <button
+      className='button'
+      style={ this.state.isOpen ? {
+        backgroundColor: 'lightgray',
+      } : {
+        backgroundColor: 'white',
+      }}
+      onClick={ _ => this.setState({ isOpen: !this.state.isOpen })}>Utilities</button>
+      {
+        this.state.isOpen ? this.props.children.map( (child, i) =>
         <div key={i} style={{
           top: i * offset,
           margin: '5px'
-        }}>{child}</div>
-      )}
+        }}>{child}</div>) : null
+      }
       </div>
     );
   }
