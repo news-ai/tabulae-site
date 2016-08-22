@@ -3,7 +3,7 @@ import * as contactActions from './contactActions';
 import * as stagingActions from '../components/Email/actions';
 import * as loginActions from '../components/Login/actions';
 import * as publicationActions from './publicationActions';
-import * as fileActions from './fileActions';
+import * as fileActions from '../components/ImportFile/actions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const register = _ => loginActions.register();

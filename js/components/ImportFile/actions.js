@@ -4,10 +4,10 @@ import {
   TURN_ON_PROCESS_WAIT,
   TURN_OFF_PROCESS_WAIT,
   fileConstant
-} from '../constants/AppConstants';
-import * as api from './api';
-import * as listActions from './listActions';
-import * as contactActions from './contactActions';
+} from './constants';
+import * as api from '../../actions/api';
+import * as listActions from '../../actions/listActions';
+import * as contactActions from '../../actions/contactActions';
 
 function receiveFile(file, listId) {
   return {

@@ -11,7 +11,7 @@ import EmailPanel from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
-import DropFile from '../pieces/DropFile.react';
+import DropFile from '../ImportFile';
 import Waiting from '../pieces/Waiting.react.js';
 
 const styles = {

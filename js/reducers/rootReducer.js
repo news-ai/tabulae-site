@@ -9,7 +9,7 @@ import contactReducer from './contactReducer';
 import listReducer from './listReducer';
 import stagingReducer from '../components/Email/reducer';
 import publicationReducer from './publicationReducer';
-import fileReducer from './fileReducer';
+import fileReducer from '../components/ImportFile/reducer';
 
 const rootReducer = combineReducers({
   personReducer,

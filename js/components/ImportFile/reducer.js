@@ -4,11 +4,11 @@ import {
   TURN_ON_PROCESS_WAIT,
   TURN_OFF_PROCESS_WAIT,
   fileConstant
-} from '../constants/AppConstants';
+} from './constants';
 
-import { assignToEmpty } from '../utils/assign';
-import { initialState } from './initialState';
-import { canAccessReducer } from './utils';
+
+import { initialState } from '../../reducers/initialState';
+import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 import _ from 'lodash';
 
 const types = _.values(fileConstant);
