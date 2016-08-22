@@ -77,9 +77,10 @@ class EmailPanel extends Component {
     selectedContacts.map( (contact, i) => {
       if (contact && contact !== null) {
         const replacedBody = this._replaceAll(body, selectedContacts[i]);
+        const replacedSubject = this._replaceAll(subject, selectedContacts[i]);
         contactEmails.push({
           to: contact.email,
-          subject: subject,
+          subject: replacedSubject,
           body: replacedBody
         });
       }
