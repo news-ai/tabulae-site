@@ -247,6 +247,7 @@ class HandsOnTable extends Component {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.value });
         });
         options.columns = columns;
+        this.setState({ immutableFieldmap });
       }
 
       if (this.state.lastFetchedIndex === -1) {
