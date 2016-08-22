@@ -33,10 +33,10 @@ import configureStore from './configureStore';
 // Import the pages
 import NotFound from './components/pages/NotFound.react';
 import App from './components/App.react';
-import ListManager from './components/pages/ListManager.react';
+import ListManagerContainer from './components/pages/ListManagerContainer.react';
+import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import NewTable from './components/pages/NewTable.react';
-import Archive from './components/pages/Archive.react';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';
@@ -57,12 +57,12 @@ ReactDOM.render(
   <Provider store={store}>
       <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
         <Route path='/' name='Home' component={App}>
-          <IndexRoute component={ListManager} />
-            <Route path='lists' name='List Manager' component={ListManager}>
+          <IndexRoute component={ListManagerContainer} />
+            <Route path='lists' name='List Manager' component={ListManagerContainer}>
           </Route>
           <Route path='lists/new' name='New Sheet' component={NewTable} />
           <Route path='lists/:listId' staticName name='Sheet' component={Table} />
-          <Route path='archive' name='Archive' component={Archive} />
+          <Route path='archive' name='Archive' component={ArchiveContainer} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

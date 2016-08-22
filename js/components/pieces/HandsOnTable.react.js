@@ -52,7 +52,6 @@ class HandsOnTable extends Component {
     this._onPromptChange = e => this.setState({ promptInput: e.target.value });
     this._changeColumnName = this._changeColumnName.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._updateSettings = this._updateSettings.bind(this);
     this.state = {
       addedRow: false,
       update: false,
@@ -275,14 +274,9 @@ class HandsOnTable extends Component {
           lastFetchedIndex,
           addedRow: false
         });
-        this._updateSettings(options);
+        this.table.updateSettings(options);
       }
     }
-  }
-
-  _updateSettings(options) {
-    this.table.updateSettings(options);
-    this.table.render();
   }
 
   _changeColumnName(columns, colNum) {

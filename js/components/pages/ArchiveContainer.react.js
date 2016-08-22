@@ -3,7 +3,7 @@ import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
 
-class Archive extends Component {
+class ArchiveContainer extends Component {
   constructor(props) {
     super(props);
   }
@@ -44,4 +44,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(Archive);
+  )(ArchiveContainer);

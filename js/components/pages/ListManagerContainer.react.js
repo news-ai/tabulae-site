@@ -3,7 +3,7 @@ import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
 
-class ListManager extends Component {
+class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
   }
@@ -49,4 +49,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(ListManager);
+  )(ListManagerContainer);
