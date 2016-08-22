@@ -10,6 +10,7 @@ import validator from 'validator';
 import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
 import { skylightStyles } from 'constants/StyleConstants';
 import _ from 'lodash';
+import { fromJS, List } from 'immutable';
 
 import 'node_modules/handsontable/dist/handsontable.full.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -51,6 +52,7 @@ class HandsOnTable extends Component {
     this._onPromptChange = e => this.setState({ promptInput: e.target.value });
     this._changeColumnName = this._changeColumnName.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
+    this._updateSettings = this._updateSettings.bind(this);
     this.state = {
       addedRow: false,
       update: false,
@@ -60,6 +62,7 @@ class HandsOnTable extends Component {
       lazyLoadingThreshold: 20,
       lastFetchedIndex: -1,
       fieldsmap: [],
+      immutableFieldmap: fromJS([]),
       dirtyRows: [],
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
@@ -77,7 +80,7 @@ class HandsOnTable extends Component {
         rowHeights: 23,
         minSpareRows: 10,
         // fixedColumnsLeft: 3,
-        columns: COLUMNS,
+        columns: _.cloneDeep(COLUMNS),
         cells: (row, col, prop) => {
           const cellProperties = {};
           if (this.state.options.data[row]) {
@@ -123,7 +126,7 @@ class HandsOnTable extends Component {
               });
             }
 
-            if (key === 'remove_these_rows') {
+            if (key === 'remove_selected_rows') {
               const low = options.start.row <= options.end.row ? options.start.row : options.end.row;
               const hi = low === options.start.row ? options.end.row : options.end.row;
               const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map( row => row.id );
@@ -139,13 +142,12 @@ class HandsOnTable extends Component {
 
             if (key === 'remove_column') {
               for (let i = options.start.col; i <= options.end.col; i++) {
-                this._removeColumn(this.state.options.columns, i);
+                this._removeColumn(listData.id, this.state.options.columns, i);
               }
             }
 
             if (key === 'change_col_name') {
               if (options.start.col !== options.end.col) {
-                console.log('CAN ONLY CHANGE NAME OF ONE COLUMN AT A TIME');
                 alertify.alert(`To change column name, only select one column at a time.`);
               } else {
                 this.setState({
@@ -161,16 +163,13 @@ class HandsOnTable extends Component {
             }
           },
           items: {
-            // row_above: {},
-            // row_below: {},
-            // remove_row: {},
             insert_row_above: {
               name: 'Insert Row Above'
             },
             insert_row_below: {
               name: 'Insert Row Below'
             },
-            remove_these_rows: {
+            remove_selected_rows: {
               name: 'Remove Row'
             },
             undo: {},
@@ -239,29 +238,35 @@ class HandsOnTable extends Component {
     const { contacts, listData, lastFetchedIndex } = nextProps;
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
-
-    fieldsmap.map( fieldObj => {
-      if (fieldObj.customfield && !fieldObj.hidden && !options.columns.some( col => col.data === fieldObj.value )) {
-        options.columns.push({ data: fieldObj.value, title: fieldObj.name });
-        // match contacts customfield name to list column value
-        contacts.map( (contact, i) => {
-          if (!_.isEmpty(contact.customfields)) {
-            if (contact.customfields.some( field => field.name === fieldObj.value)) {
-              contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
-            }
-          }
-        });
-      }
-    });
-
+    const immutableFieldmap = fromJS(listData.fieldsmap);
 
     if (!_.isEmpty(listData.contacts)) {
+      if (immutableFieldmap !== this.state.immutableFieldmap) {
+        let columns = _.cloneDeep(COLUMNS);
+        fieldsmap.map( fieldObj => {
+          if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.value });
+        });
+        options.columns = columns;
+      }
+
       if (this.state.lastFetchedIndex === -1) {
         options.minRows = listData.contacts.length + 5;
         this.setState({ options });
         this.table.updateSettings(options);
       }
+
       if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || listData.contacts.length <= 50 || lastFetchedIndex === listData.contacts.length - 1 || this.state.addedRow) {
+        fieldsmap.map( fieldObj => {
+          if (fieldObj.customfield && !fieldObj.hidden) {
+            contacts.map( (contact, i) => {
+              if (!_.isEmpty(contact.customfields)) {
+                if (contact.customfields.some( field => field.name === fieldObj.value)) {
+                  contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
+                }
+              }
+            });
+          }
+        });
         options.data = contacts;
         this.setState({
           options,
@@ -269,9 +274,14 @@ class HandsOnTable extends Component {
           lastFetchedIndex,
           addedRow: false
         });
-        this.table.updateSettings(options);
+        this._updateSettings(options);
       }
     }
+  }
+
+  _updateSettings(options) {
+    this.table.updateSettings(options);
+    this.table.render();
   }
 
   _changeColumnName(columns, colNum) {
@@ -293,20 +303,24 @@ class HandsOnTable extends Component {
     this.refs.prompt.hide();
   }
 
-  _removeColumn(columns, colNum) {
+  _removeColumn(listId, columns, colNum) {
     const { fieldsmap, options } = this.state;
+    const { dispatch } = this.props;
     const columnValue = columns[colNum].data;
     if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield )) {
-      const newColumns = columns.filter( (col, i) => i !== colNum );
+      // const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter( fieldObj => fieldObj.value !== columnValue );
-      options.columns = newColumns;
-      this.setState({
-        options: options,
+      dispatch(actionCreators.patchList({
+        listId: listId,
         fieldsmap: newFieldsmap
-      });
-      this.table.updateSettings(options);
+      }));
+      // options.columns = newColumns;
+      // this.setState({
+      //   options: options,
+      //   fieldsmap: newFieldsmap
+      // });
+      // this.table.updateSettings(options);
     } else {
-      console.log(columnValue + ' CANNOT BE DELETED');
       alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
@@ -314,14 +328,12 @@ class HandsOnTable extends Component {
   _addColumn() {
     const { isNew, dispatch, listData } = this.props;
     if (isNew) {
-      console.log('PLEASE SAVE LIST FIRST');
       alertify.alert(`Please save list first before adding custom columns.`);
       return;
     }
     const { options, newColumnName, fieldsmap } = this.state;
     if (options.columns.some( col => col.data === newColumnName)) {
-      console.log('DUPLICATE COLUMN NAME');
-      alertify.alert(`Duplicate column name. Please use another one.`);
+      alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
     } else {
       let newFieldsmap = fieldsmap;
       newFieldsmap.push({
