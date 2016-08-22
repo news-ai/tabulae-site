@@ -49,6 +49,7 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = false;
       obj[action.list.id] = action.list;
       obj[action.list.id].offset = 0;
+      obj[action.list.id].receivedAt = Date.now();
       return obj;
     case listConstant.PATCH:
       obj.isReceiving = true;

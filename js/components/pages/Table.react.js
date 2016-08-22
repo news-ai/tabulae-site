@@ -158,9 +158,11 @@ class Table extends Component {
 
       // handle customfields
       let customRow = [];
+      console.log(fieldsmap);
       fieldsmap.map( fieldObj => {
-        if (!_.isEmpty(row[fieldObj.value] && fieldObj.customfield)) customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
+        if (!_.isEmpty(row[fieldObj.value]) && fieldObj.customfield) customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
       })
+      console.log(customRow);
       field.customfields = customRow;
 
       // filter out for empty rows with only id
@@ -175,8 +177,8 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
-    // console.log(patchContactList);
-    // console.log(addContactList);
+    console.log(patchContactList);
+    console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
