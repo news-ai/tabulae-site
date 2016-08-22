@@ -1,7 +1,7 @@
 import * as loginActions from './loginActions';
 import * as listActions from './listActions';
 import * as contactActions from './contactActions';
-import * as stagingActions from './stagingActions';
+import * as stagingActions from '../components/Email/actions';
 import * as publicationActions from './publicationActions';
 import * as fileActions from './fileActions';
 

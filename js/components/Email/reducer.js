@@ -2,12 +2,10 @@ import {
   RECEIVE_STAGED_EMAILS,
   SENDING_STAGED_EMAILS,
   RECEIVE_EMAIL
-} from '../constants/AppConstants';
+} from './constants';
 
-import { assignToEmpty } from '../utils/assign';
-import { initialState } from './initialState';
-import { canAccessReducer } from './utils';
-import _ from 'lodash';
+import { initialState } from '../../reducers/initialState';
+import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 
 const types = [
   RECEIVE_STAGED_EMAILS,

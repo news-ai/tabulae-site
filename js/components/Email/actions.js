@@ -2,8 +2,8 @@ import {
   RECEIVE_STAGED_EMAILS,
   SENDING_STAGED_EMAILS,
   RECEIVE_EMAIL
-} from '../constants/AppConstants';
-import * as api from './api';
+} from './constants';
+import * as api from '../../actions/api';
 
 export function postBatchEmails(emails) {
   return dispatch => {
