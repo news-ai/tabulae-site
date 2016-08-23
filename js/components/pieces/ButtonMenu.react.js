@@ -14,22 +14,27 @@ class ButtonMenu extends Component {
       <div style={{
         position: 'fixed',
         zIndex: 150,
-        right: 30,
-        textAlign: 'center'
+        right: 50,
       }}>
-      <button
-      className='button menubutton'
-      style={ this.state.isOpen ? {
-        backgroundColor: 'lightgray',
-      } : {
-        backgroundColor: 'white',
-      }}
-      onClick={ _ => this.setState({ isOpen: !this.state.isOpen })}>Utilities</button>
+      <div
+      style={{
+        right: 0,
+      }}>
+        <button
+        className='button menubutton'
+        style={ this.state.isOpen ? {
+          backgroundColor: 'lightgray',
+        } : {
+          backgroundColor: 'white',
+        }}
+        onClick={ _ => this.setState({ isOpen: !this.state.isOpen })}>Utilities</button>
+      </div>
       {
-        this.state.isOpen ? this.props.children.map( (child, i) =>
+        this.state.isOpen ?
+        this.props.children.map( (child, i) =>
         <div key={i} style={{
           top: i * offset,
-          margin: '5px'
+          right: 0
         }}>{child}</div>) : null
       }
       </div>

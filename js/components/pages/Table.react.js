@@ -78,22 +78,21 @@ class Table extends Component {
   componentDidMount() {
     this._fetchOperations();
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
-    // setTimeout( _ => {
-    //   const steps = [{
-    //     title: 'Standalone Tooltops',
-    //     text: 'Now you can open tooltips independently! And even style them one by one!',
-    //     selector: '.handsontable',
-    //     position: 'top-left',
-    //     type: 'hover'
-    //   }, {
-    //     title: 'Standalone Tooltops',
-    //     text: 'Here is menue button',
-    //     selector: '.menubutton',
-    //     position: 'bottom',
-    //   }];
-    //   this.props.addSteps(steps);
-    // }, 5000);
-  
+    setTimeout( _ => {
+      const steps = [{
+        title: 'Standalone Tooltops',
+        text: 'Now you can open tooltips independently! And even style them one by one!',
+        selector: '.handsontable',
+        position: 'top-left',
+        type: 'hover'
+      }, {
+        title: 'Standalone Tooltops',
+        text: 'Here is menue button',
+        selector: '.menubutton',
+        position: 'bottom',
+      }];
+      this.props.addSteps(steps);
+    }, 5000);
   }
     
 
@@ -240,7 +239,7 @@ class Table extends Component {
       {
         listData ?
         <div>
-          <div style={[styles.nameBlock.parent]}>
+          <div className='row' style={[styles.nameBlock.parent]}>
             <div className='three columns'>
               <ToggleableEditInput
               name={state.name}
@@ -249,19 +248,22 @@ class Table extends Component {
               onTitleEdit={state.onTitleEdit}
               />
             </div>
-          </div>
+            <button className='button' style={{
+                backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white'
+              }} onClick={this._toggleEmailPanel}>Email</button>
+            </div>
           <SkyLight
+          ref='input'
           overlayStyles={skylightStyles.overlay}
-          dialogStyles={skylightStyles.dialog} hideOnOverlayClicked ref='input' title='File Drop'>
+          dialogStyles={skylightStyles.dialog}
+          hideOnOverlayClicked
+          title='File Drop'>
             <DropFile
             listId={listId}
             _forceRefresh={this._fetchOperations}
             />
           </SkyLight>
           <ButtonMenu>
-            <button className='button' style={{
-              backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white'
-            }} onClick={this._toggleEmailPanel}>Email</button>
             <button className='button' style={{
               backgroundColor: 'white'
             }} onClick={this._updateContacts}>Update Contacts</button>

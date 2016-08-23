@@ -37,7 +37,7 @@ import ListManagerContainer from './components/pages/ListManagerContainer.react'
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import NewTable from './components/pages/NewTable.react';
-import Onboarding from './components/pages/Onboarding.react';
+import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';
@@ -54,6 +54,8 @@ if (module.hot) {
   });
 }
 
+const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
+
 ReactDOM.render(
   <Provider store={store}>
       <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
@@ -62,7 +64,7 @@ ReactDOM.render(
             <Route path='lists' name='List Manager' component={ListManagerContainer}>
           </Route>
           <Route path='lists/new' name='New Sheet' component={NewTable} />
-          <Route path='lists/:listId' staticName name='Sheet' component={Table} />
+          <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
           <Route path='archive' name='Archive' component={ArchiveContainer} />
           <Route path='*' component={NotFound} />
         </Route>
