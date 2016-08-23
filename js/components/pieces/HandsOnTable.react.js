@@ -28,9 +28,6 @@ const styles = {
       marginRight: '30px'
     }
   },
-  columnInput: {
-    width: '400px'
-  }
 };
 
 const center = {
@@ -45,7 +42,6 @@ alertify.defaults.glossary.title = 'Oops';
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
-    this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
@@ -160,6 +156,16 @@ class HandsOnTable extends Component {
                 this.refs.prompt.show();
               }
             }
+
+            if (key === 'add_column') {
+              alertify.prompt(
+                `Add Column`,
+                `What is the new column name?`,
+                '',
+                (e, value) => this._addColumn(value),
+                _ => alertify.error('Cancel')
+                );
+            }
           },
           items: {
             insert_row_above: {
@@ -178,6 +184,9 @@ class HandsOnTable extends Component {
             },
             change_col_name: {
               name: 'Change Column Name'
+            },
+            add_column: {
+              name: 'Add Column'
             }
           }
         }
@@ -214,7 +223,7 @@ class HandsOnTable extends Component {
           this.props._getSelectedRows(selectedRows);
         }
       },
-      afterScrollVertically: (e) => {
+      afterScrollVertically: e => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
         if (listData.contacts.length < 50) return;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
@@ -310,24 +319,18 @@ class HandsOnTable extends Component {
         listId: listId,
         fieldsmap: newFieldsmap
       }));
-      // options.columns = newColumns;
-      // this.setState({
-      //   options: options,
-      //   fieldsmap: newFieldsmap
-      // });
-      // this.table.updateSettings(options);
     } else {
       alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
 
-  _addColumn() {
+  _addColumn(newColumnName) {
     const { isNew, dispatch, listData } = this.props;
     if (isNew) {
       alertify.alert(`Please save list first before adding custom columns.`);
       return;
     }
-    const { options, newColumnName, fieldsmap } = this.state;
+    const { options, fieldsmap } = this.state;
     if (options.columns.some( col => col.data === newColumnName)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
     } else {
@@ -382,8 +385,6 @@ class HandsOnTable extends Component {
           className='button-primary'
           style={styles.buttons.save}
           onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
-          <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
-          <button className='button' onClick={this._addColumn}>Add Column</button>
         </div>
         <div ref='data-grid'>
         </div>

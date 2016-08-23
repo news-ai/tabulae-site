@@ -248,10 +248,7 @@ class Table extends Component {
               onTitleEdit={state.onTitleEdit}
               />
             </div>
-            <button className='button' style={{
-                backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white'
-              }} onClick={this._toggleEmailPanel}>Email</button>
-            </div>
+          </div>
           <SkyLight
           ref='input'
           overlayStyles={skylightStyles.overlay}
@@ -263,6 +260,9 @@ class Table extends Component {
             _forceRefresh={this._fetchOperations}
             />
           </SkyLight>
+          <button className='button' style={{
+                backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white'
+              }} onClick={this._toggleEmailPanel}>Email</button>
           <ButtonMenu>
             <button className='button' style={{
               backgroundColor: 'white'
