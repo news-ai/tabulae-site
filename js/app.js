@@ -37,6 +37,7 @@ import ListManagerContainer from './components/pages/ListManagerContainer.react'
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import NewTable from './components/pages/NewTable.react';
+import Onboarding from './components/pages/Onboarding.react';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';

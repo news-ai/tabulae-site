@@ -19,11 +19,13 @@ export const COLUMNS = [
   // },
   {
     data: 'firstname',
-    title: 'firstname',
+    title: 'First Name',
+    pass: true
   },
   {
     data: 'lastname',
-    title: 'lastname',
+    title: 'Last Name',
+    pass: true
   },
   {
     data: 'email',
@@ -31,12 +33,14 @@ export const COLUMNS = [
     validator: (value, callback) => _onInvalid(value, callback, validator.isEmail),
     allowInvalid: true,
     invalidCellClass: 'invalid-cell',
+    pass: true
   },
   {
     data: 'employerString',
     title: 'Employer(s)',
     strict: false,
     renderer: multiselectRenderer,
+    pass: false
   },
   {
     data: 'linkedin',
@@ -44,14 +48,17 @@ export const COLUMNS = [
     validator: (value, callback) => _onInvalid(value, callback, validator.isURL),
     allowInvalid: true,
     invalidCellClass: 'invalid-cell',
+    pass: true
   },
   {
     data: 'twitter',
     title: 'Twitter',
+    pass: true
   },
   {
     data: 'instagram',
     title: 'Instagram',
+    pass: true
   },
   // {
   //   data: 'id',

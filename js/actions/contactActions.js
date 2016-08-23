@@ -97,11 +97,7 @@ export function addContacts(contactList) {
 
     return api.post(`/contacts`, contactList)
     .then( response => {
-      response.map( contact => dispatch({
-        type: contactConstant.RECEIVE,
-        contactId: contact.id,
-        contact
-      }));
+      response.map( contact => receiveContact(contact));
       return response;
     })
     .catch( message => console.log(message));

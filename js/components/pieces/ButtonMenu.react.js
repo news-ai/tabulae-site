@@ -4,7 +4,7 @@ class ButtonMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: false
+      isOpen: true
     };
   }
 
@@ -18,7 +18,7 @@ class ButtonMenu extends Component {
         textAlign: 'center'
       }}>
       <button
-      className='button'
+      className='button menubutton'
       style={ this.state.isOpen ? {
         backgroundColor: 'lightgray',
       } : {
