@@ -240,13 +240,14 @@ class HandsOnTable extends Component {
     const immutableFieldmap = fromJS(listData.fieldsmap);
 
     if (!_.isEmpty(listData.contacts)) {
-      if (immutableFieldmap !== this.state.immutableFieldmap) {
+      if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
         let columns = _.cloneDeep(COLUMNS);
         fieldsmap.map( fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.value });
         });
         options.columns = columns;
         this.setState({ immutableFieldmap });
+        this.table.updateSettings(options);
       }
 
       if (this.state.lastFetchedIndex === -1) {
