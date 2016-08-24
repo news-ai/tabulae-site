@@ -62,8 +62,8 @@ class Table extends Component {
       isSaved: true, // table without change
     }
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
+    this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
     this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
     this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
@@ -172,7 +172,9 @@ class Table extends Component {
       // handle customfields
       let customRow = [];
       fieldsmap.map( fieldObj => {
-        if (!_.isEmpty(row[fieldObj.value]) && fieldObj.customfield) customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
+        if (!_.isEmpty(row[fieldObj.value]) && fieldObj.customfield) {
+          customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
+        }
       })
       field.customfields = customRow;
 
@@ -188,8 +190,6 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
-    // console.log(patchContactList);
-    // console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
@@ -217,11 +217,14 @@ class Table extends Component {
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
     this.setState({ isSaved: true });
-    // create publications for later usage
-    Promise.all(this._createPublicationPromises(localData, colHeaders))
-    .then( _ => {
-      this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-    })
+    if (dirtyRows.length === 0) this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
+    else {
+      // create publications for later usage
+      Promise.all(this._createPublicationPromises(localData, colHeaders))
+      .then( _ => {
+        this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
+      });
+    }
   }
 
   render() {
