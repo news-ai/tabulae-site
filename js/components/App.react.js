@@ -9,11 +9,38 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLogin: false
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.props.getAuth();
+  }
+
+  componentDidMount() {
+    window.Intercom('boot', {
+      app_id: 'ur8dbk9e'
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isLogin) this.setState({ isLogin: true });
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextState.isLogin !== this.state.isLogin) {
+      const person = nextProps.person;
+      window.Intercom('update', {
+        email: person.data.email,
+        name: `${person.data.firstname} ${person.data.lastname}`,
+        created_at: Date.now(),
+        user_id: person.data.id
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.state.isLogin) window.Intercom('shutdown');
   }
 
   render() {
@@ -52,7 +79,8 @@ const mapStateToProps = state => {
   return {
     data: state,
     isLogin: state.personReducer.person ? true : false,
-    loginDidInvalidate: state.personReducer.didInvalidate
+    loginDidInvalidate: state.personReducer.didInvalidate,
+    person: state.personReducer.person
   };
 };
 

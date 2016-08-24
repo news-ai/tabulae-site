@@ -44,7 +44,7 @@ const styles = {
   },
   loading: {
     zIndex: 160,
-    bottom: 10,
+    top: 80,
     right: 10,
     position: 'fixed'
   }
@@ -80,7 +80,7 @@ class Table extends Component {
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
     setTimeout( _ => {
       const steps = [{
-        text: 'Select the contacts you want to email. Right click to see Context Menu that lets you add/change/remove columns.',
+        text: 'If the contact is highlighted green, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab. Select the contacts you want to email/update. Right click to see Context Menu that lets you add/change/remove columns.',
         selector: '.handsontable',
         position: 'top-left',
         type: 'hover'
