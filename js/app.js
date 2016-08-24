@@ -54,6 +54,7 @@ if (module.hot) {
   });
 }
 
+// wrap components that we want onboarding to, pass down props like routes
 const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
 
 ReactDOM.render(

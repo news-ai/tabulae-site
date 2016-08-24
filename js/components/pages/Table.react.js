@@ -95,7 +95,7 @@ class Table extends Component {
     
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ name: nextProps.name });
+    if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
   }
 
   routerWillLeave(nextLocation) {
@@ -238,7 +238,18 @@ class Table extends Component {
         listData ?
         <div>
           <div className='row' style={[styles.nameBlock.parent]}>
-            <div className='three columns'>
+            <SkyLight
+            ref='input'
+            overlayStyles={skylightStyles.overlay}
+            dialogStyles={skylightStyles.dialog}
+            hideOnOverlayClicked
+            title='File Drop'>
+              <DropFile
+              listId={listId}
+              _forceRefresh={this._fetchOperations}
+              />
+            </SkyLight>
+            <div className='seven columns'>
               <ToggleableEditInput
               name={state.name}
               updateName={this._updateName}
@@ -246,32 +257,26 @@ class Table extends Component {
               onTitleEdit={state.onTitleEdit}
               />
             </div>
+            <div className='offset-by-ten two columns'>
+              <button className='button' style={{
+                  backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
+                  right: 0
+                }} onClick={this._toggleEmailPanel}>Email</button>
+            </div>
+            <div className='offset-by-ten two columns'>
+              <ButtonMenu>
+                <button className='button' style={{
+                  backgroundColor: 'white'
+                }} onClick={this._updateContacts}>Update Contacts</button>
+                <button
+                className='button'
+                style={{backgroundColor: 'white'}}
+                onClick={ _ => this.refs.input.show() }>
+                Upload from File</button>
+              </ButtonMenu>
+            </div>
           </div>
-          <SkyLight
-          ref='input'
-          overlayStyles={skylightStyles.overlay}
-          dialogStyles={skylightStyles.dialog}
-          hideOnOverlayClicked
-          title='File Drop'>
-            <DropFile
-            listId={listId}
-            _forceRefresh={this._fetchOperations}
-            />
-          </SkyLight>
-          <button className='button' style={{
-                backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
-                right: 0
-              }} onClick={this._toggleEmailPanel}>Email</button>
-          <ButtonMenu>
-            <button className='button' style={{
-              backgroundColor: 'white'
-            }} onClick={this._updateContacts}>Update Contacts</button>
-            <button
-            className='button'
-            style={{backgroundColor: 'white'}}
-            onClick={ _ => this.refs.input.show() }>
-            Upload from File</button>
-          </ButtonMenu>
+          
           { state.emailPanelOpen ? 
             <EmailPanel
             selectedContacts={state.selectedContacts}
@@ -343,7 +348,7 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     dispatch: action => dispatch(action)
   };

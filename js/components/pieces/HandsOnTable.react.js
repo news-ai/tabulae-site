@@ -19,7 +19,8 @@ const styles = {
       marginLeft: '20px',
       marginRight: '20px',
       marginBottom: '20px',
-      marginTop: '30px'
+      marginTop: '30px',
+      right: 100
     },
     save: {
       marginLeft: '30px',

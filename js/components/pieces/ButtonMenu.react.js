@@ -14,12 +14,8 @@ class ButtonMenu extends Component {
       <div style={{
         position: 'fixed',
         zIndex: 150,
-        right: 50,
       }}>
-      <div
-      style={{
-        right: 0,
-      }}>
+      <div>
         <button
         className='button menubutton'
         style={{
@@ -32,7 +28,6 @@ class ButtonMenu extends Component {
         this.props.children.map( (child, i) =>
         <div key={i} style={{
           top: i * offset,
-          right: 0
         }}>{child}</div>) : null
       }
       </div>
