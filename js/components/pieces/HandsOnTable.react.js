@@ -145,15 +145,13 @@ class HandsOnTable extends Component {
               if (options.start.col !== options.end.col) {
                 alertify.alert(`To change column name, only select one column at a time.`);
               } else {
-                this.setState({
-                  skylightButton: (
-                    <button className='button' onClick={ _ =>
-                    this._changeColumnName(
-                      this.state.options.columns,
-                      options.start.col
-                      )}>Change column name</button>)
-                });
-                this.refs.prompt.show();
+                alertify.prompt(
+                `Change Column Name`,
+                `What is the new column name?`,
+                '',
+                (e, value) => this._changeColumnName(listData.id, this.state.options.columns, options.start.col, value),
+                _ => alertify.error('Cancel')
+                );
               }
             }
 
@@ -252,7 +250,7 @@ class HandsOnTable extends Component {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
         let columns = _.cloneDeep(COLUMNS);
         fieldsmap.map( fieldObj => {
-          if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.value });
+          if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.name });
         });
         options.columns = columns;
         this.setState({ immutableFieldmap });
@@ -289,23 +287,21 @@ class HandsOnTable extends Component {
     }
   }
 
-  _changeColumnName(columns, colNum) {
-    const { promptInput, options, fieldsmap } = this.state;
+  _changeColumnName(listId, columns, colNum, newColumnName) {
+    const { fieldsmap } = this.state;
+    const { dispatch } = this.props;
     const columnValue = columns[colNum].data;
     const newFieldsmap = fieldsmap.map( fieldObj => {
       if (fieldObj.value === columnValue && fieldObj.customfield) {
-        fieldObj.name = promptInput;
+        fieldObj.name = newColumnName;
       }
       return fieldObj;
     });
-    columns[colNum].title = promptInput;
-    this.setState({
-      columnInput: '',
+    console.log(newFieldsmap);
+    dispatch(actionCreators.patchList({
+      listId: listId,
       fieldsmap: newFieldsmap
-    });
-    options.columns = columns;
-    this.table.updateSettings(options);
-    this.refs.prompt.hide();
+    }));
   }
 
   _removeColumn(listId, columns, colNum) {
@@ -382,7 +378,7 @@ class HandsOnTable extends Component {
         </div>
         </SkyLight>
           <button
-          className='button-primary'
+          className='button-primary savebutton'
           style={styles.buttons.save}
           onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
         </div>

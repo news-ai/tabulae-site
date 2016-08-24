@@ -261,7 +261,8 @@ class Table extends Component {
             />
           </SkyLight>
           <button className='button' style={{
-                backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white'
+                backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
+                right: 0
               }} onClick={this._toggleEmailPanel}>Email</button>
           <ButtonMenu>
             <button className='button' style={{
