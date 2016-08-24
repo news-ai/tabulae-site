@@ -59,13 +59,14 @@ export function fetchPaginatedContacts(listId) {
     return api.get(`/lists/${listId}/contacts/?limit=${PAGE_LIMIT}&offset=${offset}`)
     .then( response => {
       const newOffset = offset + PAGE_LIMIT;
+      console.log(response);
       dispatch({
         type: SET_OFFSET,
         offset: newOffset,
         listId
       });
-      response.includes.map( publication => dispatch(publicationActions.receivePublication(publication)));
-      response.results.map( contact => dispatch(receiveContact(contact)));
+      response.included.map( publication => dispatch(publicationActions.receivePublication(publication)));
+      response.data.map( contact => dispatch(receiveContact(contact)));
     })
     .catch( message => dispatch(requestContactFail(message)));
   };
@@ -74,7 +75,7 @@ export function fetchPaginatedContacts(listId) {
 export function updateContact(id) {
   return dispatch => {
     return api.get(`/contacts/${id}/update`)
-    .then( response => dispatch(receiveContact(response)))
+    .then( response => dispatch(receiveContact(response.data)))
     .catch( message => dispatch(requestContactFail(message)));
   };
 }
@@ -85,7 +86,7 @@ export function patchContacts(contactList) {
 
     return api.patch(`/contacts`, contactList)
     .then( response => {
-      response.map( contact => dispatch(receiveContact(contact)));
+      response.data.map( contact => dispatch(receiveContact(contact)));
     })
     .catch( message => console.log(message));
   };
@@ -93,12 +94,12 @@ export function patchContacts(contactList) {
 
 export function addContacts(contactList) {
   return dispatch => {
-    dispatch({ type: ADDING_CONTACT });
+    dispatch({ type: ADDING_CONTACT, contactList });
 
     return api.post(`/contacts`, contactList)
     .then( response => {
-      response.map( contact => receiveContact(contact));
-      return response;
+      response.data.map( contact => dispatch(receiveContact(contact)));
+      return response.data;
     })
     .catch( message => console.log(message));
   };

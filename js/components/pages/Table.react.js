@@ -78,27 +78,24 @@ class Table extends Component {
   componentDidMount() {
     this._fetchOperations();
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
-    // setTimeout( _ => {
-    //   const steps = [{
-    //     title: 'Standalone Tooltops',
-    //     text: 'Now you can open tooltips independently! And even style them one by one!',
-    //     selector: '.handsontable',
-    //     position: 'top-left',
-    //     type: 'hover'
-    //   }, {
-    //     title: 'Standalone Tooltops',
-    //     text: 'Here is menue button',
-    //     selector: '.menubutton',
-    //     position: 'bottom',
-    //   }];
-    //   this.props.addSteps(steps);
-    // }, 5000);
-  
+    setTimeout( _ => {
+      const steps = [{
+        text: 'Select the contacts you want to email. Right click to see Context Menu that lets you add/change/remove columns.',
+        selector: '.handsontable',
+        position: 'top-left',
+        type: 'hover'
+      }, {
+        text: 'Here is where you can do things like, update contacts in your sync that are out-of-date with LinkedIn and import existing Excel sheets.',
+        selector: '.menubutton',
+        position: 'bottom',
+      }];
+      this.props.addSteps(steps);
+    }, 5000);
   }
     
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ name: nextProps.name });
+    if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
   }
 
   routerWillLeave(nextLocation) {
@@ -240,8 +237,19 @@ class Table extends Component {
       {
         listData ?
         <div>
-          <div style={[styles.nameBlock.parent]}>
-            <div className='three columns'>
+          <div className='row' style={[styles.nameBlock.parent]}>
+            <SkyLight
+            ref='input'
+            overlayStyles={skylightStyles.overlay}
+            dialogStyles={skylightStyles.dialog}
+            hideOnOverlayClicked
+            title='File Drop'>
+              <DropFile
+              listId={listId}
+              _forceRefresh={this._fetchOperations}
+              />
+            </SkyLight>
+            <div className='seven columns'>
               <ToggleableEditInput
               name={state.name}
               updateName={this._updateName}
@@ -249,28 +257,26 @@ class Table extends Component {
               onTitleEdit={state.onTitleEdit}
               />
             </div>
+            <div className='offset-by-ten two columns'>
+              <button className='button' style={{
+                  backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
+                  right: 0
+                }} onClick={this._toggleEmailPanel}>Email</button>
+            </div>
+            <div className='offset-by-ten two columns'>
+              <ButtonMenu>
+                <button className='button' style={{
+                  backgroundColor: 'white'
+                }} onClick={this._updateContacts}>Update Contacts</button>
+                <button
+                className='button'
+                style={{backgroundColor: 'white'}}
+                onClick={ _ => this.refs.input.show() }>
+                Upload from File</button>
+              </ButtonMenu>
+            </div>
           </div>
-          <SkyLight
-          overlayStyles={skylightStyles.overlay}
-          dialogStyles={skylightStyles.dialog} hideOnOverlayClicked ref='input' title='File Drop'>
-            <DropFile
-            listId={listId}
-            _forceRefresh={this._fetchOperations}
-            />
-          </SkyLight>
-          <ButtonMenu>
-            <button className='button' style={{
-              backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white'
-            }} onClick={this._toggleEmailPanel}>Email</button>
-            <button className='button' style={{
-              backgroundColor: 'white'
-            }} onClick={this._updateContacts}>Update Contacts</button>
-            <button
-            className='button'
-            style={{backgroundColor: 'white'}}
-            onClick={ _ => this.refs.input.show() }>
-            Upload from File</button>
-          </ButtonMenu>
+          
           { state.emailPanelOpen ? 
             <EmailPanel
             selectedContacts={state.selectedContacts}
@@ -342,7 +348,7 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     dispatch: action => dispatch(action)
   };

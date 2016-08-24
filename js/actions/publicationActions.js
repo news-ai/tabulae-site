@@ -21,7 +21,7 @@ export function fetchPublication(id) {
     if (getState().publicationReducer[id]) return;
     dispatch(requestPublication());
     return api.get(`/publications/${id}`)
-    .then( response => dispatch(receivePublication(response)))
+    .then( response => dispatch(receivePublication(response.data)))
     .catch( message => console.log(message));
   };
 }
@@ -31,7 +31,7 @@ export function createPublication(data) {
     dispatch(requestPublication());
     return api.post(`/publications`, data)
     .then( response => {
-      dispatch(receivePublication(response));
+      dispatch(receivePublication(response.data));
       return response;
     })
     .catch( message => console.log(message));

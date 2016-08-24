@@ -2,13 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
-import SkyLight from 'react-skylight';
 import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
 import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
-import { skylightStyles } from 'constants/StyleConstants';
 import _ from 'lodash';
 import { fromJS, List } from 'immutable';
 
@@ -21,16 +19,14 @@ const styles = {
       marginLeft: '20px',
       marginRight: '20px',
       marginBottom: '20px',
-      marginTop: '30px'
+      marginTop: '30px',
+      right: 100
     },
     save: {
       marginLeft: '30px',
       marginRight: '30px'
     }
   },
-  columnInput: {
-    width: '400px'
-  }
 };
 
 const center = {
@@ -45,19 +41,14 @@ alertify.defaults.glossary.title = 'Oops';
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
-    this._onNewColumnNameChange = e => this.setState({ newColumnName: e.target.value });
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
-    this._cleanUpURL = this._cleanUpURL.bind(this);
-    this._onPromptChange = e => this.setState({ promptInput: e.target.value });
     this._changeColumnName = this._changeColumnName.bind(this);
+    this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       addedRow: false,
       update: false,
-      skylightTitle: '',
-      promptInput: '',
-      skylightButton: null,
       lazyLoadingThreshold: 20,
       lastFetchedIndex: -1,
       fieldsmap: [],
@@ -149,16 +140,24 @@ class HandsOnTable extends Component {
               if (options.start.col !== options.end.col) {
                 alertify.alert(`To change column name, only select one column at a time.`);
               } else {
-                this.setState({
-                  skylightButton: (
-                    <button className='button' onClick={ _ =>
-                    this._changeColumnName(
-                      this.state.options.columns,
-                      options.start.col
-                      )}>Change column name</button>)
-                });
-                this.refs.prompt.show();
+                alertify.prompt(
+                `Change Column Name`,
+                `What is the new column name?`,
+                '',
+                (e, value) => this._changeColumnName(listData.id, this.state.options.columns, options.start.col, value),
+                _ => alertify.error('Cancel')
+                );
               }
+            }
+
+            if (key === 'add_column') {
+              alertify.prompt(
+                `Add Column`,
+                `What is the new column name?`,
+                '',
+                (e, value) => this._addColumn(value),
+                _ => alertify.error('Cancel')
+                );
             }
           },
           items: {
@@ -178,6 +177,9 @@ class HandsOnTable extends Component {
             },
             change_col_name: {
               name: 'Change Column Name'
+            },
+            add_column: {
+              name: 'Add Column'
             }
           }
         }
@@ -214,7 +216,7 @@ class HandsOnTable extends Component {
           this.props._getSelectedRows(selectedRows);
         }
       },
-      afterScrollVertically: (e) => {
+      afterScrollVertically: e => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
         if (listData.contacts.length < 50) return;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
@@ -243,7 +245,7 @@ class HandsOnTable extends Component {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
         let columns = _.cloneDeep(COLUMNS);
         fieldsmap.map( fieldObj => {
-          if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.value });
+          if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.name });
         });
         options.columns = columns;
         this.setState({ immutableFieldmap });
@@ -280,23 +282,20 @@ class HandsOnTable extends Component {
     }
   }
 
-  _changeColumnName(columns, colNum) {
-    const { promptInput, options, fieldsmap } = this.state;
+  _changeColumnName(listId, columns, colNum, newColumnName) {
+    const { fieldsmap } = this.state;
+    const { dispatch } = this.props;
     const columnValue = columns[colNum].data;
     const newFieldsmap = fieldsmap.map( fieldObj => {
       if (fieldObj.value === columnValue && fieldObj.customfield) {
-        fieldObj.name = promptInput;
+        fieldObj.name = newColumnName;
       }
       return fieldObj;
     });
-    columns[colNum].title = promptInput;
-    this.setState({
-      columnInput: '',
+    dispatch(actionCreators.patchList({
+      listId: listId,
       fieldsmap: newFieldsmap
-    });
-    options.columns = columns;
-    this.table.updateSettings(options);
-    this.refs.prompt.hide();
+    }));
   }
 
   _removeColumn(listId, columns, colNum) {
@@ -310,24 +309,18 @@ class HandsOnTable extends Component {
         listId: listId,
         fieldsmap: newFieldsmap
       }));
-      // options.columns = newColumns;
-      // this.setState({
-      //   options: options,
-      //   fieldsmap: newFieldsmap
-      // });
-      // this.table.updateSettings(options);
     } else {
       alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
 
-  _addColumn() {
+  _addColumn(newColumnName) {
     const { isNew, dispatch, listData } = this.props;
     if (isNew) {
       alertify.alert(`Please save list first before adding custom columns.`);
       return;
     }
-    const { options, newColumnName, fieldsmap } = this.state;
+    const { options, fieldsmap } = this.state;
     if (options.columns.some( col => col.data === newColumnName)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
     } else {
@@ -360,30 +353,14 @@ class HandsOnTable extends Component {
   }
 
   render() {
-    const { options, skylightTitle, skylightButton } = this.state;
+    const { options } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
-        <SkyLight
-        hideOnOverlayClicked
-        overlayStyles={skylightStyles.overlay}
-        dialogStyles={skylightStyles.dialog}
-        ref='prompt'
-        title={skylightTitle}
-        >
-        <div style={center}>
-          <div>
-            <input type='text' value={this.state.promptInput} onChange={this._onPromptChange} />
-            {skylightButton}
-          </div>
-        </div>
-        </SkyLight>
           <button
-          className='button-primary'
+          className='button-primary savebutton'
           style={styles.buttons.save}
           onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
-          <input style={styles.columnInput} type='text' placeholder='Column name...' value={this.state.newColumnName} onChange={this._onNewColumnNameChange}></input>
-          <button className='button' onClick={this._addColumn}>Add Column</button>
         </div>
         <div ref='data-grid'>
         </div>

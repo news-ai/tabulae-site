@@ -54,7 +54,7 @@ export function fetchList(listId) {
   return dispatch => {
     dispatch(requestList(listId));
     return api.get(`/lists/${listId}`)
-    .then( response => dispatch(receiveList(response)))
+    .then( response => dispatch(receiveList(response.data)))
     .catch( message => dispatch(requestListFail(message)));
   };
 }
@@ -63,7 +63,7 @@ export function fetchLists() {
   return dispatch => {
     dispatch(requestLists());
     return api.get(`/lists`)
-    .then( response => dispatch(receiveLists(response)))
+    .then( response => dispatch(receiveLists(response.data)))
     .catch( message => console.log(message));
   };
 }
@@ -76,7 +76,7 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   return dispatch => {
     dispatch({ type: listConstant.PATCH, listId });
     return api.patch(`/lists/${listId}`, listBody)
-    .then( response => dispatch(receiveList(response)))
+    .then( response => dispatch(receiveList(response.data)))
     .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));
   };
 }
@@ -92,8 +92,8 @@ export function createNewSheet(name, contactList) {
     };
     return api.post(`/lists`, listBody)
     .then( response => {
-      dispatch(receiveList(response));
-      window.location.href = `${window.location.origin}/lists/${response.id}`;
+      dispatch(receiveList(response.data));
+      window.location.href = `${window.location.origin}/lists/${response.data.id}`;
     })
     .catch( message => console.log(message));
   });
@@ -105,7 +105,7 @@ export function archiveListToggle(listId) {
     let listBody = getState().listReducer[listId];
     listBody.archived = !listBody.archived;
     return api.patch(`/lists/${listId}`, listBody)
-    .then( response => dispatch(receiveList(response)))
+    .then( response => dispatch(receiveList(response.data)))
     .catch( message => console.log(message));
   };
 }

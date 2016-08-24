@@ -4,7 +4,15 @@ import Table from './Table.react';
 
 import 'node_modules/react-joyride/lib/styles/react-joyride-compiled.css';
 
-class Onboarding extends Component {
+const locales = {
+  back: (<span>Back</span>),
+  close: (<span>Close</span>),
+  last: (<span>Last</span>),
+  next: (<span>Next</span>),
+  skip: (<span>Skip</span>)
+};
+
+class OnboardingWrapper extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -53,32 +61,27 @@ class Onboarding extends Component {
 
   render() {
     const state = this.state;
+    const props = this.props;
+    const childrenWithProps = React.Children.map(props.children,
+     child => React.cloneElement(child, Object.assign({}, props, { addSteps: this._addSteps}))
+    );
     return (
       <div>
         <Joyride
         ref='joyride'
         debug
-        showSkypButton
+        showSkipButton
         showStepsProgress
         joyrideOverlay
         scrollToSteps={false}
         steps={state.steps}
         type={state.joyrideType}
-        locale={{
-          back: (<span>Back</span>),
-          close: (<span>Close</span>),
-          last: (<span>Last</span>),
-          next: (<span>Next</span>),
-          skip: (<span>Skip</span>)
-        }}
+        locale={locales}
         />
-        <Table
-        {...this.props}
-        addSteps={this._addSteps}
-        />
+        {childrenWithProps}
       </div>
       );
   }
 }
 
-export default Onboarding;
+export default OnboardingWrapper;

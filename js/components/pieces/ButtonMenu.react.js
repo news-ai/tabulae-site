@@ -4,7 +4,7 @@ class ButtonMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: true
+      isOpen: false
     };
   }
 
@@ -14,22 +14,20 @@ class ButtonMenu extends Component {
       <div style={{
         position: 'fixed',
         zIndex: 150,
-        right: 30,
-        textAlign: 'center'
       }}>
-      <button
-      className='button menubutton'
-      style={ this.state.isOpen ? {
-        backgroundColor: 'lightgray',
-      } : {
-        backgroundColor: 'white',
-      }}
-      onClick={ _ => this.setState({ isOpen: !this.state.isOpen })}>Utilities</button>
+      <div>
+        <button
+        className='button menubutton'
+        style={{
+          backgroundColor: this.state.isOpen ? 'lightgray' : 'white'
+        }}
+        onClick={ _ => this.setState({ isOpen: !this.state.isOpen })}>Utilities</button>
+      </div>
       {
-        this.state.isOpen ? this.props.children.map( (child, i) =>
+        this.state.isOpen ?
+        this.props.children.map( (child, i) =>
         <div key={i} style={{
           top: i * offset,
-          margin: '5px'
         }}>{child}</div>) : null
       }
       </div>

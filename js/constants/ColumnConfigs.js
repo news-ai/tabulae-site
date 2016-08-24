@@ -19,12 +19,12 @@ export const COLUMNS = [
   // },
   {
     data: 'firstname',
-    title: 'First Name',
+    title: 'firstname',
     pass: true
   },
   {
     data: 'lastname',
-    title: 'Last Name',
+    title: 'lastname',
     pass: true
   },
   {
