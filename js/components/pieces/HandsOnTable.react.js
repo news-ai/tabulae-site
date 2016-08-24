@@ -2,13 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'handsontable/dist/handsontable.full';
-import SkyLight from 'react-skylight';
 import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
 import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
-import { skylightStyles } from 'constants/StyleConstants';
 import _ from 'lodash';
 import { fromJS, List } from 'immutable';
 
@@ -17,12 +15,6 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
   buttons: {
-    group: {
-      marginLeft: '20px',
-      marginRight: '20px',
-      marginBottom: '20px',
-      marginTop: '30px'
-    },
     save: {
       marginLeft: '30px',
       marginRight: '30px'
@@ -44,16 +36,12 @@ class HandsOnTable extends Component {
     super(props);
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
-    this._cleanUpURL = this._cleanUpURL.bind(this);
-    this._onPromptChange = e => this.setState({ promptInput: e.target.value });
     this._changeColumnName = this._changeColumnName.bind(this);
+    this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
     this.state = {
       addedRow: false,
       update: false,
-      skylightTitle: '',
-      promptInput: '',
-      skylightButton: null,
       lazyLoadingThreshold: 20,
       lastFetchedIndex: -1,
       fieldsmap: [],
@@ -297,7 +285,6 @@ class HandsOnTable extends Component {
       }
       return fieldObj;
     });
-    console.log(newFieldsmap);
     dispatch(actionCreators.patchList({
       listId: listId,
       fieldsmap: newFieldsmap
@@ -359,24 +346,10 @@ class HandsOnTable extends Component {
   }
 
   render() {
-    const { options, skylightTitle, skylightButton } = this.state;
+    const { options } = this.state;
     return (
       <div>
         <div style={styles.buttons.group}>
-        <SkyLight
-        hideOnOverlayClicked
-        overlayStyles={skylightStyles.overlay}
-        dialogStyles={skylightStyles.dialog}
-        ref='prompt'
-        title={skylightTitle}
-        >
-        <div style={center}>
-          <div>
-            <input type='text' value={this.state.promptInput} onChange={this._onPromptChange} />
-            {skylightButton}
-          </div>
-        </div>
-        </SkyLight>
           <button
           className='button-primary savebutton'
           style={styles.buttons.save}
