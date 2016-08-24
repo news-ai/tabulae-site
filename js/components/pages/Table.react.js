@@ -60,6 +60,7 @@ class Table extends Component {
       emailPanelOpen: false,
       selectedContacts: [],
       isSaved: true, // table without change
+      person: null
     }
     this._onSaveClick = this._onSaveClick.bind(this);
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
@@ -96,6 +97,16 @@ class Table extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
+    if (this.state.person === null) {
+      const person = nextProps.person;
+      const user = {
+        email: person.email,
+        name: `${person.firstname} ${person.lastname}`,
+        user_id: person.id,
+      };
+      // window.setUpIntercom(user);
+      this.setState({ person });
+    }
   }
 
   routerWillLeave(nextLocation) {
@@ -342,7 +353,6 @@ const mapStateToProps = (state, props) => {
     }
   })
 
-
   return {
     listId: listId,
     listIsReceiving: state.listReducer.isReceiving,
@@ -353,6 +363,7 @@ const mapStateToProps = (state, props) => {
     pubMapByName: publicationReducer,
     publicationReducer,
     lastFetchedIndex,
+    person: state.personReducer.person
   };
 };
 

@@ -17,34 +17,37 @@ class App extends Component {
     this.props.getAuth();
   }
 
-  componentDidMount() {
-    window.Intercom('boot', {
-      app_id: 'ur8dbk9e'
-    });
-  }
-
   componentWillReceiveProps(nextProps) {
-    if (nextProps.isLogin) this.setState({ isLogin: true });
+    if (nextProps.isLogin && !this.state.isLogin) {
+      this.setState({ isLogin: true });
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextState.isLogin !== this.state.isLogin) {
       const person = nextProps.person;
-      window.Intercom('update', {
-        email: person.data.email,
-        name: `${person.data.firstname} ${person.data.lastname}`,
-        created_at: Date.now(),
-        user_id: person.data.id
-      });
+      // console.log('SET UP INTERCOM');
+      // window.intercomSettings = {
+      //   app_id: 'ur8dbk9e',
+      //   email: person.email,
+      //   name: `${person.firstname} ${person.lastname}`,
+      //   user_id: person.id,
+      // };
+      // window.Intercom('boot', {
+      //   email: person.email,
+      //   name: `${person.firstname} ${person.lastname}`,
+      //   user_id: person.id,
+      // });
+    } else {
     }
   }
 
   componentWillUnmount() {
-    if (this.state.isLogin) window.Intercom('shutdown');
+    // if (this.state.isLogin) window.Intercom('shutdown');
   }
 
   render() {
-    const { isLogin, logoutClick } = this.props;
+    const { isLogin, logoutClick, person } = this.props;
     return (
       <div className='wrapper'>
       { isLogin ?

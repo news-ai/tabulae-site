@@ -9,13 +9,6 @@ function requestLogin() {
 }
 
 function receiveLogin(person) {
-  window.Intercom('update', {
-    app_id: 'ur8dbk9e',
-    email: person.data.email,
-    name: `${person.data.firstname} ${person.data.lastname}`,
-    created_at: Date.now(),
-    user_id: person.data.id
-  });
   return {
     type: loginConstant.RECEIVE,
     person
@@ -54,7 +47,7 @@ export function fetchPerson() {
   return dispatch => {
     dispatch(requestLogin());
     return api.get('/users/me')
-    .then( response => dispatch(receiveLogin(response)))
+    .then( response => dispatch(receiveLogin(response.data)))
     .catch( message => console.log(message));
     // .catch( message => dispatch(loginFail(message)));
   };
