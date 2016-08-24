@@ -70,7 +70,7 @@ class OnboardingWrapper extends Component {
         <Joyride
         ref='joyride'
         debug
-        showSkypButton
+        showSkipButton
         showStepsProgress
         joyrideOverlay
         scrollToSteps={false}
