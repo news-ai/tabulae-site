@@ -15,6 +15,12 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
   buttons: {
+    group: {
+      marginLeft: '20px',
+      marginRight: '20px',
+      marginBottom: '20px',
+      marginTop: '30px'
+    },
     save: {
       marginLeft: '30px',
       marginRight: '30px'
