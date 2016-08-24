@@ -59,7 +59,6 @@ export function fetchPaginatedContacts(listId) {
     return api.get(`/lists/${listId}/contacts/?limit=${PAGE_LIMIT}&offset=${offset}`)
     .then( response => {
       const newOffset = offset + PAGE_LIMIT;
-      console.log(response);
       dispatch({
         type: SET_OFFSET,
         offset: newOffset,

@@ -9,6 +9,13 @@ function requestLogin() {
 }
 
 function receiveLogin(person) {
+  window.Intercom('update', {
+    app_id: 'ur8dbk9e',
+    email: person.data.email,
+    name: `${person.data.firstname} ${person.data.lastname}`,
+    created_at: Date.now(),
+    user_id: person.data.id
+  });
   return {
     type: loginConstant.RECEIVE,
     person
@@ -16,7 +23,6 @@ function receiveLogin(person) {
 }
 
 function loginFail(message) {
-  console.log(message);
   return {
     type: loginConstant.REQUEST_FAIL,
     message
@@ -25,6 +31,7 @@ function loginFail(message) {
 
 export function loginWithGoogle() {
   const base = `${window.TABULAE_API_BASE}/auth/google?next=${window.location}`;
+  console.log(base);
   window.location.href = base;
 }
 
