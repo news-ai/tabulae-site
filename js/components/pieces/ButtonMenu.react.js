@@ -4,7 +4,7 @@ class ButtonMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: true
+      isOpen: false
     };
   }
 
@@ -22,10 +22,8 @@ class ButtonMenu extends Component {
       }}>
         <button
         className='button menubutton'
-        style={ this.state.isOpen ? {
-          backgroundColor: 'lightgray',
-        } : {
-          backgroundColor: 'white',
+        style={{
+          backgroundColor: this.state.isOpen ? 'lightgray' : 'white'
         }}
         onClick={ _ => this.setState({ isOpen: !this.state.isOpen })}>Utilities</button>
       </div>

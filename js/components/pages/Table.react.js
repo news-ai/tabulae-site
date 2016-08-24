@@ -80,14 +80,12 @@ class Table extends Component {
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
     setTimeout( _ => {
       const steps = [{
-        title: 'Standalone Tooltops',
-        text: 'Now you can open tooltips independently! And even style them one by one!',
+        text: 'Select the contacts you want to email. Right click to see Context Menu that lets you add/change/remove columns.',
         selector: '.handsontable',
         position: 'top-left',
         type: 'hover'
       }, {
-        title: 'Standalone Tooltops',
-        text: 'Here is menue button',
+        text: 'Here is where you can do things like, update contacts in your sync that are out-of-date with LinkedIn and import existing Excel sheets.',
         selector: '.menubutton',
         position: 'bottom',
       }];
