@@ -206,6 +206,11 @@ class Table extends Component {
           fieldsmap
         }));
       });
+    } else {
+      // if no new contacts, see if list needs update
+      if (this.state.name !== listData.name) {
+        dispatch(actionCreators.patchList({ listId, name: this.state.name }));
+      }
     }
     this.setState({ isSaved: true });
   }

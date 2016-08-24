@@ -16,16 +16,9 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 const styles = {
   buttons: {
     group: {
-      marginLeft: '20px',
-      marginRight: '20px',
       marginBottom: '20px',
       marginTop: '30px',
-      right: 100
     },
-    save: {
-      marginLeft: '30px',
-      marginRight: '30px'
-    }
   },
 };
 
@@ -356,11 +349,12 @@ class HandsOnTable extends Component {
     const { options } = this.state;
     return (
       <div>
-        <div style={styles.buttons.group}>
-          <button
-          className='button-primary savebutton'
-          style={styles.buttons.save}
-          onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
+        <div className='row' style={styles.buttons.group}>
+          <div className='offset-by-one two columns'>
+            <button
+            className='button-primary savebutton'
+            onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
+          </div>
         </div>
         <div ref='data-grid'>
         </div>

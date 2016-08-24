@@ -72,7 +72,7 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
-  listBody.fieldsmap = fieldsmap;
+  if (fieldsmap !== undefined) listBody.fieldsmap = fieldsmap;
   return dispatch => {
     dispatch({ type: listConstant.PATCH, listId });
     return api.patch(`/lists/${listId}`, listBody)
