@@ -363,10 +363,12 @@ class HandsOnTable extends Component {
       <div>
         <div className='row' style={styles.buttons.group}>
           <div className='offset-by-ten two columns'>
-            <div style={{ position: 'fixed', top: 200}}>
+            <div style={{ position: 'fixed', top: 200, zIndex: 200}}>
               <button
               className='button-primary savebutton'
-              onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
+              onClick={ _ => this._onSaveClick(options.data, options.columns)}
+              >Save</button>
+              <p style={{fontSize: '0.8em'}}>{this.props.lastSavedAt}</p>
             </div>
           </div>
         </div>

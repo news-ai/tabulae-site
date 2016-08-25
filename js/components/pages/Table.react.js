@@ -60,7 +60,8 @@ class Table extends Component {
       emailPanelOpen: false,
       selectedContacts: [],
       isSaved: true, // table without change
-      person: null
+      person: null,
+      lastSavedAt: null
     }
     this._onSaveClick = this._onSaveClick.bind(this);
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
@@ -228,7 +229,14 @@ class Table extends Component {
         dispatch(actionCreators.patchList({ listId, name: this.state.name }));
       }
     }
-    this.setState({ isSaved: true });
+    const currentdate = new Date(); 
+    const datetime = "Last Sync: " + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+    this.setState({
+      isSaved: true,
+      lastSavedAt: datetime
+    });
   }
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
@@ -312,6 +320,7 @@ class Table extends Component {
             /> : null }
             <HandsOnTable
             {...props}
+            lastSavedAt={state.lastSavedAt}
             listId={listId}
             onSaveClick={this._onSaveClick}
             _getSelectedRows={this._getSelectedRows}
