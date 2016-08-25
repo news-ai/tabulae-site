@@ -230,8 +230,8 @@ class Table extends Component {
       }
     }
     const currentdate = new Date(); 
-    const datetime = "Last Sync: " + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
+    const datetime = 'Last Sync: ' + currentdate.getHours() + ':'
+                + currentdate.getMinutes() + ':' 
                 + currentdate.getSeconds();
     this.setState({
       isSaved: true,

@@ -9,7 +9,7 @@ export function postBatchEmails(emails) {
   return dispatch => {
     dispatch({ type: SENDING_STAGED_EMAILS, emails });
     return api.post(`/emails`, emails)
-    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response }))
+    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response.data }))
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };
 }
@@ -26,7 +26,7 @@ export function sendEmail(id) {
 export function getStagedEmails() {
   return dispatch => {
     return api.get(`/emails`)
-    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response }))
+    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response.data }))
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };
 }

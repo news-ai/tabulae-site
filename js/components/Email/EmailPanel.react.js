@@ -14,17 +14,19 @@ import EmailEditor from './EmailEditor.react';
 const styles = {
   emailPanel: {
     position: 'fixed',
-    bottom: 0,
+    bottom: 5,
     right: 0,
     zIndex: 1000,
     height: '500px',
-    width: '600px'
+    width: '600px',
+    overflow: 'scroll'
   },
   sendButton: {
     position: 'fixed',
     zIndex: 1100,
     bottom: 20,
-    right: 30
+    right: 30,
+    backgroundColor: 'white'
   }
 };
 
@@ -163,7 +165,7 @@ class EmailPanel extends Component {
           {
             (isReceiving || previewEmails.length === 0) ? <span>LOADING..</span> :
             <div>
-              <button onClick={this._onSendAllEmailsClick}>Send All</button>
+              <button style={{backgroundColor: 'white'}} onClick={this._onSendAllEmailsClick}>Send All</button>
             {
               previewEmails.map( (pEmail, i) => {
                 const email = stagingReducer[pEmail.id];
