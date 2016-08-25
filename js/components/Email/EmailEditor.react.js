@@ -149,7 +149,7 @@ class EmailEditor extends Component {
               onChange={this.onChange}
               placeholder={placeholder}
               ref='editor'
-              spellCheck={true}
+              spellCheck
             />
           </div>
         </div>
