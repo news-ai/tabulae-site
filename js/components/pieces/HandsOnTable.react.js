@@ -191,15 +191,26 @@ class HandsOnTable extends Component {
         // console.log(source);
 
         if (!this.props.isNew) {
-            // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
+          // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
           this.props.isDirty();
-          const rowNum = changes[0][0];
-          const rowId = this.state.options.data[rowNum].id;
+
+          if (_.isEmpty(this.props.listData.contacts)) return;
+          let rowNum;
+          let rowId;
           const dirtyRows = this.state.dirtyRows;
-          if (!dirtyRows.some( rnum => rnum === rowId)) {
-            dirtyRows.push(rowId);
-            this.setState({ dirtyRows });
-          }
+          changes.map( change => {
+            rowNum = change[0];
+            rowId = this.state.options.data[rowNum].id;
+            if (change[1] === change[2] || _.isEmpty(change[1]) && _.isEmpty(change[2])) {
+              // console.log('DO NOTHING');
+            } else {
+              if (!dirtyRows.some( rnum => rnum === rowId)) {
+                dirtyRows.push(rowId);
+              }
+            }
+          });
+
+          this.setState({ dirtyRows });
         }
       },
       afterChange: (changes, source) => {
@@ -211,6 +222,7 @@ class HandsOnTable extends Component {
       },
       afterScrollVertically: e => {
         const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
+        if (_.isEmpty(listData.contacts)) return;
         if (listData.contacts.length < 50) return;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
         const rowCount = this.table.countRows();

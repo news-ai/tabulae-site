@@ -69,7 +69,7 @@ class OnboardingWrapper extends Component {
       <div>
         <Joyride
         ref='joyride'
-        debug={window.isDev}
+        debug={false}
         showSkipButton
         showStepsProgress
         joyrideOverlay
