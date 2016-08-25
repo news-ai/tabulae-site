@@ -13,7 +13,7 @@ class ButtonMenu extends Component {
     return (
       <div style={{
         position: 'fixed',
-        zIndex: 150,
+        zIndex: 300,
       }}>
       <div>
         <button
