@@ -142,12 +142,13 @@ class EmailPanel extends Component {
   }
 
   render() {
-    const { previewEmails, isReceiving, stagingReducer } = this.props;
+    const props = this.props;
     // add this button to fetch all staged emails for debugging purposes
     // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
     return (
       <div>
         <EmailEditor
+        person={props.person}
         style={styles.emailPanel}
         _setSubjectLine={this._setSubjectLine}
         _setBody={this._setBody}
@@ -163,12 +164,12 @@ class EmailPanel extends Component {
         ref='preview'
         title='Preview'>
           {
-            (isReceiving || previewEmails.length === 0) ? <span>LOADING..</span> :
+            (props.isReceiving || props.previewEmails.length === 0) ? <span>LOADING..</span> :
             <div>
               <button style={{backgroundColor: 'white'}} onClick={this._onSendAllEmailsClick}>Send All</button>
             {
-              previewEmails.map( (pEmail, i) => {
-                const email = stagingReducer[pEmail.id];
+              props.previewEmails.map( (pEmail, i) => {
+                const email = props.stagingReducer[pEmail.id];
 
                 if (email.body.length === 0 || email.issent) return null;
                 return (
