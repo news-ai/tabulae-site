@@ -60,7 +60,8 @@ class Table extends Component {
       emailPanelOpen: false,
       selectedContacts: [],
       isSaved: true, // table without change
-      person: null
+      person: null,
+      lastSavedAt: null
     }
     this._onSaveClick = this._onSaveClick.bind(this);
     this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
@@ -139,7 +140,9 @@ class Table extends Component {
       const name = header.data;
       if (!_.isEmpty(row[name])) {
         // only columns labeled as pass can send data to api
-        if (fieldsmap.some( fieldObj => fieldObj.value === name && !fieldObj.customfield)) field[name] = row[name];
+        if (fieldsmap.some( fieldObj => fieldObj.value === name && !fieldObj.customfield)) {
+          field[name] = row[name];
+        }
       }
     });
     if (!_.isEmpty(row.employerString)) {
@@ -187,10 +190,10 @@ class Table extends Component {
           customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
         }
       })
-      field.customfields = customRow;
+      if (customRow.length > 0) field.customfields = customRow;
 
       // filter out for empty rows with only id
-      if (!_.isEmpty(field) && colHeaders.some(header => header.pass && !_.isEmpty(field[header.data]))) {
+      if (!_.isEmpty(field)) {
         if (field.id) {
           if (dirtyRows.some( rowId => rowId === field.id )) patchContactList.push(field);
         } else {
@@ -201,6 +204,9 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
+
+    // console.log(patchContactList);
+    // console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
@@ -223,19 +229,30 @@ class Table extends Component {
         dispatch(actionCreators.patchList({ listId, name: this.state.name }));
       }
     }
-    this.setState({ isSaved: true });
+    const currentdate = new Date(); 
+    const datetime = "Last Sync: " + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+    this.setState({
+      isSaved: true,
+      lastSavedAt: datetime
+    });
   }
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
-    this.setState({ isSaved: true });
-    if (dirtyRows.length === 0) this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-    else {
+    console.log('SAVE CLICKED');
+    if (dirtyRows.length === 0) {
+      this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
+    } else {
+      console.log(dirtyRows);
       // create publications for later usage
       Promise.all(this._createPublicationPromises(localData, colHeaders))
       .then( _ => {
+        console.log('WHAT HAPPENDED');
         this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
       });
     }
+    this.setState({ isSaved: true });
   }
 
   render() {
@@ -303,6 +320,7 @@ class Table extends Component {
             /> : null }
             <HandsOnTable
             {...props}
+            lastSavedAt={state.lastSavedAt}
             listId={listId}
             onSaveClick={this._onSaveClick}
             _getSelectedRows={this._getSelectedRows}
