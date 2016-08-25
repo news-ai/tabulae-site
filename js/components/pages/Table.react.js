@@ -315,6 +315,7 @@ class Table extends Component {
           
           { state.emailPanelOpen ? 
             <EmailPanel
+            person={props.person}
             selectedContacts={state.selectedContacts}
             customfields={listData.customfields}
             /> : null }

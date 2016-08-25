@@ -112,7 +112,7 @@ class EmailEditor extends Component {
 
   render() {
     const { editorState } = this.state;
-    const { _setSubjectLine } = this.props;
+    const props = this.props;
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
@@ -126,7 +126,10 @@ class EmailEditor extends Component {
 
     return (
       <div>
-        <div className='RichEditor-root' style={this.props.style}>
+        <div className='RichEditor-root' style={props.style}>
+          <div className='RichEditor-controls RichEditor-styleButton'>
+            <span>Emails are sent from: {props.person.email}</span>
+          </div>
           <BlockStyleControls
               editorState={editorState}
               onToggle={this.toggleBlockType}
@@ -137,7 +140,7 @@ class EmailEditor extends Component {
           />
           <div>
             <Subject
-              _setSubjectLine={_setSubjectLine}
+              _setSubjectLine={props._setSubjectLine}
             />
           </div>
           <div className={className} onClick={this.focus}>
