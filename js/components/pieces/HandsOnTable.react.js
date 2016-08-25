@@ -362,13 +362,15 @@ class HandsOnTable extends Component {
     return (
       <div>
         <div className='row' style={styles.buttons.group}>
-          <div className='offset-by-one two columns'>
-            <button
-            className='button-primary savebutton'
-            onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
+          <div className='offset-by-ten two columns'>
+            <div style={{ position: 'fixed', top: 200}}>
+              <button
+              className='button-primary savebutton'
+              onClick={ _ => this._onSaveClick(options.data, options.columns)}>Save</button>
+            </div>
           </div>
         </div>
-        <div ref='data-grid'>
+        <div ref='data-grid' style={{marginLeft: '20px', marginRight: '20px'}}>
         </div>
       </div>
       );
