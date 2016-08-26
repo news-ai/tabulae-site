@@ -14,8 +14,8 @@ const styles = {
     marginRight: '5px',
     marginBottom: '10px'
   },
-  sendButton: {
-    // float: 'right'
+  strong: {
+    color: 'gray', marginRight: '15px'
   }
 };
 
@@ -23,15 +23,15 @@ function createMarkUp(html) {
   return { __html: html };
 }
 
-function PreviewEmailContent({id, to, subject, body, sendEmail, issent}) {
+function PreviewEmailContent({id, to, subject, body, onSendEmailClick, issent}) {
   return (
     <div style={styles.contentBox}>
       <div className='u-full-width' style={styles.content}>
-        <p style={styles.span}><strong style={{color: 'gray', marginRight: '15px'}}>To</strong>{to}</p>
-        <p style={styles.span}><strong style={{color: 'gray', marginRight: '15px'}}>Subject</strong>{subject}</p>
+        <p style={styles.span}><strong style={styles.strong}>To</strong>{to}</p>
+        <p style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</p>
         <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
       </div>
-      <button style={styles.sendButton} onClick={sendEmail}>Send</button>
+      <button className='button' onClick={onSendEmailClick}>Send</button>
     </div>
     );
 }

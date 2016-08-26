@@ -33,6 +33,10 @@ const styles = {
   }
 };
 
+const injectCssToTags = {
+  'p': 'margin: 0;'
+}
+
 alertify.defaults.glossary.title = 'Oops';
 
 class EmailPanel extends Component {
@@ -62,9 +66,8 @@ class EmailPanel extends Component {
 
   _convertToHtml(editorState) {
     const content = editorState.getCurrentContent();
-    return stateToHTML(content);
+    return stateToHTML(content, null, injectCssToTags);
   }
-
 
   _replaceAll(html, contact) {
     const { matchfields } = this.state;
@@ -176,7 +179,6 @@ class EmailPanel extends Component {
             {
               props.previewEmails.map( (pEmail, i) => {
                 const email = props.stagingReducer[pEmail.id];
-
                 if (email.body.length === 0 || email.issent) return null;
                 return (
                   <div>
