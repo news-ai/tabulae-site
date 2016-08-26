@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
-import { skylightStyles } from 'constants/StyleConstants';
+import { skylightStyles, buttonStyle } from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -26,7 +26,7 @@ const styles = {
     overflow: 'scroll'
   },
   sendButton: {
-    backgroundColor: 'white',
+    ...buttonStyle,
     position: 'absolute',
     bottom: 10,
     right: 10
@@ -172,7 +172,7 @@ class EmailPanel extends Component {
           {
             (props.isReceiving || props.previewEmails.length === 0) ? <span>LOADING..</span> :
             <div>
-              <button style={{backgroundColor: 'white'}} onClick={this._onSendAllEmailsClick}>Send All</button>
+              <button style={buttonStyle} onClick={this._onSendAllEmailsClick}>Send All</button>
             {
               props.previewEmails.map( (pEmail, i) => {
                 const email = props.stagingReducer[pEmail.id];

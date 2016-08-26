@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 import Radium from 'radium';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
-import { globalStyles, skylightStyles } from 'constants/StyleConstants';
+import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
 
 import EmailPanel from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -50,9 +50,7 @@ const styles = {
   }
 };
 
-const buttonStyle = {
-  backgroundColor: 'white'
-};
+
 
 class Table extends Component {
   constructor(props) {
