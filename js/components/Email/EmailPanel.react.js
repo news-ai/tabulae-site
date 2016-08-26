@@ -66,6 +66,7 @@ class EmailPanel extends Component {
 
   _convertToHtml(editorState) {
     const content = editorState.getCurrentContent();
+    console.log(content.getBlockMap());
     return stateToHTML(content, null, injectCssToTags);
   }
 

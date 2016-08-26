@@ -2,29 +2,30 @@ import React, { Component } from 'react';
 import {
   EditorState,
   RichUtils,
+  CompositeDecorator,
+  Entity,
   Editor,
-  CompositeDecorator
+  convertToRaw
 } from 'draft-js';
+import linkifyIt from 'linkify-it';
+import alertify from 'alertifyjs';
+import tlds from 'tlds';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
+
+const linkify = linkifyIt();
+linkify
+.tlds(tlds)
+.add('git:', 'http:')
+.add('ftp:', null)
+.set({ fuzzyIP: true });
 
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
 import Subject from './Subject.react';
 import CurlySpan from './CurlySpan.react';
+import LinkTag from './LinkTag.react';
 
-const CURLY_REGEX = /{([^}]+)}/g;
-
-function findWithRegex(regex, contentBlock, callback) {
-  const text = contentBlock.getText();
-  let matchArr, start;
-  while ((matchArr = regex.exec(text)) !== null) {
-    start = matchArr.index;
-    callback(start, start + matchArr[0].length);
-  }
-}
-
-function curlyStrategy(contentBlock, callback) {
-  findWithRegex(CURLY_REGEX, contentBlock, callback);
-}
+import { curlyStrategy } from './strategies';
 
 // Custom overrides for 'code' style.
 const styleMap = {
@@ -35,6 +36,24 @@ const styleMap = {
     padding: 2,
   },
 };
+
+const CUSTOM_INLINE_TYPES = [
+  {label: 'hyperlink', style: 'LINK'}
+];
+
+function findLinkEntities(contentBlock, callback) {
+  contentBlock.findEntityRanges(
+    (character) => {
+      const entityKey = character.getEntity();
+      return (
+        entityKey !== null &&
+        Entity.get(entityKey).getType() === 'LINK'
+      );
+    },
+    callback
+  );
+}
+
 
 const placeholder = 'Tip: Did you know you can use the column names as variables in your template email? E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
@@ -52,7 +71,11 @@ class EmailEditor extends Component {
     const compositeDecorator = new CompositeDecorator([{
       strategy: curlyStrategy,
       component: CurlySpan
-    }]);
+    }, {
+      strategy: findLinkEntities,
+      component: LinkTag,
+    },
+    ]);
 
     this.state = {
       editorState: EditorState.createEmpty(compositeDecorator),
@@ -60,10 +83,9 @@ class EmailEditor extends Component {
 
     this.focus = () => this.refs.editor.focus();
     this.onChange = (editorState) => {
-      const { _setBody } = this.props;
       // save text body to send
-      // const content = editorState.getCurrentContent();
-      _setBody(editorState);
+      const content = editorState.getCurrentContent();
+      this.props._setBody(editorState);
       this.setState({editorState});
     };
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
@@ -137,6 +159,7 @@ class EmailEditor extends Component {
           <InlineStyleControls
               editorState={editorState}
               onToggle={this.toggleInlineStyle}
+              customInlineTypes={CUSTOM_INLINE_TYPES}
           />
           <div>
             <Subject
