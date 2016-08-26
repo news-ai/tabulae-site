@@ -37,10 +37,6 @@ const styleMap = {
   },
 };
 
-const CUSTOM_INLINE_TYPES = [
-  {label: 'hyperlink', style: 'LINK'}
-];
-
 function findLinkEntities(contentBlock, callback) {
   contentBlock.findEntityRanges(
     (character) => {
@@ -64,19 +60,18 @@ function getBlockStyle(block) {
   }
 }
 
+const compositeDecorator = new CompositeDecorator([{
+  strategy: curlyStrategy,
+  component: CurlySpan
+}, {
+  strategy: findLinkEntities,
+  component: LinkTag,
+},
+]);
+
 class EmailEditor extends Component {
   constructor(props) {
     super(props);
-
-    const compositeDecorator = new CompositeDecorator([{
-      strategy: curlyStrategy,
-      component: CurlySpan
-    }, {
-      strategy: findLinkEntities,
-      component: LinkTag,
-    },
-    ]);
-
     this.state = {
       editorState: EditorState.createEmpty(compositeDecorator),
     };
@@ -91,6 +86,8 @@ class EmailEditor extends Component {
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
+    this.onInlineLinkClick = this._onInlineLinkClick.bind(this);
+    this.confirmLink = this._confirmLink.bind(this);
   }
 
 
@@ -132,6 +129,35 @@ class EmailEditor extends Component {
     );
   }
 
+  _onInlineLinkClick(e) {
+    e.preventDefault();
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (!selection.isCollapsed()) {
+      alertify.prompt('Enter hyperlink', '',
+        (e, value) => {
+          this.confirmLink(value);
+        },
+        () => {
+
+        });
+    } else {
+      alertify.alert('none selected');
+    }
+  }
+
+  _confirmLink(value) {
+    const {editorState} = this.state;
+    const entityKey = Entity.create('LINK', 'MUTABLE', {url: value});
+    this.setState({
+      editorState: RichUtils.toggleLink(
+        editorState,
+        editorState.getSelection(),
+        entityKey
+      ),
+    });
+  }
+
   render() {
     const { editorState } = this.state;
     const props = this.props;
@@ -146,6 +172,12 @@ class EmailEditor extends Component {
       }
     }
 
+    const customInlineTypes = [{
+      label: 'Hyperlink',
+      style: 'LINK',
+      onClick: this.onInlineLinkClick
+    }];
+
     return (
       <div>
         <div className='RichEditor-root' style={props.style}>
@@ -159,7 +191,7 @@ class EmailEditor extends Component {
           <InlineStyleControls
               editorState={editorState}
               onToggle={this.toggleInlineStyle}
-              customInlineTypes={CUSTOM_INLINE_TYPES}
+              customInlineTypes={customInlineTypes}
           />
           <div>
             <Subject

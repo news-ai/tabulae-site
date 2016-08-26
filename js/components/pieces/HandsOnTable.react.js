@@ -29,7 +29,7 @@ const center = {
 };
 
 const MIN_ROWS = 20;
-alertify.defaults.glossary.title = 'Oops';
+// alertify.defaults.glossary.title = 'Oops';
 
 class HandsOnTable extends Component {
   constructor(props) {
