@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
-import { skylightStyles } from 'constants/StyleConstants';
+import { skylightStyles, buttonStyle } from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -12,23 +12,30 @@ import PreviewEmailContent from './PreviewEmailContent.react';
 import EmailEditor from './EmailEditor.react';
 
 const styles = {
-  emailPanel: {
+  emailPanelWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
     position: 'fixed',
-    bottom: 5,
+    left: 0,
     right: 0,
-    zIndex: 1000,
+    zIndex: 200
+  },
+  emailPanel: {
     height: '500px',
     width: '600px',
     overflow: 'scroll'
   },
   sendButton: {
-    position: 'fixed',
-    zIndex: 1100,
-    bottom: 20,
-    right: 30,
-    backgroundColor: 'white'
+    ...buttonStyle,
+    position: 'absolute',
+    bottom: 10,
+    right: 10
   }
 };
+
+const injectCssToTags = {
+  'p': 'margin: 0;'
+}
 
 alertify.defaults.glossary.title = 'Oops';
 
@@ -59,9 +66,8 @@ class EmailPanel extends Component {
 
   _convertToHtml(editorState) {
     const content = editorState.getCurrentContent();
-    return stateToHTML(content);
+    return stateToHTML(content, null, injectCssToTags);
   }
-
 
   _replaceAll(html, contact) {
     const { matchfields } = this.state;
@@ -147,16 +153,19 @@ class EmailPanel extends Component {
     // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
     return (
       <div>
-        <EmailEditor
-        person={props.person}
-        style={styles.emailPanel}
-        _setSubjectLine={this._setSubjectLine}
-        _setBody={this._setBody}
-        />
-        <button
-        style={styles.sendButton}
-        onClick={this._onPreviewEmailsClick}
-        >Preview</button>
+        <div style={styles.emailPanelWrapper}>
+          <EmailEditor
+          person={props.person}
+          style={styles.emailPanel}
+          _setSubjectLine={this._setSubjectLine}
+          _setBody={this._setBody} />
+          <div style={{position: 'relative'}}>
+           <button
+            style={styles.sendButton}
+            onClick={this._onPreviewEmailsClick}
+            >Preview</button>
+          </div>
+        </div>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
         dialogStyles={skylightStyles.dialog}
@@ -166,11 +175,10 @@ class EmailPanel extends Component {
           {
             (props.isReceiving || props.previewEmails.length === 0) ? <span>LOADING..</span> :
             <div>
-              <button style={{backgroundColor: 'white'}} onClick={this._onSendAllEmailsClick}>Send All</button>
+              <button style={buttonStyle} onClick={this._onSendAllEmailsClick}>Send All</button>
             {
               props.previewEmails.map( (pEmail, i) => {
                 const email = props.stagingReducer[pEmail.id];
-
                 if (email.body.length === 0 || email.issent) return null;
                 return (
                   <div>

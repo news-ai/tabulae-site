@@ -33,3 +33,7 @@ export const skylightStyles = {
     transform: 'translate(-50%, -50%)'
   }
 };
+
+export const buttonStyle = {
+  backgroundColor: 'white'
+};

@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 import Radium from 'radium';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
-import { globalStyles, skylightStyles } from 'constants/StyleConstants';
+import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
 
 import EmailPanel from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -49,6 +49,8 @@ const styles = {
     position: 'fixed'
   }
 };
+
+
 
 class Table extends Component {
   constructor(props) {
@@ -100,12 +102,6 @@ class Table extends Component {
     if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
     if (this.state.person === null) {
       const person = nextProps.person;
-      const user = {
-        email: person.email,
-        name: `${person.firstname} ${person.lastname}`,
-        user_id: person.id,
-      };
-      // window.setUpIntercom(user);
       this.setState({ person });
     }
   }
@@ -244,11 +240,9 @@ class Table extends Component {
     if (dirtyRows.length === 0) {
       this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
     } else {
-      console.log(dirtyRows);
       // create publications for later usage
       Promise.all(this._createPublicationPromises(localData, colHeaders))
       .then( _ => {
-        console.log('WHAT HAPPENDED');
         this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
       });
     }
@@ -256,22 +250,14 @@ class Table extends Component {
   }
 
   render() {
-    const {
-      listId,
-      listData,
-      listIsReceiving,
-      contactIsReceiving,
-      contacts,
-      lastFetchedIndex
-    } = this.props;
     const props = this.props;
     const state = this.state;
 
     return (
       <div>
-      <Waiting isReceiving={contactIsReceiving || listData === undefined} style={styles.loading} />
+      <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
       {
-        listData ?
+        props.listData ?
         <div>
           <div className='row' style={[styles.nameBlock.parent]}>
             <SkyLight
@@ -281,7 +267,7 @@ class Table extends Component {
             hideOnOverlayClicked
             title='File Drop'>
               <DropFile
-              listId={listId}
+              listId={props.listId}
               _forceRefresh={this._fetchOperations}
               />
             </SkyLight>
@@ -296,39 +282,37 @@ class Table extends Component {
             <div className='offset-by-ten two columns'>
               <button className='button' style={{
                   backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
-                  right: 0
                 }} onClick={this._toggleEmailPanel}>Email</button>
             </div>
             <div className='offset-by-ten two columns'>
               <ButtonMenu>
-                <button className='button' style={{
-                  backgroundColor: 'white'
-                }} onClick={this._updateContacts}>Update Contacts</button>
+                <button className='button' style={buttonStyle} onClick={this._updateContacts}>Update Contacts</button>
                 <button
                 className='button'
-                style={{backgroundColor: 'white'}}
+                style={buttonStyle}
                 onClick={ _ => this.refs.input.show() }>
                 Upload from File</button>
               </ButtonMenu>
             </div>
           </div>
-          
-          { state.emailPanelOpen ? 
+          {
+            state.emailPanelOpen ? 
             <EmailPanel
             person={props.person}
             selectedContacts={state.selectedContacts}
-            customfields={listData.customfields}
-            /> : null }
+            customfields={props.listData.customfields}
+            /> : null
+          }
             <HandsOnTable
             {...props}
             lastSavedAt={state.lastSavedAt}
-            listId={listId}
+            listId={props.listId}
             onSaveClick={this._onSaveClick}
             _getSelectedRows={this._getSelectedRows}
-            listData={listData}
-            contacts={contacts}
+            listData={props.listData}
+            contacts={props.contacts}
             isNew={false}
-            lastFetchedIndex={lastFetchedIndex}
+            lastFetchedIndex={props.lastFetchedIndex}
             isDirty={this._isDirty}
             />
         </div> : null
