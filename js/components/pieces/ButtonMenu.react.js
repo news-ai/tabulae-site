@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 
+const defaultStyle = {
+  position: 'fixed'
+};
+
 class ButtonMenu extends Component {
   constructor(props) {
     super(props);
@@ -10,11 +14,9 @@ class ButtonMenu extends Component {
 
   render() {
     const offset = 15;
+    const styles = this.props.style ? {...defaultStyle, ...this.props.style} : defaultStyle;
     return (
-      <div style={{
-        position: 'fixed',
-        zIndex: 300,
-      }}>
+      <div style={styles}>
       <div>
         <button
         className='button menubutton'
