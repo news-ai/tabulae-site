@@ -23,21 +23,26 @@ export function sendEmail(id) {
   };
 }
 
-function getEmails() {
+export function getStagedEmails() {
   return dispatch => {
     return api.get(`/emails`)
-    .then( response => response)
-    .catch( message => message);
+    .then( response => {
+      const json = response.data.filter( email => !email.issent);
+      return dispatch({ type: RECEIVE_STAGED_EMAILS, json });
+    })
+    .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };
 }
 
-export function getStagedEmails() {
+export function getSentEmails() {
   return dispatch => {
-    return getEmails()
+    dispatch({ type: 'GET_SENT_EMAILS' });
+    return api.get(`/emails`)
     .then( response => {
-      const json = response.data.map( email => !email.issent);
-      dispatch({ type: RECEIVE_STAGED_EMAILS, json });
+      const json = response.data.filter( email => email.issent );
+      json.map( email => dispatch({ type: RECEIVE_EMAIL, json: email }));
+      return json;
     })
-    .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
+    .catch( message => dispatch({ type: 'GET_SENT_EMAILS_FAIL', message}));
   };
 }

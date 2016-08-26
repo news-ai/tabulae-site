@@ -31,7 +31,8 @@ function PreviewEmailContent({id, to, subject, body, onSendEmailClick, issent}) 
         <p style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</p>
         <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
       </div>
-      <button className='button' onClick={onSendEmailClick}>Send</button>
+      {issent ? null : <button className='button' onClick={onSendEmailClick}>Send</button>}
+
     </div>
     );
 }
