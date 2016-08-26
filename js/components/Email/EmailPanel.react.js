@@ -37,7 +37,11 @@ const injectCssToTags = {
   'p': 'margin: 0;'
 }
 
-alertify.defaults.glossary.title = 'Oops';
+const options = {
+  inlineStyles: {
+    LINK: {element: 'a'}
+  }
+}
 
 class EmailPanel extends Component {
   constructor(props) {

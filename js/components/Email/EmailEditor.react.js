@@ -178,6 +178,9 @@ class EmailEditor extends Component {
       onClick: this.onInlineLinkClick
     }];
 
+    // move out of InlineStyleControls until I am done with the feature
+    // customInlineTypes={customInlineTypes}
+
     return (
       <div>
         <div className='RichEditor-root' style={props.style}>
@@ -191,7 +194,7 @@ class EmailEditor extends Component {
           <InlineStyleControls
               editorState={editorState}
               onToggle={this.toggleInlineStyle}
-              customInlineTypes={customInlineTypes}
+              customInlineTypes={[]}
           />
           <div>
             <Subject
