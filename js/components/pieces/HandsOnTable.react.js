@@ -363,7 +363,7 @@ class HandsOnTable extends Component {
       <div>
         <div className='row' style={styles.buttons.group}>
           <div className='offset-by-ten two columns'>
-            <div style={{ position: 'fixed', top: 200, zIndex: 200}}>
+            <div style={{position: 'fixed', top: 100, zIndex: 200}}>
               <button
               className='button-primary savebutton'
               onClick={ _ => this._onSaveClick(options.data, options.columns)}
@@ -372,8 +372,7 @@ class HandsOnTable extends Component {
             </div>
           </div>
         </div>
-        <div ref='data-grid' style={{marginLeft: '20px', marginRight: '20px'}}>
-        </div>
+        <div ref='data-grid'></div>
       </div>
       );
   }

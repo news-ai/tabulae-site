@@ -279,13 +279,11 @@ class Table extends Component {
               onTitleEdit={state.onTitleEdit}
               />
             </div>
-            <div className='offset-by-ten two columns'>
-              <button className='button' style={{
-                  backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
-                }} onClick={this._toggleEmailPanel}>Email</button>
-            </div>
-            <div className='offset-by-ten two columns'>
-              <ButtonMenu>
+            <div className='offset-by-nine two columns'>
+              <ButtonMenu style={{zIndex: 300, top: 100}}>
+                <button className='button' style={{
+                    backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
+                  }} onClick={this._toggleEmailPanel}>Email</button>
                 <button className='button' style={buttonStyle} onClick={this._updateContacts}>Update Contacts</button>
                 <button
                 className='button'
