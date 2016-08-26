@@ -38,6 +38,7 @@ import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import NewTable from './components/pages/NewTable.react';
 import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
+import { EmailAnalytics } from './components/Email';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';
@@ -79,6 +80,7 @@ ReactDOM.render(
           <Route path='lists/new' name='New Sheet' component={NewTable} />
           <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
           <Route path='archive' name='Archive' component={ArchiveContainer} />
+          <Route path='email' name='Email' component={EmailAnalytics} />
           <Route path='*' component={NotFound} />
         </Route>
       </Router>

@@ -9,7 +9,7 @@ class EmailAnalytics extends Component {
 
   render() {
     return (
-      <div></div>
+      <div>EMAIL ANALYTICS</div>
     );
   }
 }
