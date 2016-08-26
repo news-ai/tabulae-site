@@ -37,6 +37,7 @@ const styleMap = {
   },
 };
 
+alertify.defaults.glossary.title = '';
 function findLinkEntities(contentBlock, callback) {
   contentBlock.findEntityRanges(
     (character) => {

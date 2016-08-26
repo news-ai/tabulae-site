@@ -23,10 +23,21 @@ export function sendEmail(id) {
   };
 }
 
-export function getStagedEmails() {
+function getEmails() {
   return dispatch => {
     return api.get(`/emails`)
-    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response.data }))
+    .then( response => response)
+    .catch( message => message);
+  };
+}
+
+export function getStagedEmails() {
+  return dispatch => {
+    return getEmails()
+    .then( response => {
+      const json = response.data.map( email => !email.issent);
+      dispatch({ type: RECEIVE_STAGED_EMAILS, json });
+    })
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
   };
 }

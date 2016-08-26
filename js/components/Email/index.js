@@ -1,3 +1,3 @@
-import EmailPanel from './EmailPanel.react';
+import EmailPanel from './EmailPanel/EmailPanel.react';
 
 export default EmailPanel;
