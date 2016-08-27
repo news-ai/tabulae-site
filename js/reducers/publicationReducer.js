@@ -20,6 +20,11 @@ function publicationReducer(state = initialState.publicationReducer, action) {
       obj[action.publication.id] = action.publication;
       obj[action.publication.name] = action.publication.id;
       return obj;
+    case publicationConstant.RECEIVE_MULTIPLE:
+      obj.isReceiving = false;
+      obj = assignToEmpty(state, action.publications);
+      obj.received = state.received.concat(action.ids);
+      return obj;
     default:
       return state;
   }

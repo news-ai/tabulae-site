@@ -33,8 +33,8 @@ function CountView({label, count}) {
 function AnalyticsPanel({opened, clicked, to, subject}) {
   return (
     <div className='email-analytics row' style={styles.analytics}>
-      <div className='two columns'><span>{to}</span></div>
-      <div className='two columns'><span>{subject}</span></div>
+      <div className='three columns'><span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span></div>
+      <div className='three columns'><span>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span></div>
       <div className='one columns'>
         <CountView label='Opened' count={opened} />
       </div>

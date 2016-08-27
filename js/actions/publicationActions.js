@@ -16,6 +16,14 @@ export function receivePublication(publication) {
   };
 }
 
+export function receivePublications(publications, ids) {
+  return {
+    type: publicationConstant.RECEIVE_MULTIPLE,
+    publications,
+    ids
+  };
+}
+
 export function fetchPublication(id) {
   return (dispatch, getState) => {
     if (getState().publicationReducer[id]) return;

@@ -323,7 +323,6 @@ class Table extends Component {
 const mapStateToProps = (state, props) => {
   let lastFetchedIndex = -1;
   const listId = parseInt(props.params.listId, 10);
-  const contactIsReceiving = state.contactReducer.isReceiving;
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
   let contacts = [];
@@ -360,7 +359,7 @@ const mapStateToProps = (state, props) => {
     listData: listData,
     contacts: contacts,
     name: listData ? listData.name : null,
-    contactIsReceiving: contactIsReceiving,
+    contactIsReceiving: state.contactReducer.isReceiving,
     pubMapByName: publicationReducer,
     publicationReducer,
     lastFetchedIndex,

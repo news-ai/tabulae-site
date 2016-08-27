@@ -5,7 +5,8 @@ export const initialState = {
   },
   contactReducer: {
     isReceiving: false,
-    didInvalidate: false
+    didInvalidate: false,
+    received: []
   },
   listReducer: {
     isReceiving: false,
@@ -20,7 +21,8 @@ export const initialState = {
   },
   publicationReducer: {
     isReceiving: false,
-    didInvalidate: false
+    didInvalidate: false,
+    received: []
   },
   fileReducer: {
     isReceiving: false,
