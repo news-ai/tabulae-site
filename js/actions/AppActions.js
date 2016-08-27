@@ -17,6 +17,7 @@ export const fetchList = listId => listActions.fetchList(listId);
 export const createNewSheet = (name, contactList) => listActions.createNewSheet(name, contactList);
 export const patchList = (listId, name, contactList, customfields) => listActions.patchList(listId, name, contactList, customfields);
 export const archiveListToggle = listId => listActions.archiveListToggle(listId);
+export const createEmptyList = _ => listActions.createEmptyList();
 
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);

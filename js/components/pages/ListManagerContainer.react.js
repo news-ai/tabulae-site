@@ -42,7 +42,7 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onArchiveToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    newListOnClick: _ => { window.location.href = window.location.origin + '/lists/new'; }
+    newListOnClick: _ => dispatch(actionCreators.createEmptyList())
   };
 };
 

@@ -268,7 +268,6 @@ class Table extends Component {
             title='File Drop'>
               <DropFile
               listId={props.listId}
-              _forceRefresh={this._fetchOperations}
               />
             </SkyLight>
             <div className='seven columns'>

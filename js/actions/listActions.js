@@ -4,6 +4,7 @@ import {
 } from '../constants/AppConstants';
 import * as contactActions from './contactActions';
 import * as api from './api';
+import { browserHistory } from 'react-router';
 
 
 function requestLists() {
@@ -76,7 +77,7 @@ export function fetchLists() {
     dispatch(requestLists());
     return api.get(`/lists`)
     .then( response => dispatch(receiveLists(response.data)))
-    .catch( message => console.log(message));
+    .catch( message => dispatch(requestListsFail(message)));
   };
 }
 
@@ -90,6 +91,21 @@ export function patchList({listId, name, contacts, fieldsmap}) {
     return api.patch(`/lists/${listId}`, listBody)
     .then( response => dispatch(receiveList(response.data)))
     .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));
+  };
+}
+
+export function createEmptyList() {
+  return dispatch => {
+    const listBody = {
+      name: 'untitled',
+      contacts: []
+    };
+    return api.post(`/lists`, listBody)
+    .then(response => {
+      // dispatch(receiveList(response.data));
+      browserHistory.push(`/lists/${response.data.id}`);
+    })
+    .catch(message => console.log(message));
   };
 }
 
