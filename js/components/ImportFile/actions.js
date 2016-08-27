@@ -21,7 +21,7 @@ export function uploadFile(listId, file) {
   return dispatch => {
     dispatch({ type: fileConstant.REQUEST, listId, file});
     return api.postFile(`/lists/${listId}/upload`, file)
-    .then( response => dispatch(receiveFile(response, listId)))
+    .then( response => dispatch(receiveFile(response.data, listId)))
     .catch( message => dispatch({ type: fileConstant.REQUEST_FAIL, message }));
   };
 }
@@ -31,7 +31,7 @@ export function fetchHeaders(listId) {
     const fileId = getState().fileReducer[listId].id;
     dispatch({ type: REQUEST_HEADERS, listId });
     return api.get(`/files/${fileId}/headers`)
-    .then( response => dispatch({ type: RECEIVE_HEADERS, headers: response, listId }))
+    .then( response => dispatch({ type: RECEIVE_HEADERS, headers: response.data, listId }))
     .catch( message => dispatch({ type: 'REQUEST_HEADERS_FAIL', message }));
   };
 }

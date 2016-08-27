@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 
 const styles = {
   analytics: {
-
+    margin: '10px'
   },
   contentBox: {
     border: '1px dotted lightgray',
@@ -29,10 +29,34 @@ function createMarkUp(html) {
   return { __html: html };
 }
 
+const button = {
+  border: '1px solid black',
+  display: 'inline-block',
+  // alignItems: 'center',
+  // justifyContent: 'center',
+  borderRadius: '5px',
+  padding: '2px'
+};
+
+function CountView({label, count}) {
+  return (
+    <div style={button}>
+      <span style={{
+        marginLeft: '3px',
+        marginRight: '3px'
+      }}>{label}</span>
+      <span style={{
+        marginLeft: '3px',
+        marginRight: '3px'
+      }}>{count}</span>
+    </div>
+    );
+}
+
 function AnalyticsPanel({opened, clicked}) {
   return (<div className='email-analytics' style={styles.analytics}>
-    <p>Opened: {opened}</p>
-    <p>Clicked: {clicked}</p>
+    <CountView label='Opened' count={opened} />
+    <CountView label='Clicked' count={clicked} />
   </div>);
 }
 
