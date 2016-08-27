@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import PreviewEmailContent from '../PreviewEmailContent.react';
+import AnalyticsPanel from './AnalyticsPanel.react';
 
 class EmailAnalytics extends Component {
   constructor(props) {
@@ -25,8 +26,11 @@ class EmailAnalytics extends Component {
         {
           state.sentEmails.map( email => {
             return (
-              <PreviewEmailContent
-              {...email} />
+              <div>
+              <AnalyticsPanel {...email} />
+              <PreviewEmailContent {...email} />
+              </div>
+
               )
           })
         }
