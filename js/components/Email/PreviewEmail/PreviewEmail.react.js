@@ -13,7 +13,7 @@ const styles = {
 };
 
 
-function PreviewEmailContent(props) {
+function PreviewEmail(props) {
   const {
       id,
       to,
@@ -35,7 +35,7 @@ function PreviewEmailContent(props) {
 }
 
 
-PreviewEmailContent.PropTypes = {
+PreviewEmail.PropTypes = {
   id: PropTypes.number.isRequired,
   to: PropTypes.string.isRequired,
   subject: PropTypes.string.isRequired,
@@ -48,6 +48,6 @@ PreviewEmailContent.PropTypes = {
   opened: PropTypes.number
 };
 
-export default PreviewEmailContent;
+export default PreviewEmail;
 
 

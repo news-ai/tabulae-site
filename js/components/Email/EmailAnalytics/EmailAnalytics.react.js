@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import PreviewEmailContent from '../PreviewEmailContent.react';
+import StaticEmailContent from '../EmailPreview/StaticEmailContent.react';
 import AnalyticsPanel from './AnalyticsPanel.react';
 
 class EmailAnalytics extends Component {
@@ -28,7 +28,7 @@ class EmailAnalytics extends Component {
             return (
               <div>
               <AnalyticsPanel {...email} />
-              <PreviewEmailContent {...email} />
+              <StaticEmailContent {...email} />
               </div>
 
               )

@@ -29,11 +29,18 @@ function CountView({label, count}) {
     </div>
     );
 }
-function AnalyticsPanel({opened, clicked, to}) {
+
+function AnalyticsPanel({opened, clicked, to, subject}) {
   return (
-    <div className='email-analytics' style={styles.analytics}>
-      <CountView label='Opened' count={opened} />
-      <CountView label='Clicked' count={clicked} />
+    <div className='email-analytics row' style={styles.analytics}>
+      <div className='two columns'><span>{to}</span></div>
+      <div className='two columns'><span>{subject}</span></div>
+      <div className='one columns'>
+        <CountView label='Opened' count={opened} />
+      </div>
+      <div className='one columns'>
+        <CountView label='Clicked' count={clicked} />
+      </div>
     </div>);
 }
 
