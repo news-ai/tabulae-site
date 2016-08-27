@@ -8,7 +8,7 @@ import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
-import PreviewEmailContent from './PreviewEmailContent.react';
+import PreviewEmailContent from '../PreviewEmailContent.react';
 import EmailEditor from './EmailEditor.react';
 
 const styles = {
@@ -37,7 +37,11 @@ const injectCssToTags = {
   'p': 'margin: 0;'
 }
 
-alertify.defaults.glossary.title = 'Oops';
+const options = {
+  inlineStyles: {
+    LINK: {element: 'a'}
+  }
+}
 
 class EmailPanel extends Component {
   constructor(props) {

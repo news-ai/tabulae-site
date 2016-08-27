@@ -7,6 +7,7 @@
     "axios": "^0.9.1",
     "draft-js": "^0.7.0",
     "draft-js-export-html": "git+https://git@github.com/ycp217/draft-js-export-html.git",
+    "draft-js-plugins-editor": "^1.1.0",
     "fontfaceobserver": "^1.5.1",
     "fuzzy": "^0.1.1",
     "handsontable": "^0.26.0",
@@ -14,6 +15,7 @@
     "install": "^0.8.1",
     "isomorphic-fetch": "^2.2.1",
     "json-loader": "^0.5.4",
+    "linkify-it": "^2.0.0",
     "lodash": "^4.13.1",
     "moment": "^2.14.1",
     "moment-timezone": "^0.5.3",
@@ -37,6 +39,7 @@
     "redux": "^3.0.0",
     "redux-router": "^0.1.0",
     "redux-thunk": "^1.0.3",
+    "tlds": "^1.157.0",
     "validator": "^5.5.0",
     "zeroclipboard": "^2.2.0"
   },

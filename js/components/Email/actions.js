@@ -26,7 +26,23 @@ export function sendEmail(id) {
 export function getStagedEmails() {
   return dispatch => {
     return api.get(`/emails`)
-    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response.data }))
+    .then( response => {
+      const json = response.data.filter( email => !email.issent);
+      return dispatch({ type: RECEIVE_STAGED_EMAILS, json });
+    })
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message }));
+  };
+}
+
+export function getSentEmails() {
+  return dispatch => {
+    dispatch({ type: 'GET_SENT_EMAILS' });
+    return api.get(`/emails`)
+    .then( response => {
+      const json = response.data.filter( email => email.issent );
+      json.map( email => dispatch({ type: RECEIVE_EMAIL, json: email }));
+      return json;
+    })
+    .catch( message => dispatch({ type: 'GET_SENT_EMAILS_FAIL', message}));
   };
 }

@@ -7,7 +7,7 @@ import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
 
-import EmailPanel from '../Email';
+import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
