@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
-import StaticEmailContent from '../EmailPreview/StaticEmailContent.react';
+import StaticEmailContent from '../PreviewEmail/StaticEmailContent.react';
 import AnalyticsPanel from './AnalyticsPanel.react';
 
 class EmailAnalytics extends Component {
@@ -24,11 +24,11 @@ class EmailAnalytics extends Component {
       <div>
         <span>EMAIL ANALYTICS</span>
         {
-          state.sentEmails.map( email => {
+          state.sentEmails.map( (email, i) => {
             return (
-              <div>
-              <AnalyticsPanel {...email} />
-              <StaticEmailContent {...email} />
+              <div key={i}>
+                <AnalyticsPanel {...email} />
+                <StaticEmailContent {...email} />
               </div>
 
               )
