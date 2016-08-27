@@ -24,13 +24,20 @@ export function receivePublications(publications, ids) {
   };
 }
 
+function requestPublicationFail(message) {
+  return {
+    type: publicationConstant.REQUEST_FAIL,
+    message
+  };
+}
+
 export function fetchPublication(id) {
   return (dispatch, getState) => {
     if (getState().publicationReducer[id]) return;
     dispatch(requestPublication());
     return api.get(`/publications/${id}`)
     .then( response => dispatch(receivePublication(response.data)))
-    .catch( message => console.log(message));
+    .catch( message => dispatch(requestPublicationFail(message)));
   };
 }
 
@@ -42,6 +49,6 @@ export function createPublication(data) {
       dispatch(receivePublication(response.data));
       return response;
     })
-    .catch( message => console.log(message));
+    .catch( message => dispatch(requestPublicationFail(message)));
   };
 }

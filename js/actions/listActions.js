@@ -1,6 +1,4 @@
 import {
-  REQUEST_LISTS,
-  RECEIVE_LISTS,
   ARCHIVE_LIST,
   listConstant,
 } from '../constants/AppConstants';
@@ -10,7 +8,7 @@ import * as api from './api';
 
 function requestLists() {
   return {
-    type: REQUEST_LISTS
+    type: listConstant.REQUEST
   };
 }
 
@@ -23,7 +21,7 @@ function requestList(listId) {
 
 function receiveLists(lists) {
   return {
-    type: RECEIVE_LISTS,
+    type: listConstant.RECEIVE_MULTIPLE,
     lists
   };
 }
@@ -32,6 +30,20 @@ function receiveList(list) {
   return {
     type: listConstant.RECEIVE,
     list
+  };
+}
+
+function requestListFail(message) {
+  return {
+    type: listConstant.REQUEST_FAIL,
+    message
+  };
+}
+
+function requestListsFail(message) {
+  return {
+    type: listConstant.REQUEST_MULTIPLE_FAIL,
+    message
   };
 }
 
