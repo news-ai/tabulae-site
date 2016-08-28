@@ -2,7 +2,6 @@ import {
   ARCHIVE_LIST,
   listConstant,
 } from '../constants/AppConstants';
-import * as contactActions from './contactActions';
 import * as api from './api';
 import { browserHistory } from 'react-router';
 
@@ -109,23 +108,6 @@ export function createEmptyList() {
   };
 }
 
-export function createNewSheet(name, contactList) {
-  return dispatch =>
-  dispatch(contactActions.addContacts(contactList))
-  .then( json => {
-    const contacts = json.map( contact => contact.id );
-    const listBody = {
-      name: name,
-      contacts: contacts
-    };
-    return api.post(`/lists`, listBody)
-    .then( response => {
-      dispatch(receiveList(response.data));
-      window.location.href = `${window.location.origin}/lists/${response.data.id}`;
-    })
-    .catch( message => console.log(message));
-  });
-}
 
 export function archiveListToggle(listId) {
   return (dispatch, getState) => {

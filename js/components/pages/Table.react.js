@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import SkyLight from 'react-skylight';
 import { withRouter } from 'react-router';
 import Radium from 'radium';
+import SkyLight from 'react-skylight';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
+
+import Paper from 'material-ui/Paper';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
+import Popover from 'material-ui/Popover';
 
 import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -13,6 +18,7 @@ import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../pieces/Waiting.react.js';
+
 
 const styles = {
   nameBlock: {
@@ -50,6 +56,11 @@ const styles = {
   }
 };
 
+const paperStyle = {
+  display: 'inline-block',
+  float: 'left',
+  margin: '16px 32px 16px 0', 
+}
 
 
 class Table extends Component {
@@ -63,8 +74,10 @@ class Table extends Component {
       selectedContacts: [],
       isSaved: true, // table without change
       person: null,
-      lastSavedAt: null
+      lastSavedAt: null,
+      isMenuOpen: false
     }
+    this.toggleMenu = _ => this.setState({isMenuOpen: !this.state.isMenuOpen});
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
     this._onUpdateName = e => this.setState({ name: e.target.value.substr(0, 140) });
@@ -252,6 +265,17 @@ class Table extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+      /*<ButtonMenu style={{zIndex: 300, top: 100}}>
+                <button className='button' style={{
+                    backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
+                  }} onClick={this._toggleEmailPanel}>Email</button>
+                <button className='button' style={buttonStyle} onClick={this._updateContacts}>Update Contacts</button>
+                <button
+                className='button'
+                style={buttonStyle}
+                onClick={ _ => this.refs.input.show() }>
+                Upload from File</button>
+              </ButtonMenu>*/
 
     return (
       <div>
@@ -278,18 +302,22 @@ class Table extends Component {
               isTitleEditing={state.isTitleEditing}
               />
             </div>
-            <div className='offset-by-nine two columns'>
-              <ButtonMenu style={{zIndex: 300, top: 100}}>
-                <button className='button' style={{
-                    backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
-                  }} onClick={this._toggleEmailPanel}>Email</button>
-                <button className='button' style={buttonStyle} onClick={this._updateContacts}>Update Contacts</button>
-                <button
-                className='button'
-                style={buttonStyle}
-                onClick={ _ => this.refs.input.show() }>
-                Upload from File</button>
-              </ButtonMenu>
+            <div className='offset-by-seven two columns'>
+            <Popover
+            open={state.isMenuOpen}
+            onRequestClose={this.toggleMenu}
+            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+            >
+              <Paper style={paperStyle}>
+                <Menu>
+                  <MenuItem primaryText='Maps' />
+                  <MenuItem primaryText="Books" />
+                  <MenuItem primaryText="Flights" />
+                  <MenuItem primaryText="Apps" />
+                </Menu>
+              </Paper>
+            </Popover>
             </div>
           </div>
           {
