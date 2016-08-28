@@ -15,7 +15,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../pieces/Waiting.react.js';
@@ -74,7 +73,6 @@ class Table extends Component {
     this.onMenuTouchTap = e => {
       e.preventDefault();
       this.setState({isMenuOpen: true, anchorEl: e.currentTarget});
-    };
     this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
