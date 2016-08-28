@@ -9,6 +9,7 @@ import validator from 'validator';
 import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
 import { fromJS, List } from 'immutable';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import 'node_modules/handsontable/dist/handsontable.full.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -364,10 +365,11 @@ class HandsOnTable extends Component {
         <div className='row' style={styles.buttons.group}>
           <div className='offset-by-ten two columns'>
             <div style={{position: 'fixed', top: 100, zIndex: 200}}>
-              <button
-              className='button-primary savebutton'
+              <RaisedButton
+              primary
+              label='Save'
               onClick={ _ => this._onSaveClick(options.data, options.columns)}
-              >Save</button>
+              />
               <p style={{fontSize: '0.8em'}}>{this.props.lastSavedAt}</p>
             </div>
           </div>

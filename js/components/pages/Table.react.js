@@ -11,6 +11,7 @@ import Paper from 'material-ui/Paper';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -56,13 +57,6 @@ const styles = {
   }
 };
 
-const paperStyle = {
-  display: 'inline-block',
-  float: 'left',
-  margin: '16px 32px 16px 0', 
-}
-
-
 class Table extends Component {
   constructor(props) {
     super(props);
@@ -70,18 +64,22 @@ class Table extends Component {
     this.state = {
       name: null,
       isTitleEditing: false,
-      emailPanelOpen: false,
+      isEmailPanelOpen: false,
       selectedContacts: [],
       isSaved: true, // table without change
       person: null,
       lastSavedAt: null,
       isMenuOpen: false
     }
-    this.toggleMenu = _ => this.setState({isMenuOpen: !this.state.isMenuOpen});
+    this.onMenuTouchTap = e => {
+      e.preventDefault();
+      this.setState({isMenuOpen: true, anchorEl: e.currentTarget});
+    };
+    this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
     this._onUpdateName = e => this.setState({ name: e.target.value.substr(0, 140) });
-    this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
+    this.toggleEmailPanel = _ => this.setState({ isEmailPanelOpen: !this.state.isEmailPanelOpen });
     this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
     this._handleNormalField = this._handleNormalField.bind(this);
@@ -265,18 +263,7 @@ class Table extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-      /*<ButtonMenu style={{zIndex: 300, top: 100}}>
-                <button className='button' style={{
-                    backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
-                  }} onClick={this._toggleEmailPanel}>Email</button>
-                <button className='button' style={buttonStyle} onClick={this._updateContacts}>Update Contacts</button>
-                <button
-                className='button'
-                style={buttonStyle}
-                onClick={ _ => this.refs.input.show() }>
-                Upload from File</button>
-              </ButtonMenu>*/
-
+    
     return (
       <div>
       <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
@@ -303,25 +290,25 @@ class Table extends Component {
               />
             </div>
             <div className='offset-by-seven two columns'>
-            <Popover
-            open={state.isMenuOpen}
-            onRequestClose={this.toggleMenu}
-            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-            >
-              <Paper style={paperStyle}>
+              <RaisedButton
+              onClick={this.onMenuTouchTap}
+              label='Utilities' />
+              <Popover
+              open={state.isMenuOpen}
+              anchorEl={state.anchorEl}
+              onRequestClose={this.handleRequestMenuClose}
+              anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+              targetOrigin={{horizontal: 'left', vertical: 'top'}}
+              >
                 <Menu>
-                  <MenuItem primaryText='Maps' />
-                  <MenuItem primaryText="Books" />
-                  <MenuItem primaryText="Flights" />
-                  <MenuItem primaryText="Apps" />
+                  <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
+                  <MenuItem primaryText='Upload from File' onClick={_ => this.refs.input.show()} />
                 </Menu>
-              </Paper>
-            </Popover>
+              </Popover>
             </div>
           </div>
           {
-            state.emailPanelOpen ? 
+            state.isEmailPanelOpen ? 
             <EmailPanel
             person={props.person}
             selectedContacts={state.selectedContacts}
