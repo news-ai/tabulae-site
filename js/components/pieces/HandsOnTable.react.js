@@ -35,11 +35,22 @@ alertify.defaults.glossary.title = '';
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
+    const {dispatch} = this.props;
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
     this._changeColumnName = this._changeColumnName.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
+    COLUMNS.push({
+      data: 'autocomplete',
+      type: 'autocomplete',
+      title: 'autocomplete',
+      source: (query, callback) => {
+        dispatch(actionCreators.searchPublications(query))
+        .then(publicationNameArray => callback(publicationNameArray));
+      },
+      strict: false
+    });
     this.state = {
       addedRow: false,
       update: false,
@@ -48,6 +59,7 @@ class HandsOnTable extends Component {
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
       dirtyRows: [],
+      preservedColumns: COLUMNS,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
@@ -77,7 +89,7 @@ class HandsOnTable extends Component {
         },
         contextMenu: {
           callback: (key, options) => {
-            const { dispatch, listData } = this.props;
+            const {listData} = this.props;
             if (key === 'insert_row_above') {
               const index = options.start.row;
               dispatch(actionCreators.addContacts([{ }]))
@@ -183,7 +195,7 @@ class HandsOnTable extends Component {
 
   componentDidMount() {
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
-    this.table.updateSettings({
+    const options = {
       beforeChange: (changes, source) => {
         for (let i = changes.length - 1; i >= 0; i--) {
           if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
@@ -211,7 +223,7 @@ class HandsOnTable extends Component {
             }
           });
 
-          this.setState({ dirtyRows });
+          this.setState({dirtyRows});
         }
       },
       afterChange: (changes, source) => {
@@ -237,7 +249,8 @@ class HandsOnTable extends Component {
           if (!contactIsReceiving) dispatch(actionCreators.fetchContacts(listId));
         }
       }
-    });
+    };
+    this.table.updateSettings(options);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -249,7 +262,7 @@ class HandsOnTable extends Component {
 
     if (!_.isEmpty(listData.contacts)) {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
-        let columns = _.cloneDeep(COLUMNS);
+        let columns = _.cloneDeep(this.state.preservedColumns);
         fieldsmap.map( fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({ data: fieldObj.value, title: fieldObj.name });
         });

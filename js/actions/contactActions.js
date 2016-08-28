@@ -8,9 +8,9 @@ import * as publicationActions from './publicationActions';
 
 import { normalize, Schema, arrayOf } from 'normalizr';
 
-const contact = new Schema('contacts');
+const contactSchema = new Schema('contacts');
 const list = new Schema('lists');
-const publication = new Schema('publications');
+const publicationSchema = new Schema('publications');
 
 function requestContact() {
   return {
@@ -70,7 +70,6 @@ export function fetchPaginatedContacts(listId) {
     if (getState().listReducer[listId].contacts === null) return;
     dispatch(requestContact());
     const offset = getState().listReducer[listId].offset;
-    console.log(offset);
     return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${offset}`)
     .then( response => {
       const newOffset = offset + PAGE_LIMIT;
@@ -80,8 +79,8 @@ export function fetchPaginatedContacts(listId) {
         listId
       });
       const res = normalize(response, {
-        data: arrayOf(contact),
-        included: arrayOf(publication)
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
       });
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
       dispatch(receiveContacts(res.entities.contacts, res.result.data));

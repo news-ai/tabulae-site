@@ -22,6 +22,7 @@ export const initialState = {
   publicationReducer: {
     isReceiving: false,
     didInvalidate: false,
+    publicationMapByName: {},
     received: []
   },
   fileReducer: {

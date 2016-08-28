@@ -55,7 +55,7 @@ export function listLastUsed() {
 }
 
 function requestListFail(message) {
-  window.location.href = `${window.location.origin}/NotFound`;
+  // window.location.href = `${window.location.origin}/NotFound`;
   return {
     type: listConstant.REQUEST_FAIL,
     message

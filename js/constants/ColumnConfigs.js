@@ -1,6 +1,9 @@
 import validator from 'validator';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import { multiselectRenderer } from 'constants/CustomRenderers';
+import * as api from '../actions/api';
+import * as publicationActions from '../actions/publicationActions';
+import { dispatch } from 'redux';
 
 function _onInvalid(value, callback, validate) {
   if (value.length === 0 || validate(value)) callback(true);
@@ -37,7 +40,7 @@ export const COLUMNS = [
   },
   {
     data: 'employerString',
-    title: 'Employer(s)',
+    title: 'Publication(s)',
     strict: false,
     renderer: multiselectRenderer,
     pass: false
@@ -48,7 +51,6 @@ export const COLUMNS = [
     validator: (value, callback) => _onInvalid(value, callback, validator.isURL),
     allowInvalid: true,
     invalidCellClass: 'invalid-cell',
-    pass: true
   },
   {
     data: 'twitter',
