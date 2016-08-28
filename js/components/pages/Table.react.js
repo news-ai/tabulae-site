@@ -58,7 +58,7 @@ class Table extends Component {
     const { listData } = this.props;
     this.state = {
       name: null,
-      onTitleEdit: false,
+      isTitleEditing: false,
       emailPanelOpen: false,
       selectedContacts: [],
       isSaved: true, // table without change
@@ -66,8 +66,8 @@ class Table extends Component {
       lastSavedAt: null
     }
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
-    this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
+    this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
+    this._onUpdateName = e => this.setState({ name: e.target.value.substr(0, 140) });
     this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
     this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
@@ -273,9 +273,9 @@ class Table extends Component {
             <div className='seven columns'>
               <ToggleableEditInput
               name={state.name}
-              updateName={this._updateName}
-              toggleTitleEdit={this._toggleTitleEdit}
-              onTitleEdit={state.onTitleEdit}
+              onUpdateName={this._onUpdateName}
+              onToggleTitleEdit={this._onToggleTitleEdit}
+              isTitleEditing={state.isTitleEditing}
               />
             </div>
             <div className='offset-by-nine two columns'>

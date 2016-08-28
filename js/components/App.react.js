@@ -47,10 +47,10 @@ class App extends Component {
   }
 
   render() {
-    const { isLogin, logoutClick, person } = this.props;
+    const props = this.props;
     return (
       <div className='wrapper'>
-      { isLogin ?
+      {props.isLogin ?
         <div>
           <Navigation>
             <div className='offset-by-one two columns'>
@@ -58,17 +58,17 @@ class App extends Component {
             </div>
             <div className='seven columns'>
               <Breadcrumbs
-              routes={this.props.routes}
-              params={this.props.params}
+              routes={props.routes}
+              params={props.params}
               separator=' > '
               />
             </div>
             <div className='three columns'>
-              <button onClick={logoutClick}>Logout</button>
+              <button onClick={props.logoutClick}>Logout</button>
             </div>
           </Navigation>
           <div>
-          {this.props.children}
+          {props.children}
           </div>
         </div> :
       <Login />
