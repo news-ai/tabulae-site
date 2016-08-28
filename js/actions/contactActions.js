@@ -70,7 +70,8 @@ export function fetchPaginatedContacts(listId) {
     if (getState().listReducer[listId].contacts === null) return;
     dispatch(requestContact());
     const offset = getState().listReducer[listId].offset;
-    return api.get(`/lists/${listId}/contacts/?limit=${PAGE_LIMIT}&offset=${offset}`)
+    console.log(offset);
+    return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${offset}`)
     .then( response => {
       const newOffset = offset + PAGE_LIMIT;
       dispatch({

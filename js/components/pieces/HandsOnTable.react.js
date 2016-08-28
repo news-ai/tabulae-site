@@ -368,6 +368,7 @@ class HandsOnTable extends Component {
               <RaisedButton
               primary
               label='Save'
+              labelStyle={{textTransform: 'none'}}
               onClick={ _ => this._onSaveClick(options.data, options.columns)}
               />
               <p style={{fontSize: '0.8em'}}>{this.props.lastSavedAt}</p>

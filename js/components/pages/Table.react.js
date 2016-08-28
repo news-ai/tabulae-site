@@ -7,7 +7,6 @@ import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
 
-import Paper from 'material-ui/Paper';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
@@ -23,7 +22,7 @@ import Waiting from '../pieces/Waiting.react.js';
 const styles = {
   nameBlock: {
     parent: {
-      margin: '15px',
+      marginTop: '40px',
     },
     title: {
       marginLeft: '5px',
@@ -73,6 +72,7 @@ class Table extends Component {
     this.onMenuTouchTap = e => {
       e.preventDefault();
       this.setState({isMenuOpen: true, anchorEl: e.currentTarget});
+    }
     this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
@@ -279,18 +279,25 @@ class Table extends Component {
               listId={props.listId}
               />
             </SkyLight>
-            <div className='seven columns'>
-              <ToggleableEditInput
-              name={state.name}
-              onUpdateName={this._onUpdateName}
-              onToggleTitleEdit={this._onToggleTitleEdit}
-              isTitleEditing={state.isTitleEditing}
-              />
+            <div className='six columns'>
+              <div>
+                <ToggleableEditInput
+                name={state.name}
+                onUpdateName={this._onUpdateName}
+                onToggleTitleEdit={this._onToggleTitleEdit}
+                isTitleEditing={state.isTitleEditing}
+                />
+              </div>
             </div>
-            <div className='offset-by-seven two columns'>
-              <RaisedButton
-              onClick={this.onMenuTouchTap}
-              label='Utilities' />
+            <div className='offset-by-eight two columns'>
+              <div style={{position: 'fixed', top: 100, zIndex: 200}}>
+                <RaisedButton
+                labelStyle={{textTransform: 'none'}}
+                onClick={this.onMenuTouchTap}
+                label='Utilities'
+                icon={<i className='fa fa-cog' aria-hidden='true' />}
+                />
+              </div>
               <Popover
               open={state.isMenuOpen}
               anchorEl={state.anchorEl}
@@ -313,6 +320,7 @@ class Table extends Component {
             customfields={props.listData.customfields}
             /> : null
           }
+          <div style={{marginTop: '10px'}}>
             <HandsOnTable
             {...props}
             lastSavedAt={state.lastSavedAt}
@@ -325,6 +333,7 @@ class Table extends Component {
             lastFetchedIndex={props.lastFetchedIndex}
             isDirty={this._isDirty}
             />
+          </div>
         </div> : null
       }
       </div>

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -17,7 +18,12 @@ class ListManagerContainer extends Component {
     return (
       <div className='container'>
         <Lists {...this.props} />
-        <button onClick={this.props.newListOnClick}>Add New List</button>
+        <RaisedButton
+        label='Add New List'
+        onClick={this.props.newListOnClick}
+        labelStyle={{textTransform: 'none'}}
+        icon={<i className='fa fa-plus' aria-hidden='true' />}
+        />
       </div>
       );
   }

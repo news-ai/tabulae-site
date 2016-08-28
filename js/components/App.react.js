@@ -4,6 +4,7 @@ import * as actionCreators from 'actions/AppActions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import Navigation from './pieces/Navigation.react';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class App extends Component {
   constructor(props) {
@@ -64,7 +65,7 @@ class App extends Component {
               />
             </div>
             <div className='three columns'>
-              <button onClick={props.logoutClick}>Logout</button>
+              <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
             </div>
           </Navigation>
           <div>
