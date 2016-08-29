@@ -41,16 +41,32 @@ class HandsOnTable extends Component {
     this._changeColumnName = this._changeColumnName.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
-    COLUMNS.push({
-      data: 'autocomplete',
-      type: 'autocomplete',
-      title: 'autocomplete',
-      source: (query, callback) => {
-        dispatch(actionCreators.searchPublications(query))
-        .then(publicationNameArray => callback(publicationNameArray));
-      },
-      strict: false
-    });
+    if (!COLUMNS.some( col => col.data === 'publicationName_1')) {
+      COLUMNS.push({
+        data: 'publicationName_1',
+        type: 'autocomplete',
+        title: 'Publication 1',
+        source: (query, callback) => {
+          // dispatch(actionCreators.searchPublications(query))
+          // .then(publicationNameArray => callback(publicationNameArray));
+          callback([]);
+        },
+        strict: false
+      });
+    }
+    if (!COLUMNS.some( col => col.data === 'publicationName_2')) {
+      COLUMNS.push({
+        data: 'publicationName_2',
+        type: 'autocomplete',
+        title: 'Publication 2',
+        source: (query, callback) => {
+          // dispatch(actionCreators.searchPublications(query))
+          // .then(publicationNameArray => callback(publicationNameArray));
+          callback([]);
+        },
+        strict: false
+      });
+    }
     this.state = {
       addedRow: false,
       update: false,
@@ -200,8 +216,6 @@ class HandsOnTable extends Component {
         for (let i = changes.length - 1; i >= 0; i--) {
           if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
         }
-        // console.log(changes);
-        // console.log(source);
 
         if (!this.props.isNew) {
           // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]

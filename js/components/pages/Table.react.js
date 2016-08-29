@@ -160,24 +160,24 @@ class Table extends Component {
   }
 
   _createPublicationPromises(localData, colHeaders) {
-    const { publicationReducer, dispatch } = this.props;
-    let promises = [];
-    localData.map( row => {
-      colHeaders.map( header => {
-        const name = header.data;
-        if (!_.isEmpty(row[name])) {
-          // only columns labeled as pass can send data to api
-          if (!header.pass && name === 'employerString') {
-              const employerNames = row[name].split(',');
-              const createPubNameList = employerNames.filter( eName => !publicationReducer[eName]);
-              createPubNameList.map( eName =>
-                promises.push(dispatch(actionCreators.createPublication({ name: eName })))
-                );
-          }
-        }
-      });
-    });
-    return promises;
+    // const { publicationReducer, dispatch } = this.props;
+    // let promises = [];
+    // localData.map( row => {
+    //   colHeaders.map( header => {
+    //     const name = header.data;
+    //     if (!_.isEmpty(row[name])) {
+    //       // only columns labeled as pass can send data to api
+    //       if (!header.pass && name === 'employerString') {
+    //           const employerNames = row[name].split(',');
+    //           const createPubNameList = employerNames.filter( eName => !publicationReducer[eName]);
+    //           createPubNameList.map( eName =>
+    //             promises.push(dispatch(actionCreators.createPublication({ name: eName })))
+    //             );
+    //       }
+    //     }
+    //   });
+    // });
+    // return promises;
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
@@ -246,15 +246,15 @@ class Table extends Component {
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
     console.log('SAVE CLICKED');
-    if (dirtyRows.length === 0) {
+    // if (dirtyRows.length === 0) {
       this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-    } else {
-      // create publications for later usage
-      Promise.all(this._createPublicationPromises(localData, colHeaders))
-      .then( _ => {
-        this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-      });
-    }
+    // } else {
+    //   // create publications for later usage
+    //   Promise.all(this._createPublicationPromises(localData, colHeaders))
+    //   .then( _ => {
+    //     this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
+    //   });
+    // }
     this.setState({ isSaved: true });
   }
 
@@ -360,19 +360,29 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  // make employerString for table renderer
-  contacts.map( (contact, i) => {
+  const contactWithEmployers = contacts.map(contact => {
     if (!_.isEmpty(contact.employers)) {
-      // generate string to be rendered by custom cell in table
-      const employerString = contact.employers
-      .filter( employerId => publicationReducer[employerId])
-      .map( eId => {
-        const name = publicationReducer[eId].name;
-        return name;
-      }).join(',');
-      contacts[i].employerString = employerString;
+      contact.employers.map((id, i) => {
+        if (publicationReducer[id]) contact[`publicationName_${i + 1}`] = publicationReducer[id].name;
+      });
     }
-  })
+    return contact;
+  });
+  console.log(contactWithEmployers);
+
+  // // make employerString for table renderer
+  // contacts.map( (contact, i) => {
+  //   if (!_.isEmpty(contact.employers)) {
+  //     // generate string to be rendered by custom cell in table
+  //     const employerString = contact.employers
+  //     .filter( employerId => publicationReducer[employerId])
+  //     .map( eId => {
+  //       const name = publicationReducer[eId].name;
+  //       return name;
+  //     }).join(',');
+  //     contacts[i].employerString = employerString;
+  //   }
+  // })
 
   return {
     listId: listId,
