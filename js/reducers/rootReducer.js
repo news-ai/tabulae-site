@@ -10,6 +10,7 @@ import listReducer from './listReducer';
 import stagingReducer from '../components/Email/reducer';
 import publicationReducer from './publicationReducer';
 import fileReducer from '../components/ImportFile/reducer';
+import templateReducer from '../components/Email/Template/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
   listReducer,
   stagingReducer,
   publicationReducer,
-  fileReducer
+  fileReducer,
+  templateReducer
 });
 
 export default rootReducer;

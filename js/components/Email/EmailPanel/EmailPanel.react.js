@@ -16,6 +16,8 @@ import Popover from 'material-ui/Popover';
 import MenuItem from 'material-ui/MenuItem';
 import Menu from 'material-ui/Menu';
 
+import PopoverMenu from '../../pieces/PopoverMenu.react';
+
 const styles = {
   emailPanelWrapper: {
     display: 'flex',
