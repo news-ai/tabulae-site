@@ -36,9 +36,10 @@ import App from './components/App.react';
 import ListManagerContainer from './components/pages/ListManagerContainer.react';
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
-import NewTable from './components/pages/NewTable.react';
 import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
 import { EmailAnalytics } from './components/Email';
+
+import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';
@@ -71,19 +72,20 @@ if (module.hot) {
 const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
 
 ReactDOM.render(
-  <Provider store={store}>
-      <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
-        <Route path='/' name='Home' component={App}>
-          <IndexRoute component={ListManagerContainer} />
-            <Route path='lists' name='List Manager' component={ListManagerContainer}>
+  <MultiThemeProvider>
+    <Provider store={store}>
+        <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
+          <Route path='/' name='Home' component={App}>
+            <IndexRoute component={ListManagerContainer} />
+              <Route path='lists' name='List Manager' component={ListManagerContainer}>
+            </Route>
+            <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
+            <Route path='archive' name='Archive' component={ArchiveContainer} />
+            <Route path='email' name='Email' component={EmailAnalytics} />
+            <Route path='*' component={NotFound} />
           </Route>
-          <Route path='lists/new' name='New Sheet' component={NewTable} />
-          <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
-          <Route path='archive' name='Archive' component={ArchiveContainer} />
-          <Route path='email' name='Email' component={EmailAnalytics} />
-          <Route path='*' component={NotFound} />
-        </Route>
-      </Router>
-    </Provider>,
+        </Router>
+      </Provider>
+    </MultiThemeProvider>,
   document.getElementById('app')
 );

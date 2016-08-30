@@ -4,6 +4,7 @@ import * as actionCreators from 'actions/AppActions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import Navigation from './pieces/Navigation.react';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class App extends Component {
   constructor(props) {
@@ -47,10 +48,10 @@ class App extends Component {
   }
 
   render() {
-    const { isLogin, logoutClick, person } = this.props;
+    const props = this.props;
     return (
       <div className='wrapper'>
-      { isLogin ?
+      {props.isLogin ?
         <div>
           <Navigation>
             <div className='offset-by-one two columns'>
@@ -58,17 +59,17 @@ class App extends Component {
             </div>
             <div className='seven columns'>
               <Breadcrumbs
-              routes={this.props.routes}
-              params={this.props.params}
+              routes={props.routes}
+              params={props.params}
               separator=' > '
               />
             </div>
             <div className='three columns'>
-              <button onClick={logoutClick}>Logout</button>
+              <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
             </div>
           </Navigation>
           <div>
-          {this.props.children}
+          {props.children}
           </div>
         </div> :
       <Login />

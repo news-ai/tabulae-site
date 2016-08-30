@@ -1,16 +1,14 @@
 import {
-  REQUEST_LISTS,
-  RECEIVE_LISTS,
   ARCHIVE_LIST,
   listConstant,
 } from '../constants/AppConstants';
-import * as contactActions from './contactActions';
 import * as api from './api';
+import { browserHistory } from 'react-router';
 
 
 function requestLists() {
   return {
-    type: REQUEST_LISTS
+    type: listConstant.REQUEST
   };
 }
 
@@ -23,7 +21,7 @@ function requestList(listId) {
 
 function receiveLists(lists) {
   return {
-    type: RECEIVE_LISTS,
+    type: listConstant.RECEIVE_MULTIPLE,
     lists
   };
 }
@@ -35,6 +33,20 @@ function receiveList(list) {
   };
 }
 
+function requestListFail(message) {
+  return {
+    type: listConstant.REQUEST_FAIL,
+    message
+  };
+}
+
+function requestListsFail(message) {
+  return {
+    type: listConstant.REQUEST_MULTIPLE_FAIL,
+    message
+  };
+}
+
 export function listLastUsed() {
   return {
     type: listConstant.LAST_USED,
@@ -43,7 +55,7 @@ export function listLastUsed() {
 }
 
 function requestListFail(message) {
-  window.location.href = `${window.location.origin}/NotFound`;
+  // window.location.href = `${window.location.origin}/NotFound`;
   return {
     type: listConstant.REQUEST_FAIL,
     message
@@ -64,7 +76,7 @@ export function fetchLists() {
     dispatch(requestLists());
     return api.get(`/lists`)
     .then( response => dispatch(receiveLists(response.data)))
-    .catch( message => console.log(message));
+    .catch( message => dispatch(requestListsFail(message)));
   };
 }
 
@@ -81,23 +93,21 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   };
 }
 
-export function createNewSheet(name, contactList) {
-  return dispatch =>
-  dispatch(contactActions.addContacts(contactList))
-  .then( json => {
-    const contacts = json.map( contact => contact.id );
+export function createEmptyList() {
+  return dispatch => {
     const listBody = {
-      name: name,
-      contacts: contacts
+      name: 'untitled',
+      contacts: []
     };
     return api.post(`/lists`, listBody)
-    .then( response => {
-      dispatch(receiveList(response.data));
-      window.location.href = `${window.location.origin}/lists/${response.data.id}`;
+    .then(response => {
+      // dispatch(receiveList(response.data));
+      browserHistory.push(`/lists/${response.data.id}`);
     })
-    .catch( message => console.log(message));
-  });
+    .catch(message => console.log(message));
+  };
 }
+
 
 export function archiveListToggle(listId) {
   return (dispatch, getState) => {

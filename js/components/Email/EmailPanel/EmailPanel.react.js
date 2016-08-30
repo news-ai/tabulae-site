@@ -8,7 +8,7 @@ import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
-import PreviewEmailContent from '../PreviewEmailContent.react';
+import PreviewEmail from '../PreviewEmail';
 import EmailEditor from './EmailEditor.react';
 
 const styles = {
@@ -186,7 +186,7 @@ class EmailPanel extends Component {
                 if (email.body.length === 0 || email.issent) return null;
                 return (
                   <div>
-                    <PreviewEmailContent
+                    <PreviewEmail
                     key={i}
                     {...email}
                     sendEmail={ _ => this._onSendEmailClick(email.id)}

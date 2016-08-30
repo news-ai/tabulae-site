@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import { globalStyles } from 'constants/StyleConstants';
 import Radium from 'radium';
+import {listPropTypes} from 'constants/CommonPropTypes';
 
 const styles = {
   parent: {
@@ -20,7 +21,7 @@ const styles = {
   }
 };
 
-function ListItem({list, key, onArchiveToggle, iconName}) {
+function ListItem({list, key, onToggle, iconName}) {
   return (
     <div className='row' style={[styles.parent]} key={key}>
       <div className='six columns'>
@@ -34,14 +35,19 @@ function ListItem({list, key, onArchiveToggle, iconName}) {
         key={key}
         className={iconName}
         style={[globalStyles.icon]}
-        onClick={ _ => onArchiveToggle(list.id) }
+        onClick={ _ => onToggle(list.id) }
         aria-hidden='true'></i>
       </div>
     </div>
     );
 }
 
+
 ListItem.PropTypes = {
+  list: listPropTypes.isRequired,
+  key: PropTypes.number,
+  onToggle: PropTypes.func.isRequired,
+  iconName: PropTypes.string.isRequired
 };
 
 export default Radium(ListItem);

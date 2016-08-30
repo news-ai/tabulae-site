@@ -1,5 +1,5 @@
 import Radium from 'radium';
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
 
 const styles = {
   nameBlock: {
@@ -20,18 +20,17 @@ const styles = {
   }
 };
 
-function ToggleableEditInput({ onTitleEdit, toggleTitleEdit, updateName, name}) {
-  if (onTitleEdit) return (
+function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, name}) {
+  const renderNode = isTitleEditing ? (
     <input
     className='u-full-width'
     type='text'
-    onBlur={toggleTitleEdit}
+    onBlur={onToggleTitleEdit}
     value={name}
-    onChange={updateName}
+    onChange={onUpdateName}
     autoFocus
-    />);
-  else return (
-    <div onClick={toggleTitleEdit}>
+    />) : (
+    <div onClick={onToggleTitleEdit}>
       <span
       style={[styles.nameBlock.title]}
       >{name}</span>
@@ -41,6 +40,14 @@ function ToggleableEditInput({ onTitleEdit, toggleTitleEdit, updateName, name}) 
       aria-hidden='true'></i>
     </div>
     );
+  return renderNode;
 }
+
+ToggleableEditInput.PropTypes = {
+  isTitleEditing: PropTypes.bool.isRequired,
+  onToggleTitleEdit: PropTypes.func.isRequired,
+  onUpdateName: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired
+};
 
 export default Radium(ToggleableEditInput);

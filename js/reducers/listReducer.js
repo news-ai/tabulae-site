@@ -1,6 +1,4 @@
 import {
-  REQUEST_LISTS,
-  RECEIVE_LISTS,
   listConstant,
   SET_OFFSET
 } from '../constants/AppConstants';
@@ -12,8 +10,6 @@ import _ from 'lodash';
 
 const types = _.values(listConstant);
 types.push(
-  REQUEST_LISTS,
-  RECEIVE_LISTS,
   SET_OFFSET
   );
 
@@ -23,10 +19,10 @@ function listReducer(state = initialState.listReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
-    case REQUEST_LISTS:
+    case listConstant.REQUEST_MULTIPLE:
       obj.isReceiving = true;
       return obj;
-    case RECEIVE_LISTS:
+    case listConstant.RECEIVE_MULTIPLE:
       obj.isReceiving = false;
       let unarchivedList = [];
       let archivedList = [];

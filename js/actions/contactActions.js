@@ -6,6 +6,12 @@ import {
 import * as api from './api';
 import * as publicationActions from './publicationActions';
 
+import { normalize, Schema, arrayOf } from 'normalizr';
+
+const contactSchema = new Schema('contacts');
+const list = new Schema('lists');
+const publicationSchema = new Schema('publications');
+
 function requestContact() {
   return {
     type: contactConstant.REQUEST
@@ -19,6 +25,14 @@ function receiveContact(contact) {
       type: contactConstant.RECEIVE,
       contact
     });
+  };
+}
+
+function receiveContacts(contacts, ids) {
+  return {
+    type: contactConstant.RECEIVE_MULTIPLE,
+    contacts,
+    ids
   };
 }
 
@@ -56,7 +70,7 @@ export function fetchPaginatedContacts(listId) {
     if (getState().listReducer[listId].contacts === null) return;
     dispatch(requestContact());
     const offset = getState().listReducer[listId].offset;
-    return api.get(`/lists/${listId}/contacts/?limit=${PAGE_LIMIT}&offset=${offset}`)
+    return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${offset}`)
     .then( response => {
       const newOffset = offset + PAGE_LIMIT;
       dispatch({
@@ -64,8 +78,12 @@ export function fetchPaginatedContacts(listId) {
         offset: newOffset,
         listId
       });
-      response.included.map( publication => dispatch(publicationActions.receivePublication(publication)));
-      response.data.map( contact => dispatch(receiveContact(contact)));
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
+      });
+      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+      dispatch(receiveContacts(res.entities.contacts, res.result.data));
     })
     .catch( message => dispatch(requestContactFail(message)));
   };

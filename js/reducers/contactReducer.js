@@ -33,6 +33,18 @@ function contactReducer(state = initialState.contactReducer, action) {
         });
       }
       return obj;
+    case contactConstant.RECEIVE_MULTIPLE:
+      obj = assignToEmpty(state, action.contacts);
+      obj.received = state.received.concat(action.ids);
+      obj.isReceiving = false;
+      action.ids.map( id => {
+        if (obj[id].customfields && obj[id].customfields !== null) {
+          obj[id].customfields.map( field => {
+            obj[id][field.name] = field.value;
+          });
+        }
+      });
+      return obj;
     case 'PATCH_CONTACTS':
       obj.isReceiving = true;
       return obj;

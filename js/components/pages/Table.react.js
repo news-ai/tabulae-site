@@ -1,23 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import SkyLight from 'react-skylight';
 import { withRouter } from 'react-router';
 import Radium from 'radium';
+import SkyLight from 'react-skylight';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
 
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
+import Popover from 'material-ui/Popover';
+import RaisedButton from 'material-ui/RaisedButton';
+
 import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import ButtonMenu from '../pieces/ButtonMenu.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../pieces/Waiting.react.js';
 
+
 const styles = {
   nameBlock: {
     parent: {
-      margin: '15px',
+      marginTop: '40px',
     },
     title: {
       marginLeft: '5px',
@@ -50,25 +55,29 @@ const styles = {
   }
 };
 
-
-
 class Table extends Component {
   constructor(props) {
     super(props);
     const { listData } = this.props;
     this.state = {
       name: null,
-      onTitleEdit: false,
-      emailPanelOpen: false,
+      isTitleEditing: false,
+      isEmailPanelOpen: false,
       selectedContacts: [],
       isSaved: true, // table without change
       person: null,
-      lastSavedAt: null
+      lastSavedAt: null,
+      isMenuOpen: false
     }
+    this.onMenuTouchTap = e => {
+      e.preventDefault();
+      this.setState({isMenuOpen: true, anchorEl: e.currentTarget});
+    }
+    this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._toggleTitleEdit = _ => this.setState({ onTitleEdit: !this.state.onTitleEdit });
-    this._updateName = e => this.setState({ name: e.target.value.substr(0, 140) });
-    this._toggleEmailPanel = _ => this.setState({ emailPanelOpen: !this.state.emailPanelOpen });
+    this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
+    this._onUpdateName = e => this.setState({ name: e.target.value.substr(0, 140) });
+    this.toggleEmailPanel = _ => this.setState({ isEmailPanelOpen: !this.state.isEmailPanelOpen });
     this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
     this._updateContacts = this._updateContacts.bind(this);
     this._handleNormalField = this._handleNormalField.bind(this);
@@ -135,10 +144,13 @@ class Table extends Component {
     colHeaders.map( header => {
       const name = header.data;
       if (!_.isEmpty(row[name])) {
-        // only columns labeled as pass can send data to api
         if (fieldsmap.some( fieldObj => fieldObj.value === name && !fieldObj.customfield)) {
           field[name] = row[name];
         }
+        let employers = [];
+        if (row['publication_name_1']) employers.push(publicationReducer[row['publication_name_1']]);
+        if (row['publication_name_2']) employers.push(publicationReducer[row['publication_name_2']]);
+        field.employers = employers;
       }
     });
     if (!_.isEmpty(row.employerString)) {
@@ -154,19 +166,18 @@ class Table extends Component {
     const { publicationReducer, dispatch } = this.props;
     let promises = [];
     localData.map( row => {
-      colHeaders.map( header => {
-        const name = header.data;
-        if (!_.isEmpty(row[name])) {
-          // only columns labeled as pass can send data to api
-          if (!header.pass && name === 'employerString') {
-              const employerNames = row[name].split(',');
-              const createPubNameList = employerNames.filter( eName => !publicationReducer[eName]);
-              createPubNameList.map( eName =>
-                promises.push(dispatch(actionCreators.createPublication({ name: eName })))
-                );
-          }
+      if (row['publication_name_1']) {
+        const pubName1 = row['publication_name_1'];
+        if (!publicationReducer[pubName1]) {
+          promises.push(actionCreators.createPublication({name: pubName1}));
         }
-      });
+      }
+      if (row['publication_name_2']) {
+        const pubName2 = row['publication_name_2'];
+        if (!publicationReducer[pubName2]) {
+          promises.push(actionCreators.createPublication({name: pubName2}));
+        }
+      }
     });
     return promises;
   }
@@ -200,9 +211,6 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
-
-    // console.log(patchContactList);
-    // console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
@@ -252,7 +260,7 @@ class Table extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-
+    
     return (
       <div>
       <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
@@ -268,39 +276,51 @@ class Table extends Component {
             title='File Drop'>
               <DropFile
               listId={props.listId}
-              _forceRefresh={this._fetchOperations}
               />
             </SkyLight>
-            <div className='seven columns'>
-              <ToggleableEditInput
-              name={state.name}
-              updateName={this._updateName}
-              toggleTitleEdit={this._toggleTitleEdit}
-              onTitleEdit={state.onTitleEdit}
-              />
+            <div className='six columns'>
+              <div>
+                <ToggleableEditInput
+                name={state.name}
+                onUpdateName={this._onUpdateName}
+                onToggleTitleEdit={this._onToggleTitleEdit}
+                isTitleEditing={state.isTitleEditing}
+                />
+              </div>
             </div>
             <div className='offset-by-nine two columns'>
-              <ButtonMenu style={{zIndex: 300, top: 100}}>
-                <button className='button' style={{
-                    backgroundColor: state.emailPanelOpen ? 'lightgray' : 'white',
-                  }} onClick={this._toggleEmailPanel}>Email</button>
-                <button className='button' style={buttonStyle} onClick={this._updateContacts}>Update Contacts</button>
-                <button
-                className='button'
-                style={buttonStyle}
-                onClick={ _ => this.refs.input.show() }>
-                Upload from File</button>
-              </ButtonMenu>
+              <div style={{position: 'fixed', top: 100, zIndex: 200}}>
+                <RaisedButton
+                labelStyle={{textTransform: 'none'}}
+                onClick={this.onMenuTouchTap}
+                label='Utilities'
+                icon={<i className='fa fa-cog' aria-hidden='true' />}
+                />
+              </div>
+              <Popover
+              open={state.isMenuOpen}
+              anchorEl={state.anchorEl}
+              onRequestClose={this.handleRequestMenuClose}
+              anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+              targetOrigin={{horizontal: 'left', vertical: 'top'}}
+              >
+                <Menu>
+                  <MenuItem onClick={this._updateContacts} primaryText='Update Selected Contacts' />
+                  <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
+                  <MenuItem primaryText='Upload from File' onClick={_ => this.refs.input.show()} />
+                </Menu>
+              </Popover>
             </div>
           </div>
           {
-            state.emailPanelOpen ? 
+            state.isEmailPanelOpen ? 
             <EmailPanel
             person={props.person}
             selectedContacts={state.selectedContacts}
             customfields={props.listData.customfields}
             /> : null
           }
+          <div style={{marginTop: '10px'}}>
             <HandsOnTable
             {...props}
             lastSavedAt={state.lastSavedAt}
@@ -313,6 +333,7 @@ class Table extends Component {
             lastFetchedIndex={props.lastFetchedIndex}
             isDirty={this._isDirty}
             />
+          </div>
         </div> : null
       }
       </div>
@@ -323,7 +344,6 @@ class Table extends Component {
 const mapStateToProps = (state, props) => {
   let lastFetchedIndex = -1;
   const listId = parseInt(props.params.listId, 10);
-  const contactIsReceiving = state.contactReducer.isReceiving;
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
   let contacts = [];
@@ -340,19 +360,14 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  // make employerString for table renderer
-  contacts.map( (contact, i) => {
+  const contactWithEmployers = contacts.map(contact => {
     if (!_.isEmpty(contact.employers)) {
-      // generate string to be rendered by custom cell in table
-      const employerString = contact.employers
-      .filter( employerId => publicationReducer[employerId])
-      .map( eId => {
-        const name = publicationReducer[eId].name;
-        return name;
-      }).join(',');
-      contacts[i].employerString = employerString;
+      contact.employers.map((id, i) => {
+        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
+      });
     }
-  })
+    return contact;
+  });
 
   return {
     listId: listId,
@@ -360,7 +375,7 @@ const mapStateToProps = (state, props) => {
     listData: listData,
     contacts: contacts,
     name: listData ? listData.name : null,
-    contactIsReceiving: contactIsReceiving,
+    contactIsReceiving: state.contactReducer.isReceiving,
     pubMapByName: publicationReducer,
     publicationReducer,
     lastFetchedIndex,

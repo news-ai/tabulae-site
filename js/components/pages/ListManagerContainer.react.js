@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -17,7 +18,12 @@ class ListManagerContainer extends Component {
     return (
       <div className='container'>
         <Lists {...this.props} />
-        <button onClick={this.props.newListOnClick}>Add New List</button>
+        <RaisedButton
+        label='Add New List'
+        onClick={this.props.newListOnClick}
+        labelStyle={{textTransform: 'none'}}
+        icon={<i className='fa fa-plus' aria-hidden='true' />}
+        />
       </div>
       );
   }
@@ -28,7 +34,7 @@ const mapStateToProps = state => {
   const lists = state.listReducer.lists;
   return {
     lists: lists,
-    isReceiving: lists === undefined ? true : false,
+    isReceiving: state.listReducer.isReceiving,
     statementIfEmpty: 'It looks like you haven\'t created any list. Go ahead and make one!',
     listItemIcon: 'fa fa-archive',
     backRoute: '/archive',
@@ -40,9 +46,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    onArchiveToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
+    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    newListOnClick: _ => { window.location.href = window.location.origin + '/lists/new'; }
+    newListOnClick: _ => dispatch(actionCreators.createEmptyList())
   };
 };
 

@@ -73,7 +73,7 @@ class DropFile extends Component {
   }
 
   _processHeaders(order) {
-    const { dispatch, listId, _forceRefresh } = this.props;
+    const { dispatch, listId } = this.props;
     dispatch(actionCreators.addHeaders(listId, order))
     .then( _ => dispatch(actionCreators.waitForServerProcess(listId)))
     .then( _ => window.location.reload());
