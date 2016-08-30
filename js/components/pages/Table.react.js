@@ -144,10 +144,13 @@ class Table extends Component {
     colHeaders.map( header => {
       const name = header.data;
       if (!_.isEmpty(row[name])) {
-        // only columns labeled as pass can send data to api
         if (fieldsmap.some( fieldObj => fieldObj.value === name && !fieldObj.customfield)) {
           field[name] = row[name];
         }
+        let employers = [];
+        if (row['publication_name_1']) employers.push(publicationReducer[row['publication_name_1']]);
+        if (row['publication_name_2']) employers.push(publicationReducer[row['publication_name_2']]);
+        field.employers = employers;
       }
     });
     if (!_.isEmpty(row.employerString)) {
@@ -160,24 +163,23 @@ class Table extends Component {
   }
 
   _createPublicationPromises(localData, colHeaders) {
-    // const { publicationReducer, dispatch } = this.props;
-    // let promises = [];
-    // localData.map( row => {
-    //   colHeaders.map( header => {
-    //     const name = header.data;
-    //     if (!_.isEmpty(row[name])) {
-    //       // only columns labeled as pass can send data to api
-    //       if (!header.pass && name === 'employerString') {
-    //           const employerNames = row[name].split(',');
-    //           const createPubNameList = employerNames.filter( eName => !publicationReducer[eName]);
-    //           createPubNameList.map( eName =>
-    //             promises.push(dispatch(actionCreators.createPublication({ name: eName })))
-    //             );
-    //       }
-    //     }
-    //   });
-    // });
-    // return promises;
+    const { publicationReducer, dispatch } = this.props;
+    let promises = [];
+    localData.map( row => {
+      if (row['publication_name_1']) {
+        const pubName1 = row['publication_name_1'];
+        if (!publicationReducer[pubName1]) {
+          promises.push(actionCreators.createPublication({name: pubName1}));
+        }
+      }
+      if (row['publication_name_2']) {
+        const pubName2 = row['publication_name_2'];
+        if (!publicationReducer[pubName2]) {
+          promises.push(actionCreators.createPublication({name: pubName2}));
+        }
+      }
+    });
+    return promises;
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
@@ -209,9 +211,6 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
-
-    // console.log(patchContactList);
-    // console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
@@ -246,15 +245,15 @@ class Table extends Component {
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
     console.log('SAVE CLICKED');
-    // if (dirtyRows.length === 0) {
+    if (dirtyRows.length === 0) {
       this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-    // } else {
-    //   // create publications for later usage
-    //   Promise.all(this._createPublicationPromises(localData, colHeaders))
-    //   .then( _ => {
-    //     this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-    //   });
-    // }
+    } else {
+      // create publications for later usage
+      Promise.all(this._createPublicationPromises(localData, colHeaders))
+      .then( _ => {
+        this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
+      });
+    }
     this.setState({ isSaved: true });
   }
 
@@ -289,7 +288,7 @@ class Table extends Component {
                 />
               </div>
             </div>
-            <div className='offset-by-eight two columns'>
+            <div className='offset-by-nine two columns'>
               <div style={{position: 'fixed', top: 100, zIndex: 200}}>
                 <RaisedButton
                 labelStyle={{textTransform: 'none'}}
@@ -306,6 +305,7 @@ class Table extends Component {
               targetOrigin={{horizontal: 'left', vertical: 'top'}}
               >
                 <Menu>
+                  <MenuItem onClick={this._updateContacts} primaryText='Update Selected Contacts' />
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
                   <MenuItem primaryText='Upload from File' onClick={_ => this.refs.input.show()} />
                 </Menu>
@@ -363,26 +363,11 @@ const mapStateToProps = (state, props) => {
   const contactWithEmployers = contacts.map(contact => {
     if (!_.isEmpty(contact.employers)) {
       contact.employers.map((id, i) => {
-        if (publicationReducer[id]) contact[`publicationName_${i + 1}`] = publicationReducer[id].name;
+        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
       });
     }
     return contact;
   });
-  console.log(contactWithEmployers);
-
-  // // make employerString for table renderer
-  // contacts.map( (contact, i) => {
-  //   if (!_.isEmpty(contact.employers)) {
-  //     // generate string to be rendered by custom cell in table
-  //     const employerString = contact.employers
-  //     .filter( employerId => publicationReducer[employerId])
-  //     .map( eId => {
-  //       const name = publicationReducer[eId].name;
-  //       return name;
-  //     }).join(',');
-  //     contacts[i].employerString = employerString;
-  //   }
-  // })
 
   return {
     listId: listId,

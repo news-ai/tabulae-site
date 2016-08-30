@@ -23,6 +23,9 @@ function publicationReducer(state = initialState.publicationReducer, action) {
     case publicationConstant.RECEIVE_MULTIPLE:
       obj.isReceiving = false;
       obj = assignToEmpty(state, action.publications);
+      action.ids.map(id => {
+        obj[action.publications[id].name] = id;
+      });
       obj.received = state.received.concat(action.ids);
       return obj;
     default:

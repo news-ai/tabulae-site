@@ -41,28 +41,28 @@ class HandsOnTable extends Component {
     this._changeColumnName = this._changeColumnName.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
-    if (!COLUMNS.some( col => col.data === 'publicationName_1')) {
+    if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
       COLUMNS.push({
-        data: 'publicationName_1',
+        data: 'publication_name_1',
         type: 'autocomplete',
         title: 'Publication 1',
         source: (query, callback) => {
-          // dispatch(actionCreators.searchPublications(query))
-          // .then(publicationNameArray => callback(publicationNameArray));
-          callback([]);
+          dispatch(actionCreators.searchPublications(query))
+          .then(publicationNameArray => callback(publicationNameArray));
+          // callback([]);
         },
         strict: false
       });
     }
-    if (!COLUMNS.some( col => col.data === 'publicationName_2')) {
+    if (!COLUMNS.some( col => col.data === 'publication_name_2')) {
       COLUMNS.push({
-        data: 'publicationName_2',
+        data: 'publication_name_2',
         type: 'autocomplete',
         title: 'Publication 2',
         source: (query, callback) => {
-          // dispatch(actionCreators.searchPublications(query))
-          // .then(publicationNameArray => callback(publicationNameArray));
-          callback([]);
+          dispatch(actionCreators.searchPublications(query))
+          .then(publicationNameArray => callback(publicationNameArray));
+          // callback([]);
         },
         strict: false
       });
