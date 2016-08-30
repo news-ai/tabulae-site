@@ -10,6 +10,11 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 import PreviewEmail from '../PreviewEmail';
 import EmailEditor from './EmailEditor.react';
+import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
+import Popover from 'material-ui/Popover';
+import MenuItem from 'material-ui/MenuItem';
+import Menu from 'material-ui/Menu';
 
 const styles = {
   emailPanelWrapper: {
@@ -25,8 +30,7 @@ const styles = {
     width: '600px',
     overflow: 'scroll'
   },
-  sendButton: {
-    ...buttonStyle,
+  sendButtonPosition: {
     position: 'absolute',
     bottom: 10,
     right: 10
@@ -34,14 +38,14 @@ const styles = {
 };
 
 const injectCssToTags = {
-  'p': 'margin: 0;'
-}
+  'p': 'margin: 0;font-family: arial;'
+};
 
 const options = {
   inlineStyles: {
     LINK: {element: 'a'}
   }
-}
+};
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -49,8 +53,16 @@ class EmailPanel extends Component {
     this.state = {
       subject: '',
       body: '',
-      matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields)
+      matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
+      isMenuOpen: false,
+      anchorEl: null
     };
+    this.onMenuClick = e => {
+      e.preventDefault();
+      this.setState({isMenuOpen: true, anchorEl: e.currentTarget});
+    };
+    this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
+
     this._showStagingEmails = this._showStagingEmails.bind(this);
     this._convertToHtml = this._convertToHtml.bind(this);
     this._replaceAll = this._replaceAll.bind(this);
@@ -131,14 +143,14 @@ class EmailPanel extends Component {
   }
 
   _showStagingEmails() {
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     dispatch(actionCreators.getStagedEmails())
     .then( _ => this.refs.preview.show());
   }
 
   _onSendAllEmailsClick() {
     const { previewEmails } = this.props;
-    previewEmails.map( email => {
+    previewEmails.map(email => {
       if (email.body.length > 0 && !email.issent) {
         this._onSendEmailClick(email.id);
       }
@@ -153,6 +165,7 @@ class EmailPanel extends Component {
 
   render() {
     const props = this.props;
+    const state = this.state;
     // add this button to fetch all staged emails for debugging purposes
     // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
     return (
@@ -162,13 +175,25 @@ class EmailPanel extends Component {
           person={props.person}
           style={styles.emailPanel}
           _setSubjectLine={this._setSubjectLine}
-          _setBody={this._setBody} />
-          <div style={{position: 'relative'}}>
-           <button
-            style={styles.sendButton}
-            onClick={this._onPreviewEmailsClick}
-            >Preview</button>
-          </div>
+          _setBody={this._setBody}>
+          <IconButton
+          iconClassName='fa fa-cogs'
+          onClick={this.onMenuClick}
+          />
+          <Popover
+            open={state.isMenuOpen}
+            anchorEl={state.anchorEl}
+            onRequestClose={this.handleRequestMenuClose}
+            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+            >
+            <Menu>
+              <MenuItem primaryText='Save Text to Template' />
+              <MenuItem primaryText='Save Text as New Template' />
+            </Menu>
+          </Popover>
+            <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+          </EmailEditor>
         </div>
         <SkyLight
         overlayStyles={skylightStyles.overlay}

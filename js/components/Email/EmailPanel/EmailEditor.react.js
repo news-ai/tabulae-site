@@ -214,6 +214,10 @@ class EmailEditor extends Component {
               spellCheck
             />
           </div>
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+          }}>{props.children}</div>
         </div>
       </div>
     );

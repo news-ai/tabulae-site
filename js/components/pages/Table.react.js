@@ -58,7 +58,7 @@ const styles = {
 class Table extends Component {
   constructor(props) {
     super(props);
-    const { listData } = this.props;
+    const {listData} = this.props;
     this.state = {
       name: null,
       isTitleEditing: false,
@@ -74,17 +74,18 @@ class Table extends Component {
       this.setState({isMenuOpen: true, anchorEl: e.currentTarget});
     }
     this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
+
     this._onSaveClick = this._onSaveClick.bind(this);
     this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
-    this._onUpdateName = e => this.setState({ name: e.target.value.substr(0, 140) });
-    this.toggleEmailPanel = _ => this.setState({ isEmailPanelOpen: !this.state.isEmailPanelOpen });
-    this._getSelectedRows = contacts => this.setState({ selectedContacts: contacts });
+    this._onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
+    this.toggleEmailPanel = _ => this.setState({isEmailPanelOpen: !this.state.isEmailPanelOpen});
+    this._getSelectedRows = contacts => this.setState({selectedContacts: contacts});
     this._updateContacts = this._updateContacts.bind(this);
     this._handleNormalField = this._handleNormalField.bind(this);
     this._createPublicationPromises = this._createPublicationPromises.bind(this);
     this._saveOperations = this._saveOperations.bind(this);
     this._fetchOperations = this._fetchOperations.bind(this);
-    this._isDirty = _ => this.setState({ isSaved: false });
+    this._isDirty = _ => this.setState({isSaved: false});
     this.routerWillLeave = this.routerWillLeave.bind(this);
   }
 
