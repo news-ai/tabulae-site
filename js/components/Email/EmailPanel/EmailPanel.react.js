@@ -13,11 +13,11 @@ import PreviewEmail from '../PreviewEmail';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
-import Popover from 'material-ui/Popover';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
+import Dialog from 'material-ui/Dialog';
 
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
 
@@ -75,6 +75,7 @@ class EmailPanel extends Component {
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
+    this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
   }
 
   componentWillMount() {
@@ -87,6 +88,7 @@ class EmailPanel extends Component {
       const template = this.props.templates.find(id => value);
       const bodyHtml = template.body;
       const subjectHtml = template.subject;
+      console.log(bodyHtml);
       this.setState({bodyHtml, subjectHtml});
     } else {
       this.setState({bodyHtml: null, subjectHtml: null});
@@ -180,7 +182,16 @@ class EmailPanel extends Component {
   _onSaveNewTemplateClick() {
     const {dispatch} = this.props;
     const state = this.state;
-    dispatch(actionCreators.createTemplate(state.subject, state.body));
+    alertify.prompt('', 'Name of new template',
+      (e, value) => dispatch(actionCreators.createTemplate(name, state.subject, state.body)),
+      _ => alertify.error('Something went wrong.')
+      );
+  }
+
+  _onSaveCurrentTemplateClick() {
+    const {dispatch} = this.props;
+    const state = this.state;
+    dispatch(actionCreators.patchTemplate(state.currentTemplateId, state.subject, state.body));
   }
 
   render() {
@@ -211,10 +222,10 @@ class EmailPanel extends Component {
           anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
           targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
           >
-            <MenuItem disabled={state.currentTemplateId ? false : true} primaryText='Save Text to Existing Template' />
+            <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
             <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
           </IconMenu>
-          <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+          <RaisedButton style={{float: 'right'}} labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
           </BasicHtmlEditor>
         </div>
         <SkyLight
@@ -232,13 +243,11 @@ class EmailPanel extends Component {
                 const email = props.stagingReducer[pEmail.id];
                 if (email.body.length === 0 || email.issent) return null;
                 return (
-                  <div>
-                    <PreviewEmail
-                    key={i}
-                    {...email}
-                    sendEmail={_ => this._onSendEmailClick(email.id)}
-                    />
-                  </div>
+                  <PreviewEmail
+                  key={i}
+                  {...email}
+                  sendEmail={_ => this._onSendEmailClick(email.id)}
+                  />
                   );
               })
             }

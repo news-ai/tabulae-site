@@ -6,8 +6,10 @@ import * as api from '../../../actions/api';
 import { normalize, Schema, arrayOf } from 'normalizr';
 const templateSchema = new Schema('templates');
 
-export function createTemplate(subject, body) {
+export function createTemplate(name, subject, body) {
   let templateBody = {};
+  if (!name && !subject && !body) return;
+  if (name) templateBody.name = name;
   if (subject) templateBody.subject = subject;
   if (body) templateBody.body = body;
   return dispatch => {

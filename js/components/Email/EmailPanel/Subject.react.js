@@ -41,7 +41,8 @@ class Subject extends Component {
       const content = ContentState.createFromText(nextProps.subjectHtml);
       // const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-      this.setState({editorState, subjectHtml: nextProps.subjectHtml});
+      this.setState({subjectHtml: nextProps.subjectHtml});
+      this.onChange(editorState);
     }
   }
 

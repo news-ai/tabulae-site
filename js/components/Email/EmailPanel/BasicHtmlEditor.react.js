@@ -96,9 +96,11 @@ export default class BasicHtmlEditor extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
+      console.log('change template');
       const content = ContentState.createFromBlockArray(convertFromHTML(nextProps.bodyHtml));
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-      this.setState({editorState, bodyHtml: nextProps.bodyHtml});
+      this.onChange(editorState);
+      this.setState({bodyHtml: nextProps.bodyHtml});
     }
   }
 

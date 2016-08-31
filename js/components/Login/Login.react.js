@@ -1,13 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
+import RaisedButton from 'material-ui/RaisedButton';
 
 function Login({ loginWithGoogleClick, loginClick, registerClick }) {
 	return (
 		<div className='container'>
-			<button onClick={loginWithGoogleClick}>Login with Google</button>
-			<button onClick={registerClick}>Register</button>
-			<button onClick={loginClick}>Login</button>
+			<RaisedButton label='Login with Google' onClick={loginWithGoogleClick} />
+			<RaisedButton label='Register' onClick={registerClick} />
+			<button label='Login' onClick={loginClick} />
 		</div>
 		);
 }
