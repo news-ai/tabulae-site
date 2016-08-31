@@ -32,6 +32,7 @@ export const initialState = {
   },
   templateReducer: {
     isReceiving: false,
-    didInvalidate: false
+    didInvalidate: false,
+    received: []
   }
 };

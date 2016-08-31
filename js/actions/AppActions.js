@@ -4,6 +4,7 @@ import * as stagingActions from '../components/Email/actions';
 import * as loginActions from '../components/Login/actions';
 import * as publicationActions from './publicationActions';
 import * as fileActions from '../components/ImportFile/actions';
+import * as templateActions from '../components/Email/Template/actions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const register = _ => loginActions.register();
@@ -36,3 +37,7 @@ export const uploadFile = (listId, file) => fileActions.uploadFile(listId, file)
 export const fetchHeaders = listId => fileActions.fetchHeaders(listId);
 export const addHeaders = (listId, order) => fileActions.addHeaders(listId, order);
 export const waitForServerProcess = listId => fileActions.waitForServerProcess(listId);
+
+export const createTemplate = (subject, body) => templateActions.createTemplate(subject, body);
+export const patchTemplate = (templateId, subject, body) => templateActions.patchTemplate(templateId, subject, body);
+export const getTemplates = _ => templateActions.getTemplates();

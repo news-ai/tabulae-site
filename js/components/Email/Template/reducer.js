@@ -20,8 +20,21 @@ function templateReducer(state = initialState.templateReducer, action) {
     case templateConstant.RECEIVE:
       obj.isReceiving = false;
       obj[action.template.id] = action.template;
+      if (!state.received.some(id => id === action.template.id)) {
+        const newReceived = [...state.received, action.template.id];
+        obj.received = newReceived;
+      }
       return obj;
     case templateConstant.REQUEST_FAIL:
+      obj.isReceiving = false;
+      obj.didInvalidate = true;
+      return obj;
+    case templateConstant.RECEIVE_MULTIPLE:
+      obj = Object.assign({}, state, action.templates);
+      const newReceived = state.received.concat(action.ids.filter(id => !state.received[id]));
+      obj.received = newReceived;
+      return obj;
+    case templateConstant.REQUEST_MULTIPLE_FAIL:
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;

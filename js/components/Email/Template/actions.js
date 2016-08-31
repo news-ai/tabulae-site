@@ -3,6 +3,9 @@ import {
 } from './constants';
 import * as api from '../../../actions/api';
 
+import { normalize, Schema, arrayOf } from 'normalizr';
+const templateSchema = new Schema('templates');
+
 export function createTemplate(subject, body) {
   let templateBody = {};
   if (subject) templateBody.subject = subject;
@@ -27,8 +30,20 @@ export function patchTemplate(templateId, subject, body) {
   };
 }
 
-// export function getTemplates() {
-//   return dispatch => {
-    
-//   }
-// }
+export function getTemplates() {
+  return dispatch => {
+    dispatch({type: templateConstant.REQUEST_MULTIPLE});
+    return api.get(`/templates`)
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(templateSchema),
+      });
+      return dispatch({
+        type: templateConstant.RECEIVE_MULTIPLE,
+        templates: res.entities.templates,
+        ids: res.result.data
+      });
+    })
+    .catch(message => dispatch({type: templateConstant.REQUEST_MULTIPLE_FAIL, message}));
+  };
+}

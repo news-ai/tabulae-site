@@ -40,6 +40,8 @@ import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
 import {EmailAnalytics} from './components/Email';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';

@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import {
   EditorState,
+  ContentState,
   RichUtils,
   CompositeDecorator,
   Entity,
   Editor,
-  convertToRaw
+  convertToRaw,
+  convertFromHTML
 } from 'draft-js';
 import linkifyIt from 'linkify-it';
 import alertify from 'alertifyjs';
 import tlds from 'tlds';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import {is} from 'immutable';
 
 const linkify = linkifyIt();
 linkify
@@ -80,9 +83,12 @@ class EmailEditor extends Component {
     this.focus = () => this.refs.editor.focus();
     this.onChange = (editorState) => {
       // save text body to send
-      const content = editorState.getCurrentContent();
-      this.props._setBody(editorState);
-      this.setState({editorState});
+      // const content = editorState.getCurrentContent();
+      if (!is(editorState, this.state.editorState)) {
+        this.setState({editorState});
+        const js = convertToRaw(editorState.getCurrentContent());
+        this.props.setBody(js);
+      }
     };
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
@@ -91,6 +97,14 @@ class EmailEditor extends Component {
     this.confirmLink = this._confirmLink.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.body !== null) {
+      const bodyBlocks = convertFromHTML(nextProps.body);
+      const content = ContentState.createFromBlockArray(bodyBlocks);
+      const editorState = EditorState.set(EditorState.createWithContent(content), compositeDecorator);
+      this.setState({editorState});
+    }
+  }
 
   _handleKeyCommand(command) {
     const { editorState } = this.state;
@@ -189,17 +203,17 @@ class EmailEditor extends Component {
             <span>Emails are sent from: {props.person.email}</span>
           </div>
           <BlockStyleControls
-              editorState={editorState}
-              onToggle={this.toggleBlockType}
+            editorState={editorState}
+            onToggle={this.toggleBlockType}
           />
           <InlineStyleControls
-              editorState={editorState}
-              onToggle={this.toggleInlineStyle}
-              customInlineTypes={[]}
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            customInlineTypes={[]}
           />
           <div>
             <Subject
-              _setSubjectLine={props._setSubjectLine}
+              _setSubjectLine={props.setSubjectLine}
             />
           </div>
           <div className={className} onClick={this.focus}>
