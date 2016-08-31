@@ -46,18 +46,6 @@ const injectCssToTags = {
   'p': 'margin: 0;font-family: arial;'
 };
 
-const options = {
-  inlineStyles: {
-    LINK: {element: 'a'}
-  }
-};
-
-let html = `
-  <h1>This is a Title</h1>
-  <p>Here's some text, it's useful</p>
-  <p>More text, some inline <strong>styling</strong> for <em>some</em> elements</p>
-`;
-
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
@@ -67,7 +55,7 @@ class EmailPanel extends Component {
       matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
       currentTemplateId: 0,
       bodyHtml: null,
-      html: null
+      subjectHtml: null
     };
     this.updateBodyHtml = (html) => {
       console.log(html);
@@ -80,15 +68,9 @@ class EmailPanel extends Component {
     this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this._onSendAllEmailsClick = this._onSendAllEmailsClick.bind(this);
     this._onSendEmailClick = this._onSendEmailClick.bind(this);
-    this._setSubjectLine = (editorState) => {
+    this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      this.setState({ subject });
-    };
-    this._setBody = (bodyEditorState) => {
-      // const html = this._convertToHtml(editorState);
-      // console.log(html);
-      console.log(bodyEditorState);
-      this.setState({bodyEditorState});
+      this.setState({subject});
     };
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
@@ -104,9 +86,10 @@ class EmailPanel extends Component {
     if (value !== 0) {
       const template = this.props.templates.find(id => value);
       const bodyHtml = template.body;
-      this.setState({bodyHtml});
+      const subjectHtml = template.subject;
+      this.setState({bodyHtml, subjectHtml});
     } else {
-      this.setState({bodyHtml: null});
+      this.setState({bodyHtml: null, subjectHtml: null});
     }
     this.setState({currentTemplateId: value});
   }
@@ -150,8 +133,7 @@ class EmailPanel extends Component {
 
   _onPreviewEmailsClick() {
     const {selectedContacts} = this.props;
-    const {subject, bodyEditorState} = this.state;
-    const body = this._convertToHtml(bodyEditorState);
+    const {subject, body} = this.state;
     const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
     if (selectedContacts.length === 0) {
       alertify.alert(`You didn't select any contact to send this email to.`);
@@ -208,20 +190,16 @@ class EmailPanel extends Component {
     const templateMenuItems = props.templates.length > 0 ?
     [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>].concat(props.templates.map((template, i) => <MenuItem value={template.id} key={i} primaryText={template.subject} />)) :
     null;
-    /*<EmailEditor
-          body={state.bodyHtml}
-          person={props.person}
-          style={styles.emailPanel}
-          setSubjectLine={this._setSubjectLine}
-          setBody={this._setBody}> */
 
     return (
       <div>
         <div style={styles.emailPanelWrapper}>
           <BasicHtmlEditor
             style={styles.emailPanel}
-            value={this.state.html}
-            onChange={html => this.updateBodyHtml(html) }
+            bodyHtml={state.bodyHtml}
+            subjectHtml={state.subjectHtml}
+            onBodyChange={html => this.updateBodyHtml(html) }
+            onSubjectChange={this.onSubjectChange}
             debounce={500}
             person={props.person}
           >

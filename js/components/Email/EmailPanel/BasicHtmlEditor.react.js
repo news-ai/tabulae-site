@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import debounce from 'lodash/debounce';
 import {stateToHTML} from 'draft-js-export-html';
 import {
@@ -10,12 +9,11 @@ import {
   RichUtils,
   convertToRaw,
   CompositeDecorator,
-  Modifier
+  Modifier,
+  convertFromHTML
 } from 'draft-js';
 
-import htmlToContent from './utils/htmlToContent';
-import draftRawToHtml from './utils/draftRawToHtml';
-
+import Subject from './Subject.react';
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
 import EntityControls from './components/EntityControls';
@@ -31,8 +29,6 @@ const injectCssToTags = {
 export default class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
-    let { value } = props;
-
     const decorator = new CompositeDecorator([
       {
         strategy: findEntities.bind(null, 'link'),
@@ -68,12 +64,8 @@ export default class BasicHtmlEditor extends React.Component {
     ];
 
     this.state = {
-      editorState: value ?
-        EditorState.createWithContent(
-          ContentState.createFromBlockArray(htmlToContent(value)),
-          decorator
-        ) :
-        EditorState.createEmpty(decorator)
+      editorState: EditorState.createEmpty(decorator),
+      bodyHtml: null
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -90,7 +82,7 @@ export default class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const content = editorState.getCurrentContent();
       let html = stateToHTML(content, null, injectCssToTags);
-      this.props.onChange(html);
+      this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
 
@@ -100,6 +92,14 @@ export default class BasicHtmlEditor extends React.Component {
     this.handleReturn = (e) => this._handleReturn(e);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.bodyHtml !== this.state.bodyHtml) {
+      const content = ContentState.createFromBlockArray(convertFromHTML(nextProps.bodyHtml));
+      const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      this.setState({editorState, bodyHtml: nextProps.bodyHtml});
+    }
   }
 
   _handleKeyCommand(command) {
@@ -210,6 +210,12 @@ export default class BasicHtmlEditor extends React.Component {
           editorState={editorState}
           entityControls={this.ENTITY_CONTROLS}
         />
+        <div>
+        <Subject
+        onSubjectChange={props.onSubjectChange}
+        subjectHtml={props.subjectHtml}
+        />
+        </div>
         <div className={className} onClick={this.focus}>
           <Editor
             blockStyleFn={getBlockStyle}
