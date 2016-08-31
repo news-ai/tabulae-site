@@ -6,14 +6,17 @@ import {
   CompositeDecorator,
   Entity,
   Editor,
-  convertToRaw,
   convertFromHTML
 } from 'draft-js';
+import {
+  // convertFromHTML,
+  convertToHTML
+} from 'draft-convert';
 import linkifyIt from 'linkify-it';
 import alertify from 'alertifyjs';
 import tlds from 'tlds';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
-import {is} from 'immutable';
+import _ from 'lodash';
 
 const linkify = linkifyIt();
 linkify
@@ -54,7 +57,6 @@ function findLinkEntities(contentBlock, callback) {
   );
 }
 
-
 const placeholder = 'Tip: Did you know you can use the column names as variables in your template email? E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
 function getBlockStyle(block) {
@@ -67,10 +69,11 @@ function getBlockStyle(block) {
 const compositeDecorator = new CompositeDecorator([{
   strategy: curlyStrategy,
   component: CurlySpan
-}, {
-  strategy: findLinkEntities,
-  component: LinkTag,
 },
+// {
+//   strategy: findLinkEntities,
+//   component: LinkTag,
+// },
 ]);
 
 class EmailEditor extends Component {
@@ -78,16 +81,17 @@ class EmailEditor extends Component {
     super(props);
     this.state = {
       editorState: EditorState.createEmpty(compositeDecorator),
+      bodyHTML: null,
     };
-
     this.focus = () => this.refs.editor.focus();
+    this.emitHTML = editorState => _.debounce(_ => this.props.setBody(editorState), 500);
     this.onChange = (editorState) => {
+      let previousContent = this.state.editorState.getCurrentContent();
       // save text body to send
       // const content = editorState.getCurrentContent();
-      if (!is(editorState, this.state.editorState)) {
-        this.setState({editorState});
-        const js = convertToRaw(editorState.getCurrentContent());
-        this.props.setBody(js);
+      this.setState({editorState});
+      if (previousContent !== editorState.getCurrentContent()) {
+        this.emitHTML(editorState);
       }
     };
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
@@ -101,7 +105,9 @@ class EmailEditor extends Component {
     if (nextProps.body !== null) {
       const bodyBlocks = convertFromHTML(nextProps.body);
       const content = ContentState.createFromBlockArray(bodyBlocks);
-      const editorState = EditorState.set(EditorState.createWithContent(content), compositeDecorator);
+      const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      // const editorState = EditorState.createWithContent(content);
+      // const editorState = EditorState.set(basiceditorState);
       this.setState({editorState});
     }
   }

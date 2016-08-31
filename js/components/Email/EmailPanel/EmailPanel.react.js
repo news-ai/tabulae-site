@@ -71,11 +71,11 @@ class EmailPanel extends Component {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({ subject });
     };
-    this._setBody = (editorStateInRaw) => {
+    this._setBody = (bodyEditorState) => {
       // const html = this._convertToHtml(editorState);
       // console.log(html);
-      console.log(editorStateInRaw);
-      this.setState({bodyEditorState: editorStateInRaw});
+      console.log(bodyEditorState);
+      this.setState({bodyEditorState});
     };
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
