@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import CurlySpan from './CurlySpan.react';
+import CurlySpan from './components/CurlySpan.react';
 import {
   Editor,
   EditorState,

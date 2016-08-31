@@ -12,24 +12,15 @@ import {
   // convertFromHTML,
   convertToHTML
 } from 'draft-convert';
-import linkifyIt from 'linkify-it';
 import alertify from 'alertifyjs';
-import tlds from 'tlds';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import _ from 'lodash';
-
-const linkify = linkifyIt();
-linkify
-.tlds(tlds)
-.add('git:', 'http:')
-.add('ftp:', null)
-.set({ fuzzyIP: true });
 
 import InlineStyleControls from './InlineStyleControls.react';
 import BlockStyleControls from './BlockStyleControls.react';
 import Subject from './Subject.react';
-import CurlySpan from './CurlySpan.react';
-import LinkTag from './LinkTag.react';
+// import CurlySpan from './CurlySpan.react';
+// import LinkTag from './LinkTag.react';
 
 import { curlyStrategy } from './strategies';
 
@@ -44,18 +35,7 @@ const styleMap = {
 };
 
 alertify.defaults.glossary.title = '';
-function findLinkEntities(contentBlock, callback) {
-  contentBlock.findEntityRanges(
-    (character) => {
-      const entityKey = character.getEntity();
-      return (
-        entityKey !== null &&
-        Entity.get(entityKey).getType() === 'LINK'
-      );
-    },
-    callback
-  );
-}
+
 
 const placeholder = 'Tip: Did you know you can use the column names as variables in your template email? E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
@@ -66,15 +46,15 @@ function getBlockStyle(block) {
   }
 }
 
-const compositeDecorator = new CompositeDecorator([{
-  strategy: curlyStrategy,
-  component: CurlySpan
-},
+// const compositeDecorator = new CompositeDecorator([{
+//   strategy: curlyStrategy,
+//   component: CurlySpan
+// },
 // {
 //   strategy: findLinkEntities,
 //   component: LinkTag,
 // },
-]);
+// ]);
 
 class EmailEditor extends Component {
   constructor(props) {
@@ -192,13 +172,6 @@ class EmailEditor extends Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-
-    const customInlineTypes = [{
-      label: 'Hyperlink',
-      style: 'LINK',
-      onClick: this.onInlineLinkClick
-    }];
-
     // move out of InlineStyleControls until I am done with the feature
     // customInlineTypes={customInlineTypes}
 

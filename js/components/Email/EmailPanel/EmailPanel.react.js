@@ -9,13 +9,15 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 import PreviewEmail from '../PreviewEmail';
-import EmailEditor from './EmailEditor.react';
+// import EmailEditor from './EmailEditor.react';
+
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import Popover from 'material-ui/Popover';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
+import BasicHtmlEditor from './BasicHtmlEditor.react';
 
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
 
@@ -50,6 +52,12 @@ const options = {
   }
 };
 
+let html = `
+  <h1>This is a Title</h1>
+  <p>Here's some text, it's useful</p>
+  <p>More text, some inline <strong>styling</strong> for <em>some</em> elements</p>
+`;
+
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
@@ -58,7 +66,12 @@ class EmailPanel extends Component {
       bodyEditorState: null,
       matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
       currentTemplateId: 0,
-      bodyHtml: null
+      bodyHtml: null,
+      html: null
+    };
+    this.updateBodyHtml = (html) => {
+      console.log(html);
+      this.setState({body: html});
     };
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this._showStagingEmails = this._showStagingEmails.bind(this);
@@ -192,20 +205,26 @@ class EmailPanel extends Component {
     const props = this.props;
     const state = this.state;
     // add this button to fetch all staged emails for debugging purposes
-    // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
     const templateMenuItems = props.templates.length > 0 ?
     [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>].concat(props.templates.map((template, i) => <MenuItem value={template.id} key={i} primaryText={template.subject} />)) :
     null;
-
-    return (
-      <div>
-        <div style={styles.emailPanelWrapper}>
-          <EmailEditor
+    /*<EmailEditor
           body={state.bodyHtml}
           person={props.person}
           style={styles.emailPanel}
           setSubjectLine={this._setSubjectLine}
-          setBody={this._setBody}>
+          setBody={this._setBody}> */
+
+    return (
+      <div>
+        <div style={styles.emailPanelWrapper}>
+          <BasicHtmlEditor
+            style={styles.emailPanel}
+            value={this.state.html}
+            onChange={html => this.updateBodyHtml(html) }
+            debounce={500}
+            person={props.person}
+          >
           <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
           {templateMenuItems}
           </SelectField>
@@ -217,8 +236,8 @@ class EmailPanel extends Component {
             <MenuItem disabled={state.currentTemplateId ? false : true} primaryText='Save Text to Existing Template' />
             <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
           </IconMenu>
-            <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
-          </EmailEditor>
+          <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+          </BasicHtmlEditor>
         </div>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
