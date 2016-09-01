@@ -53,7 +53,9 @@ class App extends Component {
               />
             </div>
             <div className='two columns'>
-              <RaisedButton label='Email Analytics' labelStyle={{textTransform: 'none'}} onClick={_ => props.history.push('/email')} />
+              {
+                //<RaisedButton label='Email Analytics' labelStyle={{textTransform: 'none'}} onClick={_ => props.history.push('/emailstats')} />
+              }
             </div>
             <div className='two columns'>
               <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
