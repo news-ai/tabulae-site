@@ -10,6 +10,8 @@ export const commonTypes = [
   'PATCH',
   'PATCH_FAIL',
   'LAST_USED',
+  'CREATE_REQUEST',
+  'CREATE_RECEIVED'
 ];
 
 export const listConstant = generateConstants(commonTypes, 'LIST');

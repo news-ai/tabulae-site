@@ -112,10 +112,10 @@ class DropFile extends Component {
           );
         }
       } else {
-      
+        
+          // accept='application/vnd.ms-excel'
         renderNode = (
           <Dropzone
-          accept='application/vnd.ms-excel'
           style={styles.dropzone.default}
           activeStyle={styles.dropzone.active}
           rejectStyle={styles.dropzone.reject}

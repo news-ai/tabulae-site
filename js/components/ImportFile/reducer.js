@@ -1,9 +1,8 @@
 import {
-  REQUEST_HEADERS,
-  RECEIVE_HEADERS,
   TURN_ON_PROCESS_WAIT,
   TURN_OFF_PROCESS_WAIT,
-  fileConstant
+  fileConstant,
+  headerConstant
 } from './constants';
 
 
@@ -11,10 +10,8 @@ import { initialState } from '../../reducers/initialState';
 import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 import _ from 'lodash';
 
-const types = _.values(fileConstant);
+const types = _.values(fileConstant).concat(_.values(headerConstant));
 types.push(
-  REQUEST_HEADERS,
-  RECEIVE_HEADERS,
   TURN_ON_PROCESS_WAIT,
   TURN_OFF_PROCESS_WAIT
   );
@@ -37,13 +34,17 @@ function fileReducer(state = initialState.fileReducer, action) {
       // file belongs to list
       obj[action.listId] = action.file;
       return obj;
-    case REQUEST_HEADERS:
+    case headerConstant.REQUEST:
       obj.isReceiving = true;
+      obj[action.listId] = assignToEmpty(state[action.listId], {didInvalidate: false});
       return obj;
-    case RECEIVE_HEADERS:
+    case headerConstant.RECEIVE:
       obj.isReceiving = false;
       if (!obj[action.listId]) obj[action.listId] = {};
       obj[action.listId].headers = action.headers;
+      return obj;
+    case headerConstant.REQUEST_FAIL:
+      obj[action.listId] = assignToEmpty(state[action.listId], {didInvalidate: true});
       return obj;
     case TURN_ON_PROCESS_WAIT:
       obj.isProcessWaiting = true;
