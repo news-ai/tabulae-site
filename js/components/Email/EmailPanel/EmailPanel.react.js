@@ -86,7 +86,9 @@ class EmailPanel extends Component {
 
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
-      const template = this.props.templates.find(id => value);
+      console.log(value);
+      const template = this.props.templates.find(template => value === template.id);
+      console.log(template);
       const bodyHtml = template.body;
       const subjectHtml = template.subject;
       this.setState({bodyHtml, subjectHtml});
@@ -264,6 +266,7 @@ class EmailPanel extends Component {
 
 const mapStateToProps = state => {
     const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
+    console.log(templates);
     return {
       isReceiving: state.stagingReducer.isReceiving,
       previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails,
