@@ -8,10 +8,12 @@ const templateSchema = new Schema('templates');
 
 export function createTemplate(name, subject, body) {
   let templateBody = {};
-  if (!name && !subject && !body) return;
-  if (name) templateBody.name = name;
-  if (subject) templateBody.subject = subject;
-  if (body) templateBody.body = body;
+  if (name.length > 0) templateBody.name = name;
+  else templateBody.name = 'untitled template name';
+  if (subject.length > 0) templateBody.subject = subject;
+  else templateBody.subject = 'untitled subject line';
+  if (body.length > 0) templateBody.body = body;
+  else templateBody.body = '';
   return dispatch => {
     dispatch({type: templateConstant.REQUEST});
     return api.post(`/templates`, templateBody)
