@@ -115,14 +115,14 @@ class DropFile extends Component {
       
         renderNode = (
           <Dropzone
-          accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          accept='application/vnd.ms-excel,text/csv'
           style={styles.dropzone.default}
           activeStyle={styles.dropzone.active}
           rejectStyle={styles.dropzone.reject}
           onDrop={this._onDrop}
           multiple={false}
           >
-            <div>Try dropping an Excel (.xlsx) file here, or click to select file to upload.</div>
+            <div>Try dropping an Excel (xlsx, xls, csv) file here, or click to select file to upload.</div>
           </Dropzone>);
       }
     }
