@@ -88,7 +88,6 @@ class EmailPanel extends Component {
       const template = this.props.templates.find(id => value);
       const bodyHtml = template.body;
       const subjectHtml = template.subject;
-      console.log(bodyHtml);
       this.setState({bodyHtml, subjectHtml});
     } else {
       this.setState({bodyHtml: null, subjectHtml: null});
@@ -182,8 +181,8 @@ class EmailPanel extends Component {
   _onSaveNewTemplateClick() {
     const {dispatch} = this.props;
     const state = this.state;
-    alertify.prompt('', 'Name of new template',
-      (e, value) => dispatch(actionCreators.createTemplate(name, state.subject, state.body)),
+    alertify.prompt('', 'Name of new Email Template', '',
+      (e, value) => dispatch(actionCreators.createTemplate(value, state.subject, state.body)),
       _ => alertify.error('Something went wrong.')
       );
   }
@@ -199,7 +198,7 @@ class EmailPanel extends Component {
     const state = this.state;
     // add this button to fetch all staged emails for debugging purposes
     const templateMenuItems = props.templates.length > 0 ?
-    [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>].concat(props.templates.map((template, i) => <MenuItem value={template.id} key={i} primaryText={template.subject} />)) :
+    [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>].concat(props.templates.map((template, i) => <MenuItem value={template.id} key={i} primaryText={template.name.length > 0 ? template.name : template.subject} />)) :
     null;
 
     return (
