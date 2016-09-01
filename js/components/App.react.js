@@ -38,7 +38,7 @@ class App extends Component {
   render() {
     const props = this.props;
     return (
-      <div className='wrapper'>
+      <div style={{width: '100%', height: '100%'}}>
       {props.isLogin ?
         <div>
           <Navigation>
