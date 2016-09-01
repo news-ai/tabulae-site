@@ -83,7 +83,7 @@ ReactDOM.render(
             </Route>
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
-            <Route path='email' name='Email' component={EmailAnalytics} />
+            <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

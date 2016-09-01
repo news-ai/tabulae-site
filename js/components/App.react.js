@@ -27,18 +27,6 @@ class App extends Component {
   componentWillUpdate(nextProps, nextState) {
     if (nextState.isLogin !== this.state.isLogin) {
       const person = nextProps.person;
-      // console.log('SET UP INTERCOM');
-      // window.intercomSettings = {
-      //   app_id: 'ur8dbk9e',
-      //   email: person.email,
-      //   name: `${person.firstname} ${person.lastname}`,
-      //   user_id: person.id,
-      // };
-      // window.Intercom('boot', {
-      //   email: person.email,
-      //   name: `${person.firstname} ${person.lastname}`,
-      //   user_id: person.id,
-      // });
     } else {
     }
   }
@@ -57,14 +45,19 @@ class App extends Component {
             <div className='two columns'>
               <span style={{color: 'gray', float: 'right'}}>You are at: </span>
             </div>
-            <div className='seven columns'>
+            <div className='six columns'>
               <Breadcrumbs
               routes={props.routes}
               params={props.params}
               separator=' > '
               />
             </div>
-            <div className='three columns'>
+            <div className='two columns'>
+              {
+                //<RaisedButton label='Email Analytics' labelStyle={{textTransform: 'none'}} onClick={_ => props.history.push('/emailstats')} />
+              }
+            </div>
+            <div className='two columns'>
               <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
             </div>
           </Navigation>
