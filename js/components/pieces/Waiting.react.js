@@ -1,13 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 const defaultStyle = {
   zIndex: 160,
 };
 
-export default function Waiting({ isReceiving, style }) {
+const defaultTextStyle = {
+  zIndex: 160
+};
+
+export default function Waiting({isReceiving, style, text, textStyle}) {
   const mergeStyles = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
-  return isReceiving ? (<i
-  style={mergeStyles}
-  className='fa fa-spinner fa-spin fa-3x'
-  aria-hidden='true'></i>) : <span />;
+  const mergeTextStyle = textStyle ? Object.assign({}, defaultTextStyle, textStyle) : defaultTextStyle;
+  return isReceiving ? (
+    <div>
+      <i style={mergeStyles} className='fa fa-spinner fa-spin fa-3x' aria-hidden='true' />
+      {text ? <p style={mergeTextStyle}>{text}</p> : null}
+    </div>
+  ) : <span />;
 }

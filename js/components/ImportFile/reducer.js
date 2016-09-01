@@ -44,6 +44,7 @@ function fileReducer(state = initialState.fileReducer, action) {
       obj[action.listId].headers = action.headers;
       return obj;
     case headerConstant.REQUEST_FAIL:
+      obj.isReceiving = false;
       obj[action.listId] = assignToEmpty(state[action.listId], {didInvalidate: true});
       return obj;
     case TURN_ON_PROCESS_WAIT:
