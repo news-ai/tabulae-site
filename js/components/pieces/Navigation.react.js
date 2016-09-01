@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 function Navigation({children}) {
   return (
@@ -11,7 +11,8 @@ function Navigation({children}) {
         boxShadow: '0px 0px 5px 3px rgba(0, 0, 0, 0.1)',
         top: 0,
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        padding: '5px'
       }}>
         {children}
       </div>

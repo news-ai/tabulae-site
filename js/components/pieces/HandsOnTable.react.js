@@ -112,7 +112,7 @@ class HandsOnTable extends Component {
               .then( contacts => {
                 const newListContacts = listData.contacts;
                 newListContacts.splice(index, 0, contacts[0].id);
-                this.setState({ addedRow: true });
+                this.setState({addedRow: true});
                 dispatch(actionCreators.patchList({
                   listId: listData.id,
                   contacts: newListContacts,
@@ -124,11 +124,11 @@ class HandsOnTable extends Component {
 
             if (key === 'insert_row_below') {
               const index = options.start.row;
-              dispatch(actionCreators.addContacts([{ }]))
+              dispatch(actionCreators.addContacts([{}]))
               .then( contacts => {
                 const newListContacts = listData.contacts;
                 newListContacts.splice(index + 1, 0, contacts[0].id);
-                this.setState({ addedRow: true });
+                this.setState({addedRow: true});
                 dispatch(actionCreators.patchList({
                   listId: listData.id,
                   contacts: newListContacts,
@@ -141,7 +141,7 @@ class HandsOnTable extends Component {
             if (key === 'remove_selected_rows') {
               const low = options.start.row <= options.end.row ? options.start.row : options.end.row;
               const hi = low === options.start.row ? options.end.row : options.end.row;
-              const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map( row => row.id );
+              const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map(row => row.id);
               const newListContacts = _.difference(listData.contacts, removeIdList);
               dispatch(actionCreators.patchList({
                 listId: listData.id,
@@ -149,7 +149,7 @@ class HandsOnTable extends Component {
                 name: listData.name,
                 fieldsmap: this.state.fieldsmap
               }));
-              this.setState({ addedRow: true, lastFetchedIndex: this.state.lastFetchedIndex - (hi - low + 1) });
+              this.setState({addedRow: true, lastFetchedIndex: this.state.lastFetchedIndex - (hi - low + 1)});
             }
 
             if (key === 'remove_column') {
@@ -231,7 +231,7 @@ class HandsOnTable extends Component {
             if (change[1] === change[2] || _.isEmpty(change[1]) && _.isEmpty(change[2])) {
               // console.log('DO NOTHING');
             } else {
-              if (!dirtyRows.some( rnum => rnum === rowId)) {
+              if (!dirtyRows.some(rnum => rnum === rowId)) {
                 dirtyRows.push(rowId);
               }
             }
@@ -243,7 +243,7 @@ class HandsOnTable extends Component {
       afterChange: (changes, source) => {
         // save selected rows
         if (!this.props.isNew && source === 'edit') {
-          const selectedRows = this.state.options.data.filter( row => row.selected );
+          const selectedRows = this.state.options.data.filter(row => row.selected);
           this.props._getSelectedRows(selectedRows);
         }
       },
@@ -316,8 +316,8 @@ class HandsOnTable extends Component {
   }
 
   _changeColumnName(listId, columns, colNum, newColumnName) {
-    const { fieldsmap } = this.state;
-    const { dispatch } = this.props;
+    const {fieldsmap} = this.state;
+    const {dispatch} = this.props;
     const columnValue = columns[colNum].data;
     const newFieldsmap = fieldsmap.map( fieldObj => {
       if (fieldObj.value === columnValue && fieldObj.customfield) {
@@ -369,7 +369,7 @@ class HandsOnTable extends Component {
         fieldsmap: newFieldsmap
       }));
     }
-    this.setState({ newColumnName: '' });
+    this.setState({newColumnName: ''});
   }
 
   _cleanUpURL(url) {

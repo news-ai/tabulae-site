@@ -1,48 +1,53 @@
 import React, {Component} from 'react';
-import CurlySpan from './CurlySpan.react';
 import {
   Editor,
   EditorState,
-  CompositeDecorator
+  CompositeDecorator,
+  ContentState,
+  convertFromHTML
 } from 'draft-js';
 
-const CURLY_REGEX = /{([^}]+)}/g;
-
-function findWithRegex(regex, contentBlock, callback) {
-  const text = contentBlock.getText();
-  let matchArr, start;
-  while ((matchArr = regex.exec(text)) !== null) {
-    start = matchArr.index;
-    callback(start, start + matchArr[0].length);
-  }
-}
-
-function curlyStrategy(contentBlock, callback) {
-  findWithRegex(CURLY_REGEX, contentBlock, callback);
-}
+import Link from './components/Link';
+import CurlySpan from './components/CurlySpan.react';
+import { curlyStrategy, findEntities } from './utils/strategies';
 
 class Subject extends Component {
   constructor(props) {
     super(props);
-    const compositeDecorator = new CompositeDecorator([{
-      strategy: curlyStrategy,
-      component: CurlySpan
-    }]);
+    const decorator = new CompositeDecorator([
+      {
+        strategy: findEntities.bind(null, 'link'),
+        component: Link
+      },
+      {
+        strategy: curlyStrategy,
+        component: CurlySpan
+      }
+    ]);
 
     this.state = {
-      editorState: EditorState.createEmpty(compositeDecorator)
+      editorState: EditorState.createEmpty(decorator),
+      subjectHtml: null
     };
 
     this.onChange = (editorState) => {
-      const { _setSubjectLine } = this.props;
-      // save subject line to send 
-      _setSubjectLine(editorState);
-      this.setState({ editorState });
+      this.props.onSubjectChange(editorState);
+      this.setState({editorState});
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.subjectHtml !== this.state.subjectHtml) {
+      const content = ContentState.createFromText(nextProps.subjectHtml);
+      // const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      this.setState({subjectHtml: nextProps.subjectHtml});
+      this.onChange(editorState);
+    }
+  }
+
   render() {
-    const { editorState } = this.state;
+    const {editorState} = this.state;
     return (
         <Editor
           editorState={editorState}
@@ -54,3 +59,4 @@ class Subject extends Component {
 }
 
 export default Subject;
+

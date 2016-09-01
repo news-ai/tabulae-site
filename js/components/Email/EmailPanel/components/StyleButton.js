@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class StyleButton extends Component {
+export default class StyleButton extends React.Component {
   constructor() {
     super();
     this.onToggle = (e) => {
@@ -22,7 +22,3 @@ class StyleButton extends Component {
     );
   }
 }
-
-export default StyleButton;
-
-

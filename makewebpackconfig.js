@@ -108,6 +108,9 @@ return {
       'constants': __dirname + '/js/constants',
       'actions': __dirname + '/js/actions',
       'components': __dirname + '/js/components',
+      // temporary fix for missing require in `react-ga`
+      // cf. https://github.com/react-ga/react-ga/issues/53
+      'react/lib/Object.assign': 'object-assign'
     }
   },
   plugins: plugins,

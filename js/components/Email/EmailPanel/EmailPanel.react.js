@@ -1,15 +1,25 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
-import { skylightStyles, buttonStyle } from 'constants/StyleConstants';
+import {skylightStyles, buttonStyle} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 import PreviewEmail from '../PreviewEmail';
-import EmailEditor from './EmailEditor.react';
+// import EmailEditor from './EmailEditor.react';
+
+import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
+import MenuItem from 'material-ui/MenuItem';
+import IconMenu from 'material-ui/IconMenu';
+import SelectField from 'material-ui/SelectField';
+import BasicHtmlEditor from './BasicHtmlEditor.react';
+import Dialog from 'material-ui/Dialog';
+
+// import PopoverMenu from '../../pieces/PopoverMenu.react';
 
 const styles = {
   emailPanelWrapper: {
@@ -23,10 +33,9 @@ const styles = {
   emailPanel: {
     height: '500px',
     width: '600px',
-    overflow: 'scroll'
+    overflow: 'scroll',
   },
-  sendButton: {
-    ...buttonStyle,
+  sendButtonPosition: {
     position: 'absolute',
     bottom: 10,
     right: 10
@@ -34,38 +43,56 @@ const styles = {
 };
 
 const injectCssToTags = {
-  'p': 'margin: 0;'
-}
-
-const options = {
-  inlineStyles: {
-    LINK: {element: 'a'}
-  }
-}
+  'p': 'margin: 0;font-family: arial;'
+};
 
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
       subject: '',
-      body: '',
-      matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields)
+      bodyEditorState: null,
+      matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
+      currentTemplateId: 0,
+      bodyHtml: null,
+      subjectHtml: null,
     };
+    this.updateBodyHtml = (html) => {
+      console.log(html);
+      this.setState({body: html});
+    };
+    this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this._showStagingEmails = this._showStagingEmails.bind(this);
     this._convertToHtml = this._convertToHtml.bind(this);
     this._replaceAll = this._replaceAll.bind(this);
     this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this._onSendAllEmailsClick = this._onSendAllEmailsClick.bind(this);
     this._onSendEmailClick = this._onSendEmailClick.bind(this);
-    this._setSubjectLine = (editorState) => {
+    this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      this.setState({ subject });
-    };
-    this._setBody = (editorState) => {
-      this.setState({ body: this._convertToHtml(editorState) });
+      this.setState({subject});
     };
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
+    this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
+    this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
+  }
+
+  componentWillMount() {
+    const {dispatch} = this.props;
+    dispatch(actionCreators.getTemplates());
+  }
+
+  _handleTemplateValueChange(event, index, value) {
+    if (value !== 0) {
+      const template = this.props.templates.find(id => value);
+      const bodyHtml = template.body;
+      const subjectHtml = template.subject;
+      this.setState({bodyHtml, subjectHtml});
+    } else {
+      this.setState({bodyHtml: null, subjectHtml: null});
+    }
+    this.setState({currentTemplateId: value});
   }
 
   _convertToHtml(editorState) {
@@ -74,7 +101,7 @@ class EmailPanel extends Component {
   }
 
   _replaceAll(html, contact) {
-    const { matchfields } = this.state;
+    const {matchfields} = this.state;
     let newHtml = html;
     matchfields.map( field => {
       if (contact[field] && contact[field] !== null) {
@@ -102,18 +129,18 @@ class EmailPanel extends Component {
 
   _sendGeneratedEmails(contactEmails) {
     this.props.dispatch(actionCreators.postBatchEmails(contactEmails))
-    .then( _ => this.refs.preview.show());
+    .then(_ => this.refs.preview.show());
   }
 
   _onPreviewEmailsClick() {
-    const { selectedContacts } = this.props;
-    const { subject, body } = this.state;
+    const {selectedContacts} = this.props;
+    const {subject, body} = this.state;
     const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
     if (selectedContacts.length === 0) {
       alertify.alert(`You didn't select any contact to send this email to.`);
       return;
     }
-    if (selectedContacts.some( contact => contact.email.length === 0 || contact.email === null)) {
+    if (selectedContacts.some(contact => contact.email.length === 0 || contact.email === null)) {
       alertify.alert(`You selected contacts without email field filled. We can't send emails to contacts with empty email field.`);
       return;
     }
@@ -131,14 +158,14 @@ class EmailPanel extends Component {
   }
 
   _showStagingEmails() {
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     dispatch(actionCreators.getStagedEmails())
     .then( _ => this.refs.preview.show());
   }
 
   _onSendAllEmailsClick() {
-    const { previewEmails } = this.props;
-    previewEmails.map( email => {
+    const {previewEmails} = this.props;
+    previewEmails.map(email => {
       if (email.body.length > 0 && !email.issent) {
         this._onSendEmailClick(email.id);
       }
@@ -146,29 +173,62 @@ class EmailPanel extends Component {
   }
 
   _onSendEmailClick(id) {
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     dispatch(actionCreators.sendEmail(id))
-    .then( _ => alertify.success(`Email sent.`));
+    .then(_ => alertify.success(`Email sent.`));
+  }
+
+  _onSaveNewTemplateClick() {
+    const {dispatch} = this.props;
+    const state = this.state;
+    alertify.prompt('', 'Name of new Email Template', '',
+      (e, value) => dispatch(actionCreators.createTemplate(value, state.subject, state.body)),
+      _ => alertify.error('Something went wrong.')
+      );
+  }
+
+  _onSaveCurrentTemplateClick() {
+    const {dispatch} = this.props;
+    const state = this.state;
+    dispatch(actionCreators.patchTemplate(state.currentTemplateId, state.subject, state.body));
   }
 
   render() {
     const props = this.props;
+    const state = this.state;
     // add this button to fetch all staged emails for debugging purposes
-    // <button onClick={this._showStagingEmails}>Show Staging Emails</button>
+    const templateMenuItems = props.templates.length > 0 ?
+    [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>].concat(props.templates.map((template, i) => <MenuItem value={template.id} key={i} primaryText={template.name.length > 0 ? template.name : template.subject} />)) :
+    null;
+
     return (
       <div>
         <div style={styles.emailPanelWrapper}>
-          <EmailEditor
-          person={props.person}
-          style={styles.emailPanel}
-          _setSubjectLine={this._setSubjectLine}
-          _setBody={this._setBody} />
-          <div style={{position: 'relative'}}>
-           <button
-            style={styles.sendButton}
-            onClick={this._onPreviewEmailsClick}
-            >Preview</button>
-          </div>
+          <BasicHtmlEditor
+            style={styles.emailPanel}
+            bodyHtml={state.bodyHtml}
+            subjectHtml={state.subjectHtml}
+            onBodyChange={html => this.updateBodyHtml(html) }
+            onSubjectChange={this.onSubjectChange}
+            debounce={500}
+            person={props.person}>
+              <div>
+                <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
+                {templateMenuItems}
+                </SelectField>
+                <IconMenu
+                iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
+                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                >
+                  <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
+                  <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+                </IconMenu>
+              </div>
+              <div>
+                <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+              </div>
+          </BasicHtmlEditor>
         </div>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
@@ -185,13 +245,11 @@ class EmailPanel extends Component {
                 const email = props.stagingReducer[pEmail.id];
                 if (email.body.length === 0 || email.issent) return null;
                 return (
-                  <div>
-                    <PreviewEmail
-                    key={i}
-                    {...email}
-                    sendEmail={ _ => this._onSendEmailClick(email.id)}
-                    />
-                  </div>
+                  <PreviewEmail
+                  key={i}
+                  {...email}
+                  sendEmail={_ => this._onSendEmailClick(email.id)}
+                  />
                   );
               })
             }
@@ -204,10 +262,13 @@ class EmailPanel extends Component {
 }
 
 const mapStateToProps = state => {
+    const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
+    console.log(templates);
     return {
       isReceiving: state.stagingReducer.isReceiving,
       previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails,
-      stagingReducer: state.stagingReducer
+      stagingReducer: state.stagingReducer,
+      templates: state.templateReducer.received.map(id => state.templateReducer[id])
     };
 };
 

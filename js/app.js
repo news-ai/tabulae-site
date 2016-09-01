@@ -26,8 +26,8 @@ import 'file?name=[name].[ext]!../.htaccess';
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { Router, Route, IndexRoute, browserHistory } from 'react-router';
+import {Provider} from 'react-redux';
+import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import configureStore from './configureStore';
 
 // Import the pages
@@ -37,9 +37,11 @@ import ListManagerContainer from './components/pages/ListManagerContainer.react'
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
-import { EmailAnalytics } from './components/Email';
+import {EmailAnalytics} from './components/Email';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';

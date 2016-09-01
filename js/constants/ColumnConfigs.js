@@ -38,13 +38,6 @@ export const COLUMNS = [
     invalidCellClass: 'invalid-cell',
     pass: true
   },
-  // {
-  //   data: 'employerString',
-  //   title: 'Publication(s)',
-  //   strict: false,
-  //   renderer: multiselectRenderer,
-  //   pass: false
-  // },
   {
     data: 'linkedin',
     title: 'LinkedIn',
