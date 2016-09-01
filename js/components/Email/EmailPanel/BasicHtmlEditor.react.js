@@ -233,10 +233,11 @@ export default class BasicHtmlEditor extends React.Component {
         </div>
          <div style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: 3,
           display: 'flex',
-          justifyContent: 'space-around',
+          justifyContent: 'space-between',
           width: props.style.width,
+          paddingRight: '30px'
         }}>{props.children}</div>
       </div>
     );

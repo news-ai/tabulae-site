@@ -55,7 +55,7 @@ class EmailPanel extends Component {
       matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
       currentTemplateId: 0,
       bodyHtml: null,
-      subjectHtml: null
+      subjectHtml: null,
     };
     this.updateBodyHtml = (html) => {
       console.log(html);
