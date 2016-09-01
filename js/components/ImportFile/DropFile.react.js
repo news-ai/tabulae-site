@@ -115,7 +115,7 @@ class DropFile extends Component {
       
         renderNode = (
           <Dropzone
-          accept='application/vnd.ms-excel,text/csv'
+          accept='application/vnd.ms-excel'
           style={styles.dropzone.default}
           activeStyle={styles.dropzone.active}
           rejectStyle={styles.dropzone.reject}
