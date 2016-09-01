@@ -22,6 +22,7 @@ import BlockStyleControls from './components/BlockStyleControls';
 
 import { curlyStrategy, findEntities } from './utils/strategies';
 
+const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 const injectCssToTags = {
   'p': 'margin: 0;font-family: arial;'
 };
@@ -226,7 +227,7 @@ export default class BasicHtmlEditor extends React.Component {
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}
             onChange={this.onChange}
-            placeholder='Tell a story...'
+            placeholder={placeholder}
             ref='editor'
             spellCheck
           />
