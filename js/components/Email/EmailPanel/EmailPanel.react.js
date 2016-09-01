@@ -33,7 +33,7 @@ const styles = {
   emailPanel: {
     height: '500px',
     width: '600px',
-    overflow: 'scroll'
+    overflow: 'scroll',
   },
   sendButtonPosition: {
     position: 'absolute',
@@ -212,20 +212,23 @@ class EmailPanel extends Component {
             onBodyChange={html => this.updateBodyHtml(html) }
             onSubjectChange={this.onSubjectChange}
             debounce={500}
-            person={props.person}
-          >
-          <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
-          {templateMenuItems}
-          </SelectField>
-          <IconMenu
-          iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
-          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-          targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
-          >
-            <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
-            <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
-          </IconMenu>
-          <RaisedButton style={{float: 'right'}} labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+            person={props.person}>
+              <div>
+                <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
+                {templateMenuItems}
+                </SelectField>
+                <IconMenu
+                iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
+                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                >
+                  <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
+                  <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+                </IconMenu>
+              </div>
+              <div>
+                <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+              </div>
           </BasicHtmlEditor>
         </div>
         <SkyLight

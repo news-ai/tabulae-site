@@ -54,8 +54,8 @@ class App extends Component {
       {props.isLogin ?
         <div>
           <Navigation>
-            <div className='offset-by-one two columns'>
-              <span style={{color: 'gray'}}>You are at: </span>
+            <div className='two columns'>
+              <span style={{color: 'gray', float: 'right'}}>You are at: </span>
             </div>
             <div className='seven columns'>
               <Breadcrumbs
