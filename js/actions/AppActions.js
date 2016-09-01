@@ -38,6 +38,6 @@ export const fetchHeaders = listId => fileActions.fetchHeaders(listId);
 export const addHeaders = (listId, order) => fileActions.addHeaders(listId, order);
 export const waitForServerProcess = listId => fileActions.waitForServerProcess(listId);
 
-export const createTemplate = (subject, body) => templateActions.createTemplate(subject, body);
+export const createTemplate = (name, subject, body) => templateActions.createTemplate(name, subject, body);
 export const patchTemplate = (templateId, subject, body) => templateActions.patchTemplate(templateId, subject, body);
 export const getTemplates = _ => templateActions.getTemplates();

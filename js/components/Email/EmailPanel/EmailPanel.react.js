@@ -86,9 +86,7 @@ class EmailPanel extends Component {
 
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
-      console.log(value);
       const template = this.props.templates.find(template => value === template.id);
-      console.log(template);
       const bodyHtml = template.body;
       const subjectHtml = template.subject;
       this.setState({bodyHtml, subjectHtml});
@@ -185,7 +183,7 @@ class EmailPanel extends Component {
     const {dispatch} = this.props;
     const state = this.state;
     alertify.prompt('', 'Name of new Email Template', '',
-      (e, value) => dispatch(actionCreators.createTemplate(value, state.subject, state.body)),
+      (e, name) => dispatch(actionCreators.createTemplate(name, state.subject, state.body)),
       _ => alertify.error('Something went wrong.')
       );
   }
