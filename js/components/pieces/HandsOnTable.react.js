@@ -402,6 +402,7 @@ class HandsOnTable extends Component {
             </div>
           </div>
         </div>
+        <span style={{color: 'gray', marginLeft: '5px'}}>Tip: To add row/column, right click to open context menu</span>
         <div ref='data-grid'></div>
       </div>
       );
