@@ -6,9 +6,9 @@ import RaisedButton from 'material-ui/RaisedButton';
 function Login({ loginWithGoogleClick, loginClick, registerClick }) {
 	return (
 		<div className='container'>
-			<RaisedButton label='Login with Google' onClick={loginWithGoogleClick} />
-			<RaisedButton label='Register' onClick={registerClick} />
-			<button label='Login' onClick={loginClick} />
+			<RaisedButton style={{textTransform: 'none'}} label='Login with Google' onClick={loginWithGoogleClick} />
+			<RaisedButton style={{textTransform: 'none'}} label='Register' onClick={registerClick} />
+			<RaisedButton style={{textTransform: 'none'}} label='Login' onClick={loginClick} />
 		</div>
 		);
 }

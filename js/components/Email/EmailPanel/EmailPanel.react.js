@@ -21,6 +21,7 @@ import Dialog from 'material-ui/Dialog';
 
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
 
+
 const styles = {
   emailPanelWrapper: {
     display: 'flex',
@@ -263,7 +264,6 @@ class EmailPanel extends Component {
 
 const mapStateToProps = state => {
     const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
-    console.log(templates);
     return {
       isReceiving: state.stagingReducer.isReceiving,
       previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails,
