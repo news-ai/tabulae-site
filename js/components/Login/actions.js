@@ -1,5 +1,8 @@
 import * as api from '../../actions/api';
-import { loginConstant } from './constants';
+import {
+  loginConstant,
+  SET_FIRST_TIME_USER
+} from './constants';
 
 
 function requestLogin() {
@@ -20,6 +23,10 @@ function loginFail(message) {
     type: loginConstant.REQUEST_FAIL,
     message
   };
+}
+
+export function setFirstTimeUser() {
+  return dispatch => dispatch({type: SET_FIRST_TIME_USER});
 }
 
 export function loginWithGoogle() {

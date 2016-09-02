@@ -20,23 +20,26 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
+      const firstTimeUserString = '?firstTimeUser=true';
+      if (window.location.search.substring(0, firstTimeUserString.length) === '?firstTimeUser=true') this.props.setFirstTimeUser();
       const person = nextProps.person;
       this.setState({ isLogin: true });
-      window.Intercom('boot', {
-        app_id: 'ur8dbk9e',
-        // email: person.email,
-        // user_id: person.id,
-      });
     }
   }
   componentDidUpdate() {
     if (this.props.isLogin && this.props.person) {
       const person = this.props.person;
-      window.Intercom('update', {
+      window.Intercom('boot', {
+        app_id: 'ur8dbk9e',
+        // email: person.email,
+        // user_id: person.id,
+      });
+      window.intercomSettings = {
         app_id: 'ur8dbk9e',
         email: person.email,
         user_id: person.id,
-      });
+      };
+      window.Intercom('update');
     }
   }
 
@@ -86,7 +89,7 @@ const mapStateToProps = state => {
     data: state,
     isLogin: state.personReducer.person ? true : false,
     loginDidInvalidate: state.personReducer.didInvalidate,
-    person: state.personReducer.person
+    person: state.personReducer.person,
   };
 };
 
@@ -94,6 +97,7 @@ const mapDispatchToProps = dispatch => {
   return {
     getAuth: _ => dispatch(actionCreators.fetchPerson()),
     logoutClick: _ => dispatch(actionCreators.logout()),
+    setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser())
   };
 };
 
