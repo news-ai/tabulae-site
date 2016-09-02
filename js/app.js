@@ -61,9 +61,9 @@ window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.co
 //   }
 // });
 
-if (typeof document !== 'undefined') {
-  require('./chat.js');
-}
+// if (typeof document !== 'undefined') {
+//   require('./chat.js');
+// }
 
 
 // Make reducers hot reloadable, see http://stackoverflow.com/questions/34243684/make-redux-reducers-and-other-non-components-hot-loadable

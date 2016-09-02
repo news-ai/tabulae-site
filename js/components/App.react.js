@@ -26,25 +26,15 @@ class App extends Component {
       this.setState({ isLogin: true });
     }
   }
-  componentDidUpdate() {
-    if (this.props.isLogin && this.props.person) {
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.isLogin !== this.props.isLogin && this.props.person) {
       const person = this.props.person;
       window.Intercom('boot', {
         app_id: 'ur8dbk9e',
-        // email: person.email,
-        // user_id: person.id,
-      });
-      window.intercomSettings = {
-        app_id: 'ur8dbk9e',
         email: person.email,
         user_id: person.id,
-      };
-      window.Intercom('update');
+      });
     }
-  }
-
-  componentWillUnmount() {
-    // if (this.state.isLogin) window.Intercom('shutdown');
   }
 
   render() {
