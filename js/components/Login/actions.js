@@ -55,7 +55,9 @@ export function fetchPerson() {
     dispatch(requestLogin());
     return api.get('/users/me')
     .then( response => dispatch(receiveLogin(response.data)))
-    .catch( message => console.log(message));
+    .catch( message => {
+      if (window.isDev) console.log(message);
+    });
     // .catch( message => dispatch(loginFail(message)));
   };
 }
