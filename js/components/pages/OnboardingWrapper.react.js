@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Joyride from 'react-joyride';
+import { connect } from 'react-redux';
 
 import 'node_modules/react-joyride/lib/styles/react-joyride-compiled.css';
 
@@ -18,16 +19,20 @@ class OnboardingWrapper extends Component {
       joyrideOverlay: true,
       joyrideType: 'continuous',
       ready: false,
-      steps: []
+      steps: [],
+      firstTimeUser: false
     };
     this._addSteps = this._addSteps.bind(this);
     this._addTooltip = this._addTooltip.bind(this);
   }
 
-  componentDidMount() {
-    setTimeout( _ => {
-      this.setState({ ready: true });
-    }, 7000);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.firstTimeUser !== this.state.firstTimeUser) {
+      setTimeout( _ => {
+        this.setState({ready: true});
+      }, 7000);
+      this.setState({firstTimeUser: true});
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -62,7 +67,7 @@ class OnboardingWrapper extends Component {
     const state = this.state;
     const props = this.props;
     const childrenWithProps = React.Children.map(props.children,
-     child => React.cloneElement(child, Object.assign({}, props, { addSteps: this._addSteps}))
+     child => React.cloneElement(child, Object.assign({}, props, {addSteps: this._addSteps}))
     );
     return (
       <div>
@@ -83,4 +88,17 @@ class OnboardingWrapper extends Component {
   }
 }
 
-export default OnboardingWrapper;
+const mapStateToProps = (state, props) => {
+  return {
+    firstTimeUser: state.personReducer.firstTimeUser
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {};
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(OnboardingWrapper);
