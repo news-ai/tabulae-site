@@ -387,6 +387,7 @@ class HandsOnTable extends Component {
 
   render() {
     const { options } = this.state;
+    const props = this.props;
     return (
       <div>
         <div className='row' style={styles.buttons.group}>
@@ -398,12 +399,12 @@ class HandsOnTable extends Component {
               labelStyle={{textTransform: 'none'}}
               onClick={ _ => this._onSaveClick(options.data, options.columns)}
               />
-              <p style={{fontSize: '0.8em'}}>{this.props.lastSavedAt}</p>
+              <p style={{fontSize: '0.8em'}}>{props.lastSavedAt}</p>
             </div>
           </div>
         </div>
         <span style={{color: 'gray', marginLeft: '5px'}}>Tip: To add row/column, right click to open context menu</span>
-        <div ref='data-grid'></div>
+        <div ref='data-grid' id={props.listData.id}></div>
       </div>
       );
   }
