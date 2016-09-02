@@ -39,6 +39,7 @@ class App extends Component {
 
   render() {
     const props = this.props;
+    const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
     return (
       <div style={{width: '100%', height: '100%'}}>
       {props.isLogin ?
@@ -58,6 +59,7 @@ class App extends Component {
               {
                 //<RaisedButton label='Email Analytics' labelStyle={{textTransform: 'none'}} onClick={_ => props.history.push('/emailstats')} />
               }
+              <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
             </div>
             <div className='two columns'>
               <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
@@ -80,6 +82,7 @@ const mapStateToProps = state => {
     isLogin: state.personReducer.person ? true : false,
     loginDidInvalidate: state.personReducer.didInvalidate,
     person: state.personReducer.person,
+    firstTimeUser: state.personReducer.firstTimeUser
   };
 };
 
