@@ -92,19 +92,22 @@ class Table extends Component {
   componentDidMount() {
     this._fetchOperations();
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
-    if (this.props.firstTimeUser) setTimeout( _ => {
-      const steps = [{
-        text: 'If the contact is highlighted green, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab.',
-        selector: '.handsontable',
-        position: 'top-left',
-        type: 'hover'
-      }, {
-        text: 'Here is where you can do things like, update contacts in your sync that are out-of-date with LinkedIn and import existing Excel sheets.',
-        selector: '.menubutton',
-        position: 'bottom',
-      }];
-      this.props.addSteps(steps);
-    }, 5000);
+    if (this.props.firstTimeUser) {
+      console.log(this.props.firstTimeUser);
+      setTimeout( _ => {
+        const steps = [{
+          text: 'If the contact is highlighted green, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab.',
+          selector: '.handsontable',
+          position: 'top-left',
+          type: 'hover'
+        }, {
+          text: 'Here is where you can do things like, update contacts in your sync that are out-of-date with LinkedIn and import existing Excel sheets.',
+          selector: '.menubutton',
+          position: 'bottom',
+        }];
+        this.props.addSteps(steps);
+      }, 5000);
+    }
   }
     
 

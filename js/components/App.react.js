@@ -80,14 +80,14 @@ class App extends Component {
             <div className='two columns'>
               <span style={{color: 'gray', float: 'right'}}>You are at: </span>
             </div>
-            <div className='six columns'>
+            <div className='five columns'>
               <Breadcrumbs
               routes={props.routes}
               params={props.params}
               separator=' > '
               />
             </div>
-            <div className='two columns'>
+            <div className='three columns'>
               {
                 //<RaisedButton label='Email Analytics' labelStyle={{textTransform: 'none'}} onClick={_ => props.history.push('/emailstats')} />
               }

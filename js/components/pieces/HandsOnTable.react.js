@@ -315,6 +315,11 @@ class HandsOnTable extends Component {
     }
   }
 
+  componentWillUnmount() {
+    console.log('DESTROY');
+    this.table.destroy();
+  }
+
   _changeColumnName(listId, columns, colNum, newColumnName) {
     const {fieldsmap} = this.state;
     const {dispatch} = this.props;
