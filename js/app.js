@@ -62,7 +62,7 @@ window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.co
 // });
 
 if (typeof document !== 'undefined') {
-  const Intercom = require('./chat.js');
+  require('./chat.js');
 }
 
 
