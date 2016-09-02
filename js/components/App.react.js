@@ -19,15 +19,24 @@ class App extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.isLogin && !this.state.isLogin) {
+    if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
+      const person = nextProps.person;
       this.setState({ isLogin: true });
+      window.Intercom('boot', {
+        app_id: 'ur8dbk9e',
+        // email: person.email,
+        // user_id: person.id,
+      });
     }
   }
-
-  componentWillUpdate(nextProps, nextState) {
-    if (nextState.isLogin !== this.state.isLogin) {
-      const person = nextProps.person;
-    } else {
+  componentDidUpdate() {
+    if (this.props.isLogin && this.props.person) {
+      const person = this.props.person;
+      window.Intercom('update', {
+        app_id: 'ur8dbk9e',
+        email: person.email,
+        user_id: person.id,
+      });
     }
   }
 
