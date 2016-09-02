@@ -12,7 +12,6 @@ import {
   Modifier,
   convertFromHTML
 } from 'draft-js';
-import htmlToContent from './utils/htmlToContent';
 import draftRawToHtml from './utils/draftRawToHtml';
 
 import Subject from './Subject.react';
@@ -26,9 +25,6 @@ import alertify from 'alertifyjs';
 import { curlyStrategy, findEntities } from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
-const injectCssToTags = {
-  'p': 'margin: 0;font-family: arial;'
-};
 
 export default class BasicHtmlEditor extends React.Component {
   constructor(props) {

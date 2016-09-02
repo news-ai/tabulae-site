@@ -92,7 +92,7 @@ class Table extends Component {
   componentDidMount() {
     this._fetchOperations();
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
-    setTimeout( _ => {
+    if (this.props.firstTimeUser) setTimeout( _ => {
       const steps = [{
         text: 'If the contact is highlighted green, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab.',
         selector: '.handsontable',
@@ -381,7 +381,8 @@ const mapStateToProps = (state, props) => {
     pubMapByName: publicationReducer,
     publicationReducer,
     lastFetchedIndex,
-    person: state.personReducer.person
+    person: state.personReducer.person,
+    firstTimeUser: state.personReducer.firstTimeUser
   };
 };
 

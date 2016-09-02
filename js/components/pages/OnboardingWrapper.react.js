@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Joyride from 'react-joyride';
-import Table from './Table.react';
 
 import 'node_modules/react-joyride/lib/styles/react-joyride-compiled.css';
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
-import Handsontable from 'handsontable/dist/handsontable.full';
+import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
@@ -11,7 +11,7 @@ import _ from 'lodash';
 import { fromJS, List } from 'immutable';
 import RaisedButton from 'material-ui/RaisedButton';
 
-import 'node_modules/handsontable/dist/handsontable.full.css';
+import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
