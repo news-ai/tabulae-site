@@ -3,13 +3,25 @@ import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import RaisedButton from 'material-ui/RaisedButton';
 
-function Login({ loginWithGoogleClick, loginClick, registerClick }) {
+const buttonStyle = {
+	textTransform: 'none',
+	margin: '0.1em'
+};
+
+function Login({loginWithGoogleClick, loginClick, registerClick}) {
 	return (
-		<div className='container'>
-			<RaisedButton style={{textTransform: 'none'}} label='Login with Google' onClick={loginWithGoogleClick} />
-			<RaisedButton style={{textTransform: 'none'}} label='Register' onClick={registerClick} />
-			<RaisedButton style={{textTransform: 'none'}} label='Login' onClick={loginClick} />
-		</div>
+			<div style={{
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				minHeight: '50em'
+			}}>
+				<div>
+					<RaisedButton style={buttonStyle} label='Login with Google' onClick={loginWithGoogleClick} />
+					<RaisedButton style={buttonStyle} label='Register' onClick={registerClick} />
+					<RaisedButton style={buttonStyle} label='Login' onClick={loginClick} />
+				</div>
+			</div>
 		);
 }
 

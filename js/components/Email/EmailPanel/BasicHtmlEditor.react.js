@@ -12,6 +12,8 @@ import {
   Modifier,
   convertFromHTML
 } from 'draft-js';
+import htmlToContent from './utils/htmlToContent';
+import draftRawToHtml from './utils/draftRawToHtml';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -19,6 +21,7 @@ import CurlySpan from './components/CurlySpan.react';
 import EntityControls from './components/EntityControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
+import alertify from 'alertifyjs';
 
 import { curlyStrategy, findEntities } from './utils/strategies';
 
@@ -81,8 +84,10 @@ export default class BasicHtmlEditor extends React.Component {
     };
 
     function emitHTML(editorState) {
-      const content = editorState.getCurrentContent();
-      let html = stateToHTML(content, null, injectCssToTags);
+      const raw = convertToRaw(editorState.getCurrentContent());
+      // let html = stateToHTML(content, null, injectCssToTags);
+      let html = draftRawToHtml(raw);
+      console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -166,9 +171,12 @@ export default class BasicHtmlEditor extends React.Component {
     if (selection.isCollapsed()) {
       return;
     }
-    const href = window.prompt('Enter a URL');
-    const entityKey = Entity.create('link', 'MUTABLE', {href});
-    this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
+    const href = alertify.prompt('', 'Enter a URL', 'https://',
+      (e, href) => {
+        const entityKey = Entity.create('link', 'MUTABLE', {href});
+        this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
+      },
+      _ => {});
   }
 
   _removeLink(/* e */) {

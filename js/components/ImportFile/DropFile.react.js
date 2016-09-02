@@ -5,15 +5,7 @@ import Dropzone from 'react-dropzone';
 import Headers from './Headers.react';
 import _ from 'lodash';
 import Radium from 'radium';
-
-function Waiting({}) {
-  return (
-    <div>
-      <i className='fa fa-spinner fa-spin fa-4x' aria-hidden='true'></i>
-      <p>Waiting for Columns to be processed...</p>
-    </div>
-    );
-}
+import Waiting from '../pieces/Waiting.react';
 
 const styles = {
   dropzone: {
@@ -81,20 +73,24 @@ class DropFile extends Component {
   }
 
   render() {
-    const { listId, fileIsReceiving, fileReducer, isProcessWaiting } = this.props;
-    const { file, isFileDropped, fileSubmitted } = this.state;
+    const {listId, fileIsReceiving, fileReducer, isProcessWaiting} = this.props;
+    const {file, isFileDropped, fileSubmitted} = this.state;
     const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
     let renderNode;
     if (isProcessWaiting) {
-      renderNode = <Waiting />;
+      renderNode = <Waiting isReceiving={isProcessWaiting} text='Waiting for Columns to be processed...' />;
     } else {
       if (isFileDropped) {
         if (fileSubmitted) {
-          renderNode = (fileIsReceiving || !headers) ? 
-          <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i> :
-          <Headers
-          headers={headers}
-          onProcessHeaders={this._processHeaders} />;
+          if (fileIsReceiving) {
+            renderNode = <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i>;
+          } else {
+            if (fileReducer[listId].didInvalidate) {
+              renderNode = <div><span>Something went wrong. Upload failed. Please try later.</span></div>
+            } else {
+              renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
+            }
+          }
         } else {
           renderNode = (
             <div>
@@ -112,10 +108,10 @@ class DropFile extends Component {
           );
         }
       } else {
-      
+
         renderNode = (
           <Dropzone
-          accept='application/vnd.ms-excel,text/csv'
+          accept='application/vnd.ms-excel'
           style={styles.dropzone.default}
           activeStyle={styles.dropzone.active}
           rejectStyle={styles.dropzone.reject}
