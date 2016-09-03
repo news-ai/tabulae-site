@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import Radium from 'radium';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
@@ -17,9 +18,17 @@ import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
-import Dialog from 'material-ui/Dialog';
 
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
+const iconStyle = {
+  color: 'lightgray',
+  float: 'right',
+  margin: '2px',
+  ':hover': {
+    color: 'gray',
+    cursor: 'pointer'
+  }
+};
 
 
 const styles = {
@@ -205,31 +214,53 @@ class EmailPanel extends Component {
     return (
       <div style={styles.emailPanelPosition}>
         <div style={styles.emailPanelWrapper}>
-          <BasicHtmlEditor
-            style={styles.emailPanel}
+          <div className='RichEditor-root' style={styles.emailPanel}>
+            <div>
+              <i
+              style={[iconStyle]}
+              key='email-fa-times'
+              className='fa fa-times'
+              aria-hidden='true'
+              onClick={_ => props.onClose()}
+              />
+              {/* TODO: open multiple instances of email and minimizable like GMail
+              <i
+              style={[iconStyle]}
+              key='email-fa-minus'
+              className='fa fa-minus'
+              aria-hidden='true' />
+              */}
+            </div>
+          <div className='RichEditor-controls RichEditor-styleButton'>
+            <span>Emails are sent from: {props.person.email}</span>
+          </div>
+            <BasicHtmlEditor
+            width={styles.emailPanel.width}
             bodyHtml={state.bodyHtml}
             subjectHtml={state.subjectHtml}
             onBodyChange={html => this.updateBodyHtml(html) }
             onSubjectChange={this.onSubjectChange}
             debounce={500}
-            person={props.person}>
-            <div>
-              <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
-              {templateMenuItems}
-              </SelectField>
-              <IconMenu
-              iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
-              anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-              targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
-              >
-                <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
-                <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
-              </IconMenu>
-            </div>
-            <div>
-              <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
-            </div>
-          </BasicHtmlEditor>
+            person={props.person}
+            >
+              <div>
+                <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
+                {templateMenuItems}
+                </SelectField>
+                <IconMenu
+                iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
+                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                >
+                  <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
+                  <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+                </IconMenu>
+              </div>
+              <div>
+                <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+              </div>
+            </BasicHtmlEditor>
+          </div>
         </div>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
@@ -280,4 +311,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(EmailPanel);
+)(Radium(EmailPanel));

@@ -321,6 +321,7 @@ class Table extends Component {
             person={props.person}
             selectedContacts={state.selectedContacts}
             customfields={props.listData.customfields}
+            onClose={this.toggleEmailPanel}
             /> : null
           }
           <div style={{marginTop: '10px'}}>
