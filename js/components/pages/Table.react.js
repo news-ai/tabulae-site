@@ -115,7 +115,7 @@ class Table extends Component {
     if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
     if (this.state.person === null) {
       const person = nextProps.person;
-      this.setState({ person });
+      this.setState({person});
     }
   }
 
@@ -187,7 +187,7 @@ class Table extends Component {
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
-    const { dispatch, listId, listData } = this.props;
+    const {dispatch, listId, listData, lastFetchedIndex} = this.props;
     let addContactList = [];
     let patchContactList = [];
 
@@ -283,14 +283,12 @@ class Table extends Component {
               />
             </SkyLight>
             <div className='six columns'>
-              <div>
-                <ToggleableEditInput
-                name={state.name}
-                onUpdateName={this._onUpdateName}
-                onToggleTitleEdit={this._onToggleTitleEdit}
-                isTitleEditing={state.isTitleEditing}
-                />
-              </div>
+              <ToggleableEditInput
+              name={state.name}
+              onUpdateName={this._onUpdateName}
+              onToggleTitleEdit={this._onToggleTitleEdit}
+              isTitleEditing={state.isTitleEditing}
+              />
             </div>
             <div className='offset-by-nine two columns'>
               <div style={{position: 'fixed', top: 100, zIndex: 200}}>

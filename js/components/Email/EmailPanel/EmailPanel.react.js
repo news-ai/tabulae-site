@@ -23,12 +23,12 @@ import Dialog from 'material-ui/Dialog';
 
 
 const styles = {
-  emailPanelWrapper: {
+  emailPanelPosition: {
     display: 'flex',
     justifyContent: 'center',
+  },
+  emailPanelWrapper: {
     position: 'fixed',
-    left: 0,
-    right: 0,
     zIndex: 200
   },
   emailPanel: {
@@ -203,7 +203,7 @@ class EmailPanel extends Component {
     null;
 
     return (
-      <div>
+      <div style={styles.emailPanelPosition}>
         <div style={styles.emailPanelWrapper}>
           <BasicHtmlEditor
             style={styles.emailPanel}
@@ -213,22 +213,22 @@ class EmailPanel extends Component {
             onSubjectChange={this.onSubjectChange}
             debounce={500}
             person={props.person}>
-              <div>
-                <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
-                {templateMenuItems}
-                </SelectField>
-                <IconMenu
-                iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
-                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                >
-                  <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
-                  <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
-                </IconMenu>
-              </div>
-              <div>
-                <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
-              </div>
+            <div>
+              <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
+              {templateMenuItems}
+              </SelectField>
+              <IconMenu
+              iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
+              anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+              targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+              >
+                <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
+                <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+              </IconMenu>
+            </div>
+            <div>
+              <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+            </div>
           </BasicHtmlEditor>
         </div>
         <SkyLight
@@ -250,8 +250,7 @@ class EmailPanel extends Component {
                   key={i}
                   {...email}
                   sendEmail={_ => this._onSendEmailClick(email.id)}
-                  />
-                  );
+                  />);
               })
             }
             </div>
@@ -263,14 +262,13 @@ class EmailPanel extends Component {
 }
 
 const mapStateToProps = state => {
-    const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
-    console.log(templates);
-    return {
-      isReceiving: state.stagingReducer.isReceiving,
-      previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails,
-      stagingReducer: state.stagingReducer,
-      templates: state.templateReducer.received.map(id => state.templateReducer[id])
-    };
+  const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
+  return {
+    isReceiving: state.stagingReducer.isReceiving,
+    previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails,
+    stagingReducer: state.stagingReducer,
+    templates: state.templateReducer.received.map(id => state.templateReducer[id])
+  };
 };
 
 const mapDispatchToProps = dispatch => {
