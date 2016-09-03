@@ -1,12 +1,21 @@
 import React, { PropTypes } from 'react';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
+import {deepOrange100, deepOrange700, deepOrange900, grey50} from 'material-ui/styles/colors';
 
 const styles = {
   analytics: {
     margin: '10px',
-    border: '1px black solid'
+    display: 'flex',
+    alignItems: 'center'
   },
+  wrapper: {
+    padding: '5px',
+    border: '1px gray solid',
+    borderRadius: '1.2em',
+    margin: '5px',
+    backgroundColor: grey50
+  }
 };
 
 function CountView({label, count, iconName}) {
@@ -18,22 +27,34 @@ function CountView({label, count, iconName}) {
     );
 }
 
-function AnalyticsPanel({opened, clicked, to, subject}) {
+function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason}) {
+  const wrapperStyle = bounced ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
   return (
-    <div className='email-analytics row' style={styles.analytics}>
-      <div className='five columns'>
-        <span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span>
+    <div style={wrapperStyle}>
+      <div className='email-analytics row' style={styles.analytics}>
+        <div className='three columns'>
+          <span style={{
+            color: 'gray',
+            fontSize: '0.8em',
+            alignSelf: 'flex-start',
+            marginRight: '5px'
+          }}>To</span>
+          <span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span>
+        </div>
+        <div className='six columns'>
+          <span style={{fontWeight: 'bold'}}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
+          {bounced ? <span style={{color: deepOrange700, float: 'right'}}>email bounced {bouncedreason}</span>: null}
+          {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
+        </div>
+        <div className='two columns'>
+          {!bounced ? <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
+        </div>
+        <div className='two columns'>
+          {!bounced ? <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
+        </div>
       </div>
-      <div className='three columns'>
-        <span>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
-      </div>
-      <div className='two columns'>
-        <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />
-      </div>
-      <div className='two columns'>
-        <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>
-      </div>
-    </div>);
+    </div>
+    );
 }
 
 AnalyticsPanel.PropTypes = {
