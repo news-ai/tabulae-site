@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
-import Badge from 'material-ui/Badge';
-import IconButton from 'material-ui/IconButton';
+import Chip from 'material-ui/Chip';
+import Avatar from 'material-ui/Avatar';
 
 const styles = {
   analytics: {
@@ -11,13 +11,10 @@ const styles = {
 
 function CountView({label, count, iconName}) {
   return (
-    <Badge
-    badgeContent={count}
-    secondary
-    badgeStyle={{top: 10, right: 10}}
-    >
-      <IconButton iconClassName={iconName} tooltip={label} />
-    </Badge>
+      <Chip>
+        <Avatar size={30}>{count}</Avatar>
+        {label} <i className={iconName} aria-hidden='true'/>
+      </Chip>
     );
 }
 
@@ -31,10 +28,10 @@ function AnalyticsPanel({opened, clicked, to, subject}) {
         <span>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
       </div>
       <div className='two columns'>
-        <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-fw' />
+        <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />
       </div>
       <div className='two columns'>
-        <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-fw'/>
+        <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>
       </div>
     </div>);
 }
