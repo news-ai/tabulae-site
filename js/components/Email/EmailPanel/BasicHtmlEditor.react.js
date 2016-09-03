@@ -22,11 +22,11 @@ import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
 import alertify from 'alertifyjs';
 
-import { curlyStrategy, findEntities } from './utils/strategies';
+import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
-export default class BasicHtmlEditor extends React.Component {
+class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -199,10 +199,7 @@ export default class BasicHtmlEditor extends React.Component {
     }
 
     return (
-      <div className='RichEditor-root' style={props.style}>
-        <div className='RichEditor-controls RichEditor-styleButton'>
-          <span>Emails are sent from: {props.person.email}</span>
-        </div>
+      <div>
         <BlockStyleControls
           editorState={editorState}
           blockTypes={this.BLOCK_TYPES}
@@ -241,7 +238,7 @@ export default class BasicHtmlEditor extends React.Component {
           bottom: 3,
           display: 'flex',
           justifyContent: 'space-between',
-          width: props.style.width,
+          width: props.width,
           paddingRight: '30px'
         }}>{props.children}</div>
       </div>
@@ -265,3 +262,6 @@ function getBlockStyle(block) {
     default: return null;
   }
 }
+
+export default BasicHtmlEditor;
+
