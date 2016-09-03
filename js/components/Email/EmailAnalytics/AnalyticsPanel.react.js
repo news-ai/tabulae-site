@@ -1,45 +1,40 @@
 import React, { PropTypes } from 'react';
+import Badge from 'material-ui/Badge';
+import IconButton from 'material-ui/IconButton';
 
 const styles = {
   analytics: {
-    margin: '10px'
+    margin: '10px',
+    border: '1px black solid'
   },
 };
 
-const button = {
-  border: '1px solid black',
-  display: 'inline-block',
-  // alignItems: 'center',
-  // justifyContent: 'center',
-  borderRadius: '5px',
-  padding: '2px'
-};
-
-function CountView({label, count}) {
+function CountView({label, count, iconName}) {
   return (
-    <div style={button}>
-      <span style={{
-        marginLeft: '3px',
-        marginRight: '3px'
-      }}>{label}</span>
-      <span style={{
-        marginLeft: '3px',
-        marginRight: '3px'
-      }}>{count}</span>
-    </div>
+    <Badge
+    badgeContent={count}
+    secondary
+    badgeStyle={{top: 10, right: 10}}
+    >
+      <IconButton iconClassName={iconName} tooltip={label} />
+    </Badge>
     );
 }
 
 function AnalyticsPanel({opened, clicked, to, subject}) {
   return (
     <div className='email-analytics row' style={styles.analytics}>
-      <div className='three columns'><span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span></div>
-      <div className='three columns'><span>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span></div>
-      <div className='one columns'>
-        <CountView label='Opened' count={opened} />
+      <div className='five columns'>
+        <span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span>
       </div>
-      <div className='one columns'>
-        <CountView label='Clicked' count={clicked} />
+      <div className='three columns'>
+        <span>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
+      </div>
+      <div className='two columns'>
+        <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-fw' />
+      </div>
+      <div className='two columns'>
+        <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-fw'/>
       </div>
     </div>);
 }

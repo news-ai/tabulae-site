@@ -28,9 +28,7 @@ class EmailAnalytics extends Component {
             return (
               <div key={i}>
                 <AnalyticsPanel {...email} />
-                <StaticEmailContent {...email} />
               </div>
-
               )
           })
         }
