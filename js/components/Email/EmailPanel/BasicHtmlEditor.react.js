@@ -29,6 +29,15 @@ const placeholder = 'Tip: Use column names as variables in your template email. 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
+    const bottomBlockStyle = {
+      position: 'absolute',
+      bottom: 3,
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: props.width,
+      paddingRight: '30px'
+    };
+    
     const decorator = new CompositeDecorator([
       {
         strategy: findEntities.bind(null, 'link'),
@@ -233,14 +242,7 @@ class BasicHtmlEditor extends React.Component {
             spellCheck
           />
         </div>
-         <div style={{
-          position: 'absolute',
-          bottom: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          width: props.width,
-          paddingRight: '30px'
-        }}>{props.children}</div>
+         <div style={bottomBlockStyle}>{props.children}</div>
       </div>
     );
   }

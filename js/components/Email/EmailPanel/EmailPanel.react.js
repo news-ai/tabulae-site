@@ -17,6 +17,7 @@ import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
+import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
@@ -41,7 +42,7 @@ const styles = {
     zIndex: 200
   },
   emailPanel: {
-    height: '500px',
+    height: '600px',
     width: '600px',
     overflow: 'scroll',
   },
@@ -213,7 +214,7 @@ class EmailPanel extends Component {
 
     return (
       <div style={styles.emailPanelPosition}>
-        <div style={styles.emailPanelWrapper}>
+        <Paper style={styles.emailPanelWrapper} zDepth={2}>
           <div className='RichEditor-root' style={styles.emailPanel}>
             <div>
               <i
@@ -261,7 +262,7 @@ class EmailPanel extends Component {
               </div>
             </BasicHtmlEditor>
           </div>
-        </div>
+        </Paper>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
         dialogStyles={skylightStyles.dialog}
