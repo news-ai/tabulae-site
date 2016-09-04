@@ -11,9 +11,10 @@ const styles = {
   },
   wrapper: {
     padding: '5px',
-    border: '1px gray solid',
+    // border: '1px gray solid',
     borderRadius: '1.2em',
     margin: '5px',
+    marginBottom: '10px',
     backgroundColor: grey50
   }
 };
@@ -27,8 +28,9 @@ function CountView({label, count, iconName}) {
     );
 }
 
-function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason}) {
-  const wrapperStyle = bounced ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
+function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason, delivered}) {
+  delivered = true; // hack until delivered is spelled correctly
+  const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
   return (
     <div style={wrapperStyle}>
       <div className='email-analytics row' style={styles.analytics}>
@@ -43,7 +45,8 @@ function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason}) 
         </div>
         <div className='six columns'>
           <span style={{fontWeight: 'bold'}}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
-          {bounced ? <span style={{color: deepOrange700, float: 'right'}}>email bounced {bouncedreason}</span>: null}
+          {!delivered ? <span style={{color: deepOrange700, float: 'right'}}>Something went wrong on our end. Let us know!</span>: null}
+          {bounced ? <span style={{color: deepOrange700, float: 'right'}}>email bounced</span>: null}
           {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
         </div>
         <div className='two columns'>
@@ -58,16 +61,18 @@ function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason}) 
 }
 
 AnalyticsPanel.PropTypes = {
-  // id: PropTypes.number.isRequired,
-  // to: PropTypes.string.isRequired,
-  // subject: PropTypes.string.isRequired,
-  // body: PropTypes.string.isRequired,
-  // onSendEmailClick: PropTypes.func,
-  // issent: PropTypes.bool.isRequired,
-  // bounced: PropTypes.bool.isRequired,
-  // bouncedreason: PropTypes.string,
-  // clicked: PropTypes.number,
-  // opened: PropTypes.number
+  id: PropTypes.number.isRequired,
+  to: PropTypes.string.isRequired,
+  subject: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired,
+  onSendEmailClick: PropTypes.func,
+  issent: PropTypes.bool.isRequired,
+  bounced: PropTypes.bool.isRequired,
+  bouncedreason: PropTypes.string,
+  clicked: PropTypes.number,
+  opened: PropTypes.number,
+  delivered: PropTypes.bool,
+  templateid: PropTypes.number
 };
 
 export default AnalyticsPanel;
