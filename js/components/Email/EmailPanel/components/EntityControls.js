@@ -6,7 +6,7 @@ export default function EntityControls(props) {
   let { entityControls } = props;
   var currentStyle = props.editorState.getCurrentInlineStyle();
   return (
-    <div className="RichEditor-controls">
+    <div className='RichEditor-controls' style={{display: 'flex'}}>
       {entityControls.map(type =>
         <StyleButton
           key={type.label}

@@ -232,9 +232,7 @@ class EmailPanel extends Component {
               aria-hidden='true' />
               */}
             </div>
-          <div className='RichEditor-controls RichEditor-styleButton'>
             <span>Emails are sent from: {props.person.email}</span>
-          </div>
             <BasicHtmlEditor
             width={styles.emailPanel.width}
             bodyHtml={state.bodyHtml}

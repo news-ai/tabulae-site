@@ -12,7 +12,6 @@ export default class StyleButton extends React.Component {
 
   render() {
     const props = this.props;
-    
     const buttonStyle = {
       color: props.active ? blueA400 : 'black',
       cursor: 'pointer',

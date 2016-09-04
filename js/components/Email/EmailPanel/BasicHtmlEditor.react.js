@@ -29,7 +29,6 @@ const placeholder = 'Tip: Use column names as variables in your template email. 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
-    
 
     const decorator = new CompositeDecorator([
       {
@@ -210,25 +209,27 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <BlockStyleControls
-          editorState={editorState}
-          blockTypes={this.BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-        />
-        <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
-          inlineStyles={this.INLINE_STYLES}
-        />
-        <EntityControls
-          editorState={editorState}
-          entityControls={this.ENTITY_CONTROLS}
-        />
-        <div>
-        <Subject
-        onSubjectChange={props.onSubjectChange}
-        subjectHtml={props.subjectHtml}
-        />
+        <div style={{display: 'flex', alignItems: 'flex-end'}}>
+          <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={this.INLINE_STYLES}
+          />
+          <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+          />
+          <BlockStyleControls
+            editorState={editorState}
+            blockTypes={this.BLOCK_TYPES}
+            onToggle={this.toggleBlockType}
+          />
+        </div>
+        <div style={{marginTop: '8px'}}>
+          <Subject
+          onSubjectChange={props.onSubjectChange}
+          subjectHtml={props.subjectHtml}
+          />
         </div>
         <div className={className} onClick={this.focus}>
           <Editor
