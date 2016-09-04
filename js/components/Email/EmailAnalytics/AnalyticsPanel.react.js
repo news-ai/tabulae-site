@@ -1,60 +1,78 @@
 import React, { PropTypes } from 'react';
+import Chip from 'material-ui/Chip';
+import Avatar from 'material-ui/Avatar';
+import {deepOrange100, deepOrange700, deepOrange900, grey50} from 'material-ui/styles/colors';
 
 const styles = {
   analytics: {
-    margin: '10px'
+    margin: '10px',
+    display: 'flex',
+    alignItems: 'center'
   },
+  wrapper: {
+    padding: '5px',
+    // border: '1px gray solid',
+    borderRadius: '1.2em',
+    margin: '5px',
+    marginBottom: '10px',
+    backgroundColor: grey50
+  }
 };
 
-const button = {
-  border: '1px solid black',
-  display: 'inline-block',
-  // alignItems: 'center',
-  // justifyContent: 'center',
-  borderRadius: '5px',
-  padding: '2px'
-};
-
-function CountView({label, count}) {
+function CountView({label, count, iconName}) {
   return (
-    <div style={button}>
-      <span style={{
-        marginLeft: '3px',
-        marginRight: '3px'
-      }}>{label}</span>
-      <span style={{
-        marginLeft: '3px',
-        marginRight: '3px'
-      }}>{count}</span>
+      <Chip>
+        <Avatar size={30}>{count}</Avatar>
+        {label} <i className={iconName} aria-hidden='true'/>
+      </Chip>
+    );
+}
+
+function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason, delivered}) {
+  delivered = true; // hack until delivered is spelled correctly
+  const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
+  return (
+    <div style={wrapperStyle}>
+      <div className='email-analytics row' style={styles.analytics}>
+        <div className='three columns'>
+          <span style={{
+            color: 'gray',
+            fontSize: '0.8em',
+            alignSelf: 'flex-start',
+            marginRight: '5px'
+          }}>To</span>
+          <span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span>
+        </div>
+        <div className='six columns'>
+          <span style={{fontWeight: 'bold'}}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
+          {!delivered ? <span style={{color: deepOrange700, float: 'right'}}>Something went wrong on our end. Let us know!</span>: null}
+          {bounced ? <span style={{color: deepOrange700, float: 'right'}}>email bounced</span>: null}
+          {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
+        </div>
+        <div className='two columns'>
+          {!bounced ? <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
+        </div>
+        <div className='two columns'>
+          {!bounced ? <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
+        </div>
+      </div>
     </div>
     );
 }
 
-function AnalyticsPanel({opened, clicked, to, subject}) {
-  return (
-    <div className='email-analytics row' style={styles.analytics}>
-      <div className='three columns'><span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span></div>
-      <div className='three columns'><span>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span></div>
-      <div className='one columns'>
-        <CountView label='Opened' count={opened} />
-      </div>
-      <div className='one columns'>
-        <CountView label='Clicked' count={clicked} />
-      </div>
-    </div>);
-}
-
 AnalyticsPanel.PropTypes = {
-  // id: PropTypes.number.isRequired,
-  // to: PropTypes.string.isRequired,
-  // subject: PropTypes.string.isRequired,
-  // body: PropTypes.string.isRequired,
-  // onSendEmailClick: PropTypes.func,
-  // issent: PropTypes.bool.isRequired,
-  // bounced: PropTypes.bool.isRequired,
-  // bouncedreason: PropTypes.string,
-  // clicked: PropTypes.number,
-  // opened: PropTypes.number
+  id: PropTypes.number.isRequired,
+  to: PropTypes.string.isRequired,
+  subject: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired,
+  onSendEmailClick: PropTypes.func,
+  issent: PropTypes.bool.isRequired,
+  bounced: PropTypes.bool.isRequired,
+  bouncedreason: PropTypes.string,
+  clicked: PropTypes.number,
+  opened: PropTypes.number,
+  delivered: PropTypes.bool,
+  templateid: PropTypes.number
 };
 
 export default AnalyticsPanel;

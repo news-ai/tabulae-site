@@ -19,20 +19,13 @@ class EmailAnalytics extends Component {
 
   render() {
     const state = this.state;
-    console.log(state.sentEmails);
     return (
-      <div>
-        <span>EMAIL ANALYTICS</span>
+      <div className='container'>
+        <div style={{marginTop: '20px', marginBottom: '20px'}}>
+          <span style={{fontSize: '1.2em', marginRight: '10px'}}>Emails You Sent</span>
+        </div>
         {
-          state.sentEmails.map( (email, i) => {
-            return (
-              <div key={i}>
-                <AnalyticsPanel {...email} />
-                <StaticEmailContent {...email} />
-              </div>
-
-              )
-          })
+          state.sentEmails.map( (email, i) => <AnalyticsPanel key={i} {...email} />)
         }
       </div>
     );

@@ -1,18 +1,25 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router'
 import { connect } from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import Navigation from './pieces/Navigation.react';
 import RaisedButton from 'material-ui/RaisedButton';
+import Drawer from 'material-ui/Drawer';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
 import intercomSetup from '../chat';
+import {grey700} from 'material-ui/styles/colors';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLogin: false
+      isLogin: false,
+      isDrawerOpen: false
     };
+    this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
   }
 
   componentWillMount() {
@@ -49,13 +56,22 @@ class App extends Component {
 
   render() {
     const props = this.props;
+    const state = this.state;
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
     return (
       <div style={{width: '100%', height: '100%'}}>
       {props.isLogin ?
         <div>
+          <Drawer
+          docked={false}
+          open={state.isDrawerOpen}
+          onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}
+          >
+            <MenuItem onClick={_ => props.router.push('/emailstats')}>Email Analytics</MenuItem>
+          </Drawer>
           <Navigation>
-            <div className='two columns'>
+            <div className='two columns' style={{display: 'flex', alignItems: 'center'}}>
+              <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars' />
               <span style={{color: 'gray', float: 'right'}}>You are at: </span>
             </div>
             <div className='five columns'>
@@ -66,9 +82,6 @@ class App extends Component {
               />
             </div>
             <div className='three columns'>
-              {
-                //<RaisedButton label='Email Analytics' labelStyle={{textTransform: 'none'}} onClick={_ => props.history.push('/emailstats')} />
-              }
               <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
             </div>
             <div className='two columns'>
@@ -107,4 +120,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(App);
+  )(withRouter(App));
