@@ -29,15 +29,8 @@ const placeholder = 'Tip: Use column names as variables in your template email. 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
-    const bottomBlockStyle = {
-      position: 'absolute',
-      bottom: 3,
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: props.width,
-      paddingRight: '30px'
-    };
     
+
     const decorator = new CompositeDecorator([
       {
         strategy: findEntities.bind(null, 'link'),
@@ -63,12 +56,12 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.BLOCK_TYPES = [
-      {label: 'P', style: 'unstyled'},
-      {label: 'H1', style: 'header-one'},
-      {label: 'H2', style: 'header-two'},
+      {label: 'Normal', style: 'unstyled'},
+      {label: 'Heading - Large', style: 'header-one'},
+      {label: 'Heading - Medium', style: 'header-two'},
       {label: 'Blockquote', style: 'blockquote'},
-      {label: 'UL', style: 'unordered-list-item'},
-      {label: 'OL', style: 'ordered-list-item'},
+      {label: 'Unordered List', style: 'unordered-list-item'},
+      {label: 'Ordered List', style: 'ordered-list-item'},
       {label: 'Code Block', style: 'code-block'}
     ];
 
@@ -206,6 +199,14 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    const bottomBlockStyle = {
+      position: 'absolute',
+      bottom: 3,
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: props.width,
+      paddingRight: '30px'
+    };
 
     return (
       <div>
