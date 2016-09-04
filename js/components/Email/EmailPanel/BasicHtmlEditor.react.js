@@ -29,7 +29,6 @@ const placeholder = 'Tip: Use column names as variables in your template email. 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
-
     const decorator = new CompositeDecorator([
       {
         strategy: findEntities.bind(null, 'link'),
@@ -88,7 +87,7 @@ class BasicHtmlEditor extends React.Component {
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
-
+    this.insertText = this._insertText.bind(this);
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
@@ -105,6 +104,19 @@ class BasicHtmlEditor extends React.Component {
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
+  }
+
+  _insertText() {
+    const {editorState} = this.state;
+    const content = editorState.getCurrentContent();
+    const selection = editorState.getSelection();
+    const block = content.getBlockForKey(selection.getStartKey());
+
+    // console.log(content.toJS(), selection.toJS(), block.toJS());
+
+    const newContent = Modifier.insertText(content, selection, '{COOL}');
+    const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
+    this.setState({editorState: newEditorState});
   }
 
   _handleKeyCommand(command) {
@@ -150,7 +162,7 @@ class BasicHtmlEditor extends React.Component {
     const selection = editorState.getSelection();
     const block = content.getBlockForKey(selection.getStartKey());
 
-    console.log(content.toJS(), selection.toJS(), block.toJS());
+    // console.log(content.toJS(), selection.toJS(), block.toJS());
 
     if (block.type === 'code-block') {
       newContent = Modifier.insertText(content, selection, '\n');
@@ -231,6 +243,7 @@ class BasicHtmlEditor extends React.Component {
           subjectHtml={props.subjectHtml}
           />
         </div>
+        <button onClick={this.insertText}>INSERT WORD</button>
         <div className={className} onClick={this.focus}>
           <Editor
             blockStyleFn={getBlockStyle}

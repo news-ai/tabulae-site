@@ -63,7 +63,7 @@ class EmailPanel extends Component {
     this.state = {
       subject: '',
       bodyEditorState: null,
-      matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
+      fieldsmap: [],
       currentTemplateId: 0,
       bodyHtml: null,
       subjectHtml: null,
@@ -94,6 +94,12 @@ class EmailPanel extends Component {
     dispatch(actionCreators.getTemplates());
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps.fieldsmap);
+    const fieldsmap = nextProps.fieldsmap;
+    this.setState({fieldsmap});
+  }
+
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
       const template = this.props.templates.find(template => value === template.id);
@@ -112,13 +118,14 @@ class EmailPanel extends Component {
   }
 
   _replaceAll(html, contact) {
-    const {matchfields} = this.state;
+    const {fieldsmap} = this.state;
     let newHtml = html;
-    matchfields.map( field => {
-      if (contact[field] && contact[field] !== null) {
-        newHtml = newHtml.replace('{' + field + '}', contact[field]);
+    fieldsmap.map(field => {
+      if (contact[field.value] && contact[field.value] !== null) {
+        newHtml = newHtml.replace('{' + field.name + '}', contact[field.value]);
       }
     });
+    
     return newHtml;
   }
 
