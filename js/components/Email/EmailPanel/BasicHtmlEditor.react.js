@@ -48,11 +48,11 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.INLINE_STYLES = [
-      {label: 'Bold', style: 'BOLD'},
-      {label: 'Italic', style: 'ITALIC'},
-      {label: 'Underline', style: 'UNDERLINE'},
+      {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
+      {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
+      {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
       {label: 'Monospace', style: 'CODE'},
-      {label: 'Strikethrough', style: 'STRIKETHROUGH'}
+      {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
     ];
 
     this.BLOCK_TYPES = [

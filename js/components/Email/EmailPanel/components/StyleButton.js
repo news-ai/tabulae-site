@@ -1,4 +1,5 @@
 import React from 'react';
+import {blueA400} from 'material-ui/styles/colors';
 
 export default class StyleButton extends React.Component {
   constructor() {
@@ -10,15 +11,28 @@ export default class StyleButton extends React.Component {
   }
 
   render() {
-    let className = 'RichEditor-styleButton';
-    if (this.props.active) {
-      className += ' RichEditor-activeButton';
+    const props = this.props;
+    
+    const buttonStyle = {
+      color: props.active ? blueA400 : 'black',
+      cursor: 'pointer',
+      marginRight: '10px'
+    };
+    let renderNode;
+    if (props.icon) {
+      renderNode = (
+        <i
+        style={buttonStyle}
+        className={props.icon}
+        onClick={this.onToggle}
+        aria-hidden='true' />);
+    } else {
+      renderNode = (
+        <span style={buttonStyle} onMouseDown={this.onToggle}>
+          {props.label}
+        </span>);
     }
 
-    return (
-      <span className={className} onMouseDown={this.onToggle}>
-        {this.props.label}
-      </span>
-    );
+    return <div>{renderNode}</div>;
   }
 }

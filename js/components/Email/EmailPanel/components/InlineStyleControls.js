@@ -2,11 +2,11 @@ import React from 'react';
 import StyleButton from './StyleButton';
 
 export default function InlineStyleControls(props) {
-  let { inlineStyles } = props;
+  let {inlineStyles} = props;
   var currentStyle = props.editorState.getCurrentInlineStyle();
 
   return (
-    <div className="RichEditor-controls">
+    <div className='RichEditor-controls' style={{display: 'flex'}}>
       {inlineStyles.map(type =>
         <StyleButton
           key={type.label}
@@ -14,6 +14,7 @@ export default function InlineStyleControls(props) {
           label={type.label}
           onToggle={props.onToggle}
           style={type.style}
+          icon={type.icon}
         />
       )}
     </div>
