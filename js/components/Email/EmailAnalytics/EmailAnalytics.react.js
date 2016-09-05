@@ -2,14 +2,18 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import StaticEmailContent from '../PreviewEmail/StaticEmailContent.react';
-import AnalyticsPanel from './AnalyticsPanel.react';
+import AnalyticsItem from './AnalyticsItem.react';
+import Dialog from 'material-ui/Dialog';
 
 class EmailAnalytics extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sentEmails: []
+      sentEmails: [],
+      isPreviewOpen: false
     };
+    this.handlePreviewOpen = email => this.setState({isPreviewOpen: true, previewEmail: email});
+    this.handlePreviewClose = _ => this.setState({isPreviewOpen: false, previewEmail: null});
   }
 
   componentWillMount() {
@@ -24,9 +28,18 @@ class EmailAnalytics extends Component {
         <div style={{marginTop: '20px', marginBottom: '20px'}}>
           <span style={{fontSize: '1.2em', marginRight: '10px'}}>Emails You Sent</span>
         </div>
-        {
-          state.sentEmails.map( (email, i) => <AnalyticsPanel key={i} {...email} />)
-        }
+        <Dialog
+        open={state.isPreviewOpen}
+        onRequestClose={this.handlePreviewClose}
+        >
+          <StaticEmailContent {...state.previewEmail} />
+        </Dialog>
+        {state.sentEmails.map((email, i) =>
+          <AnalyticsItem
+          key={i}
+          onPreviewOpen={ _ => this.handlePreviewOpen(email)}
+          {...email}
+          />)}
       </div>
     );
   }

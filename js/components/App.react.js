@@ -70,11 +70,11 @@ class App extends Component {
             <MenuItem onClick={_ => props.router.push('/emailstats')}>Email Analytics</MenuItem>
           </Drawer>
           <Navigation>
-            <div className='two columns' style={{display: 'flex', alignItems: 'center'}}>
+            <div className='three columns' style={{display: 'flex', alignItems: 'center'}}>
               <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars' />
               <span style={{color: 'gray', float: 'right'}}>You are at: </span>
             </div>
-            <div className='five columns'>
+            <div className='four columns'>
               <Breadcrumbs
               routes={props.routes}
               params={props.params}

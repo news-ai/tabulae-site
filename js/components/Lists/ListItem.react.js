@@ -3,13 +3,21 @@ import { Link } from 'react-router';
 import { globalStyles } from 'constants/StyleConstants';
 import Radium from 'radium';
 import {listPropTypes} from 'constants/CommonPropTypes';
+import {grey50} from 'material-ui/styles/colors';
 
 const styles = {
   parent: {
-    marginBottom: '10px'
+    marginBottom: '10px',
+    borderRadius: '1.5em',
+    height: '2em',
+    display: 'flex',
+    alignItems: 'center',
+    ':hover': {
+      backgroundColor: grey50
+    }
   },
   link: {
-    margin: '10px'
+    marginLeft: '15px'
   },
   icon: {
     color: 'lightgray',
@@ -23,13 +31,13 @@ const styles = {
 
 function ListItem({list, onToggle, iconName}) {
   return (
-    <div className='row' style={[styles.parent]}>
-      <div className='six columns'>
-        <Link to={`/lists/${list.id}`} style={[styles.link]}>
-          <span>{list.name}</span>
-        </Link>
+    <div key='parent' className='row' style={[styles.parent]}>
+      <div className='eight columns'>
+        <span style={[styles.link]}>
+          <Link to={`/lists/${list.id}`}>{list.name}</Link>
+        </span>
       </div>
-      <div className='six columns'>
+      <div className='three columns'>
         <i
         alt='archive'
         className={iconName}
