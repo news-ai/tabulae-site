@@ -17,13 +17,14 @@ class ListManagerContainer extends Component {
   render() {
     return (
       <div className='container'>
-        <Lists {...this.props} />
         <RaisedButton
+        style={{float: 'right'}}
         label='Add New List'
         onClick={this.props.newListOnClick}
         labelStyle={{textTransform: 'none'}}
         icon={<i className='fa fa-plus' aria-hidden='true' />}
         />
+        <Lists {...this.props} />
       </div>
       );
   }
