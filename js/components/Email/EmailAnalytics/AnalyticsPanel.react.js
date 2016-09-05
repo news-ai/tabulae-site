@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
-import Chip from 'material-ui/Chip';
-import Avatar from 'material-ui/Avatar';
+import CountViewItem from './CountViewItem.react';
 import {deepOrange100, deepOrange700, deepOrange900, grey50} from 'material-ui/styles/colors';
 
 const styles = {
@@ -19,14 +18,6 @@ const styles = {
   }
 };
 
-function CountView({label, count, iconName}) {
-  return (
-      <Chip>
-        <Avatar size={30}>{count}</Avatar>
-        {label} <i className={iconName} aria-hidden='true'/>
-      </Chip>
-    );
-}
 
 function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason, delivered}) {
   delivered = true; // hack until delivered is spelled correctly
@@ -45,15 +36,15 @@ function AnalyticsPanel({opened, clicked, to, subject, bounced, bouncedreason, d
         </div>
         <div className='six columns'>
           <span style={{fontWeight: 'bold'}}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
-          {!delivered ? <span style={{color: deepOrange700, float: 'right'}}>Something went wrong on our end. Let us know!</span>: null}
-          {bounced ? <span style={{color: deepOrange700, float: 'right'}}>email bounced</span>: null}
+          {!delivered ? <span style={{color: deepOrange700, float: 'right'}}>Something went wrong on our end. Let us know!</span> : null}
+          {bounced ? <span style={{color: deepOrange700, float: 'right'}}>email bounced</span> : null}
           {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
         </div>
         <div className='two columns'>
-          {!bounced ? <CountView label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
+          {!bounced ? <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
         </div>
         <div className='two columns'>
-          {!bounced ? <CountView label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
+          {!bounced ? <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
         </div>
       </div>
     </div>
