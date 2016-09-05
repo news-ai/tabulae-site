@@ -39,14 +39,6 @@ const styles = {
     height: '500px',
     width: '600px'
   },
-  icon: {
-    color: 'lightgray',
-    marginLeft: '5px',
-    ':hover': {
-      color: 'gray',
-      cursor: 'pointer'
-    }
-  },
   loading: {
     zIndex: 160,
     top: 80,
@@ -93,7 +85,6 @@ class Table extends Component {
     this._fetchOperations();
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
     if (this.props.firstTimeUser) {
-      console.log(this.props.firstTimeUser);
       setTimeout( _ => {
         const steps = [{
           text: 'If the contact is highlighted green, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab.',
@@ -234,7 +225,7 @@ class Table extends Component {
     } else {
       // if no new contacts, see if list needs update
       if (this.state.name !== listData.name) {
-        dispatch(actionCreators.patchList({ listId, name: this.state.name }));
+        dispatch(actionCreators.patchList({listId, name: this.state.name}));
       }
     }
     const currentdate = new Date(); 
@@ -257,8 +248,8 @@ class Table extends Component {
       .then( _ => {
         this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
       });
+      
     }
-    this.setState({ isSaved: true });
   }
 
   render() {

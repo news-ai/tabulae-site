@@ -37,3 +37,12 @@ export const skylightStyles = {
 export const buttonStyle = {
   backgroundColor: 'white'
 };
+
+export const iconStyle = {
+  color: 'lightgray',
+  marginLeft: '5px',
+  ':hover': {
+    color: 'gray',
+    cursor: 'pointer'
+  }
+};
