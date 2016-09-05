@@ -38,6 +38,7 @@ import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
 import {EmailAnalytics} from './components/Email';
+import intercomSetup from './chat';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -64,6 +65,7 @@ window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.co
 // if (typeof document !== 'undefined') {
 //   require('./chat.js');
 // }
+intercomSetup({app_id: 'ur8dbk9e'});
 
 
 // Make reducers hot reloadable, see http://stackoverflow.com/questions/34243684/make-redux-reducers-and-other-non-components-hot-loadable

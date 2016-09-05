@@ -46,11 +46,11 @@ class App extends Component {
       //   email: person.email,
       //   user_id: person.id,
       // };
-      intercomSetup({
-        app_id: 'ur8dbk9e',
-        email: person.email,
-        user_id: person.id,
-      });
+      // intercomSetup({
+      //   app_id: 'ur8dbk9e',
+      //   email: person.email,
+      //   user_id: person.id,
+      // });
     }
   }
 
