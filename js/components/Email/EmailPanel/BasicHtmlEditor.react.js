@@ -14,6 +14,11 @@ import {
 } from 'draft-js';
 import draftRawToHtml from './utils/draftRawToHtml';
 
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
+import FlatButton from 'material-ui/FlatButton';
+import Popover from 'material-ui/Popover';
+
 import Subject from './Subject.react';
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
@@ -46,26 +51,28 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.INLINE_STYLES = [
-      {label: 'Bold', style: 'BOLD'},
-      {label: 'Italic', style: 'ITALIC'},
-      {label: 'Underline', style: 'UNDERLINE'},
+      {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
+      {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
+      {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
       {label: 'Monospace', style: 'CODE'},
-      {label: 'Strikethrough', style: 'STRIKETHROUGH'}
+      {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
     ];
 
     this.BLOCK_TYPES = [
-      {label: 'P', style: 'unstyled'},
-      {label: 'H1', style: 'header-one'},
-      {label: 'H2', style: 'header-two'},
+      {label: 'Normal', style: 'unstyled'},
+      {label: 'Heading - Large', style: 'header-one'},
+      {label: 'Heading - Medium', style: 'header-two'},
       {label: 'Blockquote', style: 'blockquote'},
-      {label: 'UL', style: 'unordered-list-item'},
-      {label: 'OL', style: 'ordered-list-item'},
+      {label: 'Unordered List', style: 'unordered-list-item'},
+      {label: 'Ordered List', style: 'ordered-list-item'},
       {label: 'Code Block', style: 'code-block'}
     ];
 
     this.state = {
       editorState: EditorState.createEmpty(decorator),
-      bodyHtml: null
+      bodyHtml: null,
+      variableMenuOpen: false,
+      variableMenuAnchorEl: null
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -78,6 +85,14 @@ class BasicHtmlEditor extends React.Component {
         this.emitHTML(editorState);
       }
     };
+    this.handleTouchTap = (event) => {
+      event.preventDefault();
+
+      this.setState({
+        variableMenuOpen: true,
+        variableMenuAnchorEl: event.currentTarget,
+      });
+    };
 
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
@@ -87,7 +102,7 @@ class BasicHtmlEditor extends React.Component {
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
-
+    this.insertText = this._insertText.bind(this);
     this.handleKeyCommand = (command) => this._handleKeyCommand(command);
     this.toggleBlockType = (type) => this._toggleBlockType(type);
     this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
@@ -104,6 +119,15 @@ class BasicHtmlEditor extends React.Component {
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
+  }
+
+  _insertText(replaceText) {
+    const {editorState} = this.state;
+    const content = editorState.getCurrentContent();
+    const selection = editorState.getSelection();
+    const newContent = Modifier.insertText(content, selection, '{' + replaceText + '}');
+    const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
+    this.onChange(newEditorState);
   }
 
   _handleKeyCommand(command) {
@@ -149,7 +173,7 @@ class BasicHtmlEditor extends React.Component {
     const selection = editorState.getSelection();
     const block = content.getBlockForKey(selection.getStartKey());
 
-    console.log(content.toJS(), selection.toJS(), block.toJS());
+    // console.log(content.toJS(), selection.toJS(), block.toJS());
 
     if (block.type === 'code-block') {
       newContent = Modifier.insertText(content, selection, '\n');
@@ -187,6 +211,7 @@ class BasicHtmlEditor extends React.Component {
   render() {
     const {editorState} = this.state;
     const props = this.props;
+    const state = this.state;
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
@@ -197,28 +222,55 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    const bottomBlockStyle = {
+      position: 'absolute',
+      bottom: 3,
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: props.width,
+      paddingRight: '30px'
+    };
 
     return (
       <div>
+        <div style={{display: 'flex', alignItems: 'flex-end', marginTop: '10px'}}>
+          <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={this.INLINE_STYLES}
+          />
+          <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+          />
+        </div>
         <BlockStyleControls
           editorState={editorState}
           blockTypes={this.BLOCK_TYPES}
           onToggle={this.toggleBlockType}
         />
-        <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
-          inlineStyles={this.INLINE_STYLES}
+        <FlatButton
+        label='Use Column Variable'
+        labelStyle={{textTransform: 'none'}}
+        onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
         />
-        <EntityControls
-          editorState={editorState}
-          entityControls={this.ENTITY_CONTROLS}
-        />
-        <div>
-        <Subject
-        onSubjectChange={props.onSubjectChange}
-        subjectHtml={props.subjectHtml}
-        />
+        <Popover
+        open={state.variableMenuOpen}
+        anchorEl={state.variableMenuAnchorEl}
+        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        >
+          <Menu desktop>
+          {props.fieldsmap.map((field, i) =>
+            <MenuItem key={i} primaryText={field.name} onClick={_ => this.insertText(field.name)} />)}
+          </Menu>
+        </Popover>
+        <div style={{marginTop: '8px'}}>
+          <Subject
+          onSubjectChange={props.onSubjectChange}
+          subjectHtml={props.subjectHtml}
+          />
         </div>
         <div className={className} onClick={this.focus}>
           <Editor
@@ -233,14 +285,7 @@ class BasicHtmlEditor extends React.Component {
             spellCheck
           />
         </div>
-         <div style={{
-          position: 'absolute',
-          bottom: 3,
-          display: 'flex',
-          justifyContent: 'space-between',
-          width: props.width,
-          paddingRight: '30px'
-        }}>{props.children}</div>
+         <div style={bottomBlockStyle}>{props.children}</div>
       </div>
     );
   }

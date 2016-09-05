@@ -17,6 +17,7 @@ import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
+import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
@@ -41,7 +42,7 @@ const styles = {
     zIndex: 200
   },
   emailPanel: {
-    height: '500px',
+    height: '600px',
     width: '600px',
     overflow: 'scroll',
   },
@@ -62,7 +63,7 @@ class EmailPanel extends Component {
     this.state = {
       subject: '',
       bodyEditorState: null,
-      matchfields: ['firstname', 'lastname', 'email'].concat(this.props.customfields),
+      fieldsmap: [],
       currentTemplateId: 0,
       bodyHtml: null,
       subjectHtml: null,
@@ -93,6 +94,11 @@ class EmailPanel extends Component {
     dispatch(actionCreators.getTemplates());
   }
 
+  componentWillReceiveProps(nextProps) {
+    const fieldsmap = nextProps.fieldsmap;
+    this.setState({fieldsmap});
+  }
+
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
       const template = this.props.templates.find(template => value === template.id);
@@ -111,11 +117,11 @@ class EmailPanel extends Component {
   }
 
   _replaceAll(html, contact) {
-    const {matchfields} = this.state;
+    const {fieldsmap} = this.state;
     let newHtml = html;
-    matchfields.map( field => {
-      if (contact[field] && contact[field] !== null) {
-        newHtml = newHtml.replace('{' + field + '}', contact[field]);
+    fieldsmap.map(field => {
+      if (contact[field.value] && contact[field.value] !== null) {
+        newHtml = newHtml.replace(new RegExp('\{' + field.name + '\}', 'g'), contact[field.value]);
       }
     });
     return newHtml;
@@ -213,7 +219,7 @@ class EmailPanel extends Component {
 
     return (
       <div style={styles.emailPanelPosition}>
-        <div style={styles.emailPanelWrapper}>
+        <Paper style={styles.emailPanelWrapper} zDepth={2}>
           <div className='RichEditor-root' style={styles.emailPanel}>
             <div>
               <i
@@ -231,10 +237,9 @@ class EmailPanel extends Component {
               aria-hidden='true' />
               */}
             </div>
-          <div className='RichEditor-controls RichEditor-styleButton'>
             <span>Emails are sent from: {props.person.email}</span>
-          </div>
             <BasicHtmlEditor
+            fieldsmap={state.fieldsmap}
             width={styles.emailPanel.width}
             bodyHtml={state.bodyHtml}
             subjectHtml={state.subjectHtml}
@@ -261,7 +266,7 @@ class EmailPanel extends Component {
               </div>
             </BasicHtmlEditor>
           </div>
-        </div>
+        </Paper>
         <SkyLight
         overlayStyles={skylightStyles.overlay}
         dialogStyles={skylightStyles.dialog}

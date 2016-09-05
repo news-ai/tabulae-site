@@ -264,7 +264,7 @@ class Table extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    
+
     return (
       <div>
       <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
@@ -320,7 +320,7 @@ class Table extends Component {
             <EmailPanel
             person={props.person}
             selectedContacts={state.selectedContacts}
-            customfields={props.listData.customfields}
+            fieldsmap={props.listData.fieldsmap}
             onClose={this.toggleEmailPanel}
             /> : null
           }

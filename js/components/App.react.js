@@ -35,7 +35,7 @@ class App extends Component {
       const firstTimeUserString = '?firstTimeUser=true';
       if (window.location.search.substring(0, firstTimeUserString.length) === '?firstTimeUser=true') this.props.setFirstTimeUser();
       const person = nextProps.person;
-      this.setState({ isLogin: true });
+      this.setState({isLogin: true});
     }
   }
   componentDidUpdate(prevProps, prevState) {
