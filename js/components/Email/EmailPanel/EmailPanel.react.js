@@ -121,7 +121,7 @@ class EmailPanel extends Component {
     let newHtml = html;
     fieldsmap.map(field => {
       if (contact[field.value] && contact[field.value] !== null) {
-        newHtml = newHtml.replace('{' + field.name + '}', contact[field.value]);
+        newHtml = newHtml.replace(new RegExp('\{' + field.name + '\}', 'g'), contact[field.value]);
       }
     });
     return newHtml;

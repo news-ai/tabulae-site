@@ -124,13 +124,9 @@ class BasicHtmlEditor extends React.Component {
     const {editorState} = this.state;
     const content = editorState.getCurrentContent();
     const selection = editorState.getSelection();
-    const block = content.getBlockForKey(selection.getStartKey());
-
-    // console.log(content.toJS(), selection.toJS(), block.toJS());
-
     const newContent = Modifier.insertText(content, selection, '{' + replaceText + '}');
     const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
-    this.setState({editorState: newEditorState});
+    this.onChange(newEditorState);
   }
 
   _handleKeyCommand(command) {
