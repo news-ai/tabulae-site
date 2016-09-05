@@ -13,9 +13,10 @@ import {
   convertFromHTML
 } from 'draft-js';
 import draftRawToHtml from './utils/draftRawToHtml';
+
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import Popover from 'material-ui/Popover';
 
 import Subject from './Subject.react';
@@ -232,7 +233,7 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <div style={{display: 'flex', alignItems: 'flex-end'}}>
+        <div style={{display: 'flex', alignItems: 'flex-end', marginTop: '10px'}}>
           <InlineStyleControls
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
@@ -242,16 +243,16 @@ class BasicHtmlEditor extends React.Component {
             editorState={editorState}
             entityControls={this.ENTITY_CONTROLS}
           />
-          <BlockStyleControls
-            editorState={editorState}
-            blockTypes={this.BLOCK_TYPES}
-            onToggle={this.toggleBlockType}
-          />
         </div>
-        <RaisedButton
+        <BlockStyleControls
+          editorState={editorState}
+          blockTypes={this.BLOCK_TYPES}
+          onToggle={this.toggleBlockType}
+        />
+        <FlatButton
         label='Use Column Variable'
         labelStyle={{textTransform: 'none'}}
-        onClick={_ => this.setState({variableMenuOpen: true})}
+        onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
         />
         <Popover
         open={state.variableMenuOpen}
