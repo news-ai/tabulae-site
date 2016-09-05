@@ -95,7 +95,6 @@ class EmailPanel extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps.fieldsmap);
     const fieldsmap = nextProps.fieldsmap;
     this.setState({fieldsmap});
   }
@@ -125,7 +124,6 @@ class EmailPanel extends Component {
         newHtml = newHtml.replace('{' + field.name + '}', contact[field.value]);
       }
     });
-    
     return newHtml;
   }
 
@@ -241,6 +239,7 @@ class EmailPanel extends Component {
             </div>
             <span>Emails are sent from: {props.person.email}</span>
             <BasicHtmlEditor
+            fieldsmap={state.fieldsmap}
             width={styles.emailPanel.width}
             bodyHtml={state.bodyHtml}
             subjectHtml={state.subjectHtml}

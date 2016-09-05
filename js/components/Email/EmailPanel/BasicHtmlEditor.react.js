@@ -13,6 +13,10 @@ import {
   convertFromHTML
 } from 'draft-js';
 import draftRawToHtml from './utils/draftRawToHtml';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
+import Popover from 'material-ui/Popover';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -65,7 +69,9 @@ class BasicHtmlEditor extends React.Component {
 
     this.state = {
       editorState: EditorState.createEmpty(decorator),
-      bodyHtml: null
+      bodyHtml: null,
+      variableMenuOpen: false,
+      variableMenuAnchorEl: null
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -77,6 +83,14 @@ class BasicHtmlEditor extends React.Component {
       if (previousContent !== editorState.getCurrentContent()) {
         this.emitHTML(editorState);
       }
+    };
+    this.handleTouchTap = (event) => {
+      event.preventDefault();
+
+      this.setState({
+        variableMenuOpen: true,
+        variableMenuAnchorEl: event.currentTarget,
+      });
     };
 
     function emitHTML(editorState) {
@@ -106,7 +120,7 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
-  _insertText() {
+  _insertText(replaceText) {
     const {editorState} = this.state;
     const content = editorState.getCurrentContent();
     const selection = editorState.getSelection();
@@ -114,7 +128,7 @@ class BasicHtmlEditor extends React.Component {
 
     // console.log(content.toJS(), selection.toJS(), block.toJS());
 
-    const newContent = Modifier.insertText(content, selection, '{COOL}');
+    const newContent = Modifier.insertText(content, selection, '{' + replaceText + '}');
     const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
     this.setState({editorState: newEditorState});
   }
@@ -200,6 +214,7 @@ class BasicHtmlEditor extends React.Component {
   render() {
     const {editorState} = this.state;
     const props = this.props;
+    const state = this.state;
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
@@ -237,13 +252,29 @@ class BasicHtmlEditor extends React.Component {
             onToggle={this.toggleBlockType}
           />
         </div>
+        <RaisedButton
+        label='Use Column Variable'
+        labelStyle={{textTransform: 'none'}}
+        onClick={_ => this.setState({variableMenuOpen: true})}
+        />
+        <Popover
+        open={state.variableMenuOpen}
+        anchorEl={state.variableMenuAnchorEl}
+        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        >
+          <Menu desktop>
+          {props.fieldsmap.map((field, i) =>
+            <MenuItem key={i} primaryText={field.name} onClick={_ => this.insertText(field.name)} />)}
+          </Menu>
+        </Popover>
         <div style={{marginTop: '8px'}}>
           <Subject
           onSubjectChange={props.onSubjectChange}
           subjectHtml={props.subjectHtml}
           />
         </div>
-        <button onClick={this.insertText}>INSERT WORD</button>
         <div className={className} onClick={this.focus}>
           <Editor
             blockStyleFn={getBlockStyle}

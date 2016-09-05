@@ -22,12 +22,12 @@ export const COLUMNS = [
   // },
   {
     data: 'firstname',
-    title: 'firstname',
+    title: 'First Name',
     pass: true
   },
   {
     data: 'lastname',
-    title: 'lastname',
+    title: 'Last Name',
     pass: true
   },
   {
