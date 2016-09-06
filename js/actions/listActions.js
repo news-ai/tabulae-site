@@ -3,8 +3,7 @@ import {
   listConstant,
 } from '../constants/AppConstants';
 import * as api from './api';
-import { browserHistory } from 'react-router';
-
+import {browserHistory} from 'react-router';
 
 function requestLists() {
   return {

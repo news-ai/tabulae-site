@@ -9,7 +9,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
-import intercomSetup from '../chat';
 import {grey700} from 'material-ui/styles/colors';
 
 class App extends Component {

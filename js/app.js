@@ -50,21 +50,7 @@ import '../css/main.css';
 const store = configureStore();
 
 window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.com/api` : `https://tabulae.newsai.org/api`;
-// window.Intercom('boot', {
-//   app_id: 'ur8dbk9e',
-// });
 
-// browserHistory.listen(function(e) {
-//   if (e.pathname.substring(0, 7) === '/lists/') {
-//     window.Intercom('boot', {
-//       app_id: 'ur8dbk9e',
-//     });
-//   }
-// });
-
-// if (typeof document !== 'undefined') {
-//   require('./chat.js');
-// }
 intercomSetup({app_id: 'ur8dbk9e'});
 
 

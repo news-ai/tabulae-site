@@ -71,7 +71,7 @@ export function fetchPaginatedContacts(listId) {
     dispatch(requestContact());
     const offset = getState().listReducer[listId].offset;
     return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${offset}`)
-    .then( response => {
+    .then(response => {
       const newOffset = offset + PAGE_LIMIT;
       dispatch({
         type: SET_OFFSET,
@@ -88,6 +88,21 @@ export function fetchPaginatedContacts(listId) {
     .catch( message => dispatch(requestContactFail(message)));
   };
 }
+
+// export function searchListContacts(listId, query) {
+//   return (dispatch, getState) => {
+//     return api.get(`/lists/${listId}/contacts?q="${query}"`)
+//     .then(response => {
+//       const res = normalize(response, {
+//         data: arrayOf(contactSchema),
+//         included: arrayOf(publicationSchema)
+//       });
+
+//       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+//       dispatch(receiveContacts(res.entities.contacts, res.result.data));
+//     });
+//   };
+// }
 
 export function updateContact(id) {
   return dispatch => {
