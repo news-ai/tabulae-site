@@ -75,10 +75,13 @@ class HandsOnTable extends Component {
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
       dirtyRows: [],
+      // copyPaste: true,
       preservedColumns: COLUMNS,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
+        sortIndicator: true,
+        columnSorting: true,
         minCols: COLUMNS.length,
         minRows: MIN_ROWS,
         manualColumnMove: true,
@@ -227,6 +230,7 @@ class HandsOnTable extends Component {
           const dirtyRows = this.state.dirtyRows;
           changes.map( change => {
             rowNum = change[0];
+            if (rowNum > this.props.listData.contacts.length - 1) return;
             rowId = this.state.options.data[rowNum].id;
             if (change[1] === change[2] || _.isEmpty(change[1]) && _.isEmpty(change[2])) {
               // console.log('DO NOTHING');
