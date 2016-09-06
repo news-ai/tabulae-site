@@ -69,12 +69,14 @@ class EmailAnalytics extends Component {
         >
           <StaticEmailContent {...state.previewEmail} />
         </Dialog>
+        <div style={{marginTop: '30px'}}>
         {emails.map((email, i) =>
           <AnalyticsItem
           key={i}
           onPreviewOpen={ _ => this.handlePreviewOpen(email)}
           {...email}
           />)}
+        </div>
         {props.isNextButton ? <RaisedButton
           label='Load More Emails'
           labelStyle={{textTransform: 'none'}}
