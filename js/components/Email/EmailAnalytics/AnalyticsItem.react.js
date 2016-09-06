@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import CountViewItem from './CountViewItem.react';
+import {Link} from 'react-router';
 import {deepOrange100, deepOrange700, deepOrange900, grey50} from 'material-ui/styles/colors';
 
 const styles = {
@@ -29,6 +30,10 @@ const styles = {
   subjectText: {
     fontWeight: 'bold',
     cursor: 'pointer'
+  },
+  sentFrom: {
+    color: 'gray',
+    fontSize: '0.8em',
   }
 };
 
@@ -41,12 +46,20 @@ function AnalyticsItem({
   bounced,
   bouncedreason,
   delivered,
-  onPreviewOpen
+  onPreviewOpen,
+  listid,
+  listname
 }) {
   delivered = true; // hack until delivered is spelled correctly
   const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
   return (
     <div style={wrapperStyle}>
+      {
+        listid !== 0 ? <div style={{marginLeft: '10px', marginTop: '5px'}}>
+          <span style={styles.sentFrom}>Sent from List</span>
+          <span style={{marginLeft: '10px'}}><Link to={`/lists/${listid}`}>{listname || listid}</Link></span>
+        </div> : null
+      }
       <div className='email-analytics row' style={styles.analytics}>
         <div className='three columns'>
           <span style={styles.to}>To</span>
@@ -71,6 +84,7 @@ function AnalyticsItem({
 
 AnalyticsItem.PropTypes = {
   id: PropTypes.number.isRequired,
+  listid: PropTypes.number.isRequired,
   to: PropTypes.string.isRequired,
   subject: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
@@ -82,7 +96,8 @@ AnalyticsItem.PropTypes = {
   opened: PropTypes.number,
   delivered: PropTypes.bool,
   templateid: PropTypes.number,
-  onPreviewOpen: PropTypes.func
+  onPreviewOpen: PropTypes.func,
+  listname: PropTypes.string
 };
 
 export default AnalyticsItem;

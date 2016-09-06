@@ -17,12 +17,12 @@ class EmailAnalytics extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchSentEmails()
-    .then( emails => this.setState({ sentEmails: emails }));
+    this.props.fetchSentEmails();
   }
 
   render() {
     const state = this.state;
+    const props = this.props;
     return (
       <div className='container'>
         <div style={{marginTop: '20px', marginBottom: '20px'}}>
@@ -34,7 +34,7 @@ class EmailAnalytics extends Component {
         >
           <StaticEmailContent {...state.previewEmail} />
         </Dialog>
-        {state.sentEmails.map((email, i) =>
+        {props.sentEmails.map((email, i) =>
           <AnalyticsItem
           key={i}
           onPreviewOpen={ _ => this.handlePreviewOpen(email)}
@@ -46,7 +46,17 @@ class EmailAnalytics extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const sentEmails = state.stagingReducer.received
+  .filter(id => state.stagingReducer[id].issent)
+  .map(id => {
+    let email = state.stagingReducer[id];
+    if (email.listid !== 0 && state.listReducer[email.listid]) {
+      email.listname = state.listReducer[email.listid].name;
+    }
+    return email;
+  });
   return {
+    sentEmails
   };
 };
 

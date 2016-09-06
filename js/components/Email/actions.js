@@ -2,8 +2,13 @@ import {
   RECEIVE_STAGED_EMAILS,
   SENDING_STAGED_EMAILS,
   RECEIVE_EMAIL,
+  REQUEST_MULTIPLE_EMAILS,
+  RECEIVE_MULTIPLE_EMAILS
 } from './constants';
+import { normalize, Schema, arrayOf } from 'normalizr';
 import * as api from '../../actions/api';
+
+const emailSchema = new Schema('emails');
 
 export function postBatchEmails(emails) {
   return dispatch => {
@@ -36,12 +41,17 @@ export function getStagedEmails() {
 
 export function getSentEmails() {
   return dispatch => {
-    dispatch({type: 'GET_SENT_EMAILS'});
-    return api.get(`/emails`)
+    dispatch({type: REQUEST_MULTIPLE_EMAILS});
+    return api.get(`/emails?limit=50&offset=0`)
     .then( response => {
-      const json = response.data.filter(email => email.issent);
-      json.map(email => dispatch({type: RECEIVE_EMAIL, json: email}));
-      return json;
+      const res = normalize(response, {
+        data: arrayOf(emailSchema)
+      });
+      return dispatch({
+        type: RECEIVE_MULTIPLE_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data
+      });
     })
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
   };

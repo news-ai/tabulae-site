@@ -114,7 +114,7 @@ class Table extends Component {
     // return false to prevent a transition w/o prompting the user,
     // or return a string to allow the user to decide:
     if (!this.state.isSaved) return 'Your work is not saved! Are you sure you want to leave?'
-      else if (nextLocation.pathname === '/emailstats') return false;
+      else if (nextLocation.pathname === '/emailstats') return true;
     return 'Are you sure you want to leave this page?'
   }
 
