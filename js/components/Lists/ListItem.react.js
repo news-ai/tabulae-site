@@ -40,6 +40,7 @@ function ListItem({list, onToggle, iconName}) {
       <div className='three columns'>
         <i
         alt='archive'
+        title='archive'
         className={iconName}
         style={[globalStyles.icon]}
         onClick={ _ => onToggle(list.id) }

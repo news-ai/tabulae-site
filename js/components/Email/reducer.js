@@ -1,7 +1,10 @@
 import {
   RECEIVE_STAGED_EMAILS,
   SENDING_STAGED_EMAILS,
-  RECEIVE_EMAIL
+  RECEIVE_EMAIL,
+  REQUEST_MULTIPLE_EMAILS,
+  RECEIVE_MULTIPLE_EMAILS,
+  EMAIL_SET_OFFSET
 } from './constants';
 
 import { initialState } from '../../reducers/initialState';
@@ -10,7 +13,10 @@ import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 const types = [
   RECEIVE_STAGED_EMAILS,
   SENDING_STAGED_EMAILS,
-  RECEIVE_EMAIL
+  RECEIVE_EMAIL,
+  REQUEST_MULTIPLE_EMAILS,
+  RECEIVE_MULTIPLE_EMAILS,
+  EMAIL_SET_OFFSET
 ];
 
 function stagingReducer(state = initialState.stagingReducer, action) {
@@ -29,6 +35,13 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return obj;
     case RECEIVE_EMAIL:
       obj[action.json.id] = action.json;
+      return obj;
+    case RECEIVE_MULTIPLE_EMAILS:
+      obj = assignToEmpty(state, action.emails);
+      obj.received = state.received.concat(action.ids.filter(id => !state.received.some(seenId => seenId === id)));
+      return obj;
+    case EMAIL_SET_OFFSET:
+      obj.offset = action.offset;
       return obj;
     default:
       return state;

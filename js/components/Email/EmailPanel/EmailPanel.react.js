@@ -134,6 +134,7 @@ class EmailPanel extends Component {
         const replacedBody = this._replaceAll(body, selectedContacts[i]);
         const replacedSubject = this._replaceAll(subject, selectedContacts[i]);
         contactEmails.push({
+          listid: this.props.listId,
           to: contact.email,
           subject: replacedSubject,
           body: replacedBody

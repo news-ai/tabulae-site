@@ -12,7 +12,8 @@ function Navigation({children}) {
         top: 0,
         display: 'flex',
         alignItems: 'center',
-        padding: '5px'
+        padding: '5px',
+        zIndex: 300
       }}>
         {children}
       </div>
