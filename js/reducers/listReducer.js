@@ -23,7 +23,6 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = true;
       return obj;
     case listConstant.RECEIVE_MULTIPLE:
-      obj.isReceiving = false;
       let unarchivedLists = [];
       let archivedLists = [];
       action.ids.map(id => {
@@ -35,6 +34,7 @@ function listReducer(state = initialState.listReducer, action) {
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
+      obj.isReceiving = false;
       return obj;
     case listConstant.REQUEST_FAIL:
       obj.isReceiving = false;

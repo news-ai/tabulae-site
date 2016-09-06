@@ -32,9 +32,8 @@ class ListManagerContainer extends Component {
 
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.lists;
   return {
-    lists: lists,
+    lists: state.listReducer.lists,
     isReceiving: state.listReducer.isReceiving,
     statementIfEmpty: 'It looks like you haven\'t created any list. Go ahead and make one!',
     listItemIcon: 'fa fa-archive',
