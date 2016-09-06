@@ -362,17 +362,17 @@ class HandsOnTable extends Component {
       alertify.alert(`Please save list first before adding custom columns.`);
       return;
     }
-    const { options, fieldsmap } = this.state;
+    const { options } = this.state;
     if (options.columns.some( col => col.data === newColumnName)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
     } else {
-      let newFieldsmap = fieldsmap;
-      newFieldsmap.push({
+      let fieldsmap = listData.fieldsmap;
+      let newFieldsmap = fieldsmap.concat([{
         name: newColumnName,
         value: newColumnName,
         customfield: true,
         hidden: false
-      });
+      }]);
       dispatch(actionCreators.patchList({
         listId: listData.id,
         fieldsmap: newFieldsmap

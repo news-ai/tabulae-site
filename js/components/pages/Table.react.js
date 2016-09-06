@@ -134,13 +134,13 @@ class Table extends Component {
   }
 
   _handleNormalField(colHeaders, row) {
-    const { pubMapByName, publicationReducer, listData} = this.props;
+    const {pubMapByName, publicationReducer, listData} = this.props;
     let field = {};
     const fieldsmap = listData.fieldsmap;
-    colHeaders.map( header => {
+    colHeaders.map(header => {
       const name = header.data;
       if (!_.isEmpty(row[name])) {
-        if (fieldsmap.some( fieldObj => fieldObj.value === name && !fieldObj.customfield)) {
+        if (fieldsmap.some(fieldObj => fieldObj.value === name && !fieldObj.customfield)) {
           field[name] = row[name];
         }
         let employers = [];
@@ -207,6 +207,8 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = listData.contacts || [];
+    // console.log(patchContactList);
+    // console.log(addContactList);
 
     if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
 
