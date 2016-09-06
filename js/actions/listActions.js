@@ -24,7 +24,8 @@ function requestList(listId) {
 function receiveLists(lists, ids) {
   return {
     type: listConstant.RECEIVE_MULTIPLE,
-    lists
+    lists,
+    ids
   };
 }
 
@@ -74,9 +75,10 @@ export function fetchList(listId) {
 }
 
 export function fetchLists() {
-  return dispatch => {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
     dispatch(requestLists());
-    return api.get(`/lists`)
+    return api.get(`/lists?limit=50&offset=0`)
     .then( response => {
       const res = normalize(response, {
         data: arrayOf(listSchema),

@@ -8,6 +8,17 @@ import Dialog from 'material-ui/Dialog';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
+import Toggle from 'material-ui/Toggle';
+
+const toggleStyle = {
+  block: {
+    maxWidth: 190,
+  },
+  label: {
+    fontWeight: 'normal',
+    fontSize: '0.9em'
+  }
+};
 
 class EmailAnalytics extends Component {
   constructor(props) {
@@ -15,7 +26,8 @@ class EmailAnalytics extends Component {
     this.state = {
       sentEmails: [],
       isPreviewOpen: false,
-      filterValue: null
+      filterValue: 0,
+      isShowingArchived: false
     };
     this.handlePreviewOpen = email => this.setState({isPreviewOpen: true, previewEmail: email});
     this.handlePreviewClose = _ => this.setState({isPreviewOpen: false, previewEmail: null});
@@ -31,19 +43,33 @@ class EmailAnalytics extends Component {
   render() {
     const state = this.state;
     const props = this.props;
+    const emails = state.filterValue === 0 ? props.sentEmails : props.sentEmails.filter(email => email.listid === state.filterValue);
+    const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
+    const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />].concat(
+      filterLists.map(list => <MenuItem key={list.id} value={list.id} primaryText={list.name} onClick={_ => props.fetchListEmails(list.id)} />)
+      );
     return (
       <div className='container'>
         <div style={{marginTop: '20px', marginBottom: '20px'}}>
-          <span style={{fontSize: '1.2em', marginRight: '10px'}}>Emails You Sent</span>
+          <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
         </div>
-
+        {props.lists ?
+          <div>
+            <Toggle style={toggleStyle.block} labelStyle={toggleStyle.label} label='Set to Archived Lists' toggled={state.isShowingArchived} onToggle={_ => this.setState({isShowingArchived: !state.isShowingArchived})} />
+            <div>
+              <span>Filter by List: </span>
+              <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+              {selectable}
+              </DropDownMenu>
+            </div>
+          </div>: null }
         <Dialog
         open={state.isPreviewOpen}
         onRequestClose={this.handlePreviewClose}
         >
           <StaticEmailContent {...state.previewEmail} />
         </Dialog>
-        {props.sentEmails.map((email, i) =>
+        {emails.map((email, i) =>
           <AnalyticsItem
           key={i}
           onPreviewOpen={ _ => this.handlePreviewOpen(email)}
@@ -73,7 +99,9 @@ const mapStateToProps = (state, props) => {
     sentEmails,
     listId: props.params.listId,
     listReducer: state.listReducer,
-    isNextButton: (state.stagingReducer.offset !== null) ? true: false
+    isNextButton: (state.stagingReducer.offset !== null) ? true: false,
+    lists: state.listReducer.lists,
+    archivedLists: state.listReducer.archivedLists
   }
 };
 

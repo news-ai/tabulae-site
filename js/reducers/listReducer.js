@@ -24,17 +24,17 @@ function listReducer(state = initialState.listReducer, action) {
       return obj;
     case listConstant.RECEIVE_MULTIPLE:
       obj.isReceiving = false;
-      let unarchivedList = [];
-      let archivedList = [];
+      let unarchivedLists = [];
+      let archivedLists = [];
       action.ids.map(id => {
         const list = action.lists[id];
-        if (!list.archived) unarchivedList.push(list);
-        if (list.archived) archivedList.push(list);
+        if (!list.archived) unarchivedLists.push(list);
+        if (list.archived) archivedLists.push(list);
       });
       obj = assignToEmpty(state, action.lists);
-      obj.received = state.received.concat(action.ids.filter(id => state.received.some(listId => listId !== id)));
-      obj.lists = unarchivedList;
-      obj.archivedList = archivedList;
+      obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
+      obj.lists = unarchivedLists;
+      obj.archivedLists = archivedLists;
       return obj;
     case listConstant.REQUEST_FAIL:
       obj.isReceiving = false;
