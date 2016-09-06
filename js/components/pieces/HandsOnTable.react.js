@@ -195,8 +195,10 @@ class HandsOnTable extends Component {
             remove_selected_rows: {
               name: 'Remove Row'
             },
+            hsep1: '---------',
             undo: {},
             redo: {},
+            hsep2: '---------',
             remove_column: {
               name: 'Remove Column',
             },
