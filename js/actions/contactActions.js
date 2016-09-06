@@ -9,7 +9,6 @@ import * as publicationActions from './publicationActions';
 import { normalize, Schema, arrayOf } from 'normalizr';
 
 const contactSchema = new Schema('contacts');
-const list = new Schema('lists');
 const publicationSchema = new Schema('publications');
 
 function requestContact() {

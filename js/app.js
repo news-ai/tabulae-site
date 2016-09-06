@@ -76,6 +76,7 @@ ReactDOM.render(
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
+            <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

@@ -4,6 +4,9 @@ import {
 } from '../constants/AppConstants';
 import * as api from './api';
 import {browserHistory} from 'react-router';
+import { normalize, Schema, arrayOf } from 'normalizr';
+
+const listSchema = new Schema('lists');
 
 function requestLists() {
   return {
@@ -18,7 +21,7 @@ function requestList(listId) {
   };
 }
 
-function receiveLists(lists) {
+function receiveLists(lists, ids) {
   return {
     type: listConstant.RECEIVE_MULTIPLE,
     lists
@@ -74,7 +77,12 @@ export function fetchLists() {
   return dispatch => {
     dispatch(requestLists());
     return api.get(`/lists`)
-    .then( response => dispatch(receiveLists(response.data)))
+    .then( response => {
+      const res = normalize(response, {
+        data: arrayOf(listSchema),
+      });
+      dispatch(receiveLists(res.entities.lists, res.result.data));
+    })
     .catch( message => dispatch(requestListsFail(message)));
   };
 }

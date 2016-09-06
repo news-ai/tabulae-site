@@ -26,11 +26,13 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = false;
       let unarchivedList = [];
       let archivedList = [];
-      action.lists.map( list => {
-        obj[list.id] = list;
+      action.ids.map(id => {
+        const list = action.lists[id];
         if (!list.archived) unarchivedList.push(list);
         if (list.archived) archivedList.push(list);
       });
+      obj = assignToEmpty(state, action.lists);
+      obj.received = state.received.concat(action.ids.filter(id => state.received.some(listId => listId !== id)));
       obj.lists = unarchivedList;
       obj.archivedList = archivedList;
       return obj;

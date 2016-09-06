@@ -13,13 +13,15 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false,
     tempNewList: [],
-    lists: []
+    lists: [],
+    received: []
   },
   stagingReducer: {
     isReceiving: false,
     didInvalidate: false,
     previewEmails: [],
-    received: []
+    received: [],
+    offset: 0
   },
   publicationReducer: {
     isReceiving: false,
