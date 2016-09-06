@@ -101,12 +101,13 @@ class EmailPanel extends Component {
 
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
-      const template = this.props.templates.find(template => value === template.id);
+      const template = this.props.templates.find(tmp => value === tmp.id);
+      console.log(template);
       const bodyHtml = template.body;
       const subjectHtml = template.subject;
       this.setState({bodyHtml, subjectHtml});
     } else {
-      this.setState({bodyHtml: null, subjectHtml: null});
+      this.setState({bodyHtml: '', subjectHtml: ''});
     }
     this.setState({currentTemplateId: value});
   }

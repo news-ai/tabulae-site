@@ -15,9 +15,9 @@ export function createTemplate(name, subject, body) {
   if (body.length > 0) templateBody.body = body;
   else templateBody.body = '';
   return dispatch => {
-    dispatch({type: templateConstant.REQUEST});
+    dispatch({type: templateConstant.CREATE_REQUEST});
     return api.post(`/templates`, templateBody)
-    .then(response => dispatch({type: templateConstant.RECEIVE, template: response.data}))
+    .then(response => dispatch({type: templateConstant.CREATE_RECEIVED, template: response.data}))
     .catch(message => dispatch({type: templateConstant.REQUEST_FAIL, message}));
   };
 }
