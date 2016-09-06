@@ -14,10 +14,10 @@ function templateReducer(state = initialState.templateReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
-    case templateConstant.REQUEST:
+    case (templateConstant.REQUEST || templateConstant.CREATE_REQUEST):
       obj.isReceiving = true;
       return obj;
-    case templateConstant.RECEIVE:
+    case (templateConstant.RECEIVE || templateConstant.CREATE_RECEIVED):
       obj.isReceiving = false;
       obj[action.template.id] = action.template;
       if (!state.received.some(id => id === action.template.id)) {

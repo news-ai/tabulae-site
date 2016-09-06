@@ -10,9 +10,10 @@ import {
   convertToRaw,
   CompositeDecorator,
   Modifier,
-  convertFromHTML
 } from 'draft-js';
 import draftRawToHtml from './utils/draftRawToHtml';
+import htmlToContent from './utils/htmlToContent';
+import {convertFromHTML} from 'draft-convert';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -114,7 +115,8 @@ class BasicHtmlEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
-      const content = ContentState.createFromBlockArray(convertFromHTML(nextProps.bodyHtml));
+      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
+      const content = convertFromHTML(nextProps.bodyHtml);
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});

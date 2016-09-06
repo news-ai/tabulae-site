@@ -3,7 +3,7 @@ import ListItem from './ListItem.react';
 import ListsTitle from './ListsTitle.react';
 import {listPropTypes} from 'constants/CommonPropTypes';
 
-function Lists({ isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle}) {
+function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle}) {
   let renderNode;
   if (isReceiving) {
     renderNode = <span>loading...</span>;

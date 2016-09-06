@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import StaticEmailContent from './StaticEmailContent.react';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const styles = {
   contentBox: {
@@ -14,22 +15,11 @@ const styles = {
 
 
 function PreviewEmail(props) {
-  const {
-      id,
-      to,
-      subject,
-      body,
-      onSendEmailClick,
-      issent,
-      bounced,
-      bouncedreason,
-      clicked,
-      opened
-    } = props;
+  const {onSendEmailClick, issent} = props;
   return (
     <div style={styles.contentBox}>
       <StaticEmailContent {...props} />
-      {issent ? null : <button className='button' onClick={onSendEmailClick}>Send</button>}
+      {issent ? null : <RaisedButton onClick={onSendEmailClick} labelStyle={{textTransform: 'none'}} label='Send' />}
     </div>
     );
 }
