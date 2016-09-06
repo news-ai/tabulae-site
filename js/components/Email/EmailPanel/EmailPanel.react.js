@@ -69,7 +69,7 @@ class EmailPanel extends Component {
       subjectHtml: null,
     };
     this.updateBodyHtml = (html) => {
-      console.log(html);
+      // console.log(html);
       this.setState({body: html});
     };
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);

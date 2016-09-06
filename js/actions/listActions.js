@@ -95,7 +95,7 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   if (contacts !== undefined) listBody.contacts = contacts;
   if (fieldsmap !== undefined) listBody.fieldsmap = fieldsmap;
   return dispatch => {
-    dispatch({ type: listConstant.PATCH, listId });
+    dispatch({type: listConstant.PATCH, listId, listBody});
     return api.patch(`/lists/${listId}`, listBody)
     .then( response => dispatch(receiveList(response.data)))
     .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));

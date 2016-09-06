@@ -12,7 +12,7 @@ import {
   Modifier,
 } from 'draft-js';
 import draftRawToHtml from './utils/draftRawToHtml';
-import htmlToContent from './utils/htmlToContent';
+// import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 
 import Menu from 'material-ui/Menu';

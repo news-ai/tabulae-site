@@ -41,6 +41,7 @@ export const COLUMNS = [
     validator: (value, callback) => _onInvalid(value, callback, validator.isURL),
     allowInvalid: true,
     invalidCellClass: 'invalid-cell',
+    pass: true
   },
   {
     data: 'twitter',
