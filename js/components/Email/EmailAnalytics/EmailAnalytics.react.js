@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 import * as actionCreators from '../../../actions/AppActions';
-import StaticEmailContent from '../PreviewEmail/StaticEmailContent.react';
+import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
 import AnalyticsItem from './AnalyticsItem.react';
 import Dialog from 'material-ui/Dialog';
 import DropDownMenu from 'material-ui/DropDownMenu';
