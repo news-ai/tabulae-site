@@ -190,7 +190,7 @@ class Table extends Component {
       let customRow = [];
       fieldsmap.map( fieldObj => {
         if (!_.isEmpty(row[fieldObj.value]) && fieldObj.customfield) {
-          customRow.push({ name: fieldObj.value, value: row[fieldObj.value]});
+          customRow.push({name: fieldObj.value, value: row[fieldObj.value]});
         }
       })
       if (customRow.length > 0) field.customfields = customRow;
@@ -200,6 +200,7 @@ class Table extends Component {
         if (field.id) {
           if (dirtyRows.some( rowId => rowId === field.id )) patchContactList.push(field);
         } else {
+          field.listid = listId;
           addContactList.push(field);
         }
       }
@@ -232,9 +233,7 @@ class Table extends Component {
       }
     }
     const currentdate = new Date(); 
-    const datetime = 'Last Sync: ' + currentdate.getHours() + ':'
-                + currentdate.getMinutes() + ':' 
-                + currentdate.getSeconds();
+    const datetime = `Last Sync: ${currentdate.toTimeString()}`;
     this.setState({
       isSaved: true,
       lastSavedAt: datetime

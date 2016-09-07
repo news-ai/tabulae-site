@@ -88,20 +88,20 @@ export function fetchPaginatedContacts(listId) {
   };
 }
 
-// export function searchListContacts(listId, query) {
-//   return (dispatch, getState) => {
-//     return api.get(`/lists/${listId}/contacts?q="${query}"`)
-//     .then(response => {
-//       const res = normalize(response, {
-//         data: arrayOf(contactSchema),
-//         included: arrayOf(publicationSchema)
-//       });
+export function searchListContacts(listId, query) {
+  return (dispatch, getState) => {
+    return api.get(`/lists/${listId}/contacts?q="${query}"`)
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
+      });
 
-//       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
-//       dispatch(receiveContacts(res.entities.contacts, res.result.data));
-//     });
-//   };
-// }
+      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+      dispatch(receiveContacts(res.entities.contacts, res.result.data));
+    });
+  };
+}
 
 export function updateContact(id) {
   return dispatch => {
@@ -125,7 +125,7 @@ export function patchContacts(contactList) {
 
 export function addContacts(contactList) {
   return dispatch => {
-    dispatch({ type: ADDING_CONTACT, contactList });
+    dispatch({type: ADDING_CONTACT, contactList});
 
     return api.post(`/contacts`, contactList)
     .then( response => {
