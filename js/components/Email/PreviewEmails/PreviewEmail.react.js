@@ -15,11 +15,11 @@ const styles = {
 
 
 function PreviewEmail(props) {
-  const {onSendEmailClick, issent} = props;
+  const {onSendEmailClick} = props;
   return (
     <div style={styles.contentBox}>
       <StaticEmailContent {...props} />
-      {issent ? null : <RaisedButton onClick={onSendEmailClick} labelStyle={{textTransform: 'none'}} label='Send' />}
+      <RaisedButton onClick={onSendEmailClick} labelStyle={{textTransform: 'none'}} label='Send' />
     </div>
     );
 }
