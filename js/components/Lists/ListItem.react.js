@@ -9,6 +9,8 @@ const styles = {
   parent: {
     marginBottom: '10px',
     borderRadius: '1.5em',
+    paddingLeft: '15px',
+    paddingRight: '15px',
     height: '2em',
     display: 'flex',
     alignItems: 'center',
@@ -17,7 +19,7 @@ const styles = {
     }
   },
   link: {
-    marginLeft: '15px'
+    // marginLeft: '15px'
   },
   icon: {
     color: 'lightgray',
@@ -30,6 +32,7 @@ const styles = {
 };
 
 function ListItem({list, onToggle, iconName}) {
+  const updatedDate = new Date(list.updated);
   return (
     <div key='parent' className='row' style={[styles.parent]}>
       <div className='eight columns'>
@@ -38,6 +41,9 @@ function ListItem({list, onToggle, iconName}) {
         </span>
       </div>
       <div className='three columns'>
+        <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
+      </div>
+      <div className='one columns'>
         <i
         alt='archive'
         title='archive'
