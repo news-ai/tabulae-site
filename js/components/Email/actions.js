@@ -45,7 +45,7 @@ export function fetchSentEmails() {
   return (dispatch, getState) => {
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     const OFFSET = getState().stagingReducer.offset;
-    return api.get(`/emails?limit=50&offset=0&order=-Created`)
+    return api.get(`/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {
       const res = normalize(response, {
         data: arrayOf(emailSchema)
