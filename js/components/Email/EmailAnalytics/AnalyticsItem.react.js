@@ -52,6 +52,7 @@ function AnalyticsItem({
 }) {
   delivered = true; // hack until delivered is spelled correctly
   const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
+  const SUBTRING_LIMIT = 18;
   return (
     <div style={wrapperStyle}>
       {
@@ -63,7 +64,7 @@ function AnalyticsItem({
       <div className='email-analytics row' style={styles.analytics}>
         <div className='three columns'>
           <span style={styles.to}>To</span>
-          <span>{to.substring(0, 30)} {to.length > 20 ? `...` : null}</span>
+          <span>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT ? `...` : null}</span>
         </div>
         <div className='six columns'>
           <span onClick={onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
