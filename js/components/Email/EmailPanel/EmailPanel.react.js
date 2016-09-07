@@ -216,7 +216,10 @@ class EmailPanel extends Component {
     const state = this.state;
     // add this button to fetch all staged emails for debugging purposes
     const templateMenuItems = props.templates.length > 0 ?
-    [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>].concat(props.templates.map((template, i) => <MenuItem value={template.id} key={i} primaryText={template.name.length > 0 ? template.name : template.subject} />)) :
+    [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>]
+    .concat(props.templates.map(
+      (template, i) =>
+      <MenuItem value={template.id} key={i} primaryText={template.name.length > 0 ? template.name : template.subject} />)) :
     null;
 
     return (
