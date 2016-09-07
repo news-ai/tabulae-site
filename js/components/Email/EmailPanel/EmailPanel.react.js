@@ -74,7 +74,6 @@ class EmailPanel extends Component {
       this.setState({body: html});
     };
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
-    this._showStagingEmails = this._showStagingEmails.bind(this);
     this._convertToHtml = this._convertToHtml.bind(this);
     this._replaceAll = this._replaceAll.bind(this);
     this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
@@ -85,7 +84,6 @@ class EmailPanel extends Component {
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
-    this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
   }
 
   componentWillMount() {
@@ -94,6 +92,7 @@ class EmailPanel extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // add immutable here
     const fieldsmap = nextProps.fieldsmap;
     this.setState({fieldsmap});
   }
@@ -173,12 +172,6 @@ class EmailPanel extends Component {
     }
   }
 
-  _showStagingEmails() {
-    const {dispatch} = this.props;
-    dispatch(actionCreators.getStagedEmails())
-    .then( _ => this.refs.preview.show());
-  }
-
   _onSaveNewTemplateClick() {
     const {dispatch} = this.props;
     const state = this.state;
@@ -187,12 +180,6 @@ class EmailPanel extends Component {
         .then(currentTemplateId => this.setState({currentTemplateId})),
       _ => alertify.error('Something went wrong.')
       );
-  }
-
-  _onSaveCurrentTemplateClick() {
-    const {dispatch} = this.props;
-    const state = this.state;
-    dispatch(actionCreators.patchTemplate(state.currentTemplateId, state.subject, state.body));
   }
 
   render() {
@@ -246,7 +233,10 @@ class EmailPanel extends Component {
                 anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                 targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
                 >
-                  <MenuItem disabled={state.currentTemplateId ? false : true} onClick={this.onSaveCurrentTemplateClick} primaryText='Save Text to Existing Template' />
+                  <MenuItem
+                  disabled={state.currentTemplateId ? false : true}
+                  onClick={_ => this.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
+                  primaryText='Save Text to Existing Template' />
                   <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
                 </IconMenu>
               </div>
@@ -289,7 +279,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    onSendEmailClick: id => dispatch(actionCreators.sendEmail(id))
+    onSendEmailClick: id => dispatch(actionCreators.sendEmail(id)),
+    onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body))
   };
 };
 
