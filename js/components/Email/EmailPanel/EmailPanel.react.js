@@ -4,13 +4,12 @@ import Radium from 'radium';
 import {stateToHTML} from 'draft-js-export-html';
 import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
-import {skylightStyles, buttonStyle} from 'constants/StyleConstants';
+import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
-import PreviewEmail from '../PreviewEmail';
-// import EmailEditor from './EmailEditor.react';
+import PreviewEmails from '../PreviewEmails';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
@@ -57,6 +56,7 @@ const injectCssToTags = {
   'p': 'margin: 0;font-family: arial;'
 };
 
+
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
@@ -67,6 +67,7 @@ class EmailPanel extends Component {
       currentTemplateId: 0,
       bodyHtml: null,
       subjectHtml: null,
+      minimized: false
     };
     this.updateBodyHtml = (html) => {
       // console.log(html);
@@ -77,8 +78,6 @@ class EmailPanel extends Component {
     this._convertToHtml = this._convertToHtml.bind(this);
     this._replaceAll = this._replaceAll.bind(this);
     this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
-    this._onSendAllEmailsClick = this._onSendAllEmailsClick.bind(this);
-    this._onSendEmailClick = this._onSendEmailClick.bind(this);
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({subject});
@@ -180,21 +179,6 @@ class EmailPanel extends Component {
     .then( _ => this.refs.preview.show());
   }
 
-  _onSendAllEmailsClick() {
-    const {previewEmails} = this.props;
-    previewEmails.map(email => {
-      if (email.body.length > 0 && !email.issent) {
-        this._onSendEmailClick(email.id);
-      }
-    });
-  }
-
-  _onSendEmailClick(id) {
-    const {dispatch} = this.props;
-    dispatch(actionCreators.sendEmail(id))
-    .then(_ => alertify.success(`Email sent.`));
-  }
-
   _onSaveNewTemplateClick() {
     const {dispatch} = this.props;
     const state = this.state;
@@ -278,24 +262,12 @@ class EmailPanel extends Component {
         hideOnOverlayClicked
         ref='preview'
         title='Preview'>
-          {
-            (props.isReceiving || props.previewEmails.length === 0) ? <span>LOADING..</span> :
-            <div>
-              <button style={buttonStyle} onClick={this._onSendAllEmailsClick}>Send All</button>
-            {
-              props.previewEmails.map( (pEmail, i) => {
-                const email = props.stagingReducer[pEmail.id];
-                if (email.body.length === 0 || email.issent) return null;
-                return (
-                  <PreviewEmail
-                  key={i}
-                  {...email}
-                  sendEmail={_ => this._onSendEmailClick(email.id)}
-                  />);
-              })
-            }
-            </div>
-          }
+          <PreviewEmails
+          isReceiving={props.isReceiving}
+          previewEmails={props.previewEmails}
+          onSendAllEmailsClick={this._onSendAllEmailsClick}
+          onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email sent.`))}
+          />
         </SkyLight>
       </div>
     );
@@ -306,7 +278,9 @@ const mapStateToProps = state => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
   return {
     isReceiving: state.stagingReducer.isReceiving,
-    previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails,
+    previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails
+    .map(pEmail => state.stagingReducer[pEmail.id])
+    .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,
     templates: state.templateReducer.received.map(id => state.templateReducer[id])
   };
@@ -314,7 +288,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    dispatch: action => dispatch(action)
+    dispatch: action => dispatch(action),
+    onSendEmailClick: id => dispatch(actionCreators.sendEmail(id))
   };
 };
 
