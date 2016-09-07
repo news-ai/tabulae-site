@@ -17,7 +17,11 @@ export function createTemplate(name, subject, body) {
   return dispatch => {
     dispatch({type: templateConstant.CREATE_REQUEST});
     return api.post(`/templates`, templateBody)
-    .then(response => dispatch({type: templateConstant.CREATE_RECEIVED, template: response.data}))
+    .then(response => {
+      const res = normalize(response.data, templateSchema);
+      dispatch({type: templateConstant.CREATE_RECEIVED, template: res.entities.templates, id: res.result});
+      return res.result;
+    })
     .catch(message => dispatch({type: templateConstant.REQUEST_FAIL, message}));
   };
 }
@@ -29,7 +33,10 @@ export function patchTemplate(templateId, subject, body) {
   return dispatch => {
     dispatch({type: 'PATCH_TEMPLATE', templateId});
     return api.patch(`/templates/${templateId}`, templateBody)
-    .then(response => dispatch({type: templateConstant.RECEIVE, template: response.data}))
+    .then(response => {
+      const res = normalize(response.data, templateSchema);
+      return dispatch({type: templateConstant.RECEIVE, template: res.entities.templates, id: res.result});
+    })
     .catch(message => dispatch({type: 'PATCH_TEMPLATE_FAIL', message}));
   };
 }
