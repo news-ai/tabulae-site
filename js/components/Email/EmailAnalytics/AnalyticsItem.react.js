@@ -48,17 +48,20 @@ function AnalyticsItem({
   delivered,
   onPreviewOpen,
   listid,
-  listname
+  listname,
+  updated
 }) {
   delivered = true; // hack until delivered is spelled correctly
   const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
   const SUBTRING_LIMIT = 18;
+  const date = new Date(updated);
   return (
     <div style={wrapperStyle}>
       {
         listid !== 0 ? <div style={{marginLeft: '10px', marginTop: '5px'}}>
           <span style={styles.sentFrom}>Sent from List</span>
           <span style={{marginLeft: '10px'}}><Link to={`/lists/${listid}`}>{listname || listid}</Link></span>
+          <span style={{marginRight: '10px', fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
         </div> : null
       }
       <div className='email-analytics row' style={styles.analytics}>
