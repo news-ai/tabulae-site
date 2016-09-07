@@ -19,7 +19,8 @@ export function createTemplate(name, subject, body) {
     return api.post(`/templates`, templateBody)
     .then(response => {
       const res = normalize(response.data, templateSchema);
-      return dispatch({type: templateConstant.CREATE_RECEIVED, template: res.entities.templates, id: res.result});
+      dispatch({type: templateConstant.CREATE_RECEIVED, template: res.entities.templates, id: res.result});
+      return res.result;
     })
     .catch(message => dispatch({type: templateConstant.REQUEST_FAIL, message}));
   };

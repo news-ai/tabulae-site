@@ -200,7 +200,8 @@ class EmailPanel extends Component {
     const {dispatch} = this.props;
     const state = this.state;
     alertify.prompt('', 'Name of new Email Template', '',
-      (e, name) => dispatch(actionCreators.createTemplate(name, state.subject, state.body)),
+      (e, name) => dispatch(actionCreators.createTemplate(name, state.subject, state.body))
+        .then(currentTemplateId => this.setState({currentTemplateId})),
       _ => alertify.error('Something went wrong.')
       );
   }
