@@ -81,6 +81,7 @@ class Table extends Component {
     this._fetchOperations = this._fetchOperations.bind(this);
     this._isDirty = _ => this.setState({isSaved: false});
     this.routerWillLeave = this.routerWillLeave.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
   }
 
   componentDidMount() {
@@ -115,6 +116,12 @@ class Table extends Component {
     if (!this.state.isSaved) return 'Your work is not saved! Are you sure you want to leave?'
       else if (nextLocation.pathname === '/emailstats') return true;
     return 'Are you sure you want to leave this page?'
+  }
+
+  _onSearchClick() {
+    const props = this.props;
+    props.searchListContacts(props.listId, this.state.searchValue)
+    .then(results => console.log(results));
   }
 
   _fetchOperations() {
@@ -304,11 +311,12 @@ class Table extends Component {
           </div>
           <TextField
             hintText='Search...'
-            floatingLabelText='Search/Filter All'
+            floatingLabelText='Search All'
             floatingLabelFixed={true}
             value={this.state.searchValue}
             onChange={e => this.setState({searchValue: e.target.value})}
           />
+          <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
@@ -386,7 +394,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     dispatch: action => dispatch(action),
-    getSearchContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
+    searchListContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
     patchList: listObj => dispatch(actionCreators.patchList(listObj)),
     patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
     addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),

@@ -26,6 +26,7 @@ function contactReducer(state = initialState.contactReducer, action) {
       return obj;
     case contactConstant.RECEIVE:
       obj.isReceiving = false;
+      if (!state[action.contact.id]) obj.received = [...state.received, action.contact.id];
       obj[action.contact.id] = action.contact;
       if (action.contact.customfields && action.contact.customfields !== null) {
         action.contact.customfields.map( field => {
@@ -35,7 +36,7 @@ function contactReducer(state = initialState.contactReducer, action) {
       return obj;
     case contactConstant.RECEIVE_MULTIPLE:
       obj = assignToEmpty(state, action.contacts);
-      obj.received = state.received.concat(action.ids);
+      obj.received = state.received.concat(action.ids.filter(id => !state[id]));
       obj.isReceiving = false;
       action.ids.map( id => {
         if (obj[id].customfields && obj[id].customfields !== null) {

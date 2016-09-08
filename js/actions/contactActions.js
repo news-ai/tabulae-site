@@ -1,7 +1,10 @@
 import {
   ADDING_CONTACT,
   SET_OFFSET,
-  contactConstant
+  contactConstant,
+  LIST_CONTACTS_SEARCH_REQUEST,
+  LIST_CONTACTS_SEARCH_RECEIVED,
+  LIST_CONTACTS_SEARCH_FAIL
 } from '../constants/AppConstants';
 import * as api from './api';
 import * as publicationActions from './publicationActions';
@@ -52,16 +55,17 @@ export function fetchContact(contactId) {
   };
 }
 
-export function fetchContacts(listId, rangeStart, rangeEnd) {
-  return (dispatch, getState) => {
-    if (getState().listReducer[listId].contacts === null) return;
-    getState().listReducer[listId].contacts.map( (contactId, i) => {
-      if (rangeStart <= i && i < rangeEnd) {
-        dispatch(fetchContact(contactId));
-      }
-    });
-  };
-}
+// depreciated
+// export function fetchContacts(listId, rangeStart, rangeEnd) {
+//   return (dispatch, getState) => {
+//     if (getState().listReducer[listId].contacts === null) return;
+//     getState().listReducer[listId].contacts.map( (contactId, i) => {
+//       if (rangeStart <= i && i < rangeEnd) {
+//         dispatch(fetchContact(contactId));
+//       }
+//     });
+//   };
+// }
 
 export function fetchPaginatedContacts(listId) {
   const PAGE_LIMIT = 50;
@@ -90,16 +94,19 @@ export function fetchPaginatedContacts(listId) {
 
 export function searchListContacts(listId, query) {
   return (dispatch, getState) => {
-    return api.get(`/lists/${listId}/contacts?q="${query}"`)
+    dispatch({ type: LIST_CONTACTS_SEARCH_REQUEST, listId, query});
+    return api.get(`/lists/${listId}/contacts?q="${query}"&limit=50&offset=0`)
     .then(response => {
       const res = normalize(response, {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
       });
 
-      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+      // dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
       dispatch(receiveContacts(res.entities.contacts, res.result.data));
-    });
+      return dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids: res.result.data, listId});
+    })
+    .catch( message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
   };
 }
 

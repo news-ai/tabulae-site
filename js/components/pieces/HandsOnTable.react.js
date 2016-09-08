@@ -243,12 +243,13 @@ class HandsOnTable extends Component {
         this.table.updateSettings(options);
       }
 
+      // load every 50 contacts to avoid slow UI
       if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || listData.contacts.length <= 50 || lastFetchedIndex === listData.contacts.length - 1 || this.state.addedRow) {
-        fieldsmap.map( fieldObj => {
+        fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) {
-            contacts.map( (contact, i) => {
+            contacts.map((contact, i) => {
               if (!_.isEmpty(contact.customfields)) {
-                if (contact.customfields.some( field => field.name === fieldObj.value)) {
+                if (contact.customfields.some(field => field.name === fieldObj.value)) {
                   contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
                 }
               }
