@@ -11,6 +11,7 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -59,7 +60,8 @@ class Table extends Component {
       isSaved: true, // table without change
       person: null,
       lastSavedAt: null,
-      isMenuOpen: false
+      isMenuOpen: false,
+      searchValue: ''
     }
     this.onMenuTouchTap = e => {
       e.preventDefault();
@@ -119,18 +121,15 @@ class Table extends Component {
   }
 
   _fetchOperations() {
-    const { dispatch, listId } = this.props;
-    dispatch(actionCreators.fetchList(listId))
-    .then( _ => {
-      dispatch(actionCreators.fetchContacts(listId));
-    });
+    const props = this.props;
+    props.fetchList(props.listId)
+    .then(_ => props.fetchContacts(props.listId));
   }
 
   _updateContacts() {
-    const { dispatch } = this.props;
     const selected = this.state.selectedContacts
-    .filter( contact => contact.isoutdated )
-    .map( contact => dispatch(actionCreators.updateContact(contact.id)) );
+    .filter(contact => contact.isoutdated )
+    .map(contact => this.props.updateOutdatedContacts(contact.id));
   }
 
   _handleNormalField(colHeaders, row) {
@@ -159,19 +158,19 @@ class Table extends Component {
   }
 
   _createPublicationPromises(localData, colHeaders) {
-    const { publicationReducer, dispatch } = this.props;
+    const props = this.props;
     let promises = [];
     localData.map( row => {
       if (row['publication_name_1']) {
         const pubName1 = row['publication_name_1'];
-        if (!publicationReducer[pubName1]) {
-          promises.push(actionCreators.createPublication({name: pubName1}));
+        if (!props.publicationReducer[pubName1]) {
+          promises.push(props.createPublication({name: pubName1}));
         }
       }
       if (row['publication_name_2']) {
         const pubName2 = row['publication_name_2'];
-        if (!publicationReducer[pubName2]) {
-          promises.push(actionCreators.createPublication({name: pubName2}));
+        if (!props.publicationReducer[pubName2]) {
+          promises.push(props.createPublication({name: pubName2}));
         }
       }
     });
@@ -179,7 +178,9 @@ class Table extends Component {
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
-    const {dispatch, listId, listData, lastFetchedIndex} = this.props;
+    const {listId, listData, lastFetchedIndex} = this.props;
+    const props = this.props;
+    const state = this.state;
     let addContactList = [];
     let patchContactList = [];
 
@@ -211,25 +212,25 @@ class Table extends Component {
     // console.log(patchContactList);
     // console.log(addContactList);
 
-    if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
+    if (patchContactList.length > 0) props.patchContacts(patchContactList);
 
     // create new contacts and append new rows to LIST
     if (addContactList.length > 0) {
-      dispatch(actionCreators.addContacts(addContactList))
-      .then( json => {
+      props.addContacts(addContactList)
+      .then(json => {
         const appendIdList = json.map( contact => contact.id );
         const newIdList = origIdList.concat(appendIdList);
-        dispatch(actionCreators.patchList({
+        props.patchList({
           listId,
           name: this.state.name,
           contacts: newIdList,
           fieldsmap
-        }));
+        });
       });
     } else {
       // if no new contacts, see if list needs update
       if (this.state.name !== listData.name) {
-        dispatch(actionCreators.patchList({listId, name: this.state.name}));
+        props.patchList({listId, name: this.state.name});
       }
     }
     const currentdate = new Date(); 
@@ -308,6 +309,13 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
+          <TextField
+            hintText='Search...'
+            floatingLabelText='Search/Filter All'
+            floatingLabelFixed={true}
+            value={this.state.searchValue}
+            onChange={e => this.setState({searchValue: e.target.value})}
+          />
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
@@ -384,7 +392,15 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    dispatch: action => dispatch(action)
+    dispatch: action => dispatch(action),
+    getSearchContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
+    patchList: listObj => dispatch(actionCreators.patchList(listObj)),
+    patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
+    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
+    createPublication: name => dispatch(actionCreators.createPublication(name)),
+    updateOutdatedContacts: contactId => dispatch(actionCreators.updateContact(contactId)),
+    fetchList: listId => dispatch(actionCreators.fetchList(listId)),
+    fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId))
   };
 };
 
