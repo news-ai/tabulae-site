@@ -61,7 +61,8 @@ class Table extends Component {
       person: null,
       lastSavedAt: null,
       isMenuOpen: false,
-      searchValue: ''
+      searchValue: '',
+      isSearchOn: false
     }
     this.onMenuTouchTap = e => {
       e.preventDefault();
@@ -121,7 +122,7 @@ class Table extends Component {
   _onSearchClick() {
     const props = this.props;
     props.searchListContacts(props.listId, this.state.searchValue)
-    .then(results => console.log(results));
+    .then(obj => console.log(obj));
   }
 
   _fetchOperations() {
@@ -314,7 +315,7 @@ class Table extends Component {
             floatingLabelText='Search All'
             floatingLabelFixed={true}
             value={this.state.searchValue}
-            onChange={e => this.setState({searchValue: e.target.value})}
+            onChange={e => this.setState({searchValue: e.target.value, isSearchOn: e.target.value.length > 0 ? true : false})}
           />
           <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
           {
@@ -387,7 +388,7 @@ const mapStateToProps = (state, props) => {
     publicationReducer,
     lastFetchedIndex,
     person: state.personReducer.person,
-    firstTimeUser: state.personReducer.firstTimeUser
+    firstTimeUser: state.personReducer.firstTimeUser,
   };
 };
 
