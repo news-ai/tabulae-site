@@ -310,6 +310,7 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
+          {/*
           <TextField
             hintText='Search...'
             floatingLabelText='Search All'
@@ -318,6 +319,7 @@ class Table extends Component {
             onChange={e => this.setState({searchValue: e.target.value, isSearchOn: e.target.value.length > 0 ? true : false})}
           />
           <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+          */}
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
