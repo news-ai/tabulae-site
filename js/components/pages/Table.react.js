@@ -394,7 +394,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     createPublication: name => dispatch(actionCreators.createPublication(name)),
     updateOutdatedContacts: contactId => dispatch(actionCreators.updateContact(contactId)),
     fetchList: listId => dispatch(actionCreators.fetchList(listId)),
-    fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId))
+    fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
+    searchPublications: query => dispatch(actionCreators.searchPublications(query))
   };
 };
 

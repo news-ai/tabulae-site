@@ -31,6 +31,7 @@ function receiveContact(contact) {
   };
 }
 
+// helper function
 function stripOutEmployers(publicationReducer, contacts, ids) {
   const newContacts = {};
   ids.map(id => {
@@ -119,8 +120,10 @@ export function searchListContacts(listId, query) {
           });
         }
       });
+      const publicationReducer = getState().publicationReducer;
+      const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
       dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, listId});
-      return {searchContactMap: contacts, ids};
+      return {searchContactMap: contactsWithEmployers, ids};
     })
     .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
   };
