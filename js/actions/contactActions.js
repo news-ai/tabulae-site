@@ -30,9 +30,6 @@ function receiveContact(contact) {
     });
   };
 }
- // contact.employers.map((id, i) => {
- //        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
- //      });
 
 function stripOutEmployers(publicationReducer, contacts, ids) {
   const newContacts = {};
@@ -66,7 +63,6 @@ function requestContactFail(message) {
     message
   };
 }
-
 
 export function fetchContact(contactId) {
   return dispatch => {

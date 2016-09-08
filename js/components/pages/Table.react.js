@@ -349,18 +349,6 @@ class Table extends Component {
   }
 }
 
-function transformContactWithEmployers(publicationReducer, contacts) {
-  const contactsWithEmployers = contacts.map(contact => {
-    if (!_.isEmpty(contact.employers)) {
-      contact.employers.map((id, i) => {
-        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
-      });
-    }
-    return contact;
-  });
-  return contactsWithEmployers;
-}
-
 const mapStateToProps = (state, props) => {
   let lastFetchedIndex = -1;
   const listId = parseInt(props.params.listId, 10);
@@ -380,8 +368,6 @@ const mapStateToProps = (state, props) => {
       });
     }
   }
-
-  // const contactsWithEmployers = transformContactWithEmployers(publicationReducer, contacts);
 
   return {
     listId: listId,
