@@ -11,7 +11,7 @@
     "draft-js-plugins-editor": "^1.1.0",
     "fontfaceobserver": "^1.5.1",
     "fuzzy": "^0.1.1",
-    "handsontable": "^0.26.0",
+    "handsontable": "^0.27.0",
     "immutable": "^3.8.1",
     "install": "^0.8.1",
     "isomorphic-fetch": "^2.2.1",

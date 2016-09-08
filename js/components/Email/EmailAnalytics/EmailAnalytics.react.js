@@ -48,6 +48,7 @@ class EmailAnalytics extends Component {
     const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />].concat(
       filterLists.map(list => <MenuItem key={list.id} value={list.id} primaryText={list.name} onClick={_ => props.fetchListEmails(list.id)} />)
       );
+    console.log(emails);
     return (
       <div className='container'>
         <div style={{marginTop: '20px', marginBottom: '20px'}}>
@@ -69,7 +70,7 @@ class EmailAnalytics extends Component {
         >
           <StaticEmailContent {...state.previewEmail} />
         </Dialog>
-        <div style={{marginTop: '30px'}}>
+        <div style={{marginTop: '30px', marginBottom: '30px'}}>
         {emails.map((email, i) =>
           <AnalyticsItem
           key={i}

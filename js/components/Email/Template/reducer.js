@@ -35,7 +35,7 @@ function templateReducer(state = initialState.templateReducer, action) {
       obj.didInvalidate = true;
       return obj;
     case templateConstant.RECEIVE_MULTIPLE:
-      obj = Object.assign({}, state, action.templates);
+      obj = assignToEmpty(state, action.templates);
       const newReceived = state.received.concat(action.ids.filter(id => !state[id]));
       obj.received = newReceived;
       return obj;

@@ -29,16 +29,22 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.isReceiving = true;
       return obj;
     case RECEIVE_STAGED_EMAILS:
+      obj = assignToEmpty(state, action.emails);
+      obj.previewEmails = action.previewEmails;
+      obj.received = state.received.concat(action.ids.filter(id => !state.received.some(seenId => seenId === id)));
       obj.isReceiving = false;
-      obj.previewEmails = action.json;
-      action.json.map( email => obj[email.id] = email);
       return obj;
     case RECEIVE_EMAIL:
-      obj[action.json.id] = action.json;
+      obj = assignToEmpty(state, action.email);
+      if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
+      return obj;
+    case REQUEST_MULTIPLE_EMAILS:
+      obj.isReceiving = true;
       return obj;
     case RECEIVE_MULTIPLE_EMAILS:
       obj = assignToEmpty(state, action.emails);
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(seenId => seenId === id)));
+      obj.isReceiving = false;
       return obj;
     case EMAIL_SET_OFFSET:
       obj.offset = action.offset;

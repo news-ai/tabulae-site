@@ -15,7 +15,17 @@ export function postBatchEmails(emails) {
   return dispatch => {
     dispatch({ type: SENDING_STAGED_EMAILS, emails });
     return api.post(`/emails`, emails)
-    .then( response => dispatch({ type: RECEIVE_STAGED_EMAILS, json: response.data}))
+    .then( response => {
+      const res = normalize(response, {
+        data: arrayOf(emailSchema)
+      });
+      return dispatch({
+        type: RECEIVE_STAGED_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data,
+        previewEmails: response.data
+      });
+    })
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message}));
   };
 }
@@ -24,7 +34,10 @@ export function sendEmail(id) {
   return dispatch => {
     dispatch({ type: 'SEND_EMAIL', id });
     return api.get(`/emails/${id}/send`)
-    .then( response => dispatch({type: RECEIVE_EMAIL, json: response}))
+    .then( response => {
+      const res = normalize(response.data, emailSchema);
+      dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result });
+    })
     .catch( message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
   };
 }
@@ -45,7 +58,7 @@ export function fetchSentEmails() {
   return (dispatch, getState) => {
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     const OFFSET = getState().stagingReducer.offset;
-    return api.get(`/emails?limit=50&offset=0&order=-Created`)
+    return api.get(`/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {
       const res = normalize(response, {
         data: arrayOf(emailSchema)
