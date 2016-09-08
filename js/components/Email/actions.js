@@ -36,7 +36,7 @@ export function sendEmail(id) {
     return api.get(`/emails/${id}/send`)
     .then( response => {
       const res = normalize(response.data, emailSchema);
-      dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result });
+      dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result});
     })
     .catch( message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
   };

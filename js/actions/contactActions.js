@@ -1,10 +1,14 @@
 import {
   ADDING_CONTACT,
   SET_OFFSET,
-  contactConstant
+  contactConstant,
+  LIST_CONTACTS_SEARCH_REQUEST,
+  LIST_CONTACTS_SEARCH_RECEIVED,
+  LIST_CONTACTS_SEARCH_FAIL
 } from '../constants/AppConstants';
 import * as api from './api';
 import * as publicationActions from './publicationActions';
+import _ from 'lodash';
 
 import { normalize, Schema, arrayOf } from 'normalizr';
 
@@ -27,11 +31,30 @@ function receiveContact(contact) {
   };
 }
 
+// helper function
+function stripOutEmployers(publicationReducer, contacts, ids) {
+  const newContacts = {};
+  ids.map(id => {
+    newContacts[id] = Object.assign({}, contacts[id]);
+    if (!_.isEmpty(contacts[id].employers)) {
+      contacts[id].employers.map((employerId, i) => {
+        if (publicationReducer[employerId]) newContacts[id][`publication_name_${i + 1}`] = publicationReducer[employerId].name;
+      });
+    }
+  });
+  return newContacts;
+}
+
 function receiveContacts(contacts, ids) {
-  return {
-    type: contactConstant.RECEIVE_MULTIPLE,
-    contacts,
-    ids
+  return (dispatch, getState) => {
+    const publicationReducer = getState().publicationReducer;
+    const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
+
+    dispatch({
+      type: contactConstant.RECEIVE_MULTIPLE,
+      contacts: contactsWithEmployers,
+      ids
+    });
   };
 }
 
@@ -42,24 +65,12 @@ function requestContactFail(message) {
   };
 }
 
-
 export function fetchContact(contactId) {
   return dispatch => {
     dispatch(requestContact());
     return api.get(`/contacts/${contactId}`)
     .then( response => dispatch(receiveContact(response)))
     .catch( message => dispatch(requestContactFail(message)));
-  };
-}
-
-export function fetchContacts(listId, rangeStart, rangeEnd) {
-  return (dispatch, getState) => {
-    if (getState().listReducer[listId].contacts === null) return;
-    getState().listReducer[listId].contacts.map( (contactId, i) => {
-      if (rangeStart <= i && i < rangeEnd) {
-        dispatch(fetchContact(contactId));
-      }
-    });
   };
 }
 
@@ -90,36 +101,49 @@ export function fetchPaginatedContacts(listId) {
 
 export function searchListContacts(listId, query) {
   return (dispatch, getState) => {
-    return api.get(`/lists/${listId}/contacts?q="${query}"`)
+    dispatch({ type: LIST_CONTACTS_SEARCH_REQUEST, listId, query});
+    return api.get(`/lists/${listId}/contacts?q="${query}"&limit=50&offset=0`)
     .then(response => {
       const res = normalize(response, {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
       });
 
-      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
-      dispatch(receiveContacts(res.entities.contacts, res.result.data));
-    });
+      // dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+      // dispatch(receiveContacts(res.entities.contacts, res.result.data));
+      const ids = res.result.data;
+      const contacts = res.entities.contacts;
+      ids.map(id => {
+        if (contacts[id].customfields && contacts[id].customfields !== null) {
+          contacts[id].customfields.map(field => {
+            contacts[id][field.name] = field.value;
+          });
+        }
+      });
+      const publicationReducer = getState().publicationReducer;
+      const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
+      dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, listId});
+      return {searchContactMap: contactsWithEmployers, ids};
+    })
+    .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
   };
 }
 
 export function updateContact(id) {
   return dispatch => {
     return api.get(`/contacts/${id}/update`)
-    .then( response => dispatch(receiveContact(response.data)))
-    .catch( message => dispatch(requestContactFail(message)));
+    .then(response => dispatch(receiveContact(response.data)))
+    .catch(message => dispatch(requestContactFail(message)));
   };
 }
 
 export function patchContacts(contactList) {
   return dispatch => {
-    dispatch({ type: 'PATCH_CONTACTS', contactList });
+    dispatch({type: 'PATCH_CONTACTS', contactList});
 
     return api.patch(`/contacts`, contactList)
-    .then( response => {
-      response.data.map( contact => dispatch(receiveContact(contact)));
-    })
-    .catch( message => console.log(message));
+    .then(response => response.data.map( contact => dispatch(receiveContact(contact))))
+    .catch(message => console.log(message));
   };
 }
 

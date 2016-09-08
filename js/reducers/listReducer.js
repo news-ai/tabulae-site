@@ -1,6 +1,8 @@
 import {
   listConstant,
-  SET_OFFSET
+  SET_OFFSET,
+  LIST_CONTACTS_SEARCH_REQUEST,
+  LIST_CONTACTS_SEARCH_RECEIVED
 } from '../constants/AppConstants';
 
 import { assignToEmpty } from '../utils/assign';
@@ -10,7 +12,9 @@ import _ from 'lodash';
 
 const types = _.values(listConstant);
 types.push(
-  SET_OFFSET
+  SET_OFFSET,
+  LIST_CONTACTS_SEARCH_RECEIVED,
+  LIST_CONTACTS_SEARCH_REQUEST
   );
 
 function listReducer(state = initialState.listReducer, action) {
@@ -19,6 +23,14 @@ function listReducer(state = initialState.listReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
+    case LIST_CONTACTS_SEARCH_REQUEST:
+      obj.isReceiving = true;
+      obj[action.listId].searchResults = [];
+      return obj;
+    case LIST_CONTACTS_SEARCH_RECEIVED:
+      obj.isReceiving = false;
+      obj[action.listId].searchResults = action.ids;
+      return obj;
     case listConstant.REQUEST_MULTIPLE:
       obj.isReceiving = true;
       return obj;

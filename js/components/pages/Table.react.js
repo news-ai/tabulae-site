@@ -11,6 +11,7 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 
 import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -59,7 +60,9 @@ class Table extends Component {
       isSaved: true, // table without change
       person: null,
       lastSavedAt: null,
-      isMenuOpen: false
+      isMenuOpen: false,
+      searchValue: '',
+      isSearchOn: false
     }
     this.onMenuTouchTap = e => {
       e.preventDefault();
@@ -79,6 +82,7 @@ class Table extends Component {
     this._fetchOperations = this._fetchOperations.bind(this);
     this._isDirty = _ => this.setState({isSaved: false});
     this.routerWillLeave = this.routerWillLeave.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
   }
 
   componentDidMount() {
@@ -103,11 +107,8 @@ class Table extends Component {
     
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
-    if (this.state.person === null) {
-      const person = nextProps.person;
-      this.setState({person});
-    }
+    if (nextProps.name !== this.state.name) this.setState({name: nextProps.name });
+    if (this.state.person === null) this.setState({person: nextProps.person});
   }
 
   routerWillLeave(nextLocation) {
@@ -118,19 +119,22 @@ class Table extends Component {
     return 'Are you sure you want to leave this page?'
   }
 
+  _onSearchClick() {
+    const props = this.props;
+    props.searchListContacts(props.listId, this.state.searchValue)
+    .then(obj => console.log(obj));
+  }
+
   _fetchOperations() {
-    const { dispatch, listId } = this.props;
-    dispatch(actionCreators.fetchList(listId))
-    .then( _ => {
-      dispatch(actionCreators.fetchContacts(listId));
-    });
+    const props = this.props;
+    props.fetchList(props.listId)
+    .then(_ => props.fetchContacts(props.listId));
   }
 
   _updateContacts() {
-    const { dispatch } = this.props;
     const selected = this.state.selectedContacts
-    .filter( contact => contact.isoutdated )
-    .map( contact => dispatch(actionCreators.updateContact(contact.id)) );
+    .filter(contact => contact.isoutdated )
+    .map(contact => this.props.updateOutdatedContacts(contact.id));
   }
 
   _handleNormalField(colHeaders, row) {
@@ -159,19 +163,19 @@ class Table extends Component {
   }
 
   _createPublicationPromises(localData, colHeaders) {
-    const { publicationReducer, dispatch } = this.props;
+    const props = this.props;
     let promises = [];
     localData.map( row => {
       if (row['publication_name_1']) {
         const pubName1 = row['publication_name_1'];
-        if (!publicationReducer[pubName1]) {
-          promises.push(actionCreators.createPublication({name: pubName1}));
+        if (!props.publicationReducer[pubName1]) {
+          promises.push(props.createPublication({name: pubName1}));
         }
       }
       if (row['publication_name_2']) {
         const pubName2 = row['publication_name_2'];
-        if (!publicationReducer[pubName2]) {
-          promises.push(actionCreators.createPublication({name: pubName2}));
+        if (!props.publicationReducer[pubName2]) {
+          promises.push(props.createPublication({name: pubName2}));
         }
       }
     });
@@ -179,7 +183,8 @@ class Table extends Component {
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
-    const {dispatch, listId, listData, lastFetchedIndex} = this.props;
+    const props = this.props;
+    const state = this.state;
     let addContactList = [];
     let patchContactList = [];
 
@@ -200,36 +205,36 @@ class Table extends Component {
         if (field.id) {
           if (dirtyRows.some( rowId => rowId === field.id )) patchContactList.push(field);
         } else {
-          field.listid = listId;
+          field.listid = props.listId;
           addContactList.push(field);
         }
       }
     });
 
     // update existing contacts
-    const origIdList = listData.contacts || [];
+    const origIdList = props.listData.contacts || [];
     // console.log(patchContactList);
     // console.log(addContactList);
 
-    if (patchContactList.length > 0) dispatch(actionCreators.patchContacts(patchContactList));
+    if (patchContactList.length > 0) props.patchContacts(patchContactList);
 
     // create new contacts and append new rows to LIST
     if (addContactList.length > 0) {
-      dispatch(actionCreators.addContacts(addContactList))
-      .then( json => {
+      props.addContacts(addContactList)
+      .then(json => {
         const appendIdList = json.map( contact => contact.id );
         const newIdList = origIdList.concat(appendIdList);
-        dispatch(actionCreators.patchList({
-          listId,
-          name: this.state.name,
+        props.patchList({
+          listId: props.listId,
+          name: state.name,
           contacts: newIdList,
           fieldsmap
-        }));
+        });
       });
     } else {
       // if no new contacts, see if list needs update
-      if (this.state.name !== listData.name) {
-        dispatch(actionCreators.patchList({listId, name: this.state.name}));
+      if (state.name !== props.listData.name) {
+        props.patchList({listId: props.listId, name: state.name});
       }
     }
     const currentdate = new Date(); 
@@ -247,10 +252,7 @@ class Table extends Component {
     } else {
       // create publications for later usage
       Promise.all(this._createPublicationPromises(localData, colHeaders))
-      .then( _ => {
-        this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-      });
-      
+      .then( _ => this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows));
     }
   }
 
@@ -308,6 +310,16 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
+          {/*
+          <TextField
+            hintText='Search...'
+            floatingLabelText='Search All'
+            floatingLabelFixed={true}
+            value={this.state.searchValue}
+            onChange={e => this.setState({searchValue: e.target.value, isSearchOn: e.target.value.length > 0 ? true : false})}
+          />
+          <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+          */}
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
@@ -346,6 +358,7 @@ const mapStateToProps = (state, props) => {
   const publicationReducer = state.publicationReducer;
   let contacts = [];
 
+  // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   if (listData) {
     if (!_.isEmpty(listData.contacts)) {
       contacts = listData.contacts.map( (contactId, i) => {
@@ -358,15 +371,6 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  const contactWithEmployers = contacts.map(contact => {
-    if (!_.isEmpty(contact.employers)) {
-      contact.employers.map((id, i) => {
-        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
-      });
-    }
-    return contact;
-  });
-
   return {
     listId: listId,
     listIsReceiving: state.listReducer.isReceiving,
@@ -378,13 +382,22 @@ const mapStateToProps = (state, props) => {
     publicationReducer,
     lastFetchedIndex,
     person: state.personReducer.person,
-    firstTimeUser: state.personReducer.firstTimeUser
+    firstTimeUser: state.personReducer.firstTimeUser,
   };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    dispatch: action => dispatch(action)
+    dispatch: action => dispatch(action),
+    searchListContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
+    patchList: listObj => dispatch(actionCreators.patchList(listObj)),
+    patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
+    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
+    createPublication: name => dispatch(actionCreators.createPublication(name)),
+    updateOutdatedContacts: contactId => dispatch(actionCreators.updateContact(contactId)),
+    fetchList: listId => dispatch(actionCreators.fetchList(listId)),
+    fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
+    searchPublications: query => dispatch(actionCreators.searchPublications(query))
   };
 };
 

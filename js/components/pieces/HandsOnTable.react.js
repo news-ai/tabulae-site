@@ -35,7 +35,6 @@ alertify.defaults.glossary.title = '';
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
-    const {dispatch} = this.props;
     this._addColumn = this._addColumn.bind(this);
     this._removeColumn = this._removeColumn.bind(this);
     this._changeColumnName = this._changeColumnName.bind(this);
@@ -48,7 +47,7 @@ class HandsOnTable extends Component {
         type: 'autocomplete',
         title: 'Publication 1',
         source: (query, callback) => {
-          dispatch(actionCreators.searchPublications(query))
+          props.searchPublications(query)
           .then(publicationNameArray => callback(publicationNameArray));
           // callback([]);
         },
@@ -61,7 +60,7 @@ class HandsOnTable extends Component {
         type: 'autocomplete',
         title: 'Publication 2',
         source: (query, callback) => {
-          dispatch(actionCreators.searchPublications(query))
+          props.searchPublications(query)
           .then(publicationNameArray => callback(publicationNameArray));
           // callback([]);
         },
@@ -109,36 +108,35 @@ class HandsOnTable extends Component {
         },
         contextMenu: {
           callback: (key, options) => {
-            const {listData} = this.props;
             if (key === 'insert_row_above') {
               const index = options.start.row;
-              dispatch(actionCreators.addContacts([{ }]))
-              .then( contacts => {
-                const newListContacts = listData.contacts;
+              props.addContacts([{}])
+              .then(contacts => {
+                const newListContacts = props.listData.contacts;
                 newListContacts.splice(index, 0, contacts[0].id);
                 this.setState({addedRow: true});
-                dispatch(actionCreators.patchList({
-                  listId: listData.id,
+                props.patchList({
+                  listId: props.listData.id,
                   contacts: newListContacts,
-                  name: listData.name,
+                  name: props.name,
                   fieldsmap: this.state.fieldsmap
-                }));
+                });
               });
             }
 
             if (key === 'insert_row_below') {
               const index = options.start.row;
-              dispatch(actionCreators.addContacts([{}]))
+              props.addContacts([{}])
               .then( contacts => {
-                const newListContacts = listData.contacts;
+                const newListContacts = props.listData.contacts;
                 newListContacts.splice(index + 1, 0, contacts[0].id);
                 this.setState({addedRow: true});
-                dispatch(actionCreators.patchList({
-                  listId: listData.id,
+                props.patchList({
+                  listId: props.listId,
                   contacts: newListContacts,
-                  name: listData.name,
+                  name: props.name,
                   fieldsmap: this.state.fieldsmap
-                }));
+                });
               });
             }
 
@@ -146,19 +144,19 @@ class HandsOnTable extends Component {
               const low = options.start.row <= options.end.row ? options.start.row : options.end.row;
               const hi = low === options.start.row ? options.end.row : options.end.row;
               const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map(row => row.id);
-              const newListContacts = _.difference(listData.contacts, removeIdList);
-              dispatch(actionCreators.patchList({
-                listId: listData.id,
+              const newListContacts = _.difference(props.listData.contacts, removeIdList);
+              props.patchList({
+                listId: props.listId,
                 contacts: newListContacts,
-                name: listData.name,
+                name: props.name,
                 fieldsmap: this.state.fieldsmap
-              }));
+              });
               this.setState({addedRow: true, lastFetchedIndex: this.state.lastFetchedIndex - (hi - low + 1)});
             }
 
             if (key === 'remove_column') {
               for (let i = options.start.col; i <= options.end.col; i++) {
-                this._removeColumn(listData.id, this.state.options.columns, this.table.colToProp(i), i);
+                this._removeColumn(props.listId, this.state.options.columns, this.table.colToProp(i), i);
               }
             }
 
@@ -170,7 +168,7 @@ class HandsOnTable extends Component {
                 `Change Column Name`,
                 `What is the new column name?`,
                 '',
-                (e, value) => this._changeColumnName(listData.id, this.state.options.columns, options.start.col, value),
+                (e, value) => this._changeColumnName(props.listId, this.state.options.columns, options.start.col, value),
                 _ => alertify.error('Cancel')
                 );
               }
@@ -243,12 +241,18 @@ class HandsOnTable extends Component {
         this.table.updateSettings(options);
       }
 
-      if (lastFetchedIndex - this.state.lastFetchedIndex === 50 || listData.contacts.length <= 50 || lastFetchedIndex === listData.contacts.length - 1 || this.state.addedRow) {
-        fieldsmap.map( fieldObj => {
+      // load every 50 contacts to avoid slow UI
+      if (
+        lastFetchedIndex - this.state.lastFetchedIndex === 50 ||
+        listData.contacts.length <= 50 ||
+        lastFetchedIndex === listData.contacts.length - 1 ||
+        this.state.addedRow
+        ) {
+        fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) {
-            contacts.map( (contact, i) => {
+            contacts.map((contact, i) => {
               if (!_.isEmpty(contact.customfields)) {
-                if (contact.customfields.some( field => field.name === fieldObj.value)) {
+                if (contact.customfields.some(field => field.name === fieldObj.value)) {
                   contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
                 }
               }
@@ -312,7 +316,7 @@ class HandsOnTable extends Component {
         }
       },
       afterScrollVertically: e => {
-        const { lastFetchedIndex, contactIsReceiving, dispatch, listId, listData } = this.props;
+        const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
         if (_.isEmpty(listData.contacts)) return;
         if (listData.contacts.length < 50) return;
         if (lastFetchedIndex === listData.contacts.length - 1) return;
@@ -324,7 +328,7 @@ class HandsOnTable extends Component {
         const threshold = this.state.lazyLoadingThreshold;
 
         if (lastVisibleRow > (lastFetchedIndex - threshold)) {
-          if (!contactIsReceiving) dispatch(actionCreators.fetchContacts(listId));
+          if (!contactIsReceiving) fetchContacts(listId);
         }
       }
     };
@@ -333,7 +337,6 @@ class HandsOnTable extends Component {
 
   _changeColumnName(listId, columns, colNum, newColumnName) {
     const {fieldsmap} = this.state;
-    const {dispatch} = this.props;
     const columnValue = columns[colNum].data;
     const newFieldsmap = fieldsmap.map( fieldObj => {
       if (fieldObj.value === columnValue && fieldObj.customfield) {
@@ -341,24 +344,23 @@ class HandsOnTable extends Component {
       }
       return fieldObj;
     });
-    dispatch(actionCreators.patchList({
+    this.props.patchList({
       listId: listId,
       fieldsmap: newFieldsmap
-    }));
+    });
   }
 
   _removeColumn(listId, columns, colProp) {
     const { fieldsmap } = this.state;
-    const { dispatch } = this.props;
     const columnValue = columns.find(column => column.data === colProp).data;
     if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield )) {
       this.table.runHooks('persistentStateReset');
       // const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
-      dispatch(actionCreators.patchList({
+      this.props.patchList({
         listId: listId,
         fieldsmap: newFieldsmap
-      })).then(_ => {
+      }).then(_ => {
         this.table.destroy();
         this._loadTable();
       });
@@ -432,13 +434,15 @@ class HandsOnTable extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    contactIsReceiving: state.contactReducer.isReceiving
+    // contactIsReceiving: state.contactReducer.isReceiving
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    dispatch: action => dispatch(action)
+    // dispatch: action => dispatch(action),
+    // fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
+    // patchList: listObj => dispatch(actionCreators.patchList(listObj)),
   };
 };
 
