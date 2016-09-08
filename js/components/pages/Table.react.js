@@ -105,11 +105,8 @@ class Table extends Component {
     
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.name !== this.state.name) this.setState({ name: nextProps.name });
-    if (this.state.person === null) {
-      const person = nextProps.person;
-      this.setState({person});
-    }
+    if (nextProps.name !== this.state.name) this.setState({name: nextProps.name });
+    if (this.state.person === null) this.setState({person: nextProps.person});
   }
 
   routerWillLeave(nextLocation) {
@@ -178,7 +175,6 @@ class Table extends Component {
   }
 
   _saveOperations(localData, colHeaders, fieldsmap, dirtyRows) {
-    const {listId, listData, lastFetchedIndex} = this.props;
     const props = this.props;
     const state = this.state;
     let addContactList = [];
@@ -201,7 +197,7 @@ class Table extends Component {
         if (field.id) {
           if (dirtyRows.some( rowId => rowId === field.id )) patchContactList.push(field);
         } else {
-          field.listid = listId;
+          field.listid = props.listId;
           addContactList.push(field);
         }
       }
@@ -221,16 +217,16 @@ class Table extends Component {
         const appendIdList = json.map( contact => contact.id );
         const newIdList = origIdList.concat(appendIdList);
         props.patchList({
-          listId,
-          name: this.state.name,
+          listId: props.listId,
+          name: state.name,
           contacts: newIdList,
           fieldsmap
         });
       });
     } else {
       // if no new contacts, see if list needs update
-      if (this.state.name !== listData.name) {
-        props.patchList({listId, name: this.state.name});
+      if (state.name !== props.listData.name) {
+        props.patchList({listId: props.listId, name: state.name});
       }
     }
     const currentdate = new Date(); 
@@ -248,10 +244,7 @@ class Table extends Component {
     } else {
       // create publications for later usage
       Promise.all(this._createPublicationPromises(localData, colHeaders))
-      .then( _ => {
-        this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-      });
-      
+      .then( _ => this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows));
     }
   }
 
