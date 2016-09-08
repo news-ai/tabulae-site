@@ -213,6 +213,7 @@ class EmailPanel extends Component {
       zIndex: 200,
       display: state.minimized ? 'none' : 'block'
     };
+    console.log(props.previewEmails);
 
     return (
       <div style={styles.emailPanelOuterPosition}>

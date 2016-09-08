@@ -5,7 +5,7 @@ import PreviewEmail from './PreviewEmail.react';
 function PreviewEmails({isReceiving, previewEmails, onSendEmailClick}) {
   const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));
   return (
-   (isReceiving || previewEmails.length === 0) ? <span>LOADING..</span> :
+   (isReceiving || previewEmails.length === 0) ? null :
     <div>
       <RaisedButton label='Send All' primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
       {previewEmails.map((email, i) => <PreviewEmail key={i} {...email} onSendEmailClick={_ => onSendEmailClick(email.id)} />)}
