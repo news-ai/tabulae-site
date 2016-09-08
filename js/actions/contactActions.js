@@ -30,12 +30,33 @@ function receiveContact(contact) {
     });
   };
 }
+ // contact.employers.map((id, i) => {
+ //        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
+ //      });
+
+function stripOutEmployers(publicationReducer, contacts, ids) {
+  const newContacts = {};
+  ids.map(id => {
+    newContacts[id] = Object.assign({}, contacts[id]);
+    if (!_.isEmpty(contacts[id].employers)) {
+      contacts[id].employers.map((employerId, i) => {
+        if (publicationReducer[employerId]) newContacts[id][`publication_name_${i + 1}`] = publicationReducer[employerId].name;
+      });
+    }
+  });
+  return newContacts;
+}
 
 function receiveContacts(contacts, ids) {
-  return {
-    type: contactConstant.RECEIVE_MULTIPLE,
-    contacts,
-    ids
+  return (dispatch, getState) => {
+    const publicationReducer = getState().publicationReducer;
+    const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
+
+    dispatch({
+      type: contactConstant.RECEIVE_MULTIPLE,
+      contacts: contactsWithEmployers,
+      ids
+    });
   };
 }
 

@@ -212,7 +212,7 @@ class Table extends Component {
     });
 
     // update existing contacts
-    const origIdList = listData.contacts || [];
+    const origIdList = props.listData.contacts || [];
     // console.log(patchContactList);
     // console.log(addContactList);
 
@@ -349,6 +349,18 @@ class Table extends Component {
   }
 }
 
+function transformContactWithEmployers(publicationReducer, contacts) {
+  const contactsWithEmployers = contacts.map(contact => {
+    if (!_.isEmpty(contact.employers)) {
+      contact.employers.map((id, i) => {
+        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
+      });
+    }
+    return contact;
+  });
+  return contactsWithEmployers;
+}
+
 const mapStateToProps = (state, props) => {
   let lastFetchedIndex = -1;
   const listId = parseInt(props.params.listId, 10);
@@ -356,6 +368,7 @@ const mapStateToProps = (state, props) => {
   const publicationReducer = state.publicationReducer;
   let contacts = [];
 
+  // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   if (listData) {
     if (!_.isEmpty(listData.contacts)) {
       contacts = listData.contacts.map( (contactId, i) => {
@@ -368,14 +381,7 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  const contactWithEmployers = contacts.map(contact => {
-    if (!_.isEmpty(contact.employers)) {
-      contact.employers.map((id, i) => {
-        if (publicationReducer[id]) contact[`publication_name_${i + 1}`] = publicationReducer[id].name;
-      });
-    }
-    return contact;
-  });
+  // const contactsWithEmployers = transformContactWithEmployers(publicationReducer, contacts);
 
   return {
     listId: listId,
