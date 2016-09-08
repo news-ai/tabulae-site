@@ -62,7 +62,9 @@ class Table extends Component {
       lastSavedAt: null,
       isMenuOpen: false,
       searchValue: '',
-      isSearchOn: false
+      isSearchOn: false,
+      searchContacts: [],
+      errorText: null
     }
     this.onMenuTouchTap = e => {
       e.preventDefault();
@@ -83,6 +85,7 @@ class Table extends Component {
     this._isDirty = _ => this.setState({isSaved: false});
     this.routerWillLeave = this.routerWillLeave.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.onSearchClearClick = this._onSearchClearClick.bind(this);
   }
 
   componentDidMount() {
@@ -122,7 +125,21 @@ class Table extends Component {
   _onSearchClick() {
     const props = this.props;
     props.searchListContacts(props.listId, this.state.searchValue)
-    .then(obj => console.log(obj));
+    .then(obj => {
+      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
+      let errorText = null;
+      if (searchContacts.length === 0) errorText = 'No such term.'
+      this.setState({searchContacts, errorText, isSearchOn: true});
+    });
+  }
+
+  _onSearchClearClick() {
+    this.setState({
+      searchContacts: [],
+      searchValue: '',
+      errorText: null,
+      isSearchOn: false
+    });
   }
 
   _fetchOperations() {
@@ -277,7 +294,7 @@ class Table extends Component {
               listId={props.listId}
               />
             </SkyLight>
-            <div className='six columns'>
+            <div className='four columns'>
               <ToggleableEditInput
               name={state.name}
               onUpdateName={this._onUpdateName}
@@ -310,16 +327,16 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
-          {/*
-          <TextField
-            hintText='Search...'
-            floatingLabelText='Search All'
-            floatingLabelFixed={true}
-            value={this.state.searchValue}
-            onChange={e => this.setState({searchValue: e.target.value, isSearchOn: e.target.value.length > 0 ? true : false})}
-          />
-          <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
-          */}
+          <div className='three columns'>
+            <TextField
+              hintText='Search...'
+              value={this.state.searchValue}
+              onChange={e => this.setState({searchValue: e.target.value})}
+              errorText={state.errorText}
+            />
+            <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+            <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+          </div>
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
@@ -333,12 +350,13 @@ class Table extends Component {
           <div style={{marginTop: '10px'}}>
             <HandsOnTable
             {...props}
+            isSearchOn={state.isSearchOn}
             lastSavedAt={state.lastSavedAt}
             listId={props.listId}
             onSaveClick={this._onSaveClick}
             _getSelectedRows={this._getSelectedRows}
             listData={props.listData}
-            contacts={props.contacts}
+            contacts={state.isSearchOn ? state.searchContacts : props.contacts}
             isNew={false}
             lastFetchedIndex={props.lastFetchedIndex}
             isDirty={this._isDirty}
