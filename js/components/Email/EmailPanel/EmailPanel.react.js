@@ -103,6 +103,7 @@ class EmailPanel extends Component {
     this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
+    this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
   }
 
   componentWillMount() {
@@ -113,6 +114,11 @@ class EmailPanel extends Component {
     // add immutable here
     const fieldsmap = nextProps.fieldsmap;
     this.setState({fieldsmap});
+  }
+
+  _onArchiveTemplate() {
+    this.props.toggleArchiveTemplate(this.state.currentTemplateId)
+    .then(_ => this._handleTemplateValueChange(null, null, 0));
   }
 
   _handleTemplateValueChange(event, index, value) {
@@ -263,6 +269,10 @@ class EmailPanel extends Component {
                     onClick={_ => this.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
                     primaryText='Save Text to Existing Template' />
                     <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+                    <MenuItem
+                    onClick={this.onDeleteTemplate}
+                    disabled={state.currentTemplateId ? false : true}
+                    primaryText='Delete Template' />
                   </IconMenu>
                 </div>
                 <div>
@@ -291,14 +301,14 @@ class EmailPanel extends Component {
 }
 
 const mapStateToProps = state => {
-  const templates = state.templateReducer.received.map(id => state.templateReducer[id]);
+  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
   return {
     isReceiving: state.stagingReducer.isReceiving,
     previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails
     .map(pEmail => state.stagingReducer[pEmail.id])
     .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,
-    templates: state.templateReducer.received.map(id => state.templateReducer[id])
+    templates: templates
   };
 };
 
@@ -308,7 +318,8 @@ const mapDispatchToProps = dispatch => {
     onSendEmailClick: id => dispatch(actionCreators.sendEmail(id)),
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body)),
     fetchTemplates: _ => dispatch(actionCreators.getTemplates()),
-    createTemplate: (name, subject, body) => dispatch(actionCreators.createTemplate(name, subject, body))
+    createTemplate: (name, subject, body) => dispatch(actionCreators.createTemplate(name, subject, body)),
+    toggleArchiveTemplate: templateId => dispatch(actionCreators.toggleArchiveTemplate(templateId))
   };
 };
 

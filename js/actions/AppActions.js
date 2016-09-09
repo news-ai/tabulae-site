@@ -43,3 +43,4 @@ export const waitForServerProcess = listId => fileActions.waitForServerProcess(l
 export const createTemplate = (name, subject, body) => templateActions.createTemplate(name, subject, body);
 export const patchTemplate = (templateId, subject, body) => templateActions.patchTemplate(templateId, subject, body);
 export const getTemplates = _ => templateActions.getTemplates();
+export const toggleArchiveTemplate = templateId => templateActions.toggleArchiveTemplate(templateId);

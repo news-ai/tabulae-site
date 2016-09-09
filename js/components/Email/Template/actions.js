@@ -41,6 +41,20 @@ export function patchTemplate(templateId, subject, body) {
   };
 }
 
+export function toggleArchiveTemplate(templateId) {
+  return (dispatch, getState) => {
+    const template = getState().templateReducer[templateId];
+    template.archived = !template.archived;
+    dispatch({type: 'TEMPLATE_TOGGLE_ARCHIVE', templateId});
+    return api.patch(`/templates/${templateId}`, template)
+    .then(response => {
+      const res = normalize(response.data, templateSchema);
+      return dispatch({type: templateConstant.RECEIVE, template: res.entities.templates, id: res.result});
+    })
+    .catch(message => dispatch({type: 'PATCH_TEMPLATE_FAIL', message}));
+  };
+}
+
 export function getTemplates() {
   return dispatch => {
     dispatch({type: templateConstant.REQUEST_MULTIPLE});
