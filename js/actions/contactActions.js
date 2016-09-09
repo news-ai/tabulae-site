@@ -143,7 +143,13 @@ export function patchContacts(contactList) {
     dispatch({type: 'PATCH_CONTACTS', contactList});
 
     return api.patch(`/contacts`, contactList)
-    .then(response => response.data.map( contact => dispatch(receiveContact(contact))))
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
+      });
+      dispatch(receiveContacts(res.entities.contacts, res.result.data));
+    })
     .catch(message => console.log(message));
   };
 }
@@ -154,7 +160,11 @@ export function addContacts(contactList) {
 
     return api.post(`/contacts`, contactList)
     .then( response => {
-      response.data.map( contact => dispatch(receiveContact(contact)));
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
+      });
+      dispatch(receiveContacts(res.entities.contacts, res.result.data));
       return response.data;
     })
     .catch( message => console.log(message));
