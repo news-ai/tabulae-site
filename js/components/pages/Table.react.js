@@ -338,7 +338,7 @@ class Table extends Component {
             <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
           </div>
-        */}
+          */}
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
