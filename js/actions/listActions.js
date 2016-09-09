@@ -78,7 +78,7 @@ export function fetchLists() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     dispatch(requestLists());
-    return api.get(`/lists?limit=50&offset=0`)
+    return api.get(`/lists?limit=50&offset=0&order=-Created`)
     .then( response => {
       const res = normalize(response, {
         data: arrayOf(listSchema),
