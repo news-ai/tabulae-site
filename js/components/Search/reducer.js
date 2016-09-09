@@ -3,8 +3,8 @@ import {
 } from './constants';
 import _ from 'lodash';
 
-import { initialState } from '../reducers/initialState';
-import { assignToEmpty, canAccessReducer } from '../utils/assign';
+import { initialState } from '../../reducers/initialState';
+import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 const types = _.values(searchConstant);
 
 function searchReducer(state = initialState.searchReducer, action) {
@@ -17,11 +17,16 @@ function searchReducer(state = initialState.searchReducer, action) {
       obj.isReceiving = true;
       return obj;
     case searchConstant.RECEIVE_MULTIPLE:
+      obj = assignToEmpty(state, action.contacts);
       obj.isReceiving = false;
+      obj.received = action.ids;
       return obj;
     case searchConstant.REQUEST_MULTIPLE_FAIL:
       obj.isReceiving = false;
       obj.didInvalidate = false;
+      return obj;
+    case searchConstant.SET_OFFSET:
+      obj.offset = action.offset;
       return obj;
     default:
       return state;

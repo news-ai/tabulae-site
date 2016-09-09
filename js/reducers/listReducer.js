@@ -1,6 +1,5 @@
 import {
   listConstant,
-  SET_OFFSET,
   LIST_CONTACTS_SEARCH_REQUEST,
   LIST_CONTACTS_SEARCH_RECEIVED
 } from '../constants/AppConstants';
@@ -12,7 +11,6 @@ import _ from 'lodash';
 
 const types = _.values(listConstant);
 types.push(
-  SET_OFFSET,
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_REQUEST
   );
@@ -67,7 +65,7 @@ function listReducer(state = initialState.listReducer, action) {
     case listConstant.PATCH_FAIL:
       obj.isReceiving = false;
       return obj;
-    case SET_OFFSET:
+    case listConstant.SET_OFFSET:
       obj[action.listId].offset = action.offset;
       return obj;
     default:
