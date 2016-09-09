@@ -410,6 +410,7 @@ class HandsOnTable extends Component {
   render() {
     const { options } = this.state;
     const props = this.props;
+    console.log(props.contacts);
     return (
       <div key={props.listData.id}>
         <div className='row' style={styles.buttons.group}>

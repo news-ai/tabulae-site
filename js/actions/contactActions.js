@@ -108,6 +108,7 @@ export function searchListContacts(listId, query) {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
       });
+      console.log(response.data);
 
       // dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
       // dispatch(receiveContacts(res.entities.contacts, res.result.data));
@@ -122,7 +123,7 @@ export function searchListContacts(listId, query) {
       });
       const publicationReducer = getState().publicationReducer;
       const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
-      dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, listId});
+      dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, contactsWithEmployers, listId});
       return {searchContactMap: contactsWithEmployers, ids};
     })
     .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
