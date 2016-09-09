@@ -17,6 +17,14 @@ const defaultSelectableOptions = [
   {value: 'blog', label: 'Blog'},
 ];
 
+const listItemStyle = {
+  borderTop: '1px solid lightgray',
+  margin: '0 0 0 0',
+  textAlign: 'center',
+  height: '23px',
+  overflow: 'auto'
+};
+
 class Headers extends Component {
   constructor(props) {
     super(props);
@@ -111,7 +119,7 @@ class Headers extends Component {
   }
 
   render() {
-    const { headers, defaultOptions } = this.state;
+    const {headers, defaultOptions} = this.state;
     const options = defaultOptions;
     return (
       <div>
@@ -125,8 +133,7 @@ class Headers extends Component {
           justifyContent: 'space-between',
           marginBottom: '30px'
         }}>
-        {headers.map( (header, i) => {
-        return (
+        {headers ? headers.map( (header, i) =>
           <div key={i} style={{width: '180px'}}>
             <Select
             name={'row-' + i}
@@ -137,19 +144,9 @@ class Headers extends Component {
             width='100px'
             />
             <ul style={{listStyleType: 'none'}}>
-            {header.rows.map( (item, j) => <li
-              key={j}
-              style={{
-                borderTop: '1px solid lightgray',
-                margin: '0 0 0 0',
-                textAlign: 'center',
-                height: '23px',
-                overflow: 'auto'
-              }}
-              >{item}</li>)}
+            {header.rows.map((rowItem, j) => <li key={j} style={listItemStyle}>{rowItem}</li>)}
             </ul>
-          </div>);
-      })}
+          </div>) : null}
         </div>
         <button className='button' style={{ float: 'right' }} onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>

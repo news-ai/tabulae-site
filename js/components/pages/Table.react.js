@@ -118,7 +118,7 @@ class Table extends Component {
     // return false to prevent a transition w/o prompting the user,
     // or return a string to allow the user to decide:
     if (!this.state.isSaved) return 'Your work is not saved! Are you sure you want to leave?'
-      else if (nextLocation.pathname === '/emailstats') return true;
+    else if (nextLocation.pathname === '/emailstats') return true;
     return 'Are you sure you want to leave this page?'
   }
 
@@ -327,6 +327,7 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
+          {/*
           <div className='three columns'>
             <TextField
               hintText='Search...'
@@ -337,6 +338,7 @@ class Table extends Component {
             <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
           </div>
+        */}
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
