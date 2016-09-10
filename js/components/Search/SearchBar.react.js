@@ -40,6 +40,7 @@ class SearchBar extends Component {
   }
 
   _onSearchClick() {
+    if (this.props.isReceiving) return;
     this.props.fetchSearch(this.state.query)
     .then(_ => this.setState({
       isSearchReceived: true,
@@ -76,6 +77,11 @@ class SearchBar extends Component {
             {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
           </div>
         }
+        {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 ? <p style={{
+          display: 'flex',
+          justifyContent: 'center'
+        }}>Scroll to load more</p> : null}
+
       </div>);
   }
 }
