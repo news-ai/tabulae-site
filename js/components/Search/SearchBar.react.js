@@ -11,21 +11,19 @@ class SearchBar extends Component {
     super(props);
     this.state = {
       query: '',
-      isSearchReceived: false
+      isSearchReceived: false,
+      isReceiving: false
     };
-    this.onSearchClick = this._onSearchClick.bind(this);
   }
 
   componentWillMount() {
   }
 
-  componentWillUnmount() {
-    this.props.clearSearchCache();
+  componentWillReceiveProps(nextProps) {
   }
 
-  _onSearchClick() {
-    this.props.fetchSearch(this.state.query)
-    .then(_ => this.setState({isSearchReceived: true}));
+  componentWillUnmount() {
+    this.props.clearSearchCache();
   }
 
   render() {
@@ -42,10 +40,10 @@ class SearchBar extends Component {
           <div>
            <TextField
             hintText='Search query here...'
-            onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
+            onKeyDown={e => e.keyCode === 13 ? props.fetchSearch(state.query).then(_ => this.setState({isSearchReceived: true})) : null}
             onChange={e => this.setState({query: e.target.value})}
             />
-            <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+            <RaisedButton style={{marginLeft: '10px'}} onClick={_ => props.fetchSearch(state.query).then(_ => this.setState({isSearchReceived: true}))}  label='Search All Lists' labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
         {props.isReceiving ? <span>WAITING</span> :
