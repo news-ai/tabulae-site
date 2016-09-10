@@ -26,7 +26,6 @@ export function fetchSearch(query) {
         data: arrayOf(contactSchema),
         included: arrayOf(listSchema)
       });
-      console.log(res);
       dispatch({type: searchConstant.SET_OFFSET, offset: response.count === PAGE_LIMIT ? (OFFSET + PAGE_LIMIT) : null, query});
       return dispatch({type: searchConstant.RECEIVE_MULTIPLE, contacts: res.entities.contacts, ids: res.result.data, query});
     })

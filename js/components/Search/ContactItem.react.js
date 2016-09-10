@@ -10,7 +10,7 @@ const smallSpan = {
   fontColor: 'gray'
 };
 
-const ContactItem = ({email, firstname, lastname, listname, listid}) => {
+const ContactItem = ({email, firstname, lastname, listname, listid, rowNum}) => {
   return (
     <div style={{
       paddingLeft: '15px',
@@ -22,6 +22,7 @@ const ContactItem = ({email, firstname, lastname, listname, listid}) => {
     }}>
       <div>{firstname} {lastname}</div>
       <div>{email}</div>
+      {rowNum ? <div style={{float: 'right'}}>at Row {rowNum}</div>: null}
       <div>
         <span style={smallSpan}>belongs in</span>
           <Link to={`/lists/${listid}`}><span style={{marginLeft: '5px'}}>{listname}</span></Link>

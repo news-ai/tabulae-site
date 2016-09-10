@@ -87,9 +87,19 @@ class SearchBar extends Component {
 }
 
 const mapStateToProps = state => {
+  const results = state.searchReducer.received.map(id => {
+    const contact = state.searchReducer[id];
+    const list = state.listReducer[contact.listid];
+    if (list) {
+      list.contacts.map((contactId, i) => {
+        if (contactId === contact.id) contact.rowNum = i;
+      });
+    }
+    return contact;
+  });
   return {
     isReceiving: state.searchReducer.isReceiving,
-    results: state.searchReducer.received.map(id => state.searchReducer[id])
+    results: results
   };
 };
 
