@@ -3,16 +3,25 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import {contactPropTypes} from '../../constants/CommonPropTypes';
 import * as actions from './actions';
+import {grey50} from 'material-ui/styles/colors';
 
 const smallSpan = {
   fontSize: '0.8em',
   fontColor: 'gray'
 };
-const ContactItem = ({firstname, lastname, listname, listid}) => {
-  console.log(listname);
+
+const ContactItem = ({email, firstname, lastname, listname, listid}) => {
   return (
-    <div>
+    <div style={{
+      paddingLeft: '15px',
+      paddingRight: '15px',
+      paddingTop: '5px',
+      paddingBottom: '5px',
+      borderRadius: '1.2em',
+      backgroundColor: grey50
+    }}>
       <div>{firstname} {lastname}</div>
+      <div>{email}</div>
       <div>
         <span style={smallSpan}>belongs in</span>
           <Link to={`/lists/${listid}`}><span style={{marginLeft: '5px'}}>{listname}</span></Link>

@@ -1,11 +1,13 @@
 import {
-  searchConstant
+  searchConstant,
+  SEARCH_CLEAR_CACHE
 } from './constants';
 import _ from 'lodash';
 
 import { initialState } from '../../reducers/initialState';
 import { assignToEmpty, canAccessReducer } from '../../utils/assign';
 const types = _.values(searchConstant);
+types.push(SEARCH_CLEAR_CACHE)
 
 function searchReducer(state = initialState.searchReducer, action) {
   if (window.isDev) Object.freeze(state);
@@ -27,6 +29,9 @@ function searchReducer(state = initialState.searchReducer, action) {
       return obj;
     case searchConstant.SET_OFFSET:
       obj.offset = action.offset;
+      return obj;
+    case SEARCH_CLEAR_CACHE:
+      obj.received = [];
       return obj;
     default:
       return state;

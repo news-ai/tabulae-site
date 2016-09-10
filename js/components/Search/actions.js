@@ -1,5 +1,6 @@
 import {
-  searchConstant
+  searchConstant,
+  SEARCH_CLEAR_CACHE
 } from './constants';
 import * as api from '../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
@@ -21,4 +22,8 @@ export function fetchSearch(query) {
     })
     .catch(err => console.log(err));
   };
+}
+
+export function clearSearchCache() {
+  return dispatch => dispatch({type: SEARCH_CLEAR_CACHE});
 }

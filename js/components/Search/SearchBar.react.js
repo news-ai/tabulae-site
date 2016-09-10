@@ -14,11 +14,18 @@ class SearchBar extends Component {
     };
   }
 
+  componentWillMount() {
+  }
+
+  componentWillUnmount() {
+    this.props.clearSearchCache();
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
     return (
-      <div>
+      <div className='container'>
         <div>
           <TextField
           hintText='Search query here...'
@@ -28,7 +35,10 @@ class SearchBar extends Component {
           <RaisedButton onClick={_ => props.onSearchClick(state.query)} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
         </div>
         {props.isReceiving ? <span>WAITING</span> :
-          props.results.map((contact, i) => <ContactItem key={i} {...contact} />)
+          <div>
+            <p>We found {props.results.length} results for "{state.query}"</p>
+            {props.results.map((contact, i) => <div style={{marginTop: '10px'}}><ContactItem key={i} {...contact} /></div>)}
+          </div>
         }
       </div>);
   }
@@ -44,7 +54,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    onSearchClick: query => dispatch(actions.fetchSearch(query))
+    onSearchClick: query => dispatch(actions.fetchSearch(query)),
+    clearSearchCache: _ => dispatch(actions.clearSearchCache()),
   };
 };
 
