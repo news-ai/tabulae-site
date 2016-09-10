@@ -10,8 +10,10 @@ class SearchBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      query: ''
+      query: '',
+      isSearchReceived: false
     };
+    this.onSearchClick = this._onSearchClick.bind(this);
   }
 
   componentWillMount() {
@@ -21,23 +23,35 @@ class SearchBar extends Component {
     this.props.clearSearchCache();
   }
 
+  _onSearchClick() {
+    this.props.fetchSearch(this.state.query)
+    .then(_ => this.setState({isSearchReceived: true}));
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
     return (
       <div className='container'>
-        <div>
-          <TextField
-          hintText='Search query here...'
-          onKeyDown={e => e.keyCode === 13 ? props.onSearchClick(state.query) : null}
-          onChange={e => this.setState({query: e.target.value})}
-          />
-          <RaisedButton onClick={_ => props.onSearchClick(state.query)} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '15px',
+          marginBottom: '15px'
+        }}>
+          <div>
+           <TextField
+            hintText='Search query here...'
+            onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
+            onChange={e => this.setState({query: e.target.value})}
+            />
+            <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+          </div>
         </div>
         {props.isReceiving ? <span>WAITING</span> :
           <div>
-            <p>We found {props.results.length} results for "{state.query}"</p>
-            {props.results.map((contact, i) => <div style={{marginTop: '10px'}}><ContactItem key={i} {...contact} /></div>)}
+            {state.isSearchReceived ? <p>We found {props.results.length} results for "{state.query}"</p> : null}
+            {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
           </div>
         }
       </div>);
@@ -54,7 +68,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    onSearchClick: query => dispatch(actions.fetchSearch(query)),
+    fetchSearch: query => dispatch(actions.fetchSearch(query)),
     clearSearchCache: _ => dispatch(actions.clearSearchCache()),
   };
 };
