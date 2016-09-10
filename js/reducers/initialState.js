@@ -38,5 +38,11 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false,
     received: []
+  },
+  searchReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+    offset: 0
   }
 };

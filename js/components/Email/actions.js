@@ -6,7 +6,7 @@ import {
   RECEIVE_MULTIPLE_EMAILS,
   EMAIL_SET_OFFSET
 } from './constants';
-import { normalize, Schema, arrayOf } from 'normalizr';
+import {normalize, Schema, arrayOf} from 'normalizr';
 import * as api from '../../actions/api';
 
 const emailSchema = new Schema('emails');

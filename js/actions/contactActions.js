@@ -1,7 +1,7 @@
 import {
   ADDING_CONTACT,
-  SET_OFFSET,
   contactConstant,
+  listConstant,
   LIST_CONTACTS_SEARCH_REQUEST,
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL
@@ -78,14 +78,14 @@ export function fetchPaginatedContacts(listId) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
+    const OFFSET = getState().listReducer[listId].offset;
+    if (OFFSET === null) return;
     dispatch(requestContact());
-    const offset = getState().listReducer[listId].offset;
-    return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${offset}`)
+    return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
-      const newOffset = offset + PAGE_LIMIT;
       dispatch({
-        type: SET_OFFSET,
-        offset: newOffset,
+        type: listConstant.SET_OFFSET,
+        offset: response.count === PAGE_LIMIT ? (PAGE_LIMIT + OFFSET) : null,
         listId
       });
       const res = normalize(response, {

@@ -333,6 +333,7 @@ class Table extends Component {
               hintText='Search...'
               value={this.state.searchValue}
               onChange={e => this.setState({searchValue: e.target.value})}
+              onKeyDown={e => e.keyCode === 13 ? props.onSearchClick(state.query) : null}
               errorText={state.errorText}
             />
             <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />

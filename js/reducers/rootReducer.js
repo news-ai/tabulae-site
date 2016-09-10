@@ -11,6 +11,7 @@ import stagingReducer from '../components/Email/reducer';
 import publicationReducer from './publicationReducer';
 import fileReducer from '../components/ImportFile/reducer';
 import templateReducer from '../components/Email/Template/reducer';
+import searchReducer from '../components/Search/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
   stagingReducer,
   publicationReducer,
   fileReducer,
-  templateReducer
+  templateReducer,
+  searchReducer
 });
 
 export default rootReducer;

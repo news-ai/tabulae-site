@@ -67,6 +67,7 @@ class App extends Component {
           onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}
           >
             <MenuItem onClick={_ => props.router.push('/emailstats')}>Email Analytics</MenuItem>
+            <MenuItem onClick={_ => props.router.push('/search')}>Search</MenuItem>
           </Drawer>
           <Navigation>
             <div className='three columns' style={{display: 'flex', alignItems: 'center'}}>

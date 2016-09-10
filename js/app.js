@@ -36,6 +36,7 @@ import App from './components/App.react';
 import ListManagerContainer from './components/pages/ListManagerContainer.react';
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
+import SearchBar from './components/Search/SearchBar.react';
 import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
 import {EmailAnalytics} from './components/Email';
 import intercomSetup from './chat';
@@ -77,6 +78,7 @@ ReactDOM.render(
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
+            <Route path='search' name='Search' component={SearchBar} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

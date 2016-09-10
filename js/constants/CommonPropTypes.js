@@ -16,3 +16,26 @@ export const listPropTypes = PropTypes.shape({
     hidden: PropTypes.bool
   }))
 });
+
+export const contactPropTypes = {
+  blog: PropTypes.string.isRequired,
+  created: PropTypes.string.isRequired,
+  createdby: PropTypes.number.isRequired,
+  customfields: PropTypes.array,
+  email: PropTypes.string.isRequired,
+  emailbounced: PropTypes.bool.isRequired,
+  employers: PropTypes.array,
+  id: PropTypes.number.isRequired,
+  instagram: PropTypes.string.isRequired,
+  ismastercontact: PropTypes.bool.isRequired,
+  isoutdated: PropTypes.bool.isRequired,
+  lastname: PropTypes.string.isRequired,
+  linkedin: PropTypes.string.isRequired,
+  linkedinupdated: PropTypes.string.isRequired,
+  listid: PropTypes.number.isRequired,
+  notes: PropTypes.string.isRequired,
+  parent: PropTypes.number.isRequired,
+  pastemployers: PropTypes.string,
+  twitter: PropTypes.string.isRequired,
+  website: PropTypes.string.isRequired
+};
