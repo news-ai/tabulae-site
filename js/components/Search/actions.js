@@ -7,10 +7,17 @@ import {normalize, Schema, arrayOf} from 'normalizr';
 const contactSchema = new Schema('contacts');
 const listSchema = new Schema('lists');
 
+
+export function clearSearchCache() {
+  return dispatch => dispatch({type: SEARCH_CLEAR_CACHE});
+}
+
 export function fetchSearch(query) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
-    const OFFSET = (query === getState().searchReducer.query) ? getState().searchReducer.offset : 0;
+    if (query !== getState().searchReducer.query) dispatch(clearSearchCache());
+    const OFFSET = getState().searchReducer.offset;
+    if (OFFSET === null) return;
     dispatch({type: searchConstant.REQUEST, query});
     return api.get(`/contacts?q="${query}"&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
@@ -23,8 +30,4 @@ export function fetchSearch(query) {
     })
     .catch(err => console.log(err));
   };
-}
-
-export function clearSearchCache() {
-  return dispatch => dispatch({type: SEARCH_CLEAR_CACHE});
 }

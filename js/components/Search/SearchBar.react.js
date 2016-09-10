@@ -15,9 +15,15 @@ class SearchBar extends Component {
       isSearchReceived: false,
       isReceiving: false
     };
+    this.onSearchClick = this._onSearchClick.bind(this);
+    this.onScrollBottom = this._onScrollBottom.bind(this);
   }
 
   componentWillMount() {
+  }
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.onScrollBottom);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -25,11 +31,15 @@ class SearchBar extends Component {
 
   componentWillUnmount() {
     this.props.clearSearchCache();
+    window.removeEventListener('scroll', this.onScrollBottom);
+  }
+
+  _onScrollBottom(ev) {
+    ev.preventDefault();
+    if ((window.innerHeight + window.scrollY + 20) >= document.body.offsetHeight) this.props.fetchSearch(this.state.prevQuery);
   }
 
   _onSearchClick() {
-    console.log(this.state.query);
-    console.log(this.props.fetchSearch);
     this.props.fetchSearch(this.state.query)
     .then(_ => this.setState({
       isSearchReceived: true,
@@ -51,15 +61,17 @@ class SearchBar extends Component {
         }}>
           <div>
            <TextField
+            id='text-field-controlled'
             hintText='Search query here...'
-            onKeyDown={e => e.keyCode === 13 ? props.fetchSearch(state.query).then(_ => this.setState({isSearchReceived: true, prevQuery: state.query})) : null}
+            onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
             onChange={e => this.setState({query: e.target.value})}
+            value={this.state.query}
             />
-            <RaisedButton style={{marginLeft: '10px'}} onClick={_ => props.fetchSearch(state.query).then(_ => this.setState({isSearchReceived: true}))}  label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+            <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick}  label='Search All Lists' labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
         {props.isReceiving ? <span>WAITING</span> :
-          <div>
+          <div style={{marginBottom: '25px'}}>
             {state.isSearchReceived ? <p>We found {props.results.length} results for "{state.prevQuery}"</p> : null}
             {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
           </div>
