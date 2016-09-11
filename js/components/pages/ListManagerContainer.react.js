@@ -35,7 +35,10 @@ const mapStateToProps = state => {
   const lists = state.listReducer.lists;
   let untitledNum = 0;
   lists.map(list => {
-    if (list.name.substring(0, 8) === 'untitled') untitledNum++;
+    if (list.name.substring(0, 9) === 'untitled-') {
+      const num = parseInt(list.name.substring(9, list.name.length), 10);
+      if (!isNaN(num) && num >= untitledNum) untitledNum = num + 1;
+    }
   });
   return {
     lists: lists,
