@@ -21,11 +21,12 @@ function requestList(listId) {
   };
 }
 
-function receiveLists(lists, ids) {
+function receiveLists(lists, ids, offset) {
   return {
     type: listConstant.RECEIVE_MULTIPLE,
     lists,
-    ids
+    ids,
+    offset
   };
 }
 
@@ -75,15 +76,18 @@ export function fetchList(listId) {
 }
 
 export function fetchLists() {
-  const PAGE_LIMIT = 50;
+  const PAGE_LIMIT = 20;
   return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.offset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
     dispatch(requestLists());
-    return api.get(`/lists?limit=50&offset=0&order=-Created`)
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {
       const res = normalize(response, {
         data: arrayOf(listSchema),
       });
-      dispatch(receiveLists(res.entities.lists, res.result.data));
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      dispatch(receiveLists(res.entities.lists, res.result.data, newOffset));
     })
     .catch( message => dispatch(requestListsFail(message)));
   };
@@ -102,12 +106,13 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   };
 }
 
-export function createEmptyList() {
+export function createEmptyList(untitledNum) {
   return dispatch => {
     const listBody = {
-      name: 'untitled',
+      name: `untitled-${untitledNum}`,
       contacts: []
     };
+    dispatch({type: 'LIST_CREATE_EMPTY'});
     return api.post(`/lists`, listBody)
     .then(response => {
       // dispatch(receiveList(response.data));

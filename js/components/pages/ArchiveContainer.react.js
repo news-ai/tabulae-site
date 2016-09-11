@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
+import InfiniteScroll from '../pieces/InfiniteScroll.react';
 
 class ArchiveContainer extends Component {
   constructor(props) {
@@ -9,19 +10,22 @@ class ArchiveContainer extends Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(actionCreators.fetchLists());
+    this.props.fetchLists();
   }
 
   render() {
-    return (<div className='container'>
-      <Lists {...this.props} />
-      </div>);
+    return (
+      <InfiniteScroll onScrollBottom={this.props.fetchLists}>
+        <div className='container'>
+          <Lists {...this.props} />
+        </div>
+      </InfiniteScroll>
+      );
   }
 }
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.archivedLists;
+  const lists = state.listReducer.archivedLists.map(id => state.listReducer[id]);
   return {
     lists: lists,
     isReceiving: lists === undefined ? true : false,
@@ -38,6 +42,7 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
+    fetchLists: _ => dispatch(actionCreators.fetchLists())
   };
 };
 
