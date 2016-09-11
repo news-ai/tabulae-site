@@ -7,11 +7,24 @@ import RaisedButton from 'material-ui/RaisedButton';
 class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
+    this.onScrollBottom = this._onScrollBottom.bind(this);
   }
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(actionCreators.fetchLists());
+    window.addEventListener('scroll', this.onScrollBottom);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScrollBottom);
+  }
+
+  _onScrollBottom(ev) {
+    ev.preventDefault();
+    if ((window.innerHeight + window.scrollY + 20) >= document.body.offsetHeight) {
+      
+    }
   }
 
   render() {
