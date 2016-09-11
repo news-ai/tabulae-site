@@ -32,7 +32,8 @@ class ListManagerContainer extends Component {
 
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.lists;
+  const listReducer = state.listReducer;
+  const lists = listReducer.lists.map(id => listReducer[id]);
   let untitledNum = 0;
   lists.map(list => {
     if (list.name.substring(0, 9) === 'untitled-') {
@@ -43,7 +44,7 @@ const mapStateToProps = state => {
   return {
     lists: lists,
     untitledNum,
-    isReceiving: state.listReducer.isReceiving,
+    isReceiving: listReducer.isReceiving,
     statementIfEmpty: 'It looks like you haven\'t created any list. Go ahead and make one!',
     listItemIcon: 'fa fa-archive',
     backRoute: '/archive',

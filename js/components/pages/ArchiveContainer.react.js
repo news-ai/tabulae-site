@@ -21,7 +21,7 @@ class ArchiveContainer extends Component {
 }
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.archivedLists;
+  const lists = state.listReducer.archivedLists.map(id => state.listReducer[id]);
   return {
     lists: lists,
     isReceiving: lists === undefined ? true : false,

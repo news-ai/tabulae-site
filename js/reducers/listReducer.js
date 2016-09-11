@@ -35,13 +35,13 @@ function listReducer(state = initialState.listReducer, action) {
     case listConstant.RECEIVE_MULTIPLE:
       let unarchivedLists = [];
       let archivedLists = [];
-      action.ids.map(id => {
-        const list = action.lists[id];
-        if (!list.archived) unarchivedLists.push(list);
-        if (list.archived) archivedLists.push(list);
-      });
       obj = assignToEmpty(state, action.lists);
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
+      obj.received.map(id => {
+        const list = obj[id];
+        if (!list.archived) unarchivedLists.push(list.id);
+        if (list.archived) archivedLists.push(list.id);
+      });
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
       obj.isReceiving = false;
