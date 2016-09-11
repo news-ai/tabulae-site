@@ -56,8 +56,9 @@ export function getStagedEmails() {
 export function fetchSentEmails() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
-    dispatch({type: REQUEST_MULTIPLE_EMAILS});
     const OFFSET = getState().stagingReducer.offset;
+    if (OFFSET === null) return;
+    dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {
       const res = normalize(response, {
@@ -66,7 +67,6 @@ export function fetchSentEmails() {
       let newOffset = OFFSET + PAGE_LIMIT;
       if (response.data.length < PAGE_LIMIT) newOffset = null;
       dispatch({type: EMAIL_SET_OFFSET, offset: newOffset});
-
 
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
