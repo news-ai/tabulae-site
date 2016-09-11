@@ -47,8 +47,8 @@ class SearchBar extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className='container'>
-        <InfiniteScroll onScrollBottom={_ => props.fetchSearch(state.prevQuery)}>
+      <InfiniteScroll onScrollBottom={_ => props.fetchSearch(state.prevQuery)}>
+        <div className='container'>
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -76,9 +76,8 @@ class SearchBar extends Component {
             display: 'flex',
             justifyContent: 'center'
           }}>Scroll to load more</p> : null}
-
-        </InfiniteScroll>
-      </div>
+        </div>
+      </InfiniteScroll>
       );
   }
 }

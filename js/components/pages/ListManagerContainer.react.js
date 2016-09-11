@@ -3,42 +3,31 @@ import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
+import InfiniteScroll from '../pieces/InfiniteScroll.react';
 
 class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
-    this.onScrollBottom = this._onScrollBottom.bind(this);
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(actionCreators.fetchLists());
-    window.addEventListener('scroll', this.onScrollBottom);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScrollBottom);
-  }
-
-  _onScrollBottom(ev) {
-    ev.preventDefault();
-    if ((window.innerHeight + window.scrollY + 20) >= document.body.offsetHeight) {
-      
-    }
+    this.props.fetchLists();
   }
 
   render() {
     return (
-      <div className='container'>
-        <RaisedButton
-        style={{float: 'right'}}
-        label='Add New List'
-        onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
-        labelStyle={{textTransform: 'none'}}
-        icon={<i className='fa fa-plus' aria-hidden='true' />}
-        />
-        <Lists {...this.props} />
-      </div>
+      <InfiniteScroll onScrollBottom={this.props.fetchLists}>
+        <div className='container'>
+          <RaisedButton
+          style={{float: 'right'}}
+          label='Add New List'
+          onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
+          labelStyle={{textTransform: 'none'}}
+          icon={<i className='fa fa-plus' aria-hidden='true' />}
+          />
+          <Lists {...this.props} />
+        </div>
+      </InfiniteScroll>
       );
   }
 }
@@ -71,7 +60,8 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    newListOnClick: untitledNum => dispatch(actionCreators.createEmptyList(untitledNum))
+    newListOnClick: untitledNum => dispatch(actionCreators.createEmptyList(untitledNum)),
+    fetchLists: _ => dispatch(actionCreators.fetchLists())
   };
 };
 

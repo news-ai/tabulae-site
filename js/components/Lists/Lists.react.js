@@ -1,14 +1,30 @@
 import React, { PropTypes } from 'react';
 import ListItem from './ListItem.react';
 import ListsTitle from './ListsTitle.react';
+import Waiting from '../pieces/Waiting.react';
 import {listPropTypes} from 'constants/CommonPropTypes';
 
+const loading = {
+  zIndex: 160,
+  top: 80,
+  right: 10,
+  position: 'fixed'
+};
+
 function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle}) {
-  let renderNode;
-  if (isReceiving) {
-    renderNode = <span>loading...</span>;
-  } else {
-    renderNode = (
+  return (
+    <div>
+      <Waiting isReceiving={isReceiving} style={loading} />
+       <ListsTitle
+        title={title}
+        route={backRoute}
+        iconName='fa fa-angle-right fa-fw'
+        backRouteTitle={backRouteTitle}
+        />
+      <div style={{
+        marginBottom: '50px',
+        marginTop: '50px'
+      }}>
       <div>
        {lists.length === 0 ? <span>{statementIfEmpty}</span> : null}
         {
@@ -21,21 +37,6 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
           />)
         }
       </div>
-      );
-  }
-  return (
-    <div>
-       <ListsTitle
-        title={title}
-        route={backRoute}
-        iconName='fa fa-angle-right fa-fw'
-        backRouteTitle={backRouteTitle}
-        />
-      <div style={{
-        marginBottom: '50px',
-        marginTop: '50px'
-      }}>
-       {renderNode}
       </div>
     </div>);
 }
