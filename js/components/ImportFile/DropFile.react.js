@@ -5,7 +5,7 @@ import Dropzone from 'react-dropzone';
 import Headers from './Headers.react';
 import _ from 'lodash';
 import Radium from 'radium';
-import Waiting from '../pieces/Waiting.react';
+import Waiting from '../Waiting';
 
 const styles = {
   dropzone: {

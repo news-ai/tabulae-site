@@ -3,7 +3,7 @@ import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
-import InfiniteScroll from '../pieces/InfiniteScroll.react';
+import InfiniteScroll from '../InfiniteScroll';
 
 class ListManagerContainer extends Component {
   constructor(props) {
