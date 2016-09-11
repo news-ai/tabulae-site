@@ -102,12 +102,13 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   };
 }
 
-export function createEmptyList() {
+export function createEmptyList(untitledNum) {
   return dispatch => {
     const listBody = {
-      name: 'untitled',
+      name: `untitled-${untitledNum}`,
       contacts: []
     };
+    dispatch({type: 'LIST_CREATE_EMPTY'});
     return api.post(`/lists`, listBody)
     .then(response => {
       // dispatch(receiveList(response.data));

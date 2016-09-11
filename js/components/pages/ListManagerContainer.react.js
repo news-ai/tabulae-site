@@ -20,7 +20,7 @@ class ListManagerContainer extends Component {
         <RaisedButton
         style={{float: 'right'}}
         label='Add New List'
-        onClick={this.props.newListOnClick}
+        onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
         labelStyle={{textTransform: 'none'}}
         icon={<i className='fa fa-plus' aria-hidden='true' />}
         />
@@ -32,8 +32,14 @@ class ListManagerContainer extends Component {
 
 
 const mapStateToProps = state => {
+  const lists = state.listReducer.lists;
+  let untitledNum = 0;
+  lists.map(list => {
+    if (list.name.substring(0, 8) === 'untitled') untitledNum++;
+  });
   return {
-    lists: state.listReducer.lists,
+    lists: lists,
+    untitledNum,
     isReceiving: state.listReducer.isReceiving,
     statementIfEmpty: 'It looks like you haven\'t created any list. Go ahead and make one!',
     listItemIcon: 'fa fa-archive',
@@ -48,7 +54,7 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    newListOnClick: _ => dispatch(actionCreators.createEmptyList())
+    newListOnClick: untitledNum => dispatch(actionCreators.createEmptyList(untitledNum))
   };
 };
 
