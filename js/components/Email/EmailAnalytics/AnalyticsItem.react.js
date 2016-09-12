@@ -5,12 +5,12 @@ import {deepOrange100, deepOrange700, deepOrange900, grey50} from 'material-ui/s
 
 const styles = {
   analytics: {
-    margin: '10px',
     display: 'flex',
     alignItems: 'center'
   },
   wrapper: {
-    padding: '5px',
+    width: '100%',
+    padding: '15px',
     // border: '1px gray solid',
     borderRadius: '1.2em',
     margin: '5px',
@@ -57,27 +57,31 @@ function AnalyticsItem({
   return (
     <div style={wrapperStyle}>
       {
-        listid !== 0 ? <div style={{marginLeft: '10px', marginTop: '5px'}}>
-          <span style={styles.sentFrom}>Sent from List</span>
-          <span style={{marginLeft: '10px'}}><Link to={`/lists/${listid}`}>{listname || listid}</Link></span>
-          <span style={{marginRight: '10px', fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
+        listid !== 0 ? <div className='row'>
+          <div className='small-12 large-6 columns left'>
+            <span style={styles.sentFrom}>Sent from List</span>
+            <span style={{marginLeft: '10px'}}><Link to={`/lists/${listid}`}>{listname || listid}</Link></span>
+          </div>
+          <div className='small-12 large-6 columns right'>
+            <span style={{marginRight: '10px', fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
+          </div>
         </div> : null
       }
       <div className='email-analytics row' style={styles.analytics}>
-        <div className='three columns'>
+        <div className='small-12 medium-3 large-3 columns'>
           <span style={styles.to}>To</span>
           <span>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT ? `...` : null}</span>
         </div>
-        <div className='six columns'>
+        <div className='small-12 medium-3 large-5 columns'>
           <span onClick={onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
           {!delivered ? <span style={styles.errorText}>Something went wrong on our end. Let us know!</span> : null}
           {bounced ? <span style={styles.errorText}>email bounced</span> : null}
           {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
         </div>
-        <div className='two columns'>
+        <div className='small-12 medium-3 large-2 columns' style={{marginTop: '10px'}}>
           {!bounced ? <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
         </div>
-        <div className='two columns'>
+        <div className='small-12 medium-3 large-2 columns' style={{marginTop: '10px'}}>
           {!bounced ? <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
         </div>
       </div>

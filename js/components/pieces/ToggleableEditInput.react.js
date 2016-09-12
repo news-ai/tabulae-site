@@ -1,5 +1,6 @@
 import Radium from 'radium';
 import React, { PropTypes } from 'react';
+import TextField from 'material-ui/TextField';
 
 const styles = {
   nameBlock: {
@@ -22,7 +23,7 @@ const styles = {
 
 function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, name}) {
   const renderNode = isTitleEditing ? (
-    <input
+    <TextField
     className='u-full-width'
     type='text'
     onBlur={onToggleTitleEdit}
@@ -30,7 +31,7 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
     onChange={onUpdateName}
     autoFocus
     />) : (
-    <div onClick={onToggleTitleEdit}>
+    <div className='u-full-width' onClick={onToggleTitleEdit}>
       <span
       style={[styles.nameBlock.title]}
       >{name}</span>

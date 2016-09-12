@@ -48,8 +48,7 @@ class SearchBar extends Component {
     const state = this.state;
     return (
       <InfiniteScroll onScrollBottom={_ => props.fetchSearch(state.prevQuery)}>
-        <div className='container'>
-          <div style={{
+          <div className='row' style={{
             display: 'flex',
             justifyContent: 'center',
             marginTop: '15px',
@@ -57,7 +56,6 @@ class SearchBar extends Component {
           }}>
             <div>
              <TextField
-              id='text-field-controlled'
               hintText='Search query here...'
               onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
               onChange={e => this.setState({query: e.target.value})}
@@ -66,17 +64,20 @@ class SearchBar extends Component {
               <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick}  label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
           </div>
-          {props.isReceiving ? <span>WAITING</span> :
-            <div style={{marginBottom: '25px'}}>
+          <div className='row'>
+            {props.isReceiving ? <span>WAITING</span> :
+            <div className='large-12 columns' style={{marginBottom: '25px'}}>
               {state.isSearchReceived ? <p>We found {props.results.length} results for "{state.prevQuery}"</p> : null}
               {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
             </div>
-          }
+            }
+          <div className='row'>
           {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 ? <p style={{
             display: 'flex',
             justifyContent: 'center'
           }}>Scroll to load more</p> : null}
-        </div>
+          </div>
+          </div>
       </InfiniteScroll>
       );
   }

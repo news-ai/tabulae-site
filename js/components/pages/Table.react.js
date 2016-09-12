@@ -19,6 +19,8 @@ import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
 
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
   nameBlock: {
@@ -236,7 +238,7 @@ class Table extends Component {
     if (patchContactList.length > 0) props.patchContacts(patchContactList);
 
     // create new contacts and append new rows to LIST
-    if (addContactList.length > 0) {
+    if (addContactList.length > 0 && !state.isSearchOn) {
       props.addContacts(addContactList)
       .then(json => {
         const appendIdList = json.map( contact => contact.id );
@@ -252,6 +254,10 @@ class Table extends Component {
       // if no new contacts, see if list needs update
       if (state.name !== props.listData.name) {
         props.patchList({listId: props.listId, name: state.name});
+      }
+
+      if (addContactList.length > 0 && state.isSearchOn) {
+        alertify.alert(`Can't add new rows while Search is on.`);
       }
     }
     const currentdate = new Date(); 
@@ -283,8 +289,7 @@ class Table extends Component {
       {
         props.listData ?
         <div>
-          <div className='row' style={[styles.nameBlock.parent]}>
-            <SkyLight
+          <SkyLight
             ref='input'
             overlayStyles={skylightStyles.overlay}
             dialogStyles={skylightStyles.dialog}
@@ -293,8 +298,9 @@ class Table extends Component {
               <DropFile
               listId={props.listId}
               />
-            </SkyLight>
-            <div className='four columns'>
+          </SkyLight>
+          <div className='row' style={[styles.nameBlock.parent]}>
+            <div className='small-12 large-4 columns'>
               <ToggleableEditInput
               name={state.name}
               onUpdateName={this._onUpdateName}
@@ -302,8 +308,20 @@ class Table extends Component {
               isTitleEditing={state.isTitleEditing}
               />
             </div>
-            <div className='offset-by-nine two columns'>
-              <div style={{position: 'fixed', top: 100, zIndex: 200}}>
+            
+            <div className='small-12 large-6 columns' style={{display: 'flex', alignItems: 'center'}}>
+              <TextField
+                hintText='Search...'
+                value={this.state.searchValue}
+                onChange={e => this.setState({searchValue: e.target.value})}
+                onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
+                errorText={state.errorText}
+              />
+              <RaisedButton style={{marginLeft: '5px'}} onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+            </div>
+            <div className='hide-for-small-only large-1 large-offset-11 columns'>
+              <div style={{position: 'fixed', top: 100, zIndex: 190}}>
                 <RaisedButton
                 className='menubutton'
                 labelStyle={{textTransform: 'none'}}
@@ -327,19 +345,6 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
-          {/*
-          <div className='three columns'>
-            <TextField
-              hintText='Search...'
-              value={this.state.searchValue}
-              onChange={e => this.setState({searchValue: e.target.value})}
-              onKeyDown={e => e.keyCode === 13 ? props.onSearchClick(state.query) : null}
-              errorText={state.errorText}
-            />
-            <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
-            <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-          </div>
-          */}
           {
             state.isEmailPanelOpen ? 
             <EmailPanel

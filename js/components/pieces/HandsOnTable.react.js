@@ -6,7 +6,7 @@ import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
-import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
+import { outdatedRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
 import { fromJS, List } from 'immutable';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -412,8 +412,8 @@ class HandsOnTable extends Component {
     const props = this.props;
     return (
       <div key={props.listData.id}>
-        <div className='row' style={styles.buttons.group}>
-          <div className='offset-by-ten two columns'>
+        <div className='row'>
+          <div className='hide-for-small-only large-offset-10 large-1 columns'>
             <div style={{position: 'fixed', top: 100, zIndex: 200}}>
               <RaisedButton
               primary
@@ -425,7 +425,7 @@ class HandsOnTable extends Component {
             </div>
           </div>
         </div>
-        <span style={{color: 'gray', marginLeft: '5px'}}>Tip: To add row/column, right click to open context menu</span>
+        <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
         <div ref='data-grid' id={props.listData.id}></div>
       </div>
       );

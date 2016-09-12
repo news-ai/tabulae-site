@@ -72,7 +72,6 @@ export function fetchList(listId) {
     dispatch(requestList(listId));
     return api.get(`/lists/${listId}`)
     .then(response => {
-      console.log(response.data);
       const res = normalize(response.data, listSchema);
       return dispatch(receiveList(res.entities.lists, res.result));
     })
@@ -81,7 +80,7 @@ export function fetchList(listId) {
 }
 
 export function fetchLists() {
-  const PAGE_LIMIT = 20;
+  const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().listReducer.offset;
     if (OFFSET === null || getState().listReducer.isReceiving) return;
