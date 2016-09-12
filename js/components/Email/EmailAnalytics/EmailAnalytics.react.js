@@ -51,7 +51,8 @@ class EmailAnalytics extends Component {
       );
     return (
       <InfiniteScroll onScrollBottom={props.fetchSentEmails}>
-        <div className='container'>
+        <div className='row'>
+          <div className='large-10 large-offset-1 columns'>
           <div style={{marginTop: '20px', marginBottom: '20px'}}>
             <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
           </div>
@@ -79,10 +80,11 @@ class EmailAnalytics extends Component {
             {...email}
             />)}
           </div>
-           {state.isNextButton ? <p style={{
+           {state.canLoadMore ? <p style={{
             display: 'flex',
             justifyContent: 'center'
           }}>Scroll to load more</p> : null}
+          </div>
         </div>
       </InfiniteScroll>
     );
@@ -103,7 +105,7 @@ const mapStateToProps = (state, props) => {
     sentEmails,
     listId: props.params.listId,
     listReducer: state.listReducer,
-    isNextButton: (state.stagingReducer.offset !== null) ? true: false,
+    canLoadMore: (state.stagingReducer.offset !== null) ? true: false,
     lists: state.listReducer.lists,
     archivedLists: state.listReducer.archivedLists
   }

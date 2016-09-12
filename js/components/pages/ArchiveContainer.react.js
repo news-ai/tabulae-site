@@ -16,8 +16,10 @@ class ArchiveContainer extends Component {
   render() {
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
-        <div className='container'>
+        <div className='row'>
+          <div className='large-offset-1 large-10 columns'>
           <Lists {...this.props} />
+          </div>
         </div>
       </InfiniteScroll>
       );
