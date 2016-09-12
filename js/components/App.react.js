@@ -13,7 +13,8 @@ import {grey700} from 'material-ui/styles/colors';
 
 const verticalCenter = {
   display: 'flex',
-  alignItems: 'center'
+  alignItems: 'center',
+  textAlign: 'center'
 };
 
 class App extends Component {
@@ -70,25 +71,28 @@ class App extends Component {
           docked={false}
           open={state.isDrawerOpen}
           onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
+            <MenuItem onClick={_ => props.router.push('/')}>Home</MenuItem>
             <MenuItem onClick={_ => props.router.push('/emailstats')}>Email Analytics</MenuItem>
             <MenuItem onClick={_ => props.router.push('/search')}>Search</MenuItem>
           </Drawer>
           <Navigation>
-            <div className='large-2 columns' style={verticalCenter}>
+            <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
               <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars' />
               <span style={{color: 'gray', float: 'right'}}>You are at: </span>
             </div>
-            <div className='large-4 columns'>
-              <Breadcrumbs
-              routes={props.routes}
-              params={props.params}
-              separator=' > '
-              />
+            <div className='hide-for-small-only medium-4 large-5 columns'>
+              <div style={{marginTop: '13px'}}>
+                <Breadcrumbs
+                routes={props.routes}
+                params={props.params}
+                separator=' > '
+                />
+              </div>
             </div>
-            <div className='large-4 columns' style={verticalCenter}>
+            <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
               <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
             </div>
-            <div className='large-2 columns' style={verticalCenter}>
+            <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
               <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
             </div>
           </Navigation>

@@ -412,20 +412,19 @@ class HandsOnTable extends Component {
     const props = this.props;
     return (
       <div key={props.listData.id}>
-        <div className='row' style={styles.buttons.group}>
-          <div className='offset-by-ten two columns'>
-            <div style={{position: 'fixed', top: 100, zIndex: 200}}>
-              <RaisedButton
-              primary
-              label='Save'
-              labelStyle={{textTransform: 'none'}}
-              onClick={ _ => this._onSaveClick(options.data, options.columns)}
-              />
-              <p style={{fontSize: '0.8em'}}>{props.lastSavedAt}</p>
-            </div>
+        <div className='row'>
+          <div className='large-offset-11 large-1 columns'>
+            <RaisedButton
+            style={{position: 'fixed', top: 100, zIndex: 200}}
+            primary
+            label='Save'
+            labelStyle={{textTransform: 'none'}}
+            onClick={ _ => this._onSaveClick(options.data, options.columns)}
+            />
           </div>
+          <p style={{fontSize: '0.8em'}}>{props.lastSavedAt}</p>
         </div>
-        <span style={{color: 'gray', marginLeft: '5px'}}>Tip: To add row/column, right click to open context menu</span>
+        <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
         <div ref='data-grid' id={props.listData.id}></div>
       </div>
       );

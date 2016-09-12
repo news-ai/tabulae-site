@@ -289,8 +289,7 @@ class Table extends Component {
       {
         props.listData ?
         <div>
-          <div className='row' style={[styles.nameBlock.parent]}>
-            <SkyLight
+          <SkyLight
             ref='input'
             overlayStyles={skylightStyles.overlay}
             dialogStyles={skylightStyles.dialog}
@@ -299,8 +298,9 @@ class Table extends Component {
               <DropFile
               listId={props.listId}
               />
-            </SkyLight>
-            <div className='four columns'>
+          </SkyLight>
+          <div className='row' style={[styles.nameBlock.parent]}>
+            <div className='large-4 columns'>
               <ToggleableEditInput
               name={state.name}
               onUpdateName={this._onUpdateName}
@@ -308,7 +308,19 @@ class Table extends Component {
               isTitleEditing={state.isTitleEditing}
               />
             </div>
-            <div className='offset-by-nine two columns'>
+            
+            <div className='large-6 columns'>
+              <TextField
+                hintText='Search...'
+                value={this.state.searchValue}
+                onChange={e => this.setState({searchValue: e.target.value})}
+                onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
+                errorText={state.errorText}
+              />
+              <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+            </div>
+            <div className='large-2 columns'>
               <div style={{position: 'fixed', top: 100, zIndex: 200}}>
                 <RaisedButton
                 className='menubutton'
@@ -333,17 +345,9 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
-          <div className='three columns'>
-            <TextField
-              hintText='Search...'
-              value={this.state.searchValue}
-              onChange={e => this.setState({searchValue: e.target.value})}
-              onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
-              errorText={state.errorText}
-            />
-            <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
-            <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-          </div>
+
+         
+
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
