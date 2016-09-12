@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import PreviewEmail from './PreviewEmail.react';
+import Waiting from '../../Waiting';
 
 function PreviewEmails({isReceiving, previewEmails, onSendEmailClick}) {
   const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));
   let renderNode;
-  if (isReceiving) renderNode = <span>Loading...</span>;
+  if (isReceiving) renderNode = <Waiting isReceiving={isReceiving} text='Generating emails...' textStyle={{marginTop: '20px'}}/>;
   else if (previewEmails.length === 0) renderNode = <span>All done.</span>;
   else {
     renderNode = (

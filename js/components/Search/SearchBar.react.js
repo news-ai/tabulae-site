@@ -4,7 +4,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import * as actions from './actions';
 import ContactItem from './ContactItem.react';
-import InfiniteScroll from '../pieces/InfiniteScroll.react';
+import InfiniteScroll from '../InfiniteScroll';
 
 
 class SearchBar extends Component {

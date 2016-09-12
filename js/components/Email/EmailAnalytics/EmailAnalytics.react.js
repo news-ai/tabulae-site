@@ -9,6 +9,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Toggle from 'material-ui/Toggle';
+import InfiniteScroll from '../../InfiniteScroll';
 
 const toggleStyle = {
   block: {
@@ -48,42 +49,42 @@ class EmailAnalytics extends Component {
     const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />].concat(
       filterLists.map(list => <MenuItem key={list.id} value={list.id} primaryText={list.name} onClick={_ => props.fetchListEmails(list.id)} />)
       );
-    console.log(emails);
     return (
-      <div className='container'>
-        <div style={{marginTop: '20px', marginBottom: '20px'}}>
-          <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
-        </div>
-        {props.lists ?
-          <div>
-            <Toggle style={toggleStyle.block} labelStyle={toggleStyle.label} label='Set to Archived Lists' toggled={state.isShowingArchived} onToggle={_ => this.setState({isShowingArchived: !state.isShowingArchived})} />
+      <InfiniteScroll onScrollBottom={props.fetchSentEmails}>
+        <div className='container'>
+          <div style={{marginTop: '20px', marginBottom: '20px'}}>
+            <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
+          </div>
+          {props.lists ?
             <div>
-              <span>Filter by List: </span>
-              <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
-              {selectable}
-              </DropDownMenu>
-            </div>
-          </div>: null }
-        <Dialog
-        open={state.isPreviewOpen}
-        onRequestClose={this.handlePreviewClose}
-        >
-          <StaticEmailContent {...state.previewEmail} />
-        </Dialog>
-        <div style={{marginTop: '30px', marginBottom: '30px'}}>
-        {emails.map((email, i) =>
-          <AnalyticsItem
-          key={i}
-          onPreviewOpen={ _ => this.handlePreviewOpen(email)}
-          {...email}
-          />)}
+              <Toggle style={toggleStyle.block} labelStyle={toggleStyle.label} label='Set to Archived Lists' toggled={state.isShowingArchived} onToggle={_ => this.setState({isShowingArchived: !state.isShowingArchived})} />
+              <div>
+                <span>Filter by List: </span>
+                <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+                {selectable}
+                </DropDownMenu>
+              </div>
+            </div>: null }
+          <Dialog
+          open={state.isPreviewOpen}
+          onRequestClose={this.handlePreviewClose}
+          >
+            <StaticEmailContent {...state.previewEmail} />
+          </Dialog>
+          <div style={{marginTop: '30px', marginBottom: '30px'}}>
+          {emails.map((email, i) =>
+            <AnalyticsItem
+            key={i}
+            onPreviewOpen={ _ => this.handlePreviewOpen(email)}
+            {...email}
+            />)}
+          </div>
+           {state.isNextButton ? <p style={{
+            display: 'flex',
+            justifyContent: 'center'
+          }}>Scroll to load more</p> : null}
         </div>
-        {props.isNextButton ? <RaisedButton
-          label='Load More Emails'
-          labelStyle={{textTransform: 'none'}}
-          onClick={props.fetchSentEmails}
-          /> : null}
-      </div>
+      </InfiniteScroll>
     );
   }
 }

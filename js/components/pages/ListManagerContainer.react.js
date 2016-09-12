@@ -3,7 +3,7 @@ import * as actionCreators from 'actions/AppActions';
 import { connect } from 'react-redux';
 import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
-import InfiniteScroll from '../pieces/InfiniteScroll.react';
+import InfiniteScroll from '../InfiniteScroll';
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -58,7 +58,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
+    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId)),
     .then( _ => dispatch(actionCreators.fetchLists())),
     newListOnClick: untitledNum => dispatch(actionCreators.createEmptyList(untitledNum)),
     fetchLists: _ => dispatch(actionCreators.fetchLists())

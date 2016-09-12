@@ -17,7 +17,7 @@ import { EmailPanel } from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
-import Waiting from '../pieces/Waiting.react.js';
+import Waiting from '../Waiting';
 
 
 const styles = {
@@ -51,7 +51,7 @@ const styles = {
 class Table extends Component {
   constructor(props) {
     super(props);
-    const {listData} = this.props;
+    // const {listData} = this.props;
     this.state = {
       name: null,
       isTitleEditing: false,
@@ -230,8 +230,8 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = props.listData.contacts || [];
-    // console.log(patchContactList);
-    // console.log(addContactList);
+    console.log(patchContactList);
+    console.log(addContactList);
 
     if (patchContactList.length > 0) props.patchContacts(patchContactList);
 

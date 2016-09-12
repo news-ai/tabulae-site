@@ -51,7 +51,6 @@ function AnalyticsItem({
   listname,
   updated
 }) {
-  delivered = true; // hack until delivered is spelled correctly
   const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
   const SUBTRING_LIMIT = 18;
   const date = new Date(updated);
