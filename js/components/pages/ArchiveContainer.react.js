@@ -40,7 +40,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
+    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId)),
     .then( _ => dispatch(actionCreators.fetchLists())),
     fetchLists: _ => dispatch(actionCreators.fetchLists())
   };

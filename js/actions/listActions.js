@@ -30,10 +30,11 @@ function receiveLists(lists, ids, offset) {
   };
 }
 
-function receiveList(list) {
+function receiveList(list, id) {
   return {
     type: listConstant.RECEIVE,
-    list
+    list,
+    id
   };
 }
 
@@ -70,7 +71,11 @@ export function fetchList(listId) {
   return dispatch => {
     dispatch(requestList(listId));
     return api.get(`/lists/${listId}`)
-    .then( response => dispatch(receiveList(response.data)))
+    .then(response => {
+      console.log(response.data);
+      const res = normalize(response.data, listSchema);
+      return dispatch(receiveList(res.entities.lists, res.result));
+    })
     .catch( message => dispatch(requestListFail(message)));
   };
 }
@@ -101,7 +106,10 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   return dispatch => {
     dispatch({type: listConstant.PATCH, listId, listBody});
     return api.patch(`/lists/${listId}`, listBody)
-    .then( response => dispatch(receiveList(response.data)))
+    .then( response => {
+      const res = normalize(response.data, listSchema);
+      return dispatch(receiveList(res.entities.lists, res.result));
+    })
     .catch( message => dispatch({ type: listConstant.PATCH_FAIL, message }));
   };
 }
@@ -125,11 +133,14 @@ export function createEmptyList(untitledNum) {
 
 export function archiveListToggle(listId) {
   return (dispatch, getState) => {
-    dispatch({ type: ARCHIVE_LIST });
+    dispatch({ type: ARCHIVE_LIST, listId});
     let listBody = getState().listReducer[listId];
     listBody.archived = !listBody.archived;
     return api.patch(`/lists/${listId}`, listBody)
-    .then( response => dispatch(receiveList(response.data)))
+    .then(response => {
+      const res = normalize(response.data, listSchema);
+      return dispatch(receiveList(res.entities.lists, res.result));
+    })
     .catch( message => console.log(message));
   };
 }

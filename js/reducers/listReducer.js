@@ -19,6 +19,8 @@ function listReducer(state = initialState.listReducer, action) {
   if (window.isDev) Object.freeze(state);
   if (!canAccessReducer(action.type, types)) return state;
 
+  let unarchivedLists = [];
+  let archivedLists = [];
   let obj = assignToEmpty(state, {});
   switch (action.type) {
     case LIST_CONTACTS_SEARCH_REQUEST:
@@ -33,8 +35,6 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = true;
       return obj;
     case listConstant.RECEIVE_MULTIPLE:
-      let unarchivedLists = [];
-      let archivedLists = [];
       obj = assignToEmpty(state, action.lists);
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.received.map(id => {
@@ -55,10 +55,17 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = true;
       return obj;
     case listConstant.RECEIVE:
+      obj = assignToEmpty(state, action.list);
       obj.isReceiving = false;
-      obj[action.list.id] = action.list;
-      obj[action.list.id].offset = 0;
-      obj[action.list.id].receivedAt = Date.now();
+      if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
+      obj.received.map(id => {
+        const list = obj[id];
+        if (!list.archived) unarchivedLists.push(list.id);
+        if (list.archived) archivedLists.push(list.id);
+      });
+      obj.lists = unarchivedLists;
+      obj.archivedLists = archivedLists;
+      obj[action.id].offset = 0;
       return obj;
     case listConstant.PATCH:
       obj.isReceiving = true;

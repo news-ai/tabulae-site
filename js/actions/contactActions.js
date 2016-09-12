@@ -12,8 +12,8 @@ import _ from 'lodash';
 
 import { normalize, Schema, arrayOf } from 'normalizr';
 
-const contactSchema = new Schema('contacts');
-const publicationSchema = new Schema('publications');
+const contactSchema = new Schema('contacts', { idAttribute: 'id' });
+const publicationSchema = new Schema('publications', { idAttribute: 'id' });
 
 function requestContact() {
   return {
@@ -83,6 +83,7 @@ export function fetchPaginatedContacts(listId) {
     dispatch(requestContact());
     return api.get(`/lists/${listId}/contacts?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
+      console.log(response.data);
       dispatch({
         type: listConstant.SET_OFFSET,
         offset: response.count === PAGE_LIMIT ? (PAGE_LIMIT + OFFSET) : null,
