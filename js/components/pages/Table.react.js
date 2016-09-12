@@ -321,7 +321,7 @@ class Table extends Component {
               <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
             <div className='large-1 large-offset-11 columns'>
-              <div style={{position: 'fixed', top: 100, zIndex: 200}}>
+              <div style={{position: 'fixed', top: 100, zIndex: 190}}>
                 <RaisedButton
                 className='menubutton'
                 labelStyle={{textTransform: 'none'}}
