@@ -1,6 +1,6 @@
 import validator from 'validator';
 import Handsontable from 'handsontable/dist/handsontable.full';
-import { multiselectRenderer } from 'constants/CustomRenderers';
+import {toCenterRenderer} from './CustomRenderers';
 
 function _onInvalid(value, callback, validate) {
   if (value.length === 0 || validate(value)) callback(true);

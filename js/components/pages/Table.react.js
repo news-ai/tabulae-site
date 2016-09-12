@@ -309,7 +309,7 @@ class Table extends Component {
               />
             </div>
             
-            <div className='large-6 columns'>
+            <div className='large-6 columns' style={{display: 'flex', alignItems: 'center'}}>
               <TextField
                 hintText='Search...'
                 value={this.state.searchValue}
@@ -320,7 +320,7 @@ class Table extends Component {
               <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
               <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
-            <div className='large-2 columns'>
+            <div className='large-1 large-offset-11 columns'>
               <div style={{position: 'fixed', top: 100, zIndex: 200}}>
                 <RaisedButton
                 className='menubutton'
@@ -345,9 +345,6 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
-
-         
-
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
