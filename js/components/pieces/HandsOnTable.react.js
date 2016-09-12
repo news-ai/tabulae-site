@@ -6,7 +6,7 @@ import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
-import { outdatedRenderer, multiselectRenderer } from 'constants/CustomRenderers';
+import { outdatedRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
 import { fromJS, List } from 'immutable';
 import RaisedButton from 'material-ui/RaisedButton';

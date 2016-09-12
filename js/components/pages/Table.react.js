@@ -19,6 +19,8 @@ import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
 
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
   nameBlock: {
@@ -236,7 +238,7 @@ class Table extends Component {
     if (patchContactList.length > 0) props.patchContacts(patchContactList);
 
     // create new contacts and append new rows to LIST
-    if (addContactList.length > 0) {
+    if (addContactList.length > 0 && !state.isSearchOn) {
       props.addContacts(addContactList)
       .then(json => {
         const appendIdList = json.map( contact => contact.id );
@@ -252,6 +254,10 @@ class Table extends Component {
       // if no new contacts, see if list needs update
       if (state.name !== props.listData.name) {
         props.patchList({listId: props.listId, name: state.name});
+      }
+
+      if (addContactList.length > 0 && state.isSearchOn) {
+        alertify.alert(`Can't add new rows while Search is on.`);
       }
     }
     const currentdate = new Date(); 
@@ -327,19 +333,17 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
-          {/*
           <div className='three columns'>
             <TextField
               hintText='Search...'
               value={this.state.searchValue}
               onChange={e => this.setState({searchValue: e.target.value})}
-              onKeyDown={e => e.keyCode === 13 ? props.onSearchClick(state.query) : null}
+              onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
               errorText={state.errorText}
             />
             <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
           </div>
-          */}
           {
             state.isEmailPanelOpen ? 
             <EmailPanel
