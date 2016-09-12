@@ -413,7 +413,7 @@ class HandsOnTable extends Component {
     return (
       <div key={props.listData.id}>
         <div className='row'>
-          <div className='large-offset-10 large-1 columns'>
+          <div className='hide-for-small-only large-offset-10 large-1 columns'>
             <div style={{position: 'fixed', top: 100, zIndex: 200}}>
               <RaisedButton
               primary

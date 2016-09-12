@@ -300,7 +300,7 @@ class Table extends Component {
               />
           </SkyLight>
           <div className='row' style={[styles.nameBlock.parent]}>
-            <div className='large-4 columns'>
+            <div className='small-12 large-4 columns'>
               <ToggleableEditInput
               name={state.name}
               onUpdateName={this._onUpdateName}
@@ -309,7 +309,7 @@ class Table extends Component {
               />
             </div>
             
-            <div className='large-6 columns' style={{display: 'flex', alignItems: 'center'}}>
+            <div className='small-12 large-6 columns' style={{display: 'flex', alignItems: 'center'}}>
               <TextField
                 hintText='Search...'
                 value={this.state.searchValue}
@@ -317,10 +317,10 @@ class Table extends Component {
                 onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
                 errorText={state.errorText}
               />
-              <RaisedButton onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
-              <RaisedButton onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton style={{marginLeft: '5px'}} onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
-            <div className='large-1 large-offset-11 columns'>
+            <div className='hide-for-small-only large-1 large-offset-11 columns'>
               <div style={{position: 'fixed', top: 100, zIndex: 190}}>
                 <RaisedButton
                 className='menubutton'
