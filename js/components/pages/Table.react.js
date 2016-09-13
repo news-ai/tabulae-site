@@ -320,7 +320,7 @@ class Table extends Component {
               <RaisedButton style={{marginLeft: '5px'}} onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
               <RaisedButton style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
-            <div className='hide-for-small-only large-1 large-offset-11 columns'>
+            <div className='hide-for-small-only medium-1 medium-offset-10 large-1 large-offset-11 columns'>
               <div style={{position: 'fixed', top: 100, zIndex: 190}}>
                 <RaisedButton
                 className='menubutton'

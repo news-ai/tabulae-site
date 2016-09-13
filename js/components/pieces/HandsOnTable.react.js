@@ -14,21 +14,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
-const styles = {
-  buttons: {
-    group: {
-      marginBottom: '20px',
-      marginTop: '30px',
-    },
-  },
-};
-
-const center = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-};
-
 const MIN_ROWS = 20;
 alertify.defaults.glossary.title = '';
 
@@ -40,7 +25,6 @@ class HandsOnTable extends Component {
     this._changeColumnName = this._changeColumnName.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._loadTable = this._loadTable.bind(this);
     if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
       COLUMNS.push({
         data: 'publication_name_1',
@@ -75,26 +59,20 @@ class HandsOnTable extends Component {
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
       dirtyRows: [],
-      // copyPaste: true,
       preservedColumns: COLUMNS,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
         sortIndicator: true,
-        columnSorting: true,
         minCols: COLUMNS.length,
         minRows: MIN_ROWS,
         manualColumnMove: true,
         manualRowMove: true,
         manualColumnResize: true,
         manualRowResize: true,
-        observeChanges: true,
         persistentState: true,
-        // colWidths: 200,
-        // wordWrap: false,
-        rowHeights: 23,
         minSpareRows: 10,
-        // fixedColumnsLeft: 3,
+        observeChanges: true,
         columns: _.cloneDeep(COLUMNS),
         cells: (row, col, prop) => {
           const cellProperties = {};
@@ -105,6 +83,56 @@ class HandsOnTable extends Component {
             }
           }
           return cellProperties;
+        },
+        beforeChange: (changes, source) => {
+          for (let i = changes.length - 1; i >= 0; i--) {
+            if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
+          }
+
+          // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
+          this.props.isDirty();
+          if (_.isEmpty(this.props.listData.contacts)) return;
+
+          let rowNum;
+          let rowId;
+          const dirtyRows = this.state.dirtyRows;
+          changes.map( change => {
+            rowNum = change[0];
+            if (rowNum > this.props.listData.contacts.length - 1) return;
+            rowId = this.state.options.data[rowNum].id;
+            if (change[1] === change[2] || _.isEmpty(change[1]) && _.isEmpty(change[2])) {
+              // console.log('DO NOTHING');
+            } else {
+              if (!dirtyRows.some(rnum => rnum === rowId)) {
+                dirtyRows.push(rowId);
+              }
+            }
+          });
+
+          this.setState({dirtyRows});
+        },
+        afterChange: (changes, source) => {
+          // save selected rows
+          if (!this.props.isNew && source === 'edit') {
+            const selectedRows = this.state.options.data.filter(row => row.selected);
+            this.props._getSelectedRows(selectedRows);
+          }
+        },
+        afterScrollVertically: e => {
+          const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
+          if (_.isEmpty(listData.contacts)) return;
+          if (listData.contacts.length < 50) return;
+          if (lastFetchedIndex === listData.contacts.length - 1) return;
+          const rowCount = this.table.countRows();
+          const rowOffset = this.table.rowOffset();
+          const visibleRows = this.table.countVisibleRows();
+          let lastRow = rowOffset + (visibleRows * 1);
+          const lastVisibleRow = rowOffset + visibleRows + (visibleRows / 2);
+          const threshold = this.state.lazyLoadingThreshold;
+
+          if (lastVisibleRow > (lastFetchedIndex - threshold)) {
+            if (!contactIsReceiving) fetchContacts(listId);
+          }
         },
         contextMenu: {
           callback: (key, options) => {
@@ -207,18 +235,17 @@ class HandsOnTable extends Component {
             add_column: {
               name: 'Add Column'
             }
-          }
+          },
         }
       }
     };
   }
 
   componentDidMount() {
-    this._loadTable();
+    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.isNew) return;
     const { contacts, listData, lastFetchedIndex } = nextProps;
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
@@ -246,7 +273,8 @@ class HandsOnTable extends Component {
         lastFetchedIndex - this.state.lastFetchedIndex === 50 ||
         listData.contacts.length <= 50 ||
         lastFetchedIndex === listData.contacts.length - 1 ||
-        this.state.addedRow
+        this.state.addedRow ||
+        this.props.isSearchOn !== nextProps.isSearchOn
         ) {
         fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) {
@@ -274,65 +302,6 @@ class HandsOnTable extends Component {
   componentWillUnmount() {
     console.log('DESTROY');
     this.table.destroy();
-  }
-
-  _loadTable() {
-    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
-    const options = {
-      beforeChange: (changes, source) => {
-        for (let i = changes.length - 1; i >= 0; i--) {
-          if (changes[i][1] === 'linkedin' && validator.isURL(changes[i][3])) changes[i][3] = this._cleanUpURL(changes[i][3]);
-        }
-
-        if (!this.props.isNew) {
-          // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
-          this.props.isDirty();
-
-          if (_.isEmpty(this.props.listData.contacts)) return;
-          let rowNum;
-          let rowId;
-          const dirtyRows = this.state.dirtyRows;
-          changes.map( change => {
-            rowNum = change[0];
-            if (rowNum > this.props.listData.contacts.length - 1) return;
-            rowId = this.state.options.data[rowNum].id;
-            if (change[1] === change[2] || _.isEmpty(change[1]) && _.isEmpty(change[2])) {
-              // console.log('DO NOTHING');
-            } else {
-              if (!dirtyRows.some(rnum => rnum === rowId)) {
-                dirtyRows.push(rowId);
-              }
-            }
-          });
-
-          this.setState({dirtyRows});
-        }
-      },
-      afterChange: (changes, source) => {
-        // save selected rows
-        if (!this.props.isNew && source === 'edit') {
-          const selectedRows = this.state.options.data.filter(row => row.selected);
-          this.props._getSelectedRows(selectedRows);
-        }
-      },
-      afterScrollVertically: e => {
-        const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
-        if (_.isEmpty(listData.contacts)) return;
-        if (listData.contacts.length < 50) return;
-        if (lastFetchedIndex === listData.contacts.length - 1) return;
-        const rowCount = this.table.countRows();
-        const rowOffset = this.table.rowOffset();
-        const visibleRows = this.table.countVisibleRows();
-        let lastRow = rowOffset + (visibleRows * 1);
-        const lastVisibleRow = rowOffset + visibleRows + (visibleRows / 2);
-        const threshold = this.state.lazyLoadingThreshold;
-
-        if (lastVisibleRow > (lastFetchedIndex - threshold)) {
-          if (!contactIsReceiving) fetchContacts(listId);
-        }
-      }
-    };
-    this.table.updateSettings(options);
   }
 
   _changeColumnName(listId, columns, colNum, newColumnName) {
@@ -413,7 +382,7 @@ class HandsOnTable extends Component {
     return (
       <div key={props.listData.id}>
         <div className='row'>
-          <div className='hide-for-small-only large-offset-10 large-1 columns'>
+          <div className='hide-for-small-only medium-1 medium-offset-8 large-offset-10 large-1 columns'>
             <div style={{position: 'fixed', top: 100, zIndex: 200}}>
               <RaisedButton
               primary
