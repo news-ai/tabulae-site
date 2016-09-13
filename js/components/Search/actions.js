@@ -30,7 +30,6 @@ export function fetchSearch(query) {
         data: arrayOf(contactSchema),
         included: arrayOf(listSchema)
       });
-      console.log(res);
 
       dispatch(listActions.receiveLists(res.entities.lists, res.result.included, null));
       dispatch({type: searchConstant.SET_OFFSET, offset: response.count === PAGE_LIMIT ? (OFFSET + PAGE_LIMIT) : null, query});
