@@ -71,7 +71,6 @@ class HandsOnTable extends Component {
         manualColumnResize: true,
         manualRowResize: true,
         persistentState: true,
-        rowHeights: 29,
         minSpareRows: 10,
         observeChanges: true,
         columns: _.cloneDeep(COLUMNS),

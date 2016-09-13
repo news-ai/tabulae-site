@@ -115,13 +115,3 @@ input {
   padding-left: 0;
   box-shadow: none !important;
 }
-
-tr:not(:last-child) {
-    border-bottom: none;
-}
-tr:first-child td {
-    border-top: none; /* causes top border of blue selection box to be under header */
-}
-tr:first-child th {
-    border-bottom-width: 1px !important;
-}
