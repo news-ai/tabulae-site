@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
+import {connect} from 'react-redux';
+import {withRouter} from 'react-router';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
-import { globalStyles, skylightStyles, buttonStyle } from 'constants/StyleConstants';
+import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -13,7 +13,7 @@ import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
-import { EmailPanel } from '../Email';
+import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
@@ -75,23 +75,30 @@ class Table extends Component {
     this.handleRequestMenuClose = _ => this.setState({isMenuOpen: false});
 
     this._onSaveClick = this._onSaveClick.bind(this);
-    this._onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
-    this._onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
+    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
+    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
     this.toggleEmailPanel = _ => this.setState({isEmailPanelOpen: !this.state.isEmailPanelOpen});
-    this._getSelectedRows = contacts => this.setState({selectedContacts: contacts});
-    this._updateContacts = this._updateContacts.bind(this);
+    this.getSelectedRows = contacts => this.setState({selectedContacts: contacts});
+    this.updateContacts = this._updateContacts.bind(this);
     this._handleNormalField = this._handleNormalField.bind(this);
     this._createPublicationPromises = this._createPublicationPromises.bind(this);
     this._saveOperations = this._saveOperations.bind(this);
     this._fetchOperations = this._fetchOperations.bind(this);
-    this._isDirty = _ => this.setState({isSaved: false});
+    this.isDirty = _ => this.setState({isSaved: false});
     this.routerWillLeave = this.routerWillLeave.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
   }
 
+  componentWillMount() {
+    if (this.props.searchQuery) {
+      this._fetchOperations().then(_ => this.onSearchClick(this.props.searchQuery));
+    } else {
+      this._fetchOperations();
+    }
+  }
+
   componentDidMount() {
-    this._fetchOperations();
     this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
     if (this.props.firstTimeUser) {
       setTimeout( _ => {
@@ -109,11 +116,13 @@ class Table extends Component {
       }, 5000);
     }
   }
-    
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.name !== this.state.name) this.setState({name: nextProps.name });
     if (this.state.person === null) this.setState({person: nextProps.person});
+    if (nextProps.searchQuery !== this.props.searchQuery) {
+      if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
+    }
   }
 
   routerWillLeave(nextLocation) {
@@ -124,9 +133,10 @@ class Table extends Component {
     return 'Are you sure you want to leave this page?'
   }
 
-  _onSearchClick() {
+  _onSearchClick(searchValue) {
     const props = this.props;
-    props.searchListContacts(props.listId, this.state.searchValue)
+    if (searchValue !== this.state.searchValue) this.setState({searchValue});
+    props.searchListContacts(props.listId, searchValue)
     .then(obj => {
       const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
       let errorText = null;
@@ -136,6 +146,7 @@ class Table extends Component {
   }
 
   _onSearchClearClick() {
+    this.props.router.push(`/lists/${this.props.listId}`);
     this.setState({
       searchContacts: [],
       searchValue: '',
@@ -146,7 +157,7 @@ class Table extends Component {
 
   _fetchOperations() {
     const props = this.props;
-    props.fetchList(props.listId)
+    return props.fetchList(props.listId)
     .then(_ => props.fetchContacts(props.listId));
   }
 
@@ -303,8 +314,8 @@ class Table extends Component {
             <div className='small-12 large-4 columns'>
               <ToggleableEditInput
               name={state.name}
-              onUpdateName={this._onUpdateName}
-              onToggleTitleEdit={this._onToggleTitleEdit}
+              onUpdateName={this.onUpdateName}
+              onToggleTitleEdit={this.onToggleTitleEdit}
               isTitleEditing={state.isTitleEditing}
               />
             </div>
@@ -314,10 +325,10 @@ class Table extends Component {
                 hintText='Search...'
                 value={this.state.searchValue}
                 onChange={e => this.setState({searchValue: e.target.value})}
-                onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
+                onKeyDown={e => e.keyCode === 13 ? props.router.push(`/lists/${props.listId}?search=${state.searchValue}`) : null}
                 errorText={state.errorText}
               />
-              <RaisedButton style={{marginLeft: '5px'}} onClick={this.onSearchClick} label='Search' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/lists/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
               <RaisedButton style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
             <div className='hide-for-small-only medium-1 medium-offset-10 large-1 large-offset-11 columns'>
@@ -338,7 +349,7 @@ class Table extends Component {
               targetOrigin={{horizontal: 'left', vertical: 'top'}}
               >
                 <Menu>
-                  <MenuItem onClick={this._updateContacts} primaryText='Update Selected Contacts' />
+                  <MenuItem onClick={this.updateContacts} primaryText='Update Selected Contacts' />
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
                   <MenuItem primaryText='Upload from File' onClick={_ => this.refs.input.show()} />
                 </Menu>
@@ -355,19 +366,19 @@ class Table extends Component {
             onClose={this.toggleEmailPanel}
             /> : null
           }
-          <div style={{marginTop: '10px'}}>
+          <div style={{marginTop: '30px'}}>
             <HandsOnTable
             {...props}
             isSearchOn={state.isSearchOn}
             lastSavedAt={state.lastSavedAt}
             listId={props.listId}
             onSaveClick={this._onSaveClick}
-            _getSelectedRows={this._getSelectedRows}
+            getSelectedRows={this.getSelectedRows}
             listData={props.listData}
             contacts={state.isSearchOn ? state.searchContacts : props.contacts}
             isNew={false}
             lastFetchedIndex={props.lastFetchedIndex}
-            isDirty={this._isDirty}
+            isDirty={this.isDirty}
             />
           </div>
         </div> : null
@@ -397,7 +408,10 @@ const mapStateToProps = (state, props) => {
     }
   }
 
+  const searchQuery = props.location.query.search;
+
   return {
+    searchQuery,
     listId: listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData: listData,
