@@ -12,6 +12,7 @@ export const COLUMNS = [
     data: 'selected',
     title: 'Selected',
     type: 'checkbox',
+    renderer: toCenterRenderer
   },
   // {
   //   data: 'isoutdated',

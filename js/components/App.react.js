@@ -71,9 +71,9 @@ class App extends Component {
           docked={false}
           open={state.isDrawerOpen}
           onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
-            <MenuItem onClick={_ => props.router.push('/')}>Home</MenuItem>
-            <MenuItem onClick={_ => props.router.push('/emailstats')}>Email Analytics</MenuItem>
-            <MenuItem onClick={_ => props.router.push('/search')}>Search</MenuItem>
+            <MenuItem onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
+            <MenuItem onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
+            <MenuItem onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
           </Drawer>
           <Navigation>
             <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>

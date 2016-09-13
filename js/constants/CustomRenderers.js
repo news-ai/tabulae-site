@@ -3,8 +3,7 @@ import {yellow100} from 'material-ui/styles/colors';
 
 export function toCenterRenderer(instance, td, row, col, prop, value, cellProperties) {
   Handsontable.renderers.CheckboxRenderer.apply(this, arguments);
-  td.style.padding = '15px 20px';
-  td.style.boxSizing = 'border-box';
+  td.style.textAlign = 'center';
   return td;
 }
 
