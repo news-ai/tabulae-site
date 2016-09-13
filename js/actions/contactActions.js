@@ -108,7 +108,7 @@ export function searchListContacts(listId, query) {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
       });
-      console.log(response.data);
+      // console.log(response.data);
 
       // dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
       // dispatch(receiveContacts(res.entities.contacts, res.result.data));

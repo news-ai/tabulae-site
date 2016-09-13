@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router'
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {withRouter} from 'react-router';
+import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';

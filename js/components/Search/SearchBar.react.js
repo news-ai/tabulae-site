@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
+import {withRouter} from 'react-router';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import * as actions from './actions';
@@ -21,12 +22,29 @@ class SearchBar extends Component {
   }
 
   componentWillMount() {
+    if (this.props.searchQuery) {
+      this.props.fetchSearch(this.props.searchQuery)
+      .then(_ => this.setState({
+        isSearchReceived: true,
+        prevQuery: this.props.searchQuery,
+        query: ''
+      }));
+    }
   }
 
   componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.searchQuery !== this.props.searchQuery) {
+      this.props.clearSearchCache();
+      this.props.fetchSearch(nextProps.searchQuery)
+      .then(_ => this.setState({
+        isSearchReceived: true,
+        prevQuery: nextProps.searchQuery,
+        query: ''
+      }));
+    }
   }
 
   componentWillUnmount() {
@@ -36,12 +54,7 @@ class SearchBar extends Component {
 
   _onSearchClick() {
     if (this.props.isReceiving) return;
-    this.props.fetchSearch(this.state.query)
-    .then(_ => this.setState({
-      isSearchReceived: true,
-      prevQuery: this.state.query,
-      query: ''
-    }));
+    this.props.router.push(`/search?query=${this.state.query}`);
   }
 
   render() {
@@ -76,7 +89,7 @@ class SearchBar extends Component {
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: '25px'}}>
               {state.isSearchReceived ? <p>We found {expectedResultsString} for "{state.prevQuery}"</p> : null}
-              {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
+              {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} query={props.searchQuery} /></div>)}
             </div>
           <div className='row'>
           {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 ?
@@ -90,7 +103,8 @@ class SearchBar extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
+  const searchQuery = props.location.query.query;
   const results = state.searchReducer.received.map(id => {
     const contact = state.searchReducer[id];
     const list = state.listReducer[contact.listid];
@@ -103,7 +117,8 @@ const mapStateToProps = state => {
   });
   return {
     isReceiving: state.searchReducer.isReceiving,
-    results: results
+    results: results,
+    searchQuery
   };
 };
 
@@ -118,4 +133,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(SearchBar);
+  )(withRouter(SearchBar));
