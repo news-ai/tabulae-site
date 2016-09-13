@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import * as actions from './actions';
 import ContactItem from './ContactItem.react';
 import InfiniteScroll from '../InfiniteScroll';
+import Waiting from '../Waiting';
 
 
 class SearchBar extends Component {
@@ -61,21 +62,20 @@ class SearchBar extends Component {
               onChange={e => this.setState({query: e.target.value})}
               value={this.state.query}
               />
-              <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick}  label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
           </div>
           <div className='row'>
-            {props.isReceiving ? <span>WAITING</span> :
+            <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: '25px'}}>
               {state.isSearchReceived ? <p>We found {props.results.length} results for "{state.prevQuery}"</p> : null}
               {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
             </div>
-            }
           <div className='row'>
-          {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 ? <p style={{
-            display: 'flex',
-            justifyContent: 'center'
-          }}>Scroll to load more</p> : null}
+          {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 ?
+            <div className='large-12 columns' style={{display: 'flex', justifyContent: 'center'}}>
+            <p>Scroll to load more</p>
+            </div> : null}
           </div>
           </div>
       </InfiniteScroll>

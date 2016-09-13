@@ -47,7 +47,7 @@ class EmailAnalytics extends Component {
     const emails = state.filterValue === 0 ? props.sentEmails : props.sentEmails.filter(email => email.listid === state.filterValue);
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
     const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />].concat(
-      filterLists.map(list => <MenuItem key={list.id} value={list.id} primaryText={list.name} onClick={_ => props.fetchListEmails(list.id)} />)
+      filterLists.map((list, i) => <MenuItem key={i+1} value={list.id} primaryText={list.name} onClick={_ => props.fetchListEmails(list.id)} />)
       );
     return (
       <InfiniteScroll onScrollBottom={props.fetchSentEmails}>

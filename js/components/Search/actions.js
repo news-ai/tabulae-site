@@ -16,10 +16,11 @@ export function fetchSearch(query) {
   const PAGE_LIMIT = 50;
   if (query.length === 0) return;
   return (dispatch, getState) => {
+    if (getState().searchReducer.isReceiving) return;
     if (query !== getState().searchReducer.query) dispatch(clearSearchCache());
     const OFFSET = getState().searchReducer.offset;
     if (OFFSET === null) return;
-    dispatch({type: searchConstant.REQUEST, query});
+    dispatch({type: searchConstant.REQUEST_MULTIPLE, query});
     return api.get(`/contacts?q="${query}"&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const res = normalize(response, {
