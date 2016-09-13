@@ -2,7 +2,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import {contactPropTypes} from '../../constants/CommonPropTypes';
-import * as actions from './actions';
 import {grey50} from 'material-ui/styles/colors';
 
 const smallSpan = {
@@ -22,7 +21,7 @@ const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, quer
     }}>
       <div>{firstname} {lastname}</div>
       <div>{email}</div>
-      {rowNum ? <Link to={`/lists/${listid}?search=${query}`} style={{float: 'right'}}><span>at Row {rowNum}</span></Link> : null}
+      {rowNum ? <Link to={`/lists/${listid}?search=${query}`} style={{float: 'right'}}><span>Go to Search Results in List</span></Link> : null}
       <div>
         <span style={smallSpan}>belongs in</span>
           <Link to={`/lists/${listid}`}><span style={{marginLeft: '5px'}}>{listname}</span></Link>

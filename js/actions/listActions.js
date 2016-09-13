@@ -21,7 +21,7 @@ function requestList(listId) {
   };
 }
 
-function receiveLists(lists, ids, offset) {
+export function receiveLists(lists, ids, offset) {
   return {
     type: listConstant.RECEIVE_MULTIPLE,
     lists,
