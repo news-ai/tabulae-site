@@ -1,7 +1,13 @@
 import React, { PropTypes } from 'react';
 import CountViewItem from './CountViewItem.react';
 import {Link} from 'react-router';
-import {deepOrange100, deepOrange700, deepOrange900, grey50} from 'material-ui/styles/colors';
+import {
+  deepOrange100,
+  deepOrange700,
+  deepOrange900,
+  grey50,
+  grey800
+} from 'material-ui/styles/colors';
 
 const styles = {
   analytics: {
@@ -28,7 +34,7 @@ const styles = {
     float: 'right'
   },
   subjectText: {
-    fontWeight: 'bold',
+    fontWeight: 500,
     cursor: 'pointer'
   },
   sentFrom: {
@@ -39,6 +45,7 @@ const styles = {
 
 
 function AnalyticsItem({
+  id,
   opened,
   clicked,
   to,
@@ -70,19 +77,19 @@ function AnalyticsItem({
       <div className='email-analytics row' style={styles.analytics}>
         <div className='small-12 medium-3 large-3 columns'>
           <span style={styles.to}>To</span>
-          <span>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT ? `...` : null}</span>
+          <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT ? `...` : null}</span>
         </div>
         <div className='small-12 medium-3 large-5 columns'>
           <span onClick={onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
-          {!delivered ? <span style={styles.errorText}>Something went wrong on our end. Let us know!</span> : null}
+          {!delivered ? <span style={styles.errorText}>Something went wrong on our end. Let us know! Email ID: {id}</span> : null}
           {bounced ? <span style={styles.errorText}>email bounced</span> : null}
           {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
         </div>
         <div className='small-12 medium-3 large-2 columns' style={{marginTop: '10px'}}>
-          {!bounced ? <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
+          {(!bounced && delivered) ? <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
         </div>
         <div className='small-12 medium-3 large-2 columns' style={{marginTop: '10px'}}>
-          {!bounced ? <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
+          {(!bounced && delivered) ? <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
         </div>
       </div>
     </div>
