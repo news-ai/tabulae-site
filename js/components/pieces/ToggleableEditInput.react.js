@@ -26,6 +26,7 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
     <TextField
     className='u-full-width'
     type='text'
+    name={name}
     onBlur={onToggleTitleEdit}
     value={name}
     onChange={onUpdateName}

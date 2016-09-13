@@ -59,7 +59,6 @@ class HandsOnTable extends Component {
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
       dirtyRows: [],
-      // copyPaste: true,
       preservedColumns: COLUMNS,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
@@ -72,6 +71,7 @@ class HandsOnTable extends Component {
         manualColumnResize: true,
         manualRowResize: true,
         persistentState: true,
+        rowHeights: 29,
         minSpareRows: 10,
         observeChanges: true,
         columns: _.cloneDeep(COLUMNS),
