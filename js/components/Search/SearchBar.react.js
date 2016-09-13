@@ -47,6 +47,13 @@ class SearchBar extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    let expectedResultsString = '';
+    if (state.isSearchReceived) {
+      if (props.results.length % 50 === 0 && props.results.length > 0) expectedResultsString = `${props.results.length}+ results`;
+      else if (props.results.length === 0 ) expectedResultsString = `0 result`;
+      else if (props.results.length === 1) expectedResultsString = `1 result`;
+      else expectedResultsString = `${props.results.length} results`;
+    }
     return (
       <InfiniteScroll onScrollBottom={_ => props.fetchSearch(state.prevQuery)}>
           <div className='row' style={{
@@ -68,7 +75,7 @@ class SearchBar extends Component {
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: '25px'}}>
-              {state.isSearchReceived ? <p>We found {props.results.length} results for "{state.prevQuery}"</p> : null}
+              {state.isSearchReceived ? <p>We found {expectedResultsString} for "{state.prevQuery}"</p> : null}
               {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} /></div>)}
             </div>
           <div className='row'>
