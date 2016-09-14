@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import 'node_modules/react-select/dist/react-select.css';
 import AutoComplete from 'material-ui/AutoComplete';
-import isString from 'lodash/isString';
+import _ from 'lodash';
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const defaultSelectableOptions = [
-  {value: '_', label: '[leave me blank]', selected: false},
-  {value: 'ignore_column', label: '[Ignore this column]', selected: false},
+  // {value: '_', label: '[leave me blank]', selected: false},
+  // {value: 'ignore_column', label: '[Ignore this column]', selected: false},
   {value: 'firstname', label: 'First Name', selected: false},
   {value: 'lastname', label: 'Last Name', selected: false},
   {value: 'email', label: 'Email', selected: false},
@@ -45,29 +47,37 @@ class Headers extends Component {
   }
 
   _sendHeaderNames() {
-    const { headers } = this.state;
+    const { order, headers } = this.state;
     const { onProcessHeaders } = this.props;
     let untitledCount = 0;
-    const order = headers.map( header => {
-      if (!header.value || header.value.value === '_') {
+    const newOrder = order.map(item => {
+      if (item) {
+        return item
+      } else if (!item || item.length === 0) {
         untitledCount++;
-        return 'untitled-' + untitledCount;
-      } else {
-        return header.value.value;
+        return `ignore_column`;
       }
     });
-    onProcessHeaders(order);
+    if (untitledCount > 0)
+      alertify.confirm(
+        `There are ${untitledCount} columns that will be dropped when the list is imported.
+        Make sure columns have names if you would like to import them.`,
+        _ => onProcessHeaders(newOrder),
+        _ => {}
+        );
+    else if (untitledCount === headers.length)
+      alertify.alert(`Importing empty list is not allowed. You must at least name one column.`);
+    else onProcessHeaders(newOrder);
   }
 
   _onNewRequest(req, reqIndex, headerIndex) {
+    console.log(req);
     let order = this.state.order;
-    if (isString(req)) {
+    if (_.isString(req)) {
       // custom
-      console.log('STRING');
       order[headerIndex] = req;
     } else {
       // default
-      console.log('DEFAULT');
       // reset previous selected
       let options = this.state.options.map(option => {
         if (req.value === option.value) option.selected = true;
@@ -114,10 +124,6 @@ class Headers extends Component {
           onNewRequest={(req, reqIndex) => this.onNewRequest(req, reqIndex, i)}
           dataSource={state.options.filter(item => !item.selected)}
           dataSourceConfig={config}
-          onUpdateInput={(searchText, dataSource) => {
-            console.log(searchText);
-            console.log(dataSource);
-          }}
         />
             <ul style={{listStyleType: 'none'}}>
             {header.rows.map((rowItem, j) => <li key={j} style={listItemStyle}>{rowItem}</li>)}

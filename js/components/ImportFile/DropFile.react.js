@@ -66,7 +66,6 @@ class DropFile extends Component {
   _processHeaders(order) {
     const props = this.props;
     props.addHeaders(props.listId, order)
-    .then(_ => props.waitForServerProcess(props.listId))
     .then(_ => console.log('COMPLETED!'));
     // must reload to set up handsontable again, think of a better way later maybe
   }
