@@ -119,6 +119,7 @@ class Headers extends Component {
           <AutoComplete
           floatingLabelText='showAllItems'
           openOnFocus
+          onBlur={e => this.onNewRequest(e.target.value, null, i)}
           onFocus={_ => this.clearValue(i)}
           filter={AutoComplete.fuzzyFilter}
           onNewRequest={(req, reqIndex) => this.onNewRequest(req, reqIndex, i)}
