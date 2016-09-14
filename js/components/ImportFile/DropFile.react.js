@@ -50,6 +50,11 @@ class DropFile extends Component {
     this._processHeaders = this._processHeaders.bind(this);
   }
 
+  componentWillUnmount() {
+    this.props.clearReducer();
+
+  }
+
   _onDrop(files) {
     this.setState({ file: files[files.length - 1], isFileDropped: true });
   }
@@ -74,7 +79,6 @@ class DropFile extends Component {
     const {listId, fileIsReceiving, fileReducer, isProcessWaiting, headers} = this.props;
     const {file, isFileDropped, fileSubmitted} = this.state;
     let renderNode;
-    console.log(headers);
 
     if (headers) renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
     if (isProcessWaiting) {
@@ -148,7 +152,8 @@ const mapDispatchToProps = dispatch => {
     uploadFile: (listId, file) => dispatch(actionCreators.uploadFile(listId, file)),
     fetchHeaders: listId => dispatch(actionCreators.fetchHeaders(listId)),
     addHeaders: (listId, order) => dispatch(actionCreators.addHeaders(listId, order)),
-    waitForServerProcess: _ => dispatch(actionCreators.waitForServerProcess())
+    waitForServerProcess: _ => dispatch(actionCreators.waitForServerProcess()),
+    clearReducer: _ => dispatch({type: 'CLEAR_FILE_REDUCER'})
   };
 };
 

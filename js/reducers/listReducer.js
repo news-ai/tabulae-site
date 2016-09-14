@@ -23,6 +23,9 @@ function listReducer(state = initialState.listReducer, action) {
   let archivedLists = [];
   let obj = assignToEmpty(state, {});
   switch (action.type) {
+    case 'CLEAR_LIST_REDUCER':
+      obj = assignToEmpty(initialState.listReducer, {});
+      return obj;
     case LIST_CONTACTS_SEARCH_REQUEST:
       obj.isReceiving = true;
       obj[action.listId].searchResults = [];

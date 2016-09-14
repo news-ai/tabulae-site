@@ -13,7 +13,8 @@ import _ from 'lodash';
 const types = _.values(fileConstant).concat(_.values(headerConstant));
 types.push(
   TURN_ON_PROCESS_WAIT,
-  TURN_OFF_PROCESS_WAIT
+  TURN_OFF_PROCESS_WAIT,
+  'CLEAR_FILE_REDUCER'
   );
 
 function fileReducer(state = initialState.fileReducer, action) {
@@ -22,6 +23,9 @@ function fileReducer(state = initialState.fileReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
+    case 'CLEAR_FILE_REDUCER':
+      obj = assignToEmpty(initialState.fileReducer, {});
+      return obj;
     case fileConstant.REQUEST:
       obj.isReceiving = true;
       return obj;

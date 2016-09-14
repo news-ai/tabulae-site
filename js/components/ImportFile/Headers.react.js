@@ -71,7 +71,6 @@ class Headers extends Component {
   }
 
   _onNewRequest(req, reqIndex, headerIndex) {
-    console.log(req);
     let order = this.state.order;
     if (_.isString(req)) {
       // custom
@@ -117,7 +116,7 @@ class Headers extends Component {
         {state.headers.map((header, i) =>
           <div key={i} style={{width: '180px'}}>
           <AutoComplete
-          floatingLabelText='showAllItems'
+          floatingLabelText='Column Name'
           openOnFocus
           onBlur={e => this.onNewRequest(e.target.value, null, i)}
           onFocus={_ => this.clearValue(i)}
@@ -131,7 +130,7 @@ class Headers extends Component {
             </ul>
           </div>)}
         </div>
-        <button className='button' style={{ float: 'right' }} onClick={this._sendHeaderNames}>Set Column Names</button>
+        <button className='button' style={{float: 'right'}} onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>
     );
   }

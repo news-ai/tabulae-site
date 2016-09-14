@@ -1,6 +1,4 @@
 import {
-  REQUEST_HEADERS,
-  RECEIVE_HEADERS,
   TURN_ON_PROCESS_WAIT,
   TURN_OFF_PROCESS_WAIT,
   fileConstant,
@@ -41,16 +39,17 @@ export function waitForServerProcess(listId) {
   return dispatch => {
     dispatch({type: TURN_ON_PROCESS_WAIT});
     setTimeout( _ => {
-      dispatch({ type: TURN_OFF_PROCESS_WAIT});
-      return dispatch(listActions.fetchList(listId))
-      .then( _ => dispatch(contactActions.fetchPaginatedContacts(listId)));
+      console.log('RELOAD');
+      window.location.reload();
+      // dispatch({type: TURN_OFF_PROCESS_WAIT});
+      // dispatch({type: 'CLEAR_LIST_REDUCER', listId});
+      // return dispatch(listActions.fetchList(listId))
+      // .then( _ => dispatch(contactActions.fetchPaginatedContacts(listId)));
     }, 5000);
   };
 }
 
 export function addHeaders(listId, order) {
-  console.log(listId);
-  console.log(order);
   return (dispatch, getState) => {
     dispatch({type: headerConstant.CREATE_REQUEST, order});
     dispatch(waitForServerProcess(listId));
