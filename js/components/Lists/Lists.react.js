@@ -25,7 +25,6 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
         marginBottom: '50px',
         marginTop: '50px'
       }}>
-      <div>
        {lists.length === 0 ? <span>{statementIfEmpty}</span> : null}
         {
           lists.map( (list, i) =>
@@ -36,7 +35,6 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
           key={i}
           />)
         }
-      </div>
       </div>
     </div>);
 }

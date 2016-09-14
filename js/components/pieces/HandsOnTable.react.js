@@ -390,7 +390,9 @@ class HandsOnTable extends Component {
               labelStyle={{textTransform: 'none'}}
               onClick={ _ => this._onSaveClick(options.data, options.columns)}
               />
-              <p style={{fontSize: '0.8em'}}>{props.lastSavedAt}</p>
+            </div>
+            <div style={{position: 'fixed', top: 150, zIndex: 180}}>
+              <p style={{fontSize: '0.8em', zIndex: 150}}>{props.lastSavedAt}</p>
             </div>
           </div>
         </div>

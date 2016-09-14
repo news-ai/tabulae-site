@@ -16,7 +16,6 @@ const styles = {
       borderRadius: 4,
       margin: 30,
       padding: 30,
-      width: 200,
       transition: 'all 0.4s',
     },
     active: {

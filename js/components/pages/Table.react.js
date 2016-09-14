@@ -50,6 +50,36 @@ const styles = {
   }
 };
 
+function escapeHtml(unsafe) {
+  return unsafe
+   .replace(/&/g, "&amp;")
+   .replace(/</g, "&lt;")
+   .replace(/>/g, "&gt;")
+   .replace(/"/g, "&quot;")
+   .replace(/'/g, "&#039;");
+ }
+
+function convertToCsvString(data, colHeaders) {
+  let base = 'data:text/csv;charset=utf-8,';
+  const headers = colHeaders.map(header => header.data);
+  base += headers.toString() + '\n';
+  data.map(row => {
+    let rowStringArray = [];
+    headers.map(header => {
+      const el = row[header];
+      if (el !== null && el) {
+        if (el.split(',').length > 1) rowStringArray.push('\"' + escapeHtml(el) + '\"');
+        else rowStringArray.push(escapeHtml(el));
+      } else {
+        rowStringArray.push('');
+      }
+    });
+    base += rowStringArray.toString() + '\n';
+  });
+  return base;
+
+}
+
 class Table extends Component {
   constructor(props) {
     super(props);
@@ -66,7 +96,9 @@ class Table extends Component {
       searchValue: '',
       isSearchOn: false,
       searchContacts: [],
-      errorText: null
+      errorText: null,
+      localData: null,
+      colHeaders: null
     }
     this.onMenuTouchTap = e => {
       e.preventDefault();
@@ -88,6 +120,7 @@ class Table extends Component {
     this.routerWillLeave = this.routerWillLeave.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
+    this.onExportClick = this._onExportClick.bind(this);
   }
 
   componentWillMount() {
@@ -217,6 +250,7 @@ class Table extends Component {
     const state = this.state;
     let addContactList = [];
     let patchContactList = [];
+    this.setState({localData, colHeaders});
 
     localData.map( row => {
       let field = this._handleNormalField(colHeaders, row);
@@ -243,8 +277,8 @@ class Table extends Component {
 
     // update existing contacts
     const origIdList = props.listData.contacts || [];
-    console.log(patchContactList);
-    console.log(addContactList);
+    // console.log(patchContactList);
+    // console.log(addContactList);
 
     if (patchContactList.length > 0) props.patchContacts(patchContactList);
 
@@ -290,6 +324,19 @@ class Table extends Component {
     }
   }
 
+  _onExportClick() {
+    if (this.state.isDirty || this.state.localData === null) {
+      alertify.alert('Please save first!')
+      return;
+    }
+    const csvString = convertToCsvString(this.state.localData, this.state.colHeaders);
+    const csvFile = encodeURI(csvString);
+    const link = document.createElement('a');
+    link.setAttribute('href', csvFile);
+    link.setAttribute('download', this.state.name);
+    link.click();
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -311,7 +358,7 @@ class Table extends Component {
               />
           </SkyLight>
           <div className='row' style={[styles.nameBlock.parent]}>
-            <div className='small-12 large-4 columns'>
+            <div className='small-12 medium-8 large-4 columns'>
               <ToggleableEditInput
               name={state.name}
               onUpdateName={this.onUpdateName}
@@ -352,6 +399,7 @@ class Table extends Component {
                   <MenuItem onClick={this.updateContacts} primaryText='Update Selected Contacts' />
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
                   <MenuItem primaryText='Upload from File' onClick={_ => this.refs.input.show()} />
+                  <MenuItem primaryText='Export' onClick={this.onExportClick} />
                 </Menu>
               </Popover>
             </div>
@@ -373,7 +421,7 @@ class Table extends Component {
             lastSavedAt={state.lastSavedAt}
             listId={props.listId}
             onSaveClick={this._onSaveClick}
-            getSelectedRows={this.getSelectedRows}
+            _getSelectedRows={this.getSelectedRows}
             listData={props.listData}
             contacts={state.isSearchOn ? state.searchContacts : props.contacts}
             isNew={false}
