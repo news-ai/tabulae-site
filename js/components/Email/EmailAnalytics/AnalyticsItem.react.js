@@ -81,7 +81,10 @@ function AnalyticsItem({
         </div>
         <div className='small-12 medium-3 large-5 columns'>
           <span onClick={onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
-          {!delivered ? <span style={styles.errorText}>Something went wrong on our end. Let us know! Email ID: {id}</span> : null}
+          {!delivered ? <div style={styles.errorText}>
+            <span>Something went wrong on our end. Let us know!</span>
+            <p>Email ID: {id}</p>
+            </div> : null}
           {bounced ? <span style={styles.errorText}>email bounced</span> : null}
           {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
         </div>
