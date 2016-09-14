@@ -243,6 +243,32 @@ class HandsOnTable extends Component {
 
   componentDidMount() {
     this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
+    // let fieldsmapObj = {};
+    // let contactsObj = {};
+    // this.table.runHooks('persistentStateLoad', 'fieldsmap', fieldsmapObj);
+    // this.table.runHooks('persistentStateLoad', 'contacts', contactsObj);
+    // console.log(contactsObj);
+    // console.log(fieldsmapObj);
+    // if (fieldsmapObj.value && contactsObj.value) {
+    //   const fieldsmap = fieldsmapObj.value;
+    //   const contacts = contactsObj.value;
+    //   let options = this.state.options;
+
+    //   fieldsmap.map(fieldObj => {
+    //     if (fieldObj.customfield && !fieldObj.hidden) {
+    //       contacts.map((contact, i) => {
+    //         if (!_.isEmpty(contact.customfields)) {
+    //           if (contact.customfields.some(field => field.name === fieldObj.value)) {
+    //             contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
+    //           }
+    //         }
+    //       });
+    //     }
+    //   });
+    //   options.data = contacts;
+    //   console.log(options);
+    //   this.table.updateSettings(options);
+    // }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -300,6 +326,10 @@ class HandsOnTable extends Component {
   }
 
   componentWillUnmount() {
+    // console.log(this.state.fieldsmap);
+    // console.log(this.props.contacts);
+    // this.table.runHooks('persistentStateSave', 'fieldsmap', this.state.fieldsmap);
+    // this.table.runHooks('persistentStateSave', 'contacts', this.props.contacts);
     console.log('DESTROY');
     this.table.destroy();
   }
@@ -397,7 +427,7 @@ class HandsOnTable extends Component {
           </div>
         </div>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
-        <div ref='data-grid' id={props.listData.id}></div>
+        <div ref='data-grid' className='handsontable' id={props.listData.id}></div>
       </div>
       );
   }

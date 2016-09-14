@@ -37,8 +37,7 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
-      const firstTimeUserString = '?firstTimeUser=true';
-      if (window.location.search.substring(0, firstTimeUserString.length) === '?firstTimeUser=true') this.props.setFirstTimeUser();
+      if (nextProps.firstTimeUser) this.props.setFirstTimeUser();
       const person = nextProps.person;
       this.setState({isLogin: true});
     }
@@ -105,13 +104,13 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
   return {
     data: state,
     isLogin: state.personReducer.person ? true : false,
     loginDidInvalidate: state.personReducer.didInvalidate,
     person: state.personReducer.person,
-    firstTimeUser: state.personReducer.firstTimeUser
+    firstTimeUser: props.location.query.firstTimeUser || state.personReducer.firstTimeUser
   };
 };
 
