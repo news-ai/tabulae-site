@@ -1,21 +1,29 @@
 import React, { Component } from 'react';
-import Select from 'react-select';
 import 'node_modules/react-select/dist/react-select.css';
+import AutoComplete from 'material-ui/AutoComplete';
+import _ from 'lodash';
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const defaultSelectableOptions = [
-  {value: '_', label: '[leave me blank]'},
-  {value: 'ignore_column', label: '[Ignore this column]'},
-  {value: 'firstname', label: 'First Name'},
-  {value: 'lastname', label: 'Last Name'},
-  {value: 'email', label: 'Email'},
+  // {value: '_', label: '[leave me blank]', selected: false},
+  // {value: 'ignore_column', label: '[Ignore this column]', selected: false},
+  {value: 'firstname', label: 'First Name', selected: false},
+  {value: 'lastname', label: 'Last Name', selected: false},
+  {value: 'email', label: 'Email', selected: false},
   {value: 'employers', label: 'Employer(s)'},
-  {value: 'pastemployers', label: 'Past Employer(s)'},
-  {value: 'linkedin', label: 'LinkedIn'},
-  {value: 'twitter', label: 'Twitter'},
-  {value: 'instagram', label: 'Instagram'},
-  {value: 'website', label: 'Website'},
-  {value: 'blog', label: 'Blog'},
+  {value: 'pastemployers', label: 'Past Employer(s)', selected: false},
+  {value: 'linkedin', label: 'LinkedIn', selected: false},
+  {value: 'twitter', label: 'Twitter', selected: false},
+  {value: 'instagram', label: 'Instagram', selected: false},
+  {value: 'website', label: 'Website', selected: false},
+  {value: 'blog', label: 'Blog', selected: false},
 ];
+
+const config = {
+  text: 'label',
+  value: 'value'
+};
 
 const listItemStyle = {
   borderTop: '1px solid lightgray',
@@ -30,97 +38,68 @@ class Headers extends Component {
     super(props);
     this.state = {
       headers: this.props.headers,
-      defaultOptions: defaultSelectableOptions,
-      optionSelected: {
-        firstname: false,
-        lastname: false,
-        email: false,
-        employers: false,
-        pastemployers: false,
-        notes: false,
-        linkedin: false,
-        twitter: false,
-        instagram: false,
-        website: false,
-        blog: false
-      }
+      options: defaultSelectableOptions,
+      order: Array(this.props.headers.length).fill(undefined)
     };
-    this._logChange = this._logChange.bind(this);
-    this._createCustom = this._createCustom.bind(this);
     this._sendHeaderNames = this._sendHeaderNames.bind(this);
-  }
-
-  _createCustom(options, filterValue, excludeOptions) {
-    // TODO: flag input when custom values are being created
-    const lowerFilterValue = filterValue.toLowerCase();
-    const filteredOptions = options.filter( option => {
-      if (option.value.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
-      else if (option.label.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
-      else return false;
-    });
-
-    if (filteredOptions.length === 0 && filterValue.length > 0) {
-      filteredOptions.push({ value: filterValue, label: filterValue, create: true });
-    }
-
-    return filteredOptions;
-  }
-
-  _logChange(obj, i) {
-    const { headers, defaultOptions, optionSelected } = this.state;
-    const value = obj.value;
-    let newOptionSelected = optionSelected;
-    let newDefaultOptions = defaultOptions;
-    let newHeaders = headers;
-
-    if (optionSelected[value] !== undefined) {
-      if (headers[i].value) {
-        // if field is set, turn that original value back on before setting new one
-        const currObj = headers[i].value;
-        newOptionSelected[currObj.value] = false;
-        newDefaultOptions = newDefaultOptions.map( option => {
-          if (option.value === currObj.value) option.disabled = false;
-          return option;
-        });
-      }
-      // turn value on and set the field
-      newOptionSelected[value] = true;
-      newDefaultOptions = newDefaultOptions.map( option => {
-        if (option.value === value) option.disabled = true;
-        return option;
-      });
-    } else {
-      if (obj.create) {
-        newOptionSelected[value] = true;
-        newDefaultOptions.push({ value, label: value, disabled: true});
-      }
-    }
-    newHeaders[i].value = obj;
-    this.setState({
-      headers: newHeaders,
-      optionSelected: newOptionSelected,
-      defaultOptions: newDefaultOptions
-    });
+    this.onNewRequest = this._onNewRequest.bind(this);
+    this.clearValue = this._clearValue.bind(this);
   }
 
   _sendHeaderNames() {
-    const { headers } = this.state;
+    const { order, headers } = this.state;
     const { onProcessHeaders } = this.props;
     let untitledCount = 0;
-    const order = headers.map( header => {
-      if (!header.value || header.value.value === '_') {
+    const newOrder = order.map(item => {
+      if (item) {
+        return item
+      } else if (!item || item.length === 0) {
         untitledCount++;
-        return 'untitled-' + untitledCount;
-      } else {
-        return header.value.value;
+        return `ignore_column`;
       }
     });
-    onProcessHeaders(order);
+    if (untitledCount > 0)
+      alertify.confirm(
+        `There are ${untitledCount} columns that will be dropped when the list is imported.
+        Make sure columns have names if you would like to import them.`,
+        _ => onProcessHeaders(newOrder),
+        _ => {}
+        );
+    else if (untitledCount === headers.length)
+      alertify.alert(`Importing empty list is not allowed. You must at least name one column.`);
+    else onProcessHeaders(newOrder);
+  }
+
+  _onNewRequest(req, reqIndex, headerIndex) {
+    let order = this.state.order;
+    if (_.isString(req)) {
+      // custom
+      order[headerIndex] = req;
+    } else {
+      // default
+      // reset previous selected
+      let options = this.state.options.map(option => {
+        if (req.value === option.value) option.selected = true;
+        return option;
+      });
+      this.setState({options});
+
+      order[headerIndex] = req.value;
+    }
+    this.setState({order});
+  }
+
+  _clearValue(headerIndex) {
+    const headerValue = (this.state.order[headerIndex]) ? this.state.order[headerIndex] : undefined;
+    let options = this.state.options.map(option => {
+      if (headerValue === option.value) option.selected = false;
+      return option;
+    });
+    this.setState({options});
   }
 
   render() {
-    const {headers, defaultOptions} = this.state;
-    const options = defaultOptions;
+    const state = this.state;
     return (
       <div>
         <div style={{marginBottom: '30px'}}>
@@ -133,22 +112,25 @@ class Headers extends Component {
           justifyContent: 'space-between',
           marginBottom: '30px'
         }}>
-        {headers ? headers.map( (header, i) =>
+
+        {state.headers.map((header, i) =>
           <div key={i} style={{width: '180px'}}>
-            <Select
-            name={'row-' + i}
-            options={options}
-            onChange={ val => this._logChange(val, i)}
-            value={header.value}
-            filterOptions={this._createCustom}
-            width='100px'
-            />
+          <AutoComplete
+          floatingLabelText='Column Name'
+          openOnFocus
+          onBlur={e => this.onNewRequest(e.target.value, null, i)}
+          onFocus={_ => this.clearValue(i)}
+          filter={AutoComplete.fuzzyFilter}
+          onNewRequest={(req, reqIndex) => this.onNewRequest(req, reqIndex, i)}
+          dataSource={state.options.filter(item => !item.selected)}
+          dataSourceConfig={config}
+        />
             <ul style={{listStyleType: 'none'}}>
             {header.rows.map((rowItem, j) => <li key={j} style={listItemStyle}>{rowItem}</li>)}
             </ul>
-          </div>) : null}
+          </div>)}
         </div>
-        <button className='button' style={{ float: 'right' }} onClick={this._sendHeaderNames}>Set Column Names</button>
+        <button className='button' style={{float: 'right'}} onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>
     );
   }

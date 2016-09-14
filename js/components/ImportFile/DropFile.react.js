@@ -50,44 +50,47 @@ class DropFile extends Component {
     this._processHeaders = this._processHeaders.bind(this);
   }
 
+  componentWillUnmount() {
+    this.props.clearReducer();
+
+  }
+
   _onDrop(files) {
     this.setState({ file: files[files.length - 1], isFileDropped: true });
   }
 
   _submit() {
-    const {dispatch, listId, headers} = this.props;
+    const props = this.props;
     let data = new FormData();
     data.append('file', this.state.file);
-    this.setState({ fileSubmitted: true });
-    dispatch(actionCreators.uploadFile(listId, data))
-    .then( _ => dispatch(actionCreators.fetchHeaders(listId)));
+    this.setState({fileSubmitted: true});
+    props.uploadFile(props.listId, data)
+    .then( _ => props.fetchHeaders(props.listId));
   }
 
   _processHeaders(order) {
-    const { dispatch, listId } = this.props;
-    dispatch(actionCreators.addHeaders(listId, order))
-    .then( _ => dispatch(actionCreators.waitForServerProcess(listId)))
-    .then( _ => window.location.reload());
+    const props = this.props;
+    props.addHeaders(props.listId, order)
+    .then(_ => console.log('COMPLETED!'));
     // must reload to set up handsontable again, think of a better way later maybe
   }
 
   render() {
-    const {listId, fileIsReceiving, fileReducer, isProcessWaiting} = this.props;
+    const {listId, fileIsReceiving, fileReducer, isProcessWaiting, headers} = this.props;
     const {file, isFileDropped, fileSubmitted} = this.state;
-    const headers = fileReducer[listId] ? fileReducer[listId].headers : undefined;
     let renderNode;
+
+    if (headers) renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
     if (isProcessWaiting) {
       renderNode = <Waiting isReceiving={isProcessWaiting} text='Waiting for Columns to be processed...' />;
     } else {
       if (isFileDropped) {
         if (fileSubmitted) {
           if (fileIsReceiving) {
-            renderNode = <i className='fa fa-spinner fa-spin fa-3x' aria-hidden='true'></i>;
+            renderNode = <Waiting isReceiving={fileIsReceiving}/>;
           } else {
             if (fileReducer[listId].didInvalidate) {
               renderNode = <div><span>Something went wrong. Upload failed. Please try later.</span></div>
-            } else {
-              renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
             }
           }
         } else {
@@ -138,13 +141,19 @@ const mapStateToProps = (state, props) => {
   return {
     fileReducer: state.fileReducer,
     fileIsReceiving: state.fileReducer.isReceiving,
-    isProcessWaiting: state.fileReducer.isProcessWaiting
+    isProcessWaiting: state.fileReducer.isProcessWaiting,
+    headers: state.fileReducer[props.listId] ? state.fileReducer[props.listId].headers : undefined
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    dispatch: action => dispatch(action)
+    dispatch: action => dispatch(action),
+    uploadFile: (listId, file) => dispatch(actionCreators.uploadFile(listId, file)),
+    fetchHeaders: listId => dispatch(actionCreators.fetchHeaders(listId)),
+    addHeaders: (listId, order) => dispatch(actionCreators.addHeaders(listId, order)),
+    waitForServerProcess: _ => dispatch(actionCreators.waitForServerProcess()),
+    clearReducer: _ => dispatch({type: 'CLEAR_FILE_REDUCER'})
   };
 };
 

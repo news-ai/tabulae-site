@@ -1,6 +1,4 @@
 import {
-  REQUEST_HEADERS,
-  RECEIVE_HEADERS,
   TURN_ON_PROCESS_WAIT,
   TURN_OFF_PROCESS_WAIT,
   fileConstant,
@@ -39,22 +37,29 @@ export function fetchHeaders(listId) {
 
 export function waitForServerProcess(listId) {
   return dispatch => {
+    dispatch({type: TURN_ON_PROCESS_WAIT});
     setTimeout( _ => {
-      dispatch({ type: TURN_OFF_PROCESS_WAIT});
-      return dispatch(listActions.fetchList(listId))
-      .then( _ => dispatch(contactActions.fetchContacts(listId)));
-    }, 10000);
+      console.log('RELOAD');
+      window.location.reload();
+      // dispatch({type: TURN_OFF_PROCESS_WAIT});
+      // dispatch({type: 'CLEAR_LIST_REDUCER', listId});
+      // return dispatch(listActions.fetchList(listId))
+      // .then( _ => dispatch(contactActions.fetchPaginatedContacts(listId)));
+    }, 5000);
   };
 }
 
 export function addHeaders(listId, order) {
   return (dispatch, getState) => {
     dispatch({type: headerConstant.CREATE_REQUEST, order});
-    dispatch({type: TURN_ON_PROCESS_WAIT});
-    let fileId = getState().fileReducer[listId].id;
+    dispatch(waitForServerProcess(listId));
+    const fileId = getState().fileReducer[listId].id;
 
     return api.post(`/files/${fileId}/headers`, {order: order})
-    .then( response => dispatch({type: headerConstant.CREATE_RECEIVED, response}))
+    .then(response => {
+      console.log(response);
+      dispatch({type: headerConstant.CREATE_RECEIVED, response});
+    })
     .catch( message => dispatch({type: headerConstant.REQUEST_FAIL, message}));
   };
 }
