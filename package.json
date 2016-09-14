@@ -1,7 +1,7 @@
 {
-  "name": "newsai-publisher",
+  "name": "newsai-tabulae-site",
   "version": "0.0.2",
-  "description": "Publisher platform for NewsAI data",
+  "description": "Media List platform for NewsAI data",
   "dependencies": {
     "alertifyjs": "^1.8.0",
     "axios": "^0.9.1",
