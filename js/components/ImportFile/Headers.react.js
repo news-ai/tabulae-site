@@ -35,24 +35,13 @@ class Headers extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      headers: null,
+      headers: this.props.headers,
       options: defaultSelectableOptions,
-      order: []
+      order: Array(this.props.headers.length).fill(undefined)
     };
     this._sendHeaderNames = this._sendHeaderNames.bind(this);
     this.onNewRequest = this._onNewRequest.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log(nextProps.headers);
-    if (nextProps.headers) {
-      if (nextProps.headers.length > 0 && this.state.headers === null) {
-        this.setState({
-          headers: nextProps.headers,
-          order: Array(nextProps.headers.length).fill(null)
-        });
-      }
-    }
+    this.clearValue = this._clearValue.bind(this);
   }
 
   _sendHeaderNames() {
@@ -73,22 +62,31 @@ class Headers extends Component {
   _onNewRequest(req, reqIndex, headerIndex) {
     let order = this.state.order;
     if (isString(req)) {
-      console.log('STRING');
-      console.log(req);
       // custom
+      console.log('STRING');
       order[headerIndex] = req;
     } else {
-      //default
+      // default
       console.log('DEFAULT');
-      order[headerIndex] = req.value;
-      const options = this.state.options.map(
-        option => (option.value === req.value) ? Object.assign({}, option, {selected: !option.selected}) : option
-        );
+      // reset previous selected
+      let options = this.state.options.map(option => {
+        if (req.value === option.value) option.selected = true;
+        return option;
+      });
       this.setState({options});
-      console.log(options);
+
+      order[headerIndex] = req.value;
     }
-    console.log(order);
     this.setState({order});
+  }
+
+  _clearValue(headerIndex) {
+    const headerValue = (this.state.order[headerIndex]) ? this.state.order[headerIndex] : undefined;
+    let options = this.state.options.map(option => {
+      if (headerValue === option.value) option.selected = false;
+      return option;
+    });
+    this.setState({options});
   }
 
   render() {
@@ -106,20 +104,25 @@ class Headers extends Component {
           marginBottom: '30px'
         }}>
 
-        {state.headers !== null ? state.headers.map( (header, i) =>
+        {state.headers.map((header, i) =>
           <div key={i} style={{width: '180px'}}>
           <AutoComplete
           floatingLabelText='showAllItems'
           openOnFocus
+          onFocus={_ => this.clearValue(i)}
           filter={AutoComplete.fuzzyFilter}
           onNewRequest={(req, reqIndex) => this.onNewRequest(req, reqIndex, i)}
           dataSource={state.options.filter(item => !item.selected)}
           dataSourceConfig={config}
+          onUpdateInput={(searchText, dataSource) => {
+            console.log(searchText);
+            console.log(dataSource);
+          }}
         />
             <ul style={{listStyleType: 'none'}}>
             {header.rows.map((rowItem, j) => <li key={j} style={listItemStyle}>{rowItem}</li>)}
             </ul>
-          </div>) : null}
+          </div>)}
         </div>
         <button className='button' style={{ float: 'right' }} onClick={this._sendHeaderNames}>Set Column Names</button>
       </div>

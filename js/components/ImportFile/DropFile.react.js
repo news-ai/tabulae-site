@@ -76,6 +76,8 @@ class DropFile extends Component {
     const {file, isFileDropped, fileSubmitted} = this.state;
     let renderNode;
     console.log(headers);
+
+    if (headers) renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
     if (isProcessWaiting) {
       renderNode = <Waiting isReceiving={isProcessWaiting} text='Waiting for Columns to be processed...' />;
     } else {
@@ -86,8 +88,6 @@ class DropFile extends Component {
           } else {
             if (fileReducer[listId].didInvalidate) {
               renderNode = <div><span>Something went wrong. Upload failed. Please try later.</span></div>
-            } else {
-              renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
             }
           }
         } else {
