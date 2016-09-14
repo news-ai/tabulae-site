@@ -26,8 +26,8 @@ class OnboardingWrapper extends Component {
     this._addTooltip = this._addTooltip.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.firstTimeUser !== this.state.firstTimeUser) {
+  componentWillMount() {
+    if (this.props.firstTimeUser !== this.state.firstTimeUser) {
       setTimeout( _ => {
         this.setState({ready: true});
       }, 7000);

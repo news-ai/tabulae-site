@@ -162,8 +162,7 @@ class Table extends Component {
     // return false to prevent a transition w/o prompting the user,
     // or return a string to allow the user to decide:
     if (!this.state.isSaved) return 'Your work is not saved! Are you sure you want to leave?'
-    else if (nextLocation.pathname === '/emailstats') return true;
-    return 'Are you sure you want to leave this page?'
+    // return 'Are you sure you want to leave this page?'
   }
 
   _onSearchClick(searchValue) {
@@ -398,7 +397,7 @@ class Table extends Component {
                 <Menu>
                   <MenuItem onClick={this.updateContacts} primaryText='Update Selected Contacts' />
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
-                  <MenuItem primaryText='Upload from File' onClick={_ => this.refs.input.show()} />
+                  <MenuItem primaryText='Import from File' onClick={_ => this.refs.input.show()} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
                 </Menu>
               </Popover>
@@ -446,12 +445,11 @@ const mapStateToProps = (state, props) => {
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   if (listData) {
     if (!_.isEmpty(listData.contacts)) {
-      contacts = listData.contacts.map( (contactId, i) => {
+      listData.contacts.map( (contactId, i) => {
         if (state.contactReducer[contactId]) {
           lastFetchedIndex = i;
-          return state.contactReducer[contactId];
+          contacts.push(state.contactReducer[contactId]);
         }
-        else return {};
       });
     }
   }
