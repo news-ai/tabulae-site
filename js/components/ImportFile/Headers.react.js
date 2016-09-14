@@ -1,21 +1,27 @@
 import React, { Component } from 'react';
-import Select from 'react-select';
 import 'node_modules/react-select/dist/react-select.css';
+import AutoComplete from 'material-ui/AutoComplete';
+import isString from 'lodash/isString';
 
 const defaultSelectableOptions = [
-  {value: '_', label: '[leave me blank]'},
-  {value: 'ignore_column', label: '[Ignore this column]'},
-  {value: 'firstname', label: 'First Name'},
-  {value: 'lastname', label: 'Last Name'},
-  {value: 'email', label: 'Email'},
+  {value: '_', label: '[leave me blank]', selected: false},
+  {value: 'ignore_column', label: '[Ignore this column]', selected: false},
+  {value: 'firstname', label: 'First Name', selected: false},
+  {value: 'lastname', label: 'Last Name', selected: false},
+  {value: 'email', label: 'Email', selected: false},
   {value: 'employers', label: 'Employer(s)'},
-  {value: 'pastemployers', label: 'Past Employer(s)'},
-  {value: 'linkedin', label: 'LinkedIn'},
-  {value: 'twitter', label: 'Twitter'},
-  {value: 'instagram', label: 'Instagram'},
-  {value: 'website', label: 'Website'},
-  {value: 'blog', label: 'Blog'},
+  {value: 'pastemployers', label: 'Past Employer(s)', selected: false},
+  {value: 'linkedin', label: 'LinkedIn', selected: false},
+  {value: 'twitter', label: 'Twitter', selected: false},
+  {value: 'instagram', label: 'Instagram', selected: false},
+  {value: 'website', label: 'Website', selected: false},
+  {value: 'blog', label: 'Blog', selected: false},
 ];
+
+const config = {
+  text: 'label',
+  value: 'value'
+};
 
 const listItemStyle = {
   borderTop: '1px solid lightgray',
@@ -29,78 +35,24 @@ class Headers extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      headers: this.props.headers,
-      defaultOptions: defaultSelectableOptions,
-      optionSelected: {
-        firstname: false,
-        lastname: false,
-        email: false,
-        employers: false,
-        pastemployers: false,
-        notes: false,
-        linkedin: false,
-        twitter: false,
-        instagram: false,
-        website: false,
-        blog: false
-      }
+      headers: null,
+      options: defaultSelectableOptions,
+      order: []
     };
-    this._logChange = this._logChange.bind(this);
-    this._createCustom = this._createCustom.bind(this);
     this._sendHeaderNames = this._sendHeaderNames.bind(this);
+    this.onNewRequest = this._onNewRequest.bind(this);
   }
 
-  _createCustom(options, filterValue, excludeOptions) {
-    // TODO: flag input when custom values are being created
-    const lowerFilterValue = filterValue.toLowerCase();
-    const filteredOptions = options.filter( option => {
-      if (option.value.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
-      else if (option.label.toLowerCase().substring(0, lowerFilterValue.length) === lowerFilterValue) return true;
-      else return false;
-    });
-
-    if (filteredOptions.length === 0 && filterValue.length > 0) {
-      filteredOptions.push({ value: filterValue, label: filterValue, create: true });
-    }
-
-    return filteredOptions;
-  }
-
-  _logChange(obj, i) {
-    const { headers, defaultOptions, optionSelected } = this.state;
-    const value = obj.value;
-    let newOptionSelected = optionSelected;
-    let newDefaultOptions = defaultOptions;
-    let newHeaders = headers;
-
-    if (optionSelected[value] !== undefined) {
-      if (headers[i].value) {
-        // if field is set, turn that original value back on before setting new one
-        const currObj = headers[i].value;
-        newOptionSelected[currObj.value] = false;
-        newDefaultOptions = newDefaultOptions.map( option => {
-          if (option.value === currObj.value) option.disabled = false;
-          return option;
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps.headers);
+    if (nextProps.headers) {
+      if (nextProps.headers.length > 0 && this.state.headers === null) {
+        this.setState({
+          headers: nextProps.headers,
+          order: Array(nextProps.headers.length).fill(null)
         });
       }
-      // turn value on and set the field
-      newOptionSelected[value] = true;
-      newDefaultOptions = newDefaultOptions.map( option => {
-        if (option.value === value) option.disabled = true;
-        return option;
-      });
-    } else {
-      if (obj.create) {
-        newOptionSelected[value] = true;
-        newDefaultOptions.push({ value, label: value, disabled: true});
-      }
     }
-    newHeaders[i].value = obj;
-    this.setState({
-      headers: newHeaders,
-      optionSelected: newOptionSelected,
-      defaultOptions: newDefaultOptions
-    });
   }
 
   _sendHeaderNames() {
@@ -118,9 +70,29 @@ class Headers extends Component {
     onProcessHeaders(order);
   }
 
+  _onNewRequest(req, reqIndex, headerIndex) {
+    let order = this.state.order;
+    if (isString(req)) {
+      console.log('STRING');
+      console.log(req);
+      // custom
+      order[headerIndex] = req;
+    } else {
+      //default
+      console.log('DEFAULT');
+      order[headerIndex] = req.value;
+      const options = this.state.options.map(
+        option => (option.value === req.value) ? Object.assign({}, option, {selected: !option.selected}) : option
+        );
+      this.setState({options});
+      console.log(options);
+    }
+    console.log(order);
+    this.setState({order});
+  }
+
   render() {
-    const {headers, defaultOptions} = this.state;
-    const options = defaultOptions;
+    const state = this.state;
     return (
       <div>
         <div style={{marginBottom: '30px'}}>
@@ -133,16 +105,17 @@ class Headers extends Component {
           justifyContent: 'space-between',
           marginBottom: '30px'
         }}>
-        {headers ? headers.map( (header, i) =>
+
+        {state.headers !== null ? state.headers.map( (header, i) =>
           <div key={i} style={{width: '180px'}}>
-            <Select
-            name={'row-' + i}
-            options={options}
-            onChange={ val => this._logChange(val, i)}
-            value={header.value}
-            filterOptions={this._createCustom}
-            width='100px'
-            />
+          <AutoComplete
+          floatingLabelText='showAllItems'
+          openOnFocus
+          filter={AutoComplete.fuzzyFilter}
+          onNewRequest={(req, reqIndex) => this.onNewRequest(req, reqIndex, i)}
+          dataSource={state.options.filter(item => !item.selected)}
+          dataSourceConfig={config}
+        />
             <ul style={{listStyleType: 'none'}}>
             {header.rows.map((rowItem, j) => <li key={j} style={listItemStyle}>{rowItem}</li>)}
             </ul>

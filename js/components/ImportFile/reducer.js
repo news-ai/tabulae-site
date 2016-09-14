@@ -40,7 +40,6 @@ function fileReducer(state = initialState.fileReducer, action) {
       return obj;
     case headerConstant.RECEIVE:
       obj.isReceiving = false;
-      if (!obj[action.listId]) obj[action.listId] = {};
       obj[action.listId].headers = action.headers;
       return obj;
     case headerConstant.REQUEST_FAIL:
