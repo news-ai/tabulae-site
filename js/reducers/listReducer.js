@@ -57,7 +57,7 @@ function listReducer(state = initialState.listReducer, action) {
     case listConstant.RECEIVE:
       obj = assignToEmpty(state, action.list);
       obj.isReceiving = false;
-      if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
+      if (!state.received.some(id => id === action.id)) obj.received = [action.id, ...state.received];
       obj.received.map(id => {
         const list = obj[id];
         if (!list.archived) unarchivedLists.push(list.id);

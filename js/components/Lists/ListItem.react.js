@@ -7,19 +7,15 @@ import {grey50} from 'material-ui/styles/colors';
 
 const styles = {
   parent: {
-    marginBottom: '10px',
+    marginBottom: 10,
     borderRadius: '1.5em',
-    paddingLeft: '15px',
-    paddingRight: '15px',
-    height: '2em',
-    display: 'flex',
-    alignItems: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 5,
+    paddingBottom: 5,
     ':hover': {
       backgroundColor: grey50
     }
-  },
-  link: {
-    // marginLeft: '15px'
   },
   icon: {
     color: 'lightgray',
@@ -34,16 +30,14 @@ const styles = {
 function ListItem({list, onToggle, iconName}) {
   const updatedDate = new Date(list.updated);
   return (
-    <div key='parent' className='row' style={[styles.parent]}>
-      <div className='eight columns'>
-        <span style={[styles.link]}>
-          <Link to={`/lists/${list.id}`}>{list.name}</Link>
-        </span>
+    <div key='parent' className='row align-middle' style={[styles.parent]}>
+      <div className='small-8 medium-7 large-8 columns'>
+        <Link to={`/lists/${list.id}`}><span>{list.name}</span></Link>
       </div>
-      <div className='three columns'>
+      <div className='small-4 medium-4 large-3 columns'>
         <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
       </div>
-      <div className='one columns'>
+      <div className='hide-for-small-only medium-1 large-1 columns'>
         <i
         alt='archive'
         title='archive'
