@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
+import Link from 'react-router/lib/Link';
 import { globalStyles } from 'constants/StyleConstants';
 import Radium from 'radium';
 import {listPropTypes} from 'constants/CommonPropTypes';

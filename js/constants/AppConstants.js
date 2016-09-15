@@ -12,7 +12,9 @@ export const commonTypes = [
   'LAST_USED',
   'CREATE_REQUEST',
   'CREATE_RECEIVED',
-  'SET_OFFSET'
+  'SET_OFFSET',
+  'MANUALLY_SET_ISRECEIVING_ON',
+  'MANUALLY_SET_ISRECEIVING_OFF',
 ];
 
 export const listConstant = generateConstants(commonTypes, 'LIST');

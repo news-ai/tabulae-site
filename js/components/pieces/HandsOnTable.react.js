@@ -25,6 +25,7 @@ class HandsOnTable extends Component {
     this._changeColumnName = this._changeColumnName.bind(this);
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
+    this.loadTable = this._loadTable.bind(this);
     if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
       COLUMNS.push({
         data: 'publication_name_1',
@@ -54,7 +55,7 @@ class HandsOnTable extends Component {
     this.state = {
       addedRow: false,
       update: false,
-      lazyLoadingThreshold: 20,
+      lazyLoadingThreshold: 50,
       lastFetchedIndex: -1,
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
@@ -121,7 +122,7 @@ class HandsOnTable extends Component {
         afterScrollVertically: e => {
           const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
           if (_.isEmpty(listData.contacts)) return;
-          if (listData.contacts.length < 50) return;
+          if (listData.contacts.length < 150) return;
           if (lastFetchedIndex === listData.contacts.length - 1) return;
           const rowCount = this.table.countRows();
           const rowOffset = this.table.rowOffset();
@@ -241,38 +242,31 @@ class HandsOnTable extends Component {
     };
   }
 
-  componentDidMount() {
-    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), this.state.options);
-    // let fieldsmapObj = {};
-    // let contactsObj = {};
-    // this.table.runHooks('persistentStateLoad', 'fieldsmap', fieldsmapObj);
-    // this.table.runHooks('persistentStateLoad', 'contacts', contactsObj);
-    // console.log(contactsObj);
-    // console.log(fieldsmapObj);
-    // if (fieldsmapObj.value && contactsObj.value) {
-    //   const fieldsmap = fieldsmapObj.value;
-    //   const contacts = contactsObj.value;
-    //   let options = this.state.options;
+  componentWillMount() {
+    const { contacts, listData, lastFetchedIndex, isSearchOn } = this.props;
+    this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
+  }
 
-    //   fieldsmap.map(fieldObj => {
-    //     if (fieldObj.customfield && !fieldObj.hidden) {
-    //       contacts.map((contact, i) => {
-    //         if (!_.isEmpty(contact.customfields)) {
-    //           if (contact.customfields.some(field => field.name === fieldObj.value)) {
-    //             contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
-    //           }
-    //         }
-    //       });
-    //     }
-    //   });
-    //   options.data = contacts;
-    //   console.log(options);
-    //   this.table.updateSettings(options);
-    // }
+  componentDidMount() {
+    const options = this.state.options;
+    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), options);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { contacts, listData, lastFetchedIndex } = nextProps;
+    const { contacts, listData, lastFetchedIndex, isSearchOn } = nextProps;
+    this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
+  }
+
+  componentWillUnmount() {
+    // console.log(this.state.fieldsmap);
+    // console.log(this.props.contacts);
+    // this.table.runHooks('persistentStateSave', 'fieldsmap', this.state.fieldsmap);
+    // this.table.runHooks('persistentStateSave', 'contacts', this.props.contacts);
+    console.log('DESTROY');
+    this.table.destroy();
+  }
+
+  _loadTable(contacts, listData, lastFetchedIndex, isSearchOn) {
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
     const immutableFieldmap = fromJS(listData.fieldsmap);
@@ -284,35 +278,23 @@ class HandsOnTable extends Component {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({data: fieldObj.value, title: fieldObj.name});
         });
         options.columns = columns;
-        this.setState({immutableFieldmap});
-        this.table.updateSettings(options);
+        if (this.table) this.table.updateSettings(options);
       }
 
       if (this.state.lastFetchedIndex === -1) {
         options.minRows = listData.contacts.length + 5;
         this.setState({options});
-        this.table.updateSettings(options);
+        if (this.table) this.table.updateSettings(options);
       }
 
       // load every 50 contacts to avoid slow UI
       if (
-        lastFetchedIndex - this.state.lastFetchedIndex === 50 ||
-        listData.contacts.length <= 50 ||
+        lastFetchedIndex - this.state.lastFetchedIndex === 150 ||
+        listData.contacts.length <= 150 ||
         lastFetchedIndex === listData.contacts.length - 1 ||
         this.state.addedRow ||
-        this.props.isSearchOn !== nextProps.isSearchOn
+        this.props.isSearchOn !== isSearchOn
         ) {
-        fieldsmap.map(fieldObj => {
-          if (fieldObj.customfield && !fieldObj.hidden) {
-            contacts.map((contact, i) => {
-              if (!_.isEmpty(contact.customfields)) {
-                if (contact.customfields.some(field => field.name === fieldObj.value)) {
-                  contacts[i][fieldObj.value] = contact.customfields.find( field => field.name === fieldObj.value ).value;
-                }
-              }
-            });
-          }
-        });
         options.data = contacts;
         this.setState({
           options,
@@ -320,18 +302,9 @@ class HandsOnTable extends Component {
           lastFetchedIndex,
           addedRow: false
         });
-        this.table.updateSettings(options);
+        if (this.table) this.table.updateSettings(options);
       }
     }
-  }
-
-  componentWillUnmount() {
-    // console.log(this.state.fieldsmap);
-    // console.log(this.props.contacts);
-    // this.table.runHooks('persistentStateSave', 'fieldsmap', this.state.fieldsmap);
-    // this.table.runHooks('persistentStateSave', 'contacts', this.props.contacts);
-    console.log('DESTROY');
-    this.table.destroy();
   }
 
   _changeColumnName(listId, columns, colNum, newColumnName) {

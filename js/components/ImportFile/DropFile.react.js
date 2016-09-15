@@ -82,7 +82,7 @@ class DropFile extends Component {
 
     if (headers) renderNode = <Headers headers={headers} onProcessHeaders={this._processHeaders} />;
     if (isProcessWaiting) {
-      renderNode = <Waiting isReceiving={isProcessWaiting} text='Waiting for Columns to be processed...' />;
+      renderNode = <Waiting isReceiving={isProcessWaiting} textStyle={{marginTop: '10px'}} text='Waiting for Columns to be processed...' />;
     } else {
       if (isFileDropped) {
         if (fileSubmitted) {

@@ -74,6 +74,7 @@ export function fetchContact(contactId) {
   };
 }
 
+// used to lazy-load a page, keeps track of the last offset
 export function fetchPaginatedContacts(listId) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
@@ -96,6 +97,78 @@ export function fetchPaginatedContacts(listId) {
       dispatch(receiveContacts(res.entities.contacts, res.result.data));
     })
     .catch( message => dispatch(requestContactFail(message)));
+  };
+}
+
+// fetch page without concern to where offset was last
+function fetchContactsPage(listId, pageLimit, offset) {
+  return dispatch => {
+    return api.get(`/lists/${listId}/contacts?limit=${pageLimit}&offset=${offset}`)
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
+      });
+      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+      return dispatch(receiveContacts(res.entities.contacts, res.result.data));
+    })
+    .catch( message => dispatch(requestContactFail(message)));
+  };
+}
+
+export function loadAllContacts(listId) {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    if (getState().listReducer[listId].contacts === null) return;
+    const contacts = getState().listReducer[listId].contacts;
+    dispatch({type: 'FETCH_ALL_CONTACTS', listId});
+    dispatch(requestContact());
+    for (let i = 0; i < (contacts.length / PAGE_LIMIT) + 1; i++) {
+      dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT))
+      .then(_ => {
+        // poll how many received
+        const contactReducer = getState().contactReducer;
+        const count = contacts.filter(id => contactReducer[id]).length;
+        if (count < contacts.length) dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+        else dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+      });
+    }
+    dispatch({
+      type: listConstant.SET_OFFSET,
+      offset: null,
+      listId
+    });
+  };
+}
+
+export function fetchManyContacts(listId, amount) {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const contacts = getState().listReducer[listId].contacts;
+    const offset = getState().listReducer[listId].offset || 0;
+    const isReceiving = getState().contactReducer.isReceiving;
+    const contactCount = contacts.filter(id => getState().contactReducer[id]).length;
+    if (offset === null || contacts === null || isReceiving || contactCount === contacts.length) return;
+    dispatch({type: 'FETCH_MANY_CONTACTS', listId});
+    const startPage = offset / PAGE_LIMIT;
+    const endPage = offset + amount >= contacts.length ? (contacts.length / PAGE_LIMIT) : (offset + amount) / PAGE_LIMIT;
+    for (let i = startPage; i < endPage; i++) {
+      dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT))
+      .then(_ => {
+        // poll how many received
+        const contactReducer = getState().contactReducer;
+        const count = contacts.filter(id => contactReducer[id]).length;
+        if (offset + amount >= contacts.length && count === contacts.length) {
+          dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+          dispatch({type: listConstant.SET_OFFSET, listId, offset: null});
+        } else if (count === offset + amount) {
+          dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+          dispatch({type: listConstant.SET_OFFSET, listId, offset: offset + amount});
+        } else {
+          dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+        }
+      });
+    }
   };
 }
 

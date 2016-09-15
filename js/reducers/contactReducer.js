@@ -18,6 +18,12 @@ function contactReducer(state = initialState.contactReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
+    case contactConstant.MANUALLY_SET_ISRECEIVING_ON:
+      obj.isReceiving = true;
+      return obj;
+    case contactConstant.MANUALLY_SET_ISRECEIVING_OFF:
+      obj.isReceiving = false;
+      return obj;
     case ADDING_CONTACT:
       obj.isReceiving = true;
       return obj;
