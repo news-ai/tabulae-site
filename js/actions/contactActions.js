@@ -74,6 +74,7 @@ export function fetchContact(contactId) {
   };
 }
 
+// used to lazy-load a page, keeps track of the last offset
 export function fetchPaginatedContacts(listId) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
@@ -99,6 +100,7 @@ export function fetchPaginatedContacts(listId) {
   };
 }
 
+// fetch page without concern to where offset was last
 function fetchContactsPage(listId, pageLimit, offset) {
   return dispatch => {
     return api.get(`/lists/${listId}/contacts?limit=${pageLimit}&offset=${offset}`)
@@ -108,7 +110,7 @@ function fetchContactsPage(listId, pageLimit, offset) {
         included: arrayOf(publicationSchema)
       });
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
-      dispatch(receiveContacts(res.entities.contacts, res.result.data));
+      return dispatch(receiveContacts(res.entities.contacts, res.result.data));
     })
     .catch( message => dispatch(requestContactFail(message)));
   };
@@ -118,11 +120,18 @@ export function loadAllContacts(listId) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
-    const contactLength = getState().listReducer[listId].contacts.length;
+    const contacts = getState().listReducer[listId].contacts;
     dispatch({type: 'FETCH_ALL_CONTACTS', listId});
     dispatch(requestContact());
-    for (let i = 0; i < (contactLength / PAGE_LIMIT) + 1; i++) {
-      dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT));
+    for (let i = 0; i < (contacts.length / PAGE_LIMIT) + 1; i++) {
+      dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT))
+      .then(_ => {
+        // poll how many received
+        const contactReducer = getState().contactReducer;
+        const count = contacts.filter(id => contactReducer[id]).length;
+        if (count < contacts.length) dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+        else dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+      });
     }
     dispatch({
       type: listConstant.SET_OFFSET,

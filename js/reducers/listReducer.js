@@ -34,6 +34,12 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = false;
       obj[action.listId].searchResults = action.ids;
       return obj;
+    case listConstant.MANUALLY_SET_ISRECEIVING_ON:
+      obj.isReceiving = true;
+      return obj;
+    case listConstant.MANUALLY_SET_ISRECEIVING_OFF:
+      obj.isReceiving = false;
+      return obj;
     case listConstant.REQUEST_MULTIPLE:
       obj.isReceiving = true;
       return obj;
