@@ -26,6 +26,7 @@ export const patchContacts = (listId, contactList) => contactActions.patchContac
 export const fetchContacts = (listId) => contactActions.fetchPaginatedContacts(listId);
 export const updateContact = id => contactActions.updateContact(id);
 export const searchListContacts = (listId, query) => contactActions.searchListContacts(listId, query);
+export const loadAllContacts = listId => contactActions.loadAllContacts(listId);
 
 export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);
 export const sendEmail = id => stagingActions.sendEmail(id);

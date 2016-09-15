@@ -394,6 +394,7 @@ class Table extends Component {
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
                   <MenuItem primaryText='Import from File' onClick={_ => this.refs.input.show()} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
+                  <MenuItem primaryText='Load All Contacts' onClick={_ => props.fetchAllContacts(props.listId)} />
                 </Menu>
               </Popover>
             </div>
@@ -467,7 +468,7 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps = (dispatch, props) => {
   return {
     dispatch: action => dispatch(action),
     searchListContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
@@ -478,7 +479,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     updateOutdatedContacts: contactId => dispatch(actionCreators.updateContact(contactId)),
     fetchList: listId => dispatch(actionCreators.fetchList(listId)),
     fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
-    searchPublications: query => dispatch(actionCreators.searchPublications(query))
+    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
+    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId))
   };
 };
 

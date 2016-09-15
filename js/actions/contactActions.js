@@ -99,6 +99,39 @@ export function fetchPaginatedContacts(listId) {
   };
 }
 
+function fetchContactsPage(listId, pageLimit, offset) {
+  return dispatch => {
+    return api.get(`/lists/${listId}/contacts?limit=${pageLimit}&offset=${offset}`)
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
+      });
+      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
+      dispatch(receiveContacts(res.entities.contacts, res.result.data));
+    })
+    .catch( message => dispatch(requestContactFail(message)));
+  };
+}
+
+export function loadAllContacts(listId) {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    if (getState().listReducer[listId].contacts === null) return;
+    const contactLength = getState().listReducer[listId].contacts.length;
+    dispatch({type: 'FETCH_ALL_CONTACTS', listId});
+    dispatch(requestContact());
+    for (let i = 0; i < (contactLength / PAGE_LIMIT) + 1; i++) {
+      dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT));
+    }
+    dispatch({
+      type: listConstant.SET_OFFSET,
+      offset: null,
+      listId
+    });
+  };
+}
+
 export function searchListContacts(listId, query) {
   return (dispatch, getState) => {
     dispatch({ type: LIST_CONTACTS_SEARCH_REQUEST, listId, query});
