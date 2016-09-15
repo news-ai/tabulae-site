@@ -136,7 +136,7 @@ class Table extends Component {
     if (this.props.firstTimeUser) {
       setTimeout( _ => {
         const steps = [{
-          text: 'If the contact is highlighted green, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab.',
+          text: 'If the contact is highlighted yellow, that means the Employer field is different from what the LinkedIn field tells us. You can auto-update selected contacts under Utilities tab.',
           selector: '.handsontable',
           position: 'top-left',
           type: 'hover'
