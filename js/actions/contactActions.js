@@ -141,6 +141,35 @@ export function loadAllContacts(listId) {
   };
 }
 
+export function fetchManyContacts(listId, amount) {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const contacts = getState().listReducer[listId].contacts;
+    const offset = getState().listReducer[listId].offset;
+    if (offset === null || contacts === null) return;
+    dispatch({type: 'FETCH_MANY_CONTACTS', listId});
+    const startPage = offset / PAGE_LIMIT;
+    const endPage = offset + amount >= contacts.length ? (contacts.length / PAGE_LIMIT) : (offset + amount) / PAGE_LIMIT;
+    for (let i = startPage; i < endPage; i++) {
+      dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT))
+      .then(_ => {
+        // poll how many received
+        const contactReducer = getState().contactReducer;
+        const count = contacts.filter(id => contactReducer[id]).length;
+        if (offset + amount >= contacts.length && count === contacts.length) {
+          dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+          dispatch({type: listConstant.SET_OFFSET, listId, offset: null});
+        } else if (count === offset + amount) {
+          dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+          dispatch({type: listConstant.SET_OFFSET, listId, offset: offset + amount});
+        } else {
+          dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+        }
+      });
+    }
+  };
+}
+
 export function searchListContacts(listId, query) {
   return (dispatch, getState) => {
     dispatch({ type: LIST_CONTACTS_SEARCH_REQUEST, listId, query});

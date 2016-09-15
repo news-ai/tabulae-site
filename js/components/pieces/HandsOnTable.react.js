@@ -54,7 +54,7 @@ class HandsOnTable extends Component {
     this.state = {
       addedRow: false,
       update: false,
-      lazyLoadingThreshold: 20,
+      lazyLoadingThreshold: 50,
       lastFetchedIndex: -1,
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
@@ -121,7 +121,7 @@ class HandsOnTable extends Component {
         afterScrollVertically: e => {
           const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
           if (_.isEmpty(listData.contacts)) return;
-          if (listData.contacts.length < 50) return;
+          if (listData.contacts.length < 150) return;
           if (lastFetchedIndex === listData.contacts.length - 1) return;
           const rowCount = this.table.countRows();
           const rowOffset = this.table.rowOffset();
@@ -296,8 +296,8 @@ class HandsOnTable extends Component {
 
       // load every 50 contacts to avoid slow UI
       if (
-        lastFetchedIndex - this.state.lastFetchedIndex === 50 ||
-        listData.contacts.length <= 50 ||
+        lastFetchedIndex - this.state.lastFetchedIndex === 150 ||
+        listData.contacts.length <= 150 ||
         lastFetchedIndex === listData.contacts.length - 1 ||
         this.state.addedRow ||
         this.props.isSearchOn !== nextProps.isSearchOn
