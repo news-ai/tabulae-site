@@ -314,13 +314,8 @@ class Table extends Component {
 
   _onSaveClick(localData, colHeaders, fieldsmap, dirtyRows) {
     console.log('SAVE CLICKED');
-    if (dirtyRows.length === 0) {
-      this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows);
-    } else {
-      // create publications for later usage
-      Promise.all(this._createPublicationPromises(localData, colHeaders))
-      .then( _ => this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows));
-    }
+    Promise.all(this._createPublicationPromises(localData, colHeaders))
+    .then( _ => this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows));
   }
 
   _onExportClick() {
