@@ -45,6 +45,9 @@ function listReducer(state = initialState.listReducer, action) {
       return obj;
     case listConstant.RECEIVE_MULTIPLE:
       obj = assignToEmpty(state, action.lists);
+      action.ids.map(id => {
+        if (state[id]) obj[id].offset = state[id].offset;
+      });
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.received.map(id => {
         const list = obj[id];

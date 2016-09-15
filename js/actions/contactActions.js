@@ -145,8 +145,10 @@ export function fetchManyContacts(listId, amount) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const contacts = getState().listReducer[listId].contacts;
-    const offset = getState().listReducer[listId].offset;
-    if (offset === null || contacts === null) return;
+    const offset = getState().listReducer[listId].offset || 0;
+    const isReceiving = getState().contactReducer.isReceiving;
+    const listIsReceiving = getState().listReducer.isReceiving;
+    if (offset === null || contacts === null || isReceiving) return;
     dispatch({type: 'FETCH_MANY_CONTACTS', listId});
     const startPage = offset / PAGE_LIMIT;
     const endPage = offset + amount >= contacts.length ? (contacts.length / PAGE_LIMIT) : (offset + amount) / PAGE_LIMIT;
