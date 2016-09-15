@@ -27,7 +27,10 @@ import 'file?name=[name].[ext]!../.htaccess';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {Router, Route, IndexRoute, browserHistory} from 'react-router';
+import Route from 'react-router/lib/Route';
+import IndexRoute from 'react-router/lib/IndexRoute';
+import Router from 'react-router/lib/Router';
+import browserHistory from 'react-router/lib/browserHistory';
 import configureStore from './configureStore';
 
 // Import the pages
@@ -37,7 +40,7 @@ import ListManagerContainer from './components/pages/ListManagerContainer.react'
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
 import SearchBar from './components/Search/SearchBar.react';
-import OnboardingWrapper from './components/pages/OnboardingWrapper.react';
+import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
 import intercomSetup from './chat';
 

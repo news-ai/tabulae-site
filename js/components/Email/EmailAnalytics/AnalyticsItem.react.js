@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import CountViewItem from './CountViewItem.react';
-import {Link} from 'react-router';
+import Link from 'react-router/lib/Link';
 import {
   deepOrange100,
   deepOrange700,

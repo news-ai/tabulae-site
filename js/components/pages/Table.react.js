@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router';
+import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
 import _ from 'lodash';
@@ -43,7 +43,7 @@ const styles = {
     width: '600px'
   },
   loading: {
-    zIndex: 160,
+    zIndex: 200,
     top: 80,
     right: 10,
     position: 'fixed'
