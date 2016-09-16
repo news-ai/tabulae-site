@@ -151,6 +151,7 @@ export function fetchManyContacts(listId, amount) {
     const contactCount = contacts.filter(id => getState().contactReducer[id]).length;
     if (offset === null || isReceiving || contactCount === contacts.length) return;
     dispatch({type: 'FETCH_MANY_CONTACTS', listId});
+    dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
     const startPage = offset / PAGE_LIMIT;
     const endPage = offset + amount >= contacts.length ? (contacts.length / PAGE_LIMIT) : (offset + amount) / PAGE_LIMIT;
     for (let i = startPage; i < endPage; i++) {
