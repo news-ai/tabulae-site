@@ -85,7 +85,7 @@ class Table extends Component {
     super(props);
     // const {listData} = this.props;
     this.state = {
-      name: null,
+      name: null || this.props.name,
       isTitleEditing: false,
       isEmailPanelOpen: false,
       selectedContacts: [],
