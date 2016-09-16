@@ -323,6 +323,10 @@ class Table extends Component {
       alertify.alert('Please save first!')
       return;
     }
+    if (this.props.contacts.length < this.props.listData.contacts.length) {
+      alertify.alert('Must load all contacts first before exporting.')
+      return;
+    }
     const csvString = convertToCsvString(this.state.localData, this.state.colHeaders);
     const csvFile = encodeURI(csvString);
     const link = document.createElement('a');
