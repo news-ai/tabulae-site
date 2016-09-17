@@ -25,12 +25,12 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 const styles = {
   nameBlock: {
     parent: {
-      marginTop: '40px',
+      marginTop: 40,
     },
     title: {
-      marginLeft: '5px',
-      marginRight: '5px',
-      width: '500px',
+      marginLeft: 5,
+      marginRight: 5,
+      width: 500,
       fontSize: '1.2em'
     }
   },
@@ -39,8 +39,8 @@ const styles = {
     bottom: 0,
     right: 0,
     zIndex: 100,
-    height: '500px',
-    width: '600px'
+    height: 500,
+    width: 600
   },
   loading: {
     zIndex: 200,

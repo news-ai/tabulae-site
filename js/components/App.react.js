@@ -48,22 +48,7 @@ class App extends Component {
       this.setState({isLogin: true});
     }
   }
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.isLogin !== this.props.isLogin && this.props.person) {
-      const person = this.props.person;
-      // window.intercomSettings = {
-      //   app_id: 'ur8dbk9e',
-      //   email: person.email,
-      //   user_id: person.id,
-      // };
-      // intercomSetup({
-      //   app_id: 'ur8dbk9e',
-      //   email: person.email,
-      //   user_id: person.id,
-      // });
-    }
-  }
-
+  
   render() {
     const props = this.props;
     const state = this.state;
