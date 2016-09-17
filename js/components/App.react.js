@@ -38,11 +38,13 @@ class App extends Component {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
       if (nextProps.firstTimeUser) this.props.setFirstTimeUser();
       const person = nextProps.person;
-      window.Intercom('update', {
-        email: person.email,
-        user_id: person.id,
-        name: `${person.firstname} ${person.lastname}`
-      });
+      if (window.Intercom) {
+        window.Intercom('update', {
+          email: person.email,
+          user_id: person.id,
+          name: `${person.firstname} ${person.lastname}`
+        });
+      }
       this.setState({isLogin: true});
     }
   }
