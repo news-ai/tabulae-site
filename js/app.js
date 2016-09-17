@@ -34,7 +34,7 @@ import browserHistory from 'react-router/lib/browserHistory';
 import configureStore from './configureStore';
 
 // Import the pages
-import NotFound from './components/pages/NotFound.react';
+import NotFound from './components/NotFound';
 import App from './components/App.react';
 import ListManagerContainer from './components/pages/ListManagerContainer.react';
 import ArchiveContainer from './components/pages/ArchiveContainer.react';

@@ -85,7 +85,7 @@ class Table extends Component {
     super(props);
     // const {listData} = this.props;
     this.state = {
-      name: null,
+      name: null || this.props.name,
       isTitleEditing: false,
       isEmailPanelOpen: false,
       selectedContacts: [],
@@ -97,7 +97,6 @@ class Table extends Component {
       isSearchOn: false,
       searchContacts: [],
       errorText: null,
-      localData: null,
       colHeaders: null
     }
     this.onMenuTouchTap = e => {
@@ -121,6 +120,7 @@ class Table extends Component {
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onExportClick = this._onExportClick.bind(this);
+    this.exportOperations = this._exportOperations.bind(this);
   }
 
   componentWillMount() {
@@ -249,7 +249,7 @@ class Table extends Component {
     const state = this.state;
     let addContactList = [];
     let patchContactList = [];
-    this.setState({localData, colHeaders});
+    this.setState({colHeaders});
 
     localData.map( row => {
       let field = this._handleNormalField(colHeaders, row);
@@ -318,21 +318,31 @@ class Table extends Component {
     .then( _ => this._saveOperations(localData, colHeaders, fieldsmap, dirtyRows));
   }
 
-  _onExportClick() {
-    if (this.state.isDirty || this.state.localData === null) {
-      alertify.alert('Please save first!')
-      return;
-    }
-    if (this.props.contacts.length < this.props.listData.contacts.length) {
-      alertify.alert('Must load all contacts first before exporting.')
-      return;
-    }
-    const csvString = convertToCsvString(this.state.localData, this.state.colHeaders);
+  _exportOperations() {
+    const csvString = convertToCsvString(this.props.contacts, this.state.colHeaders);
     const csvFile = encodeURI(csvString);
     const link = document.createElement('a');
     link.setAttribute('href', csvFile);
     link.setAttribute('download', this.state.name);
     link.click();
+
+  }
+
+  _onExportClick() {
+    if (this.state.isDirty) {
+      alertify.alert('Please save first!')
+      return;
+    }
+    if (this.props.contacts.length < this.props.listData.contacts.length) {
+      this.props.fetchAllContacts(this.props.listId)
+      .then(_ => {
+        console.log('DONE');
+        this.exportOperations();
+      });
+    } else {
+      this.exportOperations();
+    }
+  
   }
 
   render() {
