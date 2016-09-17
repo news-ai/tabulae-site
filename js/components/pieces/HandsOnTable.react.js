@@ -6,7 +6,7 @@ import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import { COLUMNS } from 'constants/ColumnConfigs';
 import validator from 'validator';
-import { outdatedRenderer } from 'constants/CustomRenderers';
+import { outdatedRenderer, hightlightRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
 import { fromJS, List } from 'immutable';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -77,6 +77,8 @@ class HandsOnTable extends Component {
         columns: _.cloneDeep(COLUMNS),
         cells: (row, col, prop) => {
           const cellProperties = {};
+          // default to highlightable renderer when selected
+          cellProperties.renderer = hightlightRenderer;
           if (this.state.options.data[row]) {
             if (this.state.options.data[row].isoutdated) {
               // apply different colored renderer for outdated contacts
