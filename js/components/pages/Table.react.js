@@ -27,12 +27,6 @@ const styles = {
     parent: {
       marginTop: 40,
     },
-    title: {
-      marginLeft: 5,
-      marginRight: 5,
-      width: 500,
-      fontSize: '1.2em'
-    }
   },
   emailPanel: {
     position: 'fixed',
@@ -40,7 +34,7 @@ const styles = {
     right: 0,
     zIndex: 100,
     height: 500,
-    width: 600
+    width: 600,
   },
   loading: {
     zIndex: 200,
@@ -375,7 +369,7 @@ class Table extends Component {
               />
             </div>
             
-            <div className='small-12 large-6 columns' style={{display: 'flex', alignItems: 'center'}}>
+            <div className='small-12 large-6 columns noprint' style={{display: 'flex', alignItems: 'center'}}>
               <TextField
                 hintText='Search...'
                 value={this.state.searchValue}
@@ -386,7 +380,7 @@ class Table extends Component {
               <RaisedButton style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/lists/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
               <RaisedButton style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
-            <div className='hide-for-small-only medium-1 medium-offset-10 large-1 large-offset-11 columns'>
+            <div className='hide-for-small-only medium-1 medium-offset-10 large-1 large-offset-11 columns noprint'>
               <div style={{position: 'fixed', top: 100, zIndex: 190}}>
                 <RaisedButton
                 className='menubutton'

@@ -386,7 +386,7 @@ class HandsOnTable extends Component {
     const props = this.props;
     return (
       <div key={props.listData.id}>
-        <div className='row'>
+        <div className='row noprint'>
           <div className='hide-for-small-only medium-1 medium-offset-8 large-offset-10 large-1 columns'>
             <div style={{position: 'fixed', top: 100, zIndex: 200}}>
               <RaisedButton
@@ -402,7 +402,7 @@ class HandsOnTable extends Component {
           </div>
         </div>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
-        <div ref='data-grid' className='handsontable' id={props.listData.id}></div>
+        <div ref='data-grid' className='handsontable print' id={props.listData.id}></div>
       </div>
       );
   }
