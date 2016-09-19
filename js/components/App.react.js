@@ -97,6 +97,7 @@ class App extends Component {
                 <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
               </div>
               <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
+                <IconButton tooltip='How-to Videos' iconClassName='fa fa-question-circle-o' />
                 <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
               </div>
               </div>

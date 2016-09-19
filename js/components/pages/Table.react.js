@@ -420,6 +420,7 @@ class Table extends Component {
           <div style={{marginTop: '30px'}}>
             <HandsOnTable
             {...props}
+            saveHeaders={colHeaders => this.setState({colHeaders})}
             isSearchOn={state.isSearchOn}
             lastSavedAt={state.lastSavedAt}
             listId={props.listId}
