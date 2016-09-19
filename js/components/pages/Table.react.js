@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
+import Popout from 'react-popout';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
@@ -18,6 +19,7 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
+import HandsOnTableStatic from '../pieces/HandsOnTableStatic.react';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -402,6 +404,7 @@ class Table extends Component {
                   <MenuItem primaryText='Import from File' onClick={_ => this.refs.input.show()} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
                   <MenuItem primaryText='Load All Contacts' onClick={_ => props.fetchAllContacts(props.listId)} />
+                  <MenuItem primaryText='Print' onClick={_ => props.router.push(`/lists/${props.listId}/static`)} />
                 </Menu>
               </Popover>
             </div>
@@ -417,6 +420,7 @@ class Table extends Component {
             onClose={this.toggleEmailPanel}
             /> : null
           }
+
           <div style={{marginTop: '30px'}}>
             <HandsOnTable
             {...props}

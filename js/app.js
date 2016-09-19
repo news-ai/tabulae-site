@@ -42,6 +42,8 @@ import Table from './components/pages/Table.react';
 import SearchBar from './components/Search/SearchBar.react';
 import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
+import HandsOnTableStatic from './components/pieces/HandsOnTableStatic.react';
+
 import intercomSetup from './chat';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -78,6 +80,7 @@ ReactDOM.render(
               <Route path='lists' name='List Manager' component={ListManagerContainer}>
             </Route>
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
+            <Route path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTableStatic} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />

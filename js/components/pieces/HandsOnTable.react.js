@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import alertify from 'alertifyjs';
@@ -253,7 +252,7 @@ class HandsOnTable extends Component {
 
   componentDidMount() {
     const options = this.state.options;
-    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), options);
+    this.table = new Handsontable(this.refs['data-grid'], options);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -272,7 +271,7 @@ class HandsOnTable extends Component {
 
   _remountTable() {
     const options = this.state.options;
-    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), options);
+    this.table = new Handsontable(this.refs['data-grid'], options);
   }
 
   _loadTable(contacts, listData, lastFetchedIndex, isSearchOn) {
