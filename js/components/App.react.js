@@ -9,6 +9,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/Dialog';
 import {grey700, grey600} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
@@ -36,9 +37,11 @@ class App extends Component {
     super(props);
     this.state = {
       isLogin: false,
-      isDrawerOpen: false
+      isDrawerOpen: false,
+      isModalOpen: false
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
+    this.toggleModal = _ => this.setState({isModalOpen: !this.state.isModalOpen});
   }
 
   componentWillMount() {
@@ -96,7 +99,7 @@ class App extends Component {
                 </div>
               </div>
               <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-                <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} />
+                <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
                 <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
               </div>
               <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
@@ -104,6 +107,15 @@ class App extends Component {
               </div>
               </div>
             <div style={{height: '60px'}}></div>
+            <Dialog
+            title='How-to Videos'
+            modal={false}
+            open={state.isModalOpen}
+            onRequestClose={this.toggleModal}
+            autoScrollBodyContent
+            >
+              The actions in this window were passed in as an array of React objects.
+            </Dialog>
             {props.children}
           </div> :
         <Login />
