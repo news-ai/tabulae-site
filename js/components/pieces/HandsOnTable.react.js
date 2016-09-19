@@ -326,17 +326,20 @@ class HandsOnTable extends Component {
 
   _removeColumn(listId, columns, colProp) {
     const { fieldsmap } = this.state;
+    const props = this.props;
     const columnValue = columns.find(column => column.data === colProp).data;
+    console.log(fieldsmap);
+    console.log(columnValue);
     if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield )) {
       this.table.runHooks('persistentStateReset');
       // const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
-      this.props.patchList({
+      props.patchList({
         listId: listId,
         fieldsmap: newFieldsmap
       }).then(_ => {
         this.table.destroy();
-        this._loadTable();
+        this._loadTable(props.contacts, props.listData, props.lastFetchedIndex, props.isSearchOn);
       });
     } else {
       alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
