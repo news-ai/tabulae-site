@@ -51,11 +51,11 @@ class App extends Component {
       if (nextProps.firstTimeUser) this.props.setFirstTimeUser();
       const person = nextProps.person;
       if (window.Intercom) {
-        window.Intercom('update', {
-          email: person.email,
-          user_id: person.id,
-          name: `${person.firstname} ${person.lastname}`
-        });
+        // window.Intercom('update', {
+        //   email: person.email,
+        //   user_id: person.id,
+        //   name: `${person.firstname} ${person.lastname}`
+        // });
       }
       this.setState({isLogin: true});
     }

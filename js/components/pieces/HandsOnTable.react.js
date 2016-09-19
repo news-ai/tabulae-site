@@ -15,6 +15,7 @@ import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const MIN_ROWS = 20;
+const BATCH_CONTACT_SIZE = 200;
 alertify.defaults.glossary.title = '';
 
 class HandsOnTable extends Component {
@@ -56,7 +57,7 @@ class HandsOnTable extends Component {
     this.state = {
       addedRow: false,
       update: false,
-      lazyLoadingThreshold: 50,
+      lazyLoadingThreshold: 100,
       lastFetchedIndex: -1,
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
@@ -125,7 +126,7 @@ class HandsOnTable extends Component {
         afterScrollVertically: e => {
           const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
           if (_.isEmpty(listData.contacts)) return;
-          if (listData.contacts.length < 150) return;
+          if (listData.contacts.length < BATCH_CONTACT_SIZE) return;
           if (lastFetchedIndex === listData.contacts.length - 1) return;
           const rowCount = this.table.countRows();
           const rowOffset = this.table.rowOffset();
@@ -134,6 +135,8 @@ class HandsOnTable extends Component {
           const lastVisibleRow = rowOffset + visibleRows + (visibleRows / 2);
           const threshold = this.state.lazyLoadingThreshold;
 
+          console.log(lastVisibleRow);
+          console.log(lastFetchedIndex - threshold);
           if (lastVisibleRow > (lastFetchedIndex - threshold)) {
             if (!contactIsReceiving) fetchContacts(listId);
           }
@@ -297,8 +300,8 @@ class HandsOnTable extends Component {
 
       // load every 50 contacts to avoid slow UI
       if (
-        lastFetchedIndex - this.state.lastFetchedIndex === 150 ||
-        listData.contacts.length <= 150 ||
+        lastFetchedIndex - this.state.lastFetchedIndex === BATCH_CONTACT_SIZE ||
+        listData.contacts.length <= BATCH_CONTACT_SIZE ||
         lastFetchedIndex === listData.contacts.length - 1 ||
         this.state.addedRow ||
         this.props.isSearchOn !== isSearchOn
