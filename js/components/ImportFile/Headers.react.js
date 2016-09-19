@@ -11,7 +11,7 @@ const defaultSelectableOptions = [
   {value: 'firstname', label: 'First Name', selected: false},
   {value: 'lastname', label: 'Last Name', selected: false},
   {value: 'email', label: 'Email', selected: false},
-  {value: 'employers', label: 'Employer(s)'},
+  {value: 'employers', label: 'Employer/Publication'},
   {value: 'pastemployers', label: 'Past Employer(s)', selected: false},
   {value: 'linkedin', label: 'LinkedIn', selected: false},
   {value: 'twitter', label: 'Twitter', selected: false},

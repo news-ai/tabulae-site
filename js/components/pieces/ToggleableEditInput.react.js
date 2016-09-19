@@ -24,7 +24,7 @@ const styles = {
 function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, name}) {
   const renderNode = isTitleEditing ? (
     <TextField
-    className='u-full-width'
+    className='u-full-width noprint'
     type='text'
     name={name}
     onBlur={onToggleTitleEdit}
@@ -34,10 +34,11 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
     />) : (
     <div className='u-full-width' onClick={onToggleTitleEdit}>
       <span
+      className='print'
       style={[styles.nameBlock.title]}
       >{name}</span>
       <i
-      className='fa fa-pencil-square-o'
+      className='fa fa-pencil-square-o noprint'
       style={[styles.icon]}
       aria-hidden='true'></i>
     </div>

@@ -120,7 +120,7 @@ class DropFile extends Component {
           onDrop={this._onDrop}
           multiple={false}
           >
-            <div>Try dropping an Excel (xlsx, xls, csv) file here, or click to select file to upload.</div>
+            <div>Try dropping an Excel (xlsx) file here, or click to select file to upload.</div>
           </Dropzone>);
       }
     }
