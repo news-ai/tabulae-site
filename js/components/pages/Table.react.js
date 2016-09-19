@@ -7,7 +7,6 @@ import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
 
-import Popout from 'react-popout';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
