@@ -26,6 +26,7 @@ class HandsOnTable extends Component {
     this._cleanUpURL = this._cleanUpURL.bind(this);
     this._onSaveClick = this._onSaveClick.bind(this);
     this.loadTable = this._loadTable.bind(this);
+    this.remountTable = this._remountTable.bind(this);
     if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
       COLUMNS.push({
         data: 'publication_name_1',
@@ -268,6 +269,11 @@ class HandsOnTable extends Component {
     this.table.destroy();
   }
 
+  _remountTable() {
+    const options = this.state.options;
+    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), options);
+  }
+
   _loadTable(contacts, listData, lastFetchedIndex, isSearchOn) {
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
@@ -328,9 +334,7 @@ class HandsOnTable extends Component {
     const { fieldsmap } = this.state;
     const props = this.props;
     const columnValue = columns.find(column => column.data === colProp).data;
-    console.log(fieldsmap);
-    console.log(columnValue);
-    if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield )) {
+    if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
       this.table.runHooks('persistentStateReset');
       // const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
@@ -339,7 +343,7 @@ class HandsOnTable extends Component {
         fieldsmap: newFieldsmap
       }).then(_ => {
         this.table.destroy();
-        this._loadTable(props.contacts, props.listData, props.lastFetchedIndex, props.isSearchOn);
+        this.remountTable();
       });
     } else {
       alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
@@ -367,6 +371,7 @@ class HandsOnTable extends Component {
         listId: listData.id,
         fieldsmap: newFieldsmap
       }));
+      this.setState({fieldsmap: newFieldsmap});
     }
     this.setState({newColumnName: ''});
   }
