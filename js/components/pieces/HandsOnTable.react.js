@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import alertify from 'alertifyjs';
@@ -41,7 +40,7 @@ class HandsOnTable extends Component {
         strict: false
       });
     }
-    if (!COLUMNS.some( col => col.data === 'publication_name_2')) {
+    if (!COLUMNS.some(col => col.data === 'publication_name_2')) {
       COLUMNS.push({
         data: 'publication_name_2',
         type: 'autocomplete',
@@ -135,8 +134,6 @@ class HandsOnTable extends Component {
           const lastVisibleRow = rowOffset + visibleRows + (visibleRows / 2);
           const threshold = this.state.lazyLoadingThreshold;
 
-          console.log(lastVisibleRow);
-          console.log(lastFetchedIndex - threshold);
           if (lastVisibleRow > (lastFetchedIndex - threshold)) {
             if (!contactIsReceiving) fetchContacts(listId);
           }
@@ -255,7 +252,7 @@ class HandsOnTable extends Component {
 
   componentDidMount() {
     const options = this.state.options;
-    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), options);
+    this.table = new Handsontable(this.refs['data-grid'], options);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -274,7 +271,7 @@ class HandsOnTable extends Component {
 
   _remountTable() {
     const options = this.state.options;
-    this.table = new Handsontable(ReactDOM.findDOMNode(this.refs['data-grid']), options);
+    this.table = new Handsontable(this.refs['data-grid'], options);
   }
 
   _loadTable(contacts, listData, lastFetchedIndex, isSearchOn) {
@@ -289,6 +286,8 @@ class HandsOnTable extends Component {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({data: fieldObj.value, title: fieldObj.name});
         });
         options.columns = columns;
+        this.setState({immutableFieldmap});
+        this.props.saveHeaders(columns); // to pass up to Table to consume
         if (this.table) this.table.updateSettings(options);
       }
 
@@ -413,7 +412,7 @@ class HandsOnTable extends Component {
           </div>
         </div>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
-        <div ref='data-grid' className='handsontable print' id={props.listData.id}></div>
+        <div ref='data-grid' id={props.listData.id}></div>
       </div>
       );
   }

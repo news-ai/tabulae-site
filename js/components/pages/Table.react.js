@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
+import Popout from 'react-popout';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
@@ -18,6 +19,7 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
+import HandsOnTableStatic from '../pieces/HandsOnTableStatic.react';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -115,6 +117,7 @@ class Table extends Component {
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onExportClick = this._onExportClick.bind(this);
     this.exportOperations = this._exportOperations.bind(this);
+    this.onPrintClick = this._onPrintClick.bind(this);
   }
 
   componentWillMount() {
@@ -339,6 +342,15 @@ class Table extends Component {
   
   }
 
+  _onPrintClick() {
+    if (this.props.contacts.length < this.props.listData.contacts.length) {
+      this.props.fetchAllContacts(this.props.listId)
+      .then(_ => this.props.router.push(`/lists/${this.props.listId}/static`));
+    } else {
+      this.props.router.push(`/lists/${this.props.listId}/static`)
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -402,6 +414,7 @@ class Table extends Component {
                   <MenuItem primaryText='Import from File' onClick={_ => this.refs.input.show()} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
                   <MenuItem primaryText='Load All Contacts' onClick={_ => props.fetchAllContacts(props.listId)} />
+                  <MenuItem primaryText='Print' onClick={this.onPrintClick} />
                 </Menu>
               </Popover>
             </div>
@@ -417,9 +430,11 @@ class Table extends Component {
             onClose={this.toggleEmailPanel}
             /> : null
           }
+
           <div style={{marginTop: '30px'}}>
             <HandsOnTable
             {...props}
+            saveHeaders={colHeaders => this.setState({colHeaders})}
             isSearchOn={state.isSearchOn}
             lastSavedAt={state.lastSavedAt}
             listId={props.listId}
