@@ -71,7 +71,6 @@ class App extends Component {
         {props.isLogin ?
           <div>
             <Drawer
-            containerClassName='noprint'
             docked={false}
             open={state.isDrawerOpen}
             onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
@@ -81,11 +80,11 @@ class App extends Component {
             </Drawer>
            <div className='u-full-width row' style={navStyle}>
               <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
-                <IconButton className='noprint' iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars' />
-                <span className='noprint' style={{color: 'gray', float: 'right'}}>You are at: </span>
+                <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
+                <span style={{color: 'gray', float: 'right'}}>You are at: </span>
               </div>
               <div className='hide-for-small-only medium-4 large-5 columns'>
-                <div className='noprint' style={{marginTop: '13px'}}>
+                <div style={{marginTop: '13px'}}>
                   <Breadcrumbs
                   routes={props.routes}
                   params={props.params}
@@ -94,10 +93,10 @@ class App extends Component {
                 </div>
               </div>
               <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-                <span className='noprint' style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
+                <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
               </div>
-              <div className='small-4 medium-2 large-2 columns noprint' style={verticalCenter}>
-                <RaisedButton className='noprint' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
+              <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
+                <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
               </div>
               </div>
             <div style={{height: '60px'}}></div>

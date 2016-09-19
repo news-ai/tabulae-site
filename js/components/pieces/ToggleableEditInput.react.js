@@ -34,6 +34,7 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
     />) : (
     <div className='u-full-width' onClick={onToggleTitleEdit}>
       <span
+      className='print'
       style={[styles.nameBlock.title]}
       >{name}</span>
       <i

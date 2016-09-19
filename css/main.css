@@ -40,13 +40,15 @@
   @import 'components/*.css';
 
   html, body {
-    height: 99%;
-    page-break-after: avoid;
-    page-break-before: avoid;
+    visibility: hidden;
   }
 
-  .noprint {
-    display: none
+  .print {
+    visibility: visible;
+  }
+  
+  .noprint, .noprint *{
+    display: none !important;
   }
 
 }
