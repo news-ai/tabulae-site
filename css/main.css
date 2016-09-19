@@ -39,14 +39,11 @@
   /* 5. Components */
   @import 'components/*.css';
 
-  html, body {
-    visibility: hidden;
-  }
 
   .print {
     visibility: visible;
   }
-  
+
   .noprint, .noprint *{
     display: none !important;
   }

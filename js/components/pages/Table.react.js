@@ -7,6 +7,7 @@ import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
 
+import Popout from 'react-popout';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
@@ -91,7 +92,7 @@ class Table extends Component {
       isSearchOn: false,
       searchContacts: [],
       errorText: null,
-      colHeaders: null
+      colHeaders: null,
     }
     this.onMenuTouchTap = e => {
       e.preventDefault();
@@ -368,7 +369,7 @@ class Table extends Component {
               isTitleEditing={state.isTitleEditing}
               />
             </div>
-            <div className='small-12 large-6 columns' style={{display: 'flex', alignItems: 'center'}}>
+            <div className='small-12 large-6 columns noprint' style={{display: 'flex', alignItems: 'center'}}>
               <TextField
               hintText='Search...'
               value={this.state.searchValue}
@@ -376,10 +377,10 @@ class Table extends Component {
               onKeyDown={e => e.keyCode === 13 ? props.router.push(`/lists/${props.listId}?search=${state.searchValue}`) : null}
               errorText={state.errorText}
               />
-              <RaisedButton style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/lists/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-              <RaisedButton style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/lists/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
             </div>
-            <div className='hide-for-small-only medium-1 medium-offset-10 large-1 large-offset-11 columns'>
+            <div className='hide-for-small-only medium-1 medium-offset-10 large-1 large-offset-11 columns noprint'>
               <div style={{position: 'fixed', top: 100, zIndex: 190}}>
                 <RaisedButton
                 className='menubutton'
@@ -406,6 +407,7 @@ class Table extends Component {
               </Popover>
             </div>
           </div>
+         
           {
             state.isEmailPanelOpen ? 
             <EmailPanel

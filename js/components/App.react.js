@@ -71,6 +71,7 @@ class App extends Component {
         {props.isLogin ?
           <div>
             <Drawer
+            ontainerClassName='noprint'
             docked={false}
             open={state.isDrawerOpen}
             onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
@@ -78,7 +79,7 @@ class App extends Component {
               <MenuItem onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
               <MenuItem onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
             </Drawer>
-           <div className='u-full-width row' style={navStyle}>
+           <div className='u-full-width row noprint' style={navStyle}>
               <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
                 <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
                 <span style={{color: 'gray', float: 'right'}}>You are at: </span>
