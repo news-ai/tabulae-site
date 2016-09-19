@@ -108,7 +108,9 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
+            {
+            //<IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
+            }
             <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
           </div>
           <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
