@@ -34,7 +34,7 @@ const navStyle = {
 
 const noNavBarLocations = ['static'];
 function matchNoNavBar(pathname) {
-  const pathblocks = pathname.split();
+  const pathblocks = pathname.split('/');
   return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length -1 ]);
 }
 
@@ -71,10 +71,10 @@ class App extends Component {
       }
       this.setState({isLogin: true});
     }
-    if (matchNoNavBar(nextProps.location)) {
+    if (matchNoNavBar(nextProps.location.pathname) && nextProps.isLogin) {
       this.setState({showNavBar: false});
     } else {
-      this.setState({showNavBar: true})
+      this.setState({showNavBar: true});
     }
   }
 
@@ -82,7 +82,7 @@ class App extends Component {
     const props = this.props;
     const state = this.state;
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
-    const NavBar = (
+    const NavBar = (state.showNavBar && props.person) ? (
       <div>
         <Drawer
         ontainerClassName='noprint'
@@ -126,13 +126,13 @@ class App extends Component {
           The actions in this window were passed in as an array of React objects.
         </Dialog>
       </div>
-      );
+      ) : null;
     return (
       <div style={{width: '100%', height: '100%'}}>
         <StyleRoot>
         {props.isLogin ?
           <div>
-          {state.showNavBar ? {NavBar} : null}
+          {state.showNavBar ? NavBar : null}
           {props.children}
           </div> :
         <Login />

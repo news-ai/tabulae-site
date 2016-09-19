@@ -57,13 +57,8 @@ class HandsOnTableStatic extends Component {
 
   componentDidMount() {
     this.table = new Handsontable(this.refs.dataGridStatic, this.state.options);
-    console.log(this.props.router);
-    console.log(this.props);
-  }
-
-  componentWillReceiveProps() {
-    console.log(this.props.router);
-    console.log(this.props);
+    window.print();
+    this.props.router.goBack();
   }
 
   render() {
