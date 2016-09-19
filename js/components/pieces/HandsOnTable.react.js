@@ -412,7 +412,7 @@ class HandsOnTable extends Component {
           </div>
         </div>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
-        <div ref='data-grid' className='handsontable print' id={props.listData.id}></div>
+        <div ref='data-grid' id={props.listData.id}></div>
       </div>
       );
   }

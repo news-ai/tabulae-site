@@ -117,6 +117,7 @@ class Table extends Component {
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onExportClick = this._onExportClick.bind(this);
     this.exportOperations = this._exportOperations.bind(this);
+    this.onPrintClick = this._onPrintClick.bind(this);
   }
 
   componentWillMount() {
@@ -341,6 +342,15 @@ class Table extends Component {
   
   }
 
+  _onPrintClick() {
+    if (this.props.contacts.length < this.props.listData.contacts.length) {
+      this.props.fetchAllContacts(this.props.listId)
+      .then(_ => this.props.router.push(`/lists/${this.props.listId}/static`));
+    } else {
+      this.props.router.push(`/lists/${this.props.listId}/static`)
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -404,7 +414,7 @@ class Table extends Component {
                   <MenuItem primaryText='Import from File' onClick={_ => this.refs.input.show()} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
                   <MenuItem primaryText='Load All Contacts' onClick={_ => props.fetchAllContacts(props.listId)} />
-                  <MenuItem primaryText='Print' onClick={_ => props.router.push(`/lists/${props.listId}/static`)} />
+                  <MenuItem primaryText='Print' onClick={this.onPrintClick} />
                 </Menu>
               </Popover>
             </div>

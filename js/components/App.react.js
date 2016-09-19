@@ -32,13 +32,20 @@ const navStyle = {
   zIndex: 300
 };
 
+const noNavBarLocations = ['static'];
+function matchNoNavBar(pathname) {
+  const pathblocks = pathname.split();
+  return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length -1 ]);
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLogin: false,
       isDrawerOpen: false,
-      isModalOpen: false
+      isModalOpen: false,
+      showNavBar: true
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.toggleModal = _ => this.setState({isModalOpen: !this.state.isModalOpen});
@@ -64,59 +71,69 @@ class App extends Component {
       }
       this.setState({isLogin: true});
     }
+    if (matchNoNavBar(nextProps.location)) {
+      this.setState({showNavBar: false});
+    } else {
+      this.setState({showNavBar: true})
+    }
   }
 
   render() {
     const props = this.props;
     const state = this.state;
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
+    const NavBar = (
+      <div>
+        <Drawer
+        ontainerClassName='noprint'
+        docked={false}
+        open={state.isDrawerOpen}
+        onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
+          <MenuItem onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
+          <MenuItem onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
+          <MenuItem onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
+        </Drawer>
+       <div className='u-full-width row noprint' style={navStyle}>
+          <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
+            <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
+            <span style={{color: 'gray', float: 'right'}}>You are at: </span>
+          </div>
+          <div className='hide-for-small-only medium-4 large-5 columns'>
+            <div style={{marginTop: '13px'}}>
+              <Breadcrumbs
+              routes={props.routes}
+              params={props.params}
+              separator=' > '
+              />
+            </div>
+          </div>
+          <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
+            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
+            <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
+          </div>
+          <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
+            <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
+          </div>
+          </div>
+        <div style={{height: '60px'}}></div>
+        <Dialog
+        title='How-to Videos'
+        modal={false}
+        open={state.isModalOpen}
+        onRequestClose={this.toggleModal}
+        autoScrollBodyContent
+        >
+          The actions in this window were passed in as an array of React objects.
+        </Dialog>
+      </div>
+      );
     return (
       <div style={{width: '100%', height: '100%'}}>
         <StyleRoot>
         {props.isLogin ?
           <div>
-            <Drawer
-            ontainerClassName='noprint'
-            docked={false}
-            open={state.isDrawerOpen}
-            onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
-              <MenuItem onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
-              <MenuItem onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
-              <MenuItem onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
-            </Drawer>
-           <div className='u-full-width row noprint' style={navStyle}>
-              <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
-                <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
-                <span style={{color: 'gray', float: 'right'}}>You are at: </span>
-              </div>
-              <div className='hide-for-small-only medium-4 large-5 columns'>
-                <div style={{marginTop: '13px'}}>
-                  <Breadcrumbs
-                  routes={props.routes}
-                  params={props.params}
-                  separator=' > '
-                  />
-                </div>
-              </div>
-              <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-                <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
-                <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
-              </div>
-              <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
-                <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
-              </div>
-              </div>
-            <div style={{height: '60px'}}></div>
-            <Dialog
-            title='How-to Videos'
-            modal={false}
-            open={state.isModalOpen}
-            onRequestClose={this.toggleModal}
-            autoScrollBodyContent
-            >
-              The actions in this window were passed in as an array of React objects.
-            </Dialog>
-            {props.children}
+          {state.showNavBar ? {NavBar} : null}
+          {props.children}
           </div> :
         <Login />
         }

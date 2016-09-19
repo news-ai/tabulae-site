@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {outdatedRenderer, hightlightRenderer} from 'constants/CustomRenderers';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import {COLUMNS} from 'constants/ColumnConfigs';
+import withRouter from 'react-router/lib/withRouter';
 
 if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
   COLUMNS.push({
@@ -56,10 +57,20 @@ class HandsOnTableStatic extends Component {
 
   componentDidMount() {
     this.table = new Handsontable(this.refs.dataGridStatic, this.state.options);
+    console.log(this.props.router);
+    console.log(this.props);
+  }
+
+  componentWillReceiveProps() {
+    console.log(this.props.router);
+    console.log(this.props);
   }
 
   render() {
-    return <div ref='dataGridStatic'></div>;
+    return (<div className='print'>
+      <h4 style={{margin: 20}}>{this.props.name}</h4>
+      <div ref='dataGridStatic'></div>
+      </div>);
   }
 }
 
@@ -81,7 +92,8 @@ const mapStateToProps = (state, props) => {
   return {
     id: listId,
     data: contacts,
-    fieldsmap: listData.fieldsmap
+    fieldsmap: listData.fieldsmap,
+    name: listData.name
   };
 };
 
@@ -93,4 +105,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(HandsOnTableStatic);
+  )(withRouter(HandsOnTableStatic));

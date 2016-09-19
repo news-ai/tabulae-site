@@ -80,7 +80,7 @@ ReactDOM.render(
               <Route path='lists' name='List Manager' component={ListManagerContainer}>
             </Route>
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
-            <Route path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTableStatic} />
+            <Route key='static' path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTableStatic} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
