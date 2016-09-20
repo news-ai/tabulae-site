@@ -196,8 +196,7 @@ class EmailPanel extends Component {
     alertify.prompt('', 'Name of new Email Template', '',
       (e, name) => this.props.createTemplate(name, state.subject, state.body)
         .then(currentTemplateId => this.setState({currentTemplateId})),
-      _ => alertify.error('Something went wrong.')
-      );
+      _ => console.log('template saving cancelled'));
   }
 
   render() {
