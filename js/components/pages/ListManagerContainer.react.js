@@ -53,7 +53,8 @@ const mapStateToProps = state => {
     listItemIcon: 'fa fa-archive',
     backRoute: '/archive',
     backRouteTitle: 'Archive',
-    title: 'Media Lists'
+    title: 'Media Lists',
+    tooltip: 'archive',
   };
 };
 

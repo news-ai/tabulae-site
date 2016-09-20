@@ -11,7 +11,7 @@ const loading = {
   position: 'fixed'
 };
 
-function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle}) {
+function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle, tooltip}) {
   return (
     <div>
       <Waiting isReceiving={isReceiving} style={loading} />
@@ -33,6 +33,7 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
           onToggle={onToggle}
           iconName={listItemIcon}
           key={i}
+          tooltip={tooltip}
           />)
         }
       </div>
@@ -47,7 +48,8 @@ Lists.PropTypes = {
   onToggle: PropTypes.func.isRequired,
   listItemIcon: PropTypes.string.isRequired,
   backRoute: PropTypes.string.isRequired,
-  backRouteTitle: PropTypes.string.isRequired
+  backRouteTitle: PropTypes.string.isRequired,
+  tooltip: PropTypes.string
 };
 
 export default Lists;
