@@ -46,20 +46,22 @@ class ListManagerContainer extends Component {
 
         <div className='row'>
           <div className='large-offset-1 large-10 columns'>
-            <RaisedButton
-            style={{float: 'right', marginTop: '20px'}}
-            label='Add New List'
-            onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
-            labelStyle={{textTransform: 'none'}}
-            icon={<i className='fa fa-plus' aria-hidden='true' />}
-            />
-            <RaisedButton
-            style={{float: 'right', marginTop: '20px'}}
-            label='Upload from Existing'
-            onClick={_ => this.onUploadExistingClick(this.props.untitledNum)}
-            labelStyle={{textTransform: 'none'}}
-            icon={<i className='fa fa-plus' aria-hidden='true' />}
-            />
+            <div style={{marginTop: 10}}>
+              <RaisedButton
+              style={{float: 'right', margin: 10}}
+              label='Add New List'
+              onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
+              labelStyle={{textTransform: 'none'}}
+              icon={<i className='fa fa-plus' aria-hidden='true' />}
+              />
+              <RaisedButton
+              style={{float: 'right', margin: 10}}
+              label='Upload from Existing'
+              onClick={_ => this.onUploadExistingClick(this.props.untitledNum)}
+              labelStyle={{textTransform: 'none'}}
+              icon={<i className='fa fa-plus' aria-hidden='true' />}
+              />
+            </div>
             <Lists {...this.props} />
           </div>
         </div>
