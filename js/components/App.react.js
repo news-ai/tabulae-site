@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
-import FAQ from './pieces/FAQ.react';
+import FAQ from './FAQ';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
