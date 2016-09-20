@@ -122,10 +122,7 @@ export function createEmptyList(untitledNum) {
     };
     dispatch({type: 'LIST_CREATE_EMPTY'});
     return api.post(`/lists`, listBody)
-    .then(response => {
-      // dispatch(receiveList(response.data));
-      browserHistory.push(`/lists/${response.data.id}`);
-    })
+    .then(response => response)
     .catch(message => console.log(message));
   };
 }
