@@ -1,9 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import * as actionCreators from 'actions/AppActions';
-import { connect } from 'react-redux';
+import browserHistory from 'react-router/lib/browserHistory';
+import {connect} from 'react-redux';
+import {skylightStyles} from 'constants/StyleConstants';
+import SkyLight from 'react-skylight';
 import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
 import InfiniteScroll from '../InfiniteScroll';
+import DropFileWrapper from './DropFileWrapper.react';
+
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -17,15 +22,32 @@ class ListManagerContainer extends Component {
   render() {
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
+        <SkyLight
+        ref='input'
+        overlayStyles={skylightStyles.overlay}
+        dialogStyles={skylightStyles.dialog}
+        hideOnOverlayClicked
+        title='File Drop'>
+          <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
+        </SkyLight>
         <div className='row'>
           <div className='large-offset-1 large-10 columns'>
-            <RaisedButton
-            style={{float: 'right', marginTop: '20px'}}
-            label='Add New List'
-            onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
-            labelStyle={{textTransform: 'none'}}
-            icon={<i className='fa fa-plus' aria-hidden='true' />}
-            />
+            <div style={{marginTop: 10}}>
+              <RaisedButton
+              style={{float: 'right', margin: 10}}
+              label='Add New List'
+              onClick={_ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`)}
+              labelStyle={{textTransform: 'none'}}
+              icon={<i className='fa fa-plus' aria-hidden='true' />}
+              />
+              <RaisedButton
+              style={{float: 'right', margin: 10}}
+              label='Upload from Existing'
+              onClick={_ => this.refs.input.show()}
+              labelStyle={{textTransform: 'none'}}
+              icon={<i className='fa fa-plus' aria-hidden='true' />}
+              />
+            </div>
             <Lists {...this.props} />
           </div>
         </div>
@@ -63,7 +85,10 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    newListOnClick: untitledNum => dispatch(actionCreators.createEmptyList(untitledNum)),
+    newListOnClick: untitledNum => {
+      dispatch(actionCreators.createEmptyList(untitledNum))
+      .then(response => browserHistory.push(`/lists/${response.data.id}`));
+    },
     fetchLists: _ => dispatch(actionCreators.fetchLists())
   };
 };

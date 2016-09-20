@@ -114,18 +114,15 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   };
 }
 
-export function createEmptyList(untitledNum) {
+export function createEmptyList(name) {
   return dispatch => {
     const listBody = {
-      name: `untitled-${untitledNum}`,
+      name,
       contacts: []
     };
     dispatch({type: 'LIST_CREATE_EMPTY'});
     return api.post(`/lists`, listBody)
-    .then(response => {
-      // dispatch(receiveList(response.data));
-      browserHistory.push(`/lists/${response.data.id}`);
-    })
+    .then(response => response)
     .catch(message => console.log(message));
   };
 }
