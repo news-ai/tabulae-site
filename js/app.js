@@ -57,6 +57,9 @@ const store = configureStore();
 
 window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.com/api` : `https://tabulae.newsai.org/api`;
 
+
+// third-party services setups
+if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install()
 intercomSetup({app_id: 'ur8dbk9e'});
 
 

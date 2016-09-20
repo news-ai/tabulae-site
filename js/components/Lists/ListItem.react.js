@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 import Link from 'react-router/lib/Link';
-import { globalStyles } from 'constants/StyleConstants';
 import Radium from 'radium';
 import {listPropTypes} from 'constants/CommonPropTypes';
-import {grey50} from 'material-ui/styles/colors';
+import {grey50, grey700} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 
 const styles = {
   parent: {
@@ -17,17 +17,18 @@ const styles = {
       backgroundColor: grey50
     }
   },
-  icon: {
-    color: 'lightgray',
-    float: 'left',
-    ':hover': {
-      color: 'gray',
-      cursor: 'pointer'
-    }
-  }
+  smallIcon: {
+    fontSize: 16,
+    color: grey700
+  },
+  small: {
+    width: 36,
+    height: 36,
+    padding: 2,
+  },
 };
 
-function ListItem({list, onToggle, iconName}) {
+function ListItem({list, onToggle, iconName, tooltip}) {
   const updatedDate = new Date(list.updated);
   return (
     <div key='parent' className='row align-middle' style={[styles.parent]}>
@@ -38,13 +39,14 @@ function ListItem({list, onToggle, iconName}) {
         <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
       </div>
       <div className='hide-for-small-only medium-1 large-1 columns'>
-        <i
-        alt='archive'
-        title='archive'
-        className={iconName}
-        style={[globalStyles.icon]}
-        onClick={ _ => onToggle(list.id) }
-        aria-hidden='true'></i>
+        <IconButton
+        tooltip={tooltip}
+        iconStyle={styles.smallIcon}
+        style={styles.small}
+        iconClassName={iconName}
+        onClick={_ => onToggle(list.id)}
+        tooltipPosition='top-left'
+        />
       </div>
     </div>
     );
@@ -55,7 +57,8 @@ ListItem.PropTypes = {
   list: listPropTypes.isRequired,
   key: PropTypes.number,
   onToggle: PropTypes.func.isRequired,
-  iconName: PropTypes.string.isRequired
+  iconName: PropTypes.string.isRequired,
+  tooltip: PropTypes.string
 };
 
 export default Radium(ListItem);
