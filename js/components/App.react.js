@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
+import FAQ from './pieces/FAQ.react';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
@@ -108,9 +109,7 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-            {
-            //<IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
-            }
+            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
             <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
           </div>
           <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
@@ -125,7 +124,7 @@ class App extends Component {
         onRequestClose={this.toggleModal}
         autoScrollBodyContent
         >
-          The actions in this window were passed in as an array of React objects.
+          <FAQ />
         </Dialog>
       </div>
       ) : null;
