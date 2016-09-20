@@ -144,12 +144,22 @@ class HandsOnTable extends Component {
               const index = options.start.row;
               props.addContacts([{}])
               .then(contacts => {
-                const newListContacts = props.listData.contacts;
-                newListContacts.splice(index, 0, contacts[0].id);
+                const listContacts = props.listData.contacts;
+                let newContacts;
+               
+                if (index === 0) {
+                  newContacts = [contacts[0].id, ...listContacts];
+                } else {
+                  newContacts = [
+                    ...listContacts.slice(0, index),
+                    contacts[0].id,
+                    ...listContacts.slice(index, listContacts.length)
+                  ];
+                }
                 this.setState({addedRow: true});
                 props.patchList({
                   listId: props.listData.id,
-                  contacts: newListContacts,
+                  contacts: newContacts,
                   name: props.name,
                   fieldsmap: this.state.fieldsmap
                 });
@@ -160,12 +170,21 @@ class HandsOnTable extends Component {
               const index = options.start.row;
               props.addContacts([{}])
               .then( contacts => {
-                const newListContacts = props.listData.contacts;
-                newListContacts.splice(index + 1, 0, contacts[0].id);
+                const listContacts = props.listData.contacts;
+                let newContacts;
+                if (index === 0) {
+                  newContacts = [listContacts[0], contacts[0].id, ...listContacts.slice(1, listContacts.length)];
+                } else {
+                  newContacts = [
+                    ...listContacts.slice(0, index + 1),
+                    contacts[0].id,
+                    ...listContacts.slice(index + 1, listContacts.length)
+                  ];
+                }
                 this.setState({addedRow: true});
                 props.patchList({
                   listId: props.listId,
-                  contacts: newListContacts,
+                  contacts: newContacts,
                   name: props.name,
                   fieldsmap: this.state.fieldsmap
                 });
