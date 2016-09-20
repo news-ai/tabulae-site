@@ -7,57 +7,43 @@ import SkyLight from 'react-skylight';
 import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
 import InfiniteScroll from '../InfiniteScroll';
-import DropFile from '../ImportFile';
+import DropFileWrapper from './DropFileWrapper.react';
+
 
 class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      listId: null
-    };
-    this.onUploadExistingClick = this._onUploadExistingClick.bind(this);
   }
 
   componentDidMount() {
     this.props.fetchLists();
   }
 
-  _onUploadExistingClick(untitledNum) {
-    this.props.createEmptyList(untitledNum)
-    .then(response => {
-      this.setState({listId: response.data.id});
-      this.refs.input.show();
-    });
-  }
-
   render() {
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
-        {this.state.listId !== null ? <SkyLight
-          ref='input'
-          overlayStyles={skylightStyles.overlay}
-          dialogStyles={skylightStyles.dialog}
-          hideOnOverlayClicked
-          title='File Drop'>
-            <DropFile
-            listId={this.state.listId}
-            />
-        </SkyLight> : null}
-
+        <SkyLight
+        ref='input'
+        overlayStyles={skylightStyles.overlay}
+        dialogStyles={skylightStyles.dialog}
+        hideOnOverlayClicked
+        title='File Drop'>
+          <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
+        </SkyLight>
         <div className='row'>
           <div className='large-offset-1 large-10 columns'>
             <div style={{marginTop: 10}}>
               <RaisedButton
               style={{float: 'right', margin: 10}}
               label='Add New List'
-              onClick={_ => this.props.newListOnClick(this.props.untitledNum)}
+              onClick={_ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`)}
               labelStyle={{textTransform: 'none'}}
               icon={<i className='fa fa-plus' aria-hidden='true' />}
               />
               <RaisedButton
               style={{float: 'right', margin: 10}}
               label='Upload from Existing'
-              onClick={_ => this.onUploadExistingClick(this.props.untitledNum)}
+              onClick={_ => this.refs.input.show()}
               labelStyle={{textTransform: 'none'}}
               icon={<i className='fa fa-plus' aria-hidden='true' />}
               />
@@ -99,7 +85,6 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    createEmptyList: untitledNum => dispatch(actionCreators.createEmptyList(untitledNum)),
     newListOnClick: untitledNum => {
       dispatch(actionCreators.createEmptyList(untitledNum))
       .then(response => browserHistory.push(`/lists/${response.data.id}`));

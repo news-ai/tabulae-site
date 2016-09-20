@@ -114,10 +114,10 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   };
 }
 
-export function createEmptyList(untitledNum) {
+export function createEmptyList(name) {
   return dispatch => {
     const listBody = {
-      name: `untitled-${untitledNum}`,
+      name,
       contacts: []
     };
     dispatch({type: 'LIST_CREATE_EMPTY'});
