@@ -23,9 +23,9 @@ import 'node_modules/handsontable/dist/handsontable.full.min.css';
 class HandsOnTablePatchOnly extends Component {
   constructor(props) {
     super(props);
-    this.props.fieldsmap.map(fieldObj => {
-      if (fieldObj.customfield && !fieldObj.hidden) COLUMNS.push({data: fieldObj.value, title: fieldObj.name});
-    });
+    // this.props.fieldsmap.map(fieldObj => {
+    //   if (fieldObj.customfield && !fieldObj.hidden) COLUMNS.push({data: fieldObj.value, title: fieldObj.name});
+    // });
     this.state = {
       options: {
         data: this.props.data, // instantiate handsontable with empty Array of Array
@@ -61,7 +61,7 @@ class HandsOnTablePatchOnly extends Component {
 
   render() {
     return (<div className='print'>
-      <h4 style={{margin: 20}}>{this.props.name}</h4>
+      <h4 style={{margin: 20}}>Temporary List generated from Search</h4>
       <div ref='dataGridPatch'></div>
       </div>);
   }
@@ -72,21 +72,21 @@ const mapStateToProps = (state, props) => {
   const listData = state.listReducer[listId];
   let contacts = [];
 
-  // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
-  if (listData) {
-    if (!_.isEmpty(listData.contacts)) {
-      listData.contacts.map( (contactId, i) => {
-        if (state.contactReducer[contactId]) {
-          contacts.push(state.contactReducer[contactId]);
-        }
+  const results = state.searchReducer.received.map(id => {
+    const contact = state.searchReducer[id];
+    const list = state.listReducer[contact.listid];
+    if (list) {
+      list.contacts.map((contactId, i) => {
+        if (contactId === contact.id) contact.rowNum = i;
       });
     }
-  }
+    return contact;
+  });
   return {
-    id: listId,
-    data: contacts,
-    fieldsmap: listData.fieldsmap,
-    name: listData.name
+    // id: listId,
+    data: results,
+    // fieldsmap: listData.fieldsmap,
+    // name: listData.name
   };
 };
 

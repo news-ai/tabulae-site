@@ -43,6 +43,7 @@ import SearchBar from './components/Search/SearchBar.react';
 import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
+import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 
 import intercomSetup from './chat';
 
@@ -88,6 +89,7 @@ ReactDOM.render(
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
+            <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

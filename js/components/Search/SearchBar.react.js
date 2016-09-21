@@ -16,7 +16,8 @@ class SearchBar extends Component {
       query: '',
       prevQuery: '',
       isSearchReceived: false,
-      isReceiving: false
+      isReceiving: false,
+      navigate: false
     };
     this.onSearchClick = this._onSearchClick.bind(this);
   }
@@ -48,7 +49,7 @@ class SearchBar extends Component {
   }
 
   componentWillUnmount() {
-    this.props.clearSearchCache();
+    // if (!this.state.navigate) this.props.clearSearchCache();
   }
 
 
@@ -80,7 +81,7 @@ class SearchBar extends Component {
               hintText='Search query here...'
               onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
               onChange={e => this.setState({query: e.target.value})}
-              value={this.state.query}
+              value={state.query}
               />
               <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
@@ -88,7 +89,10 @@ class SearchBar extends Component {
           {props.results.length > 0 ?
           <div className='row' style={{marginTop: 20}}>
             <div className='large-offset-10 medium-offset-10 small-offset-6 columns'>
-              <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' />
+              <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' onClick={_ => {
+                this.setState({navigate: true});
+                props.router.push('/search/table');
+              }} />
             </div>
           </div> : null}
           <div className='row'>
