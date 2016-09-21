@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
-import { COLUMNS } from 'constants/ColumnConfigs';
+import {COLUMNS} from 'constants/ColumnConfigs';
 import validator from 'validator';
 import { outdatedRenderer, hightlightRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
@@ -17,6 +17,8 @@ const MIN_ROWS = 20;
 const BATCH_CONTACT_SIZE = 200;
 alertify.defaults.glossary.title = '';
 
+let defaultColumns = COLUMNS.map(col => col);
+
 class HandsOnTable extends Component {
   constructor(props) {
     super(props);
@@ -27,8 +29,9 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.loadTable = this._loadTable.bind(this);
     this.remountTable = this._remountTable.bind(this);
-    if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
-      COLUMNS.push({
+    if (!defaultColumns.some(col => col.data === 'publication_name_1' && col.type === 'autocomplete')) {
+      defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_1' && col.type !== 'autocomplete'));
+      defaultColumns.push({
         data: 'publication_name_1',
         type: 'autocomplete',
         title: 'Publication 1',
@@ -40,8 +43,9 @@ class HandsOnTable extends Component {
         strict: false
       });
     }
-    if (!COLUMNS.some(col => col.data === 'publication_name_2')) {
-      COLUMNS.push({
+    if (!defaultColumns.some(col => col.data === 'publication_name_2' && col.type === 'autocomplete')) {
+      defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_2' && col.type !== 'autocomplete'));
+      defaultColumns.push({
         data: 'publication_name_2',
         type: 'autocomplete',
         title: 'Publication 2',
@@ -61,12 +65,12 @@ class HandsOnTable extends Component {
       fieldsmap: [],
       immutableFieldmap: fromJS([]),
       dirtyRows: [],
-      preservedColumns: COLUMNS,
+      preservedColumns: defaultColumns,
       options: {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
         sortIndicator: true,
-        minCols: COLUMNS.length,
+        minCols: defaultColumns.length,
         minRows: MIN_ROWS,
         manualColumnMove: true,
         manualRowMove: true,
@@ -75,11 +79,11 @@ class HandsOnTable extends Component {
         persistentState: true,
         minSpareRows: 10,
         observeChanges: true,
-        columns: _.cloneDeep(COLUMNS),
+        columns: _.cloneDeep(defaultColumns),
         cells: (row, col, prop) => {
           const cellProperties = {};
           // default to highlightable renderer when selected
-          cellProperties.renderer = hightlightRenderer;
+          // cellProperties.renderer = hightlightRenderer;
           if (this.state.options.data[row]) {
             if (this.state.options.data[row].isoutdated) {
               // apply different colored renderer for outdated contacts
@@ -146,7 +150,6 @@ class HandsOnTable extends Component {
               .then(contacts => {
                 const listContacts = props.listData.contacts;
                 let newContacts;
-               
                 if (index === 0) {
                   newContacts = [contacts[0].id, ...listContacts];
                 } else {
