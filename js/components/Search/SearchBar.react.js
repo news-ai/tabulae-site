@@ -49,7 +49,7 @@ class SearchBar extends Component {
   }
 
   componentWillUnmount() {
-    // if (!this.state.navigate) this.props.clearSearchCache();
+    if (!this.state.navigate) this.props.clearSearchCache();
   }
 
 
