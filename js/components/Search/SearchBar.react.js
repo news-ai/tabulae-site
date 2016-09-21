@@ -72,8 +72,8 @@ class SearchBar extends Component {
           <div className='row' style={{
             display: 'flex',
             justifyContent: 'center',
-            marginTop: '15px',
-            marginBottom: '15px'
+            marginTop: 15,
+            marginBottom: 15
           }}>
             <div>
              <TextField
@@ -82,9 +82,15 @@ class SearchBar extends Component {
               onChange={e => this.setState({query: e.target.value})}
               value={this.state.query}
               />
-              <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
           </div>
+          {props.results.length > 0 ?
+          <div className='row' style={{marginTop: 20}}>
+            <div className='large-offset-10 medium-offset-10 small-offset-6 columns'>
+              <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' />
+            </div>
+          </div> : null}
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: '25px'}}>
@@ -97,7 +103,7 @@ class SearchBar extends Component {
             <p>Scroll to load more</p>
             </div> : null}
           </div>
-          </div>
+        </div>
       </InfiniteScroll>
       );
   }
@@ -115,6 +121,7 @@ const mapStateToProps = (state, props) => {
     }
     return contact;
   });
+  console.log(results);
   return {
     isReceiving: state.searchReducer.isReceiving,
     results: results,

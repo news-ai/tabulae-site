@@ -20,7 +20,7 @@ if (!COLUMNS.some(col => col.data === 'publication_name_2')) {
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 
-class HandsOnTableStatic extends Component {
+class HandsOnTablePatchOnly extends Component {
   constructor(props) {
     super(props);
     this.props.fieldsmap.map(fieldObj => {
@@ -56,15 +56,13 @@ class HandsOnTableStatic extends Component {
   }
 
   componentDidMount() {
-    this.table = new Handsontable(this.refs.dataGridStatic, this.state.options);
-    window.print();
-    this.props.router.goBack();
+    this.table = new Handsontable(this.refs.dataGridPatch, this.state.options);
   }
 
   render() {
     return (<div className='print'>
       <h4 style={{margin: 20}}>{this.props.name}</h4>
-      <div ref='dataGridStatic'></div>
+      <div ref='dataGridPatch'></div>
       </div>);
   }
 }
@@ -100,4 +98,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(withRouter(HandsOnTableStatic));
+  )(withRouter(HandsOnTablePatchOnly));
