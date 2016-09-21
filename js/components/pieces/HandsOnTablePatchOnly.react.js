@@ -5,6 +5,12 @@ import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import {COLUMNS} from 'constants/ColumnConfigs';
 import withRouter from 'react-router/lib/withRouter';
 
+if (!COLUMNS.some( col => col.data === 'listname')) {
+  COLUMNS.push({
+    data: 'listname',
+    title: 'List Name',
+  });
+}
 if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
   COLUMNS.push({
     data: 'publication_name_1',
@@ -77,7 +83,10 @@ const mapStateToProps = (state, props) => {
     const list = state.listReducer[contact.listid];
     if (list) {
       list.contacts.map((contactId, i) => {
-        if (contactId === contact.id) contact.rowNum = i;
+        if (contactId === contact.id) {
+          contact.rowNum = i;
+          contact.listname = list.name;
+        }
       });
     }
     return contact;

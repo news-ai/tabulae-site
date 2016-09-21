@@ -34,6 +34,10 @@ class SearchBar extends Component {
   }
 
   componentDidMount() {
+    this.props.router.setRouteLeaveHook(this.props.route, nextLocation => {
+      if (nextLocation.pathname !== '/search/table') this.props.clearSearchCache();
+      // don't clear cache if heading to temp list
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -46,10 +50,6 @@ class SearchBar extends Component {
         query: ''
       }));
     }
-  }
-
-  componentWillUnmount() {
-    if (!this.state.navigate) this.props.clearSearchCache();
   }
 
 
@@ -125,7 +125,6 @@ const mapStateToProps = (state, props) => {
     }
     return contact;
   });
-  console.log(results);
   return {
     isReceiving: state.searchReducer.isReceiving,
     results: results,
