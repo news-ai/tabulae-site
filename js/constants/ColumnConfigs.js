@@ -58,7 +58,6 @@ export const COLUMNS = [
   // {
   //   data: 'id',
   //   title: 'ID',
-  //   pass: true
   // },
   // {
   //   data: 'parent',

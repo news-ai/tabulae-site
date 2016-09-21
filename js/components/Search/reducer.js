@@ -21,7 +21,7 @@ function searchReducer(state = initialState.searchReducer, action) {
     case searchConstant.RECEIVE_MULTIPLE:
       obj = assignToEmpty(state, action.contacts);
       obj.isReceiving = false;
-      obj.received = [...state.received, ...action.ids];
+      obj.received = [...state.received, ...action.ids.filter(id => !state.received.some(id))];
       obj.query = action.query;
       return obj;
     case searchConstant.REQUEST_MULTIPLE_FAIL:
