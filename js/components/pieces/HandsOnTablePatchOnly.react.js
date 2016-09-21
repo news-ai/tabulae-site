@@ -8,41 +8,41 @@ import * as actionCreators from 'actions/AppActions';
 import * as actions from '../Search/actions';
 import RaisedButton from 'material-ui/RaisedButton';
 
-
-let defaultColumns = COLUMNS.map(col => col);
-
-if (!defaultColumns.some(col => col.data === 'listname')) {
-  defaultColumns.push({
-    data: 'listname',
-    title: 'List Name',
-  });
-}
+// take out selected
+let defaultColumns = [{
+  data: 'listname',
+  title: 'List Name'
+}, ...COLUMNS.filter(col => col.data !== 'selected')];
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 
 class HandsOnTablePatchOnly extends Component {
   constructor(props) {
     super(props);
-    if (!defaultColumns.some( col => col.data === 'publication_name_1')) {
+    if (!defaultColumns.some(col => col.data === 'publication_name_1' && col.type === 'autocomplete')) {
+      defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_1' && col.type !== 'autocomplete'));
       defaultColumns.push({
         data: 'publication_name_1',
         type: 'autocomplete',
         title: 'Publication 1',
         source: (query, callback) => {
-          this.props.searchPublications(query)
+          props.searchPublications(query)
           .then(publicationNameArray => callback(publicationNameArray));
+          // callback([]);
         },
         strict: false
       });
     }
-    if (!defaultColumns.some(col => col.data === 'publication_name_2')) {
+    if (!defaultColumns.some(col => col.data === 'publication_name_2' && col.type === 'autocomplete')) {
+      defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_2' && col.type !== 'autocomplete'));
       defaultColumns.push({
         data: 'publication_name_2',
         type: 'autocomplete',
         title: 'Publication 2',
         source: (query, callback) => {
-          this.props.searchPublications(query)
+          props.searchPublications(query)
           .then(publicationNameArray => callback(publicationNameArray));
+          // callback([]);
         },
         strict: false
       });
@@ -61,7 +61,6 @@ class HandsOnTablePatchOnly extends Component {
         manualRowMove: true,
         manualColumnResize: true,
         manualRowResize: true,
-        persistentState: true,
         minSpareRows: 10,
         columns: defaultColumns,
         renderAllRows: true,
