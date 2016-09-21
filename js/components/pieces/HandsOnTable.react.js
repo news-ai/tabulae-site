@@ -355,10 +355,10 @@ class HandsOnTable extends Component {
   }
 
   _removeColumn(listId, columns, colProp) {
-    const { fieldsmap } = this.state;
+    const {fieldsmap} = this.state;
     const props = this.props;
     const columnValue = columns.find(column => column.data === colProp).data;
-    if (fieldsmap.some( fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
+    if (fieldsmap.some(fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
       this.table.runHooks('persistentStateReset');
       // const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
