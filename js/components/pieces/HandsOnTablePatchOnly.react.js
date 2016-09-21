@@ -4,23 +4,12 @@ import {outdatedRenderer, hightlightRenderer} from 'constants/CustomRenderers';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import {COLUMNS} from 'constants/ColumnConfigs';
 import withRouter from 'react-router/lib/withRouter';
+import * as actionCreators from 'actions/AppActions';
 
-if (!COLUMNS.some( col => col.data === 'listname')) {
+if (!COLUMNS.some(col => col.data === 'listname')) {
   COLUMNS.push({
     data: 'listname',
     title: 'List Name',
-  });
-}
-if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
-  COLUMNS.push({
-    data: 'publication_name_1',
-    title: 'Publication 1',
-  });
-}
-if (!COLUMNS.some(col => col.data === 'publication_name_2')) {
-  COLUMNS.push({
-    data: 'publication_name_2',
-    title: 'Publication 2',
   });
 }
 
@@ -32,6 +21,30 @@ class HandsOnTablePatchOnly extends Component {
     // this.props.fieldsmap.map(fieldObj => {
     //   if (fieldObj.customfield && !fieldObj.hidden) COLUMNS.push({data: fieldObj.value, title: fieldObj.name});
     // });
+    if (!COLUMNS.some( col => col.data === 'publication_name_1')) {
+      COLUMNS.push({
+        data: 'publication_name_1',
+        type: 'autocomplete',
+        title: 'Publication 1',
+        source: (query, callback) => {
+          this.props.searchPublications(query)
+          .then(publicationNameArray => callback(publicationNameArray));
+        },
+        strict: false
+      });
+    }
+    if (!COLUMNS.some(col => col.data === 'publication_name_2')) {
+      COLUMNS.push({
+        data: 'publication_name_2',
+        type: 'autocomplete',
+        title: 'Publication 2',
+        source: (query, callback) => {
+          this.props.searchPublications(query)
+          .then(publicationNameArray => callback(publicationNameArray));
+        },
+        strict: false
+      });
+    }
     this.state = {
       options: {
         data: this.props.data, // instantiate handsontable with empty Array of Array
@@ -65,10 +78,16 @@ class HandsOnTablePatchOnly extends Component {
     this.table = new Handsontable(this.refs.dataGridPatch, this.state.options);
   }
 
+  componentWillUnmount() {
+    this.props.clearSearchCache();
+  }
+
   render() {
+    const props = this.props;
     return (<div className='print'>
-      <h4 style={{margin: 20}}>Temporary List generated from Search</h4>
-      <div ref='dataGridPatch'></div>
+      <h4 style={{margin: 20}}>Temporary List generated from Search: "{props.query}"</h4>
+      <p>You can edit the contacts from your search results, but add/delete are disabled from this Table.</p>
+      <div id={props.tableId} ref='dataGridPatch'></div>
       </div>);
   }
 }
@@ -93,6 +112,8 @@ const mapStateToProps = (state, props) => {
   });
   return {
     // id: listId,
+    tableId: state.searchReducer.query,
+    query: state.searchReducer.query,
     data: results,
     // fieldsmap: listData.fieldsmap,
     // name: listData.name
@@ -100,7 +121,10 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  return {};
+  return {
+    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
+    clearSearchCache: _ => dispatch(actions.clearSearchCache()),
+  };
 };
 // pass in fieldsmap and contacts
 

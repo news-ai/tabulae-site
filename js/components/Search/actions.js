@@ -25,6 +25,7 @@ export function fetchSearch(query) {
     return api.get(`/contacts?q="${query}"&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const listOnly = response.included.filter(item => item.type === 'lists');
+      console.log(response.included);
       response.included = listOnly;
       const res = normalize(response, {
         data: arrayOf(contactSchema),
