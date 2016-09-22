@@ -11,7 +11,7 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
-import {grey700, grey600} from 'material-ui/styles/colors';
+import {grey700, grey500} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
@@ -36,7 +36,7 @@ const navStyle = {
 const noNavBarLocations = ['static'];
 function matchNoNavBar(pathname) {
   const pathblocks = pathname.split('/');
-  return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length -1 ]);
+  return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length - 1 ]);
 }
 
 class App extends Component {
@@ -109,7 +109,7 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
+            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey500}} onClick={this.toggleModal} />
             <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
           </div>
           <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>

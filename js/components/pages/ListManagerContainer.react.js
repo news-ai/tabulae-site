@@ -8,6 +8,7 @@ import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
 import InfiniteScroll from '../InfiniteScroll';
 import DropFileWrapper from './DropFileWrapper.react';
+import {grey500} from 'material-ui/styles/colors';
 
 
 class ListManagerContainer extends Component {
@@ -38,14 +39,14 @@ class ListManagerContainer extends Component {
               label='Add New List'
               onClick={_ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`)}
               labelStyle={{textTransform: 'none'}}
-              icon={<i className='fa fa-plus' aria-hidden='true' />}
+              icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
               />
               <RaisedButton
               style={{float: 'right', margin: 10}}
               label='Upload from Existing'
               onClick={_ => this.refs.input.show()}
               labelStyle={{textTransform: 'none'}}
-              icon={<i className='fa fa-plus' aria-hidden='true' />}
+              icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
               />
             </div>
             <Lists {...this.props} />
