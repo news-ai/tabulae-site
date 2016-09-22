@@ -188,7 +188,8 @@ class HandsOnTablePatchOnly extends Component {
           </div>
         </div>
         <h4 style={{margin: 20}}>Temporary List generated from Search: "{props.query}"</h4>
-        <p style={{marginLeft: 15}}>You can edit the contacts from your search results, but add/delete are disabled from this Table.</p>
+        <span style={{marginLeft: 15}}>You can edit the contacts from your search results, but add/delete are disabled from this Table.</span>
+        <p style={{marginLeft: 15}}>You can only add a custom column field if the custom column exists in the list the contact belongs in.</p>
         <div id={props.tableId} ref='dataGridPatch'></div>
       </div>
       );
