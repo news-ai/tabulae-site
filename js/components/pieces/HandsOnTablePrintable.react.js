@@ -20,7 +20,7 @@ if (!COLUMNS.some(col => col.data === 'publication_name_2')) {
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 
-class HandsOnTableStatic extends Component {
+class HandsOnTablePrintable extends Component {
   constructor(props) {
     super(props);
     this.props.fieldsmap.map(fieldObj => {
@@ -100,4 +100,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(withRouter(HandsOnTableStatic));
+  )(withRouter(HandsOnTablePrintable));

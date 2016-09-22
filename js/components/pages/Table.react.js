@@ -19,7 +19,7 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
 import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
-import HandsOnTableStatic from '../pieces/HandsOnTableStatic.react';
+import HandsOnTablePrintable from '../pieces/HandsOnTablePrintable.react';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -212,11 +212,6 @@ class Table extends Component {
         field.employers = employers;
       }
     });
-    if (!_.isEmpty(row.employerString)) {
-      const employerNames = row.employerString.split(',');
-      const employers = employerNames.map( eName => pubMapByName[eName] );
-      field.employers = employers;
-    }
     if (row.id) field.id = row.id;
     return field;
   }

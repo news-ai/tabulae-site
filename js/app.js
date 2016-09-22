@@ -42,7 +42,8 @@ import Table from './components/pages/Table.react';
 import SearchBar from './components/Search/SearchBar.react';
 import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
-import HandsOnTableStatic from './components/pieces/HandsOnTableStatic.react';
+import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
+import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 
 import intercomSetup from './chat';
 
@@ -83,11 +84,12 @@ ReactDOM.render(
               <Route path='lists' name='List Manager' component={ListManagerContainer}>
             </Route>
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
-            <Route key='static' path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTableStatic} />
+            <Route key='static' path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
+            <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

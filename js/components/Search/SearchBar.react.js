@@ -16,7 +16,8 @@ class SearchBar extends Component {
       query: '',
       prevQuery: '',
       isSearchReceived: false,
-      isReceiving: false
+      isReceiving: false,
+      navigate: false
     };
     this.onSearchClick = this._onSearchClick.bind(this);
   }
@@ -33,6 +34,10 @@ class SearchBar extends Component {
   }
 
   componentDidMount() {
+    this.props.router.setRouteLeaveHook(this.props.route, nextLocation => {
+      if (nextLocation.pathname !== '/search/table') this.props.clearSearchCache();
+      // don't clear cache if heading to temp list
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -45,10 +50,6 @@ class SearchBar extends Component {
         query: ''
       }));
     }
-  }
-
-  componentWillUnmount() {
-    this.props.clearSearchCache();
   }
 
 
@@ -72,19 +73,28 @@ class SearchBar extends Component {
           <div className='row' style={{
             display: 'flex',
             justifyContent: 'center',
-            marginTop: '15px',
-            marginBottom: '15px'
+            marginTop: 15,
+            marginBottom: 15
           }}>
             <div>
              <TextField
               hintText='Search query here...'
               onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
               onChange={e => this.setState({query: e.target.value})}
-              value={this.state.query}
+              value={state.query}
               />
-              <RaisedButton style={{marginLeft: '10px'}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
+              <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
           </div>
+          {props.results.length > 0 ?
+          <div className='row' style={{marginTop: 20}}>
+            <div className='large-offset-10 medium-offset-10 small-offset-6 columns'>
+              <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' onClick={_ => {
+                this.setState({navigate: true});
+                props.router.push('/search/table');
+              }} />
+            </div>
+          </div> : null}
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: '25px'}}>
@@ -97,7 +107,7 @@ class SearchBar extends Component {
             <p>Scroll to load more</p>
             </div> : null}
           </div>
-          </div>
+        </div>
       </InfiniteScroll>
       );
   }
