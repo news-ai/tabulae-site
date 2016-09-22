@@ -410,11 +410,11 @@ class HandsOnTable extends Component {
     const { onSaveClick } = this.props;
     const { fieldsmap, dirtyRows } = this.state;
     onSaveClick(localData, columns, fieldsmap, dirtyRows);
-    this.setState({ dirtyRows: [] });
+    this.setState({dirtyRows: []});
   }
 
   render() {
-    const { options } = this.state;
+    const {options} = this.state;
     const props = this.props;
     return (
       <div key={props.listData.id}>

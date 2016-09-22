@@ -212,11 +212,6 @@ class Table extends Component {
         field.employers = employers;
       }
     });
-    if (!_.isEmpty(row.employerString)) {
-      const employerNames = row.employerString.split(',');
-      const employers = employerNames.map( eName => pubMapByName[eName] );
-      field.employers = employers;
-    }
     if (row.id) field.id = row.id;
     return field;
   }

@@ -28,7 +28,6 @@ class HandsOnTablePatchOnly extends Component {
         source: (query, callback) => {
           props.searchPublications(query)
           .then(publicationNameArray => callback(publicationNameArray));
-          // callback([]);
         },
         strict: false
       });
@@ -42,7 +41,6 @@ class HandsOnTablePatchOnly extends Component {
         source: (query, callback) => {
           props.searchPublications(query)
           .then(publicationNameArray => callback(publicationNameArray));
-          // callback([]);
         },
         strict: false
       });
@@ -53,11 +51,13 @@ class HandsOnTablePatchOnly extends Component {
       }
     });
     this.state = {
+      dirtyRows: [],
       options: {
-        data: this.props.data, // instantiate handsontable with empty Array of Array
+        data: this.props.data,
         rowHeaders: true,
+        colHeaders: true,
         sortIndicator: true,
-        manualColumnMove: true,
+        manualColumnMove: false,
         manualRowMove: true,
         manualColumnResize: true,
         manualRowResize: true,
@@ -76,8 +76,23 @@ class HandsOnTablePatchOnly extends Component {
           }
           return cellProperties;
         },
+        beforeChange: (changes, source) => {
+          const data = this.state.options.data;
+          let dirtyRows = this.state.dirtyRows;
+          changes.map(change => {
+            const rowId = change[0];
+            const contact = data[rowId];
+            if (!dirtyRows.some(rId => rId === contact.id)) {
+              dirtyRows.push(contact.id);
+            }
+          });
+          this.setState({dirtyRows});
+        },
       }
     };
+    this.onSaveClick = this._onSaveClick.bind(this);
+    this.createPublicationPromises = this._createPublicationPromises.bind(this);
+    this.handleNormalField = this._handleNormalField.bind(this);
   }
 
   componentDidMount() {
@@ -85,7 +100,69 @@ class HandsOnTablePatchOnly extends Component {
   }
 
   componentWillUnmount() {
+    this.table.destroy();
     this.props.clearSearchCache();
+  }
+
+  _handleNormalField(row) {
+    const props = this.props;
+    const list = props.listReducer[row.listid];
+    let field = {};
+    let customfields = [];
+    list.fieldsmap.map(fieldObj => {
+      if (fieldObj.customfield) {
+        customfields.push({
+          name: fieldObj.value,
+          value: row[fieldObj.value]
+        });
+      } else {
+        field[fieldObj.value] = row[fieldObj.value];
+      }
+    });
+    if (customfields.length > 0) field.customfields = customfields;
+    let employers = [];
+    if (row['publication_name_1']) employers.push(props.publicationReducer[row['publication_name_1']]);
+    if (row['publication_name_2']) employers.push(props.publicationReducer[row['publication_name_2']]);
+    field.employers = employers;
+    field.id = row.id;
+    return field;
+  }
+
+  _onSaveClick() {
+    const dirtyRows = this.state.dirtyRows;
+    if (dirtyRows.length > 0) {
+      const data = this.state.options.data;
+      let patchContactList = [];
+      Promise.all(this._createPublicationPromises(data))
+      .then(_ => {
+        dirtyRows.map(rowId => {
+          const row = data.find(row => row.id === rowId);
+          const contact = this.handleNormalField(row);
+          patchContactList.push(contact);
+        });
+        this.props.patchContacts(patchContactList);
+      });
+    }
+  }
+
+  _createPublicationPromises(localData) {
+    const props = this.props;
+    let promises = [];
+    localData.map(row => {
+      if (row['publication_name_1']) {
+        const pubName1 = row['publication_name_1'];
+        if (!props.publicationReducer[pubName1]) {
+          promises.push(props.createPublication({name: pubName1}));
+        }
+      }
+      if (row['publication_name_2']) {
+        const pubName2 = row['publication_name_2'];
+        if (!props.publicationReducer[pubName2]) {
+          promises.push(props.createPublication({name: pubName2}));
+        }
+      }
+    });
+    return promises;
   }
 
   render() {
@@ -100,15 +177,18 @@ class HandsOnTablePatchOnly extends Component {
               primary
               label='Save'
               labelStyle={{textTransform: 'none'}}
+              onClick={this.onSaveClick}
               />
             </div>
-            <div style={{position: 'fixed', top: 150, zIndex: 180}}>
+            {
+            /*<div style={{position: 'fixed', top: 150, zIndex: 180}}>
               <p style={{fontSize: '0.8em', zIndex: 150}}>{props.lastSavedAt}</p>
-            </div>
+            </div>*/
+            }
           </div>
         </div>
         <h4 style={{margin: 20}}>Temporary List generated from Search: "{props.query}"</h4>
-        <p>You can edit the contacts from your search results, but add/delete are disabled from this Table.</p>
+        <p style={{marginLeft: 15}}>You can edit the contacts from your search results, but add/delete are disabled from this Table.</p>
         <div id={props.tableId} ref='dataGridPatch'></div>
       </div>
       );
@@ -143,7 +223,9 @@ const mapStateToProps = (state, props) => {
     tableId: state.searchReducer.query,
     query: state.searchReducer.query,
     data: results,
-    fieldsmap: accumFieldsmap
+    fieldsmap: accumFieldsmap,
+    publicationReducer: state.publicationReducer,
+    listReducer: state.listReducer
     // name: listData.name
   };
 };
@@ -152,6 +234,8 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     clearSearchCache: _ => dispatch(actions.clearSearchCache()),
+    patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
+    createPublication: name => dispatch(actionCreators.createPublication(name)),
   };
 };
 // pass in fieldsmap and contacts
