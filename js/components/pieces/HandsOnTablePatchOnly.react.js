@@ -46,7 +46,7 @@ class HandsOnTablePatchOnly extends Component {
       });
     }
     this.props.fieldsmap.map(fieldObj => {
-      if (fieldObj.customfield && !fieldObj.hidden) {
+      if (fieldObj.customfield && !fieldObj.hidden && !defaultColumns.some(col => col.data === fieldObj.value)) {
         defaultColumns.push({data: fieldObj.value, title: fieldObj.name});
       }
     });
