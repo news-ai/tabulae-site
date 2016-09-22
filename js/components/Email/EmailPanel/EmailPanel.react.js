@@ -265,7 +265,7 @@ class EmailPanel extends Component {
                   >
                     <MenuItem
                     disabled={state.currentTemplateId ? false : true}
-                    onClick={_ => this.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
+                    onClick={_ => props.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
                     primaryText='Save Text to Existing Template' />
                     <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
                     <MenuItem
