@@ -39,7 +39,7 @@ import App from './components/App.react';
 import ListManagerContainer from './components/pages/ListManagerContainer.react';
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
-import SearchBar from './components/Search/SearchBar.react';
+import SearchBar from './components/Search';
 import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
