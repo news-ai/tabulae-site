@@ -223,7 +223,7 @@ class EmailPanel extends Component {
       <div style={styles.emailPanelOuterPosition}>
         <div style={styles.emailPanelPosition}>
           <div>
-          {state.minimized ? <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1} /> : null}
+          {state.minimized && <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1} />}
           </div>
           <Paper style={emailPanelWrapper} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>

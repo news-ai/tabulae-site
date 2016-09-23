@@ -99,7 +99,7 @@ class BasicHtmlEditor extends React.Component {
       const raw = convertToRaw(editorState.getCurrentContent());
       // let html = stateToHTML(content, null, injectCssToTags);
       let html = draftRawToHtml(raw);
-      console.log(html);
+      // console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);

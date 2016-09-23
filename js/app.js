@@ -91,7 +91,7 @@ ReactDOM.render(
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
-            <Route path='contacts/:contactId' name='Profile' component={ContactProfile} />
+            <Route path='contacts/:listId/:contactId' name='Profile' component={ContactProfile} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

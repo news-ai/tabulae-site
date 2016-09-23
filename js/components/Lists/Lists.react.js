@@ -25,7 +25,7 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
         marginBottom: '50px',
         marginTop: '50px'
       }}>
-       {lists.length === 0 ? <span>{statementIfEmpty}</span> : null}
+       {lists.length === 0 && <span>{statementIfEmpty}</span>}
         {
           lists.map( (list, i) =>
           <ListItem

@@ -83,7 +83,7 @@ class App extends Component {
     const props = this.props;
     const state = this.state;
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
-    const NavBar = (state.showNavBar && props.person) ? (
+    const NavBar = (state.showNavBar && props.person) && (
       <div>
         <Drawer
         ontainerClassName='noprint'
@@ -127,13 +127,13 @@ class App extends Component {
           <FAQ />
         </Dialog>
       </div>
-      ) : null;
+      );
     return (
       <div style={{width: '100%', height: '100%'}}>
         <StyleRoot>
         {props.isLogin ?
           <div>
-          {state.showNavBar ? NavBar : null}
+          {state.showNavBar && NavBar}
           {props.children}
           </div> :
         <Login />

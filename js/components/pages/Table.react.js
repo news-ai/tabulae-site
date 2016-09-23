@@ -354,7 +354,7 @@ class Table extends Component {
       <div>
       <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
       {
-        props.listData ?
+        props.listData &&
         <div>
           <SkyLight
             ref='input'
@@ -415,16 +415,14 @@ class Table extends Component {
             </div>
           </div>
          
-          {
-            state.isEmailPanelOpen ? 
+          {state.isEmailPanelOpen &&
             <EmailPanel
             person={props.person}
             selectedContacts={state.selectedContacts}
             fieldsmap={props.listData.fieldsmap}
             listId={props.listId}
             onClose={this.toggleEmailPanel}
-            /> : null
-          }
+            />}
 
           <div style={{marginTop: '30px'}}>
             <HandsOnTable
@@ -442,8 +440,7 @@ class Table extends Component {
             isDirty={this.isDirty}
             />
           </div>
-        </div> : null
-      }
+        </div>}
       </div>
       );
   }
