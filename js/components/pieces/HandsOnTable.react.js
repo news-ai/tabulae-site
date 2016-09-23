@@ -19,12 +19,11 @@ const BATCH_CONTACT_SIZE = 200;
 alertify.defaults.glossary.title = '';
 let defaultColumns = [{
   data: 'button',
-  title: 'Go to Contact',
+  title: 'Profile',
   readOnly: true,
   renderer: function(instance, td, row, col, prop, value, cellProperties) {
     // browserHistory.push(instance.getDataAtRowProp(row, 'listid'), instance.getDataAtRowProp(row, 'id'));
-    td.innerHTML = `<a href='${instance.getDataAtRowProp(row, 'listid')}/${instance.getDataAtRowProp(row, 'id')}'>Goto</a>`;
-
+    if (instance.getDataAtRowProp(row, 'id')) td.innerHTML = `<a href='${instance.getDataAtRowProp(row, 'listid')}/${instance.getDataAtRowProp(row, 'id')}'>Goto</a>`;
     // Handsontable.renderers.TextRenderer.apply(this, arguments);
   }
 }, ...COLUMNS.map(col => col)];

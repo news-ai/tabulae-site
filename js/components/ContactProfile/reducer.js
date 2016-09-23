@@ -18,7 +18,7 @@ function feedReducer(state = initialState.searchReducer, action) {
       return obj;
     case feedConstant.ADD_RECEIVED:
       obj.isReceiving = false;
-      return obj
+      return obj;
     default:
       return state;
   }

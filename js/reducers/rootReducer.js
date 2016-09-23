@@ -12,6 +12,8 @@ import publicationReducer from './publicationReducer';
 import fileReducer from '../components/ImportFile/reducer';
 import templateReducer from '../components/Email/Template/reducer';
 import searchReducer from '../components/Search/reducer';
+import feedReducer from '../components/ContactProfile/reducer';
+
 
 const rootReducer = combineReducers({
   personReducer,
@@ -21,7 +23,8 @@ const rootReducer = combineReducers({
   publicationReducer,
   fileReducer,
   templateReducer,
-  searchReducer
+  searchReducer,
+  feedReducer
 });
 
 export default rootReducer;

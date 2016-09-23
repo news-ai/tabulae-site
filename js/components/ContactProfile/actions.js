@@ -8,8 +8,11 @@ import * as api from '../../actions/api';
 // import * as listActions from '../../actions/listActions';
 
 export function addFeed(contactid, listid, feedUrl) {
+  console.log(contactid);
+  console.log(listid);
+  console.log(feedUrl);
   return dispatch => {
-    let feedBody = {contactid, listid, url: feedUrl};
+    const feedBody = {contactid, listid, url: feedUrl};
     dispatch({type: feedConstant.ADD_REQUESTED, body: feedBody});
     return api.post(`/feeds`, feedBody)
     .then(response => {
