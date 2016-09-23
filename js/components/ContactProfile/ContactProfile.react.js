@@ -6,6 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import validator from 'validator';
 import * as actions from './actions';
+import * as contactActions from '../../actions/contactActions';
 
 class ContactProfile extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ class ContactProfile extends Component {
   }
 
   componentWillMount() {
+    this.props.fetchContact(this.props.contactId);
     this.props.fetchFeed(this.props.contactId);
   }
 
@@ -45,7 +47,6 @@ class ContactProfile extends Component {
         onTouchTap={this.addFeedClick}
       />,
     ];
-    console.log(props.headlines);
     return (
       <div>
       ContactProfile - CONTACT INFO
@@ -58,13 +59,16 @@ class ContactProfile extends Component {
             onChange={e => this.setState({feedUrl: e.target.value})}
             />
           </Dialog>
-          <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransformation: 'none'}} />
-          {props.headlines.map(headline => (
-            <div style={{marginTop: 15}}>
-              <h4>{headline.title}</h4>
-              <span>{headline.publishdate}</span>
+          <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
+          {props.headlines && props.headlines.map((headline, i) => {
+            const date = new Date(headline.publishdate);
+            return (
+            <div key={i} style={{marginTop: 20}}>
+              <a target='_blank' href={headline.url}><h4>{headline.title}</h4></a>
+              <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
               <p>{headline.summary}</p>
-            </div>)
+            </div>
+            )}
           )}
         </div>
       </div>
@@ -89,7 +93,8 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     addFeed: (contactid, listid, url) => dispatch(actions.addFeed(contactid, listid, url)),
-    fetchFeed: contactid => dispatch(actions.fetchContactHeadlines(contactid))
+    fetchFeed: contactid => dispatch(actions.fetchContactHeadlines(contactid)),
+    fetchContact: contactid => dispatch(contactActions.fetchContact(contactid))
   };
 };
 

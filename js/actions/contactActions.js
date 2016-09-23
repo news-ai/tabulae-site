@@ -69,7 +69,10 @@ export function fetchContact(contactId) {
   return dispatch => {
     dispatch(requestContact());
     return api.get(`/contacts/${contactId}`)
-    .then( response => dispatch(receiveContact(response)))
+    .then( response => {
+      // const res = normalize(response, {data: contactSchema});
+      return dispatch(receiveContact(response.data));
+    })
     .catch( message => dispatch(requestContactFail(message)));
   };
 }

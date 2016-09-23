@@ -5,17 +5,13 @@ import * as api from '../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 const headlineSchema = new Schema('headlines', {idAttribute: 'url'});
 // const listSchema = new Schema('lists');
-// import * as listActions from '../../actions/listActions';
 
 export function addFeed(contactid, listid, feedUrl) {
   return dispatch => {
     const feedBody = {contactid, listid, url: feedUrl};
     dispatch({type: feedConstant.ADD_REQUESTED, body: feedBody});
     return api.post(`/feeds`, feedBody)
-    .then(response => {
-
-      return dispatch({type: feedConstant.ADD_REQUESTED});
-    })
+    .then(response => dispatch({type: feedConstant.ADD_REQUESTED, response}))
     .catch(err => console.log(err));
   };
 }
