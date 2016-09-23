@@ -85,13 +85,13 @@ ReactDOM.render(
               <Route path='lists' name='List Manager' component={ListManagerContainer}>
             </Route>
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
+            <Route path='lists/:listId/:contactId' name='Profile' component={ContactProfile} />
             <Route key='static' path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
-            <Route path='contacts/:listId/:contactId' name='Profile' component={ContactProfile} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>

@@ -46,7 +46,13 @@ class ContactProfile extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  return {};
+  const listId = parseInt(props.params.listId, 10);
+  const contactId = parseInt(props.params.contactId, 10);
+
+  return {
+    listId,
+    contactId
+  };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
