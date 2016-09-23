@@ -2,22 +2,35 @@ import {
   feedConstant,
 } from './constants';
 import * as api from '../../actions/api';
-// import {normalize, Schema, arrayOf} from 'normalizr';
-// const contactSchema = new Schema('contacts');
+import {normalize, Schema, arrayOf} from 'normalizr';
+const headlineSchema = new Schema('headlines', {idAttribute: 'url'});
 // const listSchema = new Schema('lists');
 // import * as listActions from '../../actions/listActions';
 
 export function addFeed(contactid, listid, feedUrl) {
-  console.log(contactid);
-  console.log(listid);
-  console.log(feedUrl);
   return dispatch => {
     const feedBody = {contactid, listid, url: feedUrl};
     dispatch({type: feedConstant.ADD_REQUESTED, body: feedBody});
     return api.post(`/feeds`, feedBody)
     .then(response => {
-      console.log(response);
+
       return dispatch({type: feedConstant.ADD_REQUESTED});
+    })
+    .catch(err => console.log(err));
+  };
+}
+
+export function fetchContactHeadlines(contactId) {
+  return dispatch => {
+    dispatch({type: feedConstant.REQUEST, contactId});
+    return api.get(`/contacts/${contactId}/headlines`)
+    .then(response => {
+      console.log(response);
+      const res = normalize(response, {
+        data: arrayOf(headlineSchema),
+      });
+      console.log(res);
+      return dispatch({type: feedConstant.RECEIVE, contactId, headlines: res.entities.headlines, ids: res.result.data});
     })
     .catch(err => console.log(err));
   };

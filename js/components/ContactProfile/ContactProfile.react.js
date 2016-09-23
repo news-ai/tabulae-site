@@ -15,10 +15,14 @@ class ContactProfile extends Component {
       feedUrl: ''
     };
     this.togglePanel = _ => this.setState({isRssPanelOpen: !this.state.isRssPanelOpen});
-    this.addFeedClick = this.addFeedClick.bind(this);
+    this.addFeedClick = this._addFeedClick.bind(this);
   }
 
-  addFeedClick() {
+  componentWillMount() {
+    this.props.fetchFeed(this.props.contactId);
+  }
+
+  _addFeedClick() {
     const props = this.props;
     if (this.state.feedUrl.length === 0) return;
     props.addFeed(props.contactId, props.listId, this.state.feedUrl);
@@ -27,6 +31,7 @@ class ContactProfile extends Component {
 
   render() {
     const state = this.state;
+    const props = this.props;
     const actions = [
       <FlatButton
         label='Cancel'
@@ -40,6 +45,7 @@ class ContactProfile extends Component {
         onTouchTap={this.addFeedClick}
       />,
     ];
+    console.log(props.headlines);
     return (
       <div>
       ContactProfile - CONTACT INFO
@@ -53,6 +59,13 @@ class ContactProfile extends Component {
             />
           </Dialog>
           <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransformation: 'none'}} />
+          {props.headlines.map(headline => (
+            <div style={{marginTop: 15}}>
+              <h4>{headline.title}</h4>
+              <span>{headline.publishdate}</span>
+              <p>{headline.summary}</p>
+            </div>)
+          )}
         </div>
       </div>
     );
@@ -62,16 +75,21 @@ class ContactProfile extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const contactId = parseInt(props.params.contactId, 10);
+  const headlines = state.feedReducer[contactId]
+  && state.feedReducer[contactId].received
+  && state.feedReducer[contactId].received.map(id => state.feedReducer[id]);
 
   return {
     listId,
-    contactId
+    contactId,
+    headlines
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    addFeed: (contactid, listid, url) => dispatch(actions.addFeed(contactid, listid, url))
+    addFeed: (contactid, listid, url) => dispatch(actions.addFeed(contactid, listid, url)),
+    fetchFeed: contactid => dispatch(actions.fetchContactHeadlines(contactid))
   };
 };
 
