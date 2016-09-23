@@ -44,6 +44,7 @@ import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
+import ContactProfile from './components/ContactProfile';
 
 import intercomSetup from './chat';
 
@@ -60,7 +61,7 @@ window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.co
 
 
 // third-party services setups
-if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install()
+if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
 intercomSetup({app_id: 'ur8dbk9e'});
 
 
@@ -90,6 +91,7 @@ ReactDOM.render(
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
+            <Route path='contacts/:contactId' name='Profile' component={ContactProfile} />
             <Route path='*' component={NotFound} />
           </Route>
         </Router>
