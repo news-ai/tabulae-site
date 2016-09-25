@@ -57,6 +57,25 @@ const ContactDescriptor = ({content, contentTitle, onClick}) => {
   );
 };
 
+const ContactProfileDescriptions = ({contact, patchContact}) => {
+  return (
+    <div>
+     {contact && <div>
+        <div className='row'>
+          <h4>{contact.firstname} {contact.lastname}</h4>
+        </div>
+        <div>
+          <ContactDescriptor content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
+          <ContactDescriptor content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
+          <ContactDescriptor content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
+          <ContactDescriptor content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
+          <ContactDescriptor content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
+        </div>
+        </div>}
+    </div>
+    );
+};
+
 class ContactProfile extends Component {
   constructor(props) {
     super(props);
@@ -96,22 +115,10 @@ class ContactProfile extends Component {
         onTouchTap={this.addFeedClick}
       />,
     ];
-    const contact = props.contact;
     return (
       <div>
         <div>
-          {contact && <div>
-          <div className='row'>
-            <h4>{contact.firstname} {contact.lastname}</h4>
-          </div>
-          <div>
-            <ContactDescriptor content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && props.patchContact(props.contactId, {email: value})}/>
-            <ContactDescriptor content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && props.patchContact(props.contactId, {blog: value})}/>
-            <ContactDescriptor content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && props.patchContact(props.contactId, {twitter: value})}/>
-            <ContactDescriptor content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && props.patchContact(props.contactId, {linkedin: value})}/>
-            <ContactDescriptor content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && props.patchContact(props.contactId, {website: value})}/>
-          </div>
-          </div>}
+          <ContactProfileDescriptions contact={props.contact} />
         </div>
         <div>
           <Dialog actions={actions} title='New Author RSS Feed' modal open={state.isRssPanelOpen} onRequestClose={this.togglePanel}>
