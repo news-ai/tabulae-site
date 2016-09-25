@@ -47,9 +47,19 @@ class ContactProfile extends Component {
         onTouchTap={this.addFeedClick}
       />,
     ];
+    const contact = props.contact;
     return (
       <div>
-      ContactProfile - CONTACT INFO
+        <div>
+          {contact && <div>
+          <div className='row'>
+            <h4>{contact.firstname} {contact.lastname}</h4>
+          </div>
+          <div className='row'>
+            <span>{contact.email ? contact.email : 'email not available'}</span>
+          </div>
+          </div>}
+        </div>
         <div>
           <Dialog actions={actions} title='New Author RSS Feed' modal open={state.isRssPanelOpen} onRequestClose={this.togglePanel}>
             <TextField
@@ -82,11 +92,13 @@ const mapStateToProps = (state, props) => {
   const headlines = state.feedReducer[contactId]
   && state.feedReducer[contactId].received
   && state.feedReducer[contactId].received.map(id => state.feedReducer[id]);
+  const contact = state.contactReducer[contactId];
 
   return {
     listId,
     contactId,
-    headlines
+    headlines,
+    contact
   };
 };
 
