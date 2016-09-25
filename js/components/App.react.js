@@ -70,6 +70,7 @@ class App extends Component {
         //   name: `${person.firstname} ${person.lastname}`
         // });
       }
+      this.props.fetchNotifications();
       this.setState({isLogin: true});
     }
     if (matchNoNavBar(nextProps.location.pathname) && nextProps.isLogin) {
@@ -158,7 +159,8 @@ const mapDispatchToProps = dispatch => {
   return {
     getAuth: _ => dispatch(actionCreators.fetchPerson()),
     logoutClick: _ => dispatch(actionCreators.logout()),
-    setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser())
+    setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser()),
+    fetchNotifications: _ => dispatch(actionCreators.fetchNotifications())
   };
 };
 

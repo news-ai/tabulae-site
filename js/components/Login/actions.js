@@ -4,6 +4,30 @@ import {
   SET_FIRST_TIME_USER
 } from './constants';
 
+function notification(argument) {
+  var notifications = JSON.parse(argument.data);
+  for (var i = notifications.length - 1; i >= 0; i--) {
+      console.log(notifications[i].message);
+  }
+}
+
+function log(argument) {
+  console.log(argument);
+}
+
+export function fetchNotifications() {
+  return dispatch => {
+    return api.get('/users/me/token')
+    .then(response => {
+      const channel = new goog.appengine.Channel(response.token);
+      const socket = channel.open();
+      socket.onopen = log;
+      socket.onmessage = notification;
+      socket.onerror = log;
+      socket.onclose = log;
+    });
+  };
+}
 
 function requestLogin() {
   return {
