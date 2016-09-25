@@ -19,6 +19,9 @@ export function fetchContactHeadlines(contactId) {
       console.log(res);
       return dispatch({type: headlineConstant.RECEIVE, contactId, headlines: res.entities.headlines, ids: res.result.data});
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err)
+      dispatch({type: headlineConstant.REQUEST_FAIL});
+    });
   };
 }

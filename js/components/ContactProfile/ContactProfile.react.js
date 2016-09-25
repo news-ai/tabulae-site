@@ -137,6 +137,8 @@ class ContactProfile extends Component {
               </div>
               )}
             )}
+            {props.headlines && !props.headlineDidInvalidate && props.headlines.length === 0 && <p>No RSS attached. No headlines.</p>}
+            {props.headlineDidInvalidate && <p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p>}
           </div>
         </div>
       </div>
@@ -156,7 +158,8 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     headlines,
-    contact
+    contact,
+    headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
 
