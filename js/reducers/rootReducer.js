@@ -13,6 +13,7 @@ import fileReducer from '../components/ImportFile/reducer';
 import templateReducer from '../components/Email/Template/reducer';
 import searchReducer from '../components/Search/reducer';
 import feedReducer from '../components/ContactProfile/reducer';
+import headlineReducer from '../components/ContactProfile/Headlines/reducer';
 
 
 const rootReducer = combineReducers({
@@ -24,7 +25,8 @@ const rootReducer = combineReducers({
   fileReducer,
   templateReducer,
   searchReducer,
-  feedReducer
+  feedReducer,
+  headlineReducer
 });
 
 export default rootReducer;

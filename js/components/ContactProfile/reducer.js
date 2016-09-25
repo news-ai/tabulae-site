@@ -7,7 +7,7 @@ import {initialState} from '../../reducers/initialState';
 import {assignToEmpty, canAccessReducer} from '../../utils/assign';
 const types = _.values(feedConstant);
 
-function feedReducer(state = initialState.searchReducer, action) {
+function feedReducer(state = initialState.feedReducer, action) {
   if (window.isDev) Object.freeze(state);
   if (!canAccessReducer(action.type, types)) return state;
 
@@ -17,19 +17,6 @@ function feedReducer(state = initialState.searchReducer, action) {
       obj.isReceiving = true;
       return obj;
     case feedConstant.ADD_RECEIVED:
-      obj.isReceiving = false;
-      return obj;
-    case feedConstant.REQUEST:
-      obj[action.contactId] = {};
-      obj[action.contactId].received = [];
-      obj.isReceiving = true;
-      return obj;
-    case feedConstant.RECEIVE:
-      obj = assignToEmpty(obj, action.headlines);
-      obj[action.contactId].received = [
-      ...obj[action.contactId].received,
-      ...action.ids.filter(id => !state[action.contactId][id])
-      ];
       obj.isReceiving = false;
       return obj;
     default:

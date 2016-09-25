@@ -6,7 +6,8 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import validator from 'validator';
-import * as actions from './actions';
+import * as feedActions from './actions';
+import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey100, grey50, grey700} from 'material-ui/styles/colors';
 
@@ -41,7 +42,7 @@ const styles = {
 
 const ContactDescriptor = ({content, contentTitle, onClick}) => {
   return (
-    <div className='row'>
+    <div className='row' style={{display: 'flex', alignItems: 'center'}}>
       <span>{content ? content : `${contentTitle} not available`}</span>
       <IconButton
         style={{marginLeft: 3}}
@@ -146,9 +147,9 @@ class ContactProfile extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const contactId = parseInt(props.params.contactId, 10);
-  const headlines = state.feedReducer[contactId]
-  && state.feedReducer[contactId].received
-  && state.feedReducer[contactId].received.map(id => state.feedReducer[id]);
+  const headlines = state.headlineReducer[contactId]
+  && state.headlineReducer[contactId].received
+  && state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]);
   const contact = state.contactReducer[contactId];
 
   return {
@@ -161,8 +162,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    addFeed: (contactid, listid, url) => dispatch(actions.addFeed(contactid, listid, url)),
-    fetchFeed: contactid => dispatch(actions.fetchContactHeadlines(contactid)),
+    addFeed: (contactid, listid, url) => dispatch(feedActions.addFeed(contactid, listid, url)),
+    fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body))
   };

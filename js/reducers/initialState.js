@@ -45,5 +45,15 @@ export const initialState = {
     didInvalidate: false,
     received: [],
     offset: 0
-  }
+  },
+  feedReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
+  headlineReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
 };
