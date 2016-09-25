@@ -77,6 +77,19 @@ export function fetchContact(contactId) {
   };
 }
 
+export function patchContact(contactId, contactBody) {
+  return dispatch => {
+    dispatch(requestContact());
+    console.log(contactBody);
+    return api.patch(`/contacts/${contactId}`, contactBody)
+    .then(response => {
+      // const res = normalize(response, {data: contactSchema});
+      return dispatch(receiveContact(response.data));
+    })
+    .catch( message => dispatch(requestContactFail(message)));
+  };
+}
+
 // used to lazy-load a page, keeps track of the last offset
 export function fetchPaginatedContacts(listId) {
   const PAGE_LIMIT = 50;
