@@ -52,22 +52,24 @@ class Headers extends Component {
     let untitledCount = 0;
     const newOrder = order.map(item => {
       if (item) {
-        return item
+        return item;
       } else if (!item || item.length === 0) {
         untitledCount++;
         return `ignore_column`;
       }
     });
-    if (untitledCount > 0)
+    if (untitledCount > 0) {
       alertify.confirm(
         `There are ${untitledCount} columns that will be dropped when the list is imported.
         Make sure columns have names if you would like to import them.`,
         _ => onProcessHeaders(newOrder),
         _ => {}
         );
-    else if (untitledCount === headers.length)
+    } else if (untitledCount === headers.length) {
       alertify.alert(`Importing empty list is not allowed. You must at least name one column.`);
-    else onProcessHeaders(newOrder);
+    } else {
+      onProcessHeaders(newOrder);
+    }
   }
 
   _onNewRequest(req, reqIndex, headerIndex) {
@@ -79,7 +81,8 @@ class Headers extends Component {
       // default
       // reset previous selected
       let options = this.state.options.map(option => {
-        if (req.value === option.value) option.selected = true;
+        if (req.value !== 'employers' || req.value !== 'pastemployers') return option;
+        else if (req.value === option.value) option.selected = true;
         return option;
       });
       this.setState({options});
