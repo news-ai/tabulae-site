@@ -7,6 +7,7 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import validator from 'validator';
 import * as feedActions from './actions';
+import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey100, grey50, grey700} from 'material-ui/styles/colors';
@@ -59,15 +60,25 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
   );
 };
 
-const ContactProfileDescriptions = ({contact, patchContact}) => {
+const ContactProfileDescriptions = ({contact, patchContact, employers, pastemployers}) => {
   return (
     <div className='large-12 medium-12 small-12 columns'>
       <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
-      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
-      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
-      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
-      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
-      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
+      <div className='large-12 medium-12 small-12 columns'>
+        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
+        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
+        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
+        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
+        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
+      </div>
+      <div className='large-12 medium-12 small-12 columns'>
+        <span>Current Publications/Employers</span>
+        {employers && employers.map((employer, i) => <div key={i}>{employer.name}</div>)}
+      </div>
+      <div className='large-12 medium-12 small-12 columns'>
+        <span>Past Publications/Employers</span>
+        {pastemployers && pastemployers.map((employer, i) => <div key={i}>{employer.name}</div>)}
+      </div>
     </div>
       );
 };
@@ -85,7 +96,16 @@ class ContactProfile extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchContact(this.props.contactId);
+    this.props.fetchContact(this.props.contactId)
+    .then(_ => {
+      const {contact, employers, pastemployers} = this.props;
+      if (contact.employers !== null) if (employers.length !== contact.employers) contact.employers
+        .filter(pubId => !employers.some(obj => obj.id === pubId))
+        .map(pubId => this.props.fetchPublication(pubId));
+      if (contact.pastemployers !== null) if (pastemployers.length !== contact.pastemployers) contact.pastemployers
+      .filter(pubId => !pastemployers.some(obj => obj.id === pubId))
+      .map(pubId => this.props.fetchPublication(pubId));
+    });
     this.props.fetchFeed(this.props.contactId);
   }
 
@@ -114,7 +134,7 @@ class ContactProfile extends Component {
     ];
     return (
       <div className='row' style={{marginTop: 20}}>
-        {props.contact && <ContactProfileDescriptions contact={props.contact} />}
+        {props.contact && <ContactProfileDescriptions contact={props.contact} {...props} />}
         <div>
           <Dialog actions={actions} title='New Author RSS Feed' modal open={state.isRssPanelOpen} onRequestClose={this.togglePanel}>
             <TextField
@@ -148,12 +168,20 @@ const mapStateToProps = (state, props) => {
   && state.headlineReducer[contactId].received
   && state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]);
   const contact = state.contactReducer[contactId];
+  const employers = contact && contact.employers !== null && contact.employers
+  .filter(pubId => state.publicationReducer[pubId])
+  .map(pubId => state.publicationReducer[pubId]);
+  const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
+  .filter(pubId => state.publicationReducer[pubId])
+  .map(pubId => state.publicationReducer[pubId]);
 
   return {
     listId,
     contactId,
     headlines,
     contact,
+    employers,
+    pastemployers,
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
@@ -163,7 +191,8 @@ const mapDispatchToProps = (dispatch, props) => {
     addFeed: (contactid, listid, url) => dispatch(feedActions.addFeed(contactid, listid, url)),
     fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
-    patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body))
+    patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
+    fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId))
   };
 };
 
