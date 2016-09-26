@@ -18,6 +18,7 @@ const defaultSelectableOptions = [
   {value: 'instagram', label: 'Instagram', selected: false},
   {value: 'website', label: 'Website', selected: false},
   {value: 'blog', label: 'Blog', selected: false},
+  {value: 'notes', label: 'Notes', selected: false},
 ];
 
 const config = {
