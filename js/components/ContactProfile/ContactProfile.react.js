@@ -11,6 +11,8 @@ import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey100, grey50, grey700} from 'material-ui/styles/colors';
 
+import HeadlineItem from './Headlines/HeadlineItem.react';
+
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
@@ -70,6 +72,7 @@ const ContactProfileDescriptions = ({contact, patchContact}) => {
       );
 };
 
+
 class ContactProfile extends Component {
   constructor(props) {
     super(props);
@@ -128,18 +131,9 @@ class ContactProfile extends Component {
             marginTop: 20,
             padding: 5,
             border: `solid 1px ${grey100}`}}>
-            {props.headlines && props.headlines.map((headline, i) => {
-              const date = new Date(headline.publishdate);
-              return (
-              <div key={i} style={{marginBottom: 20}}>
-                <a target='_blank' href={headline.url}><h4>{headline.title}</h4></a>
-                <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
-                <p>{headline.summary}</p>
-              </div>
-              )}
-            )}
-            {props.headlines && !props.headlineDidInvalidate && props.headlines.length === 0 && <p>No RSS attached. No headlines.</p>}
-            {props.headlineDidInvalidate && <p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p>}
+            {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
+            {props.headlines && !props.headlineDidInvalidate && props.headlines.length === 0 && <div className='row'><p>No RSS attached. No headlines.</p></div>}
+            {props.headlineDidInvalidate && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
           </div>
         </div>
       </div>
