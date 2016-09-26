@@ -7,9 +7,10 @@ import { normalize, Schema, arrayOf } from 'normalizr';
 const publicationSchema = new Schema('publications');
 
 
-function requestPublication() {
+function requestPublication(id) {
   return {
-    type: publicationConstant.REQUEST
+    type: publicationConstant.REQUEST,
+    id
   };
 }
 
@@ -38,7 +39,7 @@ function requestPublicationFail(message) {
 export function fetchPublication(id) {
   return (dispatch, getState) => {
     if (getState().publicationReducer[id]) return;
-    dispatch(requestPublication());
+    dispatch(requestPublication(id));
     return api.get(`/publications/${id}`)
     .then( response => dispatch(receivePublication(response.data)))
     .catch( message => dispatch(requestPublicationFail(message)));
