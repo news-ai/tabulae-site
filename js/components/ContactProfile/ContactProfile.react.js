@@ -40,9 +40,9 @@ const styles = {
   },
 };
 
-const ContactDescriptor = ({content, contentTitle, onClick}) => {
+const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
   return (
-    <div className='row' style={{display: 'flex', alignItems: 'center'}}>
+    <div className={className} style={{display: 'flex', alignItems: 'center'}}>
       <span>{content ? content : `${contentTitle} not available`}</span>
       <IconButton
         style={{marginLeft: 3}}
@@ -59,21 +59,15 @@ const ContactDescriptor = ({content, contentTitle, onClick}) => {
 
 const ContactProfileDescriptions = ({contact, patchContact}) => {
   return (
-    <div>
-     {contact && <div>
-        <div className='row'>
-          <h4>{contact.firstname} {contact.lastname}</h4>
-        </div>
-        <div>
-          <ContactDescriptor content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
-          <ContactDescriptor content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
-          <ContactDescriptor content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
-          <ContactDescriptor content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
-          <ContactDescriptor content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
-        </div>
-        </div>}
+    <div className='row'>
+      <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
+      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
+      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
+      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
+      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
+      <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
     </div>
-    );
+      );
 };
 
 class ContactProfile extends Component {
@@ -116,10 +110,8 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <div>
-        <div>
-          <ContactProfileDescriptions contact={props.contact} />
-        </div>
+      <div className='row' style={{marginTop: 20}}>
+        {props.contact && <ContactProfileDescriptions contact={props.contact} />}
         <div>
           <Dialog actions={actions} title='New Author RSS Feed' modal open={state.isRssPanelOpen} onRequestClose={this.togglePanel}>
             <TextField
@@ -129,7 +121,9 @@ class ContactProfile extends Component {
             onChange={e => this.setState({feedUrl: e.target.value})}
             />
           </Dialog>
-          <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
+          <div className='right'>
+            <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
+          </div>
           <div style={{
             marginTop: 20,
             padding: 5,
