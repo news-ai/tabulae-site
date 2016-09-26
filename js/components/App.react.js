@@ -49,6 +49,7 @@ class App extends Component {
       showNavBar: true
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
+    this.closeDrawer = _ => this.setState({isDrawerOpen: false});
     this.toggleModal = _ => this.setState({isModalOpen: !this.state.isModalOpen});
   }
 
@@ -91,9 +92,9 @@ class App extends Component {
         docked={false}
         open={state.isDrawerOpen}
         onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
-          <MenuItem onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
-          <MenuItem onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
-          <MenuItem onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
         </Drawer>
        <div className='u-full-width row noprint' style={navStyle}>
           <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
