@@ -2,6 +2,8 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import * as AppActions from '../../../actions/AppActions';
 
+function createMarkup(markup) { return {__html: markup}; };
+
 const HeadlineItem = ({url, title, publishdate, summary, publisherName}) => {
   const date = new Date(publishdate);
   return (
@@ -16,7 +18,7 @@ const HeadlineItem = ({url, title, publishdate, summary, publisherName}) => {
       <span>{publisherName}</span>
     </div>
     <div className='large-12 columns'>
-      <p>{summary}</p>
+      <div dangerouslySetInnerHTML={createMarkup(summary)} />
     </div>
   </div>
   );
