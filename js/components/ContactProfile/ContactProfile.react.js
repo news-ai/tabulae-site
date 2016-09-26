@@ -45,7 +45,7 @@ const styles = {
 const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
   return (
     <div className={className} style={{display: 'flex', alignItems: 'center'}}>
-      <span>{content ? content : `${contentTitle} not available`}</span>
+      <span>{content ? content : `${contentTitle} not filled`}</span>
       <IconButton
         style={{marginLeft: 3}}
         iconStyle={styles.smallIcon}
@@ -61,7 +61,7 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
 
 const ContactProfileDescriptions = ({contact, patchContact}) => {
   return (
-    <div className='row'>
+    <div className='large-12 medium-12 small-12 columns'>
       <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
       <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
@@ -124,15 +124,15 @@ class ContactProfile extends Component {
             onChange={e => this.setState({feedUrl: e.target.value})}
             />
           </Dialog>
-          <div className='right'>
+          <div className='large-12 medium-12 small-12 columns' style={{marginTop: 20}}>
             <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
           </div>
-          <div style={{
+          <div className='large-12 medium-12 small-12 columns' style={{
             marginTop: 20,
             padding: 5,
             border: `solid 1px ${grey100}`}}>
             {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-            {props.headlines && !props.headlineDidInvalidate && props.headlines.length === 0 && <div className='row'><p>No RSS attached. No headlines.</p></div>}
+            {props.headlines && !props.headlineDidInvalidate && props.headlines.length === 0 && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" start seeing some headlines.</p></div>}
             {props.headlineDidInvalidate && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
           </div>
         </div>
