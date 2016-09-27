@@ -77,14 +77,16 @@ export function createPublication(data) {
   };
 }
 
-export function createPublicationThenPatchContact(contactId, pubName) {
+export function createPublicationThenPatchContact(contactId, pubName, which) {
   return (dispatch, getState) => {
     const pubId = getState().publicationReducer[pubName];
     if (pubId) {
       const contact = getState().contactReducer[contactId];
       if (contact) {
-        const employers = contact.employers === null ? [pubId] : [...contact.employers, pubId];
-        dispatch(contactActions.patchContact(contactId, {employers}));
+        const employers = contact[which] === null ? [pubId] : [...contact[which], pubId];
+        let contactBody = {};
+        contactBody[which] = employers;
+        dispatch(contactActions.patchContact(contactId, contactBody));
       }
     } else {
       dispatch(createPublication({name: pubName}))
@@ -92,8 +94,10 @@ export function createPublicationThenPatchContact(contactId, pubName) {
         const newPubId = response.data.id;
         const contact = getState().contactReducer[contactId];
         if (contact) {
-          const employers = contact.employers === null ? [newPubId] : [...contact.employers, newPubId];
-          dispatch(contactActions.patchContact(contactId, {employers}));
+          const employers = contact[which] === null ? [newPubId] : [...contact[which], newPubId];
+          let contactBody = {};
+          contactBody[which] = employers;
+          dispatch(contactActions.patchContact(contactId, contactBody));
         }
       });
     }

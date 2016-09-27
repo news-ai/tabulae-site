@@ -78,10 +78,10 @@ export function fetchContact(contactId) {
 }
 
 export function patchContact(contactId, contactBody) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(requestContact());
-    console.log(contactBody);
-    return api.patch(`/contacts/${contactId}`, contactBody)
+    const contact = Object.assign({}, getState().contactReducer[contactId], contactBody);
+    return api.patch(`/contacts/${contactId}`, contact)
     .then(response => {
       // const res = normalize(response, {data: contactSchema});
       return dispatch(receiveContact(response.data));

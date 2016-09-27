@@ -65,7 +65,7 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
 
 const ContactProfileDescriptions = ({contact, patchContact}) => {
   return (
-    <div>
+    <div style={{marginTop: 30}}>
       <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
@@ -173,7 +173,32 @@ class ContactProfile extends Component {
         label='Submit'
         primary
         keyboardFocused
-        onTouchTap={this.addPublicationToContact}
+        onTouchTap={_ => {
+          props.createPublicationThenPatchContact(props.contact.id, state.autoinput, 'employers');
+          this.togglePanel('employers');
+        }}
+      />,
+    ];
+    const addPastEmployerActions = [
+      <FlatButton
+        label='Cancel'
+        primary
+        onTouchTap={_ => {
+          this.togglePanel('employers');
+          this.setState({
+            autoinput: '',
+            employerAutocompleteList: []
+          });
+        }}
+      />,
+      <FlatButton
+        label='Submit'
+        primary
+        keyboardFocused
+        onTouchTap={_ => {
+          props.createPublicationThenPatchContact(props.contact.id, state.autoinput, 'pastemployers');
+          this.togglePanel('employers');
+        }}
       />,
     ];
     return (
@@ -182,9 +207,9 @@ class ContactProfile extends Component {
           <div>
             <ContactProfileDescriptions contact={props.contact} {...props} />
             <div className='large-12 medium-12 small-12 columns'>
-              <span>Current Publications/Employers</span>
+              <h5>Current Publications/Employers</h5>
               {props.employers && props.employers.map((employer, i) =>
-                <ContactEmployerDescriptor key={i} employer={employer} contact={props.contact} />)}
+                <ContactEmployerDescriptor key={i} employer={employer} which='employers' contact={props.contact} />)}
                <IconButton
                 style={{marginLeft: 3}}
                 iconStyle={styles.smallIcon}
@@ -196,8 +221,18 @@ class ContactProfile extends Component {
                 />
             </div>
             <div className='large-12 medium-12 small-12 columns'>
-              <span>Past Publications/Employers</span>
-              {props.pastemployers && props.pastemployers.map((employer, i) => <div key={i}>{employer.name}</div>)}
+              <h5>Past Publications/Employers</h5>
+              {props.pastemployers && props.pastemployers.map((employer, i) =>
+                <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+               <IconButton
+                style={{marginLeft: 3}}
+                iconStyle={styles.smallIcon}
+                style={styles.small}
+                iconClassName='fa fa-plus'
+                tooltip='Add Publication'
+                tooltipPosition='top-right'
+                onClick={_ => this.togglePanel('employers')}
+                />
             </div>
           </div>
           )}
@@ -212,9 +247,20 @@ class ContactProfile extends Component {
           </Dialog>
           <Dialog actions={addEmployerActions} title='Add Current Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
             <AutoComplete
-            floatingLabelText='showAllItems'
+            floatingLabelText='Autocomplete dropdown'
             filter={AutoComplete.noFilter}
             onUpdateInput={this.updateAutoInput}
+            onNewRequest={autoinput => this.setState({autoinput})}
+            openOnFocus
+            dataSource={state.employerAutocompleteList}
+            />
+          </Dialog>
+           <Dialog actions={addPastEmployerActions} title='Add Past Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
+            <AutoComplete
+            floatingLabelText='Autocomplete dropdown'
+            filter={AutoComplete.noFilter}
+            onUpdateInput={this.updateAutoInput}
+            onNewRequest={autoinput => this.setState({autoinput})}
             openOnFocus
             dataSource={state.employerAutocompleteList}
             />
@@ -273,7 +319,7 @@ const mapDispatchToProps = (dispatch, props) => {
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
     fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, pubName) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName))
+    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which))
   };
 };
 
