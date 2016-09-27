@@ -8,16 +8,16 @@ const HeadlineItem = ({url, title, publishdate, summary, publisherName}) => {
   const date = new Date(publishdate);
   return (
   <div className='row' style={{marginBottom: 20}}>
-    <div className='large-12 medium-12 columns'>
+    <div className='large-12 medium-12 small-12 columns'>
       <a target='_blank' href={url}><h4>{title}</h4></a>
     </div>
-    <div className='large-12 medium-12 columns'>
+    <div className='large-12 medium-12 small-12 columns'>
       <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
     </div>
-    <div className='large-12 medium-12 columns'>
+    <div className='large-12 medium-12 small-12 columns'>
       <span>{publisherName}</span>
     </div>
-    <div className='large-12 medium-12 columns'>
+    <div className='large-12 medium-12 small-12 columns'>
       <div dangerouslySetInnerHTML={createMarkup(summary)} />
     </div>
   </div>

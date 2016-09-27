@@ -63,9 +63,9 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
   );
 };
 
-const ContactProfileDescriptions = ({contact, patchContact}) => {
+const ContactProfileDescriptions = ({contact, patchContact, className}) => {
   return (
-    <div style={{marginTop: 30}}>
+    <div className={className} style={{marginTop: 30}}>
       <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
@@ -202,37 +202,49 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <div className='row' style={{marginTop: 20}}>
+      <div style={{marginTop: 20}}>
         {props.contact && (
-          <div>
-            <ContactProfileDescriptions contact={props.contact} {...props} />
-            <div className='large-12 medium-12 small-12 columns'>
-              <h5>Current Publications/Employers</h5>
-              {props.employers && props.employers.map((employer, i) =>
-                <ContactEmployerDescriptor key={i} employer={employer} which='employers' contact={props.contact} />)}
-               <IconButton
-                style={{marginLeft: 3}}
-                iconStyle={styles.smallIcon}
-                style={styles.small}
-                iconClassName='fa fa-plus'
-                tooltip='Add Publication'
-                tooltipPosition='top-right'
-                onClick={_ => this.togglePanel('employers')}
-                />
-            </div>
-            <div className='large-12 medium-12 small-12 columns'>
-              <h5>Past Publications/Employers</h5>
-              {props.pastemployers && props.pastemployers.map((employer, i) =>
-                <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
-               <IconButton
-                style={{marginLeft: 3}}
-                iconStyle={styles.smallIcon}
-                style={styles.small}
-                iconClassName='fa fa-plus'
-                tooltip='Add Publication'
-                tooltipPosition='top-right'
-                onClick={_ => this.togglePanel('employers')}
-                />
+          <div className='row'>
+            <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
+            <div className='large-5 medium-12 small-12 columns'>
+              <div>
+                <div className='row vertical-center'>
+                  <h5>Current Publications/Employers</h5>
+                  <IconButton
+                    style={{marginLeft: 3}}
+                    iconStyle={styles.smallIcon}
+                    style={styles.small}
+                    iconClassName='fa fa-plus'
+                    tooltip='Add Publication'
+                    tooltipPosition='top-right'
+                    onClick={_ => this.togglePanel('employers')}
+                    />
+                </div>
+                <div>
+                  {props.employers && props.employers.map((employer, i) =>
+                    <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                  {props.employers.length === 0 && <span>None added</span>}
+                </div>
+              </div>
+              <div>
+                <div className='row vertical-center'>
+                  <h5>Past Publications/Employers</h5>
+                  <IconButton
+                  style={{marginLeft: 3}}
+                  iconStyle={styles.smallIcon}
+                  style={styles.small}
+                  iconClassName='fa fa-plus'
+                  tooltip='Add Publication'
+                  tooltipPosition='top-right'
+                  onClick={_ => this.togglePanel('employers')}
+                  />
+                </div>
+              </div>
+              <div>
+                {props.pastemployers && props.pastemployers.map((employer, i) =>
+                  <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                {props.pastemployers.length === 0 && <span>None added</span>}
+              </div>
             </div>
           </div>
           )}
@@ -265,7 +277,7 @@ class ContactProfile extends Component {
             dataSource={state.employerAutocompleteList}
             />
           </Dialog>
-          <div className='large-12 medium-12 small-12 columns' style={{marginTop: 20}}>
+          <div className='large-offset-10 medium-offset-8 small-12 columns' style={{marginTop: 20}}>
             <RaisedButton label='Add New RSS Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
           </div>
           <div className='large-12 medium-12 small-12 columns' style={{
