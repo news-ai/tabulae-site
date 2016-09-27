@@ -1,10 +1,5 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
-import Dialog from 'material-ui/Dialog';
 import validator from 'validator';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
@@ -12,7 +7,15 @@ import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey100, grey50, grey700} from 'material-ui/styles/colors';
 
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/Dialog';
+import AutoComplete from 'material-ui/AutoComplete';
+
 import HeadlineItem from './Headlines/HeadlineItem.react';
+import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -60,27 +63,16 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
   );
 };
 
-const ContactProfileDescriptions = ({contact, patchContact, employers, pastemployers}) => {
+const ContactProfileDescriptions = ({contact, patchContact}) => {
   return (
-    <div className='large-12 medium-12 small-12 columns'>
+    <div>
       <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
-      <div className='large-12 medium-12 small-12 columns'>
-        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
-        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
-        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
-        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
-        <ContactDescriptor className='large-3 medium-4 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
-      </div>
-      <div className='large-12 medium-12 small-12 columns'>
-        <span>Current Publications/Employers</span>
-        {employers && employers.map((employer, i) => <div key={i}>{employer.name}</div>)}
-      </div>
-      <div className='large-12 medium-12 small-12 columns'>
-        <span>Past Publications/Employers</span>
-        {pastemployers && pastemployers.map((employer, i) => <div key={i}>{employer.name}</div>)}
-      </div>
-    </div>
-      );
+      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
+      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
+      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
+      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
+      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
+    </div>);
 };
 
 
@@ -88,11 +80,16 @@ class ContactProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isRssPanelOpen: false,
-      feedUrl: ''
+      isRSSPanelOpen: false,
+      isEmployerPanelOpen: false,
+      feedUrl: '',
+      employerAutocompleteList: [],
+      autoinput: ''
     };
-    this.togglePanel = _ => this.setState({isRssPanelOpen: !this.state.isRssPanelOpen});
+    this.togglePanel = this._togglePanel.bind(this);
     this.addFeedClick = this._addFeedClick.bind(this);
+    this.updateAutoInput = this._updateAutoInput.bind(this);
+    this.addPublicationToContact = this._addPublicationToContact.bind(this);
   }
 
   componentWillMount() {
@@ -113,17 +110,44 @@ class ContactProfile extends Component {
     const props = this.props;
     if (this.state.feedUrl.length === 0) return;
     props.addFeed(props.contactId, props.listId, this.state.feedUrl);
-    this.togglePanel();
+    this.togglePanel('rss');
+  }
+
+  _togglePanel(key) {
+    switch (key) {
+      case 'rss':
+        this.setState({isRSSPanelOpen: !this.state.isRSSPanelOpen});
+        break;
+      case 'employers':
+        this.setState({isEmployerPanelOpen: !this.state.isEmployerPanelOpen});
+        break;
+      default:
+      // do nothing
+    }
+  }
+
+  _updateAutoInput(val) {
+    this.setState({autoinput: val});
+    setTimeout(_ => {
+      this.props.searchPublications(this.state.autoinput)
+      .then(response => this.setState({
+        employerAutocompleteList: response,
+      }));
+    }, 500);
+  }
+
+  _addPublicationToContact() {
+    console.log(this.state.autoinput);
   }
 
   render() {
     const state = this.state;
     const props = this.props;
-    const actions = [
+    const addFeedActions = [
       <FlatButton
         label='Cancel'
         primary
-        onTouchTap={this.togglePanel}
+        onTouchTap={_ => this.togglePanel('rss')}
       />,
       <FlatButton
         label='Submit'
@@ -132,11 +156,48 @@ class ContactProfile extends Component {
         onTouchTap={this.addFeedClick}
       />,
     ];
+    const addEmployerActions = [
+      <FlatButton
+        label='Cancel'
+        primary
+        onTouchTap={_ => {
+          this.togglePanel('employers');
+          this.setState({autoinput: ''});
+        }}
+      />,
+      <FlatButton
+        label='Submit'
+        primary
+        keyboardFocused
+        onTouchTap={this.addPublicationToContact}
+      />,
+    ];
     return (
       <div className='row' style={{marginTop: 20}}>
-        {props.contact && <ContactProfileDescriptions contact={props.contact} {...props} />}
+        {props.contact && (
+          <div>
+            <ContactProfileDescriptions contact={props.contact} {...props} />
+            <div className='large-12 medium-12 small-12 columns'>
+              <span>Current Publications/Employers</span>
+              {props.employers && props.employers.map((employer, i) => <ContactEmployerDescriptor key={i} employer={employer} />)}
+               <IconButton
+                style={{marginLeft: 3}}
+                iconStyle={styles.smallIcon}
+                style={styles.small}
+                iconClassName='fa fa-plus'
+                tooltip='Add Publication'
+                tooltipPosition='top-right'
+                onClick={_ => this.togglePanel('employers')}
+                />
+            </div>
+            <div className='large-12 medium-12 small-12 columns'>
+              <span>Past Publications/Employers</span>
+              {props.pastemployers && props.pastemployers.map((employer, i) => <div key={i}>{employer.name}</div>)}
+            </div>
+          </div>
+          )}
         <div>
-          <Dialog actions={actions} title='New Author RSS Feed' modal open={state.isRssPanelOpen} onRequestClose={this.togglePanel}>
+          <Dialog actions={addFeedActions} title='New Author RSS Feed' modal open={state.isRSSPanelOpen} onRequestClose={_ => this.togglePanel('rss')}>
             <TextField
             value={state.feedUrl}
             hintText='Enter RSS Url here'
@@ -144,16 +205,29 @@ class ContactProfile extends Component {
             onChange={e => this.setState({feedUrl: e.target.value})}
             />
           </Dialog>
+          <Dialog actions={addEmployerActions} title='Add Current Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
+            <AutoComplete
+            floatingLabelText='showAllItems'
+            filter={AutoComplete.noFilter}
+            onUpdateInput={this.updateAutoInput}
+            openOnFocus
+            dataSource={state.employerAutocompleteList}
+            />
+          </Dialog>
           <div className='large-12 medium-12 small-12 columns' style={{marginTop: 20}}>
-            <RaisedButton label='Add New RSS Feed' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
+            <RaisedButton label='Add New RSS Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
           </div>
           <div className='large-12 medium-12 small-12 columns' style={{
             marginTop: 20,
             padding: 5,
             border: `solid 1px ${grey100}`}}>
             {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-            {props.headlines && !props.headlineDidInvalidate && props.headlines.length === 0 && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" start seeing some headlines.</p></div>}
-            {props.headlineDidInvalidate && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+            {props.headlines
+              && !props.headlineDidInvalidate
+              && props.headlines.length === 0
+              && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" start seeing some headlines.</p></div>}
+            {props.headlineDidInvalidate
+              && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
           </div>
         </div>
       </div>
@@ -192,7 +266,8 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
-    fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId))
+    fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
+    searchPublications: query => dispatch(AppActions.searchPublications(query)),
   };
 };
 
