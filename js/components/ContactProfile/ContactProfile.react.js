@@ -283,7 +283,7 @@ class ContactProfile extends Component {
             {props.headlines
               && !props.headlineDidInvalidate
               && props.headlines.length === 0
-              && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" start seeing some headlines.</p></div>}
+              && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" to start seeing some headlines.</p></div>}
             {props.headlineDidInvalidate
               && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
           </div>
