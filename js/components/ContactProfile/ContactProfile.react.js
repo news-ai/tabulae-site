@@ -5,7 +5,8 @@ import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey100, grey50, grey700} from 'material-ui/styles/colors';
+import {grey100, grey700, grey500} from 'material-ui/styles/colors';
+import uniqBy from 'lodash/uniqBy';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -24,17 +25,6 @@ import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 
 const styles = {
-  parent: {
-    marginBottom: 10,
-    borderRadius: '1.5em',
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 5,
-    paddingBottom: 5,
-    ':hover': {
-      backgroundColor: grey50
-    }
-  },
   smallIcon: {
     fontSize: 16,
     color: grey700
@@ -207,7 +197,7 @@ class ContactProfile extends Component {
           <div className='row'>
             <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
             <div className='large-5 medium-12 small-12 columns'>
-              <div>
+              <div style={{marginTop: 20}}>
                 <div className='row vertical-center'>
                   <h5>Current Publications/Employers</h5>
                   <IconButton
@@ -226,7 +216,7 @@ class ContactProfile extends Component {
                   {props.employers.length === 0 && <span>None added</span>}
                 </div>
               </div>
-              <div>
+              <div style={{marginTop: 20}}>
                 <div className='row vertical-center'>
                   <h5>Past Publications/Employers</h5>
                   <IconButton
@@ -280,6 +270,10 @@ class ContactProfile extends Component {
           <div className='large-offset-10 medium-offset-8 small-12 columns' style={{marginTop: 20}}>
             <RaisedButton label='Add New RSS Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
           </div>
+          <div style={{color: grey500, fontSize: '0.8em'}}>
+          Attached Feeds:
+          {props.attachedfeeds.map(feed => <div><span>{feed}</span></div>)}
+          </div>
           <div className='large-12 medium-12 small-12 columns' style={{
             marginTop: 20,
             padding: 5,
@@ -311,6 +305,7 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
+  const attachedfeeds = uniqBy(headlines, 'feedurl').map(obj => obj.feedurl);
 
   return {
     listId,
@@ -319,6 +314,7 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
+    attachedfeeds,
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
