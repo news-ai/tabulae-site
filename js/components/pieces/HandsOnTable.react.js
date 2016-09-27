@@ -218,9 +218,11 @@ class HandsOnTable extends Component {
             }
 
             if (key === 'remove_column') {
-              for (let i = options.start.col; i <= options.end.col; i++) {
-                this._removeColumn(props.listId, this.state.options.columns, this.table.colToProp(i), i);
-              }
+              alertify.confirm('Are you sure?', 'Deleting a column is not reversible. Are you sure?', _ => {
+                for (let i = options.start.col; i <= options.end.col; i++) {
+                  this._removeColumn(props.listId, this.state.options.columns, this.table.colToProp(i), i);
+                }
+              }, _ => {});
             }
 
             if (key === 'change_col_name') {
