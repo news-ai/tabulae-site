@@ -9,7 +9,13 @@ import validator from 'validator';
 import {outdatedRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
 import {fromJS} from 'immutable';
+
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -38,6 +44,8 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.loadTable = this._loadTable.bind(this);
     this.remountTable = this._remountTable.bind(this);
+    this.handleClose = _ => this.setState({isPanelOpen: false});
+    this.handleSelectChange = (event, index, selectvalue) => this.setState({selectvalue});
     if (!defaultColumns.some(col => col.data === 'publication_name_1' && col.type === 'autocomplete')) {
       defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_1' && col.type !== 'autocomplete'));
       defaultColumns.push({
@@ -67,6 +75,11 @@ class HandsOnTable extends Component {
       });
     }
     this.state = {
+      selectvalue: '',
+      inputvalue: '',
+      isPanelOpen: false,
+      dialogtitle: '',
+      dialoginfo: '',
       addedRow: false,
       update: false,
       lazyLoadingThreshold: 100,
@@ -240,13 +253,15 @@ class HandsOnTable extends Component {
             }
 
             if (key === 'add_column') {
-              alertify.prompt(
-                `Add Column`,
-                `What is the new column name?`,
-                '',
-                (e, value) => this._addColumn(value),
-                _ => alertify.error('Cancel')
-                );
+              console.log('ADD_COLUMN');
+              this.setState({isPanelOpen: true, dialogtitle: 'Add Column', dialoginfo: 'Create Custom Column or Select from Default Fields'});
+              // alertify.prompt(
+              //   `Add Column`,
+              //   `What is the new column name?`,
+              //   '',
+              //   (e, value) => this._addColumn(value),
+              //   _ => alertify.error('Cancel')
+              //   );
             }
           },
           items: {
@@ -392,7 +407,7 @@ class HandsOnTable extends Component {
       return;
     }
     const { options } = this.state;
-    if (options.columns.some( col => col.data === newColumnName)) {
+    if (options.columns.some(col => col.data === newColumnName)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
     } else {
       let fieldsmap = listData.fieldsmap;
@@ -425,8 +440,16 @@ class HandsOnTable extends Component {
   }
 
   render() {
-    const {options} = this.state;
+    const state = this.state;
     const props = this.props;
+    const actions = [
+      <FlatButton
+        label='Ok'
+        primary
+        keyboardFocused
+        onTouchTap={this.handleClose}
+      />,
+    ];
     return (
       <div key={props.listData.id}>
         <div className='row noprint'>
@@ -436,7 +459,7 @@ class HandsOnTable extends Component {
               primary
               label='Save'
               labelStyle={{textTransform: 'none'}}
-              onClick={ _ => this._onSaveClick(options.data, options.columns)}
+              onClick={ _ => this._onSaveClick(state.options.data, state.options.columns)}
               />
             </div>
             <div style={{position: 'fixed', top: 150, zIndex: 180}}>
@@ -444,6 +467,24 @@ class HandsOnTable extends Component {
             </div>
           </div>
         </div>
+        <Dialog
+        actions={actions}
+        title={state.dialogtitle}
+        open={state.isPanelOpen}
+        modal
+        onRequestClose={this.handleClose}>
+          <div>
+            <p>{state.dialoginfo}</p>
+            <TextField id='text-field-ht' onChange={(e, val) => this.setState({inputvalue: val})} />
+            <SelectField onChange={this.handleSelectChange}>
+              <MenuItem value={1} primaryText="Never" />
+              <MenuItem value={2} primaryText="Every Night" />
+              <MenuItem value={3} primaryText="Weeknights" />
+              <MenuItem value={4} primaryText="Weekends" />
+              <MenuItem value={5} primaryText="Weekly" />
+            </SelectField>
+          </div>
+        </Dialog>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
         <div ref='data-grid' id={props.listData.id}></div>
       </div>
