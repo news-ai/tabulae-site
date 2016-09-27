@@ -6,8 +6,6 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const defaultSelectableOptions = [
-  // {value: '_', label: '[leave me blank]', selected: false},
-  // {value: 'ignore_column', label: '[Ignore this column]', selected: false},
   {value: 'firstname', label: 'First Name', selected: false},
   {value: 'lastname', label: 'Last Name', selected: false},
   {value: 'email', label: 'Email', selected: false},

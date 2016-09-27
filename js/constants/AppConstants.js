@@ -15,6 +15,8 @@ export const commonTypes = [
   'SET_OFFSET',
   'MANUALLY_SET_ISRECEIVING_ON',
   'MANUALLY_SET_ISRECEIVING_OFF',
+  'ADD_REQUESTED',
+  'ADD_RECEIVED'
 ];
 
 export const listConstant = generateConstants(commonTypes, 'LIST');

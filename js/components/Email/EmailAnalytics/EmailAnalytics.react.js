@@ -56,7 +56,7 @@ class EmailAnalytics extends Component {
           <div style={{marginTop: '20px', marginBottom: '20px'}}>
             <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
           </div>
-          {props.lists ?
+          {props.lists &&
             <div>
               <Toggle style={toggleStyle.block} labelStyle={toggleStyle.label} label='Set to Archived Lists' toggled={state.isShowingArchived} onToggle={_ => this.setState({isShowingArchived: !state.isShowingArchived})} />
               <div>
@@ -65,7 +65,7 @@ class EmailAnalytics extends Component {
                 {selectable}
                 </DropDownMenu>
               </div>
-            </div>: null }
+            </div>}
           <Dialog
           open={state.isPreviewOpen}
           onRequestClose={this.handlePreviewClose}
@@ -80,10 +80,10 @@ class EmailAnalytics extends Component {
             {...email}
             />)}
           </div>
-           {state.canLoadMore ? <p style={{
+           {state.canLoadMore && <p style={{
             display: 'flex',
             justifyContent: 'center'
-          }}>Scroll to load more</p> : null}
+          }}>Scroll to load more</p>}
           </div>
         </div>
       </InfiniteScroll>

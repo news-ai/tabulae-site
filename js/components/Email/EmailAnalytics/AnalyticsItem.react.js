@@ -64,7 +64,7 @@ function AnalyticsItem({
   return (
     <div style={wrapperStyle}>
       {
-        listid !== 0 ? <div className='row'>
+        listid !== 0 && <div className='row'>
           <div className='small-12 large-6 columns left'>
             <span style={styles.sentFrom}>Sent from List</span>
             <span style={{marginLeft: '10px'}}><Link to={`/lists/${listid}`}>{listname || listid}</Link></span>
@@ -72,27 +72,27 @@ function AnalyticsItem({
           <div className='small-12 large-6 columns right'>
             <span style={{marginRight: '10px', fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
           </div>
-        </div> : null
+        </div>
       }
       <div className='email-analytics row' style={styles.analytics}>
         <div className='small-12 medium-3 large-3 columns'>
           <span style={styles.to}>To</span>
-          <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT ? `...` : null}</span>
+          <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
         </div>
         <div className='small-12 medium-3 large-5 columns'>
-          <span onClick={onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 ? `...` : null}</span>
-          {!delivered ? <div style={styles.errorText}>
+          <span onClick={onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
+          {!delivered && <div style={styles.errorText}>
             <span>Something went wrong on our end. Let us know!</span>
             <p>Email ID: {id}</p>
-            </div> : null}
-          {bounced ? <span style={styles.errorText}>email bounced</span> : null}
-          {bouncedreason ? <p style={{color: deepOrange900}}>{bouncedreason}</p> : null}
+            </div>}
+          {bounced && <span style={styles.errorText}>email bounced</span>}
+          {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
         </div>
         <div className='small-12 medium-3 large-2 columns' style={{marginTop: '10px'}}>
-          {(!bounced && delivered) ? <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' /> : null}
+          {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />}
         </div>
         <div className='small-12 medium-3 large-2 columns' style={{marginTop: '10px'}}>
-          {(!bounced && delivered) ? <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/> : null}
+          {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>}
         </div>
       </div>
     </div>

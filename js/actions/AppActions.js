@@ -12,6 +12,7 @@ export const logout = _ => loginActions.logout();
 export const onLogin = _ => loginActions.onLogin();
 export const fetchPerson = _ => loginActions.fetchPerson();
 export const setFirstTimeUser = _ => loginActions.setFirstTimeUser();
+export const fetchNotifications = _ => loginActions.fetchNotifications();
 
 export const fetchLists = _ => listActions.fetchLists();
 export const addListWithoutContacts = name => listActions.addListWithoutContacts(name);
@@ -36,6 +37,7 @@ export const getStagedEmails = _ => stagingActions.getStagedEmails();
 export const fetchPublication = id => publicationActions.fetchPublication(id);
 export const createPublication = data => publicationActions.createPublication(data);
 export const searchPublications = query => publicationActions.searchPublications(query);
+export const createPublicationThenPatchContact = (contactId, pubName, which) => publicationActions.createPublicationThenPatchContact(contactId, pubName, which);
 
 export const uploadFile = (listId, file) => fileActions.uploadFile(listId, file);
 export const fetchHeaders = listId => fileActions.fetchHeaders(listId);

@@ -39,11 +39,12 @@ import App from './components/App.react';
 import ListManagerContainer from './components/pages/ListManagerContainer.react';
 import ArchiveContainer from './components/pages/ArchiveContainer.react';
 import Table from './components/pages/Table.react';
-import SearchBar from './components/Search/SearchBar.react';
+import SearchBar from './components/Search';
 import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
+import ContactProfile from './components/ContactProfile';
 
 import intercomSetup from './chat';
 
@@ -60,7 +61,7 @@ window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.co
 
 
 // third-party services setups
-if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install()
+if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
 intercomSetup({app_id: 'ur8dbk9e'});
 
 
@@ -84,6 +85,7 @@ ReactDOM.render(
               <Route path='lists' name='List Manager' component={ListManagerContainer}>
             </Route>
             <Route path='lists/:listId' staticName name='Sheet' component={OnboardingTable} />
+            <Route path='lists/:listId/:contactId' name='Profile' component={ContactProfile} />
             <Route key='static' path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />

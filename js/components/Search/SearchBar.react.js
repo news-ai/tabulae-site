@@ -86,7 +86,7 @@ class SearchBar extends Component {
               <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
           </div>
-          {props.results.length > 0 ?
+          {props.results.length > 0 &&
           <div className='row' style={{marginTop: 20}}>
             <div className='large-offset-10 medium-offset-10 small-offset-6 columns'>
               <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' onClick={_ => {
@@ -94,7 +94,7 @@ class SearchBar extends Component {
                 props.router.push('/search/table');
               }} />
             </div>
-          </div> : null}
+          </div>}
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: '25px'}}>
@@ -102,10 +102,10 @@ class SearchBar extends Component {
               {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} query={props.searchQuery} /></div>)}
             </div>
           <div className='row'>
-          {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 ?
+          {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 &&
             <div className='large-12 columns' style={{display: 'flex', justifyContent: 'center'}}>
             <p>Scroll to load more</p>
-            </div> : null}
+            </div>}
           </div>
         </div>
       </InfiniteScroll>

@@ -36,3 +36,13 @@
   position: absolute;
   width: 1px;
 }
+
+.vertical-center {
+  display: flex;
+  align-items: center;
+}
+
+.horizontal-center {
+  display: flex;
+  justify-content: center;
+}

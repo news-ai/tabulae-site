@@ -69,7 +69,23 @@ export function fetchContact(contactId) {
   return dispatch => {
     dispatch(requestContact());
     return api.get(`/contacts/${contactId}`)
-    .then( response => dispatch(receiveContact(response)))
+    .then( response => {
+      // const res = normalize(response, {data: contactSchema});
+      return dispatch(receiveContact(response.data));
+    })
+    .catch( message => dispatch(requestContactFail(message)));
+  };
+}
+
+export function patchContact(contactId, contactBody) {
+  return (dispatch, getState) => {
+    dispatch(requestContact());
+    const contact = Object.assign({}, getState().contactReducer[contactId], contactBody);
+    return api.patch(`/contacts/${contactId}`, contact)
+    .then(response => {
+      // const res = normalize(response, {data: contactSchema});
+      return dispatch(receiveContact(response.data));
+    })
     .catch( message => dispatch(requestContactFail(message)));
   };
 }

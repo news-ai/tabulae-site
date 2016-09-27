@@ -11,7 +11,7 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
-import {grey700, grey600} from 'material-ui/styles/colors';
+import {grey700, grey500} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
@@ -36,7 +36,7 @@ const navStyle = {
 const noNavBarLocations = ['static'];
 function matchNoNavBar(pathname) {
   const pathblocks = pathname.split('/');
-  return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length -1 ]);
+  return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length - 1 ]);
 }
 
 class App extends Component {
@@ -71,6 +71,7 @@ class App extends Component {
         //   name: `${person.firstname} ${person.lastname}`
         // });
       }
+      this.props.fetchNotifications();
       this.setState({isLogin: true});
     }
     if (matchNoNavBar(nextProps.location.pathname) && nextProps.isLogin) {
@@ -84,7 +85,7 @@ class App extends Component {
     const props = this.props;
     const state = this.state;
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
-    const NavBar = (state.showNavBar && props.person) ? (
+    const NavBar = (state.showNavBar && props.person) && (
       <div>
         <Drawer
         ontainerClassName='noprint'
@@ -110,7 +111,7 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
-            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey600}} onClick={this.toggleModal} />
+            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey500}} onClick={this.toggleModal} />
             <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
           </div>
           <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
@@ -128,13 +129,13 @@ class App extends Component {
           <FAQ />
         </Dialog>
       </div>
-      ) : null;
+      );
     return (
       <div style={{width: '100%', height: '100%'}}>
         <StyleRoot>
         {props.isLogin ?
           <div>
-          {state.showNavBar ? NavBar : null}
+          {state.showNavBar && NavBar}
           {props.children}
           </div> :
         <Login />
@@ -159,7 +160,8 @@ const mapDispatchToProps = dispatch => {
   return {
     getAuth: _ => dispatch(actionCreators.fetchPerson()),
     logoutClick: _ => dispatch(actionCreators.logout()),
-    setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser())
+    setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser()),
+    fetchNotifications: _ => dispatch(actionCreators.fetchNotifications())
   };
 };
 

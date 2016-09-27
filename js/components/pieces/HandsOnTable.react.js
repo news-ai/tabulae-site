@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
+import browserHistory from 'react-router/lib/browserHistory';
 import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import {COLUMNS} from 'constants/ColumnConfigs';
 import validator from 'validator';
-import { outdatedRenderer, hightlightRenderer } from 'constants/CustomRenderers';
+import {outdatedRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
-import { fromJS, List } from 'immutable';
+import {fromJS} from 'immutable';
 import RaisedButton from 'material-ui/RaisedButton';
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
@@ -16,8 +17,16 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 const MIN_ROWS = 20;
 const BATCH_CONTACT_SIZE = 200;
 alertify.defaults.glossary.title = '';
-
-let defaultColumns = COLUMNS.map(col => col);
+let defaultColumns = [{
+  data: 'button',
+  title: 'Profile',
+  readOnly: true,
+  renderer: function(instance, td, row, col, prop, value, cellProperties) {
+    // browserHistory.push(instance.getDataAtRowProp(row, 'listid'), instance.getDataAtRowProp(row, 'id'));
+    if (instance.getDataAtRowProp(row, 'id')) td.innerHTML = `<a href='${instance.getDataAtRowProp(row, 'listid')}/${instance.getDataAtRowProp(row, 'id')}'>Goto</a>`;
+    // Handsontable.renderers.TextRenderer.apply(this, arguments);
+  }
+}, ...COLUMNS.map(col => col)];
 
 class HandsOnTable extends Component {
   constructor(props) {
