@@ -17,6 +17,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 
 import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
+import InfiniteScroll from '../InfiniteScroll';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -190,17 +191,37 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <div className='row horizontal-center'>
-        <div className='large-9 columns' style={{marginTop: 20}}>
-          {props.contact && (
-            <div className='row' style={{marginTop: 20}}>
-              <div className='large-12 medium-12 small-12 columns'><h4>{props.contact.firstname} {props.contact.lastname}</h4></div>
-              <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
-              <div className='large-5 medium-12 small-12 columns'>
-                <div style={{marginTop: 20}}>
-                  <div className='row vertical-center'>
-                    <h5>Current Publications/Employers</h5>
-                    <IconButton
+      <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+        <div className='row horizontal-center'>
+          <div className='large-9 columns' style={{marginTop: 20}}>
+            {props.contact && (
+              <div className='row' style={{marginTop: 20}}>
+                <div className='large-12 medium-12 small-12 columns'><h4>{props.contact.firstname} {props.contact.lastname}</h4></div>
+                <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
+                <div className='large-5 medium-12 small-12 columns'>
+                  <div style={{marginTop: 20}}>
+                    <div className='row vertical-center'>
+                      <h5>Current Publications/Employers</h5>
+                      <IconButton
+                        style={{marginLeft: 3}}
+                        iconStyle={styles.smallIcon}
+                        style={styles.small}
+                        iconClassName='fa fa-plus'
+                        tooltip='Add Publication'
+                        tooltipPosition='top-right'
+                        onClick={_ => this.togglePanel('employers')}
+                        />
+                    </div>
+                    <div>
+                      {props.employers && props.employers.map((employer, i) =>
+                        <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                      {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
+                    </div>
+                  </div>
+                  <div style={{marginTop: 20}}>
+                    <div className='row vertical-center'>
+                      <h5>Past Publications/Employers</h5>
+                      <IconButton
                       style={{marginLeft: 3}}
                       iconStyle={styles.smallIcon}
                       style={styles.small}
@@ -209,86 +230,68 @@ class ContactProfile extends Component {
                       tooltipPosition='top-right'
                       onClick={_ => this.togglePanel('employers')}
                       />
+                    </div>
                   </div>
                   <div>
-                    {props.employers && props.employers.map((employer, i) =>
-                      <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='employers' contact={props.contact} />)}
-                    {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
+                    {props.pastemployers && props.pastemployers.map((employer, i) =>
+                      <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                    {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
                   </div>
                 </div>
-                <div style={{marginTop: 20}}>
-                  <div className='row vertical-center'>
-                    <h5>Past Publications/Employers</h5>
-                    <IconButton
-                    style={{marginLeft: 3}}
-                    iconStyle={styles.smallIcon}
-                    style={styles.small}
-                    iconClassName='fa fa-plus'
-                    tooltip='Add Publication'
-                    tooltipPosition='top-right'
-                    onClick={_ => this.togglePanel('employers')}
-                    />
-                  </div>
+              </div>
+              )}
+            <Dialog actions={addFeedActions} title='New Author RSS Feed' modal open={state.isRSSPanelOpen} onRequestClose={_ => this.togglePanel('rss')}>
+              <TextField
+              value={state.feedUrl}
+              hintText='Enter RSS Url here'
+              errorText={validator.isURL(state.feedUrl) || state.feedUrl.length === 0 ? null : 'not valid URL'}
+              onChange={e => this.setState({feedUrl: e.target.value})}
+              />
+            </Dialog>
+            <Dialog actions={addEmployerActions} title='Add Current Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
+              <AutoComplete
+              floatingLabelText='Autocomplete dropdown'
+              filter={AutoComplete.noFilter}
+              onUpdateInput={this.updateAutoInput}
+              onNewRequest={autoinput => this.setState({autoinput})}
+              openOnFocus
+              dataSource={state.employerAutocompleteList}
+              />
+            </Dialog>
+             <Dialog actions={addPastEmployerActions} title='Add Past Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
+              <AutoComplete
+              floatingLabelText='Autocomplete dropdown'
+              filter={AutoComplete.noFilter}
+              onUpdateInput={this.updateAutoInput}
+              onNewRequest={autoinput => this.setState({autoinput})}
+              openOnFocus
+              dataSource={state.employerAutocompleteList}
+              />
+            </Dialog>
+            <div style={{
+              margin: 8,
+              marginTop: 20
+            }}>
+             <div className='row' style={{marginTop: 15, marginBottom: 15}}>
+                <div className='large-9 medium-8 small-12 columns' style={{color: grey500, fontSize: '0.7em'}}>
+                  Attached Feeds:
+                  {props.attachedfeeds.map((feed, i) => <div key={i} style={{marginLeft: 3}}><span>{feed}</span></div>)}
                 </div>
-                <div>
-                  {props.pastemployers && props.pastemployers.map((employer, i) =>
-                    <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
-                  {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
+                 <div className='large-3 medium-4 small-12 columns'>
+                  <RaisedButton style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Add New Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
                 </div>
               </div>
+              {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
+              {props.headlines
+                && !props.headlineDidInvalidate
+                && props.headlines.length === 0
+                && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" tog start seeing some headlines.</p></div>}
+              {props.headlineDidInvalidate
+                && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
             </div>
-            )}
-          <Dialog actions={addFeedActions} title='New Author RSS Feed' modal open={state.isRSSPanelOpen} onRequestClose={_ => this.togglePanel('rss')}>
-            <TextField
-            value={state.feedUrl}
-            hintText='Enter RSS Url here'
-            errorText={validator.isURL(state.feedUrl) || state.feedUrl.length === 0 ? null : 'not valid URL'}
-            onChange={e => this.setState({feedUrl: e.target.value})}
-            />
-          </Dialog>
-          <Dialog actions={addEmployerActions} title='Add Current Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
-            <AutoComplete
-            floatingLabelText='Autocomplete dropdown'
-            filter={AutoComplete.noFilter}
-            onUpdateInput={this.updateAutoInput}
-            onNewRequest={autoinput => this.setState({autoinput})}
-            openOnFocus
-            dataSource={state.employerAutocompleteList}
-            />
-          </Dialog>
-           <Dialog actions={addPastEmployerActions} title='Add Past Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
-            <AutoComplete
-            floatingLabelText='Autocomplete dropdown'
-            filter={AutoComplete.noFilter}
-            onUpdateInput={this.updateAutoInput}
-            onNewRequest={autoinput => this.setState({autoinput})}
-            openOnFocus
-            dataSource={state.employerAutocompleteList}
-            />
-          </Dialog>
-          <div style={{
-            margin: 8,
-            marginTop: 20
-          }}>
-           <div className='row' style={{marginTop: 15, marginBottom: 15}}>
-              <div className='large-9 medium-8 small-12 columns' style={{color: grey500, fontSize: '0.7em'}}>
-                Attached Feeds:
-                {props.attachedfeeds.map(feed => <div style={{marginLeft: 3}}><span>{feed}</span></div>)}
-              </div>
-               <div className='large-3 medium-4 small-12 columns'>
-                <RaisedButton style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Add New Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
-              </div>
-            </div>
-            {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-            {props.headlines
-              && !props.headlineDidInvalidate
-              && props.headlines.length === 0
-              && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" to start seeing some headlines.</p></div>}
-            {props.headlineDidInvalidate
-              && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
           </div>
         </div>
-      </div>
+      </InfiniteScroll>
     );
   }
 }

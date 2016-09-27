@@ -14,16 +14,18 @@ function headlineReducer(state = initialState.headlineReducer, action) {
   let obj = assignToEmpty(state, {});
   switch (action.type) {
     case headlineConstant.REQUEST:
-      obj[action.contactId] = {};
-      obj[action.contactId].received = [];
       obj.isReceiving = true;
       return obj;
     case headlineConstant.RECEIVE:
       obj = assignToEmpty(obj, action.headlines);
-      obj[action.contactId].received = [
-      ...obj[action.contactId].received,
-      ...action.ids.filter(id => !state[action.contactId][id])
-      ];
+      const oldContact = state[action.contactId] || {received: []};
+      obj[action.contactId] = assignToEmpty(state[action.contactId], {
+        received: [
+          ...oldContact.received,
+          ...action.ids.filter(id => !oldContact[id])
+        ],
+        offset: action.offset
+      });
       obj.isReceiving = false;
       return obj;
     case headlineConstant.REQUEST_FAIL:
