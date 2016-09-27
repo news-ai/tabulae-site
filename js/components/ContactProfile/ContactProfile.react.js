@@ -183,7 +183,8 @@ class ContactProfile extends Component {
             <ContactProfileDescriptions contact={props.contact} {...props} />
             <div className='large-12 medium-12 small-12 columns'>
               <span>Current Publications/Employers</span>
-              {props.employers && props.employers.map((employer, i) => <ContactEmployerDescriptor key={i} employer={employer} />)}
+              {props.employers && props.employers.map((employer, i) =>
+                <ContactEmployerDescriptor key={i} employer={employer} contact={props.contact} />)}
                <IconButton
                 style={{marginLeft: 3}}
                 iconStyle={styles.smallIcon}

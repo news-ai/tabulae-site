@@ -23,6 +23,7 @@ class ContactEmployerDescriptor extends Component {
 
   render() {
     const props = this.props;
+    const contactEmployers = props.contact.employers.filter(id => id !== props.employer.id);
     return (
       <div className={props.className} style={{display: 'flex', alignItems: 'center'}}>
       <span>{props.employer.name}</span>
@@ -33,6 +34,7 @@ class ContactEmployerDescriptor extends Component {
         iconClassName='fa fa-minus'
         tooltip='Delete Publication'
         tooltipPosition='top-right'
+        onClick={_ => props.patchContact(props.contact.id, {employers: contactEmployers})}
         />
       </div>
       );
