@@ -41,3 +41,8 @@
   display: flex;
   align-items: center;
 }
+
+.horizontal-center {
+  display: flex;
+  justify-content: center;
+}

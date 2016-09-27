@@ -12,11 +12,9 @@ export function fetchContactHeadlines(contactId) {
     dispatch({type: headlineConstant.REQUEST, contactId});
     return api.get(`/contacts/${contactId}/headlines`)
     .then(response => {
-      console.log(response);
       const res = normalize(response, {
         data: arrayOf(headlineSchema),
       });
-      console.log(res);
       return dispatch({type: headlineConstant.RECEIVE, contactId, headlines: res.entities.headlines, ids: res.result.data});
     })
     .catch(err => {

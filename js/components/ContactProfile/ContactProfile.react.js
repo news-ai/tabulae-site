@@ -55,8 +55,7 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
 
 const ContactProfileDescriptions = ({contact, patchContact, className}) => {
   return (
-    <div className={className} style={{marginTop: 30}}>
-      <div className='large-12 medium-12 small-12 columns'><h4>{contact.firstname} {contact.lastname}</h4></div>
+    <div className={className} style={{marginTop: 5}}>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
@@ -127,7 +126,6 @@ class ContactProfile extends Component {
   }
 
   _addPublicationToContact() {
-    console.log(this.state.autoinput);
     this.props.createPublicationThenPatchContact(this.props.contact.id, this.state.autoinput);
   }
 
@@ -192,15 +190,36 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <div style={{marginTop: 20}}>
-        {props.contact && (
-          <div className='row'>
-            <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
-            <div className='large-5 medium-12 small-12 columns'>
-              <div style={{marginTop: 20}}>
-                <div className='row vertical-center'>
-                  <h5>Current Publications/Employers</h5>
-                  <IconButton
+      <div className='row horizontal-center'>
+        <div className='large-9 columns' style={{marginTop: 20}}>
+          {props.contact && (
+            <div className='row' style={{marginTop: 20}}>
+              <div className='large-12 medium-12 small-12 columns'><h4>{props.contact.firstname} {props.contact.lastname}</h4></div>
+              <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
+              <div className='large-5 medium-12 small-12 columns'>
+                <div style={{marginTop: 20}}>
+                  <div className='row vertical-center'>
+                    <h5>Current Publications/Employers</h5>
+                    <IconButton
+                      style={{marginLeft: 3}}
+                      iconStyle={styles.smallIcon}
+                      style={styles.small}
+                      iconClassName='fa fa-plus'
+                      tooltip='Add Publication'
+                      tooltipPosition='top-right'
+                      onClick={_ => this.togglePanel('employers')}
+                      />
+                  </div>
+                  <div>
+                    {props.employers && props.employers.map((employer, i) =>
+                      <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                    {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
+                  </div>
+                </div>
+                <div style={{marginTop: 20}}>
+                  <div className='row vertical-center'>
+                    <h5>Past Publications/Employers</h5>
+                    <IconButton
                     style={{marginLeft: 3}}
                     iconStyle={styles.smallIcon}
                     style={styles.small}
@@ -209,36 +228,16 @@ class ContactProfile extends Component {
                     tooltipPosition='top-right'
                     onClick={_ => this.togglePanel('employers')}
                     />
+                  </div>
                 </div>
                 <div>
-                  {props.employers && props.employers.map((employer, i) =>
-                    <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='employers' contact={props.contact} />)}
-                  {props.employers.length === 0 && <span>None added</span>}
+                  {props.pastemployers && props.pastemployers.map((employer, i) =>
+                    <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                  {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
                 </div>
-              </div>
-              <div style={{marginTop: 20}}>
-                <div className='row vertical-center'>
-                  <h5>Past Publications/Employers</h5>
-                  <IconButton
-                  style={{marginLeft: 3}}
-                  iconStyle={styles.smallIcon}
-                  style={styles.small}
-                  iconClassName='fa fa-plus'
-                  tooltip='Add Publication'
-                  tooltipPosition='top-right'
-                  onClick={_ => this.togglePanel('employers')}
-                  />
-                </div>
-              </div>
-              <div>
-                {props.pastemployers && props.pastemployers.map((employer, i) =>
-                  <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
-                {props.pastemployers.length === 0 && <span>None added</span>}
               </div>
             </div>
-          </div>
-          )}
-        <div>
+            )}
           <Dialog actions={addFeedActions} title='New Author RSS Feed' modal open={state.isRSSPanelOpen} onRequestClose={_ => this.togglePanel('rss')}>
             <TextField
             value={state.feedUrl}
@@ -267,17 +266,19 @@ class ContactProfile extends Component {
             dataSource={state.employerAutocompleteList}
             />
           </Dialog>
-          <div className='large-offset-10 medium-offset-8 small-12 columns' style={{marginTop: 20}}>
-            <RaisedButton label='Add New RSS Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
-          </div>
-          <div style={{color: grey500, fontSize: '0.8em'}}>
-          Attached Feeds:
-          {props.attachedfeeds.map(feed => <div><span>{feed}</span></div>)}
-          </div>
-          <div className='large-12 medium-12 small-12 columns' style={{
-            marginTop: 20,
-            padding: 5,
-            border: `solid 1px ${grey100}`}}>
+          <div style={{
+            margin: 8,
+            marginTop: 20
+          }}>
+           <div className='row' style={{marginTop: 15, marginBottom: 15}}>
+              <div className='large-9 medium-8 small-12 columns' style={{color: grey500, fontSize: '0.7em'}}>
+                Attached Feeds:
+                {props.attachedfeeds.map(feed => <div style={{marginLeft: 3}}><span>{feed}</span></div>)}
+              </div>
+               <div className='large-3 medium-4 small-12 columns'>
+                <RaisedButton style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Add New Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
+              </div>
+            </div>
             {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
             {props.headlines
               && !props.headlineDidInvalidate
