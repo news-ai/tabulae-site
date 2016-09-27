@@ -138,6 +138,7 @@ class ContactProfile extends Component {
 
   _addPublicationToContact() {
     console.log(this.state.autoinput);
+    this.props.createPublicationThenPatchContact(this.props.contact.id, this.state.autoinput);
   }
 
   render() {
@@ -162,7 +163,10 @@ class ContactProfile extends Component {
         primary
         onTouchTap={_ => {
           this.togglePanel('employers');
-          this.setState({autoinput: ''});
+          this.setState({
+            autoinput: '',
+            employerAutocompleteList: []
+          });
         }}
       />,
       <FlatButton
@@ -268,6 +272,7 @@ const mapDispatchToProps = (dispatch, props) => {
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
     fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
+    createPublicationThenPatchContact: (contactId, pubName) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName))
   };
 };
 

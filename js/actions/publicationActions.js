@@ -5,6 +5,7 @@ import * as api from './api';
 import { normalize, Schema, arrayOf } from 'normalizr';
 
 const publicationSchema = new Schema('publications');
+import * as contactActions from './contactActions';
 
 
 function requestPublication(id) {
@@ -73,5 +74,28 @@ export function createPublication(data) {
       return response;
     })
     .catch( message => dispatch(requestPublicationFail(message)));
+  };
+}
+
+export function createPublicationThenPatchContact(contactId, pubName) {
+  return (dispatch, getState) => {
+    const pubId = getState().publicationReducer[pubName];
+    if (pubId) {
+      const contact = getState().contactReducer[contactId];
+      if (contact) {
+        const employers = contact.employers === null ? [pubId] : [...contact.employers, pubId];
+        dispatch(contactActions.patchContact(contactId, {employers}));
+      }
+    } else {
+      dispatch(createPublication({name: pubName}))
+      .then(response => {
+        const newPubId = response.data.id;
+        const contact = getState().contactReducer[contactId];
+        if (contact) {
+          const employers = contact.employers === null ? [newPubId] : [...contact.employers, newPubId];
+          dispatch(contactActions.patchContact(contactId, {employers}));
+        }
+      });
+    }
   };
 }
