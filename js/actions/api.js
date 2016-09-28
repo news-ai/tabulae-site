@@ -6,7 +6,7 @@ export function get(endpoint) {
     .then( text => JSON.parse(text));
 }
 
-export function Delete(endpoint) {
+export function deleteRequest(endpoint) {
   return fetch(`${window.TABULAE_API_BASE}${endpoint}`, {
     method: 'DELETE',
     credentials: 'include'

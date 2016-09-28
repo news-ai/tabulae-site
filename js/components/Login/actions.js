@@ -75,7 +75,8 @@ export function logout() {
 }
 
 export function fetchPerson() {
-  return dispatch => {
+  return (dispatch, getState) => {
+    if (getState().personReducer.person) return;
     dispatch(requestLogin());
     return api.get('/users/me')
     .then( response => dispatch(receiveLogin(response.data)))
