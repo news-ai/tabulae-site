@@ -7,7 +7,6 @@ import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey700, grey500, grey100} from 'material-ui/styles/colors';
-import uniqBy from 'lodash/uniqBy';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -19,6 +18,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import InfiniteScroll from '../InfiniteScroll';
+import FeedsController from './FeedsController.react';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -58,6 +58,7 @@ const ContactDescriptor = ({content, contentTitle, onClick, className}) => {
 const ContactProfileDescriptions = ({contact, patchContact, className}) => {
   return (
     <div className={className} style={{marginTop: 5}}>
+      <h4>{contact.firstname} {contact.lastname}</h4>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => patchContact(contact.id, {twitter: value})}/>
@@ -71,15 +72,12 @@ class ContactProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isRSSPanelOpen: false,
       isEmployerPanelOpen: false,
       isPastEmployerPanelOpen: false,
-      feedUrl: '',
       employerAutocompleteList: [],
       autoinput: ''
     };
     this.togglePanel = this._togglePanel.bind(this);
-    this.addFeedClick = this._addFeedClick.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.addPublicationToContact = this._addPublicationToContact.bind(this);
   }
@@ -96,20 +94,11 @@ class ContactProfile extends Component {
       .map(pubId => this.props.fetchPublication(pubId));
     });
     this.props.fetchFeed(this.props.contactId);
-  }
-
-  _addFeedClick() {
-    const props = this.props;
-    if (this.state.feedUrl.length === 0) return;
-    props.addFeed(props.contactId, props.listId, this.state.feedUrl);
-    this.togglePanel('rss');
+    this.props.fetchContactFeeds(this.props.contactId);
   }
 
   _togglePanel(key) {
     switch (key) {
-      case 'rss':
-        this.setState({isRSSPanelOpen: !this.state.isRSSPanelOpen});
-        break;
       case 'employers':
         this.setState({isEmployerPanelOpen: !this.state.isEmployerPanelOpen});
         break;
@@ -138,19 +127,6 @@ class ContactProfile extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    const addFeedActions = [
-      <FlatButton
-        label='Cancel'
-        primary
-        onTouchTap={_ => this.togglePanel('rss')}
-      />,
-      <FlatButton
-        label='Submit'
-        primary
-        keyboardFocused
-        onTouchTap={this.addFeedClick}
-      />,
-    ];
     const addEmployerActions = [
       <FlatButton
         label='Cancel'
@@ -207,7 +183,6 @@ class ContactProfile extends Component {
           <div className='large-9 columns'>
             {props.contact && (
               <div className='row' style={{marginTop: 20}}>
-                <div className='large-12 medium-12 small-12 columns'><h4>{props.contact.firstname} {props.contact.lastname}</h4></div>
                 <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
                 <div className='large-5 medium-12 small-12 columns'>
                   <div style={{marginTop: 20}}>
@@ -225,7 +200,7 @@ class ContactProfile extends Component {
                     </div>
                     <div>
                       {props.employers && props.employers.map((employer, i) =>
-                        <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                        <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='employers' contact={props.contact} />)}
                       {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
                     </div>
                   </div>
@@ -245,20 +220,12 @@ class ContactProfile extends Component {
                   </div>
                   <div>
                     {props.pastemployers && props.pastemployers.map((employer, i) =>
-                      <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
                     {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
                   </div>
                 </div>
               </div>
               )}
-            <Dialog actions={addFeedActions} title='New Author RSS Feed' modal open={state.isRSSPanelOpen} onRequestClose={_ => this.togglePanel('rss')}>
-              <TextField
-              value={state.feedUrl}
-              hintText='Enter RSS Url here'
-              errorText={validator.isURL(state.feedUrl) || state.feedUrl.length === 0 ? null : 'not valid URL'}
-              onChange={e => this.setState({feedUrl: e.target.value})}
-              />
-            </Dialog>
             <Dialog
             actions={state.isEmployerPanelOpen ? addEmployerActions : addPastEmployerActions}
             title={state.isEmployerPanelOpen ? 'Add Current Publication' : 'Add Past Publication'}
@@ -278,15 +245,7 @@ class ContactProfile extends Component {
               margin: 8,
               marginTop: 20
             }}>
-             <div className='row' style={{marginTop: 15, marginBottom: 15}}>
-                <div className='large-9 medium-8 small-12 columns' style={{color: grey500, fontSize: '0.7em'}}>
-                  Attached Feeds:
-                  {props.attachedfeeds.map((feed, i) => <div key={i} style={{marginLeft: 3}}><span>{feed}</span></div>)}
-                </div>
-                 <div className='large-3 medium-4 small-12 columns'>
-                  <RaisedButton style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Add New Feed' onClick={_ => this.togglePanel('rss')} labelStyle={{textTransform: 'none'}} />
-                </div>
-              </div>
+              <FeedsController {...props} />
               {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
               {props.headlines
                 && !props.headlineDidInvalidate
@@ -315,7 +274,8 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-  const attachedfeeds = uniqBy(headlines, 'feedurl').map(obj => obj.feedurl);
+  const feeds = state.feedReducer[contactId] && state.feedReducer[contactId].map(id => state.feedReducer[id]);
+  const attachedfeeds = feeds && feeds.map(feed => feed.url);
 
   return {
     listId,
@@ -324,17 +284,16 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
-    attachedfeeds,
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    addFeed: (contactid, listid, url) => dispatch(feedActions.addFeed(contactid, listid, url)),
     fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
+    fetchContactFeeds: (contactId) => dispatch(feedActions.fetchContactFeeds(contactId)),
     fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which))

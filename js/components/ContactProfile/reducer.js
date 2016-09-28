@@ -19,6 +19,15 @@ function feedReducer(state = initialState.feedReducer, action) {
     case feedConstant.ADD_RECEIVED:
       obj.isReceiving = false;
       return obj;
+    case feedConstant.REQUEST_MULTIPLE:
+      obj.isReceiving = true;
+      return obj;
+    case feedConstant.RECEIVE_MULTIPLE:
+      obj = assignToEmpty(state, action.feeds);
+      obj[action.contactId] = action.ids;
+      obj.isReceiving = false;
+      obj.received = [...state.received, ...action.ids.filter(id => !state[id])];
+      return obj;
     default:
       return state;
   }
