@@ -106,7 +106,7 @@ export function patchList({listId, name, contacts, fieldsmap}) {
   return dispatch => {
     dispatch({type: listConstant.PATCH, listId, listBody});
     return api.patch(`/lists/${listId}`, listBody)
-    .then( response => {
+    .then(response => {
       const res = normalize(response.data, listSchema);
       return dispatch(receiveList(res.entities.lists, res.result));
     })

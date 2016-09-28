@@ -327,8 +327,10 @@ class HandsOnTable extends Component {
 
     if (!_.isEmpty(listData.contacts)) {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
-        let columns = _.cloneDeep(this.state.preservedColumns);
-        fieldsmap.map( fieldObj => {
+        let columns = _.cloneDeep(this.state.preservedColumns
+          .filter(col => !fieldsmap.some(fieldObj => fieldObj.hidden && fieldObj.value === col.data)));
+        console.log(columns);
+        fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({data: fieldObj.value, title: fieldObj.name});
         });
         options.columns = columns;
@@ -387,6 +389,7 @@ class HandsOnTable extends Component {
       // const newColumns = columns.filter( (col, i) => i !== colNum );
       const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
       props.patchList({
+        name: props.listData.name,
         listId: listId,
         fieldsmap: newFieldsmap
       }).then(_ => {
@@ -394,7 +397,24 @@ class HandsOnTable extends Component {
         this.remountTable();
       });
     } else {
-      alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
+      const newFieldsmap = fieldsmap.map(fieldObj => {
+        if (fieldObj.value === columnValue && !fieldObj.customfield) {
+          const newObj = Object.assign({}, fieldObj, {hidden: true})
+          return newObj;
+        }
+        return fieldObj;
+      });
+
+      props.patchList({
+        listId,
+        fieldsmap: newFieldsmap,
+        name: prop.listData.name
+      })
+      .then(_ => {
+        this.table.destroy();
+        this.remountTable();
+      });
+      // alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
 
@@ -417,6 +437,7 @@ class HandsOnTable extends Component {
       }]);
       dispatch(actionCreators.patchList({
         listId: listData.id,
+        name: listData.name,
         fieldsmap: newFieldsmap
       }));
       this.setState({fieldsmap: newFieldsmap});
