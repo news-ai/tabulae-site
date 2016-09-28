@@ -44,7 +44,7 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.loadTable = this._loadTable.bind(this);
     this.remountTable = this._remountTable.bind(this);
-    this.handleClose = _ => this.setState({isPanelOpen: false});
+    this.handleClose = _ => this.setState({isAddPanelOpen: false});
     this.handleSelectChange = (event, index, selectvalue) => this.setState({selectvalue});
     if (!defaultColumns.some(col => col.data === 'publication_name_1' && col.type === 'autocomplete')) {
       defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_1' && col.type !== 'autocomplete'));
@@ -77,9 +77,7 @@ class HandsOnTable extends Component {
     this.state = {
       selectvalue: '',
       inputvalue: '',
-      isPanelOpen: false,
-      dialogtitle: '',
-      dialoginfo: '',
+      isAddPanelOpen: false,
       addedRow: false,
       update: false,
       lazyLoadingThreshold: 100,
@@ -254,7 +252,7 @@ class HandsOnTable extends Component {
 
             if (key === 'add_column') {
               console.log('ADD_COLUMN');
-              this.setState({isPanelOpen: true, dialogtitle: 'Add Column', dialoginfo: 'Create Custom Column or Select from Default Fields'});
+              this.setState({isAddPanelOpen: true});
               // alertify.prompt(
               //   `Add Column`,
               //   `What is the new column name?`,
@@ -442,12 +440,21 @@ class HandsOnTable extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    const actions = [
+    const addColActions = [
       <FlatButton
-        label='Ok'
+        label='Cancel'
+        primary
+        onTouchTap={this.handleClose}
+      />,
+      <FlatButton
+        label='Submit'
         primary
         keyboardFocused
-        onTouchTap={this.handleClose}
+        onTouchTap={_ => {
+          this._addColumn(state.inputvalue);
+          this.setState({inputvalue: ''});
+          this.handleClose();
+        }}
       />,
     ];
     return (
@@ -468,21 +475,20 @@ class HandsOnTable extends Component {
           </div>
         </div>
         <Dialog
-        actions={actions}
-        title={state.dialogtitle}
-        open={state.isPanelOpen}
+        actions={addColActions}
+        title='Add Column'
+        open={state.isAddPanelOpen}
         modal
         onRequestClose={this.handleClose}>
           <div>
-            <p>{state.dialoginfo}</p>
-            <TextField id='text-field-ht' onChange={(e, val) => this.setState({inputvalue: val})} />
-            <SelectField onChange={this.handleSelectChange}>
-              <MenuItem value={1} primaryText="Never" />
-              <MenuItem value={2} primaryText="Every Night" />
-              <MenuItem value={3} primaryText="Weeknights" />
-              <MenuItem value={4} primaryText="Weekends" />
-              <MenuItem value={5} primaryText="Weekly" />
+            <p>Select from hidden Default Fields</p>
+            <SelectField value={state.selectvalue} onChange={this.handleSelectChange}>
+              {props.listData.fieldsmap
+                .filter(fieldObj => fieldObj.hidden)
+                .map((fieldObj, i) => <MenuItem key={i} value={fieldObj.value} primaryText={fieldObj.name} />)}
             </SelectField>
+            <p>OR Create Your Own</p>
+            <TextField hintText='Column Name' id='text-field-ht' onChange={(e, val) => this.setState({inputvalue: val})} />
           </div>
         </Dialog>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
