@@ -229,11 +229,9 @@ class HandsOnTable extends Component {
             }
 
             if (key === 'remove_column') {
-              alertify.confirm('Are you sure?', 'Deleting a column is not reversible if the column is custom. Are you sure?', _ => {
-                for (let i = options.start.col; i <= options.end.col; i++) {
-                  this._removeColumn(props.listId, this.state.options.columns, this.table.colToProp(i), i);
-                }
-              }, _ => {});
+              for (let i = options.start.col; i <= options.end.col; i++) {
+                this._removeColumn(props.listId, this.state.options.columns, this.table.colToProp(i), i);
+              }
             }
 
             if (key === 'change_col_name') {
@@ -253,13 +251,6 @@ class HandsOnTable extends Component {
             if (key === 'add_column') {
               console.log('ADD_COLUMN');
               this.setState({isAddPanelOpen: true});
-              // alertify.prompt(
-              //   `Add Column`,
-              //   `What is the new column name?`,
-              //   '',
-              //   (e, value) => this._addColumn(value),
-              //   _ => alertify.error('Cancel')
-              //   );
             }
           },
           items: {
@@ -386,17 +377,19 @@ class HandsOnTable extends Component {
     const columnValue = columns.find(column => column.data === colProp).data;
     if (columnValue === 'publication_name_1' || columnValue === 'publication_name_2') alertify.alert('Publication fields are special. Cannot be deleted.');
     if (fieldsmap.some(fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
-      this.table.runHooks('persistentStateReset');
-      // const newColumns = columns.filter( (col, i) => i !== colNum );
-      const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
-      props.patchList({
-        name: props.listData.name,
-        listId: listId,
-        fieldsmap: newFieldsmap
-      }).then(_ => {
-        this.table.destroy();
-        this.remountTable();
-      });
+      alertify.confirm('Are you sure?', 'Deleting a column is not reversible if the column is custom. Are you sure?', _ => {
+        this.table.runHooks('persistentStateReset');
+        // const newColumns = columns.filter( (col, i) => i !== colNum );
+        const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
+        props.patchList({
+          name: props.listData.name,
+          listId: listId,
+          fieldsmap: newFieldsmap
+        }).then(_ => {
+          this.table.destroy();
+          this.remountTable();
+        });
+      }, _ => {});
     } else {
       const newFieldsmap = fieldsmap.map(fieldObj => {
         if (fieldObj.value === columnValue && !fieldObj.customfield) {
@@ -404,17 +397,14 @@ class HandsOnTable extends Component {
         }
         return fieldObj;
       });
-
       props.patchList({
         listId,
         fieldsmap: newFieldsmap,
         name: props.listData.name
-      })
-      .then(_ => {
+      }).then(_ => {
         this.table.destroy();
         this.remountTable();
       });
-      // alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
 
