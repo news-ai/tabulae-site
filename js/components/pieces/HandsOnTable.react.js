@@ -9,7 +9,13 @@ import validator from 'validator';
 import {outdatedRenderer } from 'constants/CustomRenderers';
 import _ from 'lodash';
 import {fromJS} from 'immutable';
+
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -38,6 +44,8 @@ class HandsOnTable extends Component {
     this._onSaveClick = this._onSaveClick.bind(this);
     this.loadTable = this._loadTable.bind(this);
     this.remountTable = this._remountTable.bind(this);
+    this.handleClose = _ => this.setState({isAddPanelOpen: false});
+    this.handleSelectChange = (event, index, selectvalue) => this.setState({selectvalue});
     if (!defaultColumns.some(col => col.data === 'publication_name_1' && col.type === 'autocomplete')) {
       defaultColumns = defaultColumns.filter(col => !(col.data === 'publication_name_1' && col.type !== 'autocomplete'));
       defaultColumns.push({
@@ -67,6 +75,9 @@ class HandsOnTable extends Component {
       });
     }
     this.state = {
+      selectvalue: null,
+      inputvalue: '',
+      isAddPanelOpen: false,
       addedRow: false,
       update: false,
       lazyLoadingThreshold: 100,
@@ -238,13 +249,8 @@ class HandsOnTable extends Component {
             }
 
             if (key === 'add_column') {
-              alertify.prompt(
-                `Add Column`,
-                `What is the new column name?`,
-                '',
-                (e, value) => this._addColumn(value),
-                _ => alertify.error('Cancel')
-                );
+              console.log('ADD_COLUMN');
+              this.setState({isAddPanelOpen: true});
             }
           },
           items: {
@@ -312,8 +318,9 @@ class HandsOnTable extends Component {
 
     if (!_.isEmpty(listData.contacts)) {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
-        let columns = _.cloneDeep(this.state.preservedColumns);
-        fieldsmap.map( fieldObj => {
+        let columns = _.cloneDeep(this.state.preservedColumns
+          .filter(col => !fieldsmap.some(fieldObj => fieldObj.hidden && fieldObj.value === col.data)));
+        fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({data: fieldObj.value, title: fieldObj.name});
         });
         options.columns = columns;
@@ -358,6 +365,7 @@ class HandsOnTable extends Component {
       return fieldObj;
     });
     this.props.patchList({
+      name: this.props.listData.name,
       listId: listId,
       fieldsmap: newFieldsmap
     });
@@ -367,33 +375,61 @@ class HandsOnTable extends Component {
     const {fieldsmap} = this.state;
     const props = this.props;
     const columnValue = columns.find(column => column.data === colProp).data;
+    if (columnValue === 'publication_name_1' || columnValue === 'publication_name_2') alertify.alert('Publication fields are special. Cannot be deleted.');
     if (fieldsmap.some(fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
-      this.table.runHooks('persistentStateReset');
-      // const newColumns = columns.filter( (col, i) => i !== colNum );
-      const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
+      alertify.confirm('Are you sure?', 'Deleting a column is not reversible if the column is custom. Are you sure?', _ => {
+        this.table.runHooks('persistentStateReset');
+        // const newColumns = columns.filter( (col, i) => i !== colNum );
+        const newFieldsmap = fieldsmap.filter(fieldObj => fieldObj.value !== columnValue );
+        props.patchList({
+          name: props.listData.name,
+          listId: listId,
+          fieldsmap: newFieldsmap
+        }).then(_ => {
+          this.table.destroy();
+          this.remountTable();
+        });
+      }, _ => {});
+    } else {
+      const newFieldsmap = fieldsmap.map(fieldObj => {
+        if (fieldObj.value === columnValue && !fieldObj.customfield) {
+          return Object.assign({}, fieldObj, {hidden: true});
+        }
+        return fieldObj;
+      });
       props.patchList({
-        listId: listId,
-        fieldsmap: newFieldsmap
+        listId,
+        fieldsmap: newFieldsmap,
+        name: props.listData.name
       }).then(_ => {
         this.table.destroy();
         this.remountTable();
       });
-    } else {
-      alertify.alert(`Column '${columnValue}' is a default column and cannot be deleted.`);
     }
   }
 
   _addColumn(newColumnName) {
-    const { isNew, dispatch, listData } = this.props;
-    if (isNew) {
-      alertify.alert(`Please save list first before adding custom columns.`);
-      return;
-    }
+    const {dispatch, listData } = this.props;
     const { options } = this.state;
-    if (options.columns.some( col => col.data === newColumnName)) {
+    let fieldsmap = listData.fieldsmap;
+    if (fieldsmap.some(fieldObj => fieldObj.name === newColumnName && fieldObj.customfield)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
+    } else if (fieldsmap.some(fieldObj=> fieldObj.value === newColumnName && !fieldObj.customfield && !fieldObj.hidden)) {
+      alertify.alert(`'${newColumnName}' is a reserved column name. Please use another one.`);
+    } else if (fieldsmap.some(fieldObj=> fieldObj.value === newColumnName && !fieldObj.customfield && fieldObj.hidden)) {
+      const newFieldsmap = fieldsmap.map(fieldObj => {
+        if (fieldObj.value === newColumnName && !fieldObj.customfield && fieldObj.hidden) {
+          return Object.assign({}, fieldObj, {hidden: false});
+        }
+        return fieldObj;
+      });
+      dispatch(actionCreators.patchList({
+        listId: listData.id,
+        name: listData.name,
+        fieldsmap: newFieldsmap
+      }));
+      this.setState({fieldsmap: newFieldsmap});
     } else {
-      let fieldsmap = listData.fieldsmap;
       let newFieldsmap = fieldsmap.concat([{
         name: newColumnName,
         value: newColumnName,
@@ -402,6 +438,7 @@ class HandsOnTable extends Component {
       }]);
       dispatch(actionCreators.patchList({
         listId: listData.id,
+        name: listData.name,
         fieldsmap: newFieldsmap
       }));
       this.setState({fieldsmap: newFieldsmap});
@@ -423,8 +460,28 @@ class HandsOnTable extends Component {
   }
 
   render() {
-    const {options} = this.state;
+    const state = this.state;
     const props = this.props;
+    const addColActions = [
+      <FlatButton
+        label='Cancel'
+        primary
+        onTouchTap={this.handleClose}
+      />,
+      <FlatButton
+        label='Submit'
+        primary
+        keyboardFocused
+        onTouchTap={_ => {
+          if (state.selectvalue === null && state.inputvalue.length > 0) this._addColumn(state.inputvalue);
+          else if (state.selectvalue !== null) this._addColumn(state.selectvalue);
+          this.setState({inputvalue: '', selectvalue: null});
+          this.handleClose();
+        }}
+      />,
+    ];
+
+    const menulist = [{name: 'none', value: null}, ...props.listData.fieldsmap.filter(fieldObj => fieldObj.hidden)];
     return (
       <div key={props.listData.id}>
         <div className='row noprint'>
@@ -434,7 +491,7 @@ class HandsOnTable extends Component {
               primary
               label='Save'
               labelStyle={{textTransform: 'none'}}
-              onClick={ _ => this._onSaveClick(options.data, options.columns)}
+              onClick={ _ => this._onSaveClick(state.options.data, state.options.columns)}
               />
             </div>
             <div style={{position: 'fixed', top: 150, zIndex: 180}}>
@@ -442,6 +499,21 @@ class HandsOnTable extends Component {
             </div>
           </div>
         </div>
+        <Dialog
+        actions={addColActions}
+        title='Add Column'
+        open={state.isAddPanelOpen}
+        modal
+        onRequestClose={this.handleClose}>
+          <div>
+            <p>Select from hidden Default Fields</p>
+            <SelectField value={state.selectvalue} onChange={this.handleSelectChange}>
+              {menulist.map((fieldObj, i) => <MenuItem key={i} value={fieldObj.value} primaryText={fieldObj.name} />)}
+            </SelectField>
+            <p>OR Create Your Own</p>
+            <TextField hintText='Column Name' id='text-field-ht' onChange={(e, val) => this.setState({inputvalue: val})} />
+          </div>
+        </Dialog>
         <span style={{color: 'gray', marginLeft: '15px'}}>Tip: To add row/column, right click to open context menu</span>
         <div ref='data-grid' id={props.listData.id}></div>
       </div>

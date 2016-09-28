@@ -377,6 +377,7 @@ class Table extends Component {
             </div>
             <div className='small-12 large-6 columns noprint' style={{display: 'flex', alignItems: 'center'}}>
               <TextField
+              id='search-input'
               hintText='Search...'
               value={this.state.searchValue}
               onChange={e => this.setState({searchValue: e.target.value})}
