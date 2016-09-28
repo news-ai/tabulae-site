@@ -1,11 +1,12 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import withRouter from 'react-router/lib/withRouter';
 import validator from 'validator';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey700, grey500} from 'material-ui/styles/colors';
+import {grey700, grey500, grey100} from 'material-ui/styles/colors';
 import uniqBy from 'lodash/uniqBy';
 
 import RaisedButton from 'material-ui/RaisedButton';
@@ -196,8 +197,14 @@ class ContactProfile extends Component {
     ];
     return (
       <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+        <IconButton
+        style={{marginTop: 15, marginLeft: 20}}
+        iconStyle={{color: grey500}}
+        tooltip='back to List'
+        onClick={_ => props.router.push(`/lists/${props.listId}`)}
+        iconClassName='fa fa-arrow-left'/>
         <div className='row horizontal-center'>
-          <div className='large-9 columns' style={{marginTop: 20}}>
+          <div className='large-9 columns'>
             {props.contact && (
               <div className='row' style={{marginTop: 20}}>
                 <div className='large-12 medium-12 small-12 columns'><h4>{props.contact.firstname} {props.contact.lastname}</h4></div>
@@ -337,4 +344,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(ContactProfile);
+  )(withRouter(ContactProfile));
