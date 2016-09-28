@@ -75,7 +75,7 @@ class HandsOnTable extends Component {
       });
     }
     this.state = {
-      selectvalue: '',
+      selectvalue: null,
       inputvalue: '',
       isAddPanelOpen: false,
       addedRow: false,
@@ -229,7 +229,7 @@ class HandsOnTable extends Component {
             }
 
             if (key === 'remove_column') {
-              alertify.confirm('Are you sure?', 'Deleting a column is not reversible. Are you sure?', _ => {
+              alertify.confirm('Are you sure?', 'Deleting a column is not reversible if the column is custom. Are you sure?', _ => {
                 for (let i = options.start.col; i <= options.end.col; i++) {
                   this._removeColumn(props.listId, this.state.options.columns, this.table.colToProp(i), i);
                 }
@@ -329,7 +329,6 @@ class HandsOnTable extends Component {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
         let columns = _.cloneDeep(this.state.preservedColumns
           .filter(col => !fieldsmap.some(fieldObj => fieldObj.hidden && fieldObj.value === col.data)));
-        console.log(columns);
         fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({data: fieldObj.value, title: fieldObj.name});
         });
@@ -375,6 +374,7 @@ class HandsOnTable extends Component {
       return fieldObj;
     });
     this.props.patchList({
+      name: this.props.listData.name,
       listId: listId,
       fieldsmap: newFieldsmap
     });
@@ -384,6 +384,7 @@ class HandsOnTable extends Component {
     const {fieldsmap} = this.state;
     const props = this.props;
     const columnValue = columns.find(column => column.data === colProp).data;
+    if (columnValue === 'publication_name_1' || columnValue === 'publication_name_2') alertify.alert('Publication fields are special. Cannot be deleted.');
     if (fieldsmap.some(fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
       this.table.runHooks('persistentStateReset');
       // const newColumns = columns.filter( (col, i) => i !== colNum );
@@ -399,8 +400,7 @@ class HandsOnTable extends Component {
     } else {
       const newFieldsmap = fieldsmap.map(fieldObj => {
         if (fieldObj.value === columnValue && !fieldObj.customfield) {
-          const newObj = Object.assign({}, fieldObj, {hidden: true})
-          return newObj;
+          return Object.assign({}, fieldObj, {hidden: true});
         }
         return fieldObj;
       });
@@ -408,7 +408,7 @@ class HandsOnTable extends Component {
       props.patchList({
         listId,
         fieldsmap: newFieldsmap,
-        name: prop.listData.name
+        name: props.listData.name
       })
       .then(_ => {
         this.table.destroy();
@@ -419,16 +419,25 @@ class HandsOnTable extends Component {
   }
 
   _addColumn(newColumnName) {
-    const { isNew, dispatch, listData } = this.props;
-    if (isNew) {
-      alertify.alert(`Please save list first before adding custom columns.`);
-      return;
-    }
+    const {dispatch, listData } = this.props;
     const { options } = this.state;
-    if (options.columns.some(col => col.data === newColumnName)) {
+    let fieldsmap = listData.fieldsmap;
+    if (fieldsmap.some(fieldObj => fieldObj.name === newColumnName && fieldObj.customfield)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
+    } else if (fieldsmap.some(fieldObj=> fieldObj.value === newColumnName && !fieldObj.customfield && fieldObj.hidden)) {
+      const newFieldsmap = fieldsmap.map(fieldObj => {
+        if (fieldObj.value === newColumnName && !fieldObj.customfield && fieldObj.hidden) {
+          return Object.assign({}, fieldObj, {hidden: false});
+        }
+        return fieldObj;
+      });
+      dispatch(actionCreators.patchList({
+        listId: listData.id,
+        name: listData.name,
+        fieldsmap: newFieldsmap
+      }));
+      this.setState({fieldsmap: newFieldsmap});
     } else {
-      let fieldsmap = listData.fieldsmap;
       let newFieldsmap = fieldsmap.concat([{
         name: newColumnName,
         value: newColumnName,
@@ -472,12 +481,15 @@ class HandsOnTable extends Component {
         primary
         keyboardFocused
         onTouchTap={_ => {
-          this._addColumn(state.inputvalue);
-          this.setState({inputvalue: ''});
+          if (state.selectvalue === null && state.inputvalue.length > 0) this._addColumn(state.inputvalue);
+          else if (state.selectvalue !== null) this._addColumn(state.selectvalue);
+          this.setState({inputvalue: '', selectvalue: null});
           this.handleClose();
         }}
       />,
     ];
+
+    const menulist = [{name: 'none', value: null}, ...props.listData.fieldsmap.filter(fieldObj => fieldObj.hidden)];
     return (
       <div key={props.listData.id}>
         <div className='row noprint'>
@@ -504,9 +516,7 @@ class HandsOnTable extends Component {
           <div>
             <p>Select from hidden Default Fields</p>
             <SelectField value={state.selectvalue} onChange={this.handleSelectChange}>
-              {props.listData.fieldsmap
-                .filter(fieldObj => fieldObj.hidden)
-                .map((fieldObj, i) => <MenuItem key={i} value={fieldObj.value} primaryText={fieldObj.name} />)}
+              {menulist.map((fieldObj, i) => <MenuItem key={i} value={fieldObj.value} primaryText={fieldObj.name} />)}
             </SelectField>
             <p>OR Create Your Own</p>
             <TextField hintText='Column Name' id='text-field-ht' onChange={(e, val) => this.setState({inputvalue: val})} />
