@@ -1,11 +1,12 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import withRouter from 'react-router/lib/withRouter';
 import validator from 'validator';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey100, grey700, grey500} from 'material-ui/styles/colors';
+import {grey700, grey500, grey100} from 'material-ui/styles/colors';
 import uniqBy from 'lodash/uniqBy';
 
 import RaisedButton from 'material-ui/RaisedButton';
@@ -59,7 +60,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className}) => {
     <div className={className} style={{marginTop: 5}}>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
-      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => isURL(value) && patchContact(contact.id, {twitter: value})}/>
+      <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => patchContact(contact.id, {twitter: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
       <ContactDescriptor className='large-12 medium-8 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
     </div>);
@@ -72,6 +73,7 @@ class ContactProfile extends Component {
     this.state = {
       isRSSPanelOpen: false,
       isEmployerPanelOpen: false,
+      isPastEmployerPanelOpen: false,
       feedUrl: '',
       employerAutocompleteList: [],
       autoinput: ''
@@ -110,6 +112,9 @@ class ContactProfile extends Component {
         break;
       case 'employers':
         this.setState({isEmployerPanelOpen: !this.state.isEmployerPanelOpen});
+        break;
+      case 'pastemployers':
+        this.setState({isPastEmployerPanelOpen: !this.state.isPastEmployerPanelOpen});
         break;
       default:
       // do nothing
@@ -173,7 +178,7 @@ class ContactProfile extends Component {
         label='Cancel'
         primary
         onTouchTap={_ => {
-          this.togglePanel('employers');
+          this.togglePanel('pastemployers');
           this.setState({
             autoinput: '',
             employerAutocompleteList: []
@@ -186,14 +191,20 @@ class ContactProfile extends Component {
         keyboardFocused
         onTouchTap={_ => {
           props.createPublicationThenPatchContact(props.contact.id, state.autoinput, 'pastemployers');
-          this.togglePanel('employers');
+          this.togglePanel('pastemployers');
         }}
       />,
     ];
     return (
       <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+        <IconButton
+        style={{marginTop: 15, marginLeft: 20}}
+        iconStyle={{color: grey500}}
+        tooltip='back to List'
+        onClick={_ => props.router.push(`/lists/${props.listId}`)}
+        iconClassName='fa fa-arrow-left'/>
         <div className='row horizontal-center'>
-          <div className='large-9 columns' style={{marginTop: 20}}>
+          <div className='large-9 columns'>
             {props.contact && (
               <div className='row' style={{marginTop: 20}}>
                 <div className='large-12 medium-12 small-12 columns'><h4>{props.contact.firstname} {props.contact.lastname}</h4></div>
@@ -228,13 +239,13 @@ class ContactProfile extends Component {
                       iconClassName='fa fa-plus'
                       tooltip='Add Publication'
                       tooltipPosition='top-right'
-                      onClick={_ => this.togglePanel('employers')}
+                      onClick={_ => this.togglePanel('pastemployers')}
                       />
                     </div>
                   </div>
                   <div>
                     {props.pastemployers && props.pastemployers.map((employer, i) =>
-                      <ContactEmployerDescriptor key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                      <ContactEmployerDescriptor style={{margin: 2}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
                     {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
                   </div>
                 </div>
@@ -248,17 +259,12 @@ class ContactProfile extends Component {
               onChange={e => this.setState({feedUrl: e.target.value})}
               />
             </Dialog>
-            <Dialog actions={addEmployerActions} title='Add Current Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
-              <AutoComplete
-              floatingLabelText='Autocomplete dropdown'
-              filter={AutoComplete.noFilter}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={autoinput => this.setState({autoinput})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            </Dialog>
-             <Dialog actions={addPastEmployerActions} title='Add Past Publication' modal open={state.isEmployerPanelOpen} onRequestClose={_ => this.togglePanel('employers')}>
+            <Dialog
+            actions={state.isEmployerPanelOpen ? addEmployerActions : addPastEmployerActions}
+            title={state.isEmployerPanelOpen ? 'Add Current Publication' : 'Add Past Publication'}
+            modal
+            open={state.isEmployerPanelOpen || state.isPastEmployerPanelOpen}
+            onRequestClose={_ => state.isEmployerPanelOpen ? this.togglePanel('employers') : this.togglePanel('pastemployers')}>
               <AutoComplete
               floatingLabelText='Autocomplete dropdown'
               filter={AutoComplete.noFilter}
@@ -338,4 +344,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(ContactProfile);
+  )(withRouter(ContactProfile));
