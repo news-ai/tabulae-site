@@ -424,6 +424,8 @@ class HandsOnTable extends Component {
     let fieldsmap = listData.fieldsmap;
     if (fieldsmap.some(fieldObj => fieldObj.name === newColumnName && fieldObj.customfield)) {
       alertify.alert(`'${newColumnName}' is a duplicate column name. Please use another one.`);
+    } else if (fieldsmap.some(fieldObj=> fieldObj.value === newColumnName && !fieldObj.customfield && !fieldObj.hidden)) {
+      alertify.alert(`'${newColumnName}' is a reserved column name. Please use another one.`);
     } else if (fieldsmap.some(fieldObj=> fieldObj.value === newColumnName && !fieldObj.customfield && fieldObj.hidden)) {
       const newFieldsmap = fieldsmap.map(fieldObj => {
         if (fieldObj.value === newColumnName && !fieldObj.customfield && fieldObj.hidden) {
