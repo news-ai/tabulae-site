@@ -6,6 +6,15 @@ export function get(endpoint) {
     .then( text => JSON.parse(text));
 }
 
+export function delete(endpoint) {
+  return fetch(`${window.TABULAE_API_BASE}${endpoint}`, {
+    method: 'DELETE',
+    credentials: 'include'
+  })
+    .then( response => response.status === 200 ? response.text() : Promise.reject(response))
+    .then( text => JSON.parse(text));
+}
+
 export function post(endpoint, body) {
   return fetch(`${window.TABULAE_API_BASE}${endpoint}`, {
     method: 'POST',
