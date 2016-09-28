@@ -3,7 +3,6 @@ import {
 } from './constants';
 import * as api from '../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
-const headlineSchema = new Schema('headlines', {idAttribute: 'url'});
 const feedSchema = new Schema('feeds');
 // const listSchema = new Schema('lists');
 
@@ -13,6 +12,15 @@ export function addFeed(contactid, listid, feedUrl) {
     dispatch({type: feedConstant.ADD_REQUESTED, body: feedBody});
     return api.post(`/feeds`, feedBody)
     .then(response => dispatch({type: feedConstant.ADD_RECEIVED, response}))
+    .catch(err => console.log(err));
+  };
+}
+
+export function deleteFeed(feedId) {
+  return dispatch => {
+    dispatch({type: 'DELETE_FEED', feedId});
+    return api.deleteRequest(`/feeds/${feedId}`)
+    .then(response => console.log(response))
     .catch(err => console.log(err));
   };
 }
