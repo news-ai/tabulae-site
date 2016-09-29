@@ -55,7 +55,7 @@ const ContactDescriptor = ({content, contentTitle, onClick, className, iconClass
   );
 };
 
-const ContactProfileDescriptions = ({contact, patchContact, className}) => {
+const ContactProfileDescriptions = ({contact, patchContact, className, list}) => {
   return (
     <div className={className} style={{marginTop: 5}}>
       <h4 style={{marginLeft: 10}}>{contact.firstname} {contact.lastname}</h4>
@@ -65,6 +65,17 @@ const ContactProfileDescriptions = ({contact, patchContact, className}) => {
       <ContactDescriptor iconClassName='fa fa-instagram' className='large-12 medium-8 small-12 columns' content={contact.instagram} contentTitle='Instagram' onClick={(e, value) => patchContact(contact.id, {instagram: value})}/>
       <ContactDescriptor iconClassName='fa fa-linkedin' className='large-12 medium-8 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
       <ContactDescriptor iconClassName='fa fa-external-link' className='large-12 medium-8 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
+      <div style={{marginTop: 10}}>
+        <h5>Custom Fields</h5>
+        <div>
+        {list && contact && list.fieldsmap
+          .filter(fieldObj => fieldObj.customfield)
+          .map((fieldObj, i) => {
+            const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
+            return <div key={i}>{fieldObj.name} : {customValue && customValue.value}</div>;
+          })}
+        </div>
+      </div>
     </div>);
 };
 
@@ -96,6 +107,7 @@ class ContactProfile extends Component {
     });
     this.props.fetchFeed(this.props.contactId);
     this.props.fetchContactFeeds(this.props.contactId);
+    this.props.fetchList(this.props.listId);
   }
 
   _togglePanel(key) {
@@ -184,7 +196,7 @@ class ContactProfile extends Component {
           <div className='large-9 columns'>
             {props.contact && (
               <div className='row' style={{marginTop: 20}}>
-                <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' contact={props.contact} {...props} />
+                <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
                 <div className='large-5 medium-12 small-12 columns'>
                   <div style={{marginTop: 20}}>
                     <div className='row vertical-center'>
@@ -285,6 +297,7 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
+    list: state.listReducer[listId],
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
@@ -297,7 +310,8 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchContactFeeds: (contactId) => dispatch(feedActions.fetchContactFeeds(contactId)),
     fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which))
+    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
+    fetchList: listId => dispatch(AppActions.fetchList(listId)),
   };
 };
 
