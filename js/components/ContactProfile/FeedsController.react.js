@@ -70,7 +70,7 @@ class FeedsController extends Component {
             {props.attachedfeeds && props.attachedfeeds.map((feed, i) => <div key={i} style={{marginLeft: 3}}><span>{feed}</span></div>)}
           </div>
           <div className='large-3 medium-4 small-12 columns vertical-center'>
-            <RaisedButton style={{marginTop: 10, marginBottom: 10}} label='Add New Feed' onClick={this.toggleDeletePanel} labelStyle={{textTransform: 'none'}} />
+            <RaisedButton style={{marginTop: 10, marginBottom: 10}} label='Add New Feed' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
             <IconButton iconClassName='fa fa-times' style={{marginTop: 10, marginBottom: 10, float: 'right'}} tooltip='Delete Feed' onClick={this.toggleDeletePanel} />
           </div>
         </div>
