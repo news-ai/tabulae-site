@@ -75,6 +75,7 @@ class HandsOnTable extends Component {
       });
     }
     this.state = {
+      intervalId: null,
       selectvalue: null,
       inputvalue: '',
       isAddPanelOpen: false,
@@ -286,6 +287,10 @@ class HandsOnTable extends Component {
   componentWillMount() {
     const { contacts, listData, lastFetchedIndex, isSearchOn } = this.props;
     this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
+    const intervalId = setInterval(_ => {
+      this._onSaveClick(this.state.options.data, this.state.options.columns);
+    }, 30000);
+    this.setState({intervalId});
   }
 
   componentDidMount() {
@@ -294,7 +299,7 @@ class HandsOnTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { contacts, listData, lastFetchedIndex, isSearchOn } = nextProps;
+    const {contacts, listData, lastFetchedIndex, isSearchOn} = nextProps;
     this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
   }
 
@@ -303,7 +308,7 @@ class HandsOnTable extends Component {
     // console.log(this.props.contacts);
     // this.table.runHooks('persistentStateSave', 'fieldsmap', this.state.fieldsmap);
     // this.table.runHooks('persistentStateSave', 'contacts', this.props.contacts);
-    console.log('DESTROY');
+    clearInterval(this.state.intervalId);
     this.table.destroy();
   }
 
@@ -454,8 +459,8 @@ class HandsOnTable extends Component {
   }
 
   _onSaveClick(localData, columns) {
-    const { onSaveClick } = this.props;
-    const { fieldsmap, dirtyRows } = this.state;
+    const {onSaveClick} = this.props;
+    const {fieldsmap, dirtyRows} = this.state;
     onSaveClick(localData, columns, fieldsmap, dirtyRows);
     this.setState({dirtyRows: []});
   }
@@ -492,7 +497,7 @@ class HandsOnTable extends Component {
               primary
               label='Save'
               labelStyle={{textTransform: 'none'}}
-              onClick={ _ => this._onSaveClick(state.options.data, state.options.columns)}
+              onClick={_ => this._onSaveClick(state.options.data, state.options.columns)}
               />
             </div>
             <div style={{position: 'fixed', top: 150, zIndex: 180}}>
