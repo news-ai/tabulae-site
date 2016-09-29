@@ -1,18 +1,16 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
-import validator from 'validator';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey700, grey500, grey100} from 'material-ui/styles/colors';
+import {grey700, grey500} from 'material-ui/styles/colors';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
-import Chip from 'material-ui/Chip';
 
 import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
@@ -37,11 +35,12 @@ const styles = {
   },
 };
 
-const ContactDescriptor = ({content, contentTitle, onClick, className, iconClassName}) => {
+const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className, iconClassName}) => {
   return (
     <div className={className} style={{display: 'flex', alignItems: 'center'}}>
-      <i style={{marginRight: 8}} className={iconClassName} aria-hidden='hidden' />
-      <span>{content ? content : `${contentTitle} not filled`}</span>
+      {iconClassName && <i style={{marginRight: 8}} className={iconClassName} aria-hidden='hidden' />}
+      {showTitle && <span style={{marginRight: 10}}>{contentTitle}</span>}
+      <span style={{color: content ? 'black' : grey700}}>{content ? content : `---- ${contentTitle} empty ----`}</span>
       <IconButton
         style={{marginLeft: 3}}
         iconStyle={styles.smallIcon}
@@ -72,7 +71,27 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
           .filter(fieldObj => fieldObj.customfield)
           .map((fieldObj, i) => {
             const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
-            return <div key={i}>{fieldObj.name} : {customValue && customValue.value}</div>;
+            return (
+              <ContactDescriptor
+              key={i}
+              showTitle
+              content={customValue && customValue.value}
+              contentTitle={fieldObj.name}
+              onClick={(e, value) => {
+                let customfields;
+                if (contact.customfields === null) {
+                  customfields = [{name: fieldObj.value, value}];
+                } else if (!contact.customfields.some(customObj => customObj.name === fieldObj.value)) {
+                  customfields = [...contact.customfields, {name: fieldObj.value, value}];
+                } else {
+                  customfields = contact.customfields.map(customObj => {
+                    if (customObj.name === fieldObj.value) return {name: fieldObj.value, value};
+                    return customObj;
+                  });
+                }
+                patchContact(contact.id, {customfields});
+              }}
+              />);
           })}
         </div>
       </div>
