@@ -75,6 +75,7 @@ class HandsOnTable extends Component {
       });
     }
     this.state = {
+      intervalId: null,
       selectvalue: null,
       inputvalue: '',
       isAddPanelOpen: false,
@@ -286,18 +287,19 @@ class HandsOnTable extends Component {
   componentWillMount() {
     const { contacts, listData, lastFetchedIndex, isSearchOn } = this.props;
     this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
+    const intervalId = setInterval(_ => {
+      this._onSaveClick(this.state.options.data, this.state.options.columns);
+    }, 30000);
+    this.setState({intervalId});
   }
 
   componentDidMount() {
     const options = this.state.options;
     this.table = new Handsontable(this.refs['data-grid'], options);
-    setInterval(_ => {
-      this._onSaveClick(this.state.options.data, this.state.options.columns);
-    }, 30000);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { contacts, listData, lastFetchedIndex, isSearchOn } = nextProps;
+    const {contacts, listData, lastFetchedIndex, isSearchOn} = nextProps;
     this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
   }
 
@@ -306,7 +308,7 @@ class HandsOnTable extends Component {
     // console.log(this.props.contacts);
     // this.table.runHooks('persistentStateSave', 'fieldsmap', this.state.fieldsmap);
     // this.table.runHooks('persistentStateSave', 'contacts', this.props.contacts);
-    console.log('DESTROY');
+    clearInterval(this.state.intervalId);
     this.table.destroy();
   }
 
