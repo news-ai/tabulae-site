@@ -291,6 +291,9 @@ class HandsOnTable extends Component {
   componentDidMount() {
     const options = this.state.options;
     this.table = new Handsontable(this.refs['data-grid'], options);
+    setInterval(_ => {
+      this._onSaveClick(this.state.options.data, this.state.options.columns);
+    }, 30000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -454,8 +457,8 @@ class HandsOnTable extends Component {
   }
 
   _onSaveClick(localData, columns) {
-    const { onSaveClick } = this.props;
-    const { fieldsmap, dirtyRows } = this.state;
+    const {onSaveClick} = this.props;
+    const {fieldsmap, dirtyRows} = this.state;
     onSaveClick(localData, columns, fieldsmap, dirtyRows);
     this.setState({dirtyRows: []});
   }
@@ -492,7 +495,7 @@ class HandsOnTable extends Component {
               primary
               label='Save'
               labelStyle={{textTransform: 'none'}}
-              onClick={ _ => this._onSaveClick(state.options.data, state.options.columns)}
+              onClick={_ => this._onSaveClick(state.options.data, state.options.columns)}
               />
             </div>
             <div style={{position: 'fixed', top: 150, zIndex: 180}}>
