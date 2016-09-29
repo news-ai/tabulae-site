@@ -90,6 +90,7 @@ class HandsOnTable extends Component {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
         sortIndicator: true,
+        columnSorting: true,
         minCols: defaultColumns.length,
         minRows: MIN_ROWS,
         manualColumnMove: true,
