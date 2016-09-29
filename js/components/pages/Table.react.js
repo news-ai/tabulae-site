@@ -16,7 +16,7 @@ import TextField from 'material-ui/TextField';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import ToggleableEditInput from '../pieces/ToggleableEditInput.react';
+import ToggleableEditInput from '../ToggleableEditInput';
 import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
 import HandsOnTablePrintable from '../pieces/HandsOnTablePrintable.react';
