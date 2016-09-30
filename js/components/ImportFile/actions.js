@@ -5,8 +5,6 @@ import {
   headerConstant
 } from './constants';
 import * as api from '../../actions/api';
-import * as listActions from '../../actions/listActions';
-import * as contactActions from '../../actions/contactActions';
 
 function receiveFile(file, listId) {
   return {
@@ -18,7 +16,7 @@ function receiveFile(file, listId) {
 
 export function uploadFile(listId, file) {
   return dispatch => {
-    dispatch({ type: fileConstant.REQUEST, listId, file});
+    dispatch({type: fileConstant.REQUEST, listId, file});
     return api.postFile(`/lists/${listId}/upload`, file)
     .then( response => dispatch(receiveFile(response.data, listId)))
     .catch( message => dispatch({ type: fileConstant.REQUEST_FAIL, message }));
@@ -44,6 +42,7 @@ export function waitForServerProcess(listId) {
       // dispatch({type: TURN_OFF_PROCESS_WAIT});
       // dispatch({type: 'CLEAR_LIST_REDUCER', listId});
       // return dispatch(listActions.fetchList(listId))
+      window.location.href = window.location.origin + '/lists/' + listId;
       // .then( _ => dispatch(contactActions.fetchPaginatedContacts(listId)));
     }, 5000);
   };

@@ -35,6 +35,10 @@ export const initialState = {
     didInvalidate: false,
     isProcessWaiting: false
   },
+  headerReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+  },
   templateReducer: {
     isReceiving: false,
     didInvalidate: false,

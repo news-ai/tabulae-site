@@ -110,7 +110,6 @@ class DropFile extends Component {
           );
         }
       } else {
-
         renderNode = (
           <Dropzone
           accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
