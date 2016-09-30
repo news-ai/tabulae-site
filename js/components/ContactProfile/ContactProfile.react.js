@@ -4,8 +4,9 @@ import withRouter from 'react-router/lib/withRouter';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
+import * as mixedFeedActions from './MixedFeed/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey700, grey500} from 'material-ui/styles/colors';
+import {grey700, grey500, grey400} from 'material-ui/styles/colors';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
@@ -270,6 +271,21 @@ class ContactProfile extends Component {
                     && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
                   </Tab>
                   <Tab label='Tweets & RSS'>
+                  {props.mixedfeed && props.mixedfeed.map((obj, i) => {
+                    if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
+                    else return (
+                      <div key={i} className='row' style={{
+                        paddingTop: 10,
+                        paddingBottom: 10,
+                        marginTop: 10,
+                        marginBottom: 10,
+                        border: `dotted 1px ${grey400}`,
+                        borderRadius: '0.4em'
+                      }}>
+                        <div className='large-10 medium-9 small-8 columns'><span>{obj.text}</span></div>
+                        <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
+                      </div>);
+                  })}
                   </Tab>
                 </Tabs>
             </div>
@@ -303,6 +319,7 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
+    mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     list: state.listReducer[listId],
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
@@ -318,7 +335,7 @@ const mapDispatchToProps = (dispatch, props) => {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
-    fetchMixedFeed: contactId => dispatch(feedActions.fetchMixedFeed(contactId))
+    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId))
   };
 };
 

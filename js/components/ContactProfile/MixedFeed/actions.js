@@ -1,12 +1,12 @@
 import {mixedConstant} from './constants';
-import * as api from '../../actions/api';
+import * as api from '../../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 const feedSchema = new Schema('feeds');
 const tweetSchema = new Schema('tweets');
 
 export function fetchMixedFeed(contactId) {
   return dispatch => {
-    dispatch({type: feedConstant.REQUEST_MULTIPLE, contactId});
+    dispatch({type: mixedConstant.REQUEST_MULTIPLE, contactId});
     return api.get(`/contacts/${contactId}/feed`)
     .then(response => {
       console.log(response);
@@ -19,6 +19,7 @@ export function fetchMixedFeed(contactId) {
       //   ids: res.result.data,
       //   contactId
       // });
+      return dispatch({type: mixedConstant.RECEIVE_MULTIPLE, feed: response.data, contactId, offset: 0});
     })
     .catch(err => console.log(err));
   };

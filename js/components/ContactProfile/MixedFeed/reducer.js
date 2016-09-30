@@ -1,34 +1,33 @@
 import {
-  headlineConstant,
+  mixedConstant,
 } from './constants';
 import _ from 'lodash';
 
 import {initialState} from '../../../reducers/initialState';
 import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
-const types = _.values(headlineConstant);
+const types = _.values(mixedConstant);
 
-function headlineReducer(state = initialState.headlineReducer, action) {
+function mixedReducer(state = initialState.mixedReducer, action) {
   if (window.isDev) Object.freeze(state);
   if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
-    case headlineConstant.REQUEST:
+    case mixedConstant.REQUEST_MULTIPLE:
       obj.isReceiving = true;
       return obj;
-    case headlineConstant.RECEIVE:
-      obj = assignToEmpty(obj, action.headlines);
+    case mixedConstant.RECEIVE_MULTIPLE:
       const oldContact = state[action.contactId] || {received: []};
       obj[action.contactId] = assignToEmpty(state[action.contactId], {
         received: [
           ...oldContact.received,
-          ...action.ids.filter(id => !oldContact[id])
+          ...action.feed
         ],
         offset: action.offset
       });
       obj.isReceiving = false;
       return obj;
-    case headlineConstant.REQUEST_FAIL:
+    case mixedConstant.REQUEST_FAIL:
       obj.didInvalidate = true;
       return obj;
     default:
@@ -36,4 +35,4 @@ function headlineReducer(state = initialState.headlineReducer, action) {
   }
 }
 
-export default headlineReducer;
+export default mixedReducer;
