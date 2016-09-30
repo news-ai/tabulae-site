@@ -11,6 +11,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
+import {Tabs, Tab} from 'material-ui/Tabs';
 
 import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
@@ -106,6 +107,7 @@ class ContactProfile extends Component {
     this.props.fetchFeed(this.props.contactId);
     this.props.fetchContactFeeds(this.props.contactId);
     this.props.fetchList(this.props.listId);
+    this.props.fetchMixedFeed(this.props.contactId);
   }
 
   _togglePanel(key) {
@@ -257,13 +259,19 @@ class ContactProfile extends Component {
               marginTop: 20
             }}>
               <FeedsController {...props} />
-              {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-              {props.headlines
-                && !props.headlineDidInvalidate
-                && props.headlines.length === 0
-                && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-              {props.headlineDidInvalidate
-                && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+                <Tabs>
+                  <Tab label='RSS only'>
+                  {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
+                  {props.headlines
+                    && !props.headlineDidInvalidate
+                    && props.headlines.length === 0
+                    && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
+                  {props.headlineDidInvalidate
+                    && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+                  </Tab>
+                  <Tab label='Tweets & RSS'>
+                  </Tab>
+                </Tabs>
             </div>
           </div>
         </div>
@@ -310,6 +318,7 @@ const mapDispatchToProps = (dispatch, props) => {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
+    fetchMixedFeed: contactId => dispatch(feedActions.fetchMixedFeed(contactId))
   };
 };
 
