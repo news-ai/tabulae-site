@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux';
 import 'node_modules/react-select/dist/react-select.css';
 import AutoComplete from 'material-ui/AutoComplete';
 import _ from 'lodash';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import * as actionCreators from 'actions/AppActions';
 
 const defaultSelectableOptions = [
   {value: 'firstname', label: 'First Name', selected: false},
@@ -132,10 +134,27 @@ class Headers extends Component {
             </ul>
           </div>)}
         </div>
-        <button className='button' style={{float: 'right'}} onClick={this._sendHeaderNames}>Set Column Names</button>
+        <button className='button' style={{float: 'right'}} onClick={this._sendHeaderNames}>Finish</button>
       </div>
     );
   }
 }
 
-export default Headers;
+
+const mapStateToProps = (state, props) => {
+  return {
+    headers: props.listId && state.headerReducer[props.listId]
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onProcessHeaders: order => dispatch(actionCreators.addHeaders(props.listId, order)),
+    fetchHeaders: listId => dispatch(actionCreators.fetchHeaders(listId)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Headers);

@@ -17,7 +17,6 @@ import TextField from 'material-ui/TextField';
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import ToggleableEditInput from '../ToggleableEditInput';
-import DropFile from '../ImportFile';
 import Waiting from '../Waiting';
 import HandsOnTablePrintable from '../pieces/HandsOnTablePrintable.react';
 
@@ -360,16 +359,6 @@ class Table extends Component {
       {
         props.listData &&
         <div>
-          <SkyLight
-            ref='input'
-            overlayStyles={skylightStyles.overlay}
-            dialogStyles={skylightStyles.dialog}
-            hideOnOverlayClicked
-            title='File Drop'>
-              <DropFile
-              listId={props.listId}
-              />
-          </SkyLight>
           <div className='row' style={[styles.nameBlock.parent]}>
             <div className='small-12 medium-8 large-4 columns'>
               <ToggleableEditInput
@@ -411,7 +400,6 @@ class Table extends Component {
                 <Menu>
                   <MenuItem onClick={this.updateContacts} primaryText='Update Selected Contacts' />
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
-                  <MenuItem primaryText='Import from File' onClick={_ => this.refs.input.show()} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
                   <MenuItem primaryText='Load All Contacts' onClick={_ => props.fetchAllContacts(props.listId)} />
                   <MenuItem primaryText='Print' onClick={this.onPrintClick} />

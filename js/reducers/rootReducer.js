@@ -9,7 +9,8 @@ import contactReducer from './contactReducer';
 import listReducer from './listReducer';
 import stagingReducer from '../components/Email/reducer';
 import publicationReducer from './publicationReducer';
-import fileReducer from '../components/ImportFile/reducer';
+import fileReducer from '../components/ImportFile/fileReducer';
+import headerReducer from '../components/ImportFile/headerReducer';
 import templateReducer from '../components/Email/Template/reducer';
 import searchReducer from '../components/Search/reducer';
 import feedReducer from '../components/ContactProfile/reducer';
@@ -26,7 +27,8 @@ const rootReducer = combineReducers({
   templateReducer,
   searchReducer,
   feedReducer,
-  headlineReducer
+  headlineReducer,
+  headerReducer
 });
 
 export default rootReducer;
