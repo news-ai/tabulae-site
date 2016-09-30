@@ -241,6 +241,10 @@ class Table extends Component {
     const state = this.state;
     let addContactList = [];
     let patchContactList = [];
+    if (state.name.length === 0) {
+      alertify.alert('List name can\'t be empty!');
+      return;
+    }
     this.setState({colHeaders});
 
     localData.map( row => {

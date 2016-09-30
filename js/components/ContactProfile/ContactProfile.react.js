@@ -16,9 +16,7 @@ import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import InfiniteScroll from '../InfiniteScroll';
 import FeedsController from './FeedsController.react';
-
-import alertify from 'alertifyjs';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import ContactDescriptor from './ContactDescriptor.react';
 
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
@@ -33,25 +31,6 @@ const styles = {
     height: 36,
     padding: 2,
   },
-};
-
-const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className, iconClassName}) => {
-  return (
-    <div className={className} style={{display: 'flex', alignItems: 'center'}}>
-      {iconClassName && <i style={{marginRight: 8}} className={iconClassName} aria-hidden='hidden' />}
-      {showTitle && <span style={{marginRight: 10}}>{contentTitle}</span>}
-      <span style={{color: content ? 'black' : grey700}}>{content ? content : `---- ${contentTitle} empty ----`}</span>
-      <IconButton
-        style={{marginLeft: 3}}
-        iconStyle={styles.smallIcon}
-        style={styles.small}
-        iconClassName={content ? 'fa fa-edit' : 'fa fa-plus'}
-        tooltip={`${content ? 'Edit' : 'Add'} ${contentTitle}`}
-        tooltipPosition='top-right'
-        onClick={_ => alertify.prompt(`Enter ${contentTitle}`, '', onClick, function() {})}
-        />
-  </div>
-  );
 };
 
 const ContactProfileDescriptions = ({contact, patchContact, className, list}) => {
@@ -282,7 +261,7 @@ class ContactProfile extends Component {
               {props.headlines
                 && !props.headlineDidInvalidate
                 && props.headlines.length === 0
-                && <div className='row'><p>No RSS attached. Try clicking on "Add New RSS Feed" tog start seeing some headlines.</p></div>}
+                && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
               {props.headlineDidInvalidate
                 && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
             </div>

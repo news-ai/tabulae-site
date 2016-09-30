@@ -25,11 +25,11 @@ const config = {
 };
 
 const listItemStyle = {
-  borderTop: '1px solid lightgray',
+  borderBottom: '1px solid lightgray',
   margin: '0 0 0 0',
-  textAlign: 'center',
-  height: '23px',
-  overflow: 'auto'
+  textAlign: 'left',
+  height: 23,
+  overflow: 'auto',
 };
 
 class Headers extends Component {
@@ -46,8 +46,8 @@ class Headers extends Component {
   }
 
   _sendHeaderNames() {
-    const { order, headers } = this.state;
-    const { onProcessHeaders } = this.props;
+    const {order, headers} = this.state;
+    const {onProcessHeaders} = this.props;
     let untitledCount = 0;
     const newOrder = order.map(item => {
       if (item) {
@@ -116,7 +116,7 @@ class Headers extends Component {
         }}>
 
         {state.headers.map((header, i) =>
-          <div key={i} style={{width: '180px'}}>
+          <div key={i} style={{width: 180}}>
           <AutoComplete
           floatingLabelText='Column Name'
           openOnFocus
@@ -127,8 +127,8 @@ class Headers extends Component {
           dataSource={state.options.filter(item => !item.selected)}
           dataSourceConfig={config}
         />
-            <ul style={{listStyleType: 'none'}}>
-            {header.rows.map((rowItem, j) => <li key={j} style={listItemStyle}>{rowItem}</li>)}
+            <ul className='u-full-width' style={{listStyleType: 'none'}}>
+            {header.rows.map((rowItem, j) => <li className='u-full-width' key={j} style={listItemStyle}>{rowItem}</li>)}
             </ul>
           </div>)}
         </div>

@@ -8,7 +8,6 @@ import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
-import {grey500} from 'material-ui/styles/colors';
 
 class FeedsController extends Component {
   constructor(props) {
@@ -37,7 +36,7 @@ class FeedsController extends Component {
       <div>
         <Dialog autoScrollBodyContent open={state.isPanelOpen} onRequestClose={this.togglePanel}>
           <h5>Settings</h5>
-          <div style={{margin: 20}}>
+          <div>
             <span style={{marginRight: 10}}>Attach New RSS Feed</span>
             <TextField
             value={state.feedUrl}
@@ -51,25 +50,21 @@ class FeedsController extends Component {
             onTouchTap={this.addFeedClick}
             />
           </div>
-          <div style={{margin: 20}}>
+          <span style={{fontSize: '0.9em'}}>* feeds will begin aggregating in a few minutes</span>
+        </Dialog>
+        <div className='row' style={{marginTop: 15, marginBottom: 15}}>
+          <div className='large-10 medium-8 small-12 columns'>
             <span>Currently Attached Feeds:</span>
             {props.feeds && props.feeds.map((feed, i) => <Chip
               style={{margin: 4}}
               key={i}
               onRequestDelete={_ => props.deleteFeed(feed.id).then(_ => props.fetchContactFeeds(props.contactId))}>{feed.url}</Chip>)}
           </div>
-        </Dialog>
-        <div className='row' style={{marginTop: 15, marginBottom: 15}}>
-          <div className='large-9 medium-8 small-12 columns' style={{color: grey500, fontSize: '0.7em'}}>
-            Attached Feeds:
-            {props.attachedfeeds && props.attachedfeeds.map((feed, i) => <div key={i} style={{marginLeft: 3}}><span>{feed}</span></div>)}
-          </div>
-          <div className='large-3 medium-4 small-12 columns vertical-center'>
+          <div className='large-2 medium-4 small-12 columns vertical-center'>
             <RaisedButton style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Settings' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
       </div>
-
       );
   }
 }

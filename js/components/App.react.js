@@ -97,11 +97,13 @@ class App extends Component {
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
         </Drawer>
        <div className='u-full-width row noprint' style={navStyle}>
-          <div className='small-8 medium-3 large-2 columns' style={verticalCenter}>
+          <div className='small-8 medium-3 large-1 columns vertical-center'>
             <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
-            <span style={{color: 'gray', float: 'right'}}>You are at: </span>
           </div>
-          <div className='hide-for-small-only medium-4 large-5 columns'>
+          <div className='hide-for-small-only medium-4 large-6 columns vertical-center'>
+            <div>
+              <span style={{color: 'gray', marginRight: 5}}>You are at: </span>
+            </div>
             <div style={{marginTop: '13px'}}>
               <Breadcrumbs
               routes={props.routes}
@@ -115,7 +117,7 @@ class App extends Component {
             <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
           </div>
           <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
-            <RaisedButton label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
+            <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
           </div>
           </div>
         <div style={{height: '60px'}}></div>
