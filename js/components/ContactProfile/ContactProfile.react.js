@@ -6,7 +6,7 @@ import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as mixedFeedActions from './MixedFeed/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey700, grey500, grey400} from 'material-ui/styles/colors';
+import {grey700, grey500, grey400, grey50} from 'material-ui/styles/colors';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
@@ -260,8 +260,8 @@ class ContactProfile extends Component {
               marginTop: 20
             }}>
               <FeedsController {...props} />
-                <Tabs>
-                  <Tab label='RSS only'>
+                <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
+                  <Tab label='RSS only' style={{color: grey700}}>
                     <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
                       {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
                       {props.headlines
@@ -272,7 +272,7 @@ class ContactProfile extends Component {
                         && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
                     </InfiniteScroll>
                   </Tab>
-                  <Tab label='Tweets & RSS'>
+                  <Tab label='Tweets & RSS' style={{color: grey700}}>
                     <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
                       {props.mixedfeed && props.mixedfeed.map((obj, i) => {
                         if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
@@ -339,7 +339,7 @@ const mapDispatchToProps = (dispatch, props) => {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
-    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId))
+    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
   };
 };
 
