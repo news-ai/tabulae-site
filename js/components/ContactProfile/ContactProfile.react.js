@@ -4,13 +4,15 @@ import withRouter from 'react-router/lib/withRouter';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
+import * as mixedFeedActions from './MixedFeed/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey700, grey500} from 'material-ui/styles/colors';
+import {grey700, grey500, grey400, grey50} from 'material-ui/styles/colors';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
+import {Tabs, Tab} from 'material-ui/Tabs';
 
 import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
@@ -106,6 +108,7 @@ class ContactProfile extends Component {
     this.props.fetchFeed(this.props.contactId);
     this.props.fetchContactFeeds(this.props.contactId);
     this.props.fetchList(this.props.listId);
+    this.props.fetchMixedFeed(this.props.contactId);
   }
 
   _togglePanel(key) {
@@ -183,7 +186,7 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+      <div>
         <IconButton
         style={{marginTop: 15, marginLeft: 20}}
         iconStyle={{color: grey500}}
@@ -257,17 +260,42 @@ class ContactProfile extends Component {
               marginTop: 20
             }}>
               <FeedsController {...props} />
-              {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-              {props.headlines
-                && !props.headlineDidInvalidate
-                && props.headlines.length === 0
-                && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-              {props.headlineDidInvalidate
-                && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+                <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
+                  <Tab label='RSS only' style={{color: grey700}}>
+                    <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+                      {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
+                      {props.headlines
+                        && !props.headlineDidInvalidate
+                        && props.headlines.length === 0
+                        && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
+                      {props.headlineDidInvalidate
+                        && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+                    </InfiniteScroll>
+                  </Tab>
+                  <Tab label='Tweets & RSS' style={{color: grey700}}>
+                    <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
+                      {props.mixedfeed && props.mixedfeed.map((obj, i) => {
+                        if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
+                        else return (
+                          <div key={i} className='row' style={{
+                            paddingTop: 10,
+                            paddingBottom: 10,
+                            marginTop: 10,
+                            marginBottom: 10,
+                            border: `dotted 1px ${grey400}`,
+                            borderRadius: '0.4em'
+                          }}>
+                            <div className='large-10 medium-9 small-8 columns'><span>{obj.text}</span></div>
+                            <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
+                          </div>);
+                      })}
+                    </InfiniteScroll>
+                  </Tab>
+                </Tabs>
             </div>
           </div>
         </div>
-      </InfiniteScroll>
+      </div>
     );
   }
 }
@@ -295,6 +323,7 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
+    mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     list: state.listReducer[listId],
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
@@ -310,6 +339,7 @@ const mapDispatchToProps = (dispatch, props) => {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
+    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
   };
 };
 

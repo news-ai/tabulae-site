@@ -60,4 +60,9 @@ export const initialState = {
     didInvalidate: false,
     received: [],
   },
+  mixedReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
 };
