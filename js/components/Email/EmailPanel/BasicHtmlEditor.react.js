@@ -28,6 +28,8 @@ import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
 import alertify from 'alertifyjs';
 
+import 'node_modules/draft-js/dist/Draft.css';
+
 import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
@@ -97,7 +99,6 @@ class BasicHtmlEditor extends React.Component {
 
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
-      // let html = stateToHTML(content, null, injectCssToTags);
       let html = draftRawToHtml(raw);
       // console.log(html);
       this.props.onBodyChange(html);
@@ -235,7 +236,7 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <div style={{display: 'flex', alignItems: 'flex-end', marginTop: '10px'}}>
+        <div className='row' style={{display: 'flex', alignItems: 'flex-end'}}>
           <InlineStyleControls
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
@@ -245,12 +246,12 @@ class BasicHtmlEditor extends React.Component {
             editorState={editorState}
             entityControls={this.ENTITY_CONTROLS}
           />
-        </div>
-        <BlockStyleControls
+          <BlockStyleControls
           editorState={editorState}
           blockTypes={this.BLOCK_TYPES}
           onToggle={this.toggleBlockType}
-        />
+          />
+        </div>
         <FlatButton
         label='Use Column Variable'
         labelStyle={{textTransform: 'none'}}
