@@ -16,7 +16,7 @@ class InfiniteScroll extends Component {
 
   _onScrollBottom(ev) {
     ev.preventDefault();
-    if ((window.innerHeight + window.scrollY + 20) >= document.body.offsetHeight) {
+    if ((window.innerHeight + window.scrollY + 20) >= document.body.scrollHeight) {
       this.props.onScrollBottom();
     }
   }

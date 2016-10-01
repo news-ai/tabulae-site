@@ -186,7 +186,7 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+      <div>
         <IconButton
         style={{marginTop: 15, marginLeft: 20}}
         iconStyle={{color: grey500}}
@@ -262,36 +262,40 @@ class ContactProfile extends Component {
               <FeedsController {...props} />
                 <Tabs>
                   <Tab label='RSS only'>
-                  {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-                  {props.headlines
-                    && !props.headlineDidInvalidate
-                    && props.headlines.length === 0
-                    && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-                  {props.headlineDidInvalidate
-                    && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+                    <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+                      {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
+                      {props.headlines
+                        && !props.headlineDidInvalidate
+                        && props.headlines.length === 0
+                        && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
+                      {props.headlineDidInvalidate
+                        && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+                    </InfiniteScroll>
                   </Tab>
                   <Tab label='Tweets & RSS'>
-                  {props.mixedfeed && props.mixedfeed.map((obj, i) => {
-                    if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
-                    else return (
-                      <div key={i} className='row' style={{
-                        paddingTop: 10,
-                        paddingBottom: 10,
-                        marginTop: 10,
-                        marginBottom: 10,
-                        border: `dotted 1px ${grey400}`,
-                        borderRadius: '0.4em'
-                      }}>
-                        <div className='large-10 medium-9 small-8 columns'><span>{obj.text}</span></div>
-                        <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
-                      </div>);
-                  })}
+                    <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
+                      {props.mixedfeed && props.mixedfeed.map((obj, i) => {
+                        if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
+                        else return (
+                          <div key={i} className='row' style={{
+                            paddingTop: 10,
+                            paddingBottom: 10,
+                            marginTop: 10,
+                            marginBottom: 10,
+                            border: `dotted 1px ${grey400}`,
+                            borderRadius: '0.4em'
+                          }}>
+                            <div className='large-10 medium-9 small-8 columns'><span>{obj.text}</span></div>
+                            <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
+                          </div>);
+                      })}
+                    </InfiniteScroll>
                   </Tab>
                 </Tabs>
             </div>
           </div>
         </div>
-      </InfiniteScroll>
+      </div>
     );
   }
 }
