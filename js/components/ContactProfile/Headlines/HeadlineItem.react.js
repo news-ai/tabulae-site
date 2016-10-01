@@ -5,8 +5,8 @@ import {grey400, grey700, grey500} from 'material-ui/styles/colors';
 
 function createMarkup(markup) { return {__html: markup}; };
 
-const HeadlineItem = ({url, title, publishdate, summary, publisherName}) => {
-  const date = new Date(publishdate);
+const HeadlineItem = ({url, title, createdat, summary, publisherName}) => {
+  const date = new Date(createdat);
   return (
   <div className='row' style={{
     paddingTop: 10,
