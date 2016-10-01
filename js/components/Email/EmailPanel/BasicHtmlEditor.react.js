@@ -266,7 +266,10 @@ class BasicHtmlEditor extends React.Component {
         >
           <Menu desktop>
           {props.fieldsmap.map((field, i) =>
-            <MenuItem key={i} primaryText={field.name} onClick={_ => this.insertText(field.name)} />)}
+            <MenuItem key={i} primaryText={field.name} onClick={_ => {
+              this.insertText(field.name);
+              this.setState({variableMenuOpen: false});
+            }} />)}
           </Menu>
         </Popover>
         <div style={{marginTop: '8px'}}>
