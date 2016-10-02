@@ -261,17 +261,6 @@ class ContactProfile extends Component {
             }}>
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
-                  <Tab label='RSS only' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
-                      {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-                      {props.headlines
-                        && !props.headlineDidInvalidate
-                        && props.headlines.length === 0
-                        && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-                      {props.headlineDidInvalidate
-                        && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-                    </InfiniteScroll>
-                  </Tab>
                   <Tab label='Tweets & RSS' style={{color: grey700}}>
                     <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
                       {props.mixedfeed && props.mixedfeed.map((obj, i) => {
@@ -289,6 +278,17 @@ class ContactProfile extends Component {
                             <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
                           </div>);
                       })}
+                    </InfiniteScroll>
+                  </Tab>
+                  <Tab label='RSS only' style={{color: grey700}}>
+                    <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
+                      {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
+                      {props.headlines
+                        && !props.headlineDidInvalidate
+                        && props.headlines.length === 0
+                        && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
+                      {props.headlineDidInvalidate
+                        && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
                     </InfiniteScroll>
                   </Tab>
                 </Tabs>
