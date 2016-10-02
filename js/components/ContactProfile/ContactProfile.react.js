@@ -79,6 +79,22 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
     </div>);
 };
 
+const tweetStyle = {
+  paddingTop: 10,
+  paddingBottom: 10,
+  marginTop: 10,
+  marginBottom: 10,
+  border: `dotted 1px ${grey400}`,
+  borderRadius: '0.4em'
+};
+
+const Tweet = ({text, username}) => {
+  return <div className='row' style={tweetStyle}>
+    <div className='large-10 medium-9 small-8 columns'><span>{text}</span></div>
+    <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{username}</span></div>
+  </div>;
+};
+
 
 class ContactProfile extends Component {
   constructor(props) {
@@ -263,21 +279,9 @@ class ContactProfile extends Component {
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='Tweets & RSS' style={{color: grey700}}>
                     <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
-                      {props.mixedfeed && props.mixedfeed.map((obj, i) => {
-                        if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
-                        else return (
-                          <div key={i} className='row' style={{
-                            paddingTop: 10,
-                            paddingBottom: 10,
-                            marginTop: 10,
-                            marginBottom: 10,
-                            border: `dotted 1px ${grey400}`,
-                            borderRadius: '0.4em'
-                          }}>
-                            <div className='large-10 medium-9 small-8 columns'><span>{obj.text}</span></div>
-                            <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
-                          </div>);
-                      })}
+                      {props.mixedfeed && props.mixedfeed.map((obj, i) => obj.type === 'headlines' ?
+                        <HeadlineItem key={i} {...obj} /> :
+                        <Tweet key={i} {...obj} />)}
                     </InfiniteScroll>
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700}}>
