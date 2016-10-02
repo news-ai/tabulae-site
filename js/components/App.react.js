@@ -84,6 +84,8 @@ class App extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    console.log(props.routes);
+    console.log(props.params);
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
     const NavBar = (state.showNavBar && props.person) && (
       <div>
