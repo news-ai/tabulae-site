@@ -56,7 +56,9 @@ function escapeHtml(unsafe) {
 
 function convertToCsvString(data, colHeaders) {
   let base = 'data:text/csv;charset=utf-8,';
-  const headers = colHeaders.map(header => header.data);
+  const headers = colHeaders
+  .filter(header => header.data !== 'selected' && header.data !== 'profile')
+  .map(header => header.data);
   base += headers.toString() + '\n';
   data.map(row => {
     let rowStringArray = [];
