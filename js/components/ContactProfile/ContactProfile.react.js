@@ -190,12 +190,6 @@ class ContactProfile extends Component {
     ];
     return (
       <div>
-        <IconButton
-        style={{marginTop: 15, marginLeft: 20}}
-        iconStyle={{color: grey500}}
-        tooltip='back to List'
-        onClick={_ => props.router.push(`/lists/${props.listId}`)}
-        iconClassName='fa fa-arrow-left'/>
         <div className='row horizontal-center'>
           <div className='large-9 columns'>
             {props.contact && (
