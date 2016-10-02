@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import Link from 'react-router/lib/Link';
+import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import {listPropTypes} from 'constants/CommonPropTypes';
 import {grey50, grey700} from 'material-ui/styles/colors';
@@ -17,6 +18,11 @@ const styles = {
       backgroundColor: grey50
     }
   },
+  pointer: {
+    ':hover': {
+      cursor: 'pointer'
+    }
+  },
   smallIcon: {
     fontSize: 16,
     color: grey700
@@ -28,14 +34,14 @@ const styles = {
   },
 };
 
-function ListItem({list, onToggle, iconName, tooltip}) {
+function ListItem({list, onToggle, iconName, tooltip, router}) {
   const updatedDate = new Date(list.updated);
   return (
     <div key='parent' className='row align-middle' style={[styles.parent]}>
-      <div className='small-8 medium-7 large-8 columns'>
+      <div className='small-8 medium-7 large-8 columns' style={[styles.pointer]} onClick={_ => router.push(`/lists/${list.id}`)}>
         <Link to={`/lists/${list.id}`}><span>{list.name}</span></Link>
       </div>
-      <div className='small-4 medium-4 large-3 columns'>
+      <div className='small-4 medium-4 large-3 columns' onClick={_ => router.push(`/lists/${list.id}`)}>
         <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
       </div>
       <div className='hide-for-small-only medium-1 large-1 columns'>
@@ -61,4 +67,4 @@ ListItem.PropTypes = {
   tooltip: PropTypes.string
 };
 
-export default Radium(ListItem);
+export default withRouter(Radium(ListItem));
