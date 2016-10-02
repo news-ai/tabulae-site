@@ -24,7 +24,7 @@ const MIN_ROWS = 20;
 const BATCH_CONTACT_SIZE = 200;
 alertify.defaults.glossary.title = '';
 let defaultColumns = [{
-  data: 'button',
+  data: 'profile',
   title: 'Profile',
   readOnly: true,
   renderer: function(instance, td, row, col, prop, value, cellProperties) {

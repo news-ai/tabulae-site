@@ -21,6 +21,6 @@ export function fetchMixedFeed(contactId) {
         contactId,
         offset: newOffset});
     })
-    .catch(err => console.log(err));
+    .catch(err => dispatch({type: mixedConstant.REQUEST_MULTIPLE_FAIL, message: err}));
   };
 }

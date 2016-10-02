@@ -19,7 +19,7 @@ const styles = {
 };
 
 const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className, iconClassName}) => {
-  const icon = isURL(content) && !isEmail(content) ? <a
+  const icon = content && isURL(content) && !isEmail(content) ? <a
   href={content.substring(0, 4) === 'http' ? content : `https://${content}`}
   style={{color: 'black'}}
   target='_blank'>

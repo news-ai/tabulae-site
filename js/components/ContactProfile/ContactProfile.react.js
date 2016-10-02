@@ -15,9 +15,10 @@ import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
-import HeadlineItem from './Headlines/HeadlineItem.react';
+import TweetFeed from './Tweets/TweetFeed.react';
+import MixedFeed from './MixedFeed/MixedFeed.react';
+import Headlines from './Headlines/Headlines.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
-import InfiniteScroll from '../InfiniteScroll';
 import FeedsController from './FeedsController.react';
 import ContactDescriptor from './ContactDescriptor.react';
 
@@ -49,7 +50,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
       <div style={{marginTop: 10}}>
         <h5>Custom Fields</h5>
         <div>
-        {list && contact && list.fieldsmap
+        {list && contact && contact.customfields !== null ? list.fieldsmap
           .filter(fieldObj => fieldObj.customfield)
           .map((fieldObj, i) => {
             const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
@@ -74,30 +75,10 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
                 patchContact(contact.id, {customfields});
               }}
               />);
-          })}
+          }) : <span>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
         </div>
       </div>
     </div>);
-};
-
-const tweetStyle = {
-  paddingTop: 10,
-  paddingBottom: 10,
-  marginTop: 10,
-  marginBottom: 10,
-  border: `dotted 1px ${grey400}`,
-  borderRadius: '0.4em'
-};
-
-const Tweet = ({text, username, createdat}) => {
-  const date = new Date(createdat);
-  return <div className='row' style={tweetStyle}>
-    <div className='large-10 medium-9 small-8 columns'><span>{text}</span></div>
-    <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{username}</span></div>
-     <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
-      <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
-    </div>
-  </div>;
 };
 
 
@@ -209,12 +190,6 @@ class ContactProfile extends Component {
     ];
     return (
       <div>
-        <IconButton
-        style={{marginTop: 15, marginLeft: 20}}
-        iconStyle={{color: grey500}}
-        tooltip='back to List'
-        onClick={_ => props.router.push(`/lists/${props.listId}`)}
-        iconClassName='fa fa-arrow-left'/>
         <div className='row horizontal-center'>
           <div className='large-9 columns'>
             {props.contact && (
@@ -284,27 +259,13 @@ class ContactProfile extends Component {
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='Tweets & RSS' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
-                      {props.mixedfeed && props.mixedfeed.map((obj, i) => obj.type === 'headlines' ?
-                        <HeadlineItem key={i} {...obj} /> :
-                        <Tweet key={i} {...obj} />)}
-                    </InfiniteScroll>
+                    <MixedFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
-                      {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-                      {props.headlines
-                        && !props.headlineDidInvalidate
-                        && props.headlines.length === 0
-                        && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-                      {props.headlineDidInvalidate
-                        && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-                    </InfiniteScroll>
+                    <Headlines contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='Tweets only' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchContactTweets(props.contactId)}>
-                      {props.tweets && props.tweets.map((tweet, i) => <Tweet key={i} {...tweet} />)}
-                    </InfiniteScroll>
+                    <TweetFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                 </Tabs>
             </div>
@@ -318,9 +279,6 @@ class ContactProfile extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const contactId = parseInt(props.params.contactId, 10);
-  const headlines = state.headlineReducer[contactId]
-  && state.headlineReducer[contactId].received
-  && state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]);
   const contact = state.contactReducer[contactId];
   const employers = contact && contact.employers !== null && contact.employers
   .filter(pubId => state.publicationReducer[pubId])
@@ -328,21 +286,14 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-  const tweets = state.tweetReducer[contactId]
-  && state.tweetReducer[contactId].received
-  && state.tweetReducer[contactId].received.map(id => state.tweetReducer[id]);
 
   return {
     listId,
     contactId,
-    headlines,
     contact,
     employers,
     pastemployers,
-    tweets,
-    mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     list: state.listReducer[listId],
-    headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
 

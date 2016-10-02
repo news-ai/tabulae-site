@@ -59,6 +59,7 @@ class FeedsController extends Component {
               style={{margin: 4}}
               key={i}
               onRequestDelete={_ => props.deleteFeed(feed.id).then(_ => props.fetchContactFeeds(props.contactId))}>{feed.url}</Chip>)}
+            {props.feeds && props.feeds.length && <span style={{color: 'grey', marginLeft: 10}}>--- None ---</span>}
           </div>
           <div className='large-2 medium-4 small-12 columns vertical-center'>
             <RaisedButton style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Settings' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />

@@ -29,7 +29,7 @@ export function fetchContactTweets(contactId) {
     })
     .catch(err => {
       console.log(err);
-      dispatch({type: tweetConstant.REQUEST_FAIL});
+      dispatch({type: tweetConstant.REQUEST_MULTIPLE_FAIL});
     });
   };
 }
