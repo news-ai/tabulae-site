@@ -15,6 +15,8 @@ import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
+import TweetFeed from './Tweets/TweetFeed.react';
+import MixedFeed from './MixedFeed/MixedFeed.react';
 import HeadlineItem from './Headlines/HeadlineItem.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import InfiniteScroll from '../InfiniteScroll';
@@ -49,7 +51,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
       <div style={{marginTop: 10}}>
         <h5>Custom Fields</h5>
         <div>
-        {list && contact && list.fieldsmap
+        {list && contact && contact.customfields !== null ? list.fieldsmap
           .filter(fieldObj => fieldObj.customfield)
           .map((fieldObj, i) => {
             const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
@@ -74,30 +76,10 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
                 patchContact(contact.id, {customfields});
               }}
               />);
-          })}
+          }) : <span>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
         </div>
       </div>
     </div>);
-};
-
-const tweetStyle = {
-  paddingTop: 10,
-  paddingBottom: 10,
-  marginTop: 10,
-  marginBottom: 10,
-  border: `dotted 1px ${grey400}`,
-  borderRadius: '0.4em'
-};
-
-const Tweet = ({text, username, createdat}) => {
-  const date = new Date(createdat);
-  return <div className='row' style={tweetStyle}>
-    <div className='large-10 medium-9 small-8 columns'><span>{text}</span></div>
-    <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{username}</span></div>
-     <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
-      <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
-    </div>
-  </div>;
 };
 
 
@@ -284,11 +266,7 @@ class ContactProfile extends Component {
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='Tweets & RSS' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
-                      {props.mixedfeed && props.mixedfeed.map((obj, i) => obj.type === 'headlines' ?
-                        <HeadlineItem key={i} {...obj} /> :
-                        <Tweet key={i} {...obj} />)}
-                    </InfiniteScroll>
+                    <MixedFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700}}>
                     <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
@@ -302,9 +280,7 @@ class ContactProfile extends Component {
                     </InfiniteScroll>
                   </Tab>
                   <Tab label='Tweets only' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchContactTweets(props.contactId)}>
-                      {props.tweets && props.tweets.map((tweet, i) => <Tweet key={i} {...tweet} />)}
-                    </InfiniteScroll>
+                    <TweetFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                 </Tabs>
             </div>
@@ -328,9 +304,6 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-  const tweets = state.tweetReducer[contactId]
-  && state.tweetReducer[contactId].received
-  && state.tweetReducer[contactId].received.map(id => state.tweetReducer[id]);
 
   return {
     listId,
@@ -339,8 +312,6 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
-    tweets,
-    mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     list: state.listReducer[listId],
     headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
