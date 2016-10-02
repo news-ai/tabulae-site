@@ -1,7 +1,3 @@
-/**
- * Combine all reducers in this file and export the combined reducers.
- * If we were to do this in store.js, reducers wouldn't be hot reloadable.
- */
 import { combineReducers } from 'redux';
 
 import personReducer from '../components/Login/reducer';
@@ -16,6 +12,7 @@ import searchReducer from '../components/Search/reducer';
 import feedReducer from '../components/ContactProfile/reducer';
 import headlineReducer from '../components/ContactProfile/Headlines/reducer';
 import mixedReducer from '../components/ContactProfile/MixedFeed/reducer';
+import tweetReducer from '../components/ContactProfile/Tweets/reducer';
 
 
 const rootReducer = combineReducers({
@@ -30,8 +27,8 @@ const rootReducer = combineReducers({
   feedReducer,
   headlineReducer,
   headerReducer,
-  mixedReducer
+  mixedReducer,
+  tweetReducer
 });
 
 export default rootReducer;
-

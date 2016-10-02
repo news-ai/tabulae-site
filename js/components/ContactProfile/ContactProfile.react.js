@@ -5,6 +5,7 @@ import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as mixedFeedActions from './MixedFeed/actions';
+import * as tweetActions from './Tweets/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey700, grey500, grey400, grey50} from 'material-ui/styles/colors';
 
@@ -123,6 +124,7 @@ class ContactProfile extends Component {
     });
     this.props.fetchFeed(this.props.contactId);
     this.props.fetchContactFeeds(this.props.contactId);
+    this.props.fetchContactTweets(this.props.contactId);
     this.props.fetchList(this.props.listId);
     this.props.fetchMixedFeed(this.props.contactId);
   }
@@ -295,6 +297,11 @@ class ContactProfile extends Component {
                         && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
                     </InfiniteScroll>
                   </Tab>
+                  <Tab label='Tweets only' style={{color: grey700}}>
+                    <InfiniteScroll onScrollBottom={_ => props.fetchContactTweets(props.contactId)}>
+                      {props.tweets && props.tweets.map((tweet, i) => <Tweet key={i} {...tweet} />)}
+                    </InfiniteScroll>
+                  </Tab>
                 </Tabs>
             </div>
           </div>
@@ -317,8 +324,9 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-  const feeds = state.feedReducer[contactId] && state.feedReducer[contactId].map(id => state.feedReducer[id]);
-  const attachedfeeds = feeds && feeds.map(feed => feed.url);
+  const tweets = state.tweetReducer[contactId]
+  && state.tweetReducer[contactId].received
+  && state.tweetReducer[contactId].received.map(id => state.tweetReducer[id]);
 
   return {
     listId,
@@ -327,6 +335,7 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
+    tweets,
     mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     list: state.listReducer[listId],
     headlineDidInvalidate: state.headlineReducer.didInvalidate
@@ -344,6 +353,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
     fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
+    fetchContactTweets: contactId => dispatch(tweetActions.fetchContactTweets(contactId)),
   };
 };
 
