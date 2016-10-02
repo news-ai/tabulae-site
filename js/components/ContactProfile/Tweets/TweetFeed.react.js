@@ -4,6 +4,12 @@ import * as tweetActions from './actions';
 import Tweet from './Tweet.react';
 import InfiniteScroll from '../../InfiniteScroll';
 
+const styleEmptyRow = {
+  padding: 10,
+  marginTop: 20,
+  marginBottom: 50
+};
+
 class TweetFeed extends Component {
   constructor(props) {
     super(props);
@@ -17,9 +23,9 @@ class TweetFeed extends Component {
           {props.tweets
             && !props.didInvalidate
             && props.tweets.length === 0
-            && <div className='row'><p>No Tweets attached. Try filling in Twitter field with a handle to start seeing tweets.</p></div>}
+            && <div className='row' style={styleEmptyRow}><p>No Tweets attached. Try filling in Twitter field with a handle to start seeing tweets.</p></div>}
           {props.didInvalidate
-            && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+            && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
         </InfiniteScroll>
       );
   }

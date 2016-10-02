@@ -4,6 +4,12 @@ import HeadlineItem from './HeadlineItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
 import * as headlineActions from './actions';
 
+const styleEmptyRow = {
+  padding: 10,
+  marginTop: 20,
+  marginBottom: 50,
+};
+
 class Headlines extends Component {
   constructor(props) {
     super(props);
@@ -17,9 +23,9 @@ class Headlines extends Component {
           {props.headlines
             && !props.didInvalidate
             && props.headlines.length === 0
-            && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
+            && <div className='row' style={styleEmptyRow}><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
           {props.didInvalidate
-            && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+            && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
         </InfiniteScroll>
       );
   }
