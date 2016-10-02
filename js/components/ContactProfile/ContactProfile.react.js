@@ -5,6 +5,7 @@ import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as mixedFeedActions from './MixedFeed/actions';
+import * as tweetActions from './Tweets/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey700, grey500, grey400, grey50} from 'material-ui/styles/colors';
 
@@ -79,6 +80,26 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
     </div>);
 };
 
+const tweetStyle = {
+  paddingTop: 10,
+  paddingBottom: 10,
+  marginTop: 10,
+  marginBottom: 10,
+  border: `dotted 1px ${grey400}`,
+  borderRadius: '0.4em'
+};
+
+const Tweet = ({text, username, createdat}) => {
+  const date = new Date(createdat);
+  return <div className='row' style={tweetStyle}>
+    <div className='large-10 medium-9 small-8 columns'><span>{text}</span></div>
+    <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{username}</span></div>
+     <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
+      <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
+    </div>
+  </div>;
+};
+
 
 class ContactProfile extends Component {
   constructor(props) {
@@ -107,6 +128,7 @@ class ContactProfile extends Component {
     });
     this.props.fetchFeed(this.props.contactId);
     this.props.fetchContactFeeds(this.props.contactId);
+    this.props.fetchContactTweets(this.props.contactId);
     this.props.fetchList(this.props.listId);
     this.props.fetchMixedFeed(this.props.contactId);
   }
@@ -261,6 +283,13 @@ class ContactProfile extends Component {
             }}>
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
+                  <Tab label='Tweets & RSS' style={{color: grey700}}>
+                    <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
+                      {props.mixedfeed && props.mixedfeed.map((obj, i) => obj.type === 'headlines' ?
+                        <HeadlineItem key={i} {...obj} /> :
+                        <Tweet key={i} {...obj} />)}
+                    </InfiniteScroll>
+                  </Tab>
                   <Tab label='RSS only' style={{color: grey700}}>
                     <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
                       {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
@@ -272,23 +301,9 @@ class ContactProfile extends Component {
                         && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
                     </InfiniteScroll>
                   </Tab>
-                  <Tab label='Tweets & RSS' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
-                      {props.mixedfeed && props.mixedfeed.map((obj, i) => {
-                        if (obj.type === 'headlines') return <HeadlineItem key={i} {...obj} />;
-                        else return (
-                          <div key={i} className='row' style={{
-                            paddingTop: 10,
-                            paddingBottom: 10,
-                            marginTop: 10,
-                            marginBottom: 10,
-                            border: `dotted 1px ${grey400}`,
-                            borderRadius: '0.4em'
-                          }}>
-                            <div className='large-10 medium-9 small-8 columns'><span>{obj.text}</span></div>
-                            <div className='large-2 medium-3 small-4 columns'><span style={{float: 'right'}}>{obj.username}</span></div>
-                          </div>);
-                      })}
+                  <Tab label='Tweets only' style={{color: grey700}}>
+                    <InfiniteScroll onScrollBottom={_ => props.fetchContactTweets(props.contactId)}>
+                      {props.tweets && props.tweets.map((tweet, i) => <Tweet key={i} {...tweet} />)}
                     </InfiniteScroll>
                   </Tab>
                 </Tabs>
@@ -313,8 +328,9 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-  const feeds = state.feedReducer[contactId] && state.feedReducer[contactId].map(id => state.feedReducer[id]);
-  const attachedfeeds = feeds && feeds.map(feed => feed.url);
+  const tweets = state.tweetReducer[contactId]
+  && state.tweetReducer[contactId].received
+  && state.tweetReducer[contactId].received.map(id => state.tweetReducer[id]);
 
   return {
     listId,
@@ -323,6 +339,7 @@ const mapStateToProps = (state, props) => {
     contact,
     employers,
     pastemployers,
+    tweets,
     mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     list: state.listReducer[listId],
     headlineDidInvalidate: state.headlineReducer.didInvalidate
@@ -340,6 +357,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
     fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
+    fetchContactTweets: contactId => dispatch(tweetActions.fetchContactTweets(contactId)),
   };
 };
 

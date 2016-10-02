@@ -65,4 +65,9 @@ export const initialState = {
     didInvalidate: false,
     received: [],
   },
+  tweetReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
 };

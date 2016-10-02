@@ -3,11 +3,15 @@ import {
   loginConstant,
   SET_FIRST_TIME_USER
 } from './constants';
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
+alertify.set('notifier', 'position', 'top-right');
 
-function notification(argument) {
-  var notifications = JSON.parse(argument.data);
+function notification(dispatch, args) {
+  var notifications = JSON.parse(args.data);
   for (var i = notifications.length - 1; i >= 0; i--) {
-      console.log(notifications[i].message);
+    dispatch({type: 'EYY MESSAGE', message: notifications[i].message});
+    alertify.message(notifications[i].message, 5);
   }
 }
 
@@ -22,7 +26,7 @@ export function fetchNotifications() {
       const channel = new goog.appengine.Channel(response.token);
       const socket = channel.open();
       socket.onopen = log;
-      socket.onmessage = notification;
+      socket.onmessage = args => notification(dispatch, args);
       socket.onerror = log;
       socket.onclose = log;
     });
