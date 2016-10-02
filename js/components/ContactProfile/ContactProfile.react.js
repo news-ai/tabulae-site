@@ -17,9 +17,8 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeed.react';
-import HeadlineItem from './Headlines/HeadlineItem.react';
+import Headlines from './Headlines/Headlines.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
-import InfiniteScroll from '../InfiniteScroll';
 import FeedsController from './FeedsController.react';
 import ContactDescriptor from './ContactDescriptor.react';
 
@@ -269,15 +268,7 @@ class ContactProfile extends Component {
                     <MixedFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700}}>
-                    <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
-                      {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-                      {props.headlines
-                        && !props.headlineDidInvalidate
-                        && props.headlines.length === 0
-                        && <div className='row'><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-                      {props.headlineDidInvalidate
-                        && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-                    </InfiniteScroll>
+                    <Headlines contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='Tweets only' style={{color: grey700}}>
                     <TweetFeed contactId={props.contactId} listId={props.listId} />
@@ -294,9 +285,6 @@ class ContactProfile extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const contactId = parseInt(props.params.contactId, 10);
-  const headlines = state.headlineReducer[contactId]
-  && state.headlineReducer[contactId].received
-  && state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]);
   const contact = state.contactReducer[contactId];
   const employers = contact && contact.employers !== null && contact.employers
   .filter(pubId => state.publicationReducer[pubId])
@@ -308,12 +296,10 @@ const mapStateToProps = (state, props) => {
   return {
     listId,
     contactId,
-    headlines,
     contact,
     employers,
     pastemployers,
     list: state.listReducer[listId],
-    headlineDidInvalidate: state.headlineReducer.didInvalidate
   };
 };
 

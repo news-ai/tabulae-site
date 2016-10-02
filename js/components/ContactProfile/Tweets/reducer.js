@@ -26,7 +26,7 @@ function tweetReducer(state = initialState.tweetReducer, action) {
       });
       obj.isReceiving = false;
       return obj;
-    case tweetConstant.REQUEST_FAIL:
+    case tweetConstant.REQUEST_MULTIPLE_FAIL:
       obj.didInvalidate = true;
       return obj;
     default:

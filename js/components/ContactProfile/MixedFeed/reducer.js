@@ -27,7 +27,7 @@ function mixedReducer(state = initialState.mixedReducer, action) {
       });
       obj.isReceiving = false;
       return obj;
-    case mixedConstant.REQUEST_FAIL:
+    case mixedConstant.REQUEST_MULTIPLE_FAIL:
       obj.didInvalidate = true;
       return obj;
     default:

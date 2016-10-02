@@ -14,6 +14,12 @@ class TweetFeed extends Component {
     return (
         <InfiniteScroll onScrollBottom={_ => props.fetchContactTweets(props.contactId)}>
           {props.tweets && props.tweets.map((tweet, i) => <Tweet key={i} {...tweet} />)}
+          {props.tweets
+            && !props.didInvalidate
+            && props.tweets.length === 0
+            && <div className='row'><p>No Tweets attached. Try filling in Twitter field with a handle to start seeing tweets.</p></div>}
+          {props.didInvalidate
+            && <div className='row'><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
         </InfiniteScroll>
       );
   }
@@ -29,6 +35,7 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     tweets,
+    didInvalidate: state.tweetReducer.didInvalidate
   };
 };
 
