@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
-import browserHistory from 'react-router/lib/browserHistory';
+import Handsontable from 'node_modules/handsontable/dist/handsontable.full';
 import alertify from 'alertifyjs';
 import * as actionCreators from 'actions/AppActions';
 import {COLUMNS} from 'constants/ColumnConfigs';
@@ -91,7 +90,6 @@ class HandsOnTable extends Component {
         data: [[]], // instantiate handsontable with empty Array of Array
         rowHeaders: true,
         sortIndicator: true,
-        columnSorting: true,
         minCols: defaultColumns.length,
         minRows: MIN_ROWS,
         manualColumnMove: true,
@@ -143,10 +141,14 @@ class HandsOnTable extends Component {
         },
         afterChange: (changes, source) => {
           // save selected rows
-          if (!this.props.isNew && source === 'edit') {
+          if (source === 'edit') {
             const selectedRows = this.state.options.data.filter(row => row.selected);
             this.props._getSelectedRows(selectedRows);
+            this.table.runHooks('persistentStateReset', 'columnSorting');
           }
+        },
+        afterColumnSort: (column, order) => {
+          this.table.runHooks('persistentStateReset', 'columnSorting');
         },
         afterScrollVertically: e => {
           const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
@@ -194,7 +196,7 @@ class HandsOnTable extends Component {
             if (key === 'insert_row_below') {
               const index = options.start.row;
               props.addContacts([{}])
-              .then( contacts => {
+              .then(contacts => {
                 const listContacts = props.listData.contacts;
                 let newContacts;
                 if (index === 0) {
@@ -296,10 +298,14 @@ class HandsOnTable extends Component {
   componentDidMount() {
     const options = this.state.options;
     this.table = new Handsontable(this.refs['data-grid'], options);
+    this.table.runHooks('persistentStateReset', 'columnSorting');
   }
 
   componentWillReceiveProps(nextProps) {
     const {contacts, listData, lastFetchedIndex, isSearchOn} = nextProps;
+    if (this.table) {
+      this.table.runHooks('persistentStateReset', 'columnSorting');
+    }
     this.loadTable(contacts, listData, lastFetchedIndex, isSearchOn);
   }
 
@@ -321,6 +327,9 @@ class HandsOnTable extends Component {
     const options = this.state.options;
     const fieldsmap = listData.fieldsmap;
     const immutableFieldmap = fromJS(listData.fieldsmap);
+    if (this.table) this.table.runHooks('persistentStateReset', 'columnSorting');
+
+      //Handsontable.hooks.run(this.hot, 'persistentStateSave', 'columnSorting', sortingState);
 
     if (!_.isEmpty(listData.contacts)) {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
@@ -350,6 +359,7 @@ class HandsOnTable extends Component {
         this.props.isSearchOn !== isSearchOn
         ) {
         options.data = contacts;
+        options.columnSorting = true;
         this.setState({
           options,
           fieldsmap,
