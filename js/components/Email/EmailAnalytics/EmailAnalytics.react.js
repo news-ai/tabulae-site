@@ -26,12 +26,9 @@ class EmailAnalytics extends Component {
     super(props);
     this.state = {
       sentEmails: [],
-      isPreviewOpen: false,
       filterValue: 0,
       isShowingArchived: false
     };
-    this.handlePreviewOpen = email => this.setState({isPreviewOpen: true, previewEmail: email});
-    this.handlePreviewClose = _ => this.setState({isPreviewOpen: false, previewEmail: null});
     this.handleChange = (event, index, filterValue) => this.setState({filterValue});
   }
 
@@ -66,17 +63,10 @@ class EmailAnalytics extends Component {
                 </DropDownMenu>
               </div>
             </div>}
-          <Dialog
-          open={state.isPreviewOpen}
-          onRequestClose={this.handlePreviewClose}
-          >
-            <StaticEmailContent {...state.previewEmail} />
-          </Dialog>
           <div style={{marginTop: '30px', marginBottom: '30px'}}>
           {emails.map((email, i) =>
             <AnalyticsItem
             key={i}
-            onPreviewOpen={ _ => this.handlePreviewOpen(email)}
             {...email}
             />)}
           </div>

@@ -96,4 +96,20 @@ export function fetchListEmails(listId) {
   };
 }
 
-
+export function fetchContactEmails(contactId) {
+  return (dispatch) => {
+    dispatch({type: REQUEST_MULTIPLE_EMAILS});
+    return api.get(`/contacts/${contactId}/emails`)
+    .then( response => {
+      const res = normalize(response, {
+        data: arrayOf(emailSchema)
+      });
+      return dispatch({
+        type: RECEIVE_MULTIPLE_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data
+      });
+    })
+    .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
+  };
+}
