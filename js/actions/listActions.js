@@ -3,7 +3,6 @@ import {
   listConstant,
 } from '../constants/AppConstants';
 import * as api from './api';
-import {browserHistory} from 'react-router';
 import { normalize, Schema, arrayOf } from 'normalizr';
 
 const listSchema = new Schema('lists');
