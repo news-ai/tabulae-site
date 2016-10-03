@@ -11,7 +11,7 @@ function notification(dispatch, args) {
   var notifications = JSON.parse(args.data);
   for (var i = notifications.length - 1; i >= 0; i--) {
     dispatch({type: 'EYY MESSAGE', message: notifications[i].message});
-    alertify.message(notifications[i].message, 5);
+    alertify.notify(notifications[i].message, 'custom', 5, function(){});
   }
 }
 

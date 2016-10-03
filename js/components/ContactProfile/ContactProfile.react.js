@@ -26,7 +26,11 @@ import ContactDescriptor from './ContactDescriptor.react';
 
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
-
+const styleEmptyRow = {
+  padding: 10,
+  marginTop: 20,
+  marginBottom: 50
+};
 const styles = {
   smallIcon: {
     fontSize: 16,
@@ -191,7 +195,6 @@ class ContactProfile extends Component {
         }}
       />,
     ];
-    console.log(props.emails);
     return (
       <div>
         <div className='row horizontal-center'>
@@ -279,6 +282,9 @@ class ContactProfile extends Component {
                       key={i}
                       {...email}
                       />)}
+                      {props.emails
+                      && props.emails.length === 0
+                      && <div className='row' style={styleEmptyRow}><p>No Emails. Emails sent through Tabulae to this contact will be reflected here.</p></div>}
                     </div>
                   </Tab>
                 </Tabs>
