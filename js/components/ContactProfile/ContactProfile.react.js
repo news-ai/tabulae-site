@@ -258,7 +258,8 @@ class ContactProfile extends Component {
             </Dialog>
             <div style={{
               margin: 8,
-              marginTop: 20
+              marginTop: 20,
+              marginBottom: 100
             }}>
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
@@ -273,6 +274,11 @@ class ContactProfile extends Component {
                   </Tab>
                   <Tab label='Sent Emails' style={{color: grey700}}>
                     <div>
+                    {props.emails.map((email, i) =>
+                      <AnalyticsItem
+                      key={i}
+                      {...email}
+                      />)}
                     </div>
                   </Tab>
                 </Tabs>
