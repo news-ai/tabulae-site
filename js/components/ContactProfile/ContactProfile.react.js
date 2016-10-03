@@ -7,12 +7,14 @@ import * as headlineActions from './Headlines/actions';
 import * as mixedFeedActions from './MixedFeed/actions';
 import * as tweetActions from './Tweets/actions';
 import * as contactActions from '../../actions/contactActions';
-import {grey700, grey500, grey400, grey50} from 'material-ui/styles/colors';
+import * as stagingActions from '../Email/actions';
+import {grey700, grey50} from 'material-ui/styles/colors';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
+import AnalyticsItem from '../Email/EmailAnalytics/AnalyticsItem.react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
 import TweetFeed from './Tweets/TweetFeed.react';
@@ -112,6 +114,7 @@ class ContactProfile extends Component {
     this.props.fetchContactTweets(this.props.contactId);
     this.props.fetchList(this.props.listId);
     this.props.fetchMixedFeed(this.props.contactId);
+    this.props.fetchContactEmails(this.props.contactId);
   }
 
   _togglePanel(key) {
@@ -188,12 +191,13 @@ class ContactProfile extends Component {
         }}
       />,
     ];
+    console.log(props.emails);
     return (
       <div>
         <div className='row horizontal-center'>
           <div className='large-9 columns'>
             {props.contact && (
-              <div className='row' style={{marginTop: 20}}>
+              <div className='row' style={{marginTop: 30}}>
                 <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
                 <div className='large-5 medium-12 small-12 columns'>
                   <div style={{marginTop: 20}}>
@@ -254,7 +258,8 @@ class ContactProfile extends Component {
             </Dialog>
             <div style={{
               margin: 8,
-              marginTop: 20
+              marginTop: 20,
+              marginBottom: 100
             }}>
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
@@ -266,6 +271,15 @@ class ContactProfile extends Component {
                   </Tab>
                   <Tab label='Tweets only' style={{color: grey700}}>
                     <TweetFeed contactId={props.contactId} listId={props.listId} />
+                  </Tab>
+                  <Tab label='Sent Emails' style={{color: grey700}}>
+                    <div>
+                    {props.emails.map((email, i) =>
+                      <AnalyticsItem
+                      key={i}
+                      {...email}
+                      />)}
+                    </div>
                   </Tab>
                 </Tabs>
             </div>
@@ -286,7 +300,14 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-
+  const emails = state.stagingReducer.received.map(id => state.stagingReducer[id])
+  .filter(email => email.contactId === contactId)
+  .map(email => {
+    if (email.listid !== 0 && state.listReducer[email.listid]) {
+      email.listname = state.listReducer[email.listid].name;
+    }
+    return email;
+  });
   return {
     listId,
     contactId,
@@ -294,6 +315,7 @@ const mapStateToProps = (state, props) => {
     employers,
     pastemployers,
     list: state.listReducer[listId],
+    emails
   };
 };
 
@@ -309,6 +331,7 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
     fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
     fetchContactTweets: contactId => dispatch(tweetActions.fetchContactTweets(contactId)),
+    fetchContactEmails: contactId => dispatch(stagingActions.fetchContactEmails(contactId))
   };
 };
 

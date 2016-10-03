@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import 'node_modules/react-select/dist/react-select.css';
 import AutoComplete from 'material-ui/AutoComplete';
+import RaisedButton from 'material-ui/RaisedButton';
 import _ from 'lodash';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -45,6 +46,7 @@ class Headers extends Component {
     this._sendHeaderNames = this._sendHeaderNames.bind(this);
     this.onNewRequest = this._onNewRequest.bind(this);
     this.clearValue = this._clearValue.bind(this);
+    this.handleFirstRowClick = this._handleFirstRowClick.bind(this);
   }
 
   _sendHeaderNames() {
@@ -102,6 +104,13 @@ class Headers extends Component {
     this.setState({options});
   }
 
+  _handleFirstRowClick() {
+    const order = this.state.headers
+    .map(header => header.rows[0]);
+    this.setState({order});
+    this._sendHeaderNames();
+  }
+
   render() {
     const state = this.state;
     return (
@@ -109,6 +118,9 @@ class Headers extends Component {
         <div style={{marginBottom: '30px'}}>
           <span>By setting the columns, you can do things like, emailing from template, sync up contact to their LinkedIn/Twitter, etc.</span><br />
           <span>You can custom set column names by typing the name in the dropdown bar as well.</span>
+        </div>
+        <div>
+          <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
         </div>
         <div style={{
           display: 'flex',

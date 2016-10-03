@@ -154,7 +154,8 @@ class EmailPanel extends Component {
           listid: this.props.listId,
           to: contact.email,
           subject: replacedSubject,
-          body: replacedBody
+          body: replacedBody,
+          contactid: contact.id
         });
       }
     });

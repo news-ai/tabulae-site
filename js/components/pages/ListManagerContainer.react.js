@@ -27,7 +27,6 @@ class ListManagerContainer extends Component {
         ref='input'
         overlayStyles={skylightStyles.overlay}
         dialogStyles={skylightStyles.dialog}
-        hideOnOverlayClicked
         title='File Drop'>
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </SkyLight>
