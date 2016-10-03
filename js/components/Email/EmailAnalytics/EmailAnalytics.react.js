@@ -106,8 +106,8 @@ const mapStateToProps = (state, props) => {
     listId: props.params.listId,
     listReducer: state.listReducer,
     canLoadMore: (state.stagingReducer.offset !== null) ? true: false,
-    lists: state.listReducer.lists,
-    archivedLists: state.listReducer.archivedLists
+    lists: state.listReducer.lists && state.listReducer.lists.map(listId => state.listReducer[listId]),
+    archivedLists: state.listReducer.archivedLists && state.listReducer.archivedLists.map(listId => state.listReducer[listId])
   }
 };
 
