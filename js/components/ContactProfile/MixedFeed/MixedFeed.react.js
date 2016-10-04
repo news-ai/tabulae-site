@@ -16,6 +16,10 @@ class MixedFeed extends Component {
     super(props);
   }
 
+  componentWillMount() {
+    this.props.fetchMixedFeed(this.props.contactId);
+  }
+
   render() {
     const props = this.props;
     return (

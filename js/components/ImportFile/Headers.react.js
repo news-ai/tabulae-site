@@ -5,6 +5,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import _ from 'lodash';
 import alertify from 'alertifyjs';
+import Waiting from '../Waiting';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import * as actionCreators from 'actions/AppActions';
 
@@ -107,20 +108,43 @@ class Headers extends Component {
   _handleFirstRowClick() {
     const order = this.state.headers
     .map(header => header.rows[0]);
-    this.setState({order});
-    this._sendHeaderNames();
+    const {onProcessHeaders} = this.props;
+    let untitledCount = 0;
+    const newOrder = order.map(item => {
+      if (item) {
+        return item;
+      } else if (!item || item.length === 0) {
+        untitledCount++;
+        return `ignore_column`;
+      }
+    });
+    if (untitledCount > 0) {
+      alertify.confirm(
+        `There are ${untitledCount} columns that will be dropped when the list is imported.
+        Make sure columns have names if you would like to import them.`,
+        _ => onProcessHeaders(newOrder),
+        _ => {}
+        );
+    } else {
+      onProcessHeaders(newOrder);
+    }
   }
 
   render() {
     const state = this.state;
     return (
       <div>
-        <div style={{marginBottom: '30px'}}>
+        <div className='row' style={{marginBottom: '30px'}}>
           <span>By setting the columns, you can do things like, emailing from template, sync up contact to their LinkedIn/Twitter, etc.</span><br />
           <span>You can custom set column names by typing the name in the dropdown bar as well.</span>
         </div>
-        <div>
-          <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
+        <div className='row'>
+          <div className='large-4 columns'>
+            <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
+          </div>
+          <div className='large-8 columns'>
+            <Waiting isReceiving={this.props.isProcessWaiting} textStyle={{marginLeft: 10}} text='PROCESSING...' />
+          </div>
         </div>
         <div style={{
           display: 'flex',
@@ -155,7 +179,8 @@ class Headers extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    headers: props.listId && state.headerReducer[props.listId]
+    headers: props.listId && state.headerReducer[props.listId],
+    isProcessWaiting: state.fileReducer.isProcessWaiting
   };
 };
 

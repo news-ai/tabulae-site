@@ -328,9 +328,6 @@ class HandsOnTable extends Component {
     const fieldsmap = listData.fieldsmap;
     const immutableFieldmap = fromJS(listData.fieldsmap);
     if (this.table) this.table.runHooks('persistentStateReset', 'columnSorting');
-
-      //Handsontable.hooks.run(this.hot, 'persistentStateSave', 'columnSorting', sortingState);
-
     if (!_.isEmpty(listData.contacts)) {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
         let columns = _.cloneDeep(this.state.preservedColumns

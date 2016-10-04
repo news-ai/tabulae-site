@@ -15,6 +15,10 @@ class Headlines extends Component {
     super(props);
   }
 
+  componentWillMount() {
+    this.props.fetchFeed(this.props.contactId);
+  }
+
   render() {
     const props = this.props;
     return (
