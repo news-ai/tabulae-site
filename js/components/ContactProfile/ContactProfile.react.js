@@ -12,6 +12,7 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import Textarea from 'react-textarea-autosize';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeed.react';
@@ -87,7 +88,7 @@ class ContactProfile extends Component {
       isEmployerPanelOpen: false,
       isPastEmployerPanelOpen: false,
       employerAutocompleteList: [],
-      autoinput: ''
+      autoinput: '',
     };
     this.togglePanel = this._togglePanel.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
@@ -104,6 +105,7 @@ class ContactProfile extends Component {
       if (contact.pastemployers !== null) if (pastemployers.length !== contact.pastemployers) contact.pastemployers
       .filter(pubId => !pastemployers.some(obj => obj.id === pubId))
       .map(pubId => this.props.fetchPublication(pubId));
+      this.setState({notes: contact.notes});
     });
     this.props.fetchContactFeeds(this.props.contactId);
     this.props.fetchList(this.props.listId);
@@ -193,6 +195,15 @@ class ContactProfile extends Component {
                 <div className='large-5 medium-12 small-12 columns'>
                   <div style={{marginTop: 20}}>
                     <div className='row vertical-center'>
+                      <h5>Notes</h5>
+                      <Textarea
+                      value={state.notes}
+                      maxRows={7}
+                      onChange={e => this.setState({notes: e.target.value})}
+                      onBlur={_ => props.patchContact(props.contactId, {notes: state.notes})}
+                      />
+                    </div>
+                    <div className='row vertical-center' style={{marginTop: 20}}>
                       <h5>Current Publications/Employers</h5>
                       <IconButton
                         style={{marginLeft: 3}}
