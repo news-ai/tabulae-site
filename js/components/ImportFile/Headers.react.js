@@ -131,6 +131,10 @@ class Headers extends Component {
   }
 
   render() {
+    /*
+    <div className='large-4 columns'>
+            <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
+          </div>*/
     const state = this.state;
     return (
       <div>
@@ -139,9 +143,6 @@ class Headers extends Component {
           <span>You can custom set column names by typing the name in the dropdown bar as well.</span>
         </div>
         <div className='row'>
-          <div className='large-4 columns'>
-            <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
-          </div>
           <div className='large-8 columns'>
             <Waiting isReceiving={this.props.isProcessWaiting} textStyle={{marginLeft: 10}} text='PROCESSING...' />
           </div>
