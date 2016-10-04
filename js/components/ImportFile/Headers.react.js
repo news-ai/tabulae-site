@@ -134,13 +134,17 @@ class Headers extends Component {
     const state = this.state;
     return (
       <div>
-        <div style={{marginBottom: '30px'}}>
+        <div className='row' style={{marginBottom: '30px'}}>
           <span>By setting the columns, you can do things like, emailing from template, sync up contact to their LinkedIn/Twitter, etc.</span><br />
           <span>You can custom set column names by typing the name in the dropdown bar as well.</span>
         </div>
-        <div>
-          <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
-          <Waiting isReceiving={this.props.isProcessWaiting} textStyle={{margin: 10}} text='PROCESSING...' />
+        <div className='row'>
+          <div className='large-4 columns'>
+            <RaisedButton labelStyle={{textTransform: 'none'}} label='Or, use 1st Row as Column Name' onClick={this.handleFirstRowClick} />
+          </div>
+          <div className='large-8 columns'>
+            <Waiting isReceiving={this.props.isProcessWaiting} textStyle={{marginLeft: 10}} text='PROCESSING...' />
+          </div>
         </div>
         <div style={{
           display: 'flex',

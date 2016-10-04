@@ -102,7 +102,7 @@ class DropFileWrapper extends Component {
               <i style={[styles.icon]} onClick={ _ => this.setState({file: null, isFileDropped: false})} className='fa fa-close' aria-hidden='true'></i>
             </div>
             : <Dropzone
-            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
             style={styles.dropzone.default}
             activeStyle={styles.dropzone.active}
             rejectStyle={styles.dropzone.reject}
