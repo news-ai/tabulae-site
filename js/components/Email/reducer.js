@@ -43,6 +43,10 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return obj;
     case RECEIVE_MULTIPLE_EMAILS:
       obj = assignToEmpty(state, action.emails);
+      if (action.contactId) {
+        obj.contactOffset = assignToEmpty(state.contactOffset, {});
+        obj.contactOffset[action.contactId] = action.offset;
+      }
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(seenId => seenId === id)));
       obj.isReceiving = false;
       return obj;

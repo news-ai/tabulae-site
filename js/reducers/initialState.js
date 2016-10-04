@@ -22,7 +22,8 @@ export const initialState = {
     didInvalidate: false,
     previewEmails: [],
     received: [],
-    offset: 0
+    offset: 0,
+    contactOffset: {}
   },
   publicationReducer: {
     isReceiving: false,

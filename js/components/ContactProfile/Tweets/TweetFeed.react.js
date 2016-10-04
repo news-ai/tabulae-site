@@ -15,6 +15,10 @@ class TweetFeed extends Component {
     super(props);
   }
 
+  componentWillMount() {
+    this.props.fetchContactTweets(this.props.contactId);
+  }
+
   render() {
     const props = this.props;
     return (

@@ -4,33 +4,25 @@ import withRouter from 'react-router/lib/withRouter';
 import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
-import * as mixedFeedActions from './MixedFeed/actions';
-import * as tweetActions from './Tweets/actions';
 import * as contactActions from '../../actions/contactActions';
-import * as stagingActions from '../Email/actions';
 import {grey700, grey50} from 'material-ui/styles/colors';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
-import AnalyticsItem from '../Email/EmailAnalytics/AnalyticsItem.react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeed.react';
 import Headlines from './Headlines/Headlines.react';
+import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactDescriptor from './ContactDescriptor.react';
 
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
-const styleEmptyRow = {
-  padding: 10,
-  marginTop: 20,
-  marginBottom: 50
-};
 const styles = {
   smallIcon: {
     fontSize: 16,
@@ -113,12 +105,8 @@ class ContactProfile extends Component {
       .filter(pubId => !pastemployers.some(obj => obj.id === pubId))
       .map(pubId => this.props.fetchPublication(pubId));
     });
-    this.props.fetchFeed(this.props.contactId);
     this.props.fetchContactFeeds(this.props.contactId);
-    this.props.fetchContactTweets(this.props.contactId);
     this.props.fetchList(this.props.listId);
-    this.props.fetchMixedFeed(this.props.contactId);
-    this.props.fetchContactEmails(this.props.contactId);
   }
 
   _togglePanel(key) {
@@ -276,16 +264,7 @@ class ContactProfile extends Component {
                     <TweetFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='Sent Emails' style={{color: grey700}}>
-                    <div>
-                    {props.emails.map((email, i) =>
-                      <AnalyticsItem
-                      key={i}
-                      {...email}
-                      />)}
-                      {props.emails
-                      && props.emails.length === 0
-                      && <div className='row' style={styleEmptyRow}><p>No Emails. Emails sent through Tabulae to this contact will be reflected here.</p></div>}
-                    </div>
+                    <ContactEmails contactId={props.contactId} listId={props.listId} />
                   </Tab>
                 </Tabs>
             </div>
@@ -306,14 +285,6 @@ const mapStateToProps = (state, props) => {
   const pastemployers = contact && contact.pastemployers !== null && contact.pastemployers
   .filter(pubId => state.publicationReducer[pubId])
   .map(pubId => state.publicationReducer[pubId]);
-  const emails = state.stagingReducer.received.map(id => state.stagingReducer[id])
-  .filter(email => email.contactId === contactId)
-  .map(email => {
-    if (email.listid !== 0 && state.listReducer[email.listid]) {
-      email.listname = state.listReducer[email.listid].name;
-    }
-    return email;
-  });
   return {
     listId,
     contactId,
@@ -321,7 +292,6 @@ const mapStateToProps = (state, props) => {
     employers,
     pastemployers,
     list: state.listReducer[listId],
-    emails
   };
 };
 
@@ -335,9 +305,6 @@ const mapDispatchToProps = (dispatch, props) => {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
-    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
-    fetchContactTweets: contactId => dispatch(tweetActions.fetchContactTweets(contactId)),
-    fetchContactEmails: contactId => dispatch(stagingActions.fetchContactEmails(contactId))
   };
 };
 
