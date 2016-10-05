@@ -354,6 +354,7 @@ class Table extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+                  //<MenuItem primaryText='Print' onClick={this.onPrintClick} />
 
     return (
       <div>
@@ -404,7 +405,6 @@ class Table extends Component {
                   <MenuItem checked={state.isEmailPanelOpen} primaryText='Email' onClick={this.toggleEmailPanel} />
                   <MenuItem primaryText='Export' onClick={this.onExportClick} />
                   <MenuItem primaryText='Load All Contacts' onClick={_ => props.fetchAllContacts(props.listId)} />
-                  <MenuItem primaryText='Print' onClick={this.onPrintClick} />
                 </Menu>
               </Popover>
             </div>

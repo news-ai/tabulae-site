@@ -83,12 +83,11 @@ ReactDOM.render(
           <Route path='/' name='Home' component={App}>
             <IndexRoute component={ListManagerContainer} />
             <Route path='lists' name='List Manager' component={ListManagerContainer} />
+            <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='lists/:listId' staticName name='Sheet'>
               <IndexRoute component={OnboardingTable}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
-            <Route path='lists/:listId/:contactId' staticName name='Profile' component={ContactProfile} />
-            <Route key='static' path='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
