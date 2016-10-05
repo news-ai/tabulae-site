@@ -58,24 +58,35 @@ export function setFirstTimeUser() {
 }
 
 export function loginWithGoogle() {
-  const base = `${window.TABULAE_API_BASE}/auth/google?next=${window.location}`;
-  console.log(base);
-  window.location.href = base;
+  return dispatch => {
+    const base = `${window.TABULAE_API_BASE}/auth/google?next=${window.location}`;
+    dispatch({type: 'LOGIN WITH GOOGLE'});
+    window.location.href = base;
+  };
 }
 
 export function onLogin() {
-  const base = `${window.TABULAE_API_BASE}/auth?next=${window.location}`;
-  window.location.href = base;
+  return dispatch => {
+    const base = `${window.TABULAE_API_BASE}/auth?next=${window.location}`;
+    dispatch({type: 'LOGIN'});
+    window.location.href = base;
+  };
 }
 
 export function register() {
-  const base = `${window.TABULAE_API_BASE}/auth/registration?next=${window.location}`;
-  window.location.href = base;
+  return dispatch => {
+    const base = `${window.TABULAE_API_BASE}/auth/registration?next=${window.location}`;
+    dispatch({type: 'REGISTER'});
+    window.location.href = base;
+  };
 }
 
 export function logout() {
-  const base = `${window.TABULAE_API_BASE}/auth/logout?next=${window.location}`;
-  window.location.href = base;
+  return dispatch => {
+    const base = `${window.TABULAE_API_BASE}/auth/logout?next=${window.location}`;
+    dispatch({type: 'LOGOUT'});
+    window.location.href = base;
+  };
 }
 
 export function fetchPerson() {
