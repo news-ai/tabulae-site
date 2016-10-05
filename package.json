@@ -7,8 +7,6 @@
     "axios": "^0.9.1",
     "draft-convert": "^1.2.0",
     "draft-js": "^0.7.0",
-    "draft-js-export-html": "git+https://git@github.com/ycp217/draft-js-export-html.git",
-    "draft-js-plugins-editor": "^1.1.0",
     "fontfaceobserver": "^1.5.1",
     "fuzzy": "^0.1.1",
     "handsontable": "^0.27.0",
@@ -104,7 +102,7 @@
     "test": "mocha --compilers js:babel-core/register --recursive",
     "test:watch": "npm test -- --watch",
     "start": "cross-env NODE_ENV=development node server.dev.js",
-    "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors -p",
+    "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors",
     "serve": "cross-env NODE_ENV=production node server.prod.js"
   }
 }
