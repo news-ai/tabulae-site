@@ -241,34 +241,6 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <div className='vertical-center'>
-        <Checkbox
-        checked={state.isStyleBlockOpen}
-        checkedIcon={<FontIcon className='fa fa-file-text' color={blue100}/>}
-        uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
-        onCheck={this.onCheck}
-        iconStyle={{fontSize: 16, padding: 2, marginRight: 10}}
-        />
-       {state.isStyleBlockOpen &&
-          <Paper zDepth={2} style={{position: 'fixed', marginLeft: 35, zIndex: 200}}>
-            <div className='vertical-center' style={{paddingLeft: 10, paddingRight: 10}}>
-              <InlineStyleControls
-                editorState={editorState}
-                onToggle={this.toggleInlineStyle}
-                inlineStyles={this.INLINE_STYLES}
-              />
-              <EntityControls
-                editorState={editorState}
-                entityControls={this.ENTITY_CONTROLS}
-              />
-              <BlockStyleControls
-              editorState={editorState}
-              blockTypes={this.BLOCK_TYPES}
-              onToggle={this.toggleBlockType}
-              />
-            </div>
-          </Paper>}
-        </div>
         <FlatButton
         label='Insert Content'
         labelStyle={{textTransform: 'none'}}
@@ -308,7 +280,50 @@ class BasicHtmlEditor extends React.Component {
             spellCheck
           />
         </div>
-         <div style={bottomBlockStyle}>{props.children}</div>
+        {state.isStyleBlockOpen &&
+          <div className='row vertical-center clearfix' style={{
+            position: 'fixed',
+            height: 40,
+            zIndex: 200,
+            overflow: 'hidden',
+            paddingLeft: 10,
+            paddingRight: 10,
+            bottom: 60,
+            border: `solid 1px ${blue100}`,
+            borderRadius: '0.8em',
+            backgroundColor: 'white'
+          }}>
+            <InlineStyleControls
+              editorState={editorState}
+              onToggle={this.toggleInlineStyle}
+              inlineStyles={this.INLINE_STYLES}
+            />
+            <EntityControls
+              editorState={editorState}
+              entityControls={this.ENTITY_CONTROLS}
+            />
+            <BlockStyleControls
+            editorState={editorState}
+            blockTypes={this.BLOCK_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+          </div>}
+         <div className='vertical-center' style={{
+          position: 'absolute',
+          bottom: 3,
+          width: props.width,
+         }}>
+         <div>
+          <Checkbox
+          checked={state.isStyleBlockOpen}
+          checkedIcon={<FontIcon className='fa fa-file-text' color={blue100}/>}
+          uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
+          onCheck={this.onCheck}
+          iconStyle={{fontSize: 16, padding: 2, marginRight: 10}}
+          />
+        </div>
+         {props.children}
+         </div>
       </div>
     );
   }

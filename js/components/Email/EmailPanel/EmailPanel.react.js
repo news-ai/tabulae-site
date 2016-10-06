@@ -276,8 +276,8 @@ class EmailPanel extends Component {
                     primaryText='Delete Template' />
                   </IconMenu>
                 </div>
-                <div>
-                  <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+                <div style={{marginLeft: 90}}>
+                  <RaisedButton primary label='Preview' onClick={this._onPreviewEmailsClick} />
                 </div>
               </BasicHtmlEditor>
             </div>
