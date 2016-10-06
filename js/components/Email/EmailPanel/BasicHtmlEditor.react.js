@@ -21,6 +21,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Checkbox from 'material-ui/Checkbox';
 import Popover from 'material-ui/Popover';
 import FontIcon from 'material-ui/FontIcon';
+import Tooltip from 'material-ui/internal/Tooltip';
 import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
@@ -80,7 +81,8 @@ class BasicHtmlEditor extends React.Component {
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
-      styleBlockAnchorEl: null
+      styleBlockAnchorEl: null,
+      hoveredTooltip: false
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -309,7 +311,15 @@ class BasicHtmlEditor extends React.Component {
           width: props.width,
          }}>
            <div>
+              <Tooltip show={state.hoveredTooltip}
+              label='Toolbar'
+              horizontalPosition='center'
+              verticalPosition='top'
+              touch
+              />
               <Checkbox
+              onMouseEnter={_ => this.setState({hoveredTooltip: true})}
+              onMouseOut={_ => this.setState({hoveredTooltip: false})}
               checked={state.isStyleBlockOpen}
               checkedIcon={<FontIcon className='fa fa-file-text' color={blue200}/>}
               uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
