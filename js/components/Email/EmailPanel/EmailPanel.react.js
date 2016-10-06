@@ -46,9 +46,8 @@ const styles = {
     bottom: 0,
   },
   emailPanel: {
-    height: '600px',
-    width: '600px',
-    overflow: 'scroll',
+    height: 600,
+    width: 600,
   },
   sendButtonPosition: {
     position: 'absolute',
@@ -155,7 +154,8 @@ class EmailPanel extends Component {
           to: contact.email,
           subject: replacedSubject,
           body: replacedBody,
-          contactid: contact.id
+          contactid: contact.id,
+          templateid: this.state.currentTemplateId
         });
       }
     });
@@ -275,8 +275,8 @@ class EmailPanel extends Component {
                     primaryText='Delete Template' />
                   </IconMenu>
                 </div>
-                <div>
-                  <RaisedButton labelStyle={{textTransform: 'none'}} label='Preview' onClick={this._onPreviewEmailsClick} />
+                <div style={{marginLeft: 100}}>
+                  <RaisedButton primary label='Preview' onClick={this._onPreviewEmailsClick} />
                 </div>
               </BasicHtmlEditor>
             </div>

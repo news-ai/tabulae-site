@@ -46,7 +46,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
       <ContactDescriptor iconClassName='fa fa-instagram' className='large-12 medium-8 small-12 columns' content={contact.instagram} contentTitle='Instagram' onClick={(e, value) => patchContact(contact.id, {instagram: value})}/>
       <ContactDescriptor iconClassName='fa fa-linkedin' className='large-12 medium-8 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
       <ContactDescriptor iconClassName='fa fa-external-link' className='large-12 medium-8 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
-      <div style={{marginTop: 10}}>
+      <div style={{marginTop: 10, marginBottom: 30}}>
         <h5>Custom Fields</h5>
         <div>
         {list && contact && contact.customfields !== null ? list.fieldsmap
@@ -193,9 +193,11 @@ class ContactProfile extends Component {
               <div className='row' style={{marginTop: 30}}>
                 <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
                 <div className='large-5 medium-12 small-12 columns'>
-                  <div style={{marginTop: 20}}>
-                    <div className='row vertical-center'>
+                  <div className='row'>
+                    <div className='large-12 medium-12 small-12 columns'>
                       <h5>Notes</h5>
+                    </div>
+                    <div className='large-12 medium-12 small-12 columns'>
                       <Textarea
                       value={state.notes}
                       maxRows={7}
@@ -203,6 +205,8 @@ class ContactProfile extends Component {
                       onBlur={_ => props.patchContact(props.contactId, {notes: state.notes})}
                       />
                     </div>
+                  </div>
+                  <div className='large-12 medium-12 small-12 columns'>
                     <div className='row vertical-center' style={{marginTop: 20}}>
                       <h5>Current Publications/Employers</h5>
                       <IconButton
@@ -220,25 +224,27 @@ class ContactProfile extends Component {
                         <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='employers' contact={props.contact} />)}
                       {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
                     </div>
-                  </div>
-                  <div style={{marginTop: 20}}>
-                    <div className='row vertical-center'>
-                      <h5>Past Publications/Employers</h5>
-                      <IconButton
-                      style={{marginLeft: 3}}
-                      iconStyle={styles.smallIcon}
-                      style={styles.small}
-                      iconClassName='fa fa-plus'
-                      tooltip='Add Publication'
-                      tooltipPosition='top-right'
-                      onClick={_ => this.togglePanel('pastemployers')}
-                      />
+                    <div style={{marginTop: 20}}>
+                      <div className='row vertical-center'>
+                      <div className='large-12 medium-12 small-12 columns'>
+                      </div>
+                        <h5>Past Publications/Employers</h5>
+                        <IconButton
+                        style={{marginLeft: 3}}
+                        iconStyle={styles.smallIcon}
+                        style={styles.small}
+                        iconClassName='fa fa-plus'
+                        tooltip='Add Publication'
+                        tooltipPosition='top-right'
+                        onClick={_ => this.togglePanel('pastemployers')}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    {props.pastemployers && props.pastemployers.map((employer, i) =>
-                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
-                    {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
+                    <div>
+                      {props.pastemployers && props.pastemployers.map((employer, i) =>
+                        <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                      {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
+                    </div>
                   </div>
                 </div>
               </div>

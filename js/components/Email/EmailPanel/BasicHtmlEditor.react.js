@@ -17,8 +17,12 @@ import {convertFromHTML} from 'draft-convert';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import Checkbox from 'material-ui/Checkbox';
 import Popover from 'material-ui/Popover';
+import FontIcon from 'material-ui/FontIcon';
+import Tooltip from 'material-ui/internal/Tooltip';
+import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -75,7 +79,10 @@ class BasicHtmlEditor extends React.Component {
       editorState: EditorState.createEmpty(decorator),
       bodyHtml: null,
       variableMenuOpen: false,
-      variableMenuAnchorEl: null
+      variableMenuAnchorEl: null,
+      isStyleBlockOpen: true,
+      styleBlockAnchorEl: null,
+      hoveredTooltip: false
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -90,13 +97,11 @@ class BasicHtmlEditor extends React.Component {
     };
     this.handleTouchTap = (event) => {
       event.preventDefault();
-
       this.setState({
         variableMenuOpen: true,
         variableMenuAnchorEl: event.currentTarget,
       });
     };
-
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
@@ -111,6 +116,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleReturn = (e) => this._handleReturn(e);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
+    this.onCheck = (e, checked) => this.setState({isStyleBlockOpen: checked});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -175,9 +181,7 @@ class BasicHtmlEditor extends React.Component {
     const content = editorState.getCurrentContent();
     const selection = editorState.getSelection();
     const block = content.getBlockForKey(selection.getStartKey());
-
     // console.log(content.toJS(), selection.toJS(), block.toJS());
-
     if (block.type === 'code-block') {
       newContent = Modifier.insertText(content, selection, '\n');
       newEditorState = EditorState.push(editorState, newContent, 'add-new-line');
@@ -225,38 +229,9 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    const bottomBlockStyle = {
-      position: 'absolute',
-      bottom: 3,
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: props.width,
-      paddingRight: '30px'
-    };
 
     return (
       <div>
-        <div className='row' style={{display: 'flex', alignItems: 'flex-end'}}>
-          <InlineStyleControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-            inlineStyles={this.INLINE_STYLES}
-          />
-          <EntityControls
-            editorState={editorState}
-            entityControls={this.ENTITY_CONTROLS}
-          />
-          <BlockStyleControls
-          editorState={editorState}
-          blockTypes={this.BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-          />
-        </div>
-        <FlatButton
-        label='Use Column Variable'
-        labelStyle={{textTransform: 'none'}}
-        onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
-        />
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
@@ -278,20 +253,82 @@ class BasicHtmlEditor extends React.Component {
           subjectHtml={props.subjectHtml}
           />
         </div>
-        <div className={className} onClick={this.focus}>
-          <Editor
-            blockStyleFn={getBlockStyle}
-            customStyleMap={styleMap}
-            editorState={editorState}
-            handleKeyCommand={this.handleKeyCommand}
-            handleReturn={this.handleReturn}
-            onChange={this.onChange}
-            placeholder={placeholder}
-            ref='editor'
-            spellCheck
+        <div style={{
+          height: 480,
+          overflowY: 'scroll',
+        }}>
+          <div className={className} onClick={this.focus}>
+            <Editor
+              blockStyleFn={getBlockStyle}
+              customStyleMap={styleMap}
+              editorState={editorState}
+              handleKeyCommand={this.handleKeyCommand}
+              handleReturn={this.handleReturn}
+              onChange={this.onChange}
+              placeholder={placeholder}
+              ref='editor'
+              spellCheck
+            />
+          </div>
+          <RaisedButton
+          style={{margin: 18}}
+          label='Insert Content'
+          labelStyle={{textTransform: 'none'}}
+          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />
         </div>
-         <div style={bottomBlockStyle}>{props.children}</div>
+        {state.isStyleBlockOpen &&
+          <div className='row vertical-center clearfix' style={{
+            position: 'fixed',
+            height: 40,
+            zIndex: 200,
+            overflow: 'hidden',
+            paddingLeft: 10,
+            paddingRight: 10,
+            bottom: 60,
+            border: `solid 1px ${blue100}`,
+            borderRadius: '0.8em',
+            backgroundColor: 'white'
+          }}>
+            <InlineStyleControls
+              editorState={editorState}
+              onToggle={this.toggleInlineStyle}
+              inlineStyles={this.INLINE_STYLES}
+            />
+            <EntityControls
+              editorState={editorState}
+              entityControls={this.ENTITY_CONTROLS}
+            />
+            <BlockStyleControls
+            editorState={editorState}
+            blockTypes={this.BLOCK_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+          </div>}
+         <div className='vertical-center' style={{
+          position: 'absolute',
+          bottom: 3,
+          width: props.width,
+         }}>
+           <div>
+              <Tooltip show={state.hoveredTooltip}
+              label='Toolbar'
+              horizontalPosition='center'
+              verticalPosition='top'
+              touch
+              />
+              <Checkbox
+              onMouseEnter={_ => this.setState({hoveredTooltip: true})}
+              onMouseOut={_ => this.setState({hoveredTooltip: false})}
+              checked={state.isStyleBlockOpen}
+              checkedIcon={<FontIcon className='fa fa-file-text' color={blue200}/>}
+              uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
+              onCheck={this.onCheck}
+              iconStyle={{marginRight: 20}}
+              />
+          </div>
+           {props.children}
+         </div>
       </div>
     );
   }

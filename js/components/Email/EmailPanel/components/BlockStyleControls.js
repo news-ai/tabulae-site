@@ -13,10 +13,10 @@ export default function BlockStyleControls(props) {
 
   return (
     <DropDownMenu
-    style={{width: 200}}
+    style={{width: 150, marginBottom: 13}}
     value={blockTypes.find(type => type.style === blockType).label}
     onChange={(e, index, value) => props.onToggle(blockTypes[index].style)}>
-      {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} primaryText={type.label} />)}
+      {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} style={{paddingLeft: 10}} primaryText={type.label} />)}
     </DropDownMenu>
   );
 }
