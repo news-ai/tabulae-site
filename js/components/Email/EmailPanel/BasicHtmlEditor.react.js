@@ -17,12 +17,11 @@ import {convertFromHTML} from 'draft-convert';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Checkbox from 'material-ui/Checkbox';
 import Popover from 'material-ui/Popover';
-import Paper from 'material-ui/Paper';
 import FontIcon from 'material-ui/FontIcon';
-import {blue100, grey300} from 'material-ui/styles/colors';
+import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -180,9 +179,7 @@ class BasicHtmlEditor extends React.Component {
     const content = editorState.getCurrentContent();
     const selection = editorState.getSelection();
     const block = content.getBlockForKey(selection.getStartKey());
-
     // console.log(content.toJS(), selection.toJS(), block.toJS());
-
     if (block.type === 'code-block') {
       newContent = Modifier.insertText(content, selection, '\n');
       newEditorState = EditorState.push(editorState, newContent, 'add-new-line');
@@ -230,22 +227,9 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    const bottomBlockStyle = {
-      position: 'absolute',
-      bottom: 3,
-      display: 'flex',
-      justifyContent: 'space-between',
-      width: props.width,
-      paddingRight: 30
-    };
 
     return (
       <div>
-        <FlatButton
-        label='Insert Content'
-        labelStyle={{textTransform: 'none'}}
-        onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
-        />
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
@@ -267,17 +251,28 @@ class BasicHtmlEditor extends React.Component {
           subjectHtml={props.subjectHtml}
           />
         </div>
-        <div className={className} onClick={this.focus}>
-          <Editor
-            blockStyleFn={getBlockStyle}
-            customStyleMap={styleMap}
-            editorState={editorState}
-            handleKeyCommand={this.handleKeyCommand}
-            handleReturn={this.handleReturn}
-            onChange={this.onChange}
-            placeholder={placeholder}
-            ref='editor'
-            spellCheck
+        <div style={{
+          height: 480,
+          overflowY: 'scroll',
+        }}>
+          <div className={className} onClick={this.focus}>
+            <Editor
+              blockStyleFn={getBlockStyle}
+              customStyleMap={styleMap}
+              editorState={editorState}
+              handleKeyCommand={this.handleKeyCommand}
+              handleReturn={this.handleReturn}
+              onChange={this.onChange}
+              placeholder={placeholder}
+              ref='editor'
+              spellCheck
+            />
+          </div>
+          <RaisedButton
+          style={{margin: 18}}
+          label='Insert Content'
+          labelStyle={{textTransform: 'none'}}
+          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />
         </div>
         {state.isStyleBlockOpen &&
@@ -313,16 +308,16 @@ class BasicHtmlEditor extends React.Component {
           bottom: 3,
           width: props.width,
          }}>
-         <div>
-          <Checkbox
-          checked={state.isStyleBlockOpen}
-          checkedIcon={<FontIcon className='fa fa-file-text' color={blue100}/>}
-          uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
-          onCheck={this.onCheck}
-          iconStyle={{fontSize: 16, padding: 2, marginRight: 10}}
-          />
-        </div>
-         {props.children}
+           <div>
+              <Checkbox
+              checked={state.isStyleBlockOpen}
+              checkedIcon={<FontIcon className='fa fa-file-text' color={blue200}/>}
+              uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
+              onCheck={this.onCheck}
+              iconStyle={{marginRight: 20}}
+              />
+          </div>
+           {props.children}
          </div>
       </div>
     );
