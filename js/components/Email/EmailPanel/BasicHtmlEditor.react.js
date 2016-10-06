@@ -18,7 +18,11 @@ import {convertFromHTML} from 'draft-convert';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
+import Checkbox from 'material-ui/Checkbox';
 import Popover from 'material-ui/Popover';
+import Paper from 'material-ui/Paper';
+import FontIcon from 'material-ui/FontIcon';
+import {blue100, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -75,7 +79,9 @@ class BasicHtmlEditor extends React.Component {
       editorState: EditorState.createEmpty(decorator),
       bodyHtml: null,
       variableMenuOpen: false,
-      variableMenuAnchorEl: null
+      variableMenuAnchorEl: null,
+      isStyleBlockOpen: true,
+      styleBlockAnchorEl: null
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -90,13 +96,11 @@ class BasicHtmlEditor extends React.Component {
     };
     this.handleTouchTap = (event) => {
       event.preventDefault();
-
       this.setState({
         variableMenuOpen: true,
         variableMenuAnchorEl: event.currentTarget,
       });
     };
-
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
@@ -111,6 +115,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleReturn = (e) => this._handleReturn(e);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
+    this.onCheck = (e, checked) => this.setState({isStyleBlockOpen: checked});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -231,29 +236,41 @@ class BasicHtmlEditor extends React.Component {
       display: 'flex',
       justifyContent: 'space-between',
       width: props.width,
-      paddingRight: '30px'
+      paddingRight: 30
     };
 
     return (
       <div>
-        <div className='row' style={{display: 'flex', alignItems: 'flex-end'}}>
-          <InlineStyleControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-            inlineStyles={this.INLINE_STYLES}
-          />
-          <EntityControls
-            editorState={editorState}
-            entityControls={this.ENTITY_CONTROLS}
-          />
-          <BlockStyleControls
-          editorState={editorState}
-          blockTypes={this.BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-          />
+        <div className='vertical-center'>
+        <Checkbox
+        checked={state.isStyleBlockOpen}
+        checkedIcon={<FontIcon className='fa fa-file-text' color={blue100}/>}
+        uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
+        onCheck={this.onCheck}
+        iconStyle={{fontSize: 16, padding: 2, marginRight: 10}}
+        />
+       {state.isStyleBlockOpen &&
+          <Paper zDepth={2} style={{position: 'fixed', marginLeft: 35, zIndex: 200}}>
+            <div className='vertical-center' style={{paddingLeft: 10, paddingRight: 10}}>
+              <InlineStyleControls
+                editorState={editorState}
+                onToggle={this.toggleInlineStyle}
+                inlineStyles={this.INLINE_STYLES}
+              />
+              <EntityControls
+                editorState={editorState}
+                entityControls={this.ENTITY_CONTROLS}
+              />
+              <BlockStyleControls
+              editorState={editorState}
+              blockTypes={this.BLOCK_TYPES}
+              onToggle={this.toggleBlockType}
+              />
+            </div>
+          </Paper>}
         </div>
         <FlatButton
-        label='Use Column Variable'
+        label='Insert Content'
         labelStyle={{textTransform: 'none'}}
         onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
         />

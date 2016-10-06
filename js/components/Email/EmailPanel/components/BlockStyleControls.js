@@ -13,7 +13,7 @@ export default function BlockStyleControls(props) {
 
   return (
     <DropDownMenu
-    style={{width: 200}}
+    style={{width: 180}}
     value={blockTypes.find(type => type.style === blockType).label}
     onChange={(e, index, value) => props.onToggle(blockTypes[index].style)}>
       {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} primaryText={type.label} />)}

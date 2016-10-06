@@ -155,7 +155,8 @@ class EmailPanel extends Component {
           to: contact.email,
           subject: replacedSubject,
           body: replacedBody,
-          contactid: contact.id
+          contactid: contact.id,
+          templateid: this.state.currentTemplateId
         });
       }
     });
