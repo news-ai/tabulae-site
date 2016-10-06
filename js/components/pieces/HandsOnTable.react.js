@@ -508,7 +508,7 @@ class HandsOnTable extends Component {
               onClick={_ => this._onSaveClick(state.options.data, state.options.columns)}
               />
             </div>
-            <div style={{
+            {props.lastSavedAt && <div style={{
               position: 'fixed',
               top: 150,
               zIndex: 180,
@@ -517,7 +517,7 @@ class HandsOnTable extends Component {
               border: `solid 1px ${grey100}`,
               padding: '3px 10px 3px 10px',
               fontSize: '0.8em'
-            }}>{props.lastSavedAt}</div>
+            }}>{props.lastSavedAt}</div>}
           </div>
         </div>
         <Dialog
