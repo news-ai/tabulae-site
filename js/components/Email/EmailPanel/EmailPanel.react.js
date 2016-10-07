@@ -260,7 +260,7 @@ class EmailPanel extends Component {
                   {templateMenuItems}
                   </SelectField>
                   <IconMenu
-                  iconButtonElement={<IconButton iconClassName='fa fa-cogs'/>}
+                  iconButtonElement={<IconButton tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
                   anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                   targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
                   >

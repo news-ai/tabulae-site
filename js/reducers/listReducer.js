@@ -57,7 +57,8 @@ function listReducer(state = initialState.listReducer, action) {
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
       obj.isReceiving = false;
-      obj.offset = action.offset;
+      if (!action.archivedOffset) obj.offset = action.offset;
+      if (!action.offset) obj.archivedOffset = action.archivedOffset;
       return obj;
     case listConstant.REQUEST_FAIL:
       obj.isReceiving = false;

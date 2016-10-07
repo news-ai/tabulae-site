@@ -15,7 +15,8 @@ export const initialState = {
     lists: [],
     archivedLists: [],
     received: [],
-    offset: 0
+    offset: 0,
+    archivedOffset: 0
   },
   stagingReducer: {
     isReceiving: false,

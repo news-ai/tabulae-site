@@ -102,9 +102,9 @@ class App extends Component {
           </div>
           <div className='hide-for-small-only medium-4 large-6 columns vertical-center'>
             <div>
-              <span style={{color: 'gray', marginRight: 5}}>You are at: </span>
+              <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
-            <div style={{marginTop: '13px'}}>
+            <div style={{marginTop: 16}}>
               <Breadcrumbs
               routes={props.routes}
               params={props.params}

@@ -45,7 +45,7 @@ const mapDispatchToProps = dispatch => {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
     .then( _ => dispatch(actionCreators.fetchLists())),
-    fetchLists: _ => dispatch(actionCreators.fetchLists())
+    fetchLists: _ => dispatch(actionCreators.fetchArchivedLists())
   };
 };
 

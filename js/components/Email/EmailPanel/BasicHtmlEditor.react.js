@@ -312,6 +312,10 @@ class BasicHtmlEditor extends React.Component {
          }}>
            <div>
               <Tooltip show={state.hoveredTooltip}
+              style={{
+                fontSize: '10px',
+                lineHeight: '22px',
+                padding: '0 8px'}}
               label='Toolbar'
               horizontalPosition='center'
               verticalPosition='top'

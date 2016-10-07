@@ -22,7 +22,7 @@ class ListManagerContainer extends Component {
 
   render() {
     return (
-      <InfiniteScroll onScrollBottom={this.props.fetchLists}>
+      <InfiniteScroll className='row' onScrollBottom={_ => this.props.fetchLists()}>
         <SkyLight
         ref='input'
         overlayStyles={skylightStyles.overlay}
@@ -30,26 +30,24 @@ class ListManagerContainer extends Component {
         title='File Drop'>
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </SkyLight>
-        <div className='row'>
-          <div className='large-offset-1 large-10 columns'>
-            <div style={{marginTop: 10}}>
-              <RaisedButton
-              style={{float: 'right', margin: 10}}
-              label='Add New List'
-              onClick={_ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`)}
-              labelStyle={{textTransform: 'none'}}
-              icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
-              />
-              <RaisedButton
-              style={{float: 'right', margin: 10}}
-              label='Upload from Existing'
-              onClick={_ => this.refs.input.show()}
-              labelStyle={{textTransform: 'none'}}
-              icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
-              />
-            </div>
-            <Lists {...this.props} />
+        <div className='large-offset-1 large-10 columns'>
+          <div style={{marginTop: 10}}>
+            <RaisedButton
+            style={{float: 'right', margin: 10}}
+            label='Add New List'
+            onClick={_ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`)}
+            labelStyle={{textTransform: 'none'}}
+            icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
+            />
+            <RaisedButton
+            style={{float: 'right', margin: 10}}
+            label='Upload from Existing'
+            onClick={_ => this.refs.input.show()}
+            labelStyle={{textTransform: 'none'}}
+            icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
+            />
           </div>
+          <Lists {...this.props} />
         </div>
       </InfiniteScroll>
       );

@@ -15,6 +15,7 @@ export const setFirstTimeUser = _ => loginActions.setFirstTimeUser();
 export const fetchNotifications = _ => loginActions.fetchNotifications();
 
 export const fetchLists = _ => listActions.fetchLists();
+export const fetchArchivedLists = _ => listActions.fetchArchivedLists();
 export const addListWithoutContacts = name => listActions.addListWithoutContacts(name);
 export const fetchList = listId => listActions.fetchList(listId);
 export const patchList = (listId, name, contactList, customfields) => listActions.patchList(listId, name, contactList, customfields);

@@ -15,6 +15,7 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import {grey100} from 'material-ui/styles/colors';
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -507,9 +508,16 @@ class HandsOnTable extends Component {
               onClick={_ => this._onSaveClick(state.options.data, state.options.columns)}
               />
             </div>
-            <div style={{position: 'fixed', top: 150, zIndex: 180}}>
-              <p style={{fontSize: '0.8em', zIndex: 150}}>{props.lastSavedAt}</p>
-            </div>
+            {props.lastSavedAt && <div style={{
+              position: 'fixed',
+              top: 150,
+              zIndex: 180,
+              backgroundColor: 'white',
+              borderRadius: '0.8em',
+              border: `solid 1px ${grey100}`,
+              padding: '3px 10px 3px 10px',
+              fontSize: '0.8em'
+            }}>{props.lastSavedAt}</div>}
           </div>
         </div>
         <Dialog
