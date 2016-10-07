@@ -37,9 +37,14 @@ const Instagram = ({text, createdat, instagramcomments, instagramid, instagramli
      <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
       <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
     </div>
-    <div className='large-12 medium-12 small-12 columns'>
+    {!instagramvideo && <div className='large-12 medium-12 small-12 columns'>
       <img src={instagramimage} />
-    </div>
+    </div>}
+    {instagramvideo && <div className='large-12 medium-12 small-12 columns'>
+      <video src={instagramvideo} controls>
+      Your browser does not support the <code>video</code> element.
+      </video>
+    </div>}
     <div className='large-12 medium-12 small-12 columns'>
       <div className='row right'>
         <Chip style={{margin: 5}}>
@@ -86,7 +91,7 @@ class MixedFeed extends Component {
           {props.mixedfeed
             && !props.didInvalidate
             && props.mixedfeed.length === 0
-            && <div className='row' style={styleEmptyRow}><p>No RSS/Tweets attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
+            && <div className='row' style={styleEmptyRow}><p>No RSS/Tweets attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
           {props.didInvalidate
             && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
         </InfiniteScroll>
