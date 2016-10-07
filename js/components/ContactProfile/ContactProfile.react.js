@@ -271,7 +271,7 @@ class ContactProfile extends Component {
             }}>
               <FeedsController {...props} />
                 <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
-                  <Tab label='Tweets & RSS' style={{color: grey700}}>
+                  <Tab label='All' style={{color: grey700}}>
                     <MixedFeed contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700}}>
