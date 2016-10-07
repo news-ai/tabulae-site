@@ -5,7 +5,7 @@ import Tweet from '../Tweets/Tweet.react';
 import HeadlineItem from '../Headlines/HeadlineItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
 import {grey400} from 'material-ui/styles/colors';
-import Chip from 'material-ui/chip';
+import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
 
 const styleEmptyRow = {
