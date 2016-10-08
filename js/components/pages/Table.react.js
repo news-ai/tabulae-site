@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
-import Popout from 'react-popout';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';

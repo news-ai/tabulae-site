@@ -2,18 +2,15 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
-import SkyLight from 'react-skylight';
-import Popout from 'react-popout';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
-import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import {Column, Table} from 'react-virtualized'
+import {Column, Table, AutoSizer} from 'react-virtualized'
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -23,6 +20,7 @@ import Waiting from '../Waiting';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
+import './Table.css';
 
 const styles = {
   nameBlock: {
@@ -43,19 +41,24 @@ const styles = {
     top: 80,
     right: 10,
     position: 'fixed'
-  }
+  },
 };
+
 
 class ListTable extends Component {
   constructor(props) {
     super(props);
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
+    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
     this.state = {
       searchValue: null,
       isSearchOn: false,
       errorText: '',
-      searchContacts: []
+      searchContacts: [],
+      isTitleEditing: false,
+      name: null
     };
   }
 
@@ -69,6 +72,10 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
   }
 
   _fetchOperations() {
@@ -97,27 +104,56 @@ class ListTable extends Component {
     console.log(contacts);
     console.log(props.listData);
     return (
-      <div style={{marginTop: 50}}>
+      <div style={{marginTop: 30}}>
+        <div style={{margin: 15}}>
+          <ToggleableEditInput
+          name={state.name}
+          onUpdateName={this.onUpdateName}
+          onToggleTitleEdit={this.onToggleTitleEdit}
+          isTitleEditing={state.isTitleEditing}
+          />
+        </div>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        {contacts && 
-          <Table
-          width={1000}
-          height={700}
-          headerHeight={20}
-          rowHeight={30}
-          rowCount={contacts.length}
-          rowGetter={({index}) => contacts[index]}
-          >
-          {props.listData.fieldsmap
-            .filter((fieldObj, i) => !fieldObj.hidden)
-            .map((fieldObj, i) => <Column
-              label={fieldObj.name}
-              dataKey={fieldObj.value}
+        {props.listData && contacts && 
+          <AutoSizer disableHeight>
+          {({width}) => {
+            console.log(width);
+            return <Table
+            ref='Table'
+            headerClassName='headerColumn'
+            rowClassName={({index}) => {
+              if (index < 0) return 'headerRow';
+              return index % 2 === 0 ? 'evenRow' : 'oddRow';
+            }}
+            width={width}
+            height={600}
+            headerHeight={20}
+            rowHeight={30}
+            rowCount={contacts.length}
+            rowGetter={({index}) => contacts[index]}
+            >
+              <Column
+              label='#'
+              cellDataGetter={({columnData, dataKey, rowData}) => rowData.index}
+              dataKey='index'
+              width={60}
+              />
+              {props.listData.fieldsmap
+                //.filter((fieldObj, i) => !fieldObj.hidden)
+                .map((fieldObj, i) => <Column
+                  label={fieldObj.name}
+                  dataKey={fieldObj.value}
+                  width={300}
+                  key={i}
+                  />)}
+              <Column
+              label='Profile'
+              cellRenderer={({cellData, columnData, dataKey, isScrolling, rowData, rowIndex}) => <button>weee</button>}
+              dataKey='index'
               width={200}
-              keu={i}
-              />)
-          }
-          </Table>}
+              />
+            </Table>;}}
+          </AutoSizer>}
       </div>);
   }
 }
@@ -132,7 +168,11 @@ const mapStateToProps = (state, props) => {
   if (listData) {
     if (!_.isEmpty(listData.contacts)) {
       listData.contacts.map( (contactId, i) => {
-        if (state.contactReducer[contactId]) contacts.push(state.contactReducer[contactId]);
+        if (state.contactReducer[contactId]) {
+          let contact = state.contactReducer[contactId];
+          contact.index = i;
+          contacts.push(contact);
+        }
       });
     }
   }
