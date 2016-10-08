@@ -11,6 +11,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 import {Column, Table, AutoSizer} from 'react-virtualized'
 
 import {EmailPanel} from '../Email';
@@ -53,13 +54,15 @@ class ListTable extends Component {
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
     this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
+    this.onCheck = this._onCheck.bind(this);
     this.state = {
       searchValue: null,
       isSearchOn: false,
       errorText: '',
       searchContacts: [],
       isTitleEditing: false,
-      name: null
+      name: null,
+      selected: []
     };
   }
 
@@ -97,13 +100,18 @@ class ListTable extends Component {
     });
   }
 
+  _onCheck(e, checked, contactId) {
+    const selected = checked ?
+    [...this.state.selected, contactId] :
+    this.state.selected.filter(id => id !== contactId);
+    this.setState({selected});
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
 
-    const contacts= state.isSearchOn ? state.searchContacts : props.contacts;
-    console.log(contacts);
-    console.log(props.listData);
+    const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
     return (
       <div style={{marginTop: 30}}>
         <div style={{margin: 15}}>
@@ -129,6 +137,7 @@ class ListTable extends Component {
             height={600}
             headerHeight={20}
             rowHeight={30}
+            overscanRowCount={60}
             rowCount={contacts.length}
             rowGetter={({index}) => contacts[index]}
             onScroll={({scrollTop, scrollHeight, clientHeight}) => {
@@ -139,7 +148,16 @@ class ListTable extends Component {
               label='#'
               cellDataGetter={({columnData, dataKey, rowData}) => rowData.index}
               dataKey='index'
-              width={70}
+              minWidth={10}
+              maxWidth={70}
+              />
+              <Column
+              label='Select'
+              cellRenderer={({cellData, rowData, rowIndex}) => <Checkbox onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)} />}
+              dataKey='select'
+              flexGrow={1}
+              minWidth={30}
+              maxWidth={90}
               />
               {props.listData.fieldsmap
                 //.filter((fieldObj, i) => !fieldObj.hidden)
