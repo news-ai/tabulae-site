@@ -29,13 +29,10 @@ class MixedFeed extends Component {
             switch (obj.type) {
               case 'headlines':
                 return <HeadlineItem key={i} {...obj} />;
-                break;
               case 'tweets':
                 return <Tweet key={i} {...obj} />;
-                break;
               case 'instagrams':
                 return <InstagramItem key={i} {...obj} />;
-                break;
               default:
                 return <HeadlineItem key={i} {...obj} />;
             }

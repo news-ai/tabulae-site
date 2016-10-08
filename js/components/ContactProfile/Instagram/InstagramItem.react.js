@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {PropTypes} from 'react';
 import {grey400, grey50} from 'material-ui/styles/colors';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';

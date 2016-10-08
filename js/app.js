@@ -45,6 +45,7 @@ import {EmailAnalytics} from './components/Email';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
+import ListTable from './components/ListTable/ListTable.react';
 
 import intercomSetup from './chat';
 
@@ -75,6 +76,7 @@ if (module.hot) {
 
 // wrap components that we want onboarding to, pass down props like routes
 const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
+const OnboardingListTable = props => <OnboardingWrapper {...props}><ListTable /></OnboardingWrapper>;
 
 ReactDOM.render(
   <MultiThemeProvider>
@@ -86,6 +88,10 @@ ReactDOM.render(
             <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='lists/:listId' staticName name='Sheet'>
               <IndexRoute component={OnboardingTable}/>
+              <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
+            </Route>
+            <Route path='tables/:listId' staticName name='Sheet'>
+              <IndexRoute component={OnboardingListTable}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='archive' name='Archive' component={ArchiveContainer} />

@@ -123,7 +123,8 @@ class Table extends Component {
 
   componentWillMount() {
     if (this.props.searchQuery) {
-      this._fetchOperations().then(_ => this.onSearchClick(this.props.searchQuery));
+      this._fetchOperations().
+      then(_ => this.onSearchClick(this.props.searchQuery));
     } else {
       this._fetchOperations();
     }
