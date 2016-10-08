@@ -118,7 +118,6 @@ class ListTable extends Component {
         {props.listData && contacts && 
           <AutoSizer disableHeight>
           {({width}) => {
-            console.log(width);
             return <Table
             ref='Table'
             headerClassName='headerColumn'
@@ -132,12 +131,15 @@ class ListTable extends Component {
             rowHeight={30}
             rowCount={contacts.length}
             rowGetter={({index}) => contacts[index]}
+            onScroll={({scrollTop, scrollHeight, clientHeight}) => {
+              if (((scrollHeight - scrollTop) / clientHeight) < 2) props.fetchContacts(props.listId);
+            }}
             >
               <Column
               label='#'
               cellDataGetter={({columnData, dataKey, rowData}) => rowData.index}
               dataKey='index'
-              width={60}
+              width={70}
               />
               {props.listData.fieldsmap
                 //.filter((fieldObj, i) => !fieldObj.hidden)
@@ -149,7 +151,7 @@ class ListTable extends Component {
                   />)}
               <Column
               label='Profile'
-              cellRenderer={({cellData, rowData, rowIndex}) => <Link to={`/lists/${props.listData.id}/${rowData.id}`}>Profile</Link>}
+              cellRenderer={({cellData, rowData, rowIndex}) => <Link to={`/lists/${props.listId}/${rowData.id}`}>Profile</Link>}
               dataKey='index'
               width={200}
               />
