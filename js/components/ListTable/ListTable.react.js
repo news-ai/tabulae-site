@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
+import Link from 'react-router/lib/Link';
 import Radium from 'radium';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
@@ -148,7 +149,7 @@ class ListTable extends Component {
                   />)}
               <Column
               label='Profile'
-              cellRenderer={({cellData, columnData, dataKey, isScrolling, rowData, rowIndex}) => <button>weee</button>}
+              cellRenderer={({cellData, rowData, rowIndex}) => <Link to={`/lists/${props.listData.id}/${rowData.id}`}>Profile</Link>}
               dataKey='index'
               width={200}
               />
