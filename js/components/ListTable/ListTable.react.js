@@ -55,6 +55,8 @@ class ListTable extends Component {
     this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
     this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
     this.onCheck = this._onCheck.bind(this);
+    this.onSearchClearClick = this._onSearchClearClick.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
     this.state = {
       searchValue: null,
       isSearchOn: false,
@@ -80,6 +82,9 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    if (nextProps.searchQuery !== this.props.searchQuery) {
+      if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
+    }
   }
 
   _fetchOperations() {
@@ -107,11 +112,34 @@ class ListTable extends Component {
     this.setState({selected});
   }
 
+  _onSearchClick(searchValue) {
+    const props = this.props;
+    if (searchValue !== this.state.searchValue) this.setState({searchValue});
+    props.searchListContacts(props.listId, searchValue)
+    .then(obj => {
+      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
+      let errorText = null;
+      if (searchContacts.length === 0) errorText = 'No such term.'
+      this.setState({searchContacts, errorText, isSearchOn: true});
+    });
+  }
+
+  _onSearchClearClick() {
+    this.props.router.push(`/tables/${this.props.listId}`);
+    this.setState({
+      searchContacts: [],
+      searchValue: '',
+      errorText: null,
+      isSearchOn: false
+    });
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
 
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
+    console.log(state.isSearchOn);
     return (
       <div style={{marginTop: 30}}>
         <div style={{margin: 15}}>
@@ -121,12 +149,22 @@ class ListTable extends Component {
           onToggleTitleEdit={this.onToggleTitleEdit}
           isTitleEditing={state.isTitleEditing}
           />
+          <TextField
+          id='search-input'
+          hintText='Search...'
+          value={state.searchValue}
+          onChange={e => this.setState({searchValue: e.target.value})}
+          onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
+          errorText={state.errorText}
+          />
+          <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
+          <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
         </div>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         {props.listData && contacts && 
           <AutoSizer disableHeight>
-          {({width}) => {
-            return <Table
+          {({width}) => 
+          <Table
             ref='Table'
             headerClassName='headerColumn'
             rowClassName={({index}) => {
@@ -173,7 +211,7 @@ class ListTable extends Component {
               dataKey='index'
               width={200}
               />
-            </Table>;}}
+            </Table>}
           </AutoSizer>}
       </div>);
   }
