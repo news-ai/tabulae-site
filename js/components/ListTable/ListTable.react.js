@@ -12,7 +12,8 @@ import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
-import {Column, Table, AutoSizer} from 'react-virtualized'
+import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
+import Measure from 'react-measure';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -46,7 +47,7 @@ const styles = {
   },
 };
 
-
+/*
 class ListTable extends Component {
   constructor(props) {
     super(props);
@@ -139,26 +140,27 @@ class ListTable extends Component {
     const state = this.state;
 
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
-    console.log(state.isSearchOn);
     return (
       <div style={{marginTop: 30}}>
-        <div style={{margin: 15}}>
+        <div className='vertical-center' style={{margin: 15}}>
           <ToggleableEditInput
           name={state.name}
           onUpdateName={this.onUpdateName}
           onToggleTitleEdit={this.onToggleTitleEdit}
           isTitleEditing={state.isTitleEditing}
           />
-          <TextField
-          id='search-input'
-          hintText='Search...'
-          value={state.searchValue}
-          onChange={e => this.setState({searchValue: e.target.value})}
-          onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
-          errorText={state.errorText}
-          />
-          <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-          <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+          <div className='vertical-center'>
+            <TextField
+            id='search-input'
+            hintText='Search...'
+            value={state.searchValue}
+            onChange={e => this.setState({searchValue: e.target.value})}
+            onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
+            errorText={state.errorText}
+            />
+            <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
+            <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+          </div>
         </div>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         {props.listData && contacts && 
@@ -203,6 +205,7 @@ class ListTable extends Component {
                   label={fieldObj.name}
                   dataKey={fieldObj.value}
                   width={300}
+                  columnData={fieldObj}
                   key={i}
                   />)}
               <Column
@@ -213,6 +216,181 @@ class ListTable extends Component {
               />
             </Table>}
           </AutoSizer>}
+      </div>);
+  }
+}
+*/
+
+class ListTable extends Component {
+  constructor(props) {
+    super(props);
+    this.fetchOperations = this._fetchOperations.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
+    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
+    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
+    this.onCheck = this._onCheck.bind(this);
+    this.onSearchClearClick = this._onSearchClearClick.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
+    this.cellRenderer = this._cellRenderer.bind(this);
+    this.headerRenderer = this._headerRenderer.bind(this);
+    this.state = {
+      searchValue: '',
+      isSearchOn: false,
+      errorText: '',
+      searchContacts: [],
+      isTitleEditing: false,
+      name: null,
+      selected: [],
+      columnWidths: {}
+    };
+  }
+
+  componentWillMount() {
+    if (this.props.searchQuery) {
+      this.fetchOperations().
+      then(_ => this.onSearchClick(this.props.searchQuery));
+    } else {
+      this.fetchOperations();
+    }
+  }
+
+  componentDidMount() {
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    if (nextProps.searchQuery !== this.props.searchQuery) {
+      if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
+    }
+  }
+
+  _cellRenderer({columnIndex, rowIndex, key, style}) {
+    const fieldObj = this.props.listData.fieldsmap[columnIndex];
+    const contacts = this.props.contacts;
+    const content = fieldObj.customfield && contacts[rowIndex].customfields ?
+    contacts[rowIndex].customfields.find(obj => obj.name === fieldObj.value).name :
+    contacts[rowIndex][fieldObj.value];
+    return (
+    <div
+    className={rowIndex % 2 === 0 ? 'evenRow' : 'oddRow'}
+    key={key}
+    style={style}>
+      <Measure onMeasure={({right, left}) => {
+        const offset = right - left;
+        console.log(offset);
+      }}>
+        <span>{content}</span>
+      </Measure>
+    </div>);
+  }
+
+  _headerRenderer({columnIndex, key, style}) {
+    const content = this.props.listData.fieldsmap[columnIndex].name;
+    return <div key={key} style={style}>{content}</div>;
+  }
+
+  _fetchOperations() {
+    const props = this.props;
+    return props.fetchList(props.listId)
+    .then(_ => props.fetchContacts(props.listId));
+  }
+  
+  _onSearchClick(searchValue) {
+    const props = this.props;
+    if (searchValue !== this.state.searchValue) this.setState({searchValue});
+    props.searchListContacts(props.listId, searchValue)
+    .then(obj => {
+      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
+      let errorText = null;
+      if (searchContacts.length === 0) errorText = 'No such term.'
+      this.setState({searchContacts, errorText, isSearchOn: true});
+    });
+  }
+
+  _onCheck(e, checked, contactId) {
+    const selected = checked ?
+    [...this.state.selected, contactId] :
+    this.state.selected.filter(id => id !== contactId);
+    this.setState({selected});
+  }
+
+  _onSearchClick(searchValue) {
+    const props = this.props;
+    if (searchValue !== this.state.searchValue) this.setState({searchValue});
+    props.searchListContacts(props.listId, searchValue)
+    .then(obj => {
+      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
+      let errorText = null;
+      if (searchContacts.length === 0) errorText = 'No such term.'
+      this.setState({searchContacts, errorText, isSearchOn: true});
+    });
+  }
+
+  _onSearchClearClick() {
+    this.props.router.push(`/tables/${this.props.listId}`);
+    this.setState({
+      searchContacts: [],
+      searchValue: '',
+      errorText: null,
+      isSearchOn: false
+    });
+  }
+
+  render() {
+    const props = this.props;
+    const state = this.state;
+
+    const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
+    return (
+      <div style={{marginTop: 30}}>
+        <div className='vertical-center' style={{margin: 15}}>
+          <ToggleableEditInput
+          name={state.name}
+          onUpdateName={this.onUpdateName}
+          onToggleTitleEdit={this.onToggleTitleEdit}
+          isTitleEditing={state.isTitleEditing}
+          />
+          <div className='vertical-center'>
+            <TextField
+            id='search-input'
+            hintText='Search...'
+            value={state.searchValue}
+            onChange={e => this.setState({searchValue: e.target.value})}
+            onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
+            errorText={state.errorText}
+            />
+            <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
+            <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+          </div>
+        </div>
+        <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
+        {props.listData && props.contacts && <ScrollSync>
+         {
+          ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
+            <Grid
+            cellRenderer={this.headerRenderer}
+            columnCount={props.listData.fieldsmap.length}
+            columnWidth={100}
+            height={30}
+            width={600}
+            rowCount={1}
+            rowHeight={30}
+            scrollLeft={scrollLeft}
+            />
+            <Grid
+            className='BodyGrid'
+            cellRenderer={this.cellRenderer}
+            columnCount={props.listData.fieldsmap.length}
+            columnWidth={100}
+            height={600}
+            width={600}
+            rowCount={props.contacts.length}
+            rowHeight={30}
+            onScroll={onScroll}
+            />
+          </div>
+        }
+        </ScrollSync>}
       </div>);
   }
 }
