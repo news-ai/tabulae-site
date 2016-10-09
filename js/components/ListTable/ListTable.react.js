@@ -13,7 +13,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
-import Measure from 'react-measure';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -221,6 +220,17 @@ class ListTable extends Component {
 }
 */
 
+function measureSpanSize(txt, font) {
+  const element = document.createElement('canvas');
+  const context = element.getContext('2d');
+  context.font = font;
+  var tsize = {
+    width: context.measureText(txt).width,
+    height: parseInt(context.font)
+  };
+  return tsize;
+}
+
 class ListTable extends Component {
   constructor(props) {
     super(props);
@@ -241,7 +251,7 @@ class ListTable extends Component {
       isTitleEditing: false,
       name: null,
       selected: [],
-      columnWidths: {}
+      columnWidths: null
     };
   }
 
@@ -259,6 +269,14 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    if (nextProps.listData && this.state.columnWidths === null) {
+      const columnWidths = nextProps.listData.fieldsmap.map((fieldObj, i) => {
+        const name = fieldObj.name;
+        const size = measureSpanSize(name, '16px Source Sans Pro')
+        return size.width > 60 ? size.width + 10 : 60;
+      });
+      this.setState({columnWidths})
+    }
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
     }
@@ -275,18 +293,15 @@ class ListTable extends Component {
     className={rowIndex % 2 === 0 ? 'evenRow' : 'oddRow'}
     key={key}
     style={style}>
-      <Measure onMeasure={({right, left}) => {
-        const offset = right - left;
-        console.log(offset);
-      }}>
-        <span>{content}</span>
-      </Measure>
+    <span>{content}</span>
     </div>);
   }
 
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.listData.fieldsmap[columnIndex].name;
-    return <div key={key} style={style}>{content}</div>;
+    return <div key={key} style={style}>
+    <span>{content}</span>
+    </div>;
   }
 
   _fetchOperations() {
@@ -370,7 +385,7 @@ class ListTable extends Component {
             <Grid
             cellRenderer={this.headerRenderer}
             columnCount={props.listData.fieldsmap.length}
-            columnWidth={100}
+            columnWidth={({index}) => state.columnWidths[index]}
             height={30}
             width={600}
             rowCount={1}
@@ -381,7 +396,7 @@ class ListTable extends Component {
             className='BodyGrid'
             cellRenderer={this.cellRenderer}
             columnCount={props.listData.fieldsmap.length}
-            columnWidth={100}
+            columnWidth={({index}) => state.columnWidths[index]}
             height={600}
             width={600}
             rowCount={props.contacts.length}
