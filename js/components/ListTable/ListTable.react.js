@@ -245,6 +245,12 @@ class ListTable extends Component {
     this.onSearchClick = this._onSearchClick.bind(this);
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
+    this.setDataGridRef = ref => {
+      this._DataGrid = ref;
+    };
+    this.setHeaderGridRef = ref => {
+      this._HeaderGrid = ref;
+    }
     this.state = {
       searchValue: '',
       isSearchOn: false,
@@ -279,7 +285,7 @@ class ListTable extends Component {
       });
       this.setState({columnWidths})
     }
-    if (nextProps.contacts.length > 0) {
+    if (nextProps.listData && nextProps.contacts.length > 0) {
       // optimize with immutablejs
       let columnWidths = this.state.columnWidths.slice();
       this.props.fieldsmap.map((fieldObj, i) => {
@@ -289,7 +295,7 @@ class ListTable extends Component {
           if (fieldObj.customfield) {
             if (contact.customfields === null) return;
             if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
-            content = contact.customfields.find(obj => obj.name === fieldObj.value).name
+            content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
           } else {
             content = contact[fieldObj.value];
           }
@@ -298,7 +304,13 @@ class ListTable extends Component {
         });
         columnWidths[i] = max;
       });
-      this.setState({columnWidths});
+      this.setState({columnWidths}, _ => {
+        if (this._HeaderGrid && this._DataGrid) {
+          console.log(columnWidths);
+          this._HeaderGrid.recomputeGridSize();
+          this._DataGrid.recomputeGridSize();
+        }
+      });
     }
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
@@ -418,6 +430,7 @@ class ListTable extends Component {
             ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
               <div style={{marginBottom: 10}}>
                 <Grid
+                ref={ref => this.setHeaderGridRef(ref)}
                 className='BodyGrid'
                 cellRenderer={this.headerRenderer}
                 columnCount={props.fieldsmap.length}
@@ -432,6 +445,7 @@ class ListTable extends Component {
               </div>
               <div>
                 <Grid
+                ref={ref => this.setDataGridRef(ref)}
                 className='BodyGrid'
                 cellRenderer={this.cellRenderer}
                 columnCount={props.fieldsmap.length}
