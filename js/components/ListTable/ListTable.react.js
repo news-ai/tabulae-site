@@ -363,9 +363,13 @@ class ListTable extends Component {
 
     let contentBody;
     if (fieldObj.tableOnly) {
+      const rowData = contacts[rowIndex];
       switch (fieldObj.value) {
         case 'selected':
-        contentBody = <Checkbox onCheck={(e, checked) => this.onCheck(e, checked, contacts[rowIndex].id)} />
+        contentBody = <Checkbox
+        checked={this.state.selected.some(id => id === rowData.id)}
+        onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)}
+        />
           break;
         default:
           contentBody = <span></span>;
