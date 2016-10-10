@@ -365,11 +365,14 @@ class ListTable extends Component {
     if (fieldObj.tableOnly) {
       const rowData = contacts[rowIndex];
       switch (fieldObj.value) {
+        case 'index':
+          contentBody = <span>{rowIndex + 1}</span>;
+          break;
         case 'selected':
-        contentBody = <Checkbox
-        checked={this.state.selected.some(id => id === rowData.id)}
-        onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)}
-        />
+          contentBody = <Checkbox
+          checked={this.state.selected.some(id => id === rowData.id)}
+          onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)}
+          />
           break;
         default:
           contentBody = <span></span>;
@@ -446,7 +449,6 @@ class ListTable extends Component {
     const state = this.state;
 
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
-    console.log(state.selected);
     return (
       <div style={{marginTop: 30}}>
         <div className='vertical-center' style={{margin: 15}}>
@@ -533,6 +535,13 @@ const mapStateToProps = (state, props) => {
   }
 
   const fieldsmap = listData ? [
+  {
+    name: '#',
+    hidden: false,
+    value: 'index',
+    customfield: false,
+    tableOnly: true
+  },
   {
     name: 'Selected',
     hidden: false,
