@@ -261,7 +261,7 @@ class ListTable extends Component {
       name: null,
       selected: [],
       columnWidths: null,
-      dragPositions: null
+      dragPositions: []
     };
   }
 
@@ -285,8 +285,8 @@ class ListTable extends Component {
         const size = measureSpanSize(name, '16px Source Sans Pro')
         return size.width > 60 ? size.width : 60;
       });
-      const dragPositions = Array(nextProps.fieldsmap.length).fill({x: 0, y: 0});
-      this.setState({columnWidths, dragPositions})
+      const dragPositions = Array(nextProps.listData.fieldsmap.length).fill({x: 0, y: 0});
+      this.setState({columnWidths})
     }
     if (nextProps.listData && nextProps.contacts.length > 0) {
       // optimize with immutablejs
@@ -326,14 +326,20 @@ class ListTable extends Component {
     key={key}
     style={style}>
     <span>{content}</span>
-      <Draggable axis='x' value={this.state.dragPositions[columnIndex]} onStop={(e, {x, y}) => {
+      <Draggable zIndex={100} axis='x' position={this.state.dragPositions[columnIndex]} onStop={(e, {x, y}) => {
+        let columnWidths = this.state.columnWidths.slice();
+        columnWidths[columnIndex] += x;
         let dragPositions = this.state.dragPositions.slice();
-        dragPositions[columnIndex] = {x, y};
-        console.log(x);
-        console.log(y);
-        this.setState({dragPositions});
+        dragPositions[columnIndex] = {x: 0, y: 0};
+        this.setState({columnWidths, dragPositions}, _ => {
+          if (this._HeaderGrid && this._DataGrid) {
+            this._HeaderGrid.recomputeGridSize();
+            this._DataGrid.recomputeGridSize();
+          }
+        });
+        this.set
       }}>
-        <div className='right' style={{width: 5, backgroundColor: 'red', height: 30}}></div>
+        <div className='right' style={{width: 5, backgroundColor: 'red', height: '100%', right: 0}}></div>
       </Draggable>
     </div>;
   }
