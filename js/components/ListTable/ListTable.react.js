@@ -277,6 +277,27 @@ class ListTable extends Component {
       });
       this.setState({columnWidths})
     }
+    if (nextProps.contacts.length > 0) {
+      // optimize with immutablejs
+      let columnWidths = this.state.columnWidths.slice();
+      this.props.listData.fieldsmap.map((fieldObj, i) => {
+        let max = columnWidths[i];
+        nextProps.contacts.map(contact => {
+          let content;
+          if (fieldObj.customfield) {
+            if (contact.customfields === null) return;
+            content = contact.customfields.find(obj => obj.name === fieldObj.value).name
+          } else {
+            content = contact[fieldObj.value];
+          }
+          const size = measureSpanSize(content, '16px Source Sans Pro')
+          if (size.width > max) max = size.width;
+        });
+        columnWidths[i] = max;
+      });
+      console.log(columnWidths);
+      this.setState({columnWidths});
+    }
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
     }
@@ -379,7 +400,7 @@ class ListTable extends Component {
           </div>
         </div>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        {props.listData && props.contacts && <ScrollSync>
+        {props.listData && props.contacts.length > 0 && <ScrollSync>
          {
           ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
             <Grid
