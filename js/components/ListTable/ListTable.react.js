@@ -261,7 +261,8 @@ class ListTable extends Component {
       name: null,
       selected: [],
       columnWidths: null,
-      dragPositions: []
+      dragPositions: [],
+      dragged: false
     };
   }
 
@@ -279,6 +280,7 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    
     if (nextProps.listData && this.state.columnWidths === null) {
       const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
@@ -288,7 +290,8 @@ class ListTable extends Component {
       const dragPositions = Array(nextProps.listData.fieldsmap.length).fill({x: 0, y: 0});
       this.setState({columnWidths})
     }
-    if (nextProps.listData && nextProps.contacts.length > 0) {
+
+    if (nextProps.listData && nextProps.contacts.length > 0 && !this.state.dragged) {
       // optimize with immutablejs
       let columnWidths = this.state.columnWidths.slice();
       this.props.fieldsmap.map((fieldObj, i) => {
@@ -314,6 +317,7 @@ class ListTable extends Component {
         }
       });
     }
+
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
     }
@@ -331,7 +335,7 @@ class ListTable extends Component {
         columnWidths[columnIndex] += x;
         let dragPositions = this.state.dragPositions.slice();
         dragPositions[columnIndex] = {x: 0, y: 0};
-        this.setState({columnWidths, dragPositions}, _ => {
+        this.setState({columnWidths, dragPositions, dragged: true}, _ => {
           if (this._HeaderGrid && this._DataGrid) {
             this._HeaderGrid.recomputeGridSize();
             this._DataGrid.recomputeGridSize();
@@ -416,6 +420,7 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    console.log(state.dragged);
 
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
     return (
