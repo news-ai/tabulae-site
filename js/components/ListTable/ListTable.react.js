@@ -231,6 +231,8 @@ function measureSpanSize(txt, font) {
   return tsize;
 }
 
+const TABLE_WIDTH = 1000;
+
 class ListTable extends Component {
   constructor(props) {
     super(props);
@@ -273,7 +275,7 @@ class ListTable extends Component {
       const columnWidths = nextProps.listData.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
-        return size.width > 60 ? size.width + 10 : 60;
+        return size.width > 60 ? size.width : 60;
       });
       this.setState({columnWidths})
     }
@@ -295,7 +297,6 @@ class ListTable extends Component {
         });
         columnWidths[i] = max;
       });
-      console.log(columnWidths);
       this.setState({columnWidths});
     }
     if (nextProps.searchQuery !== this.props.searchQuery) {
@@ -311,7 +312,7 @@ class ListTable extends Component {
     contacts[rowIndex][fieldObj.value];
     return (
     <div
-    className={rowIndex % 2 === 0 ? 'evenRow' : 'oddRow'}
+    className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
     key={key}
     style={style}>
     <span>{content}</span>
@@ -320,7 +321,10 @@ class ListTable extends Component {
 
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.listData.fieldsmap[columnIndex].name;
-    return <div key={key} style={style}>
+    return <div
+    className='cell'
+    key={key}
+    style={style}>
     <span>{content}</span>
     </div>;
   }
@@ -400,33 +404,38 @@ class ListTable extends Component {
           </div>
         </div>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        {props.listData && props.contacts.length > 0 && <ScrollSync>
-         {
-          ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
-            <Grid
-            cellRenderer={this.headerRenderer}
-            columnCount={props.listData.fieldsmap.length}
-            columnWidth={({index}) => state.columnWidths[index]}
-            height={30}
-            width={600}
-            rowCount={1}
-            rowHeight={30}
-            scrollLeft={scrollLeft}
-            />
-            <Grid
-            className='BodyGrid'
-            cellRenderer={this.cellRenderer}
-            columnCount={props.listData.fieldsmap.length}
-            columnWidth={({index}) => state.columnWidths[index]}
-            height={600}
-            width={600}
-            rowCount={props.contacts.length}
-            rowHeight={30}
-            onScroll={onScroll}
-            />
-          </div>
-        }
-        </ScrollSync>}
+        <div style={{marginLeft: 20}}>
+          {props.listData && props.contacts.length > 0 && <ScrollSync>
+           {
+            ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
+              <Grid
+              className='BodyGrid'
+              cellRenderer={this.headerRenderer}
+              columnCount={props.listData.fieldsmap.length}
+              columnWidth={({index}) => state.columnWidths[index] + 10}
+              height={30}
+              autoContainerWidth
+              width={TABLE_WIDTH}
+              rowCount={1}
+              rowHeight={30}
+              scrollLeft={scrollLeft}
+              />
+              <Grid
+              className='BodyGrid'
+              cellRenderer={this.cellRenderer}
+              columnCount={props.listData.fieldsmap.length}
+              columnWidth={({index}) => state.columnWidths[index] + 10}
+              height={600}
+              autoHeight
+              autoContainerWidth
+              width={TABLE_WIDTH}
+              rowCount={props.contacts.length}
+              rowHeight={30}
+              onScroll={onScroll}
+              />
+            </div>}
+          </ScrollSync>}
+        </div>
       </div>);
   }
 }
