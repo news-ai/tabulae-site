@@ -10,8 +10,10 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
+import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
+import {blue200, grey300} from 'material-ui/styles/colors';
 import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
 import Draggable from 'react-draggable';
 
@@ -237,21 +239,6 @@ const TABLE_WIDTH = 1000;
 class ListTable extends Component {
   constructor(props) {
     super(props);
-    this.fetchOperations = this._fetchOperations.bind(this);
-    this.onSearchClick = this._onSearchClick.bind(this);
-    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
-    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
-    this.onCheck = this._onCheck.bind(this);
-    this.onSearchClearClick = this._onSearchClearClick.bind(this);
-    this.onSearchClick = this._onSearchClick.bind(this);
-    this.cellRenderer = this._cellRenderer.bind(this);
-    this.headerRenderer = this._headerRenderer.bind(this);
-    this.setDataGridRef = ref => {
-      this._DataGrid = ref;
-    };
-    this.setHeaderGridRef = ref => {
-      this._HeaderGrid = ref;
-    }
     this.state = {
       searchValue: '',
       isSearchOn: false,
@@ -263,7 +250,24 @@ class ListTable extends Component {
       columnWidths: null,
       dragPositions: [],
       dragged: false,
+      isEmailPanelOpen: false,
     };
+    this.fetchOperations = this._fetchOperations.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
+    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
+    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
+    this.toggleEmailPanel = _ => this.setState({isEmailPanelOpen: !this.state.isEmailPanelOpen});
+    this.onCheck = this._onCheck.bind(this);
+    this.onSearchClearClick = this._onSearchClearClick.bind(this);
+    this.onSearchClick = this._onSearchClick.bind(this);
+    this.cellRenderer = this._cellRenderer.bind(this);
+    this.headerRenderer = this._headerRenderer.bind(this);
+    this.setDataGridRef = ref => {
+      this._DataGrid = ref;
+    };
+    this.setHeaderGridRef = ref => {
+      this._HeaderGrid = ref;
+    }
   }
 
   componentWillMount() {
@@ -451,14 +455,23 @@ class ListTable extends Component {
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
     return (
       <div style={{marginTop: 30}}>
-        <div className='vertical-center' style={{margin: 15}}>
-          <ToggleableEditInput
-          name={state.name}
-          onUpdateName={this.onUpdateName}
-          onToggleTitleEdit={this.onToggleTitleEdit}
-          isTitleEditing={state.isTitleEditing}
-          />
-          <div className='vertical-center'>
+        <div className='row vertical-center' style={{margin: 15}}>
+          <div className='large-6 columns vertical-center'>
+            <ToggleableEditInput
+            name={state.name}
+            onUpdateName={this.onUpdateName}
+            onToggleTitleEdit={this.onToggleTitleEdit}
+            isTitleEditing={state.isTitleEditing}
+            />
+            <Checkbox
+            className='noprint'
+            checked={state.isEmailPanelOpen}
+            onCheck={(e, isEmailPanelOpen) => this.setState({isEmailPanelOpen})}
+            checkedIcon={<FontIcon className='fa fa-envelope' color={blue200}/>}
+            uncheckedIcon={<FontIcon className='fa fa-envelope' color={grey300} />}
+            />
+          </div>
+          <div className='large-6 columns vertical-center'>
             <TextField
             id='search-input'
             hintText='Search...'
@@ -471,6 +484,14 @@ class ListTable extends Component {
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
+        {state.isEmailPanelOpen &&
+          <EmailPanel
+          person={props.person}
+          selected={state.selected}
+          fieldsmap={props.listData.fieldsmap}
+          listId={props.listId}
+          onClose={_ => this.setState({isEmailPanelOpen: false})}
+          />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div style={{marginLeft: 20}}>
           {props.listData && props.contacts.length > 0 && <ScrollSync>
@@ -498,6 +519,7 @@ class ListTable extends Component {
                 cellRenderer={this.cellRenderer}
                 columnCount={props.fieldsmap.length}
                 columnWidth={({index}) => state.columnWidths[index] + 10}
+                overscanRowCount={20}
                 height={600}
                 width={TABLE_WIDTH}
                 rowCount={props.contacts.length}
