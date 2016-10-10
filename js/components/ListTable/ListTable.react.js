@@ -272,7 +272,7 @@ class ListTable extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
     if (nextProps.listData && this.state.columnWidths === null) {
-      const columnWidths = nextProps.listData.fieldsmap.map((fieldObj, i) => {
+      const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
         return size.width > 60 ? size.width : 60;
@@ -282,12 +282,13 @@ class ListTable extends Component {
     if (nextProps.contacts.length > 0) {
       // optimize with immutablejs
       let columnWidths = this.state.columnWidths.slice();
-      this.props.listData.fieldsmap.map((fieldObj, i) => {
+      this.props.fieldsmap.map((fieldObj, i) => {
         let max = columnWidths[i];
         nextProps.contacts.map(contact => {
           let content;
           if (fieldObj.customfield) {
             if (contact.customfields === null) return;
+            if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
             content = contact.customfields.find(obj => obj.name === fieldObj.value).name
           } else {
             content = contact[fieldObj.value];
@@ -305,22 +306,29 @@ class ListTable extends Component {
   }
 
   _cellRenderer({columnIndex, rowIndex, key, style}) {
-    const fieldObj = this.props.listData.fieldsmap[columnIndex];
+    const fieldObj = this.props.fieldsmap[columnIndex];
     const contacts = this.props.contacts;
-    const content = fieldObj.customfield && contacts[rowIndex].customfields ?
-    contacts[rowIndex].customfields.find(obj => obj.name === fieldObj.value).name :
-    contacts[rowIndex][fieldObj.value];
+
+    let content = '';
+    if (fieldObj.customfield) {
+      if (contacts[rowIndex].customfields !== null && contacts[rowIndex].customfields.some(obj => obj.name == fieldObj.value)) {
+        content = contacts[rowIndex].customfields.find(obj => obj.name === fieldObj.value).value;
+      }
+    } else {
+      content = contacts[rowIndex][fieldObj.value];
+    }
+
     return (
     <div
     className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
     key={key}
     style={style}>
-    <span>{content}</span>
+      <span>{content}</span>
     </div>);
   }
 
   _headerRenderer({columnIndex, key, style}) {
-    const content = this.props.listData.fieldsmap[columnIndex].name;
+    const content = this.props.fieldsmap[columnIndex].name;
     return <div
     className='cell'
     key={key}
@@ -408,31 +416,36 @@ class ListTable extends Component {
           {props.listData && props.contacts.length > 0 && <ScrollSync>
            {
             ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
-              <Grid
-              className='BodyGrid'
-              cellRenderer={this.headerRenderer}
-              columnCount={props.listData.fieldsmap.length}
-              columnWidth={({index}) => state.columnWidths[index] + 10}
-              height={30}
-              autoContainerWidth
-              width={TABLE_WIDTH}
-              rowCount={1}
-              rowHeight={30}
-              scrollLeft={scrollLeft}
-              />
-              <Grid
-              className='BodyGrid'
-              cellRenderer={this.cellRenderer}
-              columnCount={props.listData.fieldsmap.length}
-              columnWidth={({index}) => state.columnWidths[index] + 10}
-              height={600}
-              autoHeight
-              autoContainerWidth
-              width={TABLE_WIDTH}
-              rowCount={props.contacts.length}
-              rowHeight={30}
-              onScroll={onScroll}
-              />
+              <div style={{marginBottom: 10}}>
+                <Grid
+                className='BodyGrid'
+                cellRenderer={this.headerRenderer}
+                columnCount={props.fieldsmap.length}
+                columnWidth={({index}) => state.columnWidths[index] + 10}
+                height={30}
+                autoContainerWidth
+                width={TABLE_WIDTH}
+                rowCount={1}
+                rowHeight={30}
+                scrollLeft={scrollLeft}
+                />
+              </div>
+              <div>
+                <Grid
+                className='BodyGrid'
+                cellRenderer={this.cellRenderer}
+                columnCount={props.fieldsmap.length}
+                columnWidth={({index}) => state.columnWidths[index] + 10}
+                height={600}
+                width={TABLE_WIDTH}
+                rowCount={props.contacts.length}
+                rowHeight={30}
+                onScroll={args => {
+                  if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
+                  onScroll(args);
+                }}
+                />
+              </div>
             </div>}
           </ScrollSync>}
         </div>
@@ -449,7 +462,7 @@ const mapStateToProps = (state, props) => {
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   if (listData) {
     if (!_.isEmpty(listData.contacts)) {
-      listData.contacts.map( (contactId, i) => {
+      listData.contacts.map((contactId, i) => {
         if (state.contactReducer[contactId]) {
           let contact = state.contactReducer[contactId];
           contact.index = i;
@@ -459,6 +472,21 @@ const mapStateToProps = (state, props) => {
     }
   }
 
+  const fieldsmap = listData ? [
+  ...listData.fieldsmap.filter(fieldObj => !fieldObj.hidden),
+  {
+    customfield: false,
+    name: 'Publication 1',
+    value: 'publication_name_1',
+    hidden: false
+  },
+  {
+    customfield: false,
+    name: 'Publication 2',
+    value: 'publication_name_2',
+    hidden: false
+  }] : null;
+
   const searchQuery = props.location.query.search;
 
   return {
@@ -466,6 +494,7 @@ const mapStateToProps = (state, props) => {
     listId: listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData: listData,
+    fieldsmap,
     contacts: contacts,
     name: listData ? listData.name : null,
     contactIsReceiving: state.contactReducer.isReceiving,
