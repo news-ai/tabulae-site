@@ -262,7 +262,7 @@ class ListTable extends Component {
       selected: [],
       columnWidths: null,
       dragPositions: [],
-      dragged: false
+      dragged: false,
     };
   }
 
@@ -363,8 +363,12 @@ class ListTable extends Component {
 
     let contentBody;
     if (fieldObj.tableOnly) {
-      if (fieldObj.value === 'selected') {
-        contentBody = <Checkbox />;
+      switch (fieldObj.value) {
+        case 'selected':
+        contentBody = <Checkbox onCheck={(e, checked) => this.onCheck(e, checked, contacts[rowIndex].id)} />
+          break;
+        default:
+          contentBody = <span></span>;
       }
     } else {
       contentBody = <span>{content}</span>;
@@ -383,6 +387,13 @@ class ListTable extends Component {
     const props = this.props;
     return props.fetchList(props.listId)
     .then(_ => props.fetchContacts(props.listId));
+  }
+
+  _onCheck(e, checked, contactId) {
+    const selected = checked ?
+    [...this.state.selected, contactId] :
+    this.state.selected.filter(id => id !== contactId);
+    this.setState({selected});
   }
   
   _onSearchClick(searchValue) {
@@ -431,6 +442,7 @@ class ListTable extends Component {
     const state = this.state;
 
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
+    console.log(state.selected);
     return (
       <div style={{marginTop: 30}}>
         <div className='vertical-center' style={{margin: 15}}>
