@@ -13,6 +13,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
+import Draggable from 'react-draggable';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -259,7 +260,8 @@ class ListTable extends Component {
       isTitleEditing: false,
       name: null,
       selected: [],
-      columnWidths: null
+      columnWidths: null,
+      dragPositions: null
     };
   }
 
@@ -283,7 +285,8 @@ class ListTable extends Component {
         const size = measureSpanSize(name, '16px Source Sans Pro')
         return size.width > 60 ? size.width : 60;
       });
-      this.setState({columnWidths})
+      const dragPositions = Array(nextProps.fieldsmap.length).fill({x: 0, y: 0});
+      this.setState({columnWidths, dragPositions})
     }
     if (nextProps.listData && nextProps.contacts.length > 0) {
       // optimize with immutablejs
@@ -306,7 +309,6 @@ class ListTable extends Component {
       });
       this.setState({columnWidths}, _ => {
         if (this._HeaderGrid && this._DataGrid) {
-          console.log(columnWidths);
           this._HeaderGrid.recomputeGridSize();
           this._DataGrid.recomputeGridSize();
         }
@@ -315,6 +317,25 @@ class ListTable extends Component {
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
     }
+  }
+
+  _headerRenderer({columnIndex, key, style}) {
+    const content = this.props.fieldsmap[columnIndex].name;
+    return <div
+    className='cell'
+    key={key}
+    style={style}>
+    <span>{content}</span>
+      <Draggable axis='x' value={this.state.dragPositions[columnIndex]} onStop={(e, {x, y}) => {
+        let dragPositions = this.state.dragPositions.slice();
+        dragPositions[columnIndex] = {x, y};
+        console.log(x);
+        console.log(y);
+        this.setState({dragPositions});
+      }}>
+        <div className='right' style={{width: 5, backgroundColor: 'red', height: 30}}></div>
+      </Draggable>
+    </div>;
   }
 
   _cellRenderer({columnIndex, rowIndex, key, style}) {
@@ -337,16 +358,6 @@ class ListTable extends Component {
     style={style}>
       <span>{content}</span>
     </div>);
-  }
-
-  _headerRenderer({columnIndex, key, style}) {
-    const content = this.props.fieldsmap[columnIndex].name;
-    return <div
-    className='cell'
-    key={key}
-    style={style}>
-    <span>{content}</span>
-    </div>;
   }
 
   _fetchOperations() {
