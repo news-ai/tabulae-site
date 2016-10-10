@@ -361,12 +361,21 @@ class ListTable extends Component {
       content = contacts[rowIndex][fieldObj.value];
     }
 
+    let contentBody;
+    if (fieldObj.tableOnly) {
+      if (fieldObj.value === 'selected') {
+        contentBody = <Checkbox />;
+      }
+    } else {
+      contentBody = <span>{content}</span>;
+    }
+
     return (
     <div
     className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
     key={key}
     style={style}>
-      <span>{content}</span>
+    {contentBody}
     </div>);
   }
 
@@ -420,7 +429,6 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(state.dragged);
 
     const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
     return (
@@ -509,6 +517,13 @@ const mapStateToProps = (state, props) => {
   }
 
   const fieldsmap = listData ? [
+  {
+    name: 'Selected',
+    hidden: false,
+    value: 'selected',
+    customfield: false,
+    tableOnly: true
+  },
   ...listData.fieldsmap.filter(fieldObj => !fieldObj.hidden),
   {
     customfield: false,
