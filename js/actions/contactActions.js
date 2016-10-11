@@ -94,13 +94,15 @@ export function deleteContact(contactId) {
   return dispatch => {
     dispatch({type: 'DELETE_CONTACT', contactId});
     return api.deleteRequest(`/contacts/${contactId}`)
-    .then(response => console.log(response))
+    .then(response => {
+      //console.log(response);
+      return dispatch({type: 'DELETED_CONTACT', contactId});
+    })
     .catch(err => console.log(err));
   };
 }
 
 export function deleteContacts(ids) {
-  console.log(ids);
   return dispatch => {
     dispatch({type: 'DELETE_CONTACTS', ids});
     ids.map(id => dispatch(deleteContact(id)));
