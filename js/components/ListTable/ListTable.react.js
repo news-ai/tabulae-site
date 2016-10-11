@@ -10,13 +10,13 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {blue200, grey500} from 'material-ui/styles/colors';
 import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
 import Draggable from 'react-draggable';
-import Tooltip from '../Tooltip/Tooltip.react';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -235,6 +235,51 @@ function measureSpanSize(txt, font) {
   return tsize;
 }
 
+function escapeHtml(unsafe) {
+  return unsafe
+   .replace(/&/g, '&amp;')
+   .replace(/</g, '&lt;')
+   .replace(/>/g, '&gt;')
+   .replace(/"/g, '&quot;')
+   .replace(/'/g, '&#039;');
+ }
+
+function convertToCsvString(contacts, fieldsmap) {
+  let base = 'data:text/csv;charset=utf-8,';
+  const filteredfieldsmap = fieldsmap
+  .filter(fieldObj => fieldObj.value !== 'selected' || fieldObj.data !== 'profile' || !fieldObj.hidden);
+  base += filteredfieldsmap.map(fieldObj => fieldObj.name).toString() + '\n';
+  contacts.map(contact => {
+    let rowStringArray = [];
+      filteredfieldsmap.map(fieldObj => {
+        let el;
+        if (fieldObj.customfield && contact.customfields !== null) {
+          if (contact.customfields.some(obj => obj.name === fieldObj.value)) el = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+          else el = '';
+        } else {
+          el = contact[fieldObj.value];
+        }
+        if (typeof el === 'string') {
+          if (el.split(',').length > 1) rowStringArray.push('\"' + escapeHtml(el) + '\"');
+          else rowStringArray.push(escapeHtml(el));
+        } else {
+          rowStringArray.push('');
+        }
+    });
+    base += rowStringArray.toString() + '\n';
+  });
+  return base;
+}
+
+function exportOperations(contacts, fieldsmap, name) {
+  const csvString = convertToCsvString(contacts, fieldsmap);
+  const csvFile = encodeURI(csvString);
+  const link = document.createElement('a');
+  link.setAttribute('href', csvFile);
+  link.setAttribute('download', name);
+  link.click();
+}
+
 const TABLE_WIDTH = 1000;
 
 class ListTable extends Component {
@@ -257,12 +302,12 @@ class ListTable extends Component {
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
     this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
-    this.toggleEmailPanel = _ => this.setState({isEmailPanelOpen: !this.state.isEmailPanelOpen});
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
+    this.onExportClick = this._onExportClick.bind(this);
     this.setDataGridRef = ref => {
       this._DataGrid = ref;
     };
@@ -346,9 +391,8 @@ class ListTable extends Component {
             this._DataGrid.recomputeGridSize();
           }
         });
-        this.set
       }}>
-        <div className='right' style={{width: 5, backgroundColor: 'red', height: '100%', right: 0}}></div>
+        <div className='draggable-handle right'></div>
       </Draggable>
     </div>;
   }
@@ -449,6 +493,17 @@ class ListTable extends Component {
     });
   }
 
+
+
+  _onExportClick() {
+    if (this.props.contacts.length < this.props.listData.contacts.length) {
+      this.props.fetchAllContacts(this.props.listId)
+      .then(_ => exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name));
+    } else {
+      exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name);
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -464,18 +519,19 @@ class ListTable extends Component {
             onToggleTitleEdit={this.onToggleTitleEdit}
             isTitleEditing={state.isTitleEditing}
             />
-            <Tooltip label='Email'>
-            {({onMouseEnter, onMouseOut}) =>
-              <Checkbox
-              onMouseEnter={onMouseEnter}
-              onMouseOut={onMouseOut}
-              className='noprint'
-              checked={state.isEmailPanelOpen}
-              onCheck={(e, isEmailPanelOpen) => this.setState({isEmailPanelOpen})}
-              checkedIcon={<FontIcon className='fa fa-envelope' color={blue200}/>}
-              uncheckedIcon={<FontIcon className='fa fa-envelope' color={grey500} />}
-              />}
-            </Tooltip>
+            <IconButton
+            tooltip='Email'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-envelope'
+            onClick={_ => this.setState({isEmailPanelOpen: true})}
+            disabled={state.isEmailPanelOpen}
+            />
+            <IconButton
+            tooltip='Export'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-download'
+            onClick={this.onExportClick}
+            />
           </div>
           <div className='large-6 columns vertical-center'>
             <TextField

@@ -43,3 +43,13 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
+.draggable-handle {
+  position: absolute;
+  width: 5px;
+  background-color: lightgrey;
+  height: 100%;
+  right: 0;
+  cursor: pointer;
+  z-index: 100;
+}
