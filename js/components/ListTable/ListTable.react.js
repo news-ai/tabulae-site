@@ -477,6 +477,11 @@ class ListTable extends Component {
           onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)}
           />
           break;
+        case 'profile':
+          contentBody = <Link to={`/lists/${this.props.listId}/${rowData.id}`}>
+          <i className='fa fa-arrow-right' aria-hidden='true'/>
+          </Link>;
+          break;
         default:
           contentBody = <span></span>;
       }
@@ -684,6 +689,13 @@ const mapStateToProps = (state, props) => {
     tableOnly: true
   },
   {
+    name: 'Profile',
+    hidden: false,
+    value: 'profile',
+    customfield: false,
+    tableOnly: true
+  },
+  {
     name: 'Selected',
     hidden: false,
     value: 'selected',
@@ -702,7 +714,8 @@ const mapStateToProps = (state, props) => {
     name: 'Publication 2',
     value: 'publication_name_2',
     hidden: false
-  }] : null;
+  }
+  ] : null;
 
   const searchQuery = props.location.query.search;
 
