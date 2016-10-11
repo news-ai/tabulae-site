@@ -31,6 +31,7 @@
   display: flex;
   padding-left: .5em;
   overflow-x: hidden;
+  z-index: 0;
 }
 .cell {
   border-right: 1px solid #e0e0e0;
@@ -51,5 +52,5 @@
   height: 100%;
   right: 0;
   cursor: pointer;
-  z-index: 100;
+  z-index: 400;
 }

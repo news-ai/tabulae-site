@@ -308,6 +308,8 @@ class ListTable extends Component {
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
     this.onExportClick = this._onExportClick.bind(this);
+    this.onHeaderDrag = this._onHeaderDrag.bind(this);
+    this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
     this.setDataGridRef = ref => {
       this._DataGrid = ref;
     };
@@ -373,6 +375,27 @@ class ListTable extends Component {
     }
   }
 
+  _onHeaderDrag(e, {x, y}, columnIndex) {
+    let dragPositions = this.state.dragPositions.slice();
+    dragPositions[columnIndex] = {x, y};
+    this.setState({dragPositions});
+  }
+
+  _onHeaderDragStop(e, {x, y}, columnIndex) {
+    let columnWidths = this.state.columnWidths.slice();
+    columnWidths[columnIndex] += x;
+    let dragPositions = this.state.dragPositions.slice();
+    dragPositions[columnIndex] = {x: 0, y: 0};
+    this.setState(
+      {columnWidths, dragPositions, dragged: true},
+      _ => {
+      if (this._HeaderGrid && this._DataGrid) {
+        this._HeaderGrid.recomputeGridSize();
+        this._DataGrid.recomputeGridSize();
+      }
+    });
+  }
+
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.fieldsmap[columnIndex].name;
     return <div
@@ -380,18 +403,11 @@ class ListTable extends Component {
     key={key}
     style={style}>
     <span>{content}</span>
-      <Draggable zIndex={100} axis='x' position={this.state.dragPositions[columnIndex]} onStop={(e, {x, y}) => {
-        let columnWidths = this.state.columnWidths.slice();
-        columnWidths[columnIndex] += x;
-        let dragPositions = this.state.dragPositions.slice();
-        dragPositions[columnIndex] = {x: 0, y: 0};
-        this.setState({columnWidths, dragPositions, dragged: true}, _ => {
-          if (this._HeaderGrid && this._DataGrid) {
-            this._HeaderGrid.recomputeGridSize();
-            this._DataGrid.recomputeGridSize();
-          }
-        });
-      }}>
+      <Draggable
+      axis='x'
+      bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
+      position={this.state.dragPositions[columnIndex]}
+      onStop={(e, args) => this.onHeaderDragStop(e, args, columnIndex)}>
         <div className='draggable-handle right'></div>
       </Draggable>
     </div>;
