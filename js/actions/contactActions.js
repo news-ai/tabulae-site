@@ -90,6 +90,25 @@ export function patchContact(contactId, contactBody) {
   };
 }
 
+export function deleteContact(contactId) {
+  return dispatch => {
+    dispatch({type: 'DELETE_CONTACT', contactId});
+    return api.deleteRequest(`/contacts/${contactId}`)
+    .then(response => {
+      //console.log(response);
+      return dispatch({type: 'DELETED_CONTACT', contactId});
+    })
+    .catch(err => console.log(err));
+  };
+}
+
+export function deleteContacts(ids) {
+  return dispatch => {
+    dispatch({type: 'DELETE_CONTACTS', ids});
+    ids.map(id => dispatch(deleteContact(id)));
+  };
+}
+
 // used to lazy-load a page, keeps track of the last offset
 export function fetchPaginatedContacts(listId) {
   const PAGE_LIMIT = 50;

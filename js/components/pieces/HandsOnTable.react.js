@@ -222,7 +222,9 @@ class HandsOnTable extends Component {
             if (key === 'remove_selected_rows') {
               const low = options.start.row <= options.end.row ? options.start.row : options.end.row;
               const hi = low === options.start.row ? options.end.row : options.end.row;
-              const removeIdList = this.state.options.data.filter( (row, i) => low <= i && i <= hi ).map(row => row.id);
+              const removeIdList = this.state.options.data.filter((row, i) => low <= i && i <= hi ).map(row => row.id);
+              const removedIdList = this.state.options.data.filter((row, i) => low > i && i > hi ).map(row => row.id);
+              props.deleteContacts(removeIdList);
               const newListContacts = _.difference(props.listData.contacts, removeIdList);
               props.patchList({
                 listId: props.listId,
@@ -553,6 +555,8 @@ const mapDispatchToProps = dispatch => {
     // dispatch: action => dispatch(action),
     // fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
     // patchList: listObj => dispatch(actionCreators.patchList(listObj)),
+    deleteContact: id => dispatch(actionCreators.deleteContact(id)),
+    deleteContacts: ids => dispatch(actionCreators.deleteContacts(ids)),
   };
 };
 
