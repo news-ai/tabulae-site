@@ -470,8 +470,10 @@ class ListTable extends Component {
           contentBody = <span>{rowIndex + 1}</span>;
           break;
         case 'selected':
+          const checked = this.state.selected.some(id => id === rowData.id);
           contentBody = <Checkbox
-          checked={this.state.selected.some(id => id === rowData.id)}
+          iconStyle={{fill: checked ? blue200 : grey400}}
+          checked={checked}
           onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)}
           />
           break;
