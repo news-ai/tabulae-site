@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
-import Popout from 'react-popout';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
@@ -13,6 +12,9 @@ import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import FontIcon from 'material-ui/FontIcon';
+import FlatButton from 'material-ui/FlatButton';
+import {grey400} from 'material-ui/styles/colors';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -123,7 +125,8 @@ class Table extends Component {
 
   componentWillMount() {
     if (this.props.searchQuery) {
-      this._fetchOperations().then(_ => this.onSearchClick(this.props.searchQuery));
+      this._fetchOperations().
+      then(_ => this.onSearchClick(this.props.searchQuery));
     } else {
       this._fetchOperations();
     }
@@ -322,7 +325,6 @@ class Table extends Component {
     link.setAttribute('href', csvFile);
     link.setAttribute('download', this.state.name);
     link.click();
-
   }
 
   _onExportClick() {
@@ -362,7 +364,11 @@ class Table extends Component {
       {
         props.listData &&
         <div>
+          <div className='large-12 columns' style={{marginTop: 10}}>
+            <FlatButton className='noprint' label='Read Only' onClick={_ => props.router.push(`/tables/${props.listId}`)} labelStyle={{textTransform: 'none', color: grey400}} icon={<FontIcon className='fa fa-arrow-left' color={grey400} />}/>
+          </div>
           <div className='row' style={[styles.nameBlock.parent]}>
+
             <div className='small-12 medium-8 large-4 columns'>
               <ToggleableEditInput
               name={state.name}

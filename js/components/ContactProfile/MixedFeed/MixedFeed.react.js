@@ -4,60 +4,12 @@ import * as mixedFeedActions from './actions';
 import Tweet from '../Tweets/Tweet.react';
 import HeadlineItem from '../Headlines/HeadlineItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
-import {grey400} from 'material-ui/styles/colors';
-import Chip from 'material-ui/Chip';
-import Avatar from 'material-ui/Avatar';
+import InstagramItem from '../Instagram/InstagramItem.react';
 
 const styleEmptyRow = {
   padding: 10,
   marginTop: 20,
   marginBottom: 50,
-};
-
-const tweetStyle = {
-  paddingTop: 10,
-  paddingBottom: 10,
-  marginTop: 10,
-  marginBottom: 10,
-  border: `dotted 1px ${grey400}`,
-  borderRadius: '0.4em'
-};
-
-const Instagram = ({text, createdat, instagramcomments, instagramid, instagramlikes, instagramimage, instagramlink, instagramusername, instagramvideo}) => {
-  const date = new Date(createdat);
-  return <div className='row' style={tweetStyle}>
-    <div className='large-10 medium-9 small-8 columns'>
-      <a target='_blank' href={instagramlink}>{text ? text : instagramlink}</a>
-    </div>
-    <div className='large-2 medium-3 small-4 columns'>
-      <span style={{float: 'right'}}>
-        {instagramusername ? <a target='_blank' href={`https://instagram.com/${instagramusername}`}>{instagramusername}</a> : instagramusername}
-      </span>
-    </div>
-     <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
-      <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
-    </div>
-    {!instagramvideo && <div className='large-12 medium-12 small-12 columns'>
-      <img src={instagramimage} />
-    </div>}
-    {instagramvideo && <div className='large-12 medium-12 small-12 columns'>
-      <video src={instagramvideo} controls>
-      Your browser does not support the <code>video</code> element.
-      </video>
-    </div>}
-    <div className='large-12 medium-12 small-12 columns'>
-      <div className='row right'>
-        <Chip style={{margin: 5}}>
-          <Avatar size={30}>{instagramlikes}</Avatar>
-          Likes
-        </Chip>
-        <Chip style={{margin: 5}}>
-          <Avatar size={30}>{instagramcomments}</Avatar>
-          Comments
-        </Chip>
-      </div>
-    </div>
-  </div>;
 };
 
 class MixedFeed extends Component {
@@ -77,13 +29,10 @@ class MixedFeed extends Component {
             switch (obj.type) {
               case 'headlines':
                 return <HeadlineItem key={i} {...obj} />;
-                break;
               case 'tweets':
                 return <Tweet key={i} {...obj} />;
-                break;
               case 'instagrams':
-                return <Instagram key={i} {...obj} />;
-                break;
+                return <InstagramItem key={i} {...obj} />;
               default:
                 return <HeadlineItem key={i} {...obj} />;
             }

@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import * as AppActions from '../../../actions/AppActions';
-import {grey400, grey700, grey500} from 'material-ui/styles/colors';
+import {grey400} from 'material-ui/styles/colors';
 
 function createMarkup(markup) { return {__html: markup}; };
 
@@ -16,6 +16,7 @@ const HeadlineItem = ({url, title, createdat, summary, publisherName}) => {
     border: `dotted 1px ${grey400}`,
     borderRadius: '0.4em'
   }}>
+    <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from RSS</span></div>
     <div className='large-12 medium-12 small-12 columns'>
       <a target='_blank' href={url}><span style={{fontSize: '1.1em'}}>{title}</span></a>
     </div>

@@ -300,7 +300,7 @@ class EmailPanel extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
   return {
     isReceiving: state.stagingReducer.isReceiving,
@@ -308,7 +308,8 @@ const mapStateToProps = state => {
     .map(pEmail => state.stagingReducer[pEmail.id])
     .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,
-    templates: templates
+    templates: templates,
+    selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id])
   };
 };
 
