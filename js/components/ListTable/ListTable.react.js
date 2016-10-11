@@ -10,11 +10,12 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
-import {blue200, grey500} from 'material-ui/styles/colors';
+import {blue200, grey500, grey400} from 'material-ui/styles/colors';
 import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
 import Draggable from 'react-draggable';
 
@@ -328,6 +329,42 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
+    if (this.props.listData && this.props.listData.name !== this.state.name) this.setState({name: this.props.listData.name});
+    
+    if (this.props.listData && this.state.columnWidths === null) {
+      const columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
+        const name = fieldObj.name;
+        const size = measureSpanSize(name, '16px Source Sans Pro')
+        return size.width > 60 ? size.width : 60;
+      });
+
+      if (this.props.contacts.length > 0 && !this.state.dragged) {
+        // optimize with immutablejs
+        this.props.fieldsmap.map((fieldObj, i) => {
+          let max = columnWidths[i];
+          this.props.contacts.map(contact => {
+            let content;
+            if (fieldObj.customfield) {
+              if (contact.customfields === null) return;
+              if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
+              content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+            } else {
+              content = contact[fieldObj.value];
+            }
+            const size = measureSpanSize(content, '16px Source Sans Pro')
+            if (size.width > max) max = size.width;
+          });
+          columnWidths[i] = max;
+        });
+       
+      }
+      this.setState({columnWidths}, _ => {
+        if (this._HeaderGrid && this._DataGrid) {
+          this._HeaderGrid.recomputeGridSize();
+          this._DataGrid.recomputeGridSize();
+        }
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -339,7 +376,6 @@ class ListTable extends Component {
         const size = measureSpanSize(name, '16px Source Sans Pro')
         return size.width > 60 ? size.width : 60;
       });
-      const dragPositions = Array(nextProps.listData.fieldsmap.length).fill({x: 0, y: 0});
       this.setState({columnWidths})
     }
 
@@ -447,13 +483,13 @@ class ListTable extends Component {
     }
 
     return (
-    <div
-    className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
-    key={key}
-    style={style}>
-    {contentBody}
-    </div>);
-  }
+      <div
+      className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
+      key={key}
+      style={style}>
+      {contentBody}
+      </div>);
+    }
 
   _fetchOperations() {
     const props = this.props;
@@ -509,8 +545,6 @@ class ListTable extends Component {
     });
   }
 
-
-
   _onExportClick() {
     if (this.props.contacts.length < this.props.listData.contacts.length) {
       this.props.fetchAllContacts(this.props.listId)
@@ -549,7 +583,7 @@ class ListTable extends Component {
             onClick={this.onExportClick}
             />
           </div>
-          <div className='large-6 columns vertical-center'>
+          <div className='large-5 columns vertical-center'>
             <TextField
             id='search-input'
             hintText='Search...'
@@ -560,6 +594,9 @@ class ListTable extends Component {
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+          </div>
+          <div className='large-1 columns'>
+            <FlatButton className='noprint' label='Edit' onClick={_ => props.router.push(`/lists/${props.listId}`)} labelStyle={{textTransform: 'none', color: grey400}} icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
           </div>
         </div>
         {state.isEmailPanelOpen &&
@@ -572,7 +609,7 @@ class ListTable extends Component {
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div style={{marginLeft: 20}}>
-          {props.listData && props.contacts.length > 0 && <ScrollSync>
+          {props.listData && props.contacts.length > 0 && state.columnWidths !== null && <ScrollSync>
            {
             ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
               <div style={{marginBottom: 10}}>
@@ -588,6 +625,7 @@ class ListTable extends Component {
                 rowCount={1}
                 rowHeight={30}
                 scrollLeft={scrollLeft}
+                overscanColumnCount={3}
                 />
               </div>
               <div>
@@ -598,6 +636,7 @@ class ListTable extends Component {
                 columnCount={props.fieldsmap.length}
                 columnWidth={({index}) => state.columnWidths[index] + 10}
                 overscanRowCount={20}
+                overscanColumnCount={3}
                 height={600}
                 width={TABLE_WIDTH}
                 rowCount={props.contacts.length}
