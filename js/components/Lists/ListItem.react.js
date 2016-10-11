@@ -38,13 +38,21 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
   const updatedDate = new Date(list.updated);
   return (
     <div key='parent' className='row align-middle' style={[styles.parent]}>
-      <div className='small-8 medium-7 large-8 columns' style={[styles.pointer]} onClick={_ => router.push(`/lists/${list.id}`)}>
+      <div className='small-8 medium-6 large-7 columns' style={[styles.pointer]} onClick={_ => router.push(`/lists/${list.id}`)}>
         <Link to={`/lists/${list.id}`}><span>{list.name}</span></Link>
       </div>
       <div className='small-4 medium-4 large-3 columns' onClick={_ => router.push(`/lists/${list.id}`)}>
         <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
       </div>
-      <div className='hide-for-small-only medium-1 large-1 columns'>
+      <div className='hide-for-small-only medium-2 large-2 columns'>
+       <IconButton
+        tooltip='Read Only'
+        iconStyle={styles.smallIcon}
+        style={styles.small}
+        iconClassName='fa fa-lock'
+        onClick={_ => router.push(`/tables/${list.id}`)}
+        tooltipPosition='top-left'
+        />
         <IconButton
         tooltip={tooltip}
         iconStyle={styles.smallIcon}
