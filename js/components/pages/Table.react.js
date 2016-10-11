@@ -266,7 +266,7 @@ class Table extends Component {
       // filter out for empty rows with only id
       if (!_.isEmpty(field)) {
         if (field.id) {
-          if (dirtyRows.some( rowId => rowId === field.id )) patchContactList.push(field);
+          if (dirtyRows.some(rowId => rowId === field.id)) patchContactList.push(field);
         } else {
           field.listid = props.listId;
           addContactList.push(field);
@@ -496,7 +496,7 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchList: listId => dispatch(actionCreators.fetchList(listId)),
     fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
-    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId))
+    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
   };
 };
 
