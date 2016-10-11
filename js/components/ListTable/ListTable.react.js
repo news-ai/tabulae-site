@@ -13,9 +13,10 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
-import {blue200, grey300} from 'material-ui/styles/colors';
+import {blue200, grey500} from 'material-ui/styles/colors';
 import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
 import Draggable from 'react-draggable';
+import Tooltip from '../Tooltip/Tooltip.react';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -463,13 +464,18 @@ class ListTable extends Component {
             onToggleTitleEdit={this.onToggleTitleEdit}
             isTitleEditing={state.isTitleEditing}
             />
-            <Checkbox
-            className='noprint'
-            checked={state.isEmailPanelOpen}
-            onCheck={(e, isEmailPanelOpen) => this.setState({isEmailPanelOpen})}
-            checkedIcon={<FontIcon className='fa fa-envelope' color={blue200}/>}
-            uncheckedIcon={<FontIcon className='fa fa-envelope' color={grey300} />}
-            />
+            <Tooltip label='Email'>
+            {({onMouseEnter, onMouseOut}) =>
+              <Checkbox
+              onMouseEnter={onMouseEnter}
+              onMouseOut={onMouseOut}
+              className='noprint'
+              checked={state.isEmailPanelOpen}
+              onCheck={(e, isEmailPanelOpen) => this.setState({isEmailPanelOpen})}
+              checkedIcon={<FontIcon className='fa fa-envelope' color={blue200}/>}
+              uncheckedIcon={<FontIcon className='fa fa-envelope' color={grey500} />}
+              />}
+            </Tooltip>
           </div>
           <div className='large-6 columns vertical-center'>
             <TextField
