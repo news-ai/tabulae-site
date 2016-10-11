@@ -308,7 +308,7 @@ class ListTable extends Component {
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
     this.onExportClick = this._onExportClick.bind(this);
-    this.onHeaderDrag = this._onHeaderDrag.bind(this);
+    this.onHeaderDragStart = this._onHeaderDragStart.bind(this);
     this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
     this.setDataGridRef = ref => {
       this._DataGrid = ref;
@@ -375,7 +375,7 @@ class ListTable extends Component {
     }
   }
 
-  _onHeaderDrag(e, {x, y}, columnIndex) {
+  _onHeaderDragStart(e, {x, y}, columnIndex) {
     let dragPositions = this.state.dragPositions.slice();
     dragPositions[columnIndex] = {x, y};
     this.setState({dragPositions});
@@ -399,10 +399,10 @@ class ListTable extends Component {
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.fieldsmap[columnIndex].name;
     return <div
-    className='cell'
+    className='headercell'
     key={key}
     style={style}>
-    <span>{content}</span>
+      <span>{content}</span>
       <Draggable
       axis='x'
       bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
