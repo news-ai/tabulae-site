@@ -94,10 +94,7 @@ export function deleteContact(contactId) {
   return dispatch => {
     dispatch({type: 'DELETE_CONTACT', contactId});
     return api.deleteRequest(`/contacts/${contactId}`)
-    .then(response => {
-      //console.log(response);
-      return dispatch({type: 'DELETED_CONTACT', contactId});
-    })
+    .then(response => dispatch({type: 'DELETED_CONTACT', contactId}))
     .catch(err => console.log(err));
   };
 }
@@ -162,13 +159,13 @@ export function loadAllContacts(listId) {
     for (let i = 0; i < (contacts.length / PAGE_LIMIT) + 1; i++) {
       promises.push(
         dispatch(fetchContactsPage(listId, PAGE_LIMIT, i * PAGE_LIMIT))
-      .then(_ => {
-        // poll how many received
-        const contactReducer = getState().contactReducer;
-        const count = contacts.filter(id => contactReducer[id]).length;
-        if (count < contacts.length) dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
-        else dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
-      })
+        .then(_ => {
+          // poll how many received
+          const contactReducer = getState().contactReducer;
+          const count = contacts.filter(id => contactReducer[id]).length;
+          if (count < contacts.length) dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+          else dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+        })
       );
     }
     dispatch({

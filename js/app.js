@@ -46,6 +46,7 @@ import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.rea
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable/ListTable.react';
+import UserProfile from './components/UserProfile/UserProfile.react';
 
 import intercomSetup from './chat';
 
@@ -95,6 +96,7 @@ ReactDOM.render(
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='archive' name='Archive' component={ArchiveContainer} />
+            <Route path='settings' name='Profile Settings' component={UserProfile} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />

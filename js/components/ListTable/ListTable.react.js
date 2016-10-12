@@ -21,7 +21,7 @@ import Draggable from 'react-draggable';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import ToggleableEditInput from '../ToggleableEditInput';
+import {ToggleableEditInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 
 import alertify from 'alertifyjs';
@@ -569,27 +569,29 @@ class ListTable extends Component {
     return (
       <div style={{marginTop: 30}}>
         <div className='row vertical-center' style={{margin: 15}}>
-          <div className='large-6 columns vertical-center'>
+          <div className='large-4 columns vertical-center'>
             <ToggleableEditInput
             name={state.name}
             onUpdateName={this.onUpdateName}
             onToggleTitleEdit={this.onToggleTitleEdit}
             isTitleEditing={state.isTitleEditing}
             />
-            <IconButton
-            tooltip='Email'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-envelope'
-            onClick={_ => this.setState({isEmailPanelOpen: true})}
-            disabled={state.isEmailPanelOpen}
-            />
-            <IconButton
-            tooltip='Export'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-download'
-            onClick={this.onExportClick}
-            />
           </div>
+           <div className='large-2 columns'>
+              <IconButton
+              tooltip='Email'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-envelope'
+              onClick={_ => this.setState({isEmailPanelOpen: true})}
+              disabled={state.isEmailPanelOpen}
+              />
+              <IconButton
+              tooltip='Export'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-download'
+              onClick={this.onExportClick}
+              />
+            </div>
           <div className='large-5 columns vertical-center'>
             <TextField
             id='search-input'

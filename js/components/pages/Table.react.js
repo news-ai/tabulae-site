@@ -18,7 +18,7 @@ import {grey400} from 'material-ui/styles/colors';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import ToggleableEditInput from '../ToggleableEditInput';
+import {ToggleableEditInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import HandsOnTablePrintable from '../pieces/HandsOnTablePrintable.react';
 
