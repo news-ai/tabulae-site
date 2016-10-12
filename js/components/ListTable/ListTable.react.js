@@ -109,6 +109,8 @@ function exportOperations(contacts, fieldsmap, name) {
 
 const TABLE_WIDTH = 1000;
 
+const localStorage = window.localStorage;
+
 class ListTable extends Component {
   constructor(props) {
     super(props);
@@ -128,6 +130,12 @@ class ListTable extends Component {
       onSort: false,
       sortedIds: [],
     };
+    this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
+    this.getColumnStorage = _ => {
+      const store = JSON.parse(localStorage.getItem(this.props.listId));
+      if (!store) return undefined;
+      else return store.columnWidths;
+    }
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
@@ -150,6 +158,10 @@ class ListTable extends Component {
   }
 
   componentWillMount() {
+    // get locally stored columnWidths
+    let columnWidths = this.getColumnStorage();
+    if (columnWidths) this.setState({columnWidths});
+
     if (this.props.searchQuery) {
       this.fetchOperations().
       then(_ => this.onSearchClick(this.props.searchQuery));
@@ -266,6 +278,7 @@ class ListTable extends Component {
       {columnWidths, dragPositions, dragged: true},
       _ => {
       if (this._HeaderGrid && this._DataGrid) {
+        this.setColumnStorage(columnWidths);
         this._HeaderGrid.recomputeGridSize();
         this._DataGrid.recomputeGridSize();
       }
