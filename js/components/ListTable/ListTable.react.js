@@ -372,28 +372,38 @@ class ListTable extends Component {
       .map((position, i) => i === columnIndex ? newDirection : position);
     const onSort = sortPositions.some(position => position === -1 || position === 1);
 
+    const _getter = (contact, fieldObj) => {
+      if (fieldObj.customfield) {
+        if (contact.customfields === null) return undefined;
+        else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
+        else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+      } else {
+        return contact[fieldObj.value];
+      }
+    }
+
     const contactIds = this.props.listData.contacts.slice();
     let filteredIds, emptyIds, sortedIds;
     if (onSort) {
       if (fieldObj.customfield) {
-
-
+        filteredIds = contactIds.filter(id => _getter(this.props.contactReducer[id], fieldObj));
+        emptyIds = contactIds.filter(id => !_getter(this.props.contactReducer[id], fieldObj));
       } else {
         filteredIds = contactIds.filter(id => this.props.contactReducer[id][fieldObj.value]);
         emptyIds = contactIds.filter(id => !this.props.contactReducer[id][fieldObj.value]);
-        filteredIds.sort((a, b) => {
-          let valA = this.props.contactReducer[a][fieldObj.value];
-          let valB = this.props.contactReducer[b][fieldObj.value];
-          if (typeof valA === 'string') {
-            valA = valA.toUpperCase();
-            valB = valB.toUpperCase();
-          }
-          if (valA < valB) return newDirection > 0 ? -1 : 1;
-          else if (valA > valB) return newDirection > 0 ? 1 : -1;
-          else return 0;
-        });
-        sortedIds = filteredIds.concat(emptyIds);
       }
+      filteredIds.sort((a, b) => {
+        let valA = _getter(this.props.contactReducer[a], fieldObj);
+        let valB = _getter(this.props.contactReducer[b], fieldObj);
+        if (typeof valA === 'string') {
+          valA = valA.toUpperCase();
+          valB = valB.toUpperCase();
+        }
+        if (valA < valB) return 0 - newDirection;
+        else if (valA > valB) return newDirection;
+        else return 0;
+      });
+      sortedIds = filteredIds.concat(emptyIds);
     }
     this.setState({sortPositions, onSort, sortedIds});
   }
