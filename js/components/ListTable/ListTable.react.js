@@ -51,180 +51,6 @@ const styles = {
   },
 };
 
-/*
-class ListTable extends Component {
-  constructor(props) {
-    super(props);
-    this.fetchOperations = this._fetchOperations.bind(this);
-    this.onSearchClick = this._onSearchClick.bind(this);
-    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
-    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
-    this.onCheck = this._onCheck.bind(this);
-    this.onSearchClearClick = this._onSearchClearClick.bind(this);
-    this.onSearchClick = this._onSearchClick.bind(this);
-    this.state = {
-      searchValue: null,
-      isSearchOn: false,
-      errorText: '',
-      searchContacts: [],
-      isTitleEditing: false,
-      name: null,
-      selected: []
-    };
-  }
-
-  componentWillMount() {
-    if (this.props.searchQuery) {
-      this.fetchOperations().
-      then(_ => this.onSearchClick(this.props.searchQuery));
-    } else {
-      this.fetchOperations();
-    }
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
-    if (nextProps.searchQuery !== this.props.searchQuery) {
-      if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
-    }
-  }
-
-  _fetchOperations() {
-    const props = this.props;
-    return props.fetchList(props.listId)
-    .then(_ => props.fetchContacts(props.listId));
-  }
-  
-  _onSearchClick(searchValue) {
-    const props = this.props;
-    if (searchValue !== this.state.searchValue) this.setState({searchValue});
-    props.searchListContacts(props.listId, searchValue)
-    .then(obj => {
-      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
-      let errorText = null;
-      if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({searchContacts, errorText, isSearchOn: true});
-    });
-  }
-
-  _onCheck(e, checked, contactId) {
-    const selected = checked ?
-    [...this.state.selected, contactId] :
-    this.state.selected.filter(id => id !== contactId);
-    this.setState({selected});
-  }
-
-  _onSearchClick(searchValue) {
-    const props = this.props;
-    if (searchValue !== this.state.searchValue) this.setState({searchValue});
-    props.searchListContacts(props.listId, searchValue)
-    .then(obj => {
-      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
-      let errorText = null;
-      if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({searchContacts, errorText, isSearchOn: true});
-    });
-  }
-
-  _onSearchClearClick() {
-    this.props.router.push(`/tables/${this.props.listId}`);
-    this.setState({
-      searchContacts: [],
-      searchValue: '',
-      errorText: null,
-      isSearchOn: false
-    });
-  }
-
-  render() {
-    const props = this.props;
-    const state = this.state;
-
-    const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
-    return (
-      <div style={{marginTop: 30}}>
-        <div className='vertical-center' style={{margin: 15}}>
-          <ToggleableEditInput
-          name={state.name}
-          onUpdateName={this.onUpdateName}
-          onToggleTitleEdit={this.onToggleTitleEdit}
-          isTitleEditing={state.isTitleEditing}
-          />
-          <div className='vertical-center'>
-            <TextField
-            id='search-input'
-            hintText='Search...'
-            value={state.searchValue}
-            onChange={e => this.setState({searchValue: e.target.value})}
-            onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
-            errorText={state.errorText}
-            />
-            <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-            <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-          </div>
-        </div>
-        <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        {props.listData && contacts && 
-          <AutoSizer disableHeight>
-          {({width}) => 
-          <Table
-            ref='Table'
-            headerClassName='headerColumn'
-            rowClassName={({index}) => {
-              if (index < 0) return 'headerRow';
-              return index % 2 === 0 ? 'evenRow' : 'oddRow';
-            }}
-            width={width}
-            height={600}
-            headerHeight={20}
-            rowHeight={30}
-            overscanRowCount={60}
-            rowCount={contacts.length}
-            rowGetter={({index}) => contacts[index]}
-            onScroll={({scrollTop, scrollHeight, clientHeight}) => {
-              if (((scrollHeight - scrollTop) / clientHeight) < 2) props.fetchContacts(props.listId);
-            }}
-            >
-              <Column
-              label='#'
-              cellDataGetter={({columnData, dataKey, rowData}) => rowData.index}
-              dataKey='index'
-              minWidth={10}
-              maxWidth={70}
-              />
-              <Column
-              label='Select'
-              cellRenderer={({cellData, rowData, rowIndex}) => <Checkbox onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)} />}
-              dataKey='select'
-              flexGrow={1}
-              minWidth={30}
-              maxWidth={90}
-              />
-              {props.listData.fieldsmap
-                //.filter((fieldObj, i) => !fieldObj.hidden)
-                .map((fieldObj, i) => <Column
-                  label={fieldObj.name}
-                  dataKey={fieldObj.value}
-                  width={300}
-                  columnData={fieldObj}
-                  key={i}
-                  />)}
-              <Column
-              label='Profile'
-              cellRenderer={({cellData, rowData, rowIndex}) => <Link to={`/lists/${props.listId}/${rowData.id}`}>Profile</Link>}
-              dataKey='index'
-              width={200}
-              />
-            </Table>}
-          </AutoSizer>}
-      </div>);
-  }
-}
-*/
-
 function measureSpanSize(txt, font) {
   const element = document.createElement('canvas');
   const context = element.getContext('2d');
@@ -298,6 +124,9 @@ class ListTable extends Component {
       dragPositions: [],
       dragged: false,
       isEmailPanelOpen: false,
+      sortPositions: null,
+      onSort: false,
+      contactIds: [],
     };
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -311,6 +140,7 @@ class ListTable extends Component {
     this.onExportClick = this._onExportClick.bind(this);
     this.onHeaderDragStart = this._onHeaderDragStart.bind(this);
     this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
+    this.onSort = this._onSort.bind(this);
     this.setDataGridRef = ref => {
       this._DataGrid = ref;
     };
@@ -330,6 +160,11 @@ class ListTable extends Component {
 
   componentDidMount() {
     if (this.props.listData && this.props.listData.name !== this.state.name) this.setState({name: this.props.listData.name});
+
+    if (this.props.listData && this.state.sortPositions === null) {
+      const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
+      this.setState({sortPositions});
+    }
     
     if (this.props.listData && this.state.columnWidths === null) {
       const columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
@@ -369,6 +204,11 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+
+    if (this.props.listData && this.state.sortPositions === null) {
+      const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
+      this.setState({sortPositions});
+    }
     
     if (nextProps.listData && this.state.columnWidths === null) {
       const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
@@ -434,11 +274,24 @@ class ListTable extends Component {
 
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.fieldsmap[columnIndex].name;
+    const sortDirection = this.state.sortPositions[columnIndex];
+
+    let directionIcon = 'fa fa-circle-o';
+    if (sortDirection === 1) {
+      directionIcon = 'fa fa-caret-up';
+    } else if (sortDirection === -1) {
+      directionIcon = 'fa fa-caret-down';
+    }
+
     return <div
     className='headercell'
     key={key}
     style={style}>
       <span>{content}</span>
+      {sortDirection !== 2 &&
+        <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
+        className={`${directionIcon} sort-icon`}
+        onClick={_ => this.onSort(columnIndex)} aria-hidden='true' />}
       <Draggable
       axis='x'
       bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
@@ -502,6 +355,33 @@ class ListTable extends Component {
     const props = this.props;
     return props.fetchList(props.listId)
     .then(_ => props.fetchContacts(props.listId));
+  }
+
+  _onSort(columnIndex) {
+    const sortDirection = this.state.sortPositions[columnIndex];
+    const fieldObj = this.props.fieldsmap[columnIndex];
+    let newDirection;
+    if (sortDirection === 0) {
+      newDirection = 1;
+    } else if (sortDirection === -1) {
+      newDirection = 0;
+    } else {
+      newDirection = -1;
+    }
+    const sortPositions = this.state.sortPositions
+      .map((position, i) => i === columnIndex ? newDirection : position);
+    const onSort = sortPositions.some(position => position === -1 || position === 1);
+    let contactIds = this.props.listData.contacts.slice();
+    if (onSort) {
+      contactId.sort((a, b) => {
+        if (fieldObj.customfield) {
+
+        } else {
+
+        }
+      });
+    }
+    this.setState({sortPositions, onSort});
   }
 
   _onCheck(e, checked, contactId) {
@@ -704,7 +584,9 @@ const mapStateToProps = (state, props) => {
     customfield: false,
     tableOnly: true
   },
-  ...listData.fieldsmap.filter(fieldObj => !fieldObj.hidden),
+  ...listData.fieldsmap
+  .filter(fieldObj => !fieldObj.hidden)
+  .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
   {
     customfield: false,
     name: 'Publication 1',
