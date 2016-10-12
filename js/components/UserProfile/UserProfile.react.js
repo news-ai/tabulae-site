@@ -59,7 +59,7 @@ class UserProfile extends Component {
           <h4>Settings</h4>
         </div>
         <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-5 columns'>
+          <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>First Name</span>
           </div>
           <div className='large-6 columns'>
@@ -67,7 +67,7 @@ class UserProfile extends Component {
           </div>
         </div>
         <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-5 columns'>
+          <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Last Name</span>
           </div>
           <div className='large-6 columns'>
@@ -75,7 +75,7 @@ class UserProfile extends Component {
           </div>
         </div>
         <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-5 columns'>
+          <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Email</span>
           </div>
           <div className='large-6 columns'>
@@ -83,10 +83,10 @@ class UserProfile extends Component {
           </div>
         </div>
         <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-5 columns'>
+          <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Instagram</span>
           </div>
-          <div className='large-6 columns'>
+          <div className='large-4 columns'>
             {person.instagramid.length === 0 ?
               <IconButton
               iconClassName='fa fa-instagram'
@@ -95,6 +95,9 @@ class UserProfile extends Component {
               onClick={_ => {window.location.href = 'https://tabulae.newsai.org/api/internal_auth/instagram';}}
               /> :
               <span style={{color: grey600}}>---  Filled  ---</span>}
+          </div>
+          <div className='large-4 columns'>
+            {person.instagramid.length === 0 && <span style={{color: grey600, fontSize: '0.8em'}}>To track Instagram feeds, you must authenticate with your Instagram account!</span>}
           </div>
         </div>
       </div>
