@@ -1,2 +1,3 @@
 import ToggleableEditInput from './ToggleableEditInput.react';
-export default ToggleableEditInput;
+import ToggleableEditInputHOC from './ToggleableEditInputHOC.react';
+export {ToggleableEditInput, ToggleableEditInputHOC};
