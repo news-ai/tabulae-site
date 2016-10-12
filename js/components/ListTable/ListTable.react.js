@@ -126,7 +126,7 @@ class ListTable extends Component {
       isEmailPanelOpen: false,
       sortPositions: null,
       onSort: false,
-      contactIds: [],
+      sortedIds: [],
     };
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -304,7 +304,7 @@ class ListTable extends Component {
 
   _cellRenderer({columnIndex, rowIndex, key, style}) {
     const fieldObj = this.props.fieldsmap[columnIndex];
-    const contacts = this.props.contacts;
+    const contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
 
     let content = '';
     if (fieldObj.customfield) {
@@ -363,25 +363,35 @@ class ListTable extends Component {
     let newDirection;
     if (sortDirection === 0) {
       newDirection = 1;
-    } else if (sortDirection === -1) {
-      newDirection = 0;
-    } else {
+    } else if (sortDirection === 1) {
       newDirection = -1;
+    } else {
+      newDirection = 0;
     }
     const sortPositions = this.state.sortPositions
       .map((position, i) => i === columnIndex ? newDirection : position);
     const onSort = sortPositions.some(position => position === -1 || position === 1);
-    let contactIds = this.props.listData.contacts.slice();
+
+    let sortedIds = this.props.listData.contacts.slice();
     if (onSort) {
-      contactId.sort((a, b) => {
+      sortedIds.sort((a, b) => {
         if (fieldObj.customfield) {
+          // TODO: SORT CUSTOMFIELD VALUES
 
         } else {
-
+          let valA = this.props.contactReducer[a][fieldObj.value];
+          let valB = this.props.contactReducer[b][fieldObj.value];
+          if (typeof valA === 'string') {
+            valA = valA.toUpperCase();
+            valB = valB.toUpperCase();
+          }
+          if (valA < valB) return newDirection ? -1 : 1;
+          else if (valA > valB) return newDirection ? 1 : -1;
+          else return 0;
         }
       });
     }
-    this.setState({sortPositions, onSort});
+    this.setState({sortPositions, onSort, sortedIds});
   }
 
   _onCheck(e, checked, contactId) {
@@ -555,7 +565,6 @@ const mapStateToProps = (state, props) => {
       listData.contacts.map((contactId, i) => {
         if (state.contactReducer[contactId]) {
           let contact = state.contactReducer[contactId];
-          contact.index = i;
           contacts.push(contact);
         }
       });
@@ -616,6 +625,7 @@ const mapStateToProps = (state, props) => {
     publicationReducer,
     person: state.personReducer.person,
     firstTimeUser: state.personReducer.firstTimeUser,
+    contactReducer: state.contactReducer
   };
 };
 
