@@ -25,7 +25,7 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
   const renderNode = isTitleEditing ? (
     <TextField
     className='u-full-width noprint'
-    style={{left: 0}}
+    style={{left: 0, float: 'left'}}
     id='toggle-text-field'
     type='text'
     name={name}
@@ -45,7 +45,7 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
       aria-hidden='true'></i>
     </div>
     );
-  return <div style={{display: 'flex'}}>{renderNode}</div>;
+  return <div>{renderNode}</div>;
 }
 
 ToggleableEditInput.PropTypes = {

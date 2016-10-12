@@ -13,6 +13,7 @@ export const onLogin = _ => loginActions.onLogin();
 export const fetchPerson = _ => loginActions.fetchPerson();
 export const setFirstTimeUser = _ => loginActions.setFirstTimeUser();
 export const fetchNotifications = _ => loginActions.fetchNotifications();
+export const patchPerson = person => loginActions.patchPerson(person);
 
 export const fetchLists = _ => listActions.fetchLists();
 export const fetchArchivedLists = _ => listActions.fetchArchivedLists();

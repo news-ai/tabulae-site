@@ -98,6 +98,16 @@ export function fetchPerson() {
     .catch( message => {
       if (window.isDev) console.log(message);
     });
-    // .catch( message => dispatch(loginFail(message)));
+  };
+}
+
+export function patchPerson(personBody) {
+  return dispatch => {
+    dispatch({type: 'PATCH_PERSON', personBody});
+    return api.patch(`/users/me`, personBody)
+    .then( response => dispatch(receiveLogin(response.data)))
+    .catch( message => {
+      if (window.isDev) console.log(message);
+    });
   };
 }

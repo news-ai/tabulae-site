@@ -4,6 +4,7 @@ import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInpu
 import {fromJS, is} from 'immutable';
 import {grey500, grey600} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
+import * as actionCreators from '../../actions/AppActions';
 
 function ControlledInput(props) {
   return (
@@ -38,59 +39,67 @@ class UserProfile extends Component {
   }
 
   componentWillUnmount() {
-    if (is(this.state.immuperson, this.state.newPerson)) {
-
+    if (!is(this.state.immuperson, this.state.newPerson)) {
+      const newPerson = this.state.newPerson;
+      const person = {
+        firstname: newPerson.get('firstname'),
+        lastname: newPerson.get('lastname'),
+        email: newPerson.get('email')
+      };
+      this.props.patchPerson(person);
     }
   }
 
   render() {
     const {person} = this.props;
-    console.log(is(this.state.immuperson, this.state.newPerson));
     return (
-    <div style={{margin: 40}}>
-      <div className='row'>
-        <h4>Settings</h4>
+    <div className='row horizontal-center' style={{marginTop: 40}}>
+      <div className='large-6 columns'>
+        <div className='row' style={{marginBottom: 20}}>
+          <h4>Settings</h4>
+        </div>
+        <div className='row vertical-center' style={inputHeight}>
+          <div className='large-4 medium-5 columns'>
+            <span style={spanStyle}>First Name</span>
+          </div>
+          <div className='large-6 columns'>
+            <ControlledInput name={person.firstname} onBlur={value => this.setNewPerson('firstname', value)} />
+          </div>
+        </div>
+        <div className='row vertical-center' style={inputHeight}>
+          <div className='large-4 medium-5 columns'>
+            <span style={spanStyle}>Last Name</span>
+          </div>
+          <div className='large-6 columns'>
+            <ControlledInput name={person.lastname} onBlur={value => this.setNewPerson('lastname', value)} />
+          </div>
+        </div>
+        <div className='row vertical-center' style={inputHeight}>
+          <div className='large-4 medium-5 columns'>
+            <span style={spanStyle}>Email</span>
+          </div>
+          <div className='large-6 columns'>
+            <ControlledInput name={person.email} onBlur={value => this.setNewPerson('email', value)} />
+          </div>
+        </div>
+        <div className='row vertical-center' style={inputHeight}>
+          <div className='large-4 medium-5 columns'>
+            <span style={spanStyle}>Instagram</span>
+          </div>
+          <div className='large-6 columns'>
+            {person.instagramid.length === 0 ?
+              <IconButton
+              iconClassName='fa fa-instagram'
+              iconStyle={{color: grey600}}
+              tooltip='Add'
+              onClick={_ => {window.location.href = 'https://tabulae.newsai.org/api/internal_auth/instagram';}}
+              /> :
+              <span style={{color: grey600}}>---  Filled  ---</span>}
+          </div>
+        </div>
       </div>
-      <div className='row vertical-center' style={inputHeight}>
-        <div className='large-2 columns'>
-          <span style={spanStyle}>First Name</span>
-        </div>
-        <div className='large-3 columns'>
-          <ControlledInput name={person.firstname} onBlur={value => this.setNewPerson('firstname', value)} />
-        </div>
-      </div>
-      <div className='row vertical-center' style={inputHeight}>
-        <div className='large-2 columns'>
-          <span style={spanStyle}>Last Name</span>
-        </div>
-        <div className='large-3 columns'>
-          <ControlledInput name={person.lastname} onBlur={value => this.setNewPerson('lastname', value)} />
-        </div>
-      </div>
-      <div className='row vertical-center' style={inputHeight}>
-        <div className='large-2 columns'>
-          <span style={spanStyle}>Email</span>
-        </div>
-        <div className='large-3 columns'>
-          <ControlledInput name={person.email} onBlur={value => this.setNewPerson('email', value)} />
-        </div>
-      </div>
-      <div className='row vertical-center' style={inputHeight}>
-        <div className='large-2 columns'>
-          <span style={spanStyle}>Instagram</span>
-        </div>
-        <div className='large-3 columns'>
-          {person.instagramid.length === 0 ?
-            <IconButton
-            iconClassName='fa fa-instagram'
-            iconStyle={{color: grey600}}
-            tooltip='Add'
-            onClick={_ => {window.location.href = 'https://tabulae.newsai.org/api/internal_auth/instagram';}}
-            /> :
-            <span>--- Filled ---</span>}
-        </div>
-      </div>
-    </div>);
+    </div>
+    );
   }
 }
 
@@ -101,7 +110,9 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  return {};
+  return {
+    patchPerson: body => dispatch(actionCreators.patchPerson(body))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

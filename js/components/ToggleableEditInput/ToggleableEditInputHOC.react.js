@@ -11,8 +11,10 @@ class ToggleableEditInputHOC extends Component {
     this.onUpdateName = e => this.setState({name: e.target.value});
   }
 
-  componentDidUpdate(nextProps, prevState) {
-    if (!prevState.isTitleEditing && this.state.isTitleEditing) this.props.onBlur(this.state.name);
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.isTitleEditing && !this.state.isTitleEditing) {
+      this.props.onBlur(this.state.name);
+    }
   }
 
   render() {
