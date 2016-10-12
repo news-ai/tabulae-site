@@ -55,7 +55,7 @@ class FeedsController extends Component {
         </Dialog>
         <div className='row' style={{marginTop: 15, marginBottom: 15}}>
           <div className='large-10 medium-8 small-12 columns'>
-            <span>Currently Attached Feeds:</span>
+            <span>Currently Attached Feeds</span>
             {props.feeds && props.feeds.map((feed, i) => <Chip
               style={{margin: 4}}
               key={i}
