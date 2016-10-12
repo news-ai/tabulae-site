@@ -1,5 +1,5 @@
 import React from 'react';
-import {grey700} from 'material-ui/styles/colors';
+import {grey700, grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import alertify from 'alertifyjs';
 import isURL from 'validator/lib/isURL';
@@ -16,19 +16,23 @@ const styles = {
     height: 36,
     padding: 2,
   },
+  iconStyle: {
+    marginRight: 15,
+    color: grey800
+  }
 };
 
 const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className, iconClassName}) => {
   const icon = content && isURL(content) && !isEmail(content) ? <a
   href={content.substring(0, 4) === 'http' ? content : `https://${content}`}
-  style={{color: 'black'}}
+  style={styles.iconStyle}
   target='_blank'>
-  <i style={{marginRight: 8}} className={iconClassName} aria-hidden='hidden' />
-  </a> : <i style={{marginRight: 8}} className={iconClassName} aria-hidden='hidden' />;
+  <i className={iconClassName} aria-hidden='hidden' />
+  </a> : <i style={styles.iconStyle} className={iconClassName} aria-hidden='hidden' />;
   return (
     <div className={className} style={{display: 'flex', alignItems: 'center'}}>
       {iconClassName && icon}
-      {showTitle && <span style={{marginRight: 10}}>{contentTitle}</span>}
+      {showTitle && <span style={styles.iconStyle}>{contentTitle}</span>}
       <span style={{color: content ? 'black' : grey700}}>{content ? content : `---- ${contentTitle} empty ----`}</span>
       <IconButton
       style={{marginLeft: 3}}

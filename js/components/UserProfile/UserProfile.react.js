@@ -44,7 +44,6 @@ class UserProfile extends Component {
       const person = {
         firstname: newPerson.get('firstname'),
         lastname: newPerson.get('lastname'),
-        email: newPerson.get('email')
       };
       this.props.patchPerson(person);
     }
@@ -79,7 +78,7 @@ class UserProfile extends Component {
             <span style={spanStyle}>Email</span>
           </div>
           <div className='large-6 columns'>
-            <ControlledInput name={person.email} onBlur={value => this.setNewPerson('email', value)} />
+            <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>{person.email}</span>
           </div>
         </div>
         <div className='row vertical-center' style={inputHeight}>
