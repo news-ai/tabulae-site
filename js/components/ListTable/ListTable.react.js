@@ -372,24 +372,28 @@ class ListTable extends Component {
       .map((position, i) => i === columnIndex ? newDirection : position);
     const onSort = sortPositions.some(position => position === -1 || position === 1);
 
-    let sortedIds = this.props.listData.contacts.slice();
+    const contactIds = this.props.listData.contacts.slice();
+    let filteredIds, emptyIds, sortedIds;
     if (onSort) {
-      sortedIds.sort((a, b) => {
-        if (fieldObj.customfield) {
-          // TODO: SORT CUSTOMFIELD VALUES
+      if (fieldObj.customfield) {
 
-        } else {
+
+      } else {
+        filteredIds = contactIds.filter(id => this.props.contactReducer[id][fieldObj.value]);
+        emptyIds = contactIds.filter(id => !this.props.contactReducer[id][fieldObj.value]);
+        filteredIds.sort((a, b) => {
           let valA = this.props.contactReducer[a][fieldObj.value];
           let valB = this.props.contactReducer[b][fieldObj.value];
           if (typeof valA === 'string') {
             valA = valA.toUpperCase();
             valB = valB.toUpperCase();
           }
-          if (valA < valB) return newDirection ? -1 : 1;
-          else if (valA > valB) return newDirection ? 1 : -1;
+          if (valA < valB) return newDirection > 0 ? -1 : 1;
+          else if (valA > valB) return newDirection > 0 ? 1 : -1;
           else return 0;
-        }
-      });
+        });
+        sortedIds = filteredIds.concat(emptyIds);
+      }
     }
     this.setState({sortPositions, onSort, sortedIds});
   }
