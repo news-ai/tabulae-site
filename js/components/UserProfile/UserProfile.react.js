@@ -103,8 +103,8 @@ class UserProfile extends Component {
             {person.instagramid.length === 0 && <span style={{color: grey600, fontSize: '0.8em'}}>To track Instagram feeds, you must authenticate with your Instagram account!</span>}
           </div>
         </div>
-        <div className='vertical-center horizontal-center' style={{height: 400}}>
-          <Invite /> 
+        <div className='vertical-center horizontal-center' style={{height: 300}}>
+          <Invite />
         </div>
       </div>
     </div>

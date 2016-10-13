@@ -14,6 +14,7 @@ class Invite extends Component {
     super(props);
     this.state = {
       errorText: null,
+      value: ''
     };
   }
 
@@ -24,7 +25,11 @@ class Invite extends Component {
       <div>
         <div className='row'>
           <div className='large-12 columns'>
-            <TextField ref='invite' errorText={state.errorText} hintText='Email' floatingLabelText='Email' />
+            <TextField
+            value={state.value}
+            onChange={e => this.setState({value: e.target.value})}
+            errorText={state.errorText}
+            hintText='Email' floatingLabelText='Email' />
           </div>
         </div>
         <div className='row'>
@@ -32,15 +37,15 @@ class Invite extends Component {
             <RaisedButton
             label='Invite a friend to the Beta'
             onClick={_ => {
-              const email = this.refs.invite.input.value;
+              const email = state.value;
               let errorText = null;
               if (isEmail(email)) {
                 props.onInvite(email).then(res => {
-                  if (res) alertify.success(`Whee, invite is sent to ${email}.`);
+                  if (res) alertify.success(`Whee, invite sent to ${email}.`);
                   else alertify.error('Oops, something weird happened. Try again later.');
                 });
               } else errorText = 'Not an Email';
-              this.setState({errorText});
+              this.setState({errorText, value: ''});
             }}
             primary
             />
