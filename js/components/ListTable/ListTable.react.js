@@ -126,7 +126,7 @@ class ListTable extends Component {
       dragPositions: [],
       dragged: false,
       isEmailPanelOpen: false,
-      sortPositions: null,
+      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
       onSort: false,
       sortedIds: [],
     };
