@@ -5,6 +5,7 @@ import Tweet from '../Tweets/Tweet.react';
 import HeadlineItem from '../Headlines/HeadlineItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
 import InstagramItem from '../Instagram/InstagramItem.react';
+import FlatButton from 'material-ui/FlatButton';
 
 const styleEmptyRow = {
   padding: 10,
@@ -43,6 +44,7 @@ class MixedFeed extends Component {
             && <div className='row' style={styleEmptyRow}><p>No RSS/Tweets attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
           {props.didInvalidate
             && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+          {props.offset !== null && <div className='horizontal-center'><FlatButton label='Load more' onClick={_ => this.props.fetchMixedFeed(this.props.contactId)} /></div>}
         </InfiniteScroll>
       );
   }
@@ -54,7 +56,8 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
-    didInvalidate: state.mixedReducer.didInvalidate
+    didInvalidate: state.mixedReducer.didInvalidate,
+    offset: state.mixedReducer[contactId] && state.mixedReducer[contactId].offset
   };
 };
 

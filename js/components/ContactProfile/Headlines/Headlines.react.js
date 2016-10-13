@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import HeadlineItem from './HeadlineItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
 import * as headlineActions from './actions';
+import FlatButton from 'material-ui/FlatButton';
 
 const styleEmptyRow = {
   padding: 10,
@@ -30,6 +31,7 @@ class Headlines extends Component {
             && <div className='row' style={styleEmptyRow}><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
           {props.didInvalidate
             && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+          {props.offset !== null && <div className='horizontal-center'><FlatButton label='Load more' onClick={_ => this.props.fetchMixedFeed(this.props.contactId)} /></div>}
         </InfiniteScroll>
       );
   }
@@ -44,7 +46,8 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     headlines,
-    didInvalidate: state.headlineReducer.didInvalidate
+    didInvalidate: state.headlineReducer.didInvalidate,
+    offset: state.headlineReducer[contactId] && state.headlineReducer[contactId].offset
   };
 };
 

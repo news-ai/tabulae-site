@@ -2,8 +2,11 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
 import {fromJS, is} from 'immutable';
+
 import {grey500, grey600} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
+import Invite from './Invite.react';
+
 import * as actionCreators from '../../actions/AppActions';
 
 function ControlledInput(props) {
@@ -34,7 +37,7 @@ class UserProfile extends Component {
     this.setNewPerson = (key, value) => this.setState({newPerson: this.state.newPerson.set(key, value)});
     this.state = {
       immuperson: fromJS(this.props.person),
-      newPerson: fromJS(this.props.person)
+      newPerson: fromJS(this.props.person),
     };
   }
 
@@ -51,8 +54,9 @@ class UserProfile extends Component {
 
   render() {
     const {person} = this.props;
+    const state = this.state;
     return (
-    <div className='row horizontal-center' style={{marginTop: 40}}>
+    <div className='row horizontal-center' style={{marginTop: 60}}>
       <div className='large-6 columns'>
         <div className='row' style={{marginBottom: 20}}>
           <h4>Settings</h4>
@@ -95,9 +99,12 @@ class UserProfile extends Component {
               /> :
               <span style={{color: grey600}}>---  Filled  ---</span>}
           </div>
-          <div className='large-4 columns'>
+          <div className='large-4 small-12 columns'>
             {person.instagramid.length === 0 && <span style={{color: grey600, fontSize: '0.8em'}}>To track Instagram feeds, you must authenticate with your Instagram account!</span>}
           </div>
+        </div>
+        <div className='vertical-center horizontal-center' style={{height: 300}}>
+          <Invite />
         </div>
       </div>
     </div>
@@ -113,7 +120,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchPerson: body => dispatch(actionCreators.patchPerson(body))
+    patchPerson: body => dispatch(actionCreators.patchPerson(body)),
   };
 };
 
