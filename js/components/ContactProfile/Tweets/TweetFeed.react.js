@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import * as tweetActions from './actions';
 import Tweet from './Tweet.react';
 import InfiniteScroll from '../../InfiniteScroll';
+import FlatButton from 'material-ui/FlatButton';
 
 const styleEmptyRow = {
   padding: 10,
@@ -30,6 +31,7 @@ class TweetFeed extends Component {
             && <div className='row' style={styleEmptyRow}><p>No Tweets attached. Try filling in Twitter field with a handle to start seeing tweets.</p></div>}
           {props.didInvalidate
             && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+          {props.offset !== null && <div className='horizontal-center'><FlatButton label='Load more' onClick={_ => this.props.fetchContactTweets(this.props.contactId)} /></div>}
         </InfiniteScroll>
       );
   }
@@ -45,7 +47,8 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     tweets,
-    didInvalidate: state.tweetReducer.didInvalidate
+    didInvalidate: state.tweetReducer.didInvalidate,
+    offset: state.tweetReducer[contactId] && state.tweetReducer[contactId].offset
   };
 };
 
