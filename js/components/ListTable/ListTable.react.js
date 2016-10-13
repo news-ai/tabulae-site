@@ -340,7 +340,9 @@ class ListTable extends Component {
           contentBody = <Checkbox
           iconStyle={{fill: checked ? blue200 : grey400}}
           checked={checked}
-          onCheck={(e, checked) => this.onCheck(e, checked, rowData.id)}
+          onCheck={(e, checked) => {
+            this.onCheck(e, checked, rowData.id);
+          }}
           />
           break;
         case 'profile':
@@ -441,9 +443,11 @@ class ListTable extends Component {
   }
 
   _onCheck(e, checked, contactId) {
+    e.preventDefault();
     const selected = checked ?
     [...this.state.selected, contactId] :
     this.state.selected.filter(id => id !== contactId);
+
     this.setState({selected});
   }
 
