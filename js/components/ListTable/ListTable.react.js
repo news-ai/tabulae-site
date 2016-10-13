@@ -107,7 +107,7 @@ function exportOperations(contacts, fieldsmap, name) {
   link.click();
 }
 
-const TABLE_WIDTH = 1000;
+const TABLE_WIDTH = 1200;
 
 const localStorage = window.localStorage;
 
