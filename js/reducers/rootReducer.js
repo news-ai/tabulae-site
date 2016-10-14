@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import {combineReducers} from 'redux';
 
 import personReducer from '../components/Login/reducer';
 import contactReducer from './contactReducer';
@@ -13,7 +13,7 @@ import feedReducer from '../components/ContactProfile/reducer';
 import headlineReducer from '../components/ContactProfile/Headlines/reducer';
 import mixedReducer from '../components/ContactProfile/MixedFeed/reducer';
 import tweetReducer from '../components/ContactProfile/Tweets/reducer';
-
+import listfeedReducer from '../components/ListFeed/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -28,7 +28,8 @@ const rootReducer = combineReducers({
   headlineReducer,
   headerReducer,
   mixedReducer,
-  tweetReducer
+  tweetReducer,
+  listfeedReducer,
 });
 
 export default rootReducer;

@@ -1,8 +1,5 @@
 import {mixedConstant} from './constants';
 import * as api from '../../../actions/api';
-import {normalize, Schema, arrayOf} from 'normalizr';
-const feedSchema = new Schema('feeds');
-const tweetSchema = new Schema('tweets');
 
 export function fetchMixedFeed(contactId) {
   const PAGE_LIMIT = 20;

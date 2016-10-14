@@ -45,8 +45,9 @@ import {EmailAnalytics} from './components/Email';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
-import ListTable from './components/ListTable/ListTable.react';
-import UserProfile from './components/UserProfile/UserProfile.react';
+import ListTable from './components/ListTable';
+import UserProfile from './components/UserProfile';
+import ListFeed from './components/ListFeed';
 
 import intercomSetup from './chat';
 
@@ -95,6 +96,7 @@ ReactDOM.render(
               <IndexRoute component={OnboardingListTable}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
+            <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
