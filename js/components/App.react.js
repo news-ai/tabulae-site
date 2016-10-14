@@ -15,21 +15,13 @@ import {grey700, grey500} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
-const verticalCenter = {
-  display: 'flex',
-  alignItems: 'center',
-  textAlign: 'center'
-};
-
 const navStyle = {
   position: 'fixed',
   backgroundColor: 'white',
   // border: '1px dotted black',
   boxShadow: '0px 0px 5px 3px rgba(0, 0, 0, 0.1)',
   top: 0,
-  display: 'flex',
-  alignItems: 'center',
-  padding: '5px',
+  padding: 5,
   zIndex: 300
 };
 
@@ -97,7 +89,7 @@ class App extends Component {
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/settings')} rightIcon={<i className='fa fa-cogs' aria-hidden='true' />}>Settings</MenuItem>
         </Drawer>
-       <div className='u-full-width row noprint' style={navStyle}>
+        <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-8 medium-3 large-1 columns vertical-center'>
             <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
@@ -113,15 +105,15 @@ class App extends Component {
               />
             </div>
           </div>
-          <div className='hide-for-small-only medium-3 large-3 columns' style={verticalCenter}>
+          <div className='hide-for-small-only medium-3 large-3 columns vertical-center horizontal-center'>
             <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey500}} onClick={this.toggleModal} />
             <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
           </div>
-          <div className='small-4 medium-2 large-2 columns' style={verticalCenter}>
+          <div className='small-4 medium-2 large-2 columns vertical-center horizontal-center'>
             <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
           </div>
-          </div>
-        <div style={{height: '60px'}}></div>
+        </div>
+        <div style={{height: 60}}></div>
         <Dialog
         title='How-to Videos'
         modal={false}

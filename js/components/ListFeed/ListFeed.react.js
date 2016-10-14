@@ -10,7 +10,6 @@ import {List, CellMeasurer} from 'react-virtualized';
 class ListFeed extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
   }
 
@@ -36,32 +35,45 @@ class ListFeed extends Component {
     }
     return (
       <div key={key} style={style}>
-      {row}
+        {row}
       </div>);
   }
 
   render() {
     const props = this.props;
+    const state = this.state;
+    const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+    const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    console.log(screenHeight);
     return (
       <div>
-      {props.listfeed &&
-        <CellMeasurer
-        cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
-        columnCount={1}
-        >
-        {({getRowHeight}) => (
-          <List
-          width={1200}
-          height={600}
+        <div className='row' style={{marginTop: 20}}>
+          <h4>List Feed</h4>
+        </div>
+        <div className='row'>
+        {props.listfeed &&
+          <CellMeasurer
+          cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
+          columnCount={1}
           rowCount={props.listfeed.length}
-          rowRenderer={this.rowRenderer}
-          rowHeight={getRowHeight}
-          onScroll={({scrollHeight, scrollTop, clientHeight}) => {
-            if (((scrollHeight - scrollTop) / clientHeight) < 2) props.fetchListFeed(props.listId);
-          }}
-          />
-          )}
-        </CellMeasurer>}
+          >
+          {({getRowHeight}) => (
+            <List
+            width={screenWidth - 100}
+            height={screenHeight - 150}
+            rowCount={props.listfeed.length}
+            rowRenderer={this.rowRenderer}
+            rowHeight={args => {
+              if (props.listfeed[args.index].type === 'instagrams') return 700;
+              return getRowHeight(args);
+            }}
+            onScroll={({scrollHeight, scrollTop, clientHeight}) => {
+              if (((scrollHeight - scrollTop) / clientHeight) < 2) props.fetchListFeed(props.listId);
+            }}
+            />
+            )}
+          </CellMeasurer>}
+        </div>
       </div>);
   }
 }
