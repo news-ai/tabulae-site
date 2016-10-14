@@ -8,7 +8,7 @@ import HeadlineItem from '../ContactProfile/Headlines/HeadlineItem.react';
 import Tweet from '../ContactProfile/Tweets/Tweet.react';
 import InstagramItem from '../ContactProfile/Instagram/InstagramItem.react';
 import InfiniteScroll from '../InfiniteScroll';
-import {List, CellMeasurer} from 'react-virtualized';
+import {List, CellMeasurer, WindowScroller} from 'react-virtualized';
 
 import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
@@ -78,27 +78,35 @@ class ListFeed extends Component {
         }
         <div className='row'>
         {props.listfeed && props.listfeed.length > 0 &&
-          <CellMeasurer
-          cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
-          columnCount={1}
-          rowCount={props.listfeed.length}
-          >
-          {({getRowHeight}) => (
-            <List
-            width={screenWidth - 100}
-            height={screenHeight - 150}
+          <WindowScroller>
+          {({height, scrollTop}) => (
+            <CellMeasurer
+            cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
+            columnCount={1}
             rowCount={props.listfeed.length}
-            rowRenderer={this.rowRenderer}
-            rowHeight={args => {
-              if (props.listfeed[args.index].type === 'instagrams') return 850;
-              return getRowHeight(args);
-            }}
-            onScroll={({scrollHeight, scrollTop, clientHeight}) => {
-              if (((scrollHeight - scrollTop) / clientHeight) < 2) props.fetchListFeed(props.listId);
-            }}
-            />
+            >
+            {({getRowHeight}) => (
+              <List
+              width={screenWidth - 100}
+              autoHeight
+              height={height}
+              scrollTop={scrollTop}
+              rowCount={props.listfeed.length}
+              rowRenderer={this.rowRenderer}
+              overscanRowCount={10}
+              rowHeight={args => {
+                if (props.listfeed[args.index].type === 'instagrams') return 850;
+                return getRowHeight(args);
+              }}
+              onScroll={(args) => {
+                if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchListFeed(props.listId);
+              }}
+              />
+              )}
+            </CellMeasurer>
             )}
-          </CellMeasurer>}
+          </WindowScroller>
+        }
         </div>
       </div>);
   }
