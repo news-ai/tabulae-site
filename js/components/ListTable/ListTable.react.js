@@ -345,6 +345,7 @@ class ListTable extends Component {
             const lastRowIndexChecked = this.state.lastRowIndexChecked;
             if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
               let selected = this.state.selected.slice();
+              let last = null;
               if (rowIndex < lastRowIndexChecked) {
                 for (let i = rowIndex; i < lastRowIndexChecked; i++) {
                   const checked = this.state.selected.some(id => id === contacts[i].id);
@@ -356,7 +357,7 @@ class ListTable extends Component {
                   selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
                 }
               }
-              this.setState({lastRowIndexChecked: null, selected});
+              this.setState({lastRowIndexChecked: rowIndex, selected});
             } else {
               this.onCheck(rowData.id);
               this.setState({lastRowIndexChecked: rowIndex});
