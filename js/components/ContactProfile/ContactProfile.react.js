@@ -82,7 +82,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
                 patchContact(contact.id, {customfields});
               }}
               />);
-          }) : <span>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
+          }) : <span style={{fontSize: '0.9em', color: grey700}}>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
         </div>
       </div>
     </div>);

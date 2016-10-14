@@ -5,6 +5,7 @@ import {fromJS, is} from 'immutable';
 
 import {grey500, grey600} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Invite from './Invite.react';
 
 import * as actionCreators from '../../actions/AppActions';
@@ -23,7 +24,7 @@ function ControlledInput(props) {
 }
 
 const inputHeight = {
-  height: 50
+  height: 60
 };
 
 const spanStyle = {
@@ -57,15 +58,15 @@ class UserProfile extends Component {
     const state = this.state;
     return (
     <div className='row horizontal-center' style={{marginTop: 60}}>
-      <div className='large-6 columns'>
-        <div className='row' style={{marginBottom: 20}}>
+      <div className='large-6 medium-8 small-12 columns'>
+        <div className='row' style={{marginBottom: 10}}>
           <h4>Settings</h4>
         </div>
         <div className='row vertical-center' style={inputHeight}>
           <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>First Name</span>
           </div>
-          <div className='large-6 columns'>
+          <div className='large-6 medium-8 columns'>
             <ControlledInput name={person.firstname} onBlur={value => this.setNewPerson('firstname', value)} />
           </div>
         </div>
@@ -73,7 +74,7 @@ class UserProfile extends Component {
           <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Last Name</span>
           </div>
-          <div className='large-6 columns'>
+          <div className='large-6 medium-8 columns'>
             <ControlledInput name={person.lastname} onBlur={value => this.setNewPerson('lastname', value)} />
           </div>
         </div>
@@ -81,7 +82,7 @@ class UserProfile extends Component {
           <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Email</span>
           </div>
-          <div className='large-6 columns'>
+          <div className='large-6 medium-8 columns'>
             <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>{person.email}</span>
           </div>
         </div>
@@ -89,7 +90,7 @@ class UserProfile extends Component {
           <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Instagram</span>
           </div>
-          <div className='large-4 columns'>
+          <div className='large-4 medium-8 columns'>
             {person.instagramid.length === 0 ?
               <IconButton
               iconClassName='fa fa-instagram'
@@ -103,7 +104,22 @@ class UserProfile extends Component {
             {person.instagramid.length === 0 && <span style={{color: grey600, fontSize: '0.8em'}}>To track Instagram feeds, you must authenticate with your Instagram account!</span>}
           </div>
         </div>
-        <div className='vertical-center horizontal-center' style={{height: 300}}>
+        <div className='row vertical-center' style={inputHeight}>
+          <div className='large-4 medium-4 columns'>
+            <span style={spanStyle}>Password</span>
+          </div>
+          <div className='large-6 medium-8 columns'>
+            {person.googleid > 0 ?
+              <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>Logged in with Google</span> :
+              <RaisedButton
+              label='Change Password' labelStyle={{textTransform: 'none'}}
+              onClick={_ => {
+                window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword';
+              }}
+              />}
+          </div>
+        </div>
+        <div className='vertical-center horizontal-center' style={{height: 250}}>
           <Invite />
         </div>
       </div>

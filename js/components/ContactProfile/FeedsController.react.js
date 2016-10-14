@@ -53,9 +53,9 @@ class FeedsController extends Component {
           </div>
           <span style={{fontSize: '0.9em'}}>* feeds will begin aggregating in a few minutes</span>
         </Dialog>
-        <div className='row' style={{marginTop: 15, marginBottom: 15}}>
+        <div className='row' style={{marginTop: 10, marginBottom: 10}}>
           <div className='large-10 medium-8 small-12 columns'>
-            <span>Currently Attached Feeds</span>
+            <span style={{marginBottom: 10}}>Currently Attached Feeds</span>
             {props.feeds && props.feeds.map((feed, i) => <Chip
               style={{margin: 4}}
               key={i}
