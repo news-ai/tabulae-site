@@ -5,17 +5,20 @@ import {grey400} from 'material-ui/styles/colors';
 
 function createMarkup(markup) { return {__html: markup}; };
 
-const HeadlineItem = ({url, title, createdat, summary, publisherName}) => {
+const defaultStyle = {
+  paddingTop: 10,
+  paddingBottom: 10,
+  marginTop: 10,
+  marginBottom: 10,
+  border: `dotted 1px ${grey400}`,
+  borderRadius: '0.4em'
+};
+
+const HeadlineItem = ({style, url, title, createdat, summary, publisherName}) => {
   const date = new Date(createdat);
+  const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
   return (
-  <div className='row' style={{
-    paddingTop: 10,
-    paddingBottom: 10,
-    marginTop: 10,
-    marginBottom: 10,
-    border: `dotted 1px ${grey400}`,
-    borderRadius: '0.4em'
-  }}>
+  <div className='row' style={containerStyle}>
     <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from RSS</span></div>
     <div className='large-12 medium-12 small-12 columns'>
       <a target='_blank' href={url}><span style={{fontSize: '1.1em'}}>{title}</span></a>
