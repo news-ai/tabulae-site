@@ -129,6 +129,7 @@ class ListTable extends Component {
       sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
       onSort: false,
       sortedIds: [],
+      lastRowIndexChecked: null
     };
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
     this.getColumnStorage = _ => {
@@ -271,7 +272,7 @@ class ListTable extends Component {
 
   _onHeaderDragStop(e, {x, y}, columnIndex) {
     let columnWidths = this.state.columnWidths.slice();
-    columnWidths[columnIndex] += x;
+    columnWidths[columnIndex] += x
     let dragPositions = this.state.dragPositions.slice();
     dragPositions[columnIndex] = {x: 0, y: 0};
     this.setState(
@@ -336,12 +337,30 @@ class ListTable extends Component {
           contentBody = <span>{rowIndex + 1}</span>;
           break;
         case 'selected':
-          const checked = this.state.selected.some(id => id === rowData.id);
+          const isChecked = this.state.selected.some(id => id === rowData.id);
           contentBody = <Checkbox
-          iconStyle={{fill: checked ? blue200 : grey400}}
-          checked={checked}
+          iconStyle={{fill: isChecked ? blue200 : grey400}}
+          checked={isChecked}
           onCheck={(e, checked) => {
-            this.onCheck(e, checked, rowData.id);
+            const lastRowIndexChecked = this.state.lastRowIndexChecked;
+            if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
+              let selected = this.state.selected.slice();
+              if (rowIndex < lastRowIndexChecked) {
+                for (let i = rowIndex; i < lastRowIndexChecked; i++) {
+                  const checked = this.state.selected.some(id => id === contacts[i].id);
+                  selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+                }
+              } else {
+                for (let i = rowIndex; i > lastRowIndexChecked; i--) {
+                  const checked = this.state.selected.some(id => id === contacts[i].id);
+                  selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+                }
+              }
+              this.setState({lastRowIndexChecked: null, selected});
+            } else {
+              this.onCheck(rowData.id);
+              this.setState({lastRowIndexChecked: rowIndex});
+            }
           }}
           />
           break;
@@ -423,13 +442,14 @@ class ListTable extends Component {
     this.setState({sortPositions, onSort, sortedIds});
   }
 
-  _onCheck(e, checked, contactId) {
-    const selected = checked ?
+  _onCheck(contactId) {
+    const checked = this.state.selected.some(id => id === contactId);
+    const selected = !checked ?
     [...this.state.selected, contactId] :
     this.state.selected.filter(id => id !== contactId);
     this.setState({selected});
   }
-  
+
   _onSearchClick(searchValue) {
     const props = this.props;
     if (searchValue !== this.state.searchValue) this.setState({searchValue});
@@ -440,15 +460,6 @@ class ListTable extends Component {
       if (searchContacts.length === 0) errorText = 'No such term.'
       this.setState({searchContacts, errorText, isSearchOn: true});
     });
-  }
-
-  _onCheck(e, checked, contactId) {
-    e.preventDefault();
-    const selected = checked ?
-    [...this.state.selected, contactId] :
-    this.state.selected.filter(id => id !== contactId);
-
-    this.setState({selected});
   }
 
   _onSearchClick(searchValue) {
