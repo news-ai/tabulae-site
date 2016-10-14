@@ -107,8 +107,6 @@ function exportOperations(contacts, fieldsmap, name) {
   link.click();
 }
 
-const TABLE_WIDTH = 1200;
-
 const localStorage = window.localStorage;
 
 class ListTable extends Component {
@@ -129,8 +127,15 @@ class ListTable extends Component {
       sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
       onSort: false,
       sortedIds: [],
-      lastRowIndexChecked: null
+      lastRowIndexChecked: null,
+      screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
     };
+    window.onresize = _ => {
+      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+      const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      this.setState({screenWidth, screenHeight});
+    }
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
     this.getColumnStorage = _ => {
       const store = JSON.parse(localStorage.getItem(this.props.listId));
@@ -550,7 +555,7 @@ class ListTable extends Component {
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        <div style={{marginLeft: 20}}>
+        <div>
           {props.listData && props.contacts.length > 0 && state.columnWidths !== null && <ScrollSync>
            {
             ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
@@ -563,7 +568,7 @@ class ListTable extends Component {
                 columnWidth={({index}) => state.columnWidths[index] + 10}
                 height={30}
                 autoContainerWidth
-                width={TABLE_WIDTH}
+                width={state.screenWidth}
                 rowCount={1}
                 rowHeight={30}
                 scrollLeft={scrollLeft}
@@ -580,7 +585,7 @@ class ListTable extends Component {
                 overscanRowCount={20}
                 overscanColumnCount={3}
                 height={600}
-                width={TABLE_WIDTH}
+                width={state.screenWidth}
                 rowCount={props.contacts.length}
                 rowHeight={30}
                 onScroll={args => {
