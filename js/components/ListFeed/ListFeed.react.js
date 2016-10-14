@@ -8,7 +8,7 @@ import HeadlineItem from '../ContactProfile/Headlines/HeadlineItem.react';
 import Tweet from '../ContactProfile/Tweets/Tweet.react';
 import InstagramItem from '../ContactProfile/Instagram/InstagramItem.react';
 import InfiniteScroll from '../InfiniteScroll';
-import {List, CellMeasurer} from 'react-virtualized';
+import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
 
 import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
@@ -18,6 +18,15 @@ class ListFeed extends Component {
   constructor(props) {
     super(props);
     this.rowRenderer = this._rowRenderer.bind(this);
+    this.state = {
+      screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    }
+    window.onresize = _ => {
+      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+      const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      this.setState({screenWidth, screenHeight});
+    }
   }
 
   componentWillMount() {
@@ -41,8 +50,10 @@ class ListFeed extends Component {
       default:
         row = <HeadlineItem {...feedItem} />;
     }
+    let newStyle = style;
+    if (newStyle) newStyle.padding = '0 15px';
     return (
-      <div key={key} style={style}>
+      <div key={key} style={newStyle}>
         {row}
       </div>);
   }
@@ -50,8 +61,6 @@ class ListFeed extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-    const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
     return (
       <div>
         <div className='row' style={{marginTop: 20}}>
@@ -78,27 +87,30 @@ class ListFeed extends Component {
         }
         <div className='row'>
         {props.listfeed && props.listfeed.length > 0 &&
-          <CellMeasurer
-          cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
-          columnCount={1}
-          rowCount={props.listfeed.length}
-          >
-          {({getRowHeight}) => (
-            <List
-            width={screenWidth - 100}
-            height={screenHeight - 150}
+          <WindowScroller>
+          {({height, scrollTop}) => (
+            <CellMeasurer
+            cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
+            columnCount={1}
             rowCount={props.listfeed.length}
-            rowRenderer={this.rowRenderer}
-            rowHeight={args => {
-              if (props.listfeed[args.index].type === 'instagrams') return 850;
-              return getRowHeight(args);
-            }}
-            onScroll={({scrollHeight, scrollTop, clientHeight}) => {
-              if (((scrollHeight - scrollTop) / clientHeight) < 2) props.fetchListFeed(props.listId);
-            }}
-            />
-            )}
-          </CellMeasurer>}
+            >
+            {({getRowHeight}) => (
+              <List
+              width={state.screenWidth}
+              autoHeight
+              height={height}
+              scrollTop={scrollTop}
+              rowCount={props.listfeed.length}
+              rowRenderer={this.rowRenderer}
+              overscanRowCount={10}
+              rowHeight={args => (props.listfeed[args.index].type === 'instagrams') ? 850 : getRowHeight(args)}
+              onScroll={(args) => {
+                if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchListFeed(props.listId);
+              }}
+              />
+              )}
+            </CellMeasurer>)}
+          </WindowScroller>}
         </div>
       </div>);
   }

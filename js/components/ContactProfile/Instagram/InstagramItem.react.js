@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import {grey400, grey50} from 'material-ui/styles/colors';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
-const tweetStyle = {
+const defaultStyle = {
   paddingTop: 10,
   paddingBottom: 10,
   marginTop: 10,
@@ -17,10 +17,11 @@ const imgContainerStyle = {
   backgroundColor: grey50,
 };
 
-const InstagramItem = ({text, createdat, instagramcomments, instagramid, instagramlikes, instagramimage, instagramlink, instagramusername, instagramvideo}) => {
+const InstagramItem = ({style, text, createdat, instagramcomments, instagramid, instagramlikes, instagramimage, instagramlink, instagramusername, instagramvideo}) => {
+  const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
   const date = new Date(createdat);
   return (
-    <div className='row' style={tweetStyle}>
+    <div className='row' style={containerStyle}>
       <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from Instagram</span></div>
       <div className='large-12 medium-2 small-12 columns'>
         <a target='_blank' style={{float: 'left'}} href={instagramlink}>{text ? text : instagramlink}</a>
