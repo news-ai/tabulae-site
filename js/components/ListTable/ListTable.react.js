@@ -107,6 +107,16 @@ function exportOperations(contacts, fieldsmap, name) {
   link.click();
 }
 
+function _getter(contact, fieldObj) {
+  if (fieldObj.customfield) {
+    if (contact.customfields === null) return undefined;
+    else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
+    else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+  } else {
+    return contact[fieldObj.value];
+  }
+}
+
 const localStorage = window.localStorage;
 
 class ListTable extends Component {
@@ -248,6 +258,8 @@ class ListTable extends Component {
             if (contact.customfields === null) return;
             if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
             content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+          } else if (fieldObj.tableOnly) {
+            return;
           } else {
             content = contact[fieldObj.value];
           }
@@ -323,7 +335,7 @@ class ListTable extends Component {
 
   _cellRenderer({columnIndex, rowIndex, key, style}) {
     const fieldObj = this.props.fieldsmap[columnIndex];
-    const contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
+    let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
 
     let content = '';
     if (fieldObj.customfield) {
@@ -412,17 +424,8 @@ class ListTable extends Component {
       .map((position, i) => i === columnIndex ? newDirection : position);
     const onSort = sortPositions.some(position => position === -1 || position === 1);
 
-    const _getter = (contact, fieldObj) => {
-      if (fieldObj.customfield) {
-        if (contact.customfields === null) return undefined;
-        else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-        else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
-      } else {
-        return contact[fieldObj.value];
-      }
-    }
 
-    const contactIds = this.props.listData.contacts.slice();
+    const contactIds = this.props.received.slice();
     let filteredIds, emptyIds, sortedIds;
     if (onSort) {
       if (fieldObj.customfield) {
@@ -461,10 +464,13 @@ class ListTable extends Component {
     if (searchValue !== this.state.searchValue) this.setState({searchValue});
     props.searchListContacts(props.listId, searchValue)
     .then(obj => {
-      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
-      let errorText = null;
-      if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({searchContacts, errorText, isSearchOn: true});
+      // const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
+      // let errorText = null;
+      // if (searchContacts.length === 0) errorText = 'No such term.'
+      this.setState({
+        // searchContacts,
+        // errorText,
+        isSearchOn: true});
     });
   }
 
@@ -483,7 +489,6 @@ class ListTable extends Component {
   _onSearchClearClick() {
     this.props.router.push(`/tables/${this.props.listId}`);
     this.setState({
-      searchContacts: [],
       searchValue: '',
       errorText: null,
       isSearchOn: false
@@ -502,8 +507,9 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    console.log(props.received);
+    console.log(props.contacts);
 
-    const contacts = state.isSearchOn ? state.searchContacts : props.contacts;
     return (
       <div style={{marginTop: 30}}>
         <div className='row vertical-center' style={{margin: 15}}>
@@ -556,7 +562,7 @@ class ListTable extends Component {
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div>
-          {props.listData && props.contacts.length > 0 && state.columnWidths !== null && <ScrollSync>
+          {props.listData && props.received.length > 0 && state.columnWidths !== null && <ScrollSync>
            {
             ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
               <div style={{marginBottom: 10}}>
@@ -586,7 +592,7 @@ class ListTable extends Component {
                 overscanColumnCount={3}
                 height={600}
                 width={state.screenWidth}
-                rowCount={props.contacts.length}
+                rowCount={props.received.length}
                 rowHeight={30}
                 onScroll={args => {
                   if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
@@ -605,19 +611,26 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
-  let contacts = [];
+  const searchQuery = props.location.query.search;
 
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
+  let received = [];
+  let contacts = [];
   if (listData) {
-    if (!_.isEmpty(listData.contacts)) {
+    if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
+      received = listData.searchResults;
+      contacts = received.map(id => state.contactReducer[id]);
+    } else if (!_.isEmpty(listData.contacts)) {
       listData.contacts.map((contactId, i) => {
         if (state.contactReducer[contactId]) {
           let contact = state.contactReducer[contactId];
           contacts.push(contact);
+          received.push(contactId);
         }
       });
     }
   }
+
 
   const fieldsmap = listData ? [
   {
@@ -658,9 +671,9 @@ const mapStateToProps = (state, props) => {
   }
   ] : null;
 
-  const searchQuery = props.location.query.search;
 
   return {
+    received,
     searchQuery,
     listId: listId,
     listIsReceiving: state.listReducer.isReceiving,
@@ -669,11 +682,10 @@ const mapStateToProps = (state, props) => {
     contacts: contacts,
     name: listData ? listData.name : null,
     contactIsReceiving: state.contactReducer.isReceiving,
-    pubMapByName: publicationReducer,
     publicationReducer,
     person: state.personReducer.person,
     firstTimeUser: state.personReducer.firstTimeUser,
-    contactReducer: state.contactReducer
+    contactReducer: state.contactReducer,
   };
 };
 
@@ -689,7 +701,8 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchList: listId => dispatch(actionCreators.fetchList(listId)),
     fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
-    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId))
+    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
+    clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId})
   };
 };
 
