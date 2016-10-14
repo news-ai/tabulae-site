@@ -63,9 +63,21 @@ class ListFeed extends Component {
           onClick={_ => props.router.push(`/tables/${props.listId}`)}
           labelStyle={{textTransform: 'none', color: grey400}}
           icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
+          <FlatButton
+          className='noprint'
+          label='Edit Table'
+          style={{marginLeft: 20}}
+          onClick={_ => props.router.push(`/lists/${props.listId}`)}
+          labelStyle={{textTransform: 'none', color: grey400}}
+          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
         </div>
+        {props.listfeed && props.listfeed.length === 0 &&
+          <div className='row horizontal-center vertical-center' style={{height: 400}}>
+            <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
+          </div>
+        }
         <div className='row'>
-        {props.listfeed &&
+        {props.listfeed && props.listfeed.length > 0 &&
           <CellMeasurer
           cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
           columnCount={1}
