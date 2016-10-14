@@ -223,12 +223,20 @@ export function searchListContacts(listId, query) {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
       });
-      dispatch({
-        type: LIST_CONTACTS_SEARCH_RECEIVED,
-        ids: res.result.data,
-        listId,
-        query});
-      return dispatch(receiveContacts(res.entities.contacts, res.result.data));
+      const ids = res.result.data;
+      const contacts = res.entities.contacts;
+      ids.map(id => {
+        if (contacts[id].customfields && contacts[id].customfields !== null) {
+          contacts[id].customfields.map(field => {
+            contacts[id][field.name] = field.value;
+          });
+        }
+      });
+      const publicationReducer = getState().publicationReducer;
+      const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
+      dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, contactsWithEmployers, listId});
+      dispatch(receiveContacts(res.entities.contacts, res.result.data));
+      return {searchContactMap: contactsWithEmployers, ids};
     })
     .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
   };

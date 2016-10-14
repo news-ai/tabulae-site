@@ -507,8 +507,6 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.received);
-    console.log(props.contacts);
 
     return (
       <div style={{marginTop: 30}}>
