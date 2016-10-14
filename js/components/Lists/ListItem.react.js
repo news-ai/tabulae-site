@@ -46,6 +46,14 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
       </div>
       <div className='hide-for-small-only medium-2 large-2 columns'>
        <IconButton
+        tooltip='List Feed'
+        iconStyle={styles.smallIcon}
+        style={styles.small}
+        iconClassName='fa fa-list'
+        onClick={_ => router.push(`/listfeeds/${list.id}`)}
+        tooltipPosition='top-left'
+        />
+       <IconButton
         tooltip='Read Only'
         iconStyle={styles.smallIcon}
         style={styles.small}

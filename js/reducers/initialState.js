@@ -67,6 +67,11 @@ export const initialState = {
     didInvalidate: false,
     received: [],
   },
+  listfeedReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
   tweetReducer: {
     isReceiving: false,
     didInvalidate: false,
