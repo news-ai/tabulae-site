@@ -10,6 +10,7 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 
+
 class CopyOrMoveTo extends Component {
   constructor(props) {
     super(props);
@@ -47,7 +48,7 @@ class CopyOrMoveTo extends Component {
           <div className='row'>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '20px 0'}}>
               <span style={{fontWeight: 'bold', marginRight: 8}}>Selected</span>
-              {props.selectedContacts && props.selectedContacts.length === 0 && <span>None selected</span>}
+              {props.selected.length === 0 && <span>none selected</span>}
               {props.selectedContacts &&
                 <span>{props.selectedContacts
                 .map(contact => contact.firstname)
@@ -64,10 +65,11 @@ class CopyOrMoveTo extends Component {
                 onValueClick={({value}) => props.router.push(`/tables/${value}`)}
                 />}
             </div>
-            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{margin: '10px 0'}}>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 80}}>
               <RaisedButton
               label='Submit'
               primary
+              disabled={!props.selectedContacts || state.value.length === 0}
               icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
               onClick={this.onSubmit} />
             </div>
@@ -95,6 +97,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchLists: _ => dispatch(actionCreators.fetchLists()),
     addContactsThenPatchList: (rawContacts, list) => {
+      if (rawContacts.length === 0) return;
       const contacts = rawContacts.map(contact => {
         let obj = {listid: list.id};
         list.fieldsmap
