@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
@@ -23,6 +23,7 @@ import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ToggleableEditInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
+import CopyOrMoveTo from './CopyOrMoveTo.react';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -511,7 +512,7 @@ class ListTable extends Component {
     return (
       <div style={{marginTop: 30}}>
         <div className='row vertical-center' style={{margin: 15}}>
-          <div className='large-4 columns vertical-center'>
+          <div className='large-3 columns vertical-center'>
             <ToggleableEditInput
             name={state.name}
             onUpdateName={this.onUpdateName}
@@ -519,7 +520,7 @@ class ListTable extends Component {
             isTitleEditing={state.isTitleEditing}
             />
           </div>
-           <div className='large-2 columns'>
+           <div className='large-3 columns vertical-center'>
               <IconButton
               tooltip='Email'
               tooltipPosition='top-left'
@@ -533,6 +534,18 @@ class ListTable extends Component {
               iconClassName='fa fa-download'
               onClick={this.onExportClick}
               />
+              <CopyOrMoveTo
+              selected={state.selected}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Copy/Move to Another'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-copy'
+                onClick={onRequestOpen}
+                />
+                )}
+              </CopyOrMoveTo>
+              
             </div>
           <div className='large-5 columns vertical-center'>
             <TextField
@@ -550,6 +563,7 @@ class ListTable extends Component {
             <FlatButton className='noprint' label='Edit' onClick={_ => props.router.push(`/lists/${props.listId}`)} labelStyle={{textTransform: 'none', color: grey400}} icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
           </div>
         </div>
+
         {state.isEmailPanelOpen &&
           <EmailPanel
           person={props.person}
