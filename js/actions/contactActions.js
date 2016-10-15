@@ -279,7 +279,7 @@ export function addContacts(contactList) {
       dispatch(receiveContacts(res.entities.contacts, res.result.data));
       return response.data;
     })
-    .catch( message => console.log(message));
+    .catch(message => dispatch({type: 'ADDING_CONTACT_FAIL', message}));
   };
 }
 
