@@ -180,10 +180,10 @@ class ListTable extends Component {
     if (columnWidths) this.setState({columnWidths});
 
     if (this.props.searchQuery) {
-      this.fetchOperations().
-      then(_ => this.onSearchClick(this.props.searchQuery));
+      this.fetchOperations(this.props)
+      .then(_ => this.onSearchClick(this.props.searchQuery));
     } else {
-      this.fetchOperations();
+      this.fetchOperations(this.props);
     }
   }
 
@@ -232,6 +232,19 @@ class ListTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.listId !== this.props.listId) {
+      // essentially reload
+      let columnWidths = this.getColumnStorage();
+      if (columnWidths) this.setState({columnWidths});
+
+      if (nextProps.searchQuery) {
+        this.fetchOperations(nextProps).
+        then(_ => this.onSearchClick(nextProps.searchQuery));
+      } else {
+        this.fetchOperations(nextProps);
+      }
+    }
+
     if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
 
     if (this.props.listData && this.state.sortPositions === null) {
@@ -404,8 +417,7 @@ class ListTable extends Component {
       </div>);
     }
 
-  _fetchOperations() {
-    const props = this.props;
+  _fetchOperations(props) {
     return props.fetchList(props.listId)
     .then(_ => props.fetchContacts(props.listId));
   }

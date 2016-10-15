@@ -4,9 +4,11 @@ import Select from 'react-select';
 import * as actionCreators from '../../actions/AppActions';
 import * as feedActions from '../ContactProfile/actions';
 import isEmpty from 'lodash/isEmpty';
+import withRouter from 'react-router/lib/withRouter';
 
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
+import FontIcon from 'material-ui/FontIcon';
 
 class CopyOrMoveTo extends Component {
   constructor(props) {
@@ -36,23 +38,39 @@ class CopyOrMoveTo extends Component {
     return (
       <div>
         <Dialog
-        title='Copy or Move to Another Table'
+        title='Copy to Another Table'
         open={state.open}
         modal={false}
         autoScrollBodyContent
         onRequestClose={_ => this.setState({open: false})}
         >
-          <div style={{height: 500}}>
-            <p>{props.selectedContacts && props.selectedContacts.map((contact, i) => <span key={i}>{contact.firstname}</span>)}</p>
-            <p>Select the List(s) to Copy these selected contacts to:</p>
-            {props.lists &&
-              <Select
-              multi
-              value={state.value}
-              options={props.options}
-              onChange={value => this.setState({value})}
-              />}
-            <RaisedButton label='Submit' onClick={this.onSubmit} />
+          <div className='row'>
+            <div className='large-12 medium-12 small-12 columns' style={{margin: '20px 0'}}>
+              <span style={{fontWeight: 'bold', marginRight: 8}}>Selected</span>
+              {props.selectedContacts && props.selectedContacts.length === 0 && <span>None selected</span>}
+              {props.selectedContacts &&
+                <span>{props.selectedContacts
+                .map(contact => contact.firstname)
+                .join(', ')}</span>}
+            </div>
+            <div className='large-12 medium-12 small-12 columns' style={{margin: '20px 0'}}>
+              <p>Select the List(s) to Copy these selected contacts to:</p>
+              {props.lists &&
+                <Select
+                multi
+                value={state.value}
+                options={props.options}
+                onChange={value => this.setState({value})}
+                onValueClick={({value}) => props.router.push(`/tables/${value}`)}
+                />}
+            </div>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{margin: '10px 0'}}>
+              <RaisedButton
+              label='Submit'
+              primary
+              icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
+              onClick={this.onSubmit} />
+            </div>
           </div>
         </Dialog>
         {props.children({
@@ -68,7 +86,8 @@ const mapStateToProps = (state, props) => {
     lists,
     options: lists.map(list => ({label: list.name, value: list.id})),
     selectedContacts: props.selected && props.selected.length > 0 && props.selected.map(id => state.contactReducer[id]),
-    listReducer: state.listReducer
+    listReducer: state.listReducer,
+    isReceiving: state.contactReducer.isReceiving
   };
 };
 
@@ -106,4 +125,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CopyOrMoveTo);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CopyOrMoveTo));
