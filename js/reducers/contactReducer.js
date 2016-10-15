@@ -1,6 +1,9 @@
 import {
   ADDING_CONTACT,
-  contactConstant
+  contactConstant,
+  LIST_CONTACTS_SEARCH_REQUEST,
+  LIST_CONTACTS_SEARCH_RECEIVED,
+  LIST_CONTACTS_SEARCH_FAIL
 } from '../constants/AppConstants';
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
@@ -9,7 +12,10 @@ import _ from 'lodash';
 
 const types = _.values(contactConstant);
 types.push(
-  ADDING_CONTACT
+  ADDING_CONTACT,
+  LIST_CONTACTS_SEARCH_REQUEST,
+  LIST_CONTACTS_SEARCH_RECEIVED,
+  LIST_CONTACTS_SEARCH_FAIL,
   );
 
 function contactReducer(state = initialState.contactReducer, action) {
@@ -44,7 +50,7 @@ function contactReducer(state = initialState.contactReducer, action) {
       obj = assignToEmpty(state, action.contacts);
       obj.received = state.received.concat(action.ids.filter(id => !state[id]));
       obj.isReceiving = false;
-      action.ids.map( id => {
+      action.ids.map(id => {
         if (obj[id].customfields && obj[id].customfields !== null) {
           obj[id].customfields.map( field => {
             obj[id][field.name] = field.value;

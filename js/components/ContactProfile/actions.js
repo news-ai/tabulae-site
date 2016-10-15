@@ -25,27 +25,6 @@ export function deleteFeed(feedId) {
   };
 }
 
-
-export function fetchMixedFeed(contactId) {
-  return dispatch => {
-    dispatch({type: feedConstant.REQUEST_MULTIPLE, contactId});
-    return api.get(`/contacts/${contactId}/feed`)
-    .then(response => {
-      console.log(response);
-      // const res = normalize(response, {
-      //   data: arrayOf(feedSchema),
-      // });
-      // return dispatch({
-      //   type: feedConstant.RECEIVE_MULTIPLE,
-      //   feeds: res.entities.feeds,
-      //   ids: res.result.data,
-      //   contactId
-      // });
-    })
-    .catch(err => console.log(err));
-  };
-}
-
 export function fetchContactFeeds(contactId) {
   return dispatch => {
     dispatch({type: feedConstant.REQUEST_MULTIPLE, contactId});
@@ -60,6 +39,22 @@ export function fetchContactFeeds(contactId) {
         ids: res.result.data,
         contactId
       });
+    })
+    .catch(err => console.log(err));
+  };
+}
+
+export function copyFeeds(oldContactId, newContactId, listid) {
+  return (dispatch, getState) => {
+    dispatch({type: 'COPY_FEED'});
+    return api.get(`/contacts/${oldContactId}/feeds`)
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(feedSchema),
+      });
+      const feeds = res.entities.feeds;
+      const ids = res.result.data;
+      ids.map(id => dispatch(addFeed(newContactId, listid, feeds[id].url)));
     })
     .catch(err => console.log(err));
   };

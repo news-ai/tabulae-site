@@ -14,17 +14,19 @@ import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
 import {grey400} from 'material-ui/styles/colors';
 
+const FEED_PADDING = 20;
+
 class ListFeed extends Component {
   constructor(props) {
     super(props);
     this.rowRenderer = this._rowRenderer.bind(this);
     this.state = {
-      screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
+      screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING,
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
     }
     window.onresize = _ => {
-      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-      const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING;
+      const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
       this.setState({screenWidth, screenHeight});
     }
   }
@@ -85,7 +87,7 @@ class ListFeed extends Component {
             <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
           </div>
         }
-        <div className='row'>
+        <div className='row horizontal-center' style={{padding: `0 ${FEED_PADDING/2}px`}}>
         {props.listfeed && props.listfeed.length > 0 &&
           <WindowScroller>
           {({height, scrollTop}) => (

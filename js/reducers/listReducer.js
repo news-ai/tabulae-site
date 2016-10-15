@@ -1,7 +1,8 @@
 import {
   listConstant,
   LIST_CONTACTS_SEARCH_REQUEST,
-  LIST_CONTACTS_SEARCH_RECEIVED
+  LIST_CONTACTS_SEARCH_RECEIVED,
+  LIST_CONTACTS_SEARCH_FAIL,
 } from '../constants/AppConstants';
 
 import { assignToEmpty } from '../utils/assign';
@@ -12,7 +13,8 @@ import _ from 'lodash';
 const types = _.values(listConstant);
 types.push(
   LIST_CONTACTS_SEARCH_RECEIVED,
-  LIST_CONTACTS_SEARCH_REQUEST
+  LIST_CONTACTS_SEARCH_REQUEST,
+  'CLEAR_LIST_SEARCH'
   );
 
 function listReducer(state = initialState.listReducer, action) {
@@ -28,11 +30,13 @@ function listReducer(state = initialState.listReducer, action) {
       return obj;
     case LIST_CONTACTS_SEARCH_REQUEST:
       obj.isReceiving = true;
-      obj[action.listId].searchResults = [];
       return obj;
     case LIST_CONTACTS_SEARCH_RECEIVED:
+      obj[action.listId] = assignToEmpty(state[action.listId], {searchResults: action.ids});
       obj.isReceiving = false;
-      obj[action.listId].searchResults = action.ids;
+      return obj;
+    case 'CLEAR_LIST_SEARCH':
+      obj[action.listId].searchResults = undefined;
       return obj;
     case listConstant.MANUALLY_SET_ISRECEIVING_ON:
       obj.isReceiving = true;
