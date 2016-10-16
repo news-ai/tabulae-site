@@ -295,6 +295,10 @@ class ListTable extends Component {
     }
   }
 
+  componentWillUnmount() {
+    window.onresize = undefined;
+  }
+
   _onHeaderDragStart(e, {x, y}, columnIndex) {
     let dragPositions = this.state.dragPositions.slice();
     dragPositions[columnIndex] = {x, y};

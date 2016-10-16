@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import {grey400, grey50} from 'material-ui/styles/colors';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
+import FontIcon from 'material-ui/FontIcon';
 const defaultStyle = {
   paddingTop: 10,
   paddingBottom: 10,
@@ -11,15 +12,29 @@ const defaultStyle = {
   borderRadius: '0.4em'
 };
 
-const imgContainerStyle = {
+let imgContainerStyle = {
   marginBottom: 20,
   marginTop: 20,
   backgroundColor: grey50,
 };
 
-const InstagramItem = ({style, text, createdat, instagramcomments, instagramid, instagramlikes, instagramimage, instagramlink, instagramusername, instagramvideo}) => {
+const InstagramItem = ({
+  style,
+  text,
+  createdat,
+  instagramcomments,
+  instagramid,
+  instagramheight,
+  instagramwidth,
+  instagramlikes,
+  instagramimage,
+  instagramlink,
+  instagramusername,
+  instagramvideo
+}) => {
   const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
   const date = new Date(createdat);
+  imgContainerStyle.height = instagramheight;
   return (
     <div className='row' style={containerStyle}>
       <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from Instagram</span></div>
@@ -42,12 +57,12 @@ const InstagramItem = ({style, text, createdat, instagramcomments, instagramid, 
       </div>}
       <div className='large-12 medium-12 small-12 columns vertical-center horizontal-center' style={{marginTop: 10, marginBottom: 10}}>
         <Chip style={{margin: 5, float: 'right'}}>
-          <Avatar size={30}>{instagramlikes}</Avatar>
-          Likes
+          <Avatar size={30} icon={<FontIcon className='fa fa-heart' />} />
+          {instagramlikes}
         </Chip>
         <Chip style={{margin: 5, float: 'right'}}>
-          <Avatar size={30}>{instagramcomments}</Avatar>
-          Comments
+          <Avatar size={30} icon={<FontIcon className='fa fa-comment' />} />
+          {instagramcomments}
         </Chip>
       </div>
     </div>);

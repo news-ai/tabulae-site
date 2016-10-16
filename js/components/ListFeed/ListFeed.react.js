@@ -105,7 +105,7 @@ class ListFeed extends Component {
               rowCount={props.listfeed.length}
               rowRenderer={this.rowRenderer}
               overscanRowCount={10}
-              rowHeight={args => (props.listfeed[args.index].type === 'instagrams') ? 850 : getRowHeight(args)}
+              rowHeight={getRowHeight}
               onScroll={(args) => {
                 if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchListFeed(props.listId);
               }}
