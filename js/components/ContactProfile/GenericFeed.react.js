@@ -22,12 +22,7 @@ class GenericFeed extends Component {
     this.props.fetchFeed();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.containerWidth !== this.props.containerWidth) {
-      if (this._GenericFeed) this._GenericFeed.recomputeRowHeights();
-    }
-  }
-
+  
   render() {
     const props = this.props;
     const renderNode = (
@@ -46,7 +41,7 @@ class GenericFeed extends Component {
             >
             {({getRowHeight}) => (
               <List
-              ref={ref => this.setRef(ref)}
+              ref={ref => props.setRef(ref)}
               width={props.containerWidth}
               height={height}
               scrollTop={scrollTop}

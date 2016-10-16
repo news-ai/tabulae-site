@@ -10,7 +10,16 @@ class MixedFeed extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.setRef = ref => {
+      this._mixedList = ref;
+    };
     this.rowRenderer = this._rowRenderer.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.containerWidth !== this.props.containerWidth) {
+      if (this._mixedList) this._mixedList.recomputeRowHeights();
+    }
   }
 
   _rowRenderer({key, index, style}) {

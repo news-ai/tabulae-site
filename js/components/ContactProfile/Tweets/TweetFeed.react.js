@@ -8,6 +8,15 @@ class TweetFeed extends Component {
   constructor(props) {
     super(props);
     this.rowRenderer = this._rowRenderer.bind(this);
+    this.setRef = ref => {
+      this._tweetList = ref;
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.containerWidth !== this.props.containerWidth) {
+      if (this._tweetList) this._tweetList.recomputeRowHeights();
+    }
   }
 
   _rowRenderer({key, index, style}) {

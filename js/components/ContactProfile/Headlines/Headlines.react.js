@@ -8,6 +8,15 @@ class Headlines extends Component {
   constructor(props) {
     super(props);
     this.rowRenderer = this._rowRenderer.bind(this);
+    this.setRef = ref => {
+      this._headlineList = ref;
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.containerWidth !== this.props.containerWidth) {
+      if (this._headlineList) this._headlineList.recomputeRowHeights();
+    }
   }
 
   _rowRenderer({key, index, style}) {
