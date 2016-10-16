@@ -31,14 +31,15 @@ const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className
   </a> : <i style={styles.iconStyle} className={iconClassName} aria-hidden='hidden' />;
 
   return (
-    <div className={`${className} vertical-center`} style={{height: 40}}>
+    <div className={`${className} vertical-center`} style={{height: 35}}>
       {iconClassName && icon}
       {showTitle && <span style={styles.iconStyle}>{contentTitle}</span>}
       {errorText !== null && <span style={{fontSize: '0.7em', color: red600}}>{errorText}</span>}
       <span style={{
         color: content ? 'black' : grey700,
         marginLeft: 10,
-        marginRight: 10
+        marginRight: 10,
+        fontSize: '0.9em'
       }}>{content ? content : `---- ${contentTitle} empty ----`}</span>
       <IconButton
       iconStyle={styles.smallIcon}
