@@ -3,50 +3,60 @@ import {connect} from 'react-redux';
 import * as mixedFeedActions from './actions';
 import Tweet from '../Tweets/Tweet.react';
 import HeadlineItem from '../Headlines/HeadlineItem.react';
-import InfiniteScroll from '../../InfiniteScroll';
 import InstagramItem from '../Instagram/InstagramItem.react';
-import FlatButton from 'material-ui/FlatButton';
-
-const styleEmptyRow = {
-  padding: 10,
-  marginTop: 20,
-  marginBottom: 50,
-};
+import GenericFeed from '../GenericFeed.react';
 
 class MixedFeed extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
+    this.setRef = ref => {
+      this._mixedList = ref;
+    };
+    this.rowRenderer = this._rowRenderer.bind(this);
   }
 
-  componentWillMount() {
-    this.props.fetchMixedFeed(this.props.contactId);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.containerWidth !== this.props.containerWidth) {
+      if (this._mixedList) {
+        this._mixedList.recomputeRowHeights(0);
+      }
+    }
+  }
+
+  _rowRenderer({key, index, style}) {
+    const feedItem = this.props.feed[index];
+    let row;
+    switch (feedItem.type) {
+      case 'headlines':
+        row = <HeadlineItem {...feedItem} />;
+        break;
+      case 'tweets':
+        row = <Tweet {...feedItem} />;
+        break;
+      case 'instagrams':
+        row = <InstagramItem {...feedItem} />;
+        break;
+      default:
+        row = <HeadlineItem {...feedItem} />;
+    }
+
+    let newstyle = style;
+    if (newstyle) newstyle.padding = '0 18px';
+    return (
+      <div key={key} style={newstyle}>
+        {row}
+      </div>);
   }
 
   render() {
     const props = this.props;
     return (
-        <InfiniteScroll onScrollBottom={_ => props.fetchMixedFeed(props.contactId)}>
-          {props.mixedfeed && props.mixedfeed.map((obj, i) => {
-            switch (obj.type) {
-              case 'headlines':
-                return <HeadlineItem key={i} {...obj} />;
-              case 'tweets':
-                return <Tweet key={i} {...obj} />;
-              case 'instagrams':
-                return <InstagramItem key={i} {...obj} />;
-              default:
-                return <HeadlineItem key={i} {...obj} />;
-            }
-          })}
-          {props.mixedfeed
-            && !props.didInvalidate
-            && props.mixedfeed.length === 0
-            && <div className='row' style={styleEmptyRow}><p>No RSS/Tweets attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
-          {props.didInvalidate
-            && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-          {props.offset !== null && <div className='horizontal-center'><FlatButton label='Load more' onClick={_ => this.props.fetchMixedFeed(this.props.contactId)} /></div>}
-        </InfiniteScroll>
-      );
+      <GenericFeed
+      setRef={this.setRef}
+      rowRenderer={this.rowRenderer}
+      {...props}
+      />);
   }
 }
 const mapStateToProps = (state, props) => {
@@ -55,7 +65,7 @@ const mapStateToProps = (state, props) => {
   return {
     listId,
     contactId,
-    mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
+    feed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     didInvalidate: state.mixedReducer.didInvalidate,
     offset: state.mixedReducer[contactId] && state.mixedReducer[contactId].offset
   };
@@ -63,7 +73,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
+    fetchFeed: _ => dispatch(mixedFeedActions.fetchMixedFeed(props.contactId)),
   };
 };
 
