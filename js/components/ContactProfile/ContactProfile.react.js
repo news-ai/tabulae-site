@@ -105,8 +105,7 @@ class ContactProfile extends Component {
     this.addPublicationToContact = this._addPublicationToContact.bind(this);
     window.onresize = _ => {
       const node = ReactDOM.findDOMNode(this.refs.tabs);
-      console.log(node.offsetWidth);
-      this.setState({tabContainerWidth: node.offsetWidth});
+      this.setState({containerWidth: node.offsetWidth});
     };
   }
 
@@ -124,6 +123,16 @@ class ContactProfile extends Component {
     });
     this.props.fetchContactFeeds(this.props.contactId);
     this.props.fetchList(this.props.listId);
+  }
+
+  componentWillReceiveProps() {
+    const node = ReactDOM.findDOMNode(this.refs.tabs);
+    if (node) {
+      let containerWidth = node.offsetWidth;
+      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+      if (screenWidth < containerWidth) containerWidth = screenWidth;
+      this.setState({containerWidth});
+    }
   }
 
   componentWillUnmount() {
@@ -292,16 +301,16 @@ class ContactProfile extends Component {
               <FeedsController {...props} />
                 <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='All' className='horizontal-center' style={{color: grey700}}>
-                    <MixedFeed containerWidth={state.tabContainerWidth} contactId={props.contactId} listId={props.listId} />
+                    <MixedFeed containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <Headlines contactId={props.contactId} listId={props.listId} />
+                    <Headlines containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='Tweets only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <TweetFeed contactId={props.contactId} listId={props.listId} />
+                    <TweetFeed containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='Sent Emails' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <ContactEmails contactId={props.contactId} listId={props.listId} />
+                    <ContactEmails containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                 </Tabs>
             </div>

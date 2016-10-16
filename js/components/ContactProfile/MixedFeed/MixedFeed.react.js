@@ -3,17 +3,8 @@ import {connect} from 'react-redux';
 import * as mixedFeedActions from './actions';
 import Tweet from '../Tweets/Tweet.react';
 import HeadlineItem from '../Headlines/HeadlineItem.react';
-import InfiniteScroll from '../../InfiniteScroll';
 import InstagramItem from '../Instagram/InstagramItem.react';
-
-import FlatButton from 'material-ui/FlatButton';
-import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
-
-const styleEmptyRow = {
-  padding: 10,
-  marginTop: 20,
-  marginBottom: 50,
-};
+import GenericFeed from '../GenericFeed.react';
 
 class MixedFeed extends Component {
   constructor(props) {
@@ -22,12 +13,8 @@ class MixedFeed extends Component {
     this.rowRenderer = this._rowRenderer.bind(this);
   }
 
-  componentWillMount() {
-    this.props.fetchMixedFeed(this.props.contactId);
-  }
-
   _rowRenderer({key, index, style}) {
-    const feedItem = this.props.mixedfeed[index];
+    const feedItem = this.props.feed[index];
     let row;
     switch (feedItem.type) {
       case 'headlines':
@@ -42,10 +29,11 @@ class MixedFeed extends Component {
       default:
         row = <HeadlineItem {...feedItem} />;
     }
-    let newStyle = style;
-    if (newStyle) newStyle.padding = '0 18px';
+
+    let newstyle = style;
+    if (newstyle) newstyle.padding = '0 18px';
     return (
-      <div key={key} style={newStyle}>
+      <div key={key} style={newstyle}>
         {row}
       </div>);
   }
@@ -53,39 +41,10 @@ class MixedFeed extends Component {
   render() {
     const props = this.props;
     return (
-      <div>
-        {props.mixedfeed
-          && !props.didInvalidate
-          && props.mixedfeed.length === 0
-          && <div className='row' style={styleEmptyRow}><p>No RSS/Tweets attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
-        {props.mixedfeed &&
-          <WindowScroller>
-          {({height, scrollTop}) => (
-            <CellMeasurer
-            cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
-            columnCount={1}
-            rowCount={props.mixedfeed.length}
-            >
-            {({getRowHeight}) => (
-              <List
-              width={props.containerWidth}
-              height={height}
-              scrollTop={scrollTop}
-              rowCount={props.mixedfeed.length}
-              rowHeight={getRowHeight}
-              rowRenderer={this.rowRenderer}
-              onScroll={(args) => {
-                if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchMixedFeed(props.contactId);
-              }}
-              />)}
-            </CellMeasurer>
-            )}
-          </WindowScroller>}
-        {props.didInvalidate
-          && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-        {props.offset !== null && <div className='horizontal-center'><FlatButton label='Load more' onClick={_ => this.props.fetchMixedFeed(this.props.contactId)} /></div>}
-      </div>
-      );
+      <GenericFeed
+      rowRenderer={this.rowRenderer}
+      {...props}
+      />);
   }
 }
 const mapStateToProps = (state, props) => {
@@ -94,7 +53,7 @@ const mapStateToProps = (state, props) => {
   return {
     listId,
     contactId,
-    mixedfeed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
+    feed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     didInvalidate: state.mixedReducer.didInvalidate,
     offset: state.mixedReducer[contactId] && state.mixedReducer[contactId].offset
   };
@@ -102,7 +61,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchMixedFeed: contactId => dispatch(mixedFeedActions.fetchMixedFeed(contactId)),
+    fetchFeed: _ => dispatch(mixedFeedActions.fetchMixedFeed(props.contactId)),
   };
 };
 

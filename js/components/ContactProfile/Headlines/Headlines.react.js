@@ -1,51 +1,46 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import HeadlineItem from './HeadlineItem.react';
-import InfiniteScroll from '../../InfiniteScroll';
 import * as headlineActions from './actions';
-import FlatButton from 'material-ui/FlatButton';
-
-const styleEmptyRow = {
-  padding: 10,
-  marginTop: 20,
-  marginBottom: 50,
-};
+import GenericFeed from '../GenericFeed.react';
 
 class Headlines extends Component {
   constructor(props) {
     super(props);
+    this.rowRenderer = this._rowRenderer.bind(this);
   }
 
-  componentWillMount() {
-    this.props.fetchFeed(this.props.contactId);
+  _rowRenderer({key, index, style}) {
+    const feedItem = this.props.feed[index];
+    const row = <HeadlineItem {...feedItem} />;
+
+    let newstyle = style;
+    if (newstyle) newstyle.padding = '0 18px';
+    return (
+      <div key={key} style={newstyle}>
+        {row}
+      </div>);
   }
 
   render() {
     const props = this.props;
     return (
-        <InfiniteScroll onScrollBottom={_ => props.fetchFeed(props.contactId)}>
-          {props.headlines && props.headlines.map((headline, i) => <HeadlineItem key={i} {...headline} />)}
-          {props.headlines
-            && !props.didInvalidate
-            && props.headlines.length === 0
-            && <div className='row' style={styleEmptyRow}><p>No RSS attached. Try clicking on "Settings" to start seeing some headlines.</p></div>}
-          {props.didInvalidate
-            && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-          {props.offset !== null && <div className='horizontal-center'><FlatButton label='Load more' onClick={_ => this.props.fetchMixedFeed(this.props.contactId)} /></div>}
-        </InfiniteScroll>
-      );
+      <GenericFeed
+      rowRenderer={this.rowRenderer}
+      {...props}
+      />);
   }
 }
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
   const contactId = props.contactId;
-  const headlines = state.headlineReducer[contactId]
+  const feed = state.headlineReducer[contactId]
   && state.headlineReducer[contactId].received
   && state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]);
   return {
     listId,
     contactId,
-    headlines,
+    feed,
     didInvalidate: state.headlineReducer.didInvalidate,
     offset: state.headlineReducer[contactId] && state.headlineReducer[contactId].offset
   };
@@ -53,7 +48,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
+    fetchFeed: _ => dispatch(headlineActions.fetchContactHeadlines(props.contactId)),
   };
 };
 
