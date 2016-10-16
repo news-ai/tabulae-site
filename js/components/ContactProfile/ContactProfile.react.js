@@ -1,4 +1,5 @@
 import React, {PropTypes, Component} from 'react';
+import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import * as feedActions from './actions';
@@ -97,10 +98,16 @@ class ContactProfile extends Component {
       isPastEmployerPanelOpen: false,
       employerAutocompleteList: [],
       autoinput: '',
+      tabContainerWidth: 800
     };
     this.togglePanel = this._togglePanel.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.addPublicationToContact = this._addPublicationToContact.bind(this);
+    window.onresize = _ => {
+      const node = ReactDOM.findDOMNode(this.refs.tabs);
+      console.log(node.offsetWidth);
+      this.setState({tabContainerWidth: node.offsetWidth});
+    };
   }
 
   componentWillMount() {
@@ -117,6 +124,10 @@ class ContactProfile extends Component {
     });
     this.props.fetchContactFeeds(this.props.contactId);
     this.props.fetchList(this.props.listId);
+  }
+
+  componentWillUnmount() {
+    window.onresize = undefined;
   }
 
   _togglePanel(key) {
@@ -274,14 +285,14 @@ class ContactProfile extends Component {
               />
             </Dialog>
             <div style={{
-              margin: 8,
+              marginLeft: 8,
+              marginRight: 8,
               marginTop: 20,
-              marginBottom: 100
             }}>
               <FeedsController {...props} />
-                <Tabs tabItemContainerStyle={{backgroundColor: grey50}}>
-                  <Tab label='All' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <MixedFeed contactId={props.contactId} listId={props.listId} />
+                <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
+                  <Tab label='All' className='horizontal-center' style={{color: grey700}}>
+                    <MixedFeed containerWidth={state.tabContainerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
                     <Headlines contactId={props.contactId} listId={props.listId} />
