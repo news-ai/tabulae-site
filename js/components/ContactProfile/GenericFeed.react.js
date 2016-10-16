@@ -13,9 +13,6 @@ class GenericFeed extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.setRef = ref => {
-      this._GenericFeed = ref;
-    };
   }
 
   componentWillMount() {

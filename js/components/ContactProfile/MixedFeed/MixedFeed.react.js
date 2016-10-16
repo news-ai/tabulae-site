@@ -18,7 +18,9 @@ class MixedFeed extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
-      if (this._mixedList) this._mixedList.recomputeRowHeights();
+      if (this._mixedList) {
+        this._mixedList.recomputeRowHeights(0);
+      }
     }
   }
 
@@ -51,6 +53,7 @@ class MixedFeed extends Component {
     const props = this.props;
     return (
       <GenericFeed
+      setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       {...props}
       />);

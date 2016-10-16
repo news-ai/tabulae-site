@@ -35,6 +35,7 @@ class TweetFeed extends Component {
     const props = this.props;
     return (
       <GenericFeed
+      setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       {...props}
       />);
