@@ -31,7 +31,7 @@ class InstagramProfile extends Component {
           {props.profile &&
             <div>
               <img src={profile.profile_picture} />
-              <p>{profile.Username}</p>
+              <a href={`https://instagram.com/${profile.Username}`} target='_blank'><p>{profile.Username}</p></a>
               <p>{profile.full_name}</p>
               <p>{profile.bio}</p>
               <p>Followers: {profile.counts.followed_by}</p>

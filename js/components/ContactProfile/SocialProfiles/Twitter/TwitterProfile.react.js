@@ -31,7 +31,8 @@ class TwitterProfile extends Component {
           {props.profile &&
             <div>
               <img src={profile.profile_image_url} />
-              <p>{profile.Username}</p>
+              <a href={`https://twitter.com/${profile.Username}`} target='_blank'><p>{profile.Username}</p></a>
+              <p>{profile.name}</p>
               <p>{profile.description}</p>
               <p>Favorites: {profile.favourites_count}</p>
               <p>Followers: {profile.followers_count}</p>
