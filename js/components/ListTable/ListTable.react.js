@@ -120,7 +120,7 @@ function _getter(contact, fieldObj) {
 
 function ControlledInput(props) {
   return (
-    <ToggleableEditInputHOC {...props}>
+    <ToggleableEditInputHOC async {...props}>
       {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
       <ToggleableEditInput
         onToggleTitleEdit={onToggleTitleEdit}
@@ -537,7 +537,7 @@ class ListTable extends Component {
           <div className='large-3 columns vertical-center'>
             <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
           </div>
-           <div className='large-3 columns vertical-center'>
+           <div className='large-4 columns vertical-center'>
               <IconButton
               tooltip='Email'
               tooltipPosition='top-left'
@@ -562,7 +562,6 @@ class ListTable extends Component {
                 />
                 )}
               </CopyOrMoveTo>
-              
             </div>
           <div className='large-5 columns vertical-center'>
             <TextField
@@ -575,9 +574,13 @@ class ListTable extends Component {
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-          </div>
-          <div className='large-1 columns'>
-            <FlatButton className='noprint' label='Edit' onClick={_ => props.router.push(`/lists/${props.listId}`)} labelStyle={{textTransform: 'none', color: grey400}} icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
+            <IconButton
+            tooltip='Go to Bulk Edit'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-arrow-right'
+            iconStyle={{color: grey400, float: 'right'}}
+            onClick={_ => props.router.push(`/lists/${props.listId}`)}
+            />
           </div>
         </div>
 

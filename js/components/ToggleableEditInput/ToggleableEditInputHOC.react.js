@@ -12,7 +12,7 @@ class ToggleableEditInputHOC extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.name !== this.state.name) {
+    if (nextProps.name !== this.state.name && this.props.async) {
       this.setState({name: nextProps.name});
     }
   }
