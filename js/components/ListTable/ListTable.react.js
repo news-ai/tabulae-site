@@ -21,7 +21,7 @@ import Draggable from 'react-draggable';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import {ToggleableEditInput} from '../ToggleableEditInput';
+import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 
@@ -118,6 +118,19 @@ function _getter(contact, fieldObj) {
   }
 }
 
+function ControlledInput(props) {
+  return (
+    <ToggleableEditInputHOC {...props}>
+      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
+      <ToggleableEditInput
+        onToggleTitleEdit={onToggleTitleEdit}
+        isTitleEditing={isTitleEditing}
+        name={name}
+        onUpdateName={onUpdateName}
+        />}
+    </ToggleableEditInputHOC>);
+}
+
 const localStorage = window.localStorage;
 
 class ListTable extends Component {
@@ -128,8 +141,6 @@ class ListTable extends Component {
       isSearchOn: false,
       errorText: '',
       searchContacts: [],
-      isTitleEditing: false,
-      name: null,
       selected: [],
       columnWidths: null,
       dragPositions: [],
@@ -155,8 +166,6 @@ class ListTable extends Component {
     }
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
-    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
-    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -245,7 +254,7 @@ class ListTable extends Component {
       }
     }
 
-    if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    // if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
 
     if (this.props.listData && this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
@@ -484,10 +493,7 @@ class ListTable extends Component {
       // const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
       // let errorText = null;
       // if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({
-        // searchContacts,
-        // errorText,
-        isSearchOn: true});
+      this.setState({isSearchOn: true});
     });
   }
 
@@ -529,12 +535,7 @@ class ListTable extends Component {
       <div style={{marginTop: 30}}>
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 columns vertical-center'>
-            <ToggleableEditInput
-            name={state.name}
-            onUpdateName={this.onUpdateName}
-            onToggleTitleEdit={this.onToggleTitleEdit}
-            isTitleEditing={state.isTitleEditing}
-            />
+            <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
           </div>
            <div className='large-3 columns vertical-center'>
               <IconButton
@@ -703,12 +704,11 @@ const mapStateToProps = (state, props) => {
   return {
     received,
     searchQuery,
-    listId: listId,
+    listId,
     listIsReceiving: state.listReducer.isReceiving,
-    listData: listData,
+    listData,
     fieldsmap,
     contacts: contacts,
-    name: listData ? listData.name : null,
     contactIsReceiving: state.contactReducer.isReceiving,
     publicationReducer,
     person: state.personReducer.person,
