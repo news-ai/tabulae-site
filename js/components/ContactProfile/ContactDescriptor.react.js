@@ -1,10 +1,11 @@
 import React from 'react';
-import {grey700, grey800, red600} from 'material-ui/styles/colors';
-import IconButton from 'material-ui/IconButton';
 import alertify from 'alertifyjs';
 import isURL from 'validator/lib/isURL';
 import isEmail from 'validator/lib/isEmail';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
+
+import {grey700, grey800, red600} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 
 const styles = {
   smallIcon: {
@@ -22,24 +23,35 @@ const styles = {
   }
 };
 
-const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className, iconClassName, errorText}) => {
-  const icon = content && isURL(content) && !isEmail(content) ? <a
-  href={content.substring(0, 4) === 'http' ? content : `https://${content}`}
-  style={styles.iconStyle}
-  target='_blank'>
-  <i className={iconClassName} aria-hidden='hidden' />
+let contentStyle = {
+  color: 'black',
+  marginLeft: 10,
+  marginRight: 10,
+  fontSize: '0.9em'
+};
+
+function ContactDescriptor({
+  showTitle,
+  content,
+  contentTitle,
+  onClick,
+  className,
+  iconClassName,
+  errorText,
+  extraIcons,
+}) {
+  const icon = content && isURL(content) && !isEmail(content) ?
+  <a href={content.substring(0, 4) === 'http' ? content : `https://${content}`} style={styles.iconStyle} target='_blank'>
+    <i className={iconClassName} aria-hidden='hidden' />
   </a> : <i style={styles.iconStyle} className={iconClassName} aria-hidden='hidden' />;
+  if (content) contentStyle.color = grey700;
 
   return (
-    <div className={`${className} vertical-center`} style={{height: 40}}>
+    <div className={`${className} vertical-center`} style={{height: 35}}>
       {iconClassName && icon}
       {showTitle && <span style={styles.iconStyle}>{contentTitle}</span>}
       {errorText !== null && <span style={{fontSize: '0.7em', color: red600}}>{errorText}</span>}
-      <span style={{
-        color: content ? 'black' : grey700,
-        marginLeft: 10,
-        marginRight: 10
-      }}>{content ? content : `---- ${contentTitle} empty ----`}</span>
+      <span style={contentStyle}>{content ? content : `---- ${contentTitle} empty ----`}</span>
       <IconButton
       iconStyle={styles.smallIcon}
       style={styles.small}
@@ -48,8 +60,8 @@ const ContactDescriptor = ({showTitle, content, contentTitle, onClick, className
       tooltipPosition='top-right'
       onClick={_ => alertify.prompt(`Enter ${contentTitle}`, '', onClick, function() {})}
       />
-  </div>
-  );
-};
+      {extraIcons}
+  </div>);
+}
 
 export default ContactDescriptor;

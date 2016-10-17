@@ -1,7 +1,4 @@
-
-import {
-  headlineConstant,
-} from './constants';
+import {headlineConstant} from './constants';
 import * as api from '../../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 const headlineSchema = new Schema('headlines', {idAttribute: 'url'});

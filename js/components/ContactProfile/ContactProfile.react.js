@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
@@ -21,10 +21,8 @@ import Headlines from './Headlines/Headlines.react';
 import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
-import ContactDescriptor from './ContactDescriptor.react';
+import ContactProfileDescriptions from './ContactProfileDescriptions.react';
 
-import isEmail from 'validator/lib/isEmail';
-import isURL from 'validator/lib/isURL';
 const styles = {
   smallIcon: {
     fontSize: 16,
@@ -35,58 +33,6 @@ const styles = {
     height: 36,
     padding: 2,
   },
-};
-
-const ContactProfileDescriptions = ({contact, patchContact, className, list}) => {
-  let instagramErrorText = null;
-  if (contact.instagraminvalid) instagramErrorText = 'Invalid Instagram handle';
-  else if (contact.instagramprivate) instagramErrorText = 'Instagram is private';
-
-  let twitterErrorText = null;
-  if (contact.twitterinvalid) twitterErrorText = 'Invalid Twitter handle';
-  else if (contact.twitterprivate) twitterErrorText = 'Twitter is private';
-
-  return (
-    <div className={className} style={{marginTop: 5}}>
-      <h4 style={{marginLeft: 10}}>{contact.firstname} {contact.lastname}</h4>
-      <ContactDescriptor iconClassName='fa fa-envelope' className='large-12 medium-8 small-12 columns' content={contact.email} contentTitle='Email' onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
-      <ContactDescriptor iconClassName='fa fa-rss' className='large-12 medium-8 small-12 columns' content={contact.blog} contentTitle='Blog' onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
-      <ContactDescriptor iconClassName='fa fa-twitter' className='large-12 medium-8 small-12 columns' errorText={twitterErrorText} content={contact.twitter} contentTitle='Twitter' onClick={(e, value) => patchContact(contact.id, {twitter: value})}/>
-      <ContactDescriptor iconClassName='fa fa-instagram' className='large-12 medium-8 small-12 columns' errorText={instagramErrorText} content={contact.instagram} contentTitle='Instagram' onClick={(e, value) => patchContact(contact.id, {instagram: value})}/>
-      <ContactDescriptor iconClassName='fa fa-linkedin' className='large-12 medium-8 small-12 columns' content={contact.linkedin} contentTitle='LinkedIn' onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
-      <ContactDescriptor iconClassName='fa fa-external-link' className='large-12 medium-8 small-12 columns' content={contact.website} contentTitle='Website' onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
-      <div style={{marginTop: 10, marginBottom: 30}}>
-        <h5>Custom Fields</h5>
-        <div>
-        {list && contact && contact.customfields !== null ? list.fieldsmap
-          .filter(fieldObj => fieldObj.customfield)
-          .map((fieldObj, i) => {
-            const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
-            return (
-              <ContactDescriptor
-              key={i}
-              showTitle
-              content={customValue && customValue.value}
-              contentTitle={fieldObj.name}
-              onClick={(e, value) => {
-                let customfields;
-                if (contact.customfields === null) {
-                  customfields = [{name: fieldObj.value, value}];
-                } else if (!contact.customfields.some(customObj => customObj.name === fieldObj.value)) {
-                  customfields = [...contact.customfields, {name: fieldObj.value, value}];
-                } else {
-                  customfields = contact.customfields.map(customObj => {
-                    if (customObj.name === fieldObj.value) return {name: fieldObj.value, value};
-                    return customObj;
-                  });
-                }
-                patchContact(contact.id, {customfields});
-              }}
-              />);
-          }) : <span style={{fontSize: '0.9em', color: grey700}}>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
-        </div>
-      </div>
-    </div>);
 };
 
 
@@ -223,9 +169,9 @@ class ContactProfile extends Component {
         <div className='row horizontal-center'>
           <div className='large-9 columns'>
             {props.contact && (
-              <div className='row' style={{marginTop: 30}}>
-                <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
-                <div className='large-5 medium-12 small-12 columns'>
+              <div className='row' style={{marginTop: 40}}>
+                <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
+                <div className='large-6 medium-12 small-12 columns'>
                   <div className='row'>
                     <div className='large-12 medium-12 small-12 columns'>
                       <h5>Notes</h5>
@@ -244,14 +190,13 @@ class ContactProfile extends Component {
                     <div className='row vertical-center' style={{marginTop: 20}}>
                       <h5>Current Publications/Employers</h5>
                       <IconButton
-                        style={{marginLeft: 3}}
-                        iconStyle={styles.smallIcon}
-                        style={styles.small}
-                        iconClassName='fa fa-plus'
-                        tooltip='Add Publication'
-                        tooltipPosition='top-right'
-                        onClick={_ => this.togglePanel('employers')}
-                        />
+                      iconStyle={styles.smallIcon}
+                      style={styles.small}
+                      iconClassName='fa fa-plus'
+                      tooltip='Add Publication'
+                      tooltipPosition='top-right'
+                      onClick={_ => this.togglePanel('employers')}
+                      />
                     </div>
                     <div>
                       {props.employers && props.employers.map((employer, i) =>
@@ -298,11 +243,7 @@ class ContactProfile extends Component {
               dataSource={state.employerAutocompleteList}
               />
             </Dialog>
-            <div style={{
-              marginLeft: 8,
-              marginRight: 8,
-              marginTop: 20,
-            }}>
+            <div style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
               <FeedsController {...props} />
                 <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='All' className='horizontal-center' style={{color: grey700}}>
