@@ -44,7 +44,7 @@ function ContactDescriptor({
   <a href={content.substring(0, 4) === 'http' ? content : `https://${content}`} style={styles.iconStyle} target='_blank'>
     <i className={iconClassName} aria-hidden='hidden' />
   </a> : <i style={styles.iconStyle} className={iconClassName} aria-hidden='hidden' />;
-  if (content) contentStyle.color = grey700;
+  if (content) contentStyle = Object.assign({}, contentStyle, {color: grey700});
 
   return (
     <div className={`${className} vertical-center`} style={{height: 35}}>

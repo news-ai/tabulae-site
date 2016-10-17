@@ -83,7 +83,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       errorText={twitterErrorText}
       content={contact.twitter}
       contentTitle='Twitter'
-      onClick={(e, value) => patchContact(contact.id, {twitter: value})}
+      onClick={(e, value) => patchContact(contact.id, {twitter: value}).then(_ => window.location.reload())}
       extraIcons={contact.twitter && [
         <WrappedTwitter key={0} contactId={contact.id} />
         ]}
@@ -94,7 +94,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       errorText={instagramErrorText}
       content={contact.instagram}
       contentTitle='Instagram'
-      onClick={(e, value) => patchContact(contact.id, {instagram: value})}
+      onClick={(e, value) => patchContact(contact.id, {instagram: value}).then(_ => window.location.reload())}
       extraIcons={contact.instagram && [
         <WrappedInstagram key={0} contactId={contact.id} />
         ]}
