@@ -10,14 +10,14 @@ export function generateTableFieldsmap(listData) {
       tableOnly: true
     },
     {
-      name: 'Profile',
+      name: 'profile',
       hidden: false,
       value: 'profile',
       customfield: false,
       tableOnly: true
     },
     {
-      name: 'Selected',
+      name: 'selected',
       hidden: false,
       value: 'selected',
       customfield: false,
@@ -28,13 +28,13 @@ export function generateTableFieldsmap(listData) {
     .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     {
       customfield: false,
-      name: 'Publication 1',
+      name: 'publication 1',
       value: 'publication_name_1',
       hidden: false
     },
     {
       customfield: false,
-      name: 'Publication 2',
+      name: 'publication 2',
       value: 'publication_name_2',
       hidden: false
     }

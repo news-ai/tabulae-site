@@ -514,7 +514,7 @@ class ListTable extends Component {
                 onClick={onRequestOpen}
                 />)}
               </CopyOrMoveTo>
-              <AddOrHideColumns>
+              <AddOrHideColumns fieldsmap={props.fieldsmap}>
               {({onRequestOpen}) => (
                 <IconButton
                 tooltip='Show/Hide columns'
