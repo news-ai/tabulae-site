@@ -4,6 +4,37 @@ import {grey700} from 'material-ui/styles/colors';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 import ContactDescriptor from './ContactDescriptor.react';
+import IconButton from 'material-ui/IconButton';
+import ContactCustomDescriptions from './ContactCustomDescriptions.react';
+import TwitterProfile from './SocialProfiles/Twitter/TwitterProfile.react';
+
+const styles = {
+  smallIcon: {
+    fontSize: 16,
+    color: grey700
+  },
+  small: {
+    width: 36,
+    height: 36,
+    padding: 2,
+  },
+};
+
+const WrappedTwitter = props => {
+  return (
+     <TwitterProfile {...props}>
+      {({onRequestOpen}) => (
+        <IconButton
+        iconStyle={styles.smallIcon}
+        style={styles.small}
+        iconClassName='fa fa-user'
+        tooltip='Show Profile'
+        tooltipPosition='top-right'
+        onClick={onRequestOpen}
+        />)}
+      </TwitterProfile>
+    );
+};
 
 function ContactProfileDescriptions({contact, patchContact, className, list}) {
   let instagramErrorText = null;
@@ -35,14 +66,19 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       errorText={twitterErrorText}
       content={contact.twitter}
       contentTitle='Twitter'
-      onClick={(e, value) => patchContact(contact.id, {twitter: value})}/>
+      onClick={(e, value) => patchContact(contact.id, {twitter: value})}
+      extraIcons={contact.twitter && [
+        <WrappedTwitter key={0} contactId={contact.id} />
+        ]}
+      />
       <ContactDescriptor
       iconClassName='fa fa-instagram'
       className='large-12 medium-8 small-12 columns'
       errorText={instagramErrorText}
       content={contact.instagram}
       contentTitle='Instagram'
-      onClick={(e, value) => patchContact(contact.id, {instagram: value})}/>
+      onClick={(e, value) => patchContact(contact.id, {instagram: value})}
+      />
       <ContactDescriptor
       iconClassName='fa fa-linkedin'
       className='large-12 medium-8 small-12 columns'
@@ -54,38 +90,9 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       className='large-12 medium-8 small-12 columns'
       content={contact.website}
       contentTitle='Website'
-      onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}/>
-      <div style={{marginTop: 10, marginBottom: 30}}>
-        <h5>Custom Fields</h5>
-        <div>
-        {list && contact && contact.customfields !== null ? list.fieldsmap
-          .filter(fieldObj => fieldObj.customfield)
-          .map((fieldObj, i) => {
-            const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
-            return (
-              <ContactDescriptor
-              key={i}
-              showTitle
-              content={customValue && customValue.value}
-              contentTitle={fieldObj.name}
-              onClick={(e, value) => {
-                let customfields;
-                if (contact.customfields === null) {
-                  customfields = [{name: fieldObj.value, value}];
-                } else if (!contact.customfields.some(customObj => customObj.name === fieldObj.value)) {
-                  customfields = [...contact.customfields, {name: fieldObj.value, value}];
-                } else {
-                  customfields = contact.customfields.map(customObj => {
-                    if (customObj.name === fieldObj.value) return {name: fieldObj.value, value};
-                    return customObj;
-                  });
-                }
-                patchContact(contact.id, {customfields});
-              }}
-              />);
-          }) : <span style={{fontSize: '0.9em', color: grey700}}>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
-        </div>
-      </div>
+      onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}
+      />
+      <ContactCustomDescriptions contact={contact} patchContact={patchContact} list={list} />
     </div>);
 }
 

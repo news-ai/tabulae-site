@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
@@ -169,9 +169,9 @@ class ContactProfile extends Component {
         <div className='row horizontal-center'>
           <div className='large-9 columns'>
             {props.contact && (
-              <div className='row' style={{marginTop: 30}}>
-                <ContactProfileDescriptions className='large-7 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
-                <div className='large-5 medium-12 small-12 columns'>
+              <div className='row' style={{marginTop: 40}}>
+                <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
+                <div className='large-6 medium-12 small-12 columns'>
                   <div className='row'>
                     <div className='large-12 medium-12 small-12 columns'>
                       <h5>Notes</h5>
@@ -190,14 +190,13 @@ class ContactProfile extends Component {
                     <div className='row vertical-center' style={{marginTop: 20}}>
                       <h5>Current Publications/Employers</h5>
                       <IconButton
-                        style={{marginLeft: 3}}
-                        iconStyle={styles.smallIcon}
-                        style={styles.small}
-                        iconClassName='fa fa-plus'
-                        tooltip='Add Publication'
-                        tooltipPosition='top-right'
-                        onClick={_ => this.togglePanel('employers')}
-                        />
+                      iconStyle={styles.smallIcon}
+                      style={styles.small}
+                      iconClassName='fa fa-plus'
+                      tooltip='Add Publication'
+                      tooltipPosition='top-right'
+                      onClick={_ => this.togglePanel('employers')}
+                      />
                     </div>
                     <div>
                       {props.employers && props.employers.map((employer, i) =>
@@ -244,11 +243,7 @@ class ContactProfile extends Component {
               dataSource={state.employerAutocompleteList}
               />
             </Dialog>
-            <div style={{
-              marginLeft: 8,
-              marginRight: 8,
-              marginTop: 20,
-            }}>
+            <div style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
               <FeedsController {...props} />
                 <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='All' className='horizontal-center' style={{color: grey700}}>
