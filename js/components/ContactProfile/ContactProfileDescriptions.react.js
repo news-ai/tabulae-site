@@ -7,6 +7,7 @@ import ContactDescriptor from './ContactDescriptor.react';
 import IconButton from 'material-ui/IconButton';
 import ContactCustomDescriptions from './ContactCustomDescriptions.react';
 import TwitterProfile from './SocialProfiles/Twitter/TwitterProfile.react';
+import InstagramProfile from './SocialProfiles/Instagram/InstagramProfile.react';
 
 const styles = {
   smallIcon: {
@@ -33,6 +34,22 @@ const WrappedTwitter = props => {
         onClick={onRequestOpen}
         />)}
       </TwitterProfile>
+    );
+};
+
+const WrappedInstagram = props => {
+  return (
+     <InstagramProfile {...props}>
+      {({onRequestOpen}) => (
+        <IconButton
+        iconStyle={styles.smallIcon}
+        style={styles.small}
+        iconClassName='fa fa-user'
+        tooltip='Show Profile'
+        tooltipPosition='top-right'
+        onClick={onRequestOpen}
+        />)}
+      </InstagramProfile>
     );
 };
 
@@ -78,6 +95,9 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       content={contact.instagram}
       contentTitle='Instagram'
       onClick={(e, value) => patchContact(contact.id, {instagram: value})}
+      extraIcons={contact.instagram && [
+        <WrappedInstagram key={0} contactId={contact.id} />
+        ]}
       />
       <ContactDescriptor
       iconClassName='fa fa-linkedin'

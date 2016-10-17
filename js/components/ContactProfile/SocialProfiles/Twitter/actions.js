@@ -3,7 +3,6 @@ import * as api from '../../../../actions/api';
 // const listSchema = new Schema('lists');
 
 export function fetchTwitterProfile(contactId) {
-  const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const isReceiving = getState().twitterProfileReducer.isReceiving;
     if (isReceiving) return;

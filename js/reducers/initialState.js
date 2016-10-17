@@ -81,5 +81,10 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false,
     received: [],
-  }
+  },
+  instagramProfileReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
 };
