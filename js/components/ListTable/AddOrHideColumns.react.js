@@ -5,7 +5,6 @@ import * as actionCreators from 'actions/AppActions';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import Checkbox from 'material-ui/Checkbox';
-import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 
@@ -57,7 +56,7 @@ class AddOrHideColumns extends Component {
     super(props);
     this.state = {
       open: false,
-      items: null
+      items: this.props.fieldsmap
     };
     this.onSortEnd = ({oldIndex, newIndex}) => this.setState({items: arrayMove(this.state.items, oldIndex, newIndex)});
     this.onCheck = this._onCheck.bind(this);
@@ -70,13 +69,6 @@ class AddOrHideColumns extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.open === false && this.state.open === true) {
-    // onRequestOpen hit
-
-    }
-  }
-
   _onCheck(e, checked, value) {
     const items = this.state.items.map(fieldObj => {
       if (fieldObj.value === value) return Object.assign({}, fieldObj, {hidden: checked});
@@ -86,10 +78,16 @@ class AddOrHideColumns extends Component {
   }
 
   _onSubmit() {
-    console.log(this.state.items);
     const fieldsmap = this.state.items
-    .filter(fieldObj => !fieldObj.tableOnly);
-    console.log(fieldsmap);
+    .filter(fieldObj => !fieldObj.tableOnly)
+    .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}));
+    const listBody = {
+      listId: this.props.listId,
+      name: this.props.list.name,
+      fieldsmap
+    };
+    window.localStorage.clear();
+    this.props.patchList(listBody);
   }
 
   render() {
@@ -113,7 +111,7 @@ class AddOrHideColumns extends Component {
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add or Hide Columns' onRequestClose={_ => this.setState({open: false})}>
          <div style={{marginTop: 10}}>
             {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
-            {props.fieldsmap !== null &&
+            {props.fieldsmap !== null && state.items !== null &&
               <SortableList
               lockAxis='y'
               items={state.items}
@@ -133,6 +131,7 @@ class AddOrHideColumns extends Component {
 const mapStateToProps = (state, props) => {
   return {
     isReceiving: state.listReducer.isReceiving,
+    list: state.listReducer[props.listId],
   };
 };
 

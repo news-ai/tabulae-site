@@ -24,19 +24,22 @@ export function generateTableFieldsmap(listData) {
       tableOnly: true
     },
     ...listData.fieldsmap
-    .filter(fieldObj => !fieldObj.hidden)
     .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     {
       customfield: false,
       name: 'publication 1',
       value: 'publication_name_1',
-      hidden: false
+      hidden: false,
+      sortEnabled: true,
+      tableOnly: true
     },
     {
       customfield: false,
       name: 'publication 2',
       value: 'publication_name_2',
-      hidden: false
+      hidden: false,
+      sortEnabled: true,
+      tableOnly: true
     }
   ];
 }

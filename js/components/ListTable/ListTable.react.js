@@ -368,7 +368,7 @@ class ListTable extends Component {
           </Link>;
           break;
         default:
-          contentBody = <span></span>;
+          contentBody = <span>{content}</span>;
       }
     } else {
       contentBody = <span>{content}</span>;
@@ -514,7 +514,7 @@ class ListTable extends Component {
                 onClick={onRequestOpen}
                 />)}
               </CopyOrMoveTo>
-              <AddOrHideColumns fieldsmap={props.fieldsmap}>
+              <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
               {({onRequestOpen}) => (
                 <IconButton
                 tooltip='Show/Hide columns'
@@ -544,7 +544,6 @@ class ListTable extends Component {
             />
           </div>
         </div>
-
         {state.isEmailPanelOpen &&
           <EmailPanel
           person={props.person}
@@ -624,7 +623,7 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-  const fieldsmap = listData ? generateTableFieldsmap(listData) : null;
+  const rawFieldsmap = listData ? generateTableFieldsmap(listData) : null;
 
   return {
     received,
@@ -632,7 +631,8 @@ const mapStateToProps = (state, props) => {
     listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData,
-    fieldsmap,
+    fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden) : null,
+    rawFieldsmap,
     contacts: contacts,
     contactIsReceiving: state.contactReducer.isReceiving,
     publicationReducer,
