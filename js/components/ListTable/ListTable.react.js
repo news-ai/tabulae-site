@@ -129,6 +129,7 @@ class ListTable extends Component {
     this.onHeaderDragStart = this._onHeaderDragStart.bind(this);
     this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
     this.onSort = this._onSort.bind(this);
+    this.onRemoveContacts = this._onRemoveContacts.bind(this);
     this.setDataGridRef = ref => {
       this._DataGrid = ref;
     };
@@ -492,6 +493,18 @@ class ListTable extends Component {
     }
   }
 
+  _onRemoveContacts() {
+    const selected = this.state.selected;
+    const props = this.props;
+    const newListContacts = _.difference(props.listData.contacts, selected);
+    props.deleteContacts(selected);
+    props.patchList({
+      listId: props.listId,
+      contacts: newListContacts,
+      name: props.listData.name,
+    });
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -499,10 +512,10 @@ class ListTable extends Component {
     return (
       <div style={{marginTop: 30}}>
         <div className='row vertical-center' style={{margin: 15}}>
-          <div className='large-3 columns vertical-center'>
+          <div className='large-3 medium-4 columns vertical-center'>
             <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
           </div>
-           <div className='large-4 columns vertical-center'>
+           <div className='large-4 medium-4 columns vertical-center'>
               <IconButton
               tooltip='Email'
               tooltipPosition='top-left'
@@ -549,6 +562,13 @@ class ListTable extends Component {
                 onClick={onRequestOpen}
                 />)}
               </AddContact>
+              <IconButton
+              tooltip='Delete Contact'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-trash'
+              iconStyle={{color: grey500}}
+              onClick={this.onRemoveContacts}
+              />
             </div>
           <div className='large-5 columns vertical-center'>
             <TextField
@@ -681,7 +701,8 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
-    clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId})
+    clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId}),
+    deleteContacts: ids => dispatch(actionCreators.deleteContacts(ids)),
   };
 };
 
