@@ -1,41 +1,54 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
+import Radium from 'radium';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 
 import './react_sortable_hoc.css';
 
-const Column = ({name, value, customfield, tableOnly, hidden, onCheck}) => {
+const Column = ({name, value, customfield, tableOnly, hidden, onCheck, onRemove}) => {
   return (
     <div className='row item'>
       <div className='large-1 medium-2 columns'>
         <Checkbox disabled={tableOnly} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
       </div>
-      <div className='large-3 columns'>{name}</div>
-      <div className='large-4 columns'>{tableOnly ? 'Table Only' : customfield ? 'Custom Editable' : 'Editable'}</div>
+      <div className='large-3 medium-4 columns'>
+        <span>{name}</span>
+      </div>
+      <div className='large-4 medium-4 columns'>
+        <span>{tableOnly ? 'Table Only' : customfield ? 'Custom Editable' : 'Editable'}</span>
+      </div>
+      <div className='large-1 medium-2 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
+        {customfield && <i className='fa fa-edit hoverable-icon' aria-hidden='true' />}
+        {customfield && <i className='fa fa-trash hoverable-icon' aria-hidden='true' onClick={_ => onRemove(value)} />}
+      </div>
     </div>
     );
 };
 
-const SortableItem = SortableElement(({fieldObj, onCheck}) => <Column {...fieldObj} onCheck={onCheck} />);
+const SortableItem = SortableElement(({fieldObj, onCheck, onRemove}) => <Column {...fieldObj} onCheck={onCheck} onRemove={onRemove} />);
 
-const SortableList = SortableContainer(({items, onCheck}) => {
+const SortableList = SortableContainer(({items, onCheck, onRemove}) => {
   return (
     <div>
-      <div className='row' style={{borderBottom: 'solid 1px black'}}>
+      <div className='row' style={{borderBottom: 'solid 1px black', marginBottom: 5}}>
         <div className='large-1 medium-2 columns'>
           <span>Hidden</span>
         </div>
-        <div className='large-3 columns'>
+        <div className='large-3 medium-4 columns'>
           <span>Name</span>
         </div>
-        <div className='large-4 columns'>
+        <div className='large-4 medium-4 columns'>
           <span>Type</span>
+        </div>
+        <div className='large-1 medium-1 columns'>
         </div>
       </div>
       {items.map((fieldObj, index) =>
@@ -45,6 +58,7 @@ const SortableList = SortableContainer(({items, onCheck}) => {
         index={index}
         fieldObj={fieldObj}
         onCheck={onCheck}
+        onRemove={onRemove}
         />
       )}
     </div>
@@ -56,15 +70,25 @@ class AddOrHideColumns extends Component {
     super(props);
     this.state = {
       open: false,
-      items: this.props.fieldsmap
+      items: this.props.fieldsmap,
+      textvalue: '',
     };
     this.onSortEnd = ({oldIndex, newIndex}) => this.setState({items: arrayMove(this.state.items, oldIndex, newIndex)});
     this.onCheck = this._onCheck.bind(this);
     this.onSubmit = this._onSubmit.bind(this);
+    this.onAddColumn = this._onAddColumn.bind(this);
+    this.onRemove = this._onRemove.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.fieldsmap === null && nextProps.fieldsmap !== null) {
+      this.setState({items: nextProps.fieldsmap});
+    }
+
+    if (
+      this.props.fieldsmap !== null &&
+      nextProps.fieldsmap !== null &&
+      this.props.fieldsmap.length !== nextProps.fieldsmap.length) {
       this.setState({items: nextProps.fieldsmap});
     }
   }
@@ -86,7 +110,42 @@ class AddOrHideColumns extends Component {
       name: this.props.list.name,
       fieldsmap
     };
-    window.localStorage.clear();
+    this.props.patchList(listBody);
+  }
+
+  _onAddColumn() {
+    const value = this.state.textvalue;
+    if (this.state.items.some(fieldObj => fieldObj.name === value)) {
+      console.log('duplicate');
+      return;
+    }
+    const prevFieldsmap = this.state.items
+    .filter(fieldObj => !fieldObj.tableOnly)
+    .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}));
+    const fieldsmap = [...prevFieldsmap, {
+      name: value,
+      value,
+      customfield: true,
+      hidden: false
+    }];
+    const listBody = {
+      listId: this.props.listId,
+      name: this.props.list.name,
+      fieldsmap
+    };
+    this.props.patchList(listBody);
+  }
+
+  _onRemove(deleteValue) {
+    const fieldsmap = this.state.items
+    .filter(fieldObj => !fieldObj.tableOnly)
+    .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}))
+    .filter(fieldObj => fieldObj.value !== deleteValue);
+    const listBody = {
+      listId: this.props.listId,
+      name: this.props.list.name,
+      fieldsmap
+    };
     this.props.patchList(listBody);
   }
 
@@ -109,7 +168,7 @@ class AddOrHideColumns extends Component {
     return (
       <div>
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add or Hide Columns' onRequestClose={_ => this.setState({open: false})}>
-         <div style={{marginTop: 10}}>
+         <div style={{marginTop: 20}}>
             {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
             {props.fieldsmap !== null && state.items !== null &&
               <SortableList
@@ -117,7 +176,19 @@ class AddOrHideColumns extends Component {
               items={state.items}
               onSortEnd={this.onSortEnd}
               onCheck={this.onCheck}
+              onRemove={this.onRemove}
               />}
+            <div style={{margin: 10}}>
+              <TextField
+              id='custom-column'
+              value={state.textvalue}
+              onChange={e => this.setState({textvalue: e.target.value})}
+              />
+              <RaisedButton
+              label='Add Custom Column'
+              onClick={this.onAddColumn}
+              />
+            </div>
           </div>
         </Dialog>
         {props.children({

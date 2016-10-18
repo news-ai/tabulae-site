@@ -207,7 +207,14 @@ class ListTable extends Component {
       }
     }
 
-    // if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    if (this.props.listData && this.props.listData.fieldsmap.length !== nextProps.listData.fieldsmap.length) {
+      const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
+        const name = fieldObj.name;
+        const size = measureSpanSize(name, '16px Source Sans Pro')
+        return size.width > 60 ? size.width : 60;
+      });
+      this.setState({columnWidths})
+    }
 
     if (this.props.listData && this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
