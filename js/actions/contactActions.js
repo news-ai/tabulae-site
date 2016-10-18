@@ -269,7 +269,6 @@ export function patchContacts(contactList) {
 export function addContacts(contactList) {
   return dispatch => {
     dispatch({type: ADDING_CONTACT, contactList});
-
     return api.post(`/contacts`, contactList)
     .then( response => {
       const res = normalize(response, {

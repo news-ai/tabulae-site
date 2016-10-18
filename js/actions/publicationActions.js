@@ -65,6 +65,24 @@ export function searchPublications(query) {
   };
 }
 
+export function searchPublicationsByIdName(query) {
+  return (dispatch, getState) => {
+    // implement search for match in cache first then after some time make the search call
+    // maybe do some timeout
+    dispatch({type: 'SEARCH_PUBLICATION_REQUEST', query});
+    return api.get(`/publications?q="${query}"`)
+      .then( response => {
+        const res = normalize(response, {
+          data: arrayOf(publicationSchema)
+        });
+        dispatch(receivePublications(res.entities.publications, res.result.data));
+        const responseArray = response.data.map(publication => ({label: publication.name, value: publication.id}));
+        return responseArray;
+      })
+      .catch( message => dispatch({type: 'SEARCH_PUBLICATION_FAIL', message}));
+  };
+}
+
 export function createPublication(data) {
   return (dispatch) => {
     dispatch(requestPublication());

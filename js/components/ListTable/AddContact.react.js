@@ -6,6 +6,9 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import Select from 'react-select';
+
+import 'react-select/dist/react-select.css';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -15,9 +18,12 @@ class AddContact extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false
+      open: false,
+      contactBody: {}
     };
     this.onSubmit = this._onSubmit.bind(this);
+    this.onUpdateInput = this._onUpdateInput.bind(this);
+    this.onChange = this._onChange.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -27,20 +33,17 @@ class AddContact extends Component {
   }
 
   _onSubmit() {
-    let contactBody = {};
+    let customRow = [];
+    let contactBody = this.state.contactBody;
     const list = this.props.list;
     list.fieldsmap
     .map(fieldObj => {
-      if (!fieldObj.customfield) {
-        if (this.refs[fieldObj.value]) {
-          if (this.refs[fieldObj.value].input.value.length > 0) {
-            contactBody[fieldObj.value] = this.refs[fieldObj.value].input.value;
-          }
-        } else {
-          console.log(fieldObj.value);
-        }
+      if (fieldObj.customfield && this.refs[fieldObj.value]) {
+        const value = this.refs[fieldObj.value].getValue();
+        if (value.length > 0) customRow.push({name: fieldObj.value, value});
       }
     });
+    if (customRow.length > 0) contactBody.customfields = customRow;
 
     this.props.addContacts([contactBody])
     .then(contacts => {
@@ -53,6 +56,17 @@ class AddContact extends Component {
       this.props.patchList(listBody);
       this.setState({open: false});
     });
+  }
+
+  _onChange(name, value) {
+    this.setState({
+      contactBody: Object.assign({}, this.state.contactBody, {[name]: value})
+    });
+  }
+
+  _onUpdateInput(input, callback) {
+    this.props.searchPublicationsByIdName(input)
+    .then(options => callback(null, {options, complete: true}));
   }
 
   render() {
@@ -77,35 +91,51 @@ class AddContact extends Component {
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Firstname</span><TextField style={textfieldStyle} ref='firstname' name='firstname' />
+              <span style={{whiteSpace: 'nowrap'}}>First Name</span>
+              <TextField style={textfieldStyle} value={state.contactBody.firstname || ''} name='firstname' onChange={e => this.onChange('firstname', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Lastname</span><TextField style={textfieldStyle} ref='lastname' name='lastname' />
+              <span style={{whiteSpace: 'nowrap'}}>Last Name</span>
+              <TextField style={textfieldStyle} value={state.contactBody.lastname || ''} name='lastname' onChange={e => this.onChange('lastname', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Email</span><TextField style={textfieldStyle} ref='email' name='email' />
+              <span>Email</span>
+              <TextField style={textfieldStyle} value={state.contactBody.email || ''} name='email' onChange={e => this.onChange('email', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Twitter</span><TextField style={textfieldStyle} ref='twitter' name='twitter' />
+              <span>Twitter</span>
+              <TextField style={textfieldStyle} value={state.contactBody.twitter || ''} name='twitter' onChange={e => this.onChange('twitter', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Instagram</span><TextField style={textfieldStyle} ref='instagram' name='instagram' />
+              <span>Instagram</span>
+              <TextField style={textfieldStyle} value={state.contactBody.instagram || ''} name='instagram' onChange={e => this.onChange('instagram', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>LinkedIn</span><TextField style={textfieldStyle} ref='linkedin' name='linkedin' />
+              <span>LinkedIn</span>
+              <TextField style={textfieldStyle} value={state.contactBody.linkedin || ''} name='linkedin' onChange={e => this.onChange('linkedin', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Phone #</span><TextField style={textfieldStyle} ref='phone' name='phone' />
+              <span>Phone #</span>
+              <TextField style={textfieldStyle} value={state.contactBody.phonenumber || ''} name='phonenumber' onChange={e => this.onChange('phonenumber', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Blog</span><TextField style={textfieldStyle} ref='blog' name='blog' />
+              <span>Blog</span>
+              <TextField style={textfieldStyle} value={state.contactBody.blog || ''} name='blog' onChange={e => this.onChange('blog', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Website</span><TextField style={textfieldStyle} ref='website' name='website' />
+              <span>Website</span>
+              <TextField style={textfieldStyle} value={state.contactBody.website || ''} name='website' onChange={e => this.onChange('website', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Notes</span><TextField style={textfieldStyle} ref='notes' name='notes' />
+              <span>Notes</span>
+              <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
+            {props.list && props.list.fieldsmap !== null &&
+              props.list.fieldsmap.map((fieldObj, i) => fieldObj.customfield && (
+                <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
+                  <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
+                </div>
+                ))}
           </div>
         </Dialog>
         {props.children({
@@ -125,6 +155,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
+    searchPublicationsByIdName: query => dispatch(actionCreators.searchPublicationsByIdName(query)),
   };
 };
 
