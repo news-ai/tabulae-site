@@ -50,7 +50,7 @@ export function measureSpanSize(txt, font) {
   const context = element.getContext('2d');
   context.font = font;
   var tsize = {
-    width: context.measureText(txt).width,
+    width: context.measureText(txt).width + 15,
     height: parseInt(context.font)
   };
   return tsize;

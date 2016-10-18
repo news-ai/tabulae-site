@@ -25,6 +25,7 @@ import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInpu
 import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 import AddOrHideColumns from './AddOrHideColumns.react';
+import AddContact from './AddContact.react';
 
 import {
   generateTableFieldsmap,
@@ -534,6 +535,15 @@ class ListTable extends Component {
                 onClick={onRequestOpen}
                 />)}
               </AddOrHideColumns>
+              <AddContact listId={props.listId}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Add Contact'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-plus'
+                onClick={onRequestOpen}
+                />)}
+              </AddContact>
             </div>
           <div className='large-5 columns vertical-center'>
             <TextField
