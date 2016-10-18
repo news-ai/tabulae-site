@@ -507,6 +507,7 @@ class ListTable extends Component {
               tooltip='Email'
               tooltipPosition='top-left'
               iconClassName='fa fa-envelope'
+              iconStyle={{color: grey500}}
               onClick={_ => this.setState({isEmailPanelOpen: true})}
               disabled={state.isEmailPanelOpen}
               />
@@ -514,6 +515,7 @@ class ListTable extends Component {
               tooltip='Export'
               tooltipPosition='top-left'
               iconClassName='fa fa-download'
+              iconStyle={{color: grey500}}
               onClick={this.onExportClick}
               />
               <CopyOrMoveTo
@@ -523,6 +525,7 @@ class ListTable extends Component {
                 tooltip='Copy/Move to Another'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-copy'
+                iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
               </CopyOrMoveTo>
@@ -532,6 +535,7 @@ class ListTable extends Component {
                 tooltip='Show/Hide columns'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-edit'
+                iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
               </AddOrHideColumns>
@@ -541,6 +545,7 @@ class ListTable extends Component {
                 tooltip='Add Contact'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-plus'
+                iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
               </AddContact>
