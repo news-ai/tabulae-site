@@ -535,7 +535,7 @@ class ListTable extends Component {
                 onClick={onRequestOpen}
                 />)}
               </AddOrHideColumns>
-              <AddContact>
+              <AddContact listId={props.listId}>
               {({onRequestOpen}) => (
                 <IconButton
                 tooltip='Add Contact'

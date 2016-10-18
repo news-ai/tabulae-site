@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import * as actionCreators from 'actions/AppActions';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
@@ -26,7 +27,32 @@ class AddContact extends Component {
   }
 
   _onSubmit() {
-    console.log(this.refs.firstname.input.value);
+    let contactBody = {};
+    const list = this.props.list;
+    list.fieldsmap
+    .map(fieldObj => {
+      if (!fieldObj.customfield) {
+        if (this.refs[fieldObj.value]) {
+          if (this.refs[fieldObj.value].input.value.length > 0) {
+            contactBody[fieldObj.value] = this.refs[fieldObj.value].input.value;
+          }
+        } else {
+          console.log(fieldObj.value);
+        }
+      }
+    });
+
+    this.props.addContacts([contactBody])
+    .then(contacts => {
+      const ids = contacts.map(contact => contact.id);
+      const listBody = {
+        listId: list.id,
+        name: list.name,
+        contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
+      };
+      this.props.patchList(listBody);
+      this.setState({open: false});
+    });
   }
 
   render() {
@@ -91,11 +117,14 @@ class AddContact extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
+    list: state.listReducer[props.listId]
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
+    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
+    patchList: listBody => dispatch(actionCreators.patchList(listBody)),
   };
 };
 
