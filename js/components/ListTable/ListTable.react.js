@@ -21,10 +21,18 @@ import Draggable from 'react-draggable';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import {ToggleableEditInput} from '../ToggleableEditInput';
+import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
+import AddOrHideColumns from './AddOrHideColumns.react';
 
+import {
+  generateTableFieldsmap,
+  measureSpanSize,
+  escapeHtml,
+  convertToCsvString,
+  exportOperations,
+} from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
@@ -52,61 +60,6 @@ const styles = {
   },
 };
 
-function measureSpanSize(txt, font) {
-  const element = document.createElement('canvas');
-  const context = element.getContext('2d');
-  context.font = font;
-  var tsize = {
-    width: context.measureText(txt).width,
-    height: parseInt(context.font)
-  };
-  return tsize;
-}
-
-function escapeHtml(unsafe) {
-  return unsafe
-   .replace(/&/g, '&amp;')
-   .replace(/</g, '&lt;')
-   .replace(/>/g, '&gt;')
-   .replace(/"/g, '&quot;')
-   .replace(/'/g, '&#039;');
- }
-
-function convertToCsvString(contacts, fieldsmap) {
-  let base = 'data:text/csv;charset=utf-8,';
-  const filteredfieldsmap = fieldsmap
-  .filter(fieldObj => fieldObj.value !== 'selected' || fieldObj.data !== 'profile' || !fieldObj.hidden);
-  base += filteredfieldsmap.map(fieldObj => fieldObj.name).toString() + '\n';
-  contacts.map(contact => {
-    let rowStringArray = [];
-      filteredfieldsmap.map(fieldObj => {
-        let el;
-        if (fieldObj.customfield && contact.customfields !== null) {
-          if (contact.customfields.some(obj => obj.name === fieldObj.value)) el = contact.customfields.find(obj => obj.name === fieldObj.value).value;
-          else el = '';
-        } else {
-          el = contact[fieldObj.value];
-        }
-        if (typeof el === 'string') {
-          if (el.split(',').length > 1) rowStringArray.push('\"' + escapeHtml(el) + '\"');
-          else rowStringArray.push(escapeHtml(el));
-        } else {
-          rowStringArray.push('');
-        }
-    });
-    base += rowStringArray.toString() + '\n';
-  });
-  return base;
-}
-
-function exportOperations(contacts, fieldsmap, name) {
-  const csvString = convertToCsvString(contacts, fieldsmap);
-  const csvFile = encodeURI(csvString);
-  const link = document.createElement('a');
-  link.setAttribute('href', csvFile);
-  link.setAttribute('download', name);
-  link.click();
-}
 
 function _getter(contact, fieldObj) {
   if (fieldObj.customfield) {
@@ -116,6 +69,19 @@ function _getter(contact, fieldObj) {
   } else {
     return contact[fieldObj.value];
   }
+}
+
+function ControlledInput(props) {
+  return (
+    <ToggleableEditInputHOC async {...props}>
+      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
+      <ToggleableEditInput
+        onToggleTitleEdit={onToggleTitleEdit}
+        isTitleEditing={isTitleEditing}
+        name={name}
+        onUpdateName={onUpdateName}
+        />}
+    </ToggleableEditInputHOC>);
 }
 
 const localStorage = window.localStorage;
@@ -128,8 +94,6 @@ class ListTable extends Component {
       isSearchOn: false,
       errorText: '',
       searchContacts: [],
-      isTitleEditing: false,
-      name: null,
       selected: [],
       columnWidths: null,
       dragPositions: [],
@@ -155,8 +119,6 @@ class ListTable extends Component {
     }
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
-    this.onUpdateName = e => this.setState({name: e.target.value.substr(0, 140)});
-    this.onToggleTitleEdit = _ => this.setState({isTitleEditing: !this.state.isTitleEditing});
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -245,7 +207,18 @@ class ListTable extends Component {
       }
     }
 
-    if (nextProps.listData && nextProps.listData.name !== this.state.name) this.setState({name: nextProps.listData.name});
+    if (
+      this.props.listData &&
+      nextProps.listData &&
+      this.props.listData.fieldsmap.length !== nextProps.listData.fieldsmap.length
+      ) {
+      const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
+        const name = fieldObj.name;
+        const size = measureSpanSize(name, '16px Source Sans Pro')
+        return size.width > 60 ? size.width : 60;
+      });
+      this.setState({columnWidths})
+    }
 
     if (this.props.listData && this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
@@ -406,7 +379,7 @@ class ListTable extends Component {
           </Link>;
           break;
         default:
-          contentBody = <span></span>;
+          contentBody = <span>{content}</span>;
       }
     } else {
       contentBody = <span>{content}</span>;
@@ -484,10 +457,7 @@ class ListTable extends Component {
       // const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
       // let errorText = null;
       // if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({
-        // searchContacts,
-        // errorText,
-        isSearchOn: true});
+      this.setState({isSearchOn: true});
     });
   }
 
@@ -529,14 +499,9 @@ class ListTable extends Component {
       <div style={{marginTop: 30}}>
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 columns vertical-center'>
-            <ToggleableEditInput
-            name={state.name}
-            onUpdateName={this.onUpdateName}
-            onToggleTitleEdit={this.onToggleTitleEdit}
-            isTitleEditing={state.isTitleEditing}
-            />
+            <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
           </div>
-           <div className='large-3 columns vertical-center'>
+           <div className='large-4 columns vertical-center'>
               <IconButton
               tooltip='Email'
               tooltipPosition='top-left'
@@ -558,10 +523,17 @@ class ListTable extends Component {
                 tooltipPosition='top-left'
                 iconClassName='fa fa-copy'
                 onClick={onRequestOpen}
-                />
-                )}
+                />)}
               </CopyOrMoveTo>
-              
+              <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Show/Hide columns'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-edit'
+                onClick={onRequestOpen}
+                />)}
+              </AddOrHideColumns>
             </div>
           <div className='large-5 columns vertical-center'>
             <TextField
@@ -574,12 +546,15 @@ class ListTable extends Component {
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-          </div>
-          <div className='large-1 columns'>
-            <FlatButton className='noprint' label='Edit' onClick={_ => props.router.push(`/lists/${props.listId}`)} labelStyle={{textTransform: 'none', color: grey400}} icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
+            <IconButton
+            tooltip='Go to Bulk Edit'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-arrow-right'
+            iconStyle={{color: grey400, float: 'right'}}
+            onClick={_ => props.router.push(`/lists/${props.listId}`)}
+            />
           </div>
         </div>
-
         {state.isEmailPanelOpen &&
           <EmailPanel
           person={props.person}
@@ -659,56 +634,17 @@ const mapStateToProps = (state, props) => {
     }
   }
 
-
-  const fieldsmap = listData ? [
-  {
-    name: '#',
-    hidden: false,
-    value: 'index',
-    customfield: false,
-    tableOnly: true
-  },
-  {
-    name: 'Profile',
-    hidden: false,
-    value: 'profile',
-    customfield: false,
-    tableOnly: true
-  },
-  {
-    name: 'Selected',
-    hidden: false,
-    value: 'selected',
-    customfield: false,
-    tableOnly: true
-  },
-  ...listData.fieldsmap
-  .filter(fieldObj => !fieldObj.hidden)
-  .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
-  {
-    customfield: false,
-    name: 'Publication 1',
-    value: 'publication_name_1',
-    hidden: false
-  },
-  {
-    customfield: false,
-    name: 'Publication 2',
-    value: 'publication_name_2',
-    hidden: false
-  }
-  ] : null;
-
+  const rawFieldsmap = listData ? generateTableFieldsmap(listData) : null;
 
   return {
     received,
     searchQuery,
-    listId: listId,
+    listId,
     listIsReceiving: state.listReducer.isReceiving,
-    listData: listData,
-    fieldsmap,
+    listData,
+    fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden) : null,
+    rawFieldsmap,
     contacts: contacts,
-    name: listData ? listData.name : null,
     contactIsReceiving: state.contactReducer.isReceiving,
     publicationReducer,
     person: state.personReducer.person,
