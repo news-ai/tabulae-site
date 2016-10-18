@@ -11,23 +11,28 @@ import IconButton from 'material-ui/IconButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {grey400, grey700} from 'material-ui/styles/colors';
-import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
+import {SortableContainer, SortableHandle, SortableElement, arrayMove} from 'react-sortable-hoc';
 
 import './react_sortable_hoc.css';
+
+const DragHandle = SortableHandle(() => <i className='fa fa-bars pointer' aria-hidden='true' />);
 
 const Column = ({name, value, customfield, tableOnly, hidden, onCheck, onRemove}) => {
   return (
     <div className='row item'>
-      <div className='large-1 medium-2 columns'>
+      <div className='large-1 medium-1 small-6 columns'>
+        <DragHandle />
+      </div>
+      <div className='large-1 medium-2 small-6 columns'>
         <Checkbox disabled={tableOnly} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
       </div>
-      <div className='large-3 medium-4 columns'>
+      <div className='large-3 medium-4 small-12 columns'>
         <span>{name}</span>
       </div>
-      <div className='large-4 medium-4 columns'>
+      <div className='large-4 medium-4 small-12 columns'>
         <span>{tableOnly ? 'Table Only' : customfield ? 'Custom Editable' : 'Editable'}</span>
       </div>
-      <div className='large-1 medium-2 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
+      <div className='large-1 medium-1 small-12 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
         {customfield && <i className='fa fa-trash hoverable-icon' aria-hidden='true' onClick={_ => onRemove(value)} />}
       </div>
     </div>
@@ -40,7 +45,9 @@ const SortableList = SortableContainer(({items, onCheck, onRemove}) => {
   return (
     <div>
       <div className='row' style={{borderBottom: 'solid 1px black', marginBottom: 5}}>
-        <div className='large-1 medium-2 columns'>
+        <div className='large-1 columns'>
+        </div>
+        <div className='large-1 medium-3 columns'>
           <span>Hidden</span>
         </div>
         <div className='large-3 medium-4 columns'>
@@ -112,7 +119,7 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
-    this.setState({open: false});
+    this.setState({open: false, textvalue: ''});
   }
 
   _onAddColumn() {
@@ -136,7 +143,7 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
-    this.setState({open: false});
+    this.setState({open: false, textvalue: ''});
   }
 
   _onRemove(deleteValue) {
@@ -180,6 +187,7 @@ class AddOrHideColumns extends Component {
               onSortEnd={this.onSortEnd}
               onCheck={this.onCheck}
               onRemove={this.onRemove}
+              useDragHandle
               />}
             <div style={{margin: 30}}>
               <span>Add Column</span>

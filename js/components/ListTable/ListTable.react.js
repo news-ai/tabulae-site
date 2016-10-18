@@ -207,7 +207,11 @@ class ListTable extends Component {
       }
     }
 
-    if (this.props.listData && this.props.listData.fieldsmap.length !== nextProps.listData.fieldsmap.length) {
+    if (
+      this.props.listData &&
+      nextProps.listData &&
+      this.props.listData.fieldsmap.length !== nextProps.listData.fieldsmap.length
+      ) {
       const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
