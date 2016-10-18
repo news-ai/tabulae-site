@@ -7,8 +7,10 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import {grey400, grey700} from 'material-ui/styles/colors';
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 
 import './react_sortable_hoc.css';
@@ -26,7 +28,6 @@ const Column = ({name, value, customfield, tableOnly, hidden, onCheck, onRemove}
         <span>{tableOnly ? 'Table Only' : customfield ? 'Custom Editable' : 'Editable'}</span>
       </div>
       <div className='large-1 medium-2 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
-        {customfield && <i className='fa fa-edit hoverable-icon' aria-hidden='true' />}
         {customfield && <i className='fa fa-trash hoverable-icon' aria-hidden='true' onClick={_ => onRemove(value)} />}
       </div>
     </div>
@@ -111,6 +112,7 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
+    this.setState({open: false});
   }
 
   _onAddColumn() {
@@ -134,6 +136,7 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
+    this.setState({open: false});
   }
 
   _onRemove(deleteValue) {
@@ -178,14 +181,17 @@ class AddOrHideColumns extends Component {
               onCheck={this.onCheck}
               onRemove={this.onRemove}
               />}
-            <div style={{margin: 10}}>
+            <div style={{margin: 30}}>
+              <span>Add Column</span>
               <TextField
               id='custom-column'
+              style={{marginLeft: 15, marginRight: 15}}
               value={state.textvalue}
               onChange={e => this.setState({textvalue: e.target.value})}
               />
               <RaisedButton
-              label='Add Custom Column'
+              label='Add'
+              icon={<FontIcon color={grey400} hoverColor={grey700} className='fa fa-plus' />}
               onClick={this.onAddColumn}
               />
             </div>
