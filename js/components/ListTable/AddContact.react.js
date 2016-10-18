@@ -54,7 +54,7 @@ class AddContact extends Component {
         contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
       };
       this.props.patchList(listBody);
-      this.setState({open: false});
+      this.setState({open: false, contactBody: {}});
     });
   }
 
