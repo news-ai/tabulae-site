@@ -496,6 +496,7 @@ class ListTable extends Component {
   _onRemoveContacts() {
     const selected = this.state.selected;
     const props = this.props;
+    if (selected.length === 0) return;
     const newListContacts = _.difference(props.listData.contacts, selected);
     props.deleteContacts(selected);
     props.patchList({
