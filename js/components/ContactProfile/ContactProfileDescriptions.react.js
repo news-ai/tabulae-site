@@ -1,6 +1,6 @@
 import React from 'react';
-import {grey700} from 'material-ui/styles/colors';
 
+import {grey700} from 'material-ui/styles/colors';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 import ContactDescriptor from './ContactDescriptor.react';
@@ -8,6 +8,7 @@ import IconButton from 'material-ui/IconButton';
 import ContactCustomDescriptions from './ContactCustomDescriptions.react';
 import TwitterProfile from './SocialProfiles/Twitter/TwitterProfile.react';
 import InstagramProfile from './SocialProfiles/Instagram/InstagramProfile.react';
+import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
 
 const styles = {
   smallIcon: {
@@ -53,6 +54,22 @@ const WrappedInstagram = props => {
     );
 };
 
+const ControlledInput = props => {
+  return (
+    <ToggleableEditInputHOC {...props}>
+      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
+      <ToggleableEditInput
+        onToggleTitleEdit={onToggleTitleEdit}
+        isTitleEditing={isTitleEditing}
+        name={name}
+        onUpdateName={onUpdateName}
+        nameStyle={props.nameStyle}
+        />}
+    </ToggleableEditInputHOC>);
+};
+
+const contactDescriptorClassname = 'large-12 medium-8 small-12 columns';
+
 function ContactProfileDescriptions({contact, patchContact, className, list}) {
   let instagramErrorText = null;
   if (contact.instagraminvalid) instagramErrorText = 'Invalid Instagram handle';
@@ -64,22 +81,35 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
 
   return (
     <div className={className} style={{marginTop: 5}}>
-      <h4 style={{marginLeft: 10}}>{contact.firstname} {contact.lastname}</h4>
+      <div className='row' style={{margin: '5px 0'}}>
+        <div className='large-12 medium-12 small-12 columns'>
+          <ControlledInput
+          nameStyle={{fontSize: '1.3em'}}
+          name={`${contact.firstname} ${contact.lastname}`}
+          onBlur={val => {
+            if (val === `${contact.firstname} ${contact.lastname}`) return;
+            const fullname = val.split(' ');
+            const firstname = fullname[0];
+            const lastname = fullname.filter((name, i) => i > 0).join(' ');
+            patchContact(contact.id, {firstname, lastname});
+          }}/>
+        </div>
+      </div>
       <ContactDescriptor
       iconClassName='fa fa-envelope'
-      className='large-12 medium-8 small-12 columns'
+      className={contactDescriptorClassname}
       content={contact.email}
       contentTitle='Email'
       onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
       <ContactDescriptor
       iconClassName='fa fa-rss'
-      className='large-12 medium-8 small-12 columns'
+      className={contactDescriptorClassname}
       content={contact.blog}
       contentTitle='Blog'
       onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
       <ContactDescriptor
       iconClassName='fa fa-twitter'
-      className='large-12 medium-8 small-12 columns'
+      className={contactDescriptorClassname}
       errorText={twitterErrorText}
       content={contact.twitter}
       contentTitle='Twitter'
@@ -90,7 +120,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       />
       <ContactDescriptor
       iconClassName='fa fa-instagram'
-      className='large-12 medium-8 small-12 columns'
+      className={contactDescriptorClassname}
       errorText={instagramErrorText}
       content={contact.instagram}
       contentTitle='Instagram'
@@ -101,13 +131,13 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       />
       <ContactDescriptor
       iconClassName='fa fa-linkedin'
-      className='large-12 medium-8 small-12 columns'
+      className={contactDescriptorClassname}
       content={contact.linkedin}
       contentTitle='LinkedIn'
       onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
       <ContactDescriptor
       iconClassName='fa fa-external-link'
-      className='large-12 medium-8 small-12 columns'
+      className={contactDescriptorClassname}
       content={contact.website}
       contentTitle='Website'
       onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}

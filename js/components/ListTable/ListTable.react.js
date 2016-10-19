@@ -376,7 +376,7 @@ class ListTable extends Component {
           />
           break;
         case 'profile':
-          contentBody = <Link to={`/lists/${this.props.listId}/${rowData.id}`}>
+          contentBody = <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
           <i className='fa fa-arrow-right' aria-hidden='true'/>
           </Link>;
           break;
