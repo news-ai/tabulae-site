@@ -18,7 +18,7 @@ const HeadlineItem = ({style, url, title, createdat, summary, publisherName}) =>
   const date = new Date(createdat);
   const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
   return (
-  <div className='row' style={containerStyle}>
+  <div className='row headline-item' style={containerStyle}>
     <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from RSS</span></div>
     <div className='large-12 medium-12 small-12 columns'>
       <a target='_blank' href={url}><span style={{fontSize: '1.1em'}}>{title}</span></a>

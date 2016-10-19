@@ -116,4 +116,13 @@ input {
   box-shadow: none !important;
 }
 
-.ajs-message.ajs-custom { color: #31708f;  background-color: #d9edf7;  border-color: #31708f; }
+.ajs-message.ajs-custom {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #31708f;
+}
+
+.headline-item img {
+  height: 300px;
+  display: block
+}
