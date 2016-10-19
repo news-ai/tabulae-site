@@ -21,7 +21,8 @@ const styles = {
   }
 };
 
-function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, name}) {
+function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, name, nameStyle}) {
+  const spanStyle = nameStyle ? Object.assign({}, styles.nameBlock.title, nameStyle) : styles.nameBlock.title;
   const renderNode = isTitleEditing ? (
     <TextField
     className='u-full-width noprint'
@@ -37,7 +38,7 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
     <div className='u-full-width' onClick={onToggleTitleEdit}>
       <span
       className='print'
-      style={[styles.nameBlock.title]}
+      style={[spanStyle]}
       >{name}</span>
       <i
       className='fa fa-pencil-square-o noprint'

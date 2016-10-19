@@ -88,12 +88,12 @@ ReactDOM.render(
             <IndexRoute component={ListManagerContainer} />
             <Route path='lists' name='List Manager' component={ListManagerContainer} />
             <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
-            <Route path='lists/:listId' staticName name='List'>
-              <IndexRoute component={OnboardingTable}/>
-              <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
-            </Route>
             <Route path='tables/:listId' staticName name='Table'>
               <IndexRoute component={OnboardingListTable}/>
+              <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
+            </Route>
+            <Route path='lists/:listId' staticName name='List'>
+              <IndexRoute component={OnboardingTable}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
