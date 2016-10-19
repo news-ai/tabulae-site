@@ -41,16 +41,16 @@ class ListFeed extends Component {
     let row;
     switch (feedItem.type) {
       case 'headlines':
-        row = <HeadlineItem screenWidth={this.state.screenWidth} {...feedItem} />;
+        row = <HeadlineItem showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
         break;
       case 'tweets':
-        row = <Tweet screenWidth={this.state.screenWidth} {...feedItem} />;
+        row = <Tweet showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
         break;
       case 'instagrams':
-        row = <InstagramItem screenWidth={this.state.screenWidth} {...feedItem} />;
+        row = <InstagramItem showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
         break;
       default:
-        row = <HeadlineItem screenWidth={this.state.screenWidth} {...feedItem} />;
+        row = <HeadlineItem showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
     }
     let newStyle = style;
     if (newStyle) newStyle.padding = '0 15px';
