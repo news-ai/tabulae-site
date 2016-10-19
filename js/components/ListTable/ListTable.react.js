@@ -16,7 +16,7 @@ import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import {blue200, grey500, grey400} from 'material-ui/styles/colors';
-import {Column, Table, AutoSizer, Grid, ScrollSync} from 'react-virtualized'
+import {Column, Table, AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 
 import {EmailPanel} from '../Email';
@@ -608,9 +608,9 @@ class ListTable extends Component {
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div>
-          {props.listData && props.received.length > 0 && state.columnWidths !== null && <ScrollSync>
-           {
-            ({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
+          {props.listData && props.received.length > 0 && state.columnWidths !== null &&
+            <ScrollSync>
+            {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
               <div style={{marginBottom: 10}}>
                 <Grid
                 ref={ref => this.setHeaderGridRef(ref)}
@@ -628,23 +628,29 @@ class ListTable extends Component {
                 />
               </div>
               <div>
-                <Grid
-                ref={ref => this.setDataGridRef(ref)}
-                className='BodyGrid'
-                cellRenderer={this.cellRenderer}
-                columnCount={props.fieldsmap.length}
-                columnWidth={({index}) => state.columnWidths[index] + 10}
-                overscanRowCount={20}
-                overscanColumnCount={3}
-                height={600}
-                width={state.screenWidth}
-                rowCount={props.received.length}
-                rowHeight={30}
-                onScroll={args => {
-                  if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
-                  onScroll(args);
-                }}
-                />
+                <WindowScroller>
+                {args => (
+                  <Grid
+                  autoHeight
+                  ref={ref => this.setDataGridRef(ref)}
+                  className='BodyGrid'
+                  cellRenderer={this.cellRenderer}
+                  columnCount={props.fieldsmap.length}
+                  columnWidth={({index}) => state.columnWidths[index] + 10}
+                  overscanRowCount={20}
+                  overscanColumnCount={3}
+                  height={args.height}
+                  scrollTop={args.scrollTop}
+                  width={state.screenWidth}
+                  rowCount={props.received.length}
+                  rowHeight={30}
+                  onScroll={args => {
+                    if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
+                    onScroll(args);
+                  }}
+                  />
+                  )}
+                </WindowScroller>
               </div>
             </div>}
           </ScrollSync>}
