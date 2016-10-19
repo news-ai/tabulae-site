@@ -15,7 +15,7 @@ class Headlines extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
-      if (this._headlineList) this._headlineList.recomputeRowHeights();
+      // if (this._headlineList) this._headlineList.recomputeRowHeights();
     }
   }
 
