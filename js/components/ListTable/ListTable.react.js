@@ -397,8 +397,17 @@ class ListTable extends Component {
     }
 
   _fetchOperations(props) {
-    return props.fetchList(props.listId)
-    .then(_ => props.fetchContacts(props.listId));
+    if (!props.listData) {
+      props.fetchList(props.listId)
+      .then(_ => props.loadAllContacts(props.listId));
+    } else {
+      if (
+        props.listData.contacts !== null &&
+        props.received < props.listData.contacts.length
+        ) {
+        props.loadAllContacts(props.listId);
+      }
+    }
   }
 
   _onSort(columnIndex) {
@@ -717,6 +726,7 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
     clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId}),
     deleteContacts: ids => dispatch(actionCreators.deleteContacts(ids)),
+    loadAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
   };
 };
 
