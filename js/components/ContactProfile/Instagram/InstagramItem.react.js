@@ -35,6 +35,7 @@ const InstagramItem = ({
   instagramlink,
   instagramusername,
   instagramvideo,
+  caption,
 }) => {
   const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
   const date = new Date(createdat);
@@ -43,8 +44,10 @@ const InstagramItem = ({
   return (
     <div className='row' style={containerStyle}>
       <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from Instagram</span></div>
-      <div className='large-12 medium-2 small-12 columns'>
+      <div className='large-10 medium-12 small-12 columns'>
         <a target='_blank' style={{float: 'left'}} href={instagramlink}>{text ? text : instagramlink}</a>
+      </div>
+      <div className='large-2 medium-12 small-12 columns'>
         <span style={{float: 'right'}}>
           {instagramusername ? <a target='_blank' href={`https://instagram.com/${instagramusername}`}>{instagramusername}</a> : instagramusername}
         </span>
@@ -52,6 +55,10 @@ const InstagramItem = ({
       <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
         <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
       </div>
+      {caption &&
+        <div className='large-12 medium-12 small-12 columns'>
+          <span>{caption}</span>
+        </div>}
       {!instagramvideo && <div className='large-12 medium-12 small-12 columns horizontal-center' style={imgContainerStyle}>
         <img style={{maxHeight: '100%', maxWidth: '100%'}} src={instagramimage} />
       </div>}

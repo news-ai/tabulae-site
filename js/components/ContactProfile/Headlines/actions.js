@@ -2,7 +2,6 @@ import {headlineConstant} from './constants';
 import * as api from '../../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 const headlineSchema = new Schema('headlines', {idAttribute: 'url'});
-// const listSchema = new Schema('lists');
 
 export function fetchContactHeadlines(contactId) {
   const PAGE_LIMIT = 50;
@@ -14,9 +13,7 @@ export function fetchContactHeadlines(contactId) {
     dispatch({type: headlineConstant.REQUEST, contactId});
     return api.get(`/contacts/${contactId}/headlines?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(headlineSchema),
-      });
+      const res = normalize(response, {data: arrayOf(headlineSchema)});
 
       return dispatch({
         type: headlineConstant.RECEIVE,

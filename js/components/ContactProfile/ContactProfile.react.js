@@ -18,6 +18,7 @@ import Textarea from 'react-textarea-autosize';
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeed.react';
 import Headlines from './Headlines/Headlines.react';
+import InstagramFeed from './Instagram/InstagramFeed.react';
 import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
@@ -254,6 +255,9 @@ class ContactProfile extends Component {
                   </Tab>
                   <Tab label='Tweets only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
                     <TweetFeed refName='twitter' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                  </Tab>
+                  <Tab label='Instagram only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
+                    <InstagramFeed refName='instagram' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='Sent Emails' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
                     <ContactEmails refName='emails' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
