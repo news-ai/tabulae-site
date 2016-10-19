@@ -85,8 +85,7 @@ class ListFeed extends Component {
         {props.listfeed && props.listfeed.length === 0 &&
           <div className='row horizontal-center vertical-center' style={{height: 400}}>
             <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
-          </div>
-        }
+          </div>}
         <div className='row horizontal-center' style={{padding: `0 ${FEED_PADDING/2}px`}}>
         {props.listfeed && props.listfeed.length > 0 &&
           <WindowScroller>
