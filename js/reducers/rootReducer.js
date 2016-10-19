@@ -13,6 +13,7 @@ import feedReducer from '../components/ContactProfile/reducer';
 import headlineReducer from '../components/ContactProfile/Headlines/reducer';
 import mixedReducer from '../components/ContactProfile/MixedFeed/reducer';
 import tweetReducer from '../components/ContactProfile/Tweets/reducer';
+import instagramReducer from '../components/ContactProfile/Instagram/reducer';
 import listfeedReducer from '../components/ListFeed/reducer';
 import twitterProfileReducer from '../components/ContactProfile/SocialProfiles/Twitter/reducer';
 import instagramProfileReducer from '../components/ContactProfile/SocialProfiles/Instagram/reducer';
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   headerReducer,
   mixedReducer,
   tweetReducer,
+  instagramReducer,
   listfeedReducer,
   twitterProfileReducer,
   instagramProfileReducer,

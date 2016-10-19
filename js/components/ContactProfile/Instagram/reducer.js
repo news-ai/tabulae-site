@@ -1,21 +1,21 @@
-import {headlineConstant} from './constants';
+import {instagramConstant} from './constants';
 import _ from 'lodash';
 
 import {initialState} from '../../../reducers/initialState';
 import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
-const types = _.values(headlineConstant);
+const types = _.values(instagramConstant);
 
-function headlineReducer(state = initialState.headlineReducer, action) {
+function instagramReducer(state = initialState.instagramReducer, action) {
   if (window.isDev) Object.freeze(state);
   if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
-    case headlineConstant.REQUEST:
+    case instagramConstant.REQUEST:
       obj.isReceiving = true;
       return obj;
-    case headlineConstant.RECEIVE:
-      obj = assignToEmpty(obj, action.headlines);
+    case instagramConstant.RECEIVE:
+      obj = assignToEmpty(obj, action.instagrams);
       const oldContact = state[action.contactId] || {received: []};
       obj[action.contactId] = assignToEmpty(state[action.contactId], {
         received: [
@@ -26,7 +26,7 @@ function headlineReducer(state = initialState.headlineReducer, action) {
       });
       obj.isReceiving = false;
       return obj;
-    case headlineConstant.REQUEST_FAIL:
+    case instagramConstant.REQUEST_FAIL:
       obj.didInvalidate = true;
       return obj;
     default:
@@ -34,4 +34,4 @@ function headlineReducer(state = initialState.headlineReducer, action) {
   }
 }
 
-export default headlineReducer;
+export default instagramReducer;
