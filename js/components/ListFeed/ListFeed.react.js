@@ -65,7 +65,7 @@ class ListFeed extends Component {
     const state = this.state;
     return (
       <div>
-        <div className='row' style={{marginTop: 20}}>
+        <div className='row horizontal-center' style={{marginTop: 20}}>
           <h4>{props.list ? props.list.name : 'List Feed'}</h4>
           <FlatButton
           className='noprint'
