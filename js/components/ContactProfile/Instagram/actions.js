@@ -14,8 +14,6 @@ export function fetchContactInstagrams(contactId) {
     return api.get(`/contacts/${contactId}/instagrams?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const res = normalize(response, {data: arrayOf(instagramSchema)});
-      console.log(response);
-
       return dispatch({
         type: instagramConstant.RECEIVE,
         contactId,

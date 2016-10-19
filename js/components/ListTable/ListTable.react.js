@@ -638,7 +638,7 @@ class ListTable extends Component {
                 cellRenderer={this.headerRenderer}
                 columnCount={props.fieldsmap.length}
                 columnWidth={({index}) => state.columnWidths[index] + 10}
-                height={30}
+                height={40}
                 autoContainerWidth
                 width={state.screenWidth}
                 rowCount={1}
