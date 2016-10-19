@@ -311,7 +311,7 @@ class ListTable extends Component {
     className='headercell'
     key={key}
     style={style}>
-      <span>{content}</span>
+      <span style={{whiteSpace: 'nowrap'}}>{content}</span>
       {sortDirection !== 2 &&
         <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
         className={`${directionIcon} sort-icon`}
@@ -617,6 +617,17 @@ class ListTable extends Component {
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div>
+        {props.listData && props.listData.contacts === null &&
+          <div className='row horizontal-center vertical-center' style={{height: 400}}>
+            <div>
+              <p>You haven't added any contacts. You will see a master sheet of them here after you added some.</p>
+              <ul>
+                <li>"Add Contact" icon on top to add ONE contact</li>
+                <li>"Go to Bulk Edit" to add MULTIPLE contacts</li>
+                <li>Go back to Home and "Upload from Existing" Excel sheet</li>
+              </ul>
+            </div>
+          </div>}
           {props.listData && props.received.length > 0 && state.columnWidths !== null &&
             <ScrollSync>
             {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
