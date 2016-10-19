@@ -512,6 +512,19 @@ class ListTable extends Component {
 
     return (
       <div style={{marginTop: 30}}>
+        <div className='row'>
+          <FlatButton
+          labelStyle={{textTransform: 'none', color: grey400}}
+          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
+          label='List Feed'
+          onClick={_ => props.router.push(`/listfeeds/${props.listId}`)} />
+          <FlatButton
+          label='Go to Bulk Edit'
+          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
+          labelStyle={{color: grey400, textTransform: 'none'}}
+          onClick={_ => props.router.push(`/lists/${props.listId}`)}
+          />
+        </div>
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 medium-4 columns vertical-center'>
             <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
@@ -582,13 +595,7 @@ class ListTable extends Component {
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-            <IconButton
-            tooltip='Go to Bulk Edit'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-arrow-right'
-            iconStyle={{color: grey400, float: 'right'}}
-            onClick={_ => props.router.push(`/lists/${props.listId}`)}
-            />
+           
           </div>
         </div>
         {state.isEmailPanelOpen &&
