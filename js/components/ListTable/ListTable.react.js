@@ -637,7 +637,7 @@ class ListTable extends Component {
                   cellRenderer={this.cellRenderer}
                   columnCount={props.fieldsmap.length}
                   columnWidth={({index}) => state.columnWidths[index] + 10}
-                  overscanRowCount={20}
+                  overscanRowCount={30}
                   overscanColumnCount={3}
                   height={args.height}
                   scrollTop={args.scrollTop}

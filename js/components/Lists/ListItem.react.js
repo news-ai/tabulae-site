@@ -38,7 +38,7 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
   const updatedDate = new Date(list.updated);
   return (
     <div key='parent' className='row align-middle' style={[styles.parent]}>
-      <div className='small-8 medium-5 large-7 columns' style={[styles.pointer]} onClick={_ => router.push(`/lists/${list.id}`)}>
+      <div className='small-8 medium-5 large-7 columns' style={[styles.pointer]} onClick={_ => router.push(`/tables/${list.id}`)}>
         <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
       </div>
       <div className='small-4 medium-4 large-3 columns' onClick={_ => router.push(`/lists/${list.id}`)}>
