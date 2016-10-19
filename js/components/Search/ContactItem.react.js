@@ -34,13 +34,13 @@ const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, quer
             tooltip='Go to Profile'
             tooltipPosition='top-right'
             iconClassName='fa fa-user'
-            onClick={_ => router.push(`/lists/${listid}/${id}`)}
+            onClick={_ => router.push(`/tables/${listid}/${id}`)}
             /> : null}
           {rowNum ? <IconButton
             tooltip='Go to Search Results in List'
             tooltipPosition='top-right'
             iconClassName='fa fa-list-alt'
-            onClick={_ => router.push(`/lists/${listid}?search=${query}`)}
+            onClick={_ => router.push(`/tables/${listid}?search=${query}`)}
             /> : null}
         </div>
         </div>
