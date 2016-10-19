@@ -398,14 +398,14 @@ class ListTable extends Component {
 
   _fetchOperations(props) {
     if (!props.listData) {
-      props.fetchList(props.listId)
+      return props.fetchList(props.listId)
       .then(_ => props.loadAllContacts(props.listId));
     } else {
       if (
         props.listData.contacts !== null &&
         props.received < props.listData.contacts.length
         ) {
-        props.loadAllContacts(props.listId);
+        return props.loadAllContacts(props.listId);
       }
     }
   }
