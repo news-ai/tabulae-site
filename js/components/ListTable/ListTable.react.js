@@ -309,23 +309,24 @@ class ListTable extends Component {
       directionIcon = 'fa fa-caret-down';
     }
 
-    return <div
-    className='headercell'
-    key={key}
-    style={style}>
-      <span style={{whiteSpace: 'nowrap'}}>{content}</span>
-      {sortDirection !== 2 &&
-        <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
-        className={`${directionIcon} sort-icon`}
-        onClick={_ => this.onSort(columnIndex)} aria-hidden='true' />}
-      <Draggable
-      axis='x'
-      bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
-      position={this.state.dragPositions[columnIndex]}
-      onStop={(e, args) => this.onHeaderDragStop(e, args, columnIndex)}>
-        <div className='draggable-handle right'></div>
-      </Draggable>
-    </div>;
+    return (
+      <div
+      className='headercell'
+      key={key}
+      style={style}>
+        <span style={{whiteSpace: 'nowrap'}}>{content}</span>
+        {sortDirection !== 2 &&
+          <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
+          className={`${directionIcon} sort-icon`}
+          onClick={_ => this.onSort(columnIndex)} aria-hidden='true' />}
+        <Draggable
+        axis='x'
+        bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
+        position={this.state.dragPositions[columnIndex]}
+        onStop={(e, args) => this.onHeaderDragStop(e, args, columnIndex)}>
+          <div className='draggable-handle right'></div>
+        </Draggable>
+      </div>);
   }
 
   _cellRenderer({columnIndex, rowIndex, key, style}) {
@@ -389,9 +390,7 @@ class ListTable extends Component {
               });
             }}
             onMouseLeave={e => {
-              this.setState({
-                showProfileTooltip: false
-              });
+              setTimeout(_ => !state.onPanel ? this.setState({showProfileTooltip: true}) : null, 500);
             }}
             to={`/tables/${this.props.listId}/${rowData.id}`}>
               <i className='fa fa-arrow-right' aria-hidden='true'/>
@@ -552,7 +551,10 @@ class ListTable extends Component {
           />
         </div>
         {state.showProfileTooltip &&
-          <div style={{
+          <div
+          onMouseEnter={_ => this.setState({showProfileTooltip: true, onTooltipPanel: true})}
+          onMouseLeave={_ => this.setState({showProfileTooltip: false, onTooltipPanel: false})}
+          style={{
             zIndex: 200,
             width: 300,
             height: 300,
