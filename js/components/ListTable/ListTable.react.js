@@ -22,7 +22,7 @@ import Overlay from 'react-overlays';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
+import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 import AddOrHideColumns from './AddOrHideColumns.react';
@@ -73,19 +73,6 @@ function _getter(contact, fieldObj) {
   }
 }
 
-function ControlledInput(props) {
-  return (
-    <ToggleableEditInputHOC async {...props}>
-      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
-      <ToggleableEditInput
-        onToggleTitleEdit={onToggleTitleEdit}
-        isTitleEditing={isTitleEditing}
-        name={name}
-        onUpdateName={onUpdateName}
-        />}
-    </ToggleableEditInputHOC>);
-}
-
 const localStorage = window.localStorage;
 
 class ListTable extends Component {
@@ -106,6 +93,7 @@ class ListTable extends Component {
       sortedIds: [],
       lastRowIndexChecked: null,
       showProfileTooltip: false,
+      profileContactId: null,
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
     };
@@ -386,7 +374,8 @@ class ListTable extends Component {
               this.setState({
                 showProfileTooltip: true,
                 profileX: e.pageX,
-                profileY: e.pageY
+                profileY: e.pageY,
+                profileContactId: rowData.id
               });
             }}
             onMouseLeave={e => {
@@ -556,16 +545,18 @@ class ListTable extends Component {
           onMouseLeave={_ => this.setState({showProfileTooltip: false, onTooltipPanel: false})}
           style={{
             zIndex: 200,
-            width: 300,
+            width: 500,
             height: 300,
             backgroundColor: 'red',
             position: 'fixed',
             top: state.profileY,
             left: state.profileX + 8,
-          }}></div>}
+          }}>
+
+          </div>}
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 medium-4 columns vertical-center'>
-            <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
+            <ControlledInput async name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
           </div>
            <div className='large-4 medium-4 columns vertical-center'>
               <IconButton

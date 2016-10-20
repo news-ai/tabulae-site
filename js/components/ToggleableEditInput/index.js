@@ -1,3 +1,18 @@
+import React, {PropTypes, Component} from 'react';
 import ToggleableEditInput from './ToggleableEditInput.react';
 import ToggleableEditInputHOC from './ToggleableEditInputHOC.react';
-export {ToggleableEditInput, ToggleableEditInputHOC};
+
+function ControlledInput(props) {
+  return (
+    <ToggleableEditInputHOC {...props}>
+      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
+      <ToggleableEditInput
+        onToggleTitleEdit={onToggleTitleEdit}
+        isTitleEditing={isTitleEditing}
+        name={name}
+        onUpdateName={onUpdateName}
+        />}
+    </ToggleableEditInputHOC>);
+}
+
+export {ToggleableEditInput, ToggleableEditInputHOC, ControlledInput};
