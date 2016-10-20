@@ -43,6 +43,7 @@ class InstagramFeed extends Component {
       <GenericFeed
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
+      title='Instagram'
       {...props}
       />);
   }
@@ -57,6 +58,7 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     feed,
+    isReceiving: state.instagramReducer.isReceiving,
     didInvalidate: state.instagramReducer.didInvalidate,
     offset: state.instagramReducer[contactId] && state.instagramReducer[contactId].offset
   };

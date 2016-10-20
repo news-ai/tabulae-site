@@ -37,6 +37,7 @@ class Headlines extends Component {
       <GenericFeed
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
+      title='RSS'
       {...props}
       />);
   }
@@ -51,6 +52,7 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     feed,
+    isReceiving: state.headlineReducer.isReceiving,
     didInvalidate: state.headlineReducer.didInvalidate,
     offset: state.headlineReducer[contactId] && state.headlineReducer[contactId].offset
   };

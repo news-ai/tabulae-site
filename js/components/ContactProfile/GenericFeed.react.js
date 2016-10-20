@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 
 import RaisedButton from 'material-ui/RaisedButton';
+import FontIcon from 'material-ui/FontIcon';
 import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
 
 const styleEmptyRow = {
@@ -28,7 +29,11 @@ class GenericFeed extends Component {
           && !props.didInvalidate
           && props.feed.length === 0
           && <div className='row' style={styleEmptyRow}><p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
-        {props.feed &&
+        {props.isReceiving &&
+          <div className='row horizontal-center' style={{margin: '20px 0'}}>
+            <FontIcon className='fa fa-spinner fa-spin' />
+          </div>}
+        {props.feed && !props.isReceiving &&
           <WindowScroller>
           {({height, scrollTop}) => (
             <CellMeasurer
@@ -40,7 +45,7 @@ class GenericFeed extends Component {
               <List
               ref={ref => props.setRef(ref)}
               width={props.containerWidth}
-              height={height}
+              height={props.containerHeight ? props.containerHeight : height}
               scrollTop={scrollTop}
               rowCount={props.feed.length}
               rowHeight={getRowHeight}
@@ -55,7 +60,9 @@ class GenericFeed extends Component {
         {props.didInvalidate
           && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
         {props.offset !== null && <div className='horizontal-center'>
-        <RaisedButton label='Load more' onClick={_ => this.props.fetchFeed()} />
+        {!props.isReceiving &&
+          !props.hideLoadMore &&
+          <RaisedButton label='Load more' onClick={_ => this.props.fetchFeed()} />}
         </div>}
       </div>
       );
