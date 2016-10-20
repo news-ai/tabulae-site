@@ -37,6 +37,7 @@ class TweetFeed extends Component {
       <GenericFeed
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
+      title='Twitter'
       {...props}
       />);
   }
@@ -53,6 +54,7 @@ const mapStateToProps = (state, props) => {
     listId,
     contactId,
     feed,
+    isReceiving: state.tweetReducer.isReceiving,
     didInvalidate: state.tweetReducer.didInvalidate,
     offset: state.tweetReducer[contactId] && state.tweetReducer[contactId].offset
   };

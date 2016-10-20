@@ -28,7 +28,7 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 const styles = {
   nameBlock: {
     parent: {
-      marginTop: 40,
+      marginTop: 20,
     },
   },
   emailPanel: {
@@ -359,16 +359,14 @@ class Table extends Component {
                   //<MenuItem primaryText='Print' onClick={this.onPrintClick} />
 
     return (
-      <div>
-      <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-      {
-        props.listData &&
+      <div style={{marginTop: 30}}>
+        <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
+        {props.listData &&
         <div>
-          <div className='large-12 columns' style={{marginTop: 10}}>
+          <div className='vertical-center'>
             <FlatButton className='noprint' label='Read Only' onClick={_ => props.router.push(`/tables/${props.listId}`)} labelStyle={{textTransform: 'none', color: grey400}} icon={<FontIcon className='fa fa-arrow-left' color={grey400} />}/>
           </div>
           <div className='row' style={[styles.nameBlock.parent]}>
-
             <div className='small-12 medium-8 large-4 columns'>
               <ToggleableEditInput
               name={state.name}
@@ -442,8 +440,7 @@ class Table extends Component {
             />
           </div>
         </div>}
-      </div>
-      );
+      </div>);
   }
 }
 

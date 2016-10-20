@@ -55,6 +55,7 @@ class MixedFeed extends Component {
       <GenericFeed
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
+      title='RSS/Twitter/Instagram'
       {...props}
       />);
   }
@@ -65,6 +66,7 @@ const mapStateToProps = (state, props) => {
   return {
     listId,
     contactId,
+    isReceiving: state.mixedReducer.isReceiving,
     feed: state.mixedReducer[contactId] && state.mixedReducer[contactId].received,
     didInvalidate: state.mixedReducer.didInvalidate,
     offset: state.mixedReducer[contactId] && state.mixedReducer[contactId].offset

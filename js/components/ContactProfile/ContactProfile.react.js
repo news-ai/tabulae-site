@@ -248,7 +248,7 @@ class ContactProfile extends Component {
               <FeedsController {...props} />
                 <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
                   <Tab label='All' className='horizontal-center' style={{color: grey700}}>
-                    <MixedFeed refName='all' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                    <MixedFeed containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
                   </Tab>
                   <Tab label='RSS only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
                     <Headlines refName='rss' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />

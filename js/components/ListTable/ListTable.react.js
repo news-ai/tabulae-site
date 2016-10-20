@@ -14,14 +14,16 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
 import Checkbox from 'material-ui/Checkbox';
-import {blue200, grey500, grey400} from 'material-ui/styles/colors';
+import {blue200, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
 import {Column, Table, AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
-import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
+import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 import AddOrHideColumns from './AddOrHideColumns.react';
@@ -72,20 +74,41 @@ function _getter(contact, fieldObj) {
   }
 }
 
-function ControlledInput(props) {
-  return (
-    <ToggleableEditInputHOC async {...props}>
-      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
-      <ToggleableEditInput
-        onToggleTitleEdit={onToggleTitleEdit}
-        isTitleEditing={isTitleEditing}
-        name={name}
-        onUpdateName={onUpdateName}
-        />}
-    </ToggleableEditInputHOC>);
-}
-
 const localStorage = window.localStorage;
+
+const PanelOverlay = ({
+  profileY,
+  profileX,
+  onMouseEnter,
+  onMouseLeave,
+  contactId,
+  listId,
+}) => {
+  return (
+      <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{
+        top: profileY,
+        left: profileX + 8,
+        zIndex: 200,
+        width: 505,
+        height: 305,
+        border: `1px solid ${grey300}`,
+        borderRadius: '0.2em',
+        position: 'fixed',
+        backgroundColor: 'white',
+        boxShadow: `0 0 30px -10px ${grey500}`
+      }}>
+        <MixedFeed
+        containerWidth={500}
+        containerHeight={300}
+        contactId={contactId}
+        listId={listId}
+        hideLoadMore
+        />
+      </div>);
+}
 
 class ListTable extends Component {
   constructor(props) {
@@ -104,8 +127,10 @@ class ListTable extends Component {
       onSort: false,
       sortedIds: [],
       lastRowIndexChecked: null,
+      showProfileTooltip: false,
+      profileContactId: null,
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
     };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -307,23 +332,24 @@ class ListTable extends Component {
       directionIcon = 'fa fa-caret-down';
     }
 
-    return <div
-    className='headercell'
-    key={key}
-    style={style}>
-      <span style={{whiteSpace: 'nowrap'}}>{content}</span>
-      {sortDirection !== 2 &&
-        <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
-        className={`${directionIcon} sort-icon`}
-        onClick={_ => this.onSort(columnIndex)} aria-hidden='true' />}
-      <Draggable
-      axis='x'
-      bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
-      position={this.state.dragPositions[columnIndex]}
-      onStop={(e, args) => this.onHeaderDragStop(e, args, columnIndex)}>
-        <div className='draggable-handle right'></div>
-      </Draggable>
-    </div>;
+    return (
+      <div
+      className='headercell'
+      key={key}
+      style={style}>
+        <span style={{whiteSpace: 'nowrap'}}>{content}</span>
+        {sortDirection !== 2 &&
+          <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
+          className={`${directionIcon} sort-icon`}
+          onClick={_ => this.onSort(columnIndex)} aria-hidden='true' />}
+        <Draggable
+        axis='x'
+        bounds={{left: 0 - this.state.columnWidths[columnIndex]}}
+        position={this.state.dragPositions[columnIndex]}
+        onStop={(e, args) => this.onHeaderDragStop(e, args, columnIndex)}>
+          <div className='draggable-handle right'></div>
+        </Draggable>
+      </div>);
   }
 
   _cellRenderer({columnIndex, rowIndex, key, style}) {
@@ -348,37 +374,50 @@ class ListTable extends Component {
           break;
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
-          contentBody = <Checkbox
-          iconStyle={{fill: isChecked ? blue200 : grey400}}
-          checked={isChecked}
-          onCheck={(e, checked) => {
-            const lastRowIndexChecked = this.state.lastRowIndexChecked;
-            if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
-              let selected = this.state.selected.slice();
-              let last = null;
-              if (rowIndex < lastRowIndexChecked) {
-                for (let i = rowIndex; i < lastRowIndexChecked; i++) {
-                  const checked = this.state.selected.some(id => id === contacts[i].id);
-                  selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+          contentBody = (
+            <Checkbox
+            iconStyle={{fill: isChecked ? blue200 : grey400}}
+            checked={isChecked}
+            onCheck={(e, checked) => {
+              const lastRowIndexChecked = this.state.lastRowIndexChecked;
+              if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
+                let selected = this.state.selected.slice();
+                let last = null;
+                if (rowIndex < lastRowIndexChecked) {
+                  for (let i = rowIndex; i < lastRowIndexChecked; i++) {
+                    const checked = this.state.selected.some(id => id === contacts[i].id);
+                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+                  }
+                } else {
+                  for (let i = rowIndex; i > lastRowIndexChecked; i--) {
+                    const checked = this.state.selected.some(id => id === contacts[i].id);
+                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+                  }
                 }
+                this.setState({lastRowIndexChecked: rowIndex, selected});
               } else {
-                for (let i = rowIndex; i > lastRowIndexChecked; i--) {
-                  const checked = this.state.selected.some(id => id === contacts[i].id);
-                  selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
-                }
+                this.onCheck(rowData.id);
+                this.setState({lastRowIndexChecked: rowIndex});
               }
-              this.setState({lastRowIndexChecked: rowIndex, selected});
-            } else {
-              this.onCheck(rowData.id);
-              this.setState({lastRowIndexChecked: rowIndex});
-            }
-          }}
-          />
+            }}/>);
           break;
         case 'profile':
-          contentBody = <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
-          <i className='fa fa-arrow-right' aria-hidden='true'/>
-          </Link>;
+          const state = this.state;
+          contentBody = (
+            <Link
+            onMouseEnter={e =>
+              this.setState({
+                showProfileTooltip: true,
+                profileX: e.pageX,
+                profileY: e.pageY,
+                profileContactId: rowData.id
+              })}
+            onMouseLeave={e => setTimeout(
+              _ => !state.onPanel ? this.setState({showProfileTooltip: true}) :
+              null, 500)}
+            to={`/tables/${this.props.listId}/${rowData.id}`}>
+              <i className='fa fa-arrow-right' aria-hidden='true'/>
+            </Link>);
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -521,7 +560,7 @@ class ListTable extends Component {
 
     return (
       <div style={{marginTop: 30}}>
-        <div className='row'>
+        <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
           icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
@@ -534,9 +573,18 @@ class ListTable extends Component {
           onClick={_ => props.router.push(`/lists/${props.listId}`)}
           />
         </div>
+        {state.showProfileTooltip &&
+          <PanelOverlay
+          onMouseEnter={_ => this.setState({showProfileTooltip: true, onTooltipPanel: true})}
+          onMouseLeave={_ => this.setState({showProfileTooltip: false, onTooltipPanel: false})}
+          profileX={state.profileX}
+          profileY={state.profileY}
+          contactId={state.profileContactId}
+          listId={props.listId}
+          />}
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 medium-4 columns vertical-center'>
-            <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
+            <ControlledInput async name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
           </div>
            <div className='large-4 medium-4 columns vertical-center'>
               <IconButton
@@ -604,7 +652,6 @@ class ListTable extends Component {
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-           
           </div>
         </div>
         {state.isEmailPanelOpen &&
@@ -667,9 +714,7 @@ class ListTable extends Component {
                   onScroll={args => {
                     if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
                     onScroll(args);
-                  }}
-                  />
-                  )}
+                  }}/>)}
                 </WindowScroller>
               </div>
             </div>}
