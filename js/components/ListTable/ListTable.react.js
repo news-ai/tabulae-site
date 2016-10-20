@@ -18,6 +18,7 @@ import Checkbox from 'material-ui/Checkbox';
 import {blue200, grey500, grey400} from 'material-ui/styles/colors';
 import {Column, Table, AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
+import Overlay from 'react-overlays';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -104,8 +105,9 @@ class ListTable extends Component {
       onSort: false,
       sortedIds: [],
       lastRowIndexChecked: null,
+      showProfileTooltip: false,
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
-      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
     };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -348,37 +350,52 @@ class ListTable extends Component {
           break;
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
-          contentBody = <Checkbox
-          iconStyle={{fill: isChecked ? blue200 : grey400}}
-          checked={isChecked}
-          onCheck={(e, checked) => {
-            const lastRowIndexChecked = this.state.lastRowIndexChecked;
-            if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
-              let selected = this.state.selected.slice();
-              let last = null;
-              if (rowIndex < lastRowIndexChecked) {
-                for (let i = rowIndex; i < lastRowIndexChecked; i++) {
-                  const checked = this.state.selected.some(id => id === contacts[i].id);
-                  selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+          contentBody = (
+            <Checkbox
+            iconStyle={{fill: isChecked ? blue200 : grey400}}
+            checked={isChecked}
+            onCheck={(e, checked) => {
+              const lastRowIndexChecked = this.state.lastRowIndexChecked;
+              if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
+                let selected = this.state.selected.slice();
+                let last = null;
+                if (rowIndex < lastRowIndexChecked) {
+                  for (let i = rowIndex; i < lastRowIndexChecked; i++) {
+                    const checked = this.state.selected.some(id => id === contacts[i].id);
+                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+                  }
+                } else {
+                  for (let i = rowIndex; i > lastRowIndexChecked; i--) {
+                    const checked = this.state.selected.some(id => id === contacts[i].id);
+                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+                  }
                 }
+                this.setState({lastRowIndexChecked: rowIndex, selected});
               } else {
-                for (let i = rowIndex; i > lastRowIndexChecked; i--) {
-                  const checked = this.state.selected.some(id => id === contacts[i].id);
-                  selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
-                }
+                this.onCheck(rowData.id);
+                this.setState({lastRowIndexChecked: rowIndex});
               }
-              this.setState({lastRowIndexChecked: rowIndex, selected});
-            } else {
-              this.onCheck(rowData.id);
-              this.setState({lastRowIndexChecked: rowIndex});
-            }
-          }}
-          />
+            }}/>);
           break;
         case 'profile':
-          contentBody = <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
-          <i className='fa fa-arrow-right' aria-hidden='true'/>
-          </Link>;
+          const state = this.state;
+          contentBody = (
+            <Link
+            onMouseEnter={e => {
+              this.setState({
+                showProfileTooltip: true,
+                profileX: e.pageX,
+                profileY: e.pageY
+              });
+            }}
+            onMouseLeave={e => {
+              this.setState({
+                showProfileTooltip: false
+              });
+            }}
+            to={`/tables/${this.props.listId}/${rowData.id}`}>
+              <i className='fa fa-arrow-right' aria-hidden='true'/>
+            </Link>);
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -521,7 +538,7 @@ class ListTable extends Component {
 
     return (
       <div style={{marginTop: 30}}>
-        <div className='row'>
+        <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
           icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
@@ -534,6 +551,16 @@ class ListTable extends Component {
           onClick={_ => props.router.push(`/lists/${props.listId}`)}
           />
         </div>
+        {state.showProfileTooltip &&
+          <div style={{
+            zIndex: 200,
+            width: 300,
+            height: 300,
+            backgroundColor: 'red',
+            position: 'fixed',
+            top: state.profileY,
+            left: state.profileX + 8,
+          }}></div>}
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 medium-4 columns vertical-center'>
             <ControlledInput name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
@@ -604,7 +631,6 @@ class ListTable extends Component {
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
-           
           </div>
         </div>
         {state.isEmailPanelOpen &&
@@ -667,9 +693,7 @@ class ListTable extends Component {
                   onScroll={args => {
                     if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
                     onScroll(args);
-                  }}
-                  />
-                  )}
+                  }}/>)}
                 </WindowScroller>
               </div>
             </div>}
