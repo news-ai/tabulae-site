@@ -37,13 +37,7 @@ export function waitForServerProcess(listId) {
   return dispatch => {
     dispatch({type: TURN_ON_PROCESS_WAIT});
     setTimeout( _ => {
-      console.log('RELOAD');
-      window.location.reload();
-      // dispatch({type: TURN_OFF_PROCESS_WAIT});
-      // dispatch({type: 'CLEAR_LIST_REDUCER', listId});
-      // return dispatch(listActions.fetchList(listId))
-      window.location.href = window.location.origin + '/lists/' + listId;
-      // .then( _ => dispatch(contactActions.fetchPaginatedContacts(listId)));
+      window.location.href = window.location.origin + '/tables/' + listId;
     }, 5000);
   };
 }
@@ -56,7 +50,6 @@ export function addHeaders(listId, order) {
 
     return api.post(`/files/${fileId}/headers`, {order: order})
     .then(response => {
-      console.log(response);
       dispatch({type: headerConstant.CREATE_RECEIVED, response});
     })
     .catch( message => dispatch({type: headerConstant.REQUEST_FAIL, message}));

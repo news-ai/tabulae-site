@@ -1,5 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 import TextField from 'material-ui/TextField';
+import withRouter from 'react-router/lib/withRouter';
 import RaisedButton from 'material-ui/RaisedButton';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
@@ -64,7 +65,7 @@ class DropFileWrapper extends Component {
       data.append('file', this.state.file);
       this.setState({isFileSubmitted: true});
       props.uploadFile(listId, data)
-      .then(_ => props.fetchHeaders(listId));
+      .then(_ => props.router.push(`/headersnaming/${listId}`));
     });
   }
 
@@ -120,7 +121,10 @@ class DropFileWrapper extends Component {
       <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: '10px'}} text='Waiting for Columns to be processed...' /> :
       <Headers listId={state.listId} />;
     }
-    return <div className='horizontal-center'>{renderNode}</div>;
+    return (
+      <div className='horizontal-center'>
+        {renderNode}
+      </div>);
   }
 }
 
@@ -144,4 +148,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(Radium(DropFileWrapper));
+  )(Radium(withRouter(DropFileWrapper)));

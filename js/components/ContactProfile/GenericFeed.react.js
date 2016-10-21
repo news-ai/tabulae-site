@@ -19,7 +19,6 @@ class GenericFeed extends Component {
   componentWillMount() {
     this.props.fetchFeed();
   }
-
   
   render() {
     const props = this.props;
@@ -39,8 +38,7 @@ class GenericFeed extends Component {
             <CellMeasurer
             cellRenderer={({rowIndex, ...rest}) => props.rowRenderer({index: rowIndex, ...rest})}
             columnCount={1}
-            rowCount={props.feed.length}
-            >
+            rowCount={props.feed.length}>
             {({getRowHeight}) => (
               <List
               ref={ref => props.setRef(ref)}
