@@ -66,32 +66,33 @@ class HeaderNaming extends Component {
     }
     return (
       <div
-      className={
-        rowIndex % 2 === 0 ?
-        'cell evenRow vertical-center' :
-        'cell oddRow vertical-center'}
+      className='headersnaming-headercell horizontal-center vertical-center'
       key={key}
       style={style}>
-        <span style={{fontSize: '1.1em'}}>{contentBody}</span>
+        <span style={{fontSize: '1.1em', fontWeight: 'bold'}}>{contentBody}</span>
       </div>
       );
   }
 
   _rowRenderer({columnIndex, rowIndex, key, style}) {
     const rows = this.props.headers[rowIndex].rows;
+    let classname = rowIndex % 2 === 0 ?
+        'headersnaming-cell evenRow vertical-center' :
+        'headersnaming-cell oddRow vertical-center';
     let contentBody;
     switch (columnIndex) {
       case 0:
-        contentBody = <span>{rows[0]}</span>;
+        contentBody = <span style={{marginRight: 10}}>{rows[0]}</span>;
         break;
       case 1:
-        contentBody = <span>{rows[1]}</span>;
+        contentBody = <span style={{fontSize: '0.9em'}}>{rows[1]}</span>;
         break;
       case 2:
-       contentBody = (
+        classname += ' horizontal-center';
+        contentBody = (
         <DropDownMenu
         value={this.state.order[rowIndex]}
-        onChange={(e, i, v) => this.onMenuChange(e, i, v, rowIndex)}>
+        onChange={(e, i, v) => this.onMenuChange(e, i, v, rowIndex, this.state.order[rowIndex])}>
         {[
           <MenuItem key={-1} value={undefined} primaryText='----- Ignore Column -----' />,
           ...this.state.options
@@ -111,21 +112,20 @@ class HeaderNaming extends Component {
 
     return (
       <div
-      className={
-        rowIndex % 2 === 0 ?
-        'headersnaming-cell evenRow vertical-center' :
-        'headersnaming-cell oddRow vertical-center'}
+      className={classname}
       key={key}
       style={style}>
       {contentBody}
       </div>);
   }
 
-  _onMenuChange(event, index, value, rowIndex) {
+  _onMenuChange(event, index, value, rowIndex, prevValue) {
     if (value === undefined) {
+      const emptyOrder = this.state.order.map((val, i) => rowIndex === i ? undefined : val);
+      const emptyOptions = this.state.options.map(option => option.value === prevValue ? Object.assign({}, option, {selected: false}) : option);
       this.setState({
-        order: this.state.order.map((val, i) => rowIndex === i ? undefined : val),
-        options: this.state.options.map(option => option.value === value ? Object.assign({}, option, {selected: false}) : option)
+        order: emptyOrder,
+        options: emptyOptions
       }, _ => this._headernames.recomputeGridSize());
       return;
     }
@@ -146,9 +146,8 @@ class HeaderNaming extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.isProcessWaiting);
     return (
-      <div style={{margin: 50}}>
+      <div className='horizontal-center' style={{margin: 50}}>
       {props.isReceiving && <span>LOADING ...</span>}
       {props.headers &&
         <div>
@@ -156,9 +155,9 @@ class HeaderNaming extends Component {
           className='BodyGrid'
           cellRenderer={this.headerRenderer}
           columnCount={3}
-          columnWidth={300}
+          columnWidth={250}
           height={60}
-          width={900}
+          width={750}
           rowCount={1}
           rowHeight={50}
           />
@@ -169,15 +168,15 @@ class HeaderNaming extends Component {
             className='BodyGrid'
             cellRenderer={this.rowRenderer}
             columnCount={3}
-            columnWidth={300}
+            columnWidth={250}
             height={args.height}
             scrollTop={args.scrollTop}
-            width={900}
+            width={750}
             rowCount={props.headers.length}
             rowHeight={60}
             />)}
           </WindowScroller>
-          <RaisedButton primary icon={<FontIcon color={grey500} className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />} label='Submit' onClick={this.onSubmit} />
+          <RaisedButton icon={<FontIcon color={grey500} className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />} label='Submit' onClick={this.onSubmit} />
         </div>}
       </div>);
   }

@@ -711,10 +711,8 @@ class ListTable extends Component {
                   width={state.screenWidth}
                   rowCount={props.received.length}
                   rowHeight={30}
-                  onScroll={args => {
-                    if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchContacts(props.listId);
-                    onScroll(args);
-                  }}/>)}
+                  onScroll={onScroll}
+                  />)}
                 </WindowScroller>
               </div>
             </div>}

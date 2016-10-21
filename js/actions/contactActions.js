@@ -163,8 +163,8 @@ export function loadAllContacts(listId) {
           // poll how many received
           const contactReducer = getState().contactReducer;
           const count = contacts.filter(id => contactReducer[id]).length;
-          if (count < contacts.length) dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
-          else dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+          if (count === contacts.length) dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+          else dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON, count});
         })
       );
     }
