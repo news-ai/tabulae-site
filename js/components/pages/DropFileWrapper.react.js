@@ -1,5 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 import TextField from 'material-ui/TextField';
+import withRouter from 'react-router/lib/withRouter';
 import RaisedButton from 'material-ui/RaisedButton';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
@@ -120,7 +121,13 @@ class DropFileWrapper extends Component {
       <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: '10px'}} text='Waiting for Columns to be processed...' /> :
       <Headers listId={state.listId} />;
     }
-    return <div className='horizontal-center'>{renderNode}</div>;
+    return (
+      <div className='horizontal-center'>
+        {renderNode}
+        <div>
+          <RaisedButton label='go to Headers' onClick={_ => props.router.push(`/headersnaming/${state.listId}`)} />
+        </div>
+      </div>);
   }
 }
 
@@ -144,4 +151,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(Radium(DropFileWrapper));
+  )(Radium(withRouter(DropFileWrapper)));

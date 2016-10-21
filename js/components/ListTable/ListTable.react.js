@@ -17,7 +17,7 @@ import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Checkbox from 'material-ui/Checkbox';
 import {blue200, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
-import {Column, Table, AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
+import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 

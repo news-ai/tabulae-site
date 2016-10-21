@@ -48,6 +48,7 @@ import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable';
 import UserProfile from './components/UserProfile';
 import ListFeed from './components/ListFeed';
+import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
 
 import intercomSetup from './chat';
 
@@ -97,6 +98,7 @@ ReactDOM.render(
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
+            <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />

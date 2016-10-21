@@ -6,7 +6,7 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import Select from 'react-select';
+import AutoComplete from 'material-ui/AutoComplete';
 
 import 'react-select/dist/react-select.css';
 
@@ -19,11 +19,19 @@ class AddContact extends Component {
     super(props);
     this.state = {
       open: false,
-      contactBody: {}
+      contactBody: {},
+      dataSource: [],
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onUpdateInput = this._onUpdateInput.bind(this);
     this.onChange = this._onChange.bind(this);
+    this.handleUpdateInput = value =>
+      this.setState({
+        dataSource: [
+          value,
+          value + value,
+          value + value + value
+        ]});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -129,6 +137,15 @@ class AddContact extends Component {
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
+            </div>
+            <div className='large-6 medium-12 small-12 columns vertical-center'>
+              <span>Publication 1</span>
+              <AutoComplete
+              name='pub1'
+              style={textfieldStyle}
+              dataSource={state.dataSource}
+              onUpdateInput={this.handleUpdateInput}
+              />
             </div>
             {props.list && props.list.fieldsmap !== null &&
               props.list.fieldsmap.map((fieldObj, i) => fieldObj.customfield && (
