@@ -6,7 +6,10 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton';
 import {grey500} from 'material-ui/styles/colors';
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const defaultSelectableOptions = [
   {value: 'firstname', label: 'First Name', selected: false},
@@ -33,6 +36,7 @@ class HeaderNaming extends Component {
     this.headerRenderer = this._headerRenderer.bind(this);
     this.onMenuChange = this._onMenuChange.bind(this);
     this.onSubmit = this._onSubmit.bind(this);
+    this.onAddCustom = this._onAddCustom.bind(this);
   }
 
   componentWillMount() {
@@ -142,6 +146,19 @@ class HeaderNaming extends Component {
     this.props.onAddHeaders(order);
   }
 
+  _onAddCustom() {
+    alertify.prompt(
+      'Name Custom Property',
+      'This will be applied as a custom column name.',
+      '',
+      (e, name) => {
+        const value = name.toLowerCase().split(' ').join('_');
+        const options = [...this.state.options, {value, label: name, selected: false}];
+        this.setState({options}, _ => this._headernames.recomputeGridSize());
+      },
+      _ => {});
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -150,6 +167,15 @@ class HeaderNaming extends Component {
       {props.isReceiving && <span>LOADING ...</span>}
       {props.headers &&
         <div>
+          <div>
+            <IconButton
+            style={{float: 'right'}}
+            iconClassName='fa fa-plus'
+            tooltip='Add Custom Properties'
+            tooltipPosition='bottom-right'
+            onClick={this.onAddCustom}
+            />
+          </div>
           <div style={{marginBottom: 20}}>
             <Grid
             className='BodyGrid'
