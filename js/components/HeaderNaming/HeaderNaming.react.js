@@ -2,12 +2,14 @@ import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import {Grid, WindowScroller} from 'react-virtualized';
+
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-import IconButton from 'material-ui/IconButton';
-import {grey500} from 'material-ui/styles/colors';
+import FlatButton from 'material-ui/FlatButton';
+
+import {grey500, grey800, lightBlue50, lightBlue300} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
@@ -163,16 +165,23 @@ class HeaderNaming extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className='horizontal-center' style={{margin: 50}}>
+      <div className='horizontal-center' style={{margin: 30}}>
       {props.isReceiving && <span>LOADING ...</span>}
       {props.headers &&
-        <div>
+        <div style={{width: 750}}>
+          <div className='panel radius' style={{backgroundColor: lightBlue50, padding: 20, margin: 10}}>
+            <h5>Name Your Columns</h5>
+            <span style={{fontSize: '0.9em'}}>
+            Look through each column we pulled from your file and map it to Tabulae properties we have.
+            Tabulae will start to aggregate feeds from each contact's social fields once its connected.
+            </span>
+          </div>
           <div>
-            <IconButton
-            style={{float: 'right'}}
-            iconClassName='fa fa-plus'
-            tooltip='Add Custom Properties'
-            tooltipPosition='bottom-right'
+            <FlatButton
+            icon={<FontIcon className='fa fa-plus' color={grey500} />}
+            style={{float: 'right', margin: 10}}
+            labelStyle={{textTransform: 'none'}}
+            label='Add Custom Properties'
             onClick={this.onAddCustom}
             />
           </div>
@@ -199,8 +208,16 @@ class HeaderNaming extends Component {
           rowCount={props.headers.length}
           rowHeight={60}
           />
-          <div style={{margin: 20}}>
-            <RaisedButton style={{float: 'right'}} icon={<FontIcon color={grey500} className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />} label='Submit' onClick={this.onSubmit} />
+          <div style={{margin: 30}}>
+            <RaisedButton
+            style={{float: 'right'}}
+            labelStyle={{color: 'white', textTransform: 'none'}}
+            backgroundColor={lightBlue300}
+            icon={
+              <FontIcon color='white'
+              className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />}
+            label='Submit'
+            onClick={this.onSubmit} />
           </div>
         </div>}
       </div>);
