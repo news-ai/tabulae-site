@@ -68,8 +68,16 @@ class HeaderNaming extends Component {
   }
 
   _onMenuChange(event, index, value, rowIndex) {
-    const order = this.state.order
-    .map((columnName, i) => i === rowIndex ? value : columnName);
+    if (value === undefined) {
+      this.setState({
+        order: this.state.order.map(val => val === value ? undefined : val),
+        options: this.state.options.map(option => option.value === value ? Object.assign({}, option, {selected: false}) : option)
+      });
+      return;
+    }
+    let prevOrder = this.state.order.slice();
+    if (prevOrder[rowIndex]) prevOrder[rowIndex] = undefined;
+    const order = prevOrder.map((columnName, i) => i === rowIndex ? value : columnName);
     const options = this.state.options
     .map(option => option.value === value ?
       Object.assign({}, option, {selected: !option.selected}) : option);
@@ -88,13 +96,17 @@ class HeaderNaming extends Component {
         <DropDownMenu
         value={this.state.order[rowIndex]}
         onChange={(e, i, v) => this.onMenuChange(e, i, v, rowIndex)}>
-        {this.state.options
-          .map(option => (
+        {[
+          <MenuItem key={-1} value={undefined} primaryText='--- default ---' />,
+          ...this.state.options
+          .map((option, i) => (
             <MenuItem
+            key={i}
             disabled={option.selected}
             value={option.value}
             primaryText={option.label}
-            />))}
+            />))
+          ]}
         </DropDownMenu>);
     }
 
