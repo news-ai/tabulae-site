@@ -1,43 +1,81 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
+import withRouter from 'react-router/lib/withRouter';
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
+import IconButton from 'material-ui/IconButton';
+import {grey500, grey300, lightBlue300} from 'material-ui/styles/colors';
 
-class PanelOverlay extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: false,
-      x: 0,
-      y: 0,
-      onPanel: false
-    };
-  }
+const titleStyleHeight = 30;
 
-  render() {
-    const state = this.state;
-    console.log(state.show);
-    console.log(state.y);
-    return (
-      <div>
-      {state.show &&
-        <div
-        style={{
-          top: state.y,
-          left: state.x + 8,
-          backgroundColor: 'red',
-          width: 300,
-          height: 300,
-          position: 'fixed !important',
-          zIndex: 1200,
-        }}
-        onMouseEnter={_ => this.setState({show: true})}
-        onMouseLeave={_ => this.setState({show: false})}
-        />}
-      {this.props.children({
-        onTargetMouseEnter: (x, y) => this.setState({show: true, x, y}),
-        onTargetMouseLeave: () => setTimeout(_ => !state.onPanel ? this.setState({show: false}) : null, 500)
-      })}
+const styles = {
+  smallIcon: {
+    width: 15,
+    height: 15,
+    fontSize: '15px',
+    color: grey300
+  },
+  small: {
+    width: 30,
+    height: 30,
+    padding: 7,
+    margin: '0 10px'
+  },
+};
+
+const PanelOverlay = ({
+  router,
+  contact,
+  profileY,
+  profileX,
+  onMouseEnter,
+  onMouseLeave,
+  contactId,
+  listId,
+}) => {
+  return (
+      <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{
+        top: profileY,
+        left: profileX + 8,
+        zIndex: 200,
+        width: 510,
+        height: 305 + titleStyleHeight,
+        border: `1px solid ${grey300}`,
+        borderRadius: '0.2em',
+        position: 'fixed',
+        backgroundColor: 'white',
+        boxShadow: `0 0 30px -10px ${grey500}`
+      }}>
+        <div className='vertical-center' style={{margin: '0 15px', height: titleStyleHeight, borderBottom: `1px dotted ${lightBlue300}`, padding: '0 10px'}}>
+          <span>{`${contact.firstname} ${contact.lastname}`}</span>
+          <IconButton
+          onClick={_ => router.push(`/tables/${listId}/${contactId}`)}
+          tooltip='goto Profile'
+          tooltipPosition='top-right'
+          iconClassName='fa fa-arrow-right'
+          iconStyle={styles.smallIcon}
+          style={styles.small} />
+        </div>
+        <MixedFeed
+        containerWidth={500}
+        containerHeight={300}
+        contactId={contactId}
+        listId={listId}
+        hideLoadMore
+        />
       </div>);
-  }
-}
+};
 
-export default PanelOverlay;
+const mapStateToProps = (state, props) => {
+  return {
+    contact: state.contactReducer[props.contactId],
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PanelOverlay));
