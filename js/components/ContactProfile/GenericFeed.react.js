@@ -59,11 +59,12 @@ class GenericFeed extends Component {
           </WindowScroller>}
         {props.didInvalidate
           && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
-        {props.offset !== null && <div className='horizontal-center'>
-        {!props.isReceiving &&
-          !props.hideLoadMore &&
-          <RaisedButton label='Load more' onClick={_ => this.props.fetchFeed()} />}
-        </div>}
+        {props.offset !== null &&
+          <div className='horizontal-center'>
+          {!props.isReceiving &&
+            !props.hideLoadMore &&
+            <RaisedButton label='Load more' onClick={_ => this.props.fetchFeed()} />}
+          </div>}
       </div>
       );
     return props.value === props.name ? renderNode : null;

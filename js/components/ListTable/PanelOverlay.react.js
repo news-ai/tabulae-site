@@ -18,7 +18,7 @@ const PanelOverlay = ({
         top: profileY,
         left: profileX + 8,
         zIndex: 200,
-        width: 505,
+        width: 510,
         height: 305,
         border: `1px solid ${grey300}`,
         borderRadius: '0.2em',

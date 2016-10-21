@@ -29,16 +29,16 @@ class MixedFeed extends Component {
     let row;
     switch (feedItem.type) {
       case 'headlines':
-        row = <HeadlineItem {...feedItem} />;
+        row = <HeadlineItem screenWidth={this.props.containerWidth} style={this.props.rowStyle} {...feedItem} />;
         break;
       case 'tweets':
-        row = <Tweet {...feedItem} />;
+        row = <Tweet screenWidth={this.props.containerWidth} style={this.props.rowStyle} {...feedItem} />;
         break;
       case 'instagrams':
-        row = <InstagramItem {...feedItem} />;
+        row = <InstagramItem screenWidth={this.props.containerWidth} style={this.props.rowStyle} {...feedItem} />;
         break;
       default:
-        row = <HeadlineItem {...feedItem} />;
+        row = <HeadlineItem screenWidth={this.props.containerWidth} style={this.props.rowStyle} {...feedItem} />;
     }
 
     let newstyle = style;
