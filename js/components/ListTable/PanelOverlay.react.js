@@ -1,43 +1,39 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import React from 'react';
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
+import {grey500, grey300} from 'material-ui/styles/colors';
 
-class PanelOverlay extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      show: false,
-      x: 0,
-      y: 0,
-      onPanel: false
-    };
-  }
-
-  render() {
-    const state = this.state;
-    console.log(state.show);
-    console.log(state.y);
-    return (
-      <div>
-      {state.show &&
-        <div
-        style={{
-          top: state.y,
-          left: state.x + 8,
-          backgroundColor: 'red',
-          width: 300,
-          height: 300,
-          position: 'fixed !important',
-          zIndex: 1200,
-        }}
-        onMouseEnter={_ => this.setState({show: true})}
-        onMouseLeave={_ => this.setState({show: false})}
-        />}
-      {this.props.children({
-        onTargetMouseEnter: (x, y) => this.setState({show: true, x, y}),
-        onTargetMouseLeave: () => setTimeout(_ => !state.onPanel ? this.setState({show: false}) : null, 500)
-      })}
+const PanelOverlay = ({
+  profileY,
+  profileX,
+  onMouseEnter,
+  onMouseLeave,
+  contactId,
+  listId,
+}) => {
+  return (
+      <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{
+        top: profileY,
+        left: profileX + 8,
+        zIndex: 200,
+        width: 505,
+        height: 305,
+        border: `1px solid ${grey300}`,
+        borderRadius: '0.2em',
+        position: 'fixed',
+        backgroundColor: 'white',
+        boxShadow: `0 0 30px -10px ${grey500}`
+      }}>
+        <MixedFeed
+        containerWidth={500}
+        containerHeight={300}
+        contactId={contactId}
+        listId={listId}
+        hideLoadMore
+        />
       </div>);
-  }
-}
+};
 
 export default PanelOverlay;

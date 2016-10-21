@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import * as AppActions from '../../../actions/AppActions';
 import {grey400} from 'material-ui/styles/colors';
 
-function createMarkup(markup) { return {__html: markup}; };
+const createMarkup = markup => ({__html: markup});
 
 const defaultStyle = {
   paddingTop: 10,
@@ -57,14 +57,13 @@ const mapStateToProps = (state, props) => {
   return {
     publisherName: state.publicationReducer[props.publicationid] && state.publicationReducer[props.publicationid].name,
     isReceiving: state.publicationReducer[props.publicationid] && state.publicationReducer[props.publicationid].isReceiving
-  }
-}
+  };
+};
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchPublication: id => dispatch(AppActions.fetchPublication(id))
   };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(HeadlineItemContainer);
-

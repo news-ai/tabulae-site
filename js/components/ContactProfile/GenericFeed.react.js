@@ -48,7 +48,7 @@ class GenericFeed extends Component {
               rowCount={props.feed.length}
               rowHeight={getRowHeight}
               rowRenderer={props.rowRenderer}
-              onScroll={(args) => {
+              onScroll={args => {
                 if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchFeed();
               }}
               />)}

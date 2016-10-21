@@ -28,6 +28,7 @@ import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 import AddOrHideColumns from './AddOrHideColumns.react';
 import AddContact from './AddContact.react';
+import PanelOverlay from './PanelOverlay.react';
 
 import {
   generateTableFieldsmap,
@@ -75,40 +76,6 @@ function _getter(contact, fieldObj) {
 }
 
 const localStorage = window.localStorage;
-
-const PanelOverlay = ({
-  profileY,
-  profileX,
-  onMouseEnter,
-  onMouseLeave,
-  contactId,
-  listId,
-}) => {
-  return (
-      <div
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={{
-        top: profileY,
-        left: profileX + 8,
-        zIndex: 200,
-        width: 505,
-        height: 305,
-        border: `1px solid ${grey300}`,
-        borderRadius: '0.2em',
-        position: 'fixed',
-        backgroundColor: 'white',
-        boxShadow: `0 0 30px -10px ${grey500}`
-      }}>
-        <MixedFeed
-        containerWidth={500}
-        containerHeight={300}
-        contactId={contactId}
-        listId={listId}
-        hideLoadMore
-        />
-      </div>);
-}
 
 class ListTable extends Component {
   constructor(props) {
@@ -442,7 +409,7 @@ class ListTable extends Component {
     } else {
       if (
         props.listData.contacts !== null &&
-        props.received < props.listData.contacts.length
+        props.received.length < props.listData.contacts.length
         ) {
         return props.loadAllContacts(props.listId);
       }
