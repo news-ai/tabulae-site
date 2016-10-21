@@ -66,10 +66,10 @@ class HeaderNaming extends Component {
     }
     return (
       <div
-      className='headersnaming-headercell horizontal-center vertical-center'
+      className='headersnaming-headercell vertical-center'
       key={key}
       style={style}>
-        <span style={{fontSize: '1.1em', fontWeight: 'bold'}}>{contentBody}</span>
+        <span style={{fontSize: '1.1em', fontWeight: 'bold', marginLeft: 15, color: grey500}}>{contentBody}</span>
       </div>
       );
   }
@@ -82,13 +82,12 @@ class HeaderNaming extends Component {
     let contentBody;
     switch (columnIndex) {
       case 0:
-        contentBody = <span style={{marginRight: 10}}>{rows[0]}</span>;
+        contentBody = <span style={{marginLeft: 15}}>{rows[0]}</span>;
         break;
       case 1:
-        contentBody = <span style={{fontSize: '0.9em'}}>{rows[1]}</span>;
+        contentBody = <span style={{fontSize: '0.9em', marginLeft: 15}}>{rows[1]}</span>;
         break;
       case 2:
-        classname += ' horizontal-center';
         contentBody = (
         <DropDownMenu
         value={this.state.order[rowIndex]}
@@ -151,32 +150,32 @@ class HeaderNaming extends Component {
       {props.isReceiving && <span>LOADING ...</span>}
       {props.headers &&
         <div>
-          <Grid
-          className='BodyGrid'
-          cellRenderer={this.headerRenderer}
-          columnCount={3}
-          columnWidth={250}
-          height={60}
-          width={750}
-          rowCount={1}
-          rowHeight={50}
-          />
-          <WindowScroller>
-          {args => (
+          <div style={{marginBottom: 20}}>
             <Grid
-            ref={ref => this._headernames = ref}
             className='BodyGrid'
-            cellRenderer={this.rowRenderer}
+            cellRenderer={this.headerRenderer}
             columnCount={3}
             columnWidth={250}
-            height={args.height}
-            scrollTop={args.scrollTop}
+            height={50}
             width={750}
-            rowCount={props.headers.length}
-            rowHeight={60}
-            />)}
-          </WindowScroller>
-          <RaisedButton icon={<FontIcon color={grey500} className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />} label='Submit' onClick={this.onSubmit} />
+            rowCount={1}
+            rowHeight={50}
+            />
+          </div>
+          <Grid
+          ref={ref => this._headernames = ref}
+          className='BodyGrid'
+          cellRenderer={this.rowRenderer}
+          columnCount={3}
+          columnWidth={250}
+          height={props.headers.length * 60}
+          width={750}
+          rowCount={props.headers.length}
+          rowHeight={60}
+          />
+          <div style={{margin: 20}}>
+            <RaisedButton style={{float: 'right'}} icon={<FontIcon color={grey500} className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />} label='Submit' onClick={this.onSubmit} />
+          </div>
         </div>}
       </div>);
   }
