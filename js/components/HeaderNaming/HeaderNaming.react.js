@@ -1,11 +1,12 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
-import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized';
+import {Grid, WindowScroller} from 'react-virtualized';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
+import FontIcon from 'material-ui/FontIcon';
+import {grey500} from 'material-ui/styles/colors';
 
 const defaultSelectableOptions = [
   {value: 'firstname', label: 'First Name', selected: false},
@@ -43,7 +44,7 @@ class HeaderNaming extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.headers && nextProps.headers) {
+    if (!this.props.headers && nextProps.headers) {
       this.setState({order: Array(nextProps.headers.length).fill(undefined)});
     }
   }
@@ -123,9 +124,9 @@ class HeaderNaming extends Component {
   _onMenuChange(event, index, value, rowIndex) {
     if (value === undefined) {
       this.setState({
-        order: this.state.order.map(val => val === value ? undefined : val),
+        order: this.state.order.map((val, i) => rowIndex === i ? undefined : val),
         options: this.state.options.map(option => option.value === value ? Object.assign({}, option, {selected: false}) : option)
-      });
+      }, _ => this._headernames.recomputeGridSize());
       return;
     }
     let prevOrder = this.state.order.slice();
@@ -139,13 +140,13 @@ class HeaderNaming extends Component {
 
   _onSubmit() {
     const order = this.state.order.map(name => name || 'ignore_column');
-    console.log(order);
     this.props.onAddHeaders(order);
   }
 
   render() {
     const props = this.props;
     const state = this.state;
+    console.log(props.isProcessWaiting);
     return (
       <div style={{margin: 50}}>
       {props.isReceiving && <span>LOADING ...</span>}
@@ -157,7 +158,7 @@ class HeaderNaming extends Component {
           columnCount={3}
           columnWidth={300}
           height={60}
-          width={1000}
+          width={900}
           rowCount={1}
           rowHeight={50}
           />
@@ -171,12 +172,12 @@ class HeaderNaming extends Component {
             columnWidth={300}
             height={args.height}
             scrollTop={args.scrollTop}
-            width={1000}
+            width={900}
             rowCount={props.headers.length}
             rowHeight={60}
             />)}
           </WindowScroller>
-          <RaisedButton label='Submit' onClick={this.onSubmit} />
+          <RaisedButton primary icon={<FontIcon color={grey500} className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />} label='Submit' onClick={this.onSubmit} />
         </div>}
       </div>);
   }
@@ -186,6 +187,7 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   return {
     listId,
+    isProcessWaiting: state.fileReducer.isProcessWaiting,
     isReceiving: state.headerReducer.isReceiving,
     headers: state.headerReducer[listId],
   };

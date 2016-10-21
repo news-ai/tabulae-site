@@ -65,7 +65,7 @@ class DropFileWrapper extends Component {
       data.append('file', this.state.file);
       this.setState({isFileSubmitted: true});
       props.uploadFile(listId, data)
-      .then(_ => props.fetchHeaders(listId));
+      .then(_ => props.router.push(`/headersnaming/${listId}`));
     });
   }
 
@@ -124,9 +124,6 @@ class DropFileWrapper extends Component {
     return (
       <div className='horizontal-center'>
         {renderNode}
-        <div>
-          <RaisedButton label='go to Headers' onClick={_ => props.router.push(`/headersnaming/${state.listId}`)} />
-        </div>
       </div>);
   }
 }

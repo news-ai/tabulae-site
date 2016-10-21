@@ -38,11 +38,11 @@ export function waitForServerProcess(listId) {
     dispatch({type: TURN_ON_PROCESS_WAIT});
     setTimeout( _ => {
       console.log('RELOAD');
-      window.location.reload();
+      // window.location.reload();
       // dispatch({type: TURN_OFF_PROCESS_WAIT});
       // dispatch({type: 'CLEAR_LIST_REDUCER', listId});
       // return dispatch(listActions.fetchList(listId))
-      window.location.href = window.location.origin + '/lists/' + listId;
+      window.location.href = window.location.origin + '/tables/' + listId;
       // .then( _ => dispatch(contactActions.fetchPaginatedContacts(listId)));
     }, 5000);
   };
