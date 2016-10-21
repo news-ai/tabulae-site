@@ -38,7 +38,9 @@ class GenericFeed extends Component {
             <CellMeasurer
             cellRenderer={({rowIndex, ...rest}) => props.rowRenderer({index: rowIndex, ...rest})}
             columnCount={1}
-            rowCount={props.feed.length}>
+            rowCount={props.feed.length}
+            width={props.containerWidth}
+            >
             {({getRowHeight}) => (
               <List
               ref={ref => props.setRef(ref)}

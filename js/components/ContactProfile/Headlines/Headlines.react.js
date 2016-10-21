@@ -26,7 +26,7 @@ class Headlines extends Component {
     let newstyle = style;
     if (newstyle) newstyle.padding = '0 18px';
     return (
-      <div key={key} style={newstyle}>
+      <div className='vertical-center' key={key} style={newstyle}>
         {row}
       </div>);
   }
