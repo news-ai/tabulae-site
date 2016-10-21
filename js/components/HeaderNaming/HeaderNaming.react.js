@@ -4,6 +4,8 @@ import * as actionCreators from 'actions/AppActions';
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import Checkbox from 'material-ui/Checkbox';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const defaultSelectableOptions = [
   {value: 'firstname', label: 'First Name', selected: false},
@@ -29,6 +31,7 @@ class HeaderNaming extends Component {
     this.rowRenderer = this._rowRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
     this.onMenuChange = this._onMenuChange.bind(this);
+    this.onSubmit = this._onSubmit.bind(this);
   }
 
   componentWillMount() {
@@ -47,12 +50,18 @@ class HeaderNaming extends Component {
 
   _headerRenderer({columnIndex, rowIndex, key, style}) {
     let contentBody;
-    if (columnIndex === 0) {
-      contentBody = 'First Cell from First Row';
-    } else if (columnIndex === 1) {
-      contentBody = 'Preview Information';
-    } else {
-      contentBody = 'Tabulae Properties';
+    switch (columnIndex) {
+      case 0:
+        contentBody = 'First Cell from First Row';
+        break;
+      case 1:
+        contentBody = 'Preview Information';
+        break;
+      case 2:
+        contentBody = 'Tabulae Properties';
+        break;
+      default:
+        contentBody = '';
     }
     return (
       <div
@@ -65,6 +74,50 @@ class HeaderNaming extends Component {
         <span style={{fontSize: '1.1em'}}>{contentBody}</span>
       </div>
       );
+  }
+
+  _rowRenderer({columnIndex, rowIndex, key, style}) {
+    const rows = this.props.headers[rowIndex].rows;
+    let contentBody;
+    switch (columnIndex) {
+      case 0:
+        contentBody = <span>{rows[0]}</span>;
+        break;
+      case 1:
+        contentBody = <span>{rows[1]}</span>;
+        break;
+      case 2:
+       contentBody = (
+        <DropDownMenu
+        value={this.state.order[rowIndex]}
+        onChange={(e, i, v) => this.onMenuChange(e, i, v, rowIndex)}>
+        {[
+          <MenuItem key={-1} value={undefined} primaryText='----- Ignore Column -----' />,
+          ...this.state.options
+          .map((option, i) => (
+            <MenuItem
+            key={i}
+            disabled={option.selected}
+            value={option.value}
+            primaryText={option.label}
+            />))
+        ]}
+        </DropDownMenu>);
+        break;
+      default:
+        contentBody = '';
+    }
+
+    return (
+      <div
+      className={
+        rowIndex % 2 === 0 ?
+        'headersnaming-cell evenRow vertical-center' :
+        'headersnaming-cell oddRow vertical-center'}
+      key={key}
+      style={style}>
+      {contentBody}
+      </div>);
   }
 
   _onMenuChange(event, index, value, rowIndex) {
@@ -84,49 +137,15 @@ class HeaderNaming extends Component {
     this.setState({order, options}, _ => this._headernames.recomputeGridSize());
   }
 
-  _rowRenderer({columnIndex, rowIndex, key, style}) {
-    const rows = this.props.headers[rowIndex].rows;
-    let contentBody;
-    if (columnIndex === 0) {
-      contentBody = <span>{rows[0]}</span>;
-    } else if (columnIndex === 1) {
-      contentBody = <span>{rows[1]}</span>;
-    } else {
-      contentBody = (
-        <DropDownMenu
-        value={this.state.order[rowIndex]}
-        onChange={(e, i, v) => this.onMenuChange(e, i, v, rowIndex)}>
-        {[
-          <MenuItem key={-1} value={undefined} primaryText='--- default ---' />,
-          ...this.state.options
-          .map((option, i) => (
-            <MenuItem
-            key={i}
-            disabled={option.selected}
-            value={option.value}
-            primaryText={option.label}
-            />))
-          ]}
-        </DropDownMenu>);
-    }
-
-    return (
-      <div
-      className={
-        rowIndex % 2 === 0 ?
-        'headersnaming-cell evenRow vertical-center' :
-        'headersnaming-cell oddRow vertical-center'}
-      key={key}
-      style={style}>
-      {contentBody}
-      </div>);
+  _onSubmit() {
+    const order = this.state.order.map(name => name || 'ignore_column');
+    console.log(order);
+    this.props.onAddHeaders(order);
   }
 
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(state.order);
-    console.log(state.options);
     return (
       <div style={{margin: 50}}>
       {props.isReceiving && <span>LOADING ...</span>}
@@ -138,7 +157,7 @@ class HeaderNaming extends Component {
           columnCount={3}
           columnWidth={300}
           height={60}
-          width={900}
+          width={1000}
           rowCount={1}
           rowHeight={50}
           />
@@ -152,11 +171,12 @@ class HeaderNaming extends Component {
             columnWidth={300}
             height={args.height}
             scrollTop={args.scrollTop}
-            width={900}
+            width={1000}
             rowCount={props.headers.length}
             rowHeight={60}
             />)}
           </WindowScroller>
+          <RaisedButton label='Submit' onClick={this.onSubmit} />
         </div>}
       </div>);
   }
@@ -175,6 +195,7 @@ const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.params.listId, 10);
   return {
     fetchHeaders: _ => dispatch(actionCreators.fetchHeaders(listId)),
+    onAddHeaders: order => dispatch(actionCreators.addHeaders(listId, order)),
   };
 };
 
