@@ -21,12 +21,15 @@ class TweetFeed extends Component {
 
   _rowRenderer({key, index, style}) {
     const feedItem = this.props.feed[index];
-    const row = <Tweet {...feedItem} />;
+    const row = <Tweet screenWidth={this.props.containerWidth} {...feedItem} />;
 
     let newstyle = style;
     if (newstyle) newstyle.padding = '0 18px';
     return (
-      <div className='vertical-center' key={key} style={newstyle}>
+      <div
+      className='vertical-center'
+      key={key}
+      style={newstyle}>
         {row}
       </div>);
   }

@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import IconButton from 'material-ui/IconButton';
+import FontIcon from 'material-ui/FontIcon';
 import {grey500, grey300, lightBlue300} from 'material-ui/styles/colors';
 
 const titleStyleHeight = 30;
@@ -31,6 +32,7 @@ const PanelOverlay = ({
   onMouseLeave,
   contactId,
   listId,
+  isReceiving
 }) => {
   return (
       <div
@@ -48,7 +50,14 @@ const PanelOverlay = ({
         backgroundColor: 'white',
         boxShadow: `0 0 30px -10px ${grey500}`
       }}>
-        <div className='vertical-center' style={{margin: '0 15px', height: titleStyleHeight, borderBottom: `1px dotted ${lightBlue300}`, padding: '0 10px'}}>
+        <div
+        className='vertical-center'
+        style={{
+          margin: '0 15px',
+          height: titleStyleHeight,
+          borderBottom: `1px dotted ${lightBlue300}`,
+          padding: '0 10px'
+        }}>
           <span
           onClick={_ => router.push(`/tables/${listId}/${contactId}`)}
           >{`${contact.firstname} ${contact.lastname}`}</span>
@@ -60,6 +69,11 @@ const PanelOverlay = ({
           iconStyle={styles.smallIcon}
           style={styles.small} />
         </div>
+        {isReceiving &&
+          <FontIcon
+          className='fa fa-spinner fa-spin'
+          style={{position: 'fixed', margin: '20px', zIndex: 201}}
+          />}
         <MixedFeed
         containerWidth={500}
         containerHeight={300}
@@ -73,6 +87,7 @@ const PanelOverlay = ({
 const mapStateToProps = (state, props) => {
   return {
     contact: state.contactReducer[props.contactId],
+    isReceiving: state.mixedReducer.isReceiving,
   };
 };
 

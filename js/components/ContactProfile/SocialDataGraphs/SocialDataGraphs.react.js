@@ -38,13 +38,18 @@ class SocialDataGraphs extends Component {
     const state = this.state;
 
     return props.contact ? (
-      <div>
+      <div style={{margin: '20px 0'}}>
         {props.contact.instagram && props.instadata &&
-          <div>
-            <LineGraph
-            data={props.instadata.received}
-            dataKeys={state.instaDataKeys.filter(key => state.instagramParams[key])} />
-            <div>
+          <div className='row' style={{marginTop: '10px', marginBottom: '10px'}}>
+            <div className='large-12 large-offset-1 medium-12 medium-offset-1 small-12 columns'>
+              <h5>Instagram Stats</h5>
+            </div>
+            <div className='large-8 medium-8 small-12 columns horizontal-center'>
+              <LineGraph
+              data={props.instadata.received}
+              dataKeys={state.instaDataKeys.filter(key => state.instagramParams[key])} />
+            </div>
+            <div className='large-4 medium-3 small-12 columns'>
               {state.instaDataKeys.map((dataKey, i) =>
                 <Checkbox
                 key={i}
@@ -57,11 +62,16 @@ class SocialDataGraphs extends Component {
           </div>
         }
         {props.contact.twitter && props.twitterdata &&
-          <div>
-            <LineGraph
-            data={props.twitterdata.received}
-            dataKeys={state.twitterDataKeys.filter(key => state.twitterParams[key])} />
-            <div>
+          <div className='row' style={{marginTop: '10px', marginBottom: '10px'}}>
+            <div className='large-12 large-offset-1 medium-12 medium-offset-1 small-12 columns'>
+              <h5>Twitter Stats</h5>
+            </div>
+            <div className='large-8 medium-8 small-12 columns horizontal-center'>
+              <LineGraph
+              data={props.twitterdata.received}
+              dataKeys={state.twitterDataKeys.filter(key => state.twitterParams[key])} />
+            </div>
+            <div className='large-4 medium-4 small-12 columns'>
               {state.twitterDataKeys.map((dataKey, i) =>
                 <Checkbox
                 key={i}
@@ -71,8 +81,7 @@ class SocialDataGraphs extends Component {
                   this.setState({twitterParams: Object.assign({}, state.twitterParams, {[dataKey]: checked})})
                 }/>)}
             </div>
-          </div>
-        }
+          </div>}
       </div>) : null;
   }
 }

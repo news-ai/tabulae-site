@@ -28,11 +28,7 @@ class GenericFeed extends Component {
           && !props.didInvalidate
           && props.feed.length === 0
           && <div className='row' style={styleEmptyRow}><p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
-        {props.isReceiving &&
-          <div className='row horizontal-center' style={{margin: '20px 0'}}>
-            <FontIcon className='fa fa-spinner fa-spin' />
-          </div>}
-        {props.feed && !props.isReceiving &&
+        {props.feed &&
           <WindowScroller>
           {({height, scrollTop}) => (
             <CellMeasurer
