@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import * as actions from './actions';
 import {XAxis, YAxis, CartesianGrid, Legend, Line, Tooltip, LineChart} from 'recharts';
+import {red300, blue300, cyan300} from 'material-ui/styles/colors';
 
 const data = [
   {name: 'Page A', uv: 4000, pv: 2400, amt: 2400},
@@ -12,40 +14,48 @@ const data = [
   {name: 'Page G', uv: 3490, pv: 4300, amt: 2100},
 ];
 
-class LineGraph extends Component {
+class InstagramLineGraph extends Component {
   constructor(props) {
     super(props);
+  }
+
+  componentWillMount() {
+    this.props.fetchData();
   }
 
   render() {
     const props = this.props;
     const state = this.state;
-    return (
+    return props.data ? (
       <LineChart
       width={600}
       height={300}
-      data={data}
+      data={props.data.received}
       margin={{top: 5, right: 30, left: 20, bottom: 5}}>
-        <XAxis dataKey='name'/>
+        <XAxis dataKey='CreatedAt'/>
         <YAxis/>
         <CartesianGrid strokeDasharray='3 3'/>
         <Tooltip/>
         <Legend />
-        <Line type='monotone' dataKey='pv' stroke='#8884d8' activeDot={{r: 8}}/>
-        <Line type='monotone' dataKey='uv' stroke='#82ca9d' />
+        <Line type='monotone' dataKey='Likes' stroke='#8884d8' activeDot={{r: 8}}/>
+        <Line type='monotone' dataKey='Followers' stroke='#82ca9d' />
+        <Line type='monotone' dataKey='Posts' stroke={blue300} />
+        <Line type='monotone' dataKey='Comments' stroke={cyan300} />
       </LineChart>
-      );
+      ) : null;
   }
 }
 
 function mapStateToProps(state, props) {
   return {
-    data: state.twitterDataReducer[props.contactId]
+    data: state.instagramDataReducer[props.contactId]
   };
 }
 
 function mapDispatchToProps(dispatch, props) {
-  return {};
+  return {
+    fetchData: _ => dispatch(actions.fetchContactInstagramData(props.contactId))
+  };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LineGraph);
+export default connect(mapStateToProps, mapDispatchToProps)(InstagramLineGraph);

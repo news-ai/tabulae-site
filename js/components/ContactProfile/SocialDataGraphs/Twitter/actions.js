@@ -1,5 +1,5 @@
 import {twitterDataConstant} from './constants';
-import * as api from '../../../actions/api';
+import * as api from '../../../../actions/api';
 
 export function fetchContactTwitterData(contactId) {
   const PAGE_LIMIT = 50;

@@ -23,7 +23,8 @@ import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
-import LineGraph from './SocialDataGraphs/LineGraph.react';
+import TwitterLineGraph from './SocialDataGraphs/Twitter/TwitterLineGraph.react';
+import InstagramLineGraph from './SocialDataGraphs/Instagram/InstagramLineGraph.react';
 
 const styles = {
   smallIcon: {
@@ -246,7 +247,10 @@ class ContactProfile extends Component {
               />
             </Dialog>
             <div>
-              <LineGraph /> 
+              <TwitterLineGraph contactId={props.contactId} /> 
+            </div>
+            <div>
+              <InstagramLineGraph contactId={props.contactId} /> 
             </div>
             <div style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
               <FeedsController {...props} />

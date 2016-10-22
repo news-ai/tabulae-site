@@ -96,5 +96,10 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false,
     received: [],
-  }
+  },
+  instagramDataReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
 };
