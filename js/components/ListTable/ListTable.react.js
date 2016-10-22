@@ -230,7 +230,7 @@ class ListTable extends Component {
 
     if (nextProps.listData && nextProps.contacts.length > 0 && !this.state.dragged) {
       // optimize with immutablejs
-      let columnWidths = this.state.columnWidths.slice();
+      let columnWidths = this.state.columnWidths !== null ? this.state.columnWidths.slice() : Array(nextProps.listData.fieldsmap.length).fill(60);
       this.props.fieldsmap.map((fieldObj, i) => {
         let max = columnWidths[i];
         nextProps.contacts.map(contact => {
