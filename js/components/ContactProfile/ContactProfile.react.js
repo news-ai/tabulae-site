@@ -166,104 +166,102 @@ class ContactProfile extends Component {
       />,
     ];
     return (
-      <div>
-        <div className='row horizontal-center'>
-          <div className='large-9 columns'>
-            {props.contact && (
-              <div className='row' style={{marginTop: 40}}>
-                <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
-                <div className='large-6 medium-12 small-12 columns'>
-                  <div className='row'>
-                    <div className='large-12 medium-12 small-12 columns'>
-                      <h5>Notes</h5>
-                    </div>
-                    <div className='large-12 medium-12 small-12 columns'>
-                      <Textarea
-                      value={state.notes}
-                      maxRows={7}
-                      onChange={e => this.setState({notes: e.target.value})}
-                      onBlur={_ => props.contact.notes !== state.notes ? props.patchContact(props.contactId, {notes: state.notes}) : null}
-                      />
-                      <span style={{color: grey500, margin: 5, fontSize: '0.7em', float: 'right'}}>{props.contact.notes !== state.notes ? 'Unsaved' : 'Saved'}</span>
-                    </div>
+      <div className='row horizontal-center'>
+        <div className='large-9 columns'>
+          {props.contact && (
+            <div className='row' style={{marginTop: 40}}>
+              <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
+              <div className='large-6 medium-12 small-12 columns'>
+                <div className='row'>
+                  <div className='large-12 medium-12 small-12 columns'>
+                    <h5>Notes</h5>
                   </div>
                   <div className='large-12 medium-12 small-12 columns'>
-                    <div className='row vertical-center' style={{marginTop: 20}}>
-                      <h5>Current Publications/Employers</h5>
+                    <Textarea
+                    value={state.notes}
+                    maxRows={7}
+                    onChange={e => this.setState({notes: e.target.value})}
+                    onBlur={_ => props.contact.notes !== state.notes ? props.patchContact(props.contactId, {notes: state.notes}) : null}
+                    />
+                    <span style={{color: grey500, margin: 5, fontSize: '0.7em', float: 'right'}}>{props.contact.notes !== state.notes ? 'Unsaved' : 'Saved'}</span>
+                  </div>
+                </div>
+                <div className='large-12 medium-12 small-12 columns'>
+                  <div className='row vertical-center' style={{marginTop: 20}}>
+                    <h5>Current Publications/Employers</h5>
+                    <IconButton
+                    iconStyle={styles.smallIcon}
+                    style={styles.small}
+                    iconClassName='fa fa-plus'
+                    tooltip='Add Publication'
+                    tooltipPosition='top-right'
+                    onClick={_ => this.togglePanel('employers')}
+                    />
+                  </div>
+                  <div>
+                    {props.employers && props.employers.map((employer, i) =>
+                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                    {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
+                  </div>
+                  <div style={{marginTop: 20}}>
+                    <div className='row vertical-center'>
+                    <div className='large-12 medium-12 small-12 columns'>
+                    </div>
+                      <h5>Past Publications/Employers</h5>
                       <IconButton
+                      style={{marginLeft: 3}}
                       iconStyle={styles.smallIcon}
                       style={styles.small}
                       iconClassName='fa fa-plus'
                       tooltip='Add Publication'
                       tooltipPosition='top-right'
-                      onClick={_ => this.togglePanel('employers')}
+                      onClick={_ => this.togglePanel('pastemployers')}
                       />
                     </div>
-                    <div>
-                      {props.employers && props.employers.map((employer, i) =>
-                        <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='employers' contact={props.contact} />)}
-                      {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
-                    </div>
-                    <div style={{marginTop: 20}}>
-                      <div className='row vertical-center'>
-                      <div className='large-12 medium-12 small-12 columns'>
-                      </div>
-                        <h5>Past Publications/Employers</h5>
-                        <IconButton
-                        style={{marginLeft: 3}}
-                        iconStyle={styles.smallIcon}
-                        style={styles.small}
-                        iconClassName='fa fa-plus'
-                        tooltip='Add Publication'
-                        tooltipPosition='top-right'
-                        onClick={_ => this.togglePanel('pastemployers')}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      {props.pastemployers && props.pastemployers.map((employer, i) =>
-                        <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
-                      {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
-                    </div>
+                  </div>
+                  <div>
+                    {props.pastemployers && props.pastemployers.map((employer, i) =>
+                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
+                    {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
                   </div>
                 </div>
               </div>
-              )}
-            <Dialog
-            actions={state.isEmployerPanelOpen ? addEmployerActions : addPastEmployerActions}
-            title={state.isEmployerPanelOpen ? 'Add Current Publication' : 'Add Past Publication'}
-            modal
-            open={state.isEmployerPanelOpen || state.isPastEmployerPanelOpen}
-            onRequestClose={_ => state.isEmployerPanelOpen ? this.togglePanel('employers') : this.togglePanel('pastemployers')}>
-              <AutoComplete
-              floatingLabelText='Autocomplete dropdown'
-              filter={AutoComplete.noFilter}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={autoinput => this.setState({autoinput})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            </Dialog>
-            <div style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
-              <FeedsController {...props} />
-                <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
-                  <Tab label='All' className='horizontal-center' style={{color: grey700}}>
-                    <MixedFeed containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                  </Tab>
-                  <Tab label='RSS only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <Headlines refName='rss' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                  </Tab>
-                  <Tab label='Tweets only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <TweetFeed refName='twitter' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                  </Tab>
-                  <Tab label='Instagram only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <InstagramFeed refName='instagram' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                  </Tab>
-                  <Tab label='Sent Emails' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                    <ContactEmails refName='emails' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                  </Tab>
-                </Tabs>
             </div>
+            )}
+          <Dialog
+          actions={state.isEmployerPanelOpen ? addEmployerActions : addPastEmployerActions}
+          title={state.isEmployerPanelOpen ? 'Add Current Publication' : 'Add Past Publication'}
+          modal
+          open={state.isEmployerPanelOpen || state.isPastEmployerPanelOpen}
+          onRequestClose={_ => state.isEmployerPanelOpen ? this.togglePanel('employers') : this.togglePanel('pastemployers')}>
+            <AutoComplete
+            floatingLabelText='Autocomplete dropdown'
+            filter={AutoComplete.noFilter}
+            onUpdateInput={this.updateAutoInput}
+            onNewRequest={autoinput => this.setState({autoinput})}
+            openOnFocus
+            dataSource={state.employerAutocompleteList}
+            />
+          </Dialog>
+          <div className='large-12 columns' style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
+            <FeedsController {...props} />
+              <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
+                <Tab label='All' className='horizontal-center' style={{color: grey700}}>
+                  <MixedFeed containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                </Tab>
+                <Tab label='RSS only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
+                  <Headlines refName='rss' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                </Tab>
+                <Tab label='Tweets only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
+                  <TweetFeed refName='twitter' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                </Tab>
+                <Tab label='Instagram only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
+                  <InstagramFeed refName='instagram' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                </Tab>
+                <Tab label='Sent Emails' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
+                  <ContactEmails refName='emails' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
+                </Tab>
+              </Tabs>
           </div>
         </div>
       </div>
@@ -271,7 +269,7 @@ class ContactProfile extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
+function mapStateToProps(state, props) {
   const listId = parseInt(props.params.listId, 10);
   const contactId = parseInt(props.params.contactId, 10);
   const contact = state.contactReducer[contactId];
@@ -289,9 +287,9 @@ const mapStateToProps = (state, props) => {
     pastemployers,
     list: state.listReducer[listId],
   };
-};
+}
 
-const mapDispatchToProps = (dispatch, props) => {
+function mapDispatchToProps(dispatch, props) {
   return {
     fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
@@ -302,7 +300,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
   };
-};
+}
 
 export default connect(
   mapStateToProps,

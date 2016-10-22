@@ -29,8 +29,8 @@ const WrappedTwitter = props => {
         <IconButton
         iconStyle={styles.smallIcon}
         style={styles.small}
-        iconClassName='fa fa-user'
-        tooltip='Show Profile'
+        iconClassName='fa fa-line-chart'
+        tooltip='Show Profile & Engagement Data'
         tooltipPosition='top-right'
         onClick={onRequestOpen}
         />)}
@@ -45,8 +45,8 @@ const WrappedInstagram = props => {
         <IconButton
         iconStyle={styles.smallIcon}
         style={styles.small}
-        iconClassName='fa fa-user'
-        tooltip='Show Profile'
+        iconClassName='fa fa-line-chart'
+        tooltip='Show Profile & Engagement Data'
         tooltipPosition='top-right'
         onClick={onRequestOpen}
         />)}

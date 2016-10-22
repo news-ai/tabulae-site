@@ -92,4 +92,14 @@ export const initialState = {
     didInvalidate: false,
     received: [],
   },
+  twitterDataReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
+  instagramDataReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    received: [],
+  },
 };

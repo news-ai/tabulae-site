@@ -11,9 +11,9 @@ const defaultStyle = {
   minHeight: 100
 };
 
-const Tweet = ({style, text, username, createdat, tweetidstr}) => {
+const Tweet = ({style, text, username, createdat, tweetidstr, screenWidth}) => {
   const date = new Date(createdat);
-  const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
+  const containerStyle = style ? Object.assign({}, defaultStyle, style, {width: screenWidth}) : Object.assign({}, defaultStyle, {width: screenWidth});
   return (
     <div className='row' style={containerStyle}>
       <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from Twitter</span></div>
