@@ -49,7 +49,9 @@ const PanelOverlay = ({
         boxShadow: `0 0 30px -10px ${grey500}`
       }}>
         <div className='vertical-center' style={{margin: '0 15px', height: titleStyleHeight, borderBottom: `1px dotted ${lightBlue300}`, padding: '0 10px'}}>
-          <span>{`${contact.firstname} ${contact.lastname}`}</span>
+          <span
+          onClick={_ => router.push(`/tables/${listId}/${contactId}`)}
+          >{`${contact.firstname} ${contact.lastname}`}</span>
           <IconButton
           onClick={_ => router.push(`/tables/${listId}/${contactId}`)}
           tooltip='goto Profile'

@@ -23,6 +23,7 @@ import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
+import LineGraph from './SocialDataGraphs/LineGraph.react';
 
 const styles = {
   smallIcon: {
@@ -244,6 +245,9 @@ class ContactProfile extends Component {
               dataSource={state.employerAutocompleteList}
               />
             </Dialog>
+            <div>
+              
+            </div>
             <div style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
               <FeedsController {...props} />
                 <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
@@ -271,7 +275,7 @@ class ContactProfile extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
+function mapStateToProps(state, props) {
   const listId = parseInt(props.params.listId, 10);
   const contactId = parseInt(props.params.contactId, 10);
   const contact = state.contactReducer[contactId];
@@ -289,9 +293,9 @@ const mapStateToProps = (state, props) => {
     pastemployers,
     list: state.listReducer[listId],
   };
-};
+}
 
-const mapDispatchToProps = (dispatch, props) => {
+function mapDispatchToProps(dispatch, props) {
   return {
     fetchFeed: contactid => dispatch(headlineActions.fetchContactHeadlines(contactid)),
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
@@ -302,7 +306,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
   };
-};
+}
 
 export default connect(
   mapStateToProps,

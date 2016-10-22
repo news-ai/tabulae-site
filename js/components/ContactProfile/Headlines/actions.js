@@ -23,7 +23,6 @@ export function fetchContactHeadlines(contactId) {
         offset: res.result.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT});
     })
     .catch(err => {
-      console.log(err);
       dispatch({type: headlineConstant.REQUEST_FAIL});
     });
   };
