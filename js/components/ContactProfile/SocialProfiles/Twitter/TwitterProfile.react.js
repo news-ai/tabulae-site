@@ -4,6 +4,9 @@ import * as actions from './actions';
 import * as twitterDataActions from '../../SocialDataGraphs/Twitter/actions';
 import SocialDataGraph from '../../SocialDataGraphs/SocialDataGraph.react';
 
+import Chip from 'material-ui/Chip';
+import {lightBlue100} from 'material-ui/styles/colors';
+
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 
@@ -48,9 +51,10 @@ class TwitterProfile extends Component {
             <div className='row' style={{marginTop: 15}}>
               <div className='large-3 medium-4 small-12 columns horizontal-center'>
                 <div>
-                  <div><img src={profile.profile_image_url} /></div>
-                  <div><a href={`https://twitter.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
-                  <div><span>{profile.name}</span></div>
+                  <div className='horizontal-center'><img src={profile.profile_image_url} /></div>
+                  <div className='horizontal-center'><a href={`https://twitter.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
+                  <div className='horizontal-center'><span>{profile.name}</span></div>
+                  {profile.verified && <Chip style={{margin: 10}} className='horizontal-center' backgroundColor={lightBlue100}>Verified</Chip>}
                 </div>
               </div>
               <div className='large-9 medium-8 small-12 columns'>
@@ -61,7 +65,6 @@ class TwitterProfile extends Component {
                 <div><span style={{fontSize: '0.9em'}}>Followers: </span><span>{profile.followers_count}</span></div>
                 <div><span style={{fontSize: '0.9em'}}>Following: </span><span>{profile.friends_count}</span></div>
                 <div><span style={{fontSize: '0.9em'}}>Location: </span><span>{profile.location}</span></div>
-                {profile.verified && <span>Verified</span>}
               </div>
             </div>}
           {props.graphdata &&
