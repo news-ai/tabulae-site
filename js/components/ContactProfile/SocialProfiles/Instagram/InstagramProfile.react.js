@@ -47,9 +47,9 @@ class InstagramProfile extends Component {
           {props.profile &&
             <div className='row' style={{marginTop: 10}}>
               <div className='large-3 medium-4 small-12 columns'>
-                <div><img src={profile.profile_picture} /></div>
-                <div><a href={`https://instagram.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
-                <div><span>{profile.full_name}</span></div>
+                <div className='horizontal-center'><img src={profile.profile_picture} /></div>
+                <div className='horizontal-center'><a href={`https://instagram.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
+                <div className='horizontal-center'><span>{profile.full_name}</span></div>
               </div>
               <div className='large-9 medium-8 small-12 columns'>
                 <div style={{margin: 8}}>
