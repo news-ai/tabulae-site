@@ -14,10 +14,10 @@ class LineGraph extends Component {
     const state = this.state;
     return (
       <LineChart
-      width={600}
+      width={550}
       height={300}
       data={props.data}
-      margin={{top: 5, right: 30, left: 20, bottom: 5}}>
+      margin={{top: 5, right: 40, left: 20, bottom: 5}}>
         <XAxis dataKey='CreatedAt'/>
         <YAxis/>
         <CartesianGrid strokeDasharray='3 3'/>

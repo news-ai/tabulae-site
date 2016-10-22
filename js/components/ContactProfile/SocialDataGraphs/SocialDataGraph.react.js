@@ -20,12 +20,12 @@ class SocialDataGraph extends Component {
         <div className='large-12 large-offset-1 medium-12 medium-offset-1 small-12 columns'>
           <h5>{props.title} Stats</h5>
         </div>
-        <div className='large-8 medium-8 small-12 columns horizontal-center'>
+        <div className='large-9 medium-12 small-12 columns horizontal-center'>
           <LineGraph
           data={props.data}
           dataKeys={props.dataKeys.filter(key => state.params[key])} />
         </div>
-        <div className='large-4 medium-4 small-12 columns'>
+        <div className='large-3 medium-12 small-12 columns'>
           {props.dataKeys.map((dataKey, i) =>
             <Checkbox
             key={i}

@@ -1,9 +1,21 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actions from './actions';
+import * as twitterDataActions from '../../SocialDataGraphs/Twitter/actions';
+import SocialDataGraph from '../../SocialDataGraphs/SocialDataGraph.react';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
+
+const graphParams = {
+  Likes: true,
+  Posts: false,
+  Followers: false,
+  Following: false,
+  Retweets: true,
+};
+
+const graphDataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets'];
 
 class TwitterProfile extends Component {
   constructor(props) {
@@ -11,6 +23,10 @@ class TwitterProfile extends Component {
     this.state = {
       open: false
     };
+  }
+
+  componentWillMount() {
+    if (!this.props.graphdata) this.props.fetchGraphData();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -26,20 +42,35 @@ class TwitterProfile extends Component {
     const profile = props.profile;
     return (
       <div>
-        <Dialog open={state.open} title='Twitter' onRequestClose={_ => this.setState({open: false})}>
+        <Dialog autoScrollBodyContent open={state.open} title='Twitter' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           {props.profile &&
-            <div>
-              <img src={profile.profile_image_url} />
-              <a href={`https://twitter.com/${profile.Username}`} target='_blank'><p>{profile.Username}</p></a>
-              <p>{profile.name}</p>
-              <p>{profile.description}</p>
-              <p>Favorites: {profile.favourites_count}</p>
-              <p>Followers: {profile.followers_count}</p>
-              <p>Following: {profile.friends_count}</p>
-              <p>Location: {profile.location}</p>
-              {profile.verified && <p>Verified</p>}
+            <div className='row' style={{marginTop: 15}}>
+              <div className='large-3 medium-4 small-12 columns horizontal-center'>
+                <div>
+                  <div><img src={profile.profile_image_url} /></div>
+                  <div><a href={`https://twitter.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
+                  <div><span>{profile.name}</span></div>
+                </div>
+              </div>
+              <div className='large-9 medium-8 small-12 columns'>
+                <div style={{margin: 8}}>
+                  <span>{profile.description}</span>
+                </div>
+                <div><span style={{fontSize: '0.9em'}}>Favorites: </span><span>{profile.favourites_count}</span></div>
+                <div><span style={{fontSize: '0.9em'}}>Followers: </span><span>{profile.followers_count}</span></div>
+                <div><span style={{fontSize: '0.9em'}}>Following: </span><span>{profile.friends_count}</span></div>
+                <div><span style={{fontSize: '0.9em'}}>Location: </span><span>{profile.location}</span></div>
+                {profile.verified && <span>Verified</span>}
+              </div>
             </div>}
+          {props.graphdata &&
+            <SocialDataGraph
+            data={props.graphdata.received}
+            title='Twitter'
+            dataKeys={graphDataKeys}
+            params={graphParams}
+            />}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
@@ -53,12 +84,14 @@ const mapStateToProps = (state, props) => {
   return {
     profile: state.twitterProfileReducer[props.contactId],
     isReceiving: state.twitterProfileReducer.isReceiving,
+    graphdata: state.twitterDataReducer[props.contactId],
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchTwitter: _ => dispatch(actions.fetchTwitterProfile(props.contactId)),
+    fetchGraphData: _ => dispatch(twitterDataActions.fetchContactTwitterData(props.contactId))
   };
 };
 

@@ -23,7 +23,6 @@ import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
-import SocialDataGraphs from './SocialDataGraphs/SocialDataGraphs.react';
 
 const styles = {
   smallIcon: {
@@ -244,9 +243,6 @@ class ContactProfile extends Component {
             dataSource={state.employerAutocompleteList}
             />
           </Dialog>
-          <div>
-            <SocialDataGraphs contactId={props.contactId} />
-          </div>
           <div className='large-12 columns' style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
             <FeedsController {...props} />
               <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
