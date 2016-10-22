@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as instaActions from './Instagram/actions';
 import * as twitterActions from './Twitter/actions';
-import LineGraph from './LineGraph.react';
-import Checkbox from 'material-ui/Checkbox';
+import SocialDataGraph from './SocialDataGraph.react';
 
 class SocialDataGraphs extends Component {
   constructor(props) {
@@ -39,49 +38,32 @@ class SocialDataGraphs extends Component {
 
     return props.contact ? (
       <div style={{margin: '20px 0'}}>
-        {props.contact.instagram && props.instadata &&
-          <div className='row' style={{marginTop: '10px', marginBottom: '10px'}}>
-            <div className='large-12 large-offset-1 medium-12 medium-offset-1 small-12 columns'>
-              <h5>Instagram Stats</h5>
-            </div>
-            <div className='large-8 medium-8 small-12 columns horizontal-center'>
-              <LineGraph
-              data={props.instadata.received}
-              dataKeys={state.instaDataKeys.filter(key => state.instagramParams[key])} />
-            </div>
-            <div className='large-4 medium-3 small-12 columns'>
-              {state.instaDataKeys.map((dataKey, i) =>
-                <Checkbox
-                key={i}
-                label={dataKey}
-                checked={state.instagramParams[dataKey]}
-                onCheck={(e, checked) =>
-                  this.setState({instagramParams: Object.assign({}, state.instagramParams, {[dataKey]: checked})})
-                }/>)}
-            </div>
-          </div>
-        }
-        {props.contact.twitter && props.twitterdata &&
-          <div className='row' style={{marginTop: '10px', marginBottom: '10px'}}>
-            <div className='large-12 large-offset-1 medium-12 medium-offset-1 small-12 columns'>
-              <h5>Twitter Stats</h5>
-            </div>
-            <div className='large-8 medium-8 small-12 columns horizontal-center'>
-              <LineGraph
-              data={props.twitterdata.received}
-              dataKeys={state.twitterDataKeys.filter(key => state.twitterParams[key])} />
-            </div>
-            <div className='large-4 medium-4 small-12 columns'>
-              {state.twitterDataKeys.map((dataKey, i) =>
-                <Checkbox
-                key={i}
-                label={dataKey}
-                checked={state.twitterParams[dataKey]}
-                onCheck={(e, checked) =>
-                  this.setState({twitterParams: Object.assign({}, state.twitterParams, {[dataKey]: checked})})
-                }/>)}
-            </div>
-          </div>}
+        {props.instadata &&
+          <SocialDataGraph
+          data={props.instadata.received}
+          title='Instagram'
+          dataKeys={['Likes', 'Posts', 'Followers', 'Following', 'Comments']}
+          params={{
+            Likes: true,
+            Posts: false,
+            Followers: false,
+            Following: false,
+            Comments: false,
+          }}
+          />}
+        {props.twitterdata &&
+          <SocialDataGraph
+          data={props.twitterdata.received}
+          title='Twitter'
+          dataKeys={['Likes', 'Posts', 'Followers', 'Following', 'Retweets']}
+          params={{
+            Likes: true,
+            Posts: false,
+            Followers: false,
+            Following: false,
+            Retweets: true,
+          }}
+          />}
       </div>) : null;
   }
 }
