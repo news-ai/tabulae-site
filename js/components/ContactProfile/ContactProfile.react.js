@@ -246,7 +246,7 @@ class ContactProfile extends Component {
               />
             </Dialog>
             <div>
-              
+              <LineGraph /> 
             </div>
             <div style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
               <FeedsController {...props} />

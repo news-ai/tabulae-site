@@ -17,7 +17,7 @@ import instagramReducer from '../components/ContactProfile/Instagram/reducer';
 import listfeedReducer from '../components/ListFeed/reducer';
 import twitterProfileReducer from '../components/ContactProfile/SocialProfiles/Twitter/reducer';
 import instagramProfileReducer from '../components/ContactProfile/SocialProfiles/Instagram/reducer';
-import twitterDataReducer from '../ContactProfile/SocialDataGraphs/reducer';
+import twitterDataReducer from '../components/ContactProfile/SocialDataGraphs/reducer';
 
 const rootReducer = combineReducers({
   personReducer,

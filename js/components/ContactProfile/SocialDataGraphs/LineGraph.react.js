@@ -12,7 +12,7 @@ const data = [
   {name: 'Page G', uv: 3490, pv: 4300, amt: 2100},
 ];
 
-class LinGraph extends Component {
+class LineGraph extends Component {
   constructor(props) {
     super(props);
   }
@@ -48,4 +48,4 @@ function mapDispatchToProps(dispatch, props) {
   return {};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LinGraph);
+export default connect(mapStateToProps, mapDispatchToProps)(LineGraph);
