@@ -49,13 +49,11 @@ class TwitterProfile extends Component {
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           {props.profile &&
             <div className='row' style={{marginTop: 15}}>
-              <div className='large-3 medium-4 small-12 columns horizontal-center'>
-                <div>
-                  <div className='horizontal-center'><img src={profile.profile_image_url} /></div>
-                  <div className='horizontal-center'><a href={`https://twitter.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
-                  <div className='horizontal-center'><span>{profile.name}</span></div>
-                  {profile.verified && <Chip style={{margin: 10}} className='horizontal-center' backgroundColor={lightBlue100}>Verified</Chip>}
-                </div>
+              <div className='large-3 medium-4 small-12 columns'>
+                <div className='horizontal-center'><img src={profile.profile_image_url} /></div>
+                <div className='horizontal-center'><a href={`https://twitter.com/${profile.Username}`} target='_blank'><span>{profile.Username}</span></a></div>
+                <div className='horizontal-center'><span>{profile.name}</span></div>
+                {profile.verified && <Chip style={{margin: 10}} className='horizontal-center' backgroundColor={lightBlue100}>Verified</Chip>}
               </div>
               <div className='large-9 medium-8 small-12 columns'>
                 <div style={{margin: 8}}>
