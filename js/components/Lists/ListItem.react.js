@@ -54,11 +54,11 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
         tooltipPosition='top-left'
         />
        <IconButton
-        tooltip='Read Only'
+        tooltip='Bulk Edit'
         iconStyle={styles.smallIcon}
         style={styles.small}
-        iconClassName='fa fa-lock'
-        onClick={_ => router.push(`/tables/${list.id}`)}
+        iconClassName='fa fa-edit'
+        onClick={_ => router.push(`/lists/${list.id}`)}
         tooltipPosition='top-left'
         />
         <IconButton
