@@ -50,7 +50,6 @@ import UserProfile from './components/UserProfile';
 import ListFeed from './components/ListFeed';
 import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
 
-import intercomSetup from './chat';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -66,7 +65,6 @@ window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.co
 
 // third-party services setups
 if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
-intercomSetup({app_id: 'ur8dbk9e'});
 
 
 // Make reducers hot reloadable, see http://stackoverflow.com/questions/34243684/make-redux-reducers-and-other-non-components-hot-loadable

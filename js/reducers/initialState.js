@@ -102,4 +102,9 @@ export const initialState = {
     didInvalidate: false,
     received: [],
   },
+  joyrideReducer: {
+    showUploadGuide: false,
+    showGeneralGuide: false,
+    currentStep: 0
+  }
 };

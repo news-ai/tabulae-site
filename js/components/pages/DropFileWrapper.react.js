@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Dropzone from 'react-dropzone';
 import Waiting from '../Waiting';
-import Headers from '../ImportFile/Headers.react';
 import Radium from 'radium';
 
 const styles = {
@@ -103,13 +102,13 @@ class DropFileWrapper extends Component {
               <i style={[styles.icon]} onClick={ _ => this.setState({file: null, isFileDropped: false})} className='fa fa-close' aria-hidden='true'></i>
             </div>
             : <Dropzone
-            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
-            style={styles.dropzone.default}
-            activeStyle={styles.dropzone.active}
-            rejectStyle={styles.dropzone.reject}
-            onDrop={this.onDrop}
-            multiple={false}
-            >
+              accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
+              style={styles.dropzone.default}
+              activeStyle={styles.dropzone.active}
+              rejectStyle={styles.dropzone.reject}
+              onDrop={this.onDrop}
+              multiple={false}
+              >
             <div>Try dropping an Excel (xlsx) file here, or click to select file to upload.</div>
           </Dropzone>}
           </div>
@@ -117,9 +116,7 @@ class DropFileWrapper extends Component {
         </div>
         );
     } else {
-      renderNode = state.isReceiving || !props.headerReducer[state.listId] ?
-      <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: '10px'}} text='Waiting for Columns to be processed...' /> :
-      <Headers listId={state.listId} />;
+      renderNode = <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: 10}} text='Waiting for Columns to be processed...' />;
     }
     return (
       <div className='horizontal-center'>
@@ -133,7 +130,7 @@ const mapStateToProps = (state, props) => {
     isProcessWaiting: state.fileReducer.isProcessWaiting,
     isReceiving: state.fileReducer.isReceiving,
     headerIsReceiving: state.headerReducer.isReceiving,
-    headerReducer: state.headerReducer
+    headerReducer: state.headerReducer,
   };
 };
 

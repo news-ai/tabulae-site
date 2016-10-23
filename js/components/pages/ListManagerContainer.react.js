@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component, PropTypes} from 'react';
 import * as actionCreators from 'actions/AppActions';
 import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';
@@ -20,14 +20,20 @@ class ListManagerContainer extends Component {
     this.props.fetchLists();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.showUploadGuide !== this.props.showUploadGuide) {
+      setTimeout(_ => this.refs.input.show(), 1000);
+    }
+  }
+
   render() {
     return (
-      <InfiniteScroll className='row' onScrollBottom={_ => this.props.fetchLists()}>
+      <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <SkyLight
         ref='input'
         overlayStyles={skylightStyles.overlay}
         dialogStyles={skylightStyles.dialog}
-        title='File Drop'>
+        title='Import File'>
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </SkyLight>
         <div className='large-offset-1 large-10 columns'>
@@ -40,6 +46,7 @@ class ListManagerContainer extends Component {
             icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
             />
             <RaisedButton
+            id='uploadButton'
             style={{float: 'right', margin: 10}}
             label='Upload from Existing'
             onClick={_ => this.refs.input.show()}
@@ -75,6 +82,8 @@ const mapStateToProps = state => {
     backRouteTitle: 'Archive',
     title: 'Media Lists',
     tooltip: 'archive',
+    showUploadGuide: state.joyrideReducer.showUploadGuide,
+    firstTimeUser: state.personReducer.firstTimeUser
   };
 };
 

@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
 import withRouter from 'react-router/lib/withRouter';
 import {connect} from 'react-redux';
+import intercomSetup from '../chat';
+
 import * as actionCreators from 'actions/AppActions';
+import * as joyrideActions from './Joyride/actions';
+
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import FAQ from './FAQ';
@@ -11,7 +15,8 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
-import {grey700, grey500} from 'material-ui/styles/colors';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import {grey700, grey500, blue600} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
@@ -38,7 +43,8 @@ class App extends Component {
       isLogin: false,
       isDrawerOpen: false,
       isModalOpen: false,
-      showNavBar: true
+      showNavBar: true,
+      firstTimeUser: false
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
@@ -49,19 +55,18 @@ class App extends Component {
     this.props.getAuth();
   }
 
-  componentDidMount() {
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
-      if (nextProps.firstTimeUser) this.props.setFirstTimeUser();
-      const person = nextProps.person;
-      if (window.Intercom) {
-        // window.Intercom('update', {
-        //   email: person.email,
-        //   user_id: person.id,
-        //   name: `${person.firstname} ${person.lastname}`
-        // });
+      intercomSetup({
+        app_id: 'ur8dbk9e',
+        email: nextProps.person.email,
+        name: `${nextProps.person.firstname} ${nextProps.person.lastname}`,
+        custom_launcher_selector: '#custom_intercom_launcher',
+        user_id: nextProps.person.id
+      });
+      if (nextProps.firstTimeUser) {
+        this.props.setFirstTimeUser();
+        this.setState({firstTimeUser: true});
       }
       this.props.fetchNotifications();
       this.setState({isLogin: true});
@@ -79,6 +84,22 @@ class App extends Component {
     const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
     const NavBar = (state.showNavBar && props.person) && (
       <div>
+        {
+          /* props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
+            <div className='horizontal-center'>
+              <RaisedButton label='Guide me through an existing sheet' onClick={_ => {
+                props.turnOnGeneralGuide();
+                this.setState({firstTimeUser: false});
+              }} />
+            </div>
+            <div className='horizontal-center'>
+              <RaisedButton label='Show me how to upload my first sheet' onClick={_ => {
+                props.turnOnUploadGuide();
+                this.setState({firstTimeUser: false});
+              }} />
+            </div>
+          </Dialog>*/
+        }
         <Drawer
         ontainerClassName='noprint'
         docked={false}
@@ -128,12 +149,23 @@ class App extends Component {
     return (
       <div style={{width: '100%', height: '100%'}}>
         <StyleRoot>
-        {props.isLogin ?
+        {
+          props.isLogin ?
           <div>
-          {state.showNavBar && NavBar}
-          {props.children}
+            {state.showNavBar && NavBar}
+            {props.children}
+            <FloatingActionButton
+            id='custom_intercom_launcher'
+            backgroundColor={blue600}
+            style={{
+              position: 'fixed',
+              bottom: 20,
+              right: 20
+            }}
+            iconClassName='fa fa-comment-o'
+            />
           </div> :
-        <Login />
+          <Login />
         }
         </StyleRoot>
       </div>
@@ -156,7 +188,9 @@ const mapDispatchToProps = dispatch => {
     getAuth: _ => dispatch(actionCreators.fetchPerson()),
     logoutClick: _ => dispatch(actionCreators.logout()),
     setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser()),
-    fetchNotifications: _ => dispatch(actionCreators.fetchNotifications())
+    fetchNotifications: _ => dispatch(actionCreators.fetchNotifications()),
+    turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
+    turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
   };
 };
 
