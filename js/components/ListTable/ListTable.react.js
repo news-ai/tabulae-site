@@ -6,6 +6,9 @@ import Radium from 'radium';
 import _ from 'lodash';
 import * as actionCreators from 'actions/AppActions';
 
+import hopscotch from 'hopscotch';
+import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
+
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
@@ -20,6 +23,7 @@ import {blue200, grey500, grey400, grey300, grey700} from 'material-ui/styles/co
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
+import Dialog from 'material-ui/Dialog';
 
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
@@ -98,6 +102,7 @@ class ListTable extends Component {
       profileContactId: null,
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
+      firsttime: this.props.firstTimeUser,
     };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -527,6 +532,13 @@ class ListTable extends Component {
 
     return (
       <div style={{marginTop: 30}}>
+        {props.firstTimeUser &&
+          <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
+            <span style={{fontWeight: 'bold'}}>Table</span> powers <span style={{fontWeight: 'bold'}}>List Feed</span>.
+            <div className='horizontal-center' style={{margin: '10px 0'}}>
+              <RaisedButton primary label='Start the Tour' onClick={_ => this.setState({firsttime: false})}/>
+            </div>
+          </Dialog>}
         <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
@@ -584,6 +596,7 @@ class ListTable extends Component {
               {({onRequestOpen}) => (
                 <IconButton
                 tooltip='Show/Hide columns'
+                id='add'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-edit'
                 iconStyle={{color: grey500}}
@@ -594,6 +607,7 @@ class ListTable extends Component {
               {({onRequestOpen}) => (
                 <IconButton
                 tooltip='Add Contact'
+                id='add_remove_columns_hop'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-plus'
                 iconStyle={{color: grey500}}

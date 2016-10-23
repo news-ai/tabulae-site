@@ -19,6 +19,7 @@ import twitterProfileReducer from '../components/ContactProfile/SocialProfiles/T
 import instagramProfileReducer from '../components/ContactProfile/SocialProfiles/Instagram/reducer';
 import twitterDataReducer from '../components/ContactProfile/SocialDataGraphs/Twitter/reducer';
 import instagramDataReducer from '../components/ContactProfile/SocialDataGraphs/Instagram/reducer';
+import joyrideReducer from '../components/Joyride/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -40,6 +41,7 @@ const rootReducer = combineReducers({
   instagramProfileReducer,
   twitterDataReducer,
   instagramDataReducer,
+  joyrideReducer,
 });
 
 export default rootReducer;

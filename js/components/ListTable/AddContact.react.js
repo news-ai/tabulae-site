@@ -138,15 +138,16 @@ class AddContact extends Component {
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Publication 1</span>
+            {/*<div className='large-6 medium-12 small-12 columns vertical-center'>
+              <span style={{whiteSpace: 'nowrap'}}>Publication 1</span>
               <AutoComplete
               name='pub1'
               style={textfieldStyle}
               dataSource={state.dataSource}
               onUpdateInput={this.handleUpdateInput}
               />
-            </div>
+            </div>*/
+            }
             {props.list && props.list.fieldsmap !== null &&
               props.list.fieldsmap.map((fieldObj, i) => fieldObj.customfield && (
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>

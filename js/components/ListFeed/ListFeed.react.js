@@ -11,8 +11,10 @@ import InfiniteScroll from '../InfiniteScroll';
 import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
 
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import {grey400} from 'material-ui/styles/colors';
+import Dialog from 'material-ui/Dialog';
 
 const FEED_PADDING = 20;
 
@@ -22,7 +24,8 @@ class ListFeed extends Component {
     this.rowRenderer = this._rowRenderer.bind(this);
     this.state = {
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING,
-      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
+      firsttime: this.props.firstTimeUser
     }
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING;
@@ -65,6 +68,14 @@ class ListFeed extends Component {
     const state = this.state;
     return (
       <div>
+        {props.firstTimeUser &&
+          <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
+            <span style={{fontWeight: 'bold'}}>List Feed</span> is created from all the attached social feeds and RSS feeds from all your contacts in a list.
+            Check it out and click on <span style={{fontWeight: 'bold'}}>"READ ONLY TABLE"</span> when you are ready to see how this feed is created.
+            <div className='horizontal-center' style={{margin: '10px 0'}}>
+              <RaisedButton primary label='OK' onClick={_ => this.setState({firsttime: false})}/>
+            </div>
+          </Dialog>}
         <div className='row horizontal-center' style={{marginTop: 20}}>
           <h4>{props.list ? props.list.name : 'List Feed'}</h4>
           <FlatButton
@@ -124,7 +135,8 @@ const mapStateToProps = (state, props) => {
     list: state.listReducer[listId],
     listfeed: state.listfeedReducer[listId] && state.listfeedReducer[listId].received,
     didInvalidate: state.listfeedReducer.didInvalidate,
-    offset: state.listfeedReducer[listId] && state.listfeedReducer[listId].offset
+    offset: state.listfeedReducer[listId] && state.listfeedReducer[listId].offset,
+    firstTimeUser: state.personReducer.firstTimeUser
   };
 };
 
