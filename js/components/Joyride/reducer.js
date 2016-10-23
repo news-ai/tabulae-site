@@ -26,16 +26,16 @@ function joyrideReducer(state = initialState.joyrideReducer, action) {
   let obj = assignToEmpty(state, {});
   switch (action.type) {
     case TURN_ON_UPLOAD_GUIDE:
-      obj.showUploadGuide = true;
+      // obj.showUploadGuide = true;
       return obj;
     case TURN_OFF_UPLOAD_GUIDE:
-      obj.showUploadGuide = false;
+      // obj.showUploadGuide = false;
       return obj;
     case TURN_ON_GENERAL_GUIDE:
-      obj.showGeneralGuide = true;
+      // obj.showGeneralGuide = true;
       return obj;
     case TURN_OFF_GENERAL_GUIDE:
-      obj.showGeneralGuide = false;
+      // obj.showGeneralGuide = false;
       return obj;
     case FORWARD_STEP:
       return obj;

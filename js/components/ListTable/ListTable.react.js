@@ -532,13 +532,15 @@ class ListTable extends Component {
 
     return (
       <div style={{marginTop: 30}}>
-        {props.firstTimeUser &&
+        {
+          /*props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
             <span style={{fontWeight: 'bold'}}>Table</span> powers <span style={{fontWeight: 'bold'}}>List Feed</span>.
             <div className='horizontal-center' style={{margin: '10px 0'}}>
               <RaisedButton primary label='Start the Tour' onClick={_ => this.setState({firsttime: false})}/>
             </div>
-          </Dialog>}
+          </Dialog>*/
+        }
         <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}

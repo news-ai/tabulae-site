@@ -68,14 +68,16 @@ class ListFeed extends Component {
     const state = this.state;
     return (
       <div>
-        {props.firstTimeUser &&
+        {
+          /*props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
             <span style={{fontWeight: 'bold'}}>List Feed</span> is created from all the attached social feeds and RSS feeds from all your contacts in a list.
             Check it out and click on <span style={{fontWeight: 'bold'}}>"READ ONLY TABLE"</span> when you are ready to see how this feed is created.
             <div className='horizontal-center' style={{margin: '10px 0'}}>
               <RaisedButton primary label='OK' onClick={_ => this.setState({firsttime: false})}/>
             </div>
-          </Dialog>}
+          </Dialog>*/
+        }
         <div className='row horizontal-center' style={{marginTop: 20}}>
           <h4>{props.list ? props.list.name : 'List Feed'}</h4>
           <FlatButton
