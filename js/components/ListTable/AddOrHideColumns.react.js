@@ -22,7 +22,7 @@ const Column = ({name, value, customfield, tableOnly, hidden, onCheck, onRemove}
         <DragHandle />
       </div>
       <div className='large-1 medium-2 small-6 columns'>
-        <Checkbox disabled={tableOnly} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
+        <Checkbox disabled={tableOnly || value === 'employers' || value === 'pastemployers'} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
       </div>
       <div className='large-3 medium-4 small-12 columns'>
         <span>{name}</span>
@@ -57,15 +57,16 @@ const SortableList = SortableContainer(({items, onCheck, onRemove}) => {
         <div className='large-1 medium-1 columns'>
         </div>
       </div>
-      {items.map((fieldObj, index) =>
-        <SortableItem
-        disabled={fieldObj.tableOnly}
-        key={index}
-        index={index}
-        fieldObj={fieldObj}
-        onCheck={onCheck}
-        onRemove={onRemove}
-        />
+      {items
+        .map((fieldObj, index) => (
+          <SortableItem
+          disabled={fieldObj.tableOnly}
+          key={index}
+          index={index}
+          fieldObj={fieldObj}
+          onCheck={onCheck}
+          onRemove={onRemove}
+          />)
       )}
     </div>
   );
@@ -141,6 +142,7 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
+    window.localStorage.clear();
     this.setState({open: false, textvalue: ''});
   }
 
@@ -155,6 +157,7 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
+    window.localStorage.clear();
   }
 
   render() {

@@ -1,20 +1,18 @@
-.GridRow {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: row;
-}
-.GridColumn {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-}
-.LeftSideGridContainer {
-  flex: 0 0 50px;
-}
-
 .BodyGrid {
   width: 100%;
   border: 1px solid #e0e0e0;
+}
+
+.HeaderGrid {
+  width: 100%;
+}
+
+.HeaderGridContainer {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  height: 30px;
+  overflow: hidden;
+  margin-bottom: 15px;
 }
 
 .evenRow,
