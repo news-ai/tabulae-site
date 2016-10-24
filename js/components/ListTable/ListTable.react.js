@@ -667,14 +667,14 @@ class ListTable extends Component {
           {props.listData && props.received.length > 0 && state.columnWidths !== null &&
             <ScrollSync>
             {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
-              <div style={{marginBottom: 10}}>
+              <div className='HeaderGridContainer'>
                 <Grid
                 ref={ref => this.setHeaderGridRef(ref)}
-                className='BodyGrid'
+                className='HeaderGrid'
                 cellRenderer={this.headerRenderer}
                 columnCount={props.fieldsmap.length}
                 columnWidth={({index}) => state.columnWidths[index] + 10}
-                height={40}
+                height={45}
                 autoContainerWidth
                 width={state.screenWidth}
                 rowCount={1}
