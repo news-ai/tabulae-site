@@ -15,7 +15,7 @@ import './react_sortable_hoc.css';
 
 const DragHandle = SortableHandle(() => <i className='fa fa-bars pointer' aria-hidden='true' />);
 
-const Column = ({name, value, customfield, tableOnly, hidden, onCheck, onRemove}) => {
+const Column = ({name, value, customfield, tableOnly, hidden, internal, onCheck, onRemove}) => {
   return (
     <div className='row item'>
       <div className='large-1 medium-1 small-6 columns'>

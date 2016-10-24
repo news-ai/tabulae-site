@@ -197,7 +197,9 @@ class ListTable extends Component {
     if (nextProps.listId !== this.props.listId) {
       // essentially reload
       let columnWidths = this.getColumnStorage();
-      if (columnWidths) this.setState({columnWidths});
+      if (columnWidths.length === nextProps.fieldsmap.length) {
+        this.setState({columnWidths});
+      }
 
       if (nextProps.searchQuery) {
         this.fetchOperations(nextProps).
@@ -207,37 +209,39 @@ class ListTable extends Component {
       }
     }
 
-    if (
-      this.props.listData &&
-      nextProps.listData &&
-      this.props.listData.fieldsmap.length !== nextProps.listData.fieldsmap.length
-      ) {
-      const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
-        const name = fieldObj.name;
-        const size = measureSpanSize(name, '16px Source Sans Pro')
-        return size.width > 60 ? size.width : 60;
-      });
-      this.setState({columnWidths})
-    }
-
     if (this.props.listData && this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
     }
-    
+
+    // initialize columnWidths
     if (nextProps.listData && this.state.columnWidths === null) {
       const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
         return size.width > 60 ? size.width : 60;
       });
-      this.setState({columnWidths})
+      this.setState({columnWidths}, _ => {
+        if (this._HeaderGrid && this._DataGrid) {
+          this._HeaderGrid.recomputeGridSize();
+          this._DataGrid.recomputeGridSize();
+        }
+      })
     }
 
-    if (nextProps.listData && nextProps.contacts.length > 0 && !this.state.dragged) {
-      // optimize with immutablejs
-      let columnWidths = this.state.columnWidths !== null ? this.state.columnWidths.slice() : Array(nextProps.listData.fieldsmap.length).fill(60);
-      this.props.fieldsmap.map((fieldObj, i) => {
+    if (this.props.listData && nextProps.listData) {
+      let columnWidths = this.state.columnWidths;
+      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length) {
+        columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
+          const name = fieldObj.name;
+          const size = measureSpanSize(name, '16px Source Sans Pro')
+          return size.width > 60 ? size.width : 60;
+        });
+      }
+
+      if (nextProps.contacts.length > 0 && !this.state.dragged) {
+        if (columnWidths === null) columnWidths = Array(nextProps.fieldsmap.length).fill(60);
+        nextProps.fieldsmap.map((fieldObj, i) => {
         let max = columnWidths[i];
         nextProps.contacts.map(contact => {
           let content;
@@ -255,12 +259,15 @@ class ListTable extends Component {
         });
         columnWidths[i] = max;
       });
+
+      }
+
       this.setState({columnWidths}, _ => {
         if (this._HeaderGrid && this._DataGrid) {
           this._HeaderGrid.recomputeGridSize();
           this._DataGrid.recomputeGridSize();
         }
-      });
+      })
     }
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
