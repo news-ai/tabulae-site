@@ -20,7 +20,7 @@ export const tour = {
       placement: 'bottom'
     },
     {
-      title: 'Feed Preview',
+      title: 'Hover for Preview',
       content: 'Hover over profile arrow button to see a preview of the feed. Try hovering over the arrow!',
       target: 'profile_hop',
       placement: 'top'

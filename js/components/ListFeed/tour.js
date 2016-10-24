@@ -1,5 +1,6 @@
 export const tour = {
   id: 'listfeed-hopscotch',
+  nextOnTargetClick: true,
   steps: [
     {
       title: 'Next Step',

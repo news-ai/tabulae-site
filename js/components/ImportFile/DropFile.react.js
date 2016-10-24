@@ -7,6 +7,8 @@ import _ from 'lodash';
 import Radium from 'radium';
 import Waiting from '../Waiting';
 
+// DEPRECIATED!!!
+
 const styles = {
   dropzone: {
     default: {
