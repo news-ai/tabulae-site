@@ -6,6 +6,7 @@ import {
   FORWARD_STEP,
   BACKWARD_STEP,
 } from './constants';
+import {REMOVE_FIRST_TIME_USER} from '../Login/constants';
 
 import {initialState} from '../../reducers/initialState';
 import {assignToEmpty, canAccessReducer} from '../../utils/assign';
@@ -16,7 +17,8 @@ const types = [
   TURN_ON_GENERAL_GUIDE,
   TURN_OFF_GENERAL_GUIDE,
   FORWARD_STEP,
-  BACKWARD_STEP
+  BACKWARD_STEP,
+  REMOVE_FIRST_TIME_USER
 ];
 
 function joyrideReducer(state = initialState.joyrideReducer, action) {
@@ -25,6 +27,10 @@ function joyrideReducer(state = initialState.joyrideReducer, action) {
 
   let obj = assignToEmpty(state, {});
   switch (action.type) {
+    case REMOVE_FIRST_TIME_USER:
+      obj.showUploadGuide = false;
+      obj.showGeneralGuide = false;
+      return obj;
     case TURN_ON_UPLOAD_GUIDE:
       obj.showUploadGuide = true;
       return obj;

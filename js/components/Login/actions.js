@@ -1,7 +1,8 @@
 import * as api from '../../actions/api';
 import {
   loginConstant,
-  SET_FIRST_TIME_USER
+  SET_FIRST_TIME_USER,
+  REMOVE_FIRST_TIME_USER
 } from './constants';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -55,6 +56,10 @@ function loginFail(message) {
 
 export function setFirstTimeUser() {
   return dispatch => dispatch({type: SET_FIRST_TIME_USER});
+}
+
+export function removeFirstTimeUser() {
+  return dispatch => dispatch({type: REMOVE_FIRST_TIME_USER});
 }
 
 export function loginWithGoogle() {

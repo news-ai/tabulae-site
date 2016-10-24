@@ -6,6 +6,7 @@ import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
+import * as joyrideActions from '../Joyride/actions';
 import {grey700, grey500, grey50} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
@@ -180,7 +181,26 @@ class ContactProfile extends Component {
             <div className='horizontal-center' style={{margin: '10px 0'}}>
               <RaisedButton primary label='OK' onClick={_ => {
                 this.setState({firsttime: false});
-                hopscotch.startTour(tour);
+                if (props.showUploadGuide) {
+                  hopscotch.startTour(Object.assign({}, tour, {
+                    steps: [...tour.steps, {
+                      title: 'Check out the Sample Table at Home',
+                      content: 'Discover the full power of Tabulae when feeds are subscribed to on contacts. Check it out in the sample Table.',
+                      target: 'breadcrumbs_hop',
+                      placement: 'bottom'
+                    }]
+                  }));
+                } else if (props.showGeneralGuide) {
+                  hopscotch.startTour(Object.assign({}, tour, {
+                    steps: [...tour.steps, {
+                      title: 'That\'s it!',
+                      content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
+                      target: 'breadcrumbs_hop',
+                      placement: 'bottom'
+                    }]
+                  }));
+                }
+                props.removeFirstTimeUser();
               }}/>
             </div>
           </Dialog>
@@ -304,7 +324,9 @@ function mapStateToProps(state, props) {
     employers,
     pastemployers,
     list: state.listReducer[listId],
-    firstTimeUser: state.personReducer.firstTimeUser
+    firstTimeUser: state.personReducer.firstTimeUser,
+    showUploadGuide: state.joyrideReducer.showUploadGuide,
+    showGeneralGuide: state.joyrideReducer.showGeneralGuide
   };
 }
 
@@ -318,6 +340,8 @@ function mapDispatchToProps(dispatch, props) {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
+    removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser()),
+    turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide())
   };
 }
 

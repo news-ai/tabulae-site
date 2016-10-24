@@ -1,14 +1,16 @@
 import {
   loginConstant,
-  SET_FIRST_TIME_USER
+  SET_FIRST_TIME_USER,
+  REMOVE_FIRST_TIME_USER
 } from './constants';
-import { initialState } from '../../reducers/initialState';
-import { assignToEmpty, canAccessReducer } from '../../utils/assign';
+import {initialState} from '../../reducers/initialState';
+import {assignToEmpty, canAccessReducer} from '../../utils/assign';
 import _ from 'lodash';
 
 
 const types = _.values(loginConstant);
 types.push(SET_FIRST_TIME_USER);
+types.push(REMOVE_FIRST_TIME_USER);
 
 function personReducer(state = initialState.personReducer, action) {
   if (window.isDev) Object.freeze(state);
@@ -29,6 +31,9 @@ function personReducer(state = initialState.personReducer, action) {
       return obj;
     case SET_FIRST_TIME_USER:
       obj.firstTimeUser = true;
+      return obj;
+    case REMOVE_FIRST_TIME_USER:
+      obj.firstTimeUser = false;
       return obj;
     default:
       return state;

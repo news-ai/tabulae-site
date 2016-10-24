@@ -86,17 +86,19 @@ class App extends Component {
       <div>
         {
           props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
-            <div className='horizontal-center'>
-              <RaisedButton label='Guide me through an existing sheet' onClick={_ => {
-                props.turnOnGeneralGuide();
-                this.setState({firstTimeUser: false});
-              }} />
-            </div>
-            <div className='horizontal-center'>
-              <RaisedButton label='Show me how to upload my first sheet' onClick={_ => {
-                props.turnOnUploadGuide();
-                this.setState({firstTimeUser: false});
-              }} />
+            <div style={{margin: '10px 0'}}>
+              <div className='horizontal-center'>
+                <RaisedButton primary style={{margin: 10}} label='Guide me through an existing sheet' onClick={_ => {
+                  props.turnOnGeneralGuide();
+                  this.setState({firstTimeUser: false});
+                }} />
+              </div>
+              <div className='horizontal-center'>
+                <RaisedButton primary style={{margin: 10}} label='Show me how to upload my first sheet' onClick={_ => {
+                  props.turnOnUploadGuide();
+                  this.setState({firstTimeUser: false});
+                }} />
+              </div>
             </div>
           </Dialog>
         }

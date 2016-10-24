@@ -4,6 +4,7 @@ import withRouter from 'react-router/lib/withRouter';
 
 import * as listfeedActions from './actions';
 import * as actionCreators from '../../actions/AppActions';
+import * as AppActions from 'actions/AppActions';
 import HeadlineItem from '../ContactProfile/Headlines/HeadlineItem.react';
 import Tweet from '../ContactProfile/Tweets/Tweet.react';
 import InstagramItem from '../ContactProfile/Instagram/InstagramItem.react';
@@ -80,7 +81,9 @@ class ListFeed extends Component {
               Scroll down to check it out!
             </div>
             <div className='horizontal-center' style={{margin: '10px 0'}}>
-              <RaisedButton primary label='OK' onClick={_ => this.setState({firsttime: false}, _ => hopscotch.startTour(tour))}/>
+              <RaisedButton primary label='OK' onClick={_ => this.setState({firsttime: false}, _ => {
+                hopscotch.startTour(tour);
+              })}/>
             </div>
           </Dialog>
         }
@@ -146,6 +149,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchListFeed: listId => dispatch(listfeedActions.fetchListFeed(listId)),
     fetchList: listId => dispatch(actionCreators.fetchList(listId)),
+    removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser())
   };
 };
 

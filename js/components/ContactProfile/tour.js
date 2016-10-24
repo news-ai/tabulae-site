@@ -25,11 +25,5 @@ export const tour = {
       target: 'insta_data_hop',
       placement: 'right'
     },
-    {
-      title: 'That\'s it!',
-      content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
-      target: 'breadcrumbs_hop',
-      placement: 'bottom'
-    }
   ]
 };

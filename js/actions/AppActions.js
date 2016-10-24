@@ -12,6 +12,7 @@ export const logout = _ => loginActions.logout();
 export const onLogin = _ => loginActions.onLogin();
 export const fetchPerson = _ => loginActions.fetchPerson();
 export const setFirstTimeUser = _ => loginActions.setFirstTimeUser();
+export const removeFirstTimeUser = _ => loginActions.removeFirstTimeUser();
 export const fetchNotifications = _ => loginActions.fetchNotifications();
 export const patchPerson = person => loginActions.patchPerson(person);
 
