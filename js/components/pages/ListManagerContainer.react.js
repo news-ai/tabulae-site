@@ -10,6 +10,9 @@ import InfiniteScroll from '../InfiniteScroll';
 import DropFileWrapper from './DropFileWrapper.react';
 import {grey500} from 'material-ui/styles/colors';
 
+import hopscotch from 'hopscotch';
+import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
+import {tour} from './tour';
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -23,6 +26,10 @@ class ListManagerContainer extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.showUploadGuide !== this.props.showUploadGuide) {
       setTimeout(_ => this.refs.input.show(), 1000);
+    }
+
+    if (nextProps.showGeneralGuide !== this.props.showGeneralGuide) {
+      hopscotch.startTour(tour);
     }
   }
 
@@ -83,6 +90,7 @@ const mapStateToProps = state => {
     title: 'Media Lists',
     tooltip: 'archive',
     showUploadGuide: state.joyrideReducer.showUploadGuide,
+    showGeneralGuide: state.joyrideReducer.showGeneralGuide,
     firstTimeUser: state.personReducer.firstTimeUser
   };
 };

@@ -4,7 +4,7 @@ import ContactDescriptor from './ContactDescriptor.react';
 
 function ContactCustomDescriptions({contact, patchContact, list}) {
   return (
-    <div style={{marginTop: 10, marginBottom: 20, marginLeft: 8}}>
+    <div id='contact_profile_custom_hop' style={{marginTop: 10, marginBottom: 20, marginLeft: 8}}>
       <h5>Custom Fields</h5>
       <div style={{marginLeft: 5}}>
       {list && contact && contact.customfields !== null ? list.fieldsmap

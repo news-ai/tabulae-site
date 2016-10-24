@@ -85,20 +85,22 @@ class App extends Component {
     const NavBar = (state.showNavBar && props.person) && (
       <div>
         {
-          /* props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
-            <div className='horizontal-center'>
-              <RaisedButton label='Guide me through an existing sheet' onClick={_ => {
-                props.turnOnGeneralGuide();
-                this.setState({firstTimeUser: false});
-              }} />
+          props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
+            <div style={{margin: '10px 0'}}>
+              <div className='horizontal-center'>
+                <RaisedButton primary style={{margin: 10}} label='Guide me through an existing sheet' onClick={_ => {
+                  props.turnOnGeneralGuide();
+                  this.setState({firstTimeUser: false});
+                }} />
+              </div>
+              <div className='horizontal-center'>
+                <RaisedButton primary style={{margin: 10}} label='Show me how to upload my first sheet' onClick={_ => {
+                  props.turnOnUploadGuide();
+                  this.setState({firstTimeUser: false});
+                }} />
+              </div>
             </div>
-            <div className='horizontal-center'>
-              <RaisedButton label='Show me how to upload my first sheet' onClick={_ => {
-                props.turnOnUploadGuide();
-                this.setState({firstTimeUser: false});
-              }} />
-            </div>
-          </Dialog>*/
+          </Dialog>
         }
         <Drawer
         ontainerClassName='noprint'
@@ -118,7 +120,7 @@ class App extends Component {
             <div>
               <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
-            <div style={{marginTop: 16}}>
+            <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs
               routes={props.routes}
               params={props.params}

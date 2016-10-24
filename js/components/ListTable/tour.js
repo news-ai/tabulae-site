@@ -1,9 +1,9 @@
-export default tour = {
+export const tour = {
   id: 'listable-hopscotch',
-  steps : [
+  steps: [
     {
       title: 'Add Contact',
-      content: 'Click here to Add Contact',
+      content: 'Here is where you add new contacts',
       target: 'add_contact_hop',
       placement: 'bottom'
     },
@@ -14,10 +14,22 @@ export default tour = {
       placement: 'bottom'
     },
     {
-      title: 'Feed Preview',
-      content: 'Hover over profile arrow button to see a preview of the feed',
+      title: 'Add/Remove Columns',
+      content: 'Here is where you can copy selected contacts along with their attached feeds to different Tables.',
+      target: 'copy_contacts_hop',
+      placement: 'bottom'
+    },
+    {
+      title: 'Hover for Preview',
+      content: 'Hover over profile arrow button to see a preview of the feed. Try hovering over the arrow!',
       target: 'profile_hop',
-      placement: 'right'
-    }
+      placement: 'top'
+    },
+    {
+      title: 'Next Step',
+      content: 'Click Profile when you are ready',
+      target: 'profile_hop',
+      placement: 'top'
+    },
   ]
 };

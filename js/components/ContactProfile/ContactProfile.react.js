@@ -6,7 +6,12 @@ import * as feedActions from './actions';
 import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
+import * as joyrideActions from '../Joyride/actions';
 import {grey700, grey500, grey50} from 'material-ui/styles/colors';
+
+import hopscotch from 'hopscotch';
+import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
+import {tour} from './tour';
 
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
@@ -14,6 +19,7 @@ import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Textarea from 'react-textarea-autosize';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeed.react';
@@ -45,7 +51,8 @@ class ContactProfile extends Component {
       isPastEmployerPanelOpen: false,
       employerAutocompleteList: [],
       autoinput: '',
-      tabContainerWidth: 800
+      tabContainerWidth: 800,
+      firsttime: this.props.firstTimeUser
     };
     this.togglePanel = this._togglePanel.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
@@ -167,6 +174,37 @@ class ContactProfile extends Component {
     ];
     return (
       <div className='row horizontal-center'>
+        {
+          props.firstTimeUser &&
+          <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
+            <p><span style={{fontWeight: 'bold'}}>Profile</span> is generated for every contact in <span style={{fontWeight: 'bold'}}>Table</span>.</p>
+            <div className='horizontal-center' style={{margin: '10px 0'}}>
+              <RaisedButton primary label='OK' onClick={_ => {
+                this.setState({firsttime: false});
+                if (props.showUploadGuide) {
+                  hopscotch.startTour(Object.assign({}, tour, {
+                    steps: [...tour.steps, {
+                      title: 'Check out the Sample Table at Home',
+                      content: 'Discover the full power of Tabulae when feeds are subscribed to on contacts. Check it out in the sample Table.',
+                      target: 'breadcrumbs_hop',
+                      placement: 'bottom'
+                    }]
+                  }));
+                } else if (props.showGeneralGuide) {
+                  hopscotch.startTour(Object.assign({}, tour, {
+                    steps: [...tour.steps, {
+                      title: 'That\'s it!',
+                      content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
+                      target: 'breadcrumbs_hop',
+                      placement: 'bottom'
+                    }]
+                  }));
+                }
+                props.removeFirstTimeUser();
+              }}/>
+            </div>
+          </Dialog>
+        }
         <div className='large-9 columns'>
           {props.contact && (
             <div className='row' style={{marginTop: 40}}>
@@ -286,6 +324,9 @@ function mapStateToProps(state, props) {
     employers,
     pastemployers,
     list: state.listReducer[listId],
+    firstTimeUser: state.personReducer.firstTimeUser,
+    showUploadGuide: state.joyrideReducer.showUploadGuide,
+    showGeneralGuide: state.joyrideReducer.showGeneralGuide
   };
 }
 
@@ -299,6 +340,8 @@ function mapDispatchToProps(dispatch, props) {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
+    removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser()),
+    turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide())
   };
 }
 

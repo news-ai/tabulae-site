@@ -43,6 +43,7 @@ const WrappedInstagram = props => {
      <InstagramProfile {...props}>
       {({onRequestOpen}) => (
         <IconButton
+        id='insta_data_hop'
         iconStyle={styles.smallIcon}
         style={styles.small}
         iconClassName='fa fa-line-chart'
@@ -80,7 +81,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
   else if (contact.twitterprivate) twitterErrorText = 'Twitter is private';
 
   return (
-    <div className={className} style={{marginTop: 5}}>
+    <div id='contact_profile_default_hop' className={className} style={{marginTop: 5}}>
       <div className='row' style={{margin: '5px 0'}}>
         <div className='large-12 medium-12 small-12 columns'>
           <ControlledInput

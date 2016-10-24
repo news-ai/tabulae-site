@@ -9,6 +9,8 @@ import Waiting from '../Waiting';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import * as actionCreators from 'actions/AppActions';
 
+// DEPRECIATED!!!
+
 const defaultSelectableOptions = [
   {value: 'firstname', label: 'First Name', selected: false},
   {value: 'lastname', label: 'Last Name', selected: false},

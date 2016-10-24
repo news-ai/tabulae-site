@@ -8,6 +8,7 @@ import * as actionCreators from 'actions/AppActions';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
+import {tour} from './tour';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -388,7 +389,7 @@ class ListTable extends Component {
               _ => !state.onPanel ? this.setState({showProfileTooltip: true}) :
               null, 500)}
             to={`/tables/${this.props.listId}/${rowData.id}`}>
-              <i className='fa fa-arrow-right' aria-hidden='true'/>
+              <i id='profile_hop' className='fa fa-arrow-right' aria-hidden='true'/>
             </Link>);
           break;
         default:
@@ -533,13 +534,17 @@ class ListTable extends Component {
     return (
       <div style={{marginTop: 30}}>
         {
-          /*props.firstTimeUser &&
+          props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
-            <span style={{fontWeight: 'bold'}}>Table</span> powers <span style={{fontWeight: 'bold'}}>List Feed</span>.
+            <p><span style={{fontWeight: 'bold'}}>Table</span> powers <span style={{fontWeight: 'bold'}}>List Feed</span>.</p>
+            <p>It comes with default columns that connect social profiles to power different feeds and dynamic graphs.</p>
             <div className='horizontal-center' style={{margin: '10px 0'}}>
-              <RaisedButton primary label='Start the Tour' onClick={_ => this.setState({firsttime: false})}/>
+              <RaisedButton primary label='OK' onClick={_ => {
+                this.setState({firsttime: false});
+                hopscotch.startTour(tour);
+              }}/>
             </div>
-          </Dialog>*/
+          </Dialog>
         }
         <div className='vertical-center'>
           <FlatButton
@@ -587,7 +592,8 @@ class ListTable extends Component {
               selected={state.selected}>
               {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Copy/Move to Another'
+                id='copy_contacts_hop'
+                tooltip='Copy to Another Table'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-copy'
                 iconStyle={{color: grey500}}
@@ -597,8 +603,8 @@ class ListTable extends Component {
               <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
               {({onRequestOpen}) => (
                 <IconButton
+                id='add_remove_columns_hop'
                 tooltip='Show/Hide columns'
-                id='add'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-edit'
                 iconStyle={{color: grey500}}
@@ -608,8 +614,8 @@ class ListTable extends Component {
               <AddContact listId={props.listId}>
               {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Add Contact'
-                id='add_remove_columns_hop'
+                tooltip='Add New Contact'
+                id='add_contact_hop'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-plus'
                 iconStyle={{color: grey500}}

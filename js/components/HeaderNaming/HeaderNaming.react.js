@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
+import withRouter from 'react-router/lib/withRouter';
 import * as actionCreators from 'actions/AppActions';
-import {Grid, WindowScroller} from 'react-virtualized';
+import {Grid} from 'react-virtualized';
 
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -9,7 +10,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 
-import {grey500, grey800, lightBlue50, lightBlue300} from 'material-ui/styles/colors';
+import {grey500, lightBlue50, lightBlue300} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
@@ -145,7 +146,7 @@ class HeaderNaming extends Component {
 
   _onSubmit() {
     const order = this.state.order.map(name => name || 'ignore_column');
-    this.props.onAddHeaders(order);
+    this.props.onAddHeaders(order).then(_ => setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}`), 5000));
   }
 
   _onAddCustom() {
@@ -242,4 +243,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HeaderNaming);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(HeaderNaming));

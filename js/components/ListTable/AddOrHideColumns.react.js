@@ -177,7 +177,7 @@ class AddOrHideColumns extends Component {
       <div>
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Show/Hide Columns' onRequestClose={_ => this.setState({open: false})}>
          <div style={{marginTop: 20}}>
-          <div style={{margin: '25px 0'}}>
+          <div style={{margin: '20px 0'}}>
             <span style={{fontSize: '0.9em'}}>
               Use the drag handle icon <i style={{margin: '0 3px'}} className='fa fa-bars' aria-hidden='true'/> to reorder the order of you columns. Activate or de-activate default columns. Create or delete custom columns that you can use as template variable in emails.
             </span>

@@ -36,9 +36,6 @@ export function fetchHeaders(listId) {
 export function waitForServerProcess(listId) {
   return dispatch => {
     dispatch({type: TURN_ON_PROCESS_WAIT});
-    setTimeout( _ => {
-      window.location.href = window.location.origin + '/tables/' + listId;
-    }, 5000);
   };
 }
 
@@ -48,10 +45,8 @@ export function addHeaders(listId, order) {
     dispatch(waitForServerProcess(listId));
     const fileId = getState().fileReducer[listId].id;
 
-    return api.post(`/files/${fileId}/headers`, {order: order})
-    .then(response => {
-      dispatch({type: headerConstant.CREATE_RECEIVED, response});
-    })
+    return api.post(`/files/${fileId}/headers`, {order})
+    .then(response => dispatch({type: headerConstant.CREATE_RECEIVED, response}))
     .catch( message => dispatch({type: headerConstant.REQUEST_FAIL, message}));
   };
 }
