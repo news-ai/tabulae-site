@@ -102,6 +102,17 @@ class App extends Component {
             </div>
           </Dialog>
         }
+        {
+          props.isLogin && !props.person.isactive &&
+          <Dialog open={!props.person.isactive} modal>
+            <div className='horizontal-center'>
+              <p>Your subscription is over. To re-subscribe please visit the our billing page.</p>
+            </div>
+            <div className='horizontal-center'>
+              <RaisedButton primary label='Go to Billing' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} />
+            </div>
+          </Dialog>
+        }
         <Drawer
         ontainerClassName='noprint'
         docked={false}
