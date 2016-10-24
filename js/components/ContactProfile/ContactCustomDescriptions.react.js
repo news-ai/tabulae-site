@@ -7,10 +7,11 @@ function ContactCustomDescriptions({contact, patchContact, list}) {
     <div id='contact_profile_custom_hop' style={{marginTop: 10, marginBottom: 20, marginLeft: 8}}>
       <h5>Custom Fields</h5>
       <div style={{marginLeft: 5}}>
-      {list && contact && contact.customfields !== null ? list.fieldsmap
+      {list && contact && list.fieldsmap.some(fieldObj => fieldObj.customfield) ?
+        list.fieldsmap
         .filter(fieldObj => fieldObj.customfield)
         .map((fieldObj, i) => {
-          const customValue = contact.customfields.find(customObj => customObj.name === fieldObj.value);
+          const customValue = contact.customfields !== null && contact.customfields.find(customObj => customObj.name === fieldObj.value);
           return (
             <ContactDescriptor
             key={i}

@@ -7,7 +7,7 @@ import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
 const styleEmptyRow = {
   padding: 10,
   marginTop: 20,
-  marginBottom: 50,
+  marginBottom: 20,
 };
 
 class GenericFeed extends Component {
@@ -28,6 +28,11 @@ class GenericFeed extends Component {
           && !props.didInvalidate
           && props.feed.length === 0
           && <div className='row' style={styleEmptyRow}><p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
+        {props.didInvalidate
+          && <div className='row' style={styleEmptyRow}>
+          <p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p>
+          </div>
+        }
         {props.feed &&
           <WindowScroller>
           {({height, scrollTop}) => (
@@ -53,8 +58,7 @@ class GenericFeed extends Component {
             </CellMeasurer>
             )}
           </WindowScroller>}
-        {props.didInvalidate
-          && <div className='row' style={styleEmptyRow}><p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right Interm button to reach out and we'll try to resolve this for you.</p></div>}
+
         {/*props.offset !== null &&
           <div className='horizontal-center'>
           {!props.isReceiving &&
