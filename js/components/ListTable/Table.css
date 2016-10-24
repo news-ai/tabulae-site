@@ -31,6 +31,7 @@
   overflow-x: hidden;
   z-index: 0;
 }
+
 .cell {
   border-right: 1px solid #e0e0e0;
   border-bottom: 1px solid #e0e0e0;
@@ -45,6 +46,7 @@
   overflow-x: hidden;
   z-index: 0;
 }
+
 .headercell {
   border-right: 1px solid #e0e0e0;
   border-bottom: 1px solid #e0e0e0;
