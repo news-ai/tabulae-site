@@ -8,12 +8,17 @@ import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import {grey700, grey500, grey50} from 'material-ui/styles/colors';
 
+import hopscotch from 'hopscotch';
+import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
+import {tour} from './tour';
+
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Textarea from 'react-textarea-autosize';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeed.react';
@@ -45,7 +50,8 @@ class ContactProfile extends Component {
       isPastEmployerPanelOpen: false,
       employerAutocompleteList: [],
       autoinput: '',
-      tabContainerWidth: 800
+      tabContainerWidth: 800,
+      firsttime: this.props.firstTimeUser
     };
     this.togglePanel = this._togglePanel.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
@@ -167,6 +173,18 @@ class ContactProfile extends Component {
     ];
     return (
       <div className='row horizontal-center'>
+        {
+          props.firstTimeUser &&
+          <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
+            <p><span style={{fontWeight: 'bold'}}>Profile</span> is generated for every contact in <span style={{fontWeight: 'bold'}}>Table</span>.</p>
+            <div className='horizontal-center' style={{margin: '10px 0'}}>
+              <RaisedButton primary label='OK' onClick={_ => {
+                this.setState({firsttime: false});
+                hopscotch.startTour(tour);
+              }}/>
+            </div>
+          </Dialog>
+        }
         <div className='large-9 columns'>
           {props.contact && (
             <div className='row' style={{marginTop: 40}}>
@@ -286,6 +304,7 @@ function mapStateToProps(state, props) {
     employers,
     pastemployers,
     list: state.listReducer[listId],
+    firstTimeUser: state.personReducer.firstTimeUser
   };
 }
 

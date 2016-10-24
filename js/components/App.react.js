@@ -85,7 +85,7 @@ class App extends Component {
     const NavBar = (state.showNavBar && props.person) && (
       <div>
         {
-          /* props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
+          props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
             <div className='horizontal-center'>
               <RaisedButton label='Guide me through an existing sheet' onClick={_ => {
                 props.turnOnGeneralGuide();
@@ -98,7 +98,7 @@ class App extends Component {
                 this.setState({firstTimeUser: false});
               }} />
             </div>
-          </Dialog>*/
+          </Dialog>
         }
         <Drawer
         ontainerClassName='noprint'
@@ -118,7 +118,7 @@ class App extends Component {
             <div>
               <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
-            <div style={{marginTop: 16}}>
+            <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs
               routes={props.routes}
               params={props.params}
