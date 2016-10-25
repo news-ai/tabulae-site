@@ -273,7 +273,7 @@ class ContactProfile extends Component {
           open={state.isEmployerPanelOpen || state.isPastEmployerPanelOpen}
           onRequestClose={_ => state.isEmployerPanelOpen ? this.togglePanel('employers') : this.togglePanel('pastemployers')}>
             <AutoComplete
-            floatingLabelText='Autocomplete dropdown'
+            floatingLabelText='Autocomplete Dropdown'
             filter={AutoComplete.noFilter}
             onUpdateInput={this.updateAutoInput}
             onNewRequest={autoinput => this.setState({autoinput})}

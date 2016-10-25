@@ -16,19 +16,23 @@ import './react_sortable_hoc.css';
 const DragHandle = SortableHandle(() => <i className='fa fa-bars pointer' aria-hidden='true' />);
 
 const Column = ({name, value, customfield, tableOnly, hidden, internal, onCheck, onRemove}) => {
+  let typeLabel = 'Editable';
+  if (tableOnly) typeLabel = 'Table Only';
+  if (customfield) typeLabel = 'Custom Editable';
+  if (internal) typeLabel = 'Internal';
   return (
     <div className='row item'>
       <div className='large-1 medium-1 small-6 columns'>
         <DragHandle />
       </div>
       <div className='large-1 medium-2 small-6 columns'>
-        <Checkbox disabled={tableOnly || value === 'employers' || value === 'pastemployers'} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
+        <Checkbox disabled={tableOnly || internal} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
       </div>
       <div className='large-3 medium-4 small-12 columns'>
         <span>{name}</span>
       </div>
       <div className='large-4 medium-4 small-12 columns'>
-        <span>{tableOnly ? 'Table Only' : customfield ? 'Custom Editable' : 'Editable'}</span>
+        <span>{typeLabel}</span>
       </div>
       <div className='large-1 medium-1 small-12 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
         {customfield && <i className='fa fa-trash hoverable-icon' aria-hidden='true' onClick={_ => onRemove(value)} />}
@@ -179,12 +183,12 @@ class AddOrHideColumns extends Component {
     return (
       <div>
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Show/Hide Columns' onRequestClose={_ => this.setState({open: false})}>
-         <div style={{marginTop: 20}}>
-          <div style={{margin: '20px 0'}}>
-            <span style={{fontSize: '0.9em'}}>
-              Use the drag handle icon <i style={{margin: '0 3px'}} className='fa fa-bars' aria-hidden='true'/> to reorder the order of you columns. Activate or de-activate default columns. Create or delete custom columns that you can use as template variable in emails.
-            </span>
-          </div>
+          <div style={{marginTop: 20}}>
+            <div style={{margin: '20px 0'}}>
+              <span style={{fontSize: '0.9em'}}>
+                Use the drag handle icon <i style={{margin: '0 3px'}} className='fa fa-bars' aria-hidden='true'/> to reorder the order of you columns. Activate or de-activate default columns. Create or delete custom columns that you can use as template variable in emails.
+              </span>
+            </div>
             {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
             {props.fieldsmap !== null && state.items !== null &&
               <SortableList

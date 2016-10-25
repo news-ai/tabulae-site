@@ -20,18 +20,12 @@ class AddContact extends Component {
     this.state = {
       open: false,
       contactBody: {},
-      dataSource: [],
+      pub1input: '',
+      employerAutocompleteList: []
     };
     this.onSubmit = this._onSubmit.bind(this);
-    this.onUpdateInput = this._onUpdateInput.bind(this);
     this.onChange = this._onChange.bind(this);
-    this.handleUpdateInput = value =>
-      this.setState({
-        dataSource: [
-          value,
-          value + value,
-          value + value + value
-        ]});
+    this.updateAutoInput = this._updateAutoInput.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -44,6 +38,7 @@ class AddContact extends Component {
     let customRow = [];
     let contactBody = this.state.contactBody;
     const list = this.props.list;
+    const pub1input = this.state.pub1input;
     list.fieldsmap
     .map(fieldObj => {
       if (fieldObj.customfield && this.refs[fieldObj.value]) {
@@ -56,6 +51,9 @@ class AddContact extends Component {
     this.props.addContacts([contactBody])
     .then(contacts => {
       const ids = contacts.map(contact => contact.id);
+      if (pub1input.length > 0) {
+        ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
+      }
       const listBody = {
         listId: list.id,
         name: list.name,
@@ -72,9 +70,14 @@ class AddContact extends Component {
     });
   }
 
-  _onUpdateInput(input, callback) {
-    this.props.searchPublicationsByIdName(input)
-    .then(options => callback(null, {options, complete: true}));
+  _updateAutoInput(val) {
+    this.setState({pub1input: val});
+    setTimeout(_ => {
+      this.props.searchPublications(this.state.pub1input)
+      .then(response => this.setState({
+        employerAutocompleteList: response,
+      }));
+    }, 500);
   }
 
   render() {
@@ -138,16 +141,18 @@ class AddContact extends Component {
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
-            {/*<div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span style={{whiteSpace: 'nowrap'}}>Publication 1</span>
+            <div className='large-6 medium-12 small-12 columns vertical-center'>
+              <span style={{whiteSpace: 'nowrap'}}>Publication</span>
               <AutoComplete
-              name='pub1'
+              id='pub1input'
               style={textfieldStyle}
-              dataSource={state.dataSource}
-              onUpdateInput={this.handleUpdateInput}
+              filter={AutoComplete.noFilter}
+              onUpdateInput={this.updateAutoInput}
+              onNewRequest={pub1input => this.setState({pub1input})}
+              openOnFocus
+              dataSource={state.employerAutocompleteList}
               />
-            </div>*/
-            }
+            </div>
             {props.list && props.list.fieldsmap !== null &&
               props.list.fieldsmap.map((fieldObj, i) => fieldObj.customfield && (
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
@@ -165,7 +170,8 @@ class AddContact extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    list: state.listReducer[props.listId]
+    list: state.listReducer[props.listId],
+    publicationReducer: state.publicationReducer
   };
 };
 
@@ -173,7 +179,8 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
-    searchPublicationsByIdName: query => dispatch(actionCreators.searchPublicationsByIdName(query)),
+    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
+    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
   };
 };
 

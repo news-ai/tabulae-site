@@ -42,7 +42,7 @@ class InstagramProfile extends Component {
     const profile = props.profile;
     return (
       <div>
-        <Dialog autoScrollBodyContent open={state.open} title='Instagram' onRequestClose={_ => this.setState({open: false})}>
+        <Dialog autoScrollBodyContent open={state.open} title='Instagram Profile' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           {props.profile &&
             <div className='row' style={{marginTop: 10}}>
@@ -52,13 +52,13 @@ class InstagramProfile extends Component {
                 <div className='horizontal-center'><span>{profile.full_name}</span></div>
               </div>
               <div className='large-9 medium-8 small-12 columns'>
-                <div style={{margin: 8}}>
-                  <span>{profile.bio}</span>
-                </div>
                 <div><span style={{fontSize: '0.9em'}}>Followers: </span><span>{profile.counts.followed_by}</span></div>
                 <div><span style={{fontSize: '0.9em'}}>Following: </span><span>{profile.counts.follows}</span></div>
                 <div><span style={{fontSize: '0.9em'}}>Media: </span><span>{profile.counts.media}</span></div>
                 <div><span style={{fontSize: '0.9em'}}>Website: </span><span>{profile.website}</span></div>
+                <div style={{margin: 10}}>
+                  <span>{profile.bio}</span>
+                </div>
               </div>
             </div>}
             {props.graphdata &&

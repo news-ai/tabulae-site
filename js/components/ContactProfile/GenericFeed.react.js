@@ -59,7 +59,8 @@ class GenericFeed extends Component {
             )}
           </WindowScroller>}
 
-        {/*props.offset !== null &&
+        {
+        /*props.offset !== null &&
           <div className='horizontal-center'>
           {!props.isReceiving &&
             !props.hideLoadMore &&
