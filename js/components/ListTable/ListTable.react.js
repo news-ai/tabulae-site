@@ -116,6 +116,7 @@ class ListTable extends Component {
       if (!store) return undefined;
       else return store.columnWidths;
     }
+    this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
     this.onCheck = this._onCheck.bind(this);
@@ -150,17 +151,18 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
-    if (this.props.listData && this.props.listData.name !== this.state.name) this.setState({name: this.props.listData.name});
+    if (!this.props.listData) return;
+    if (this.props.listData.name !== this.state.name) this.setState({name: this.props.listData.name});
 
-    if (this.props.listData && this.state.sortPositions === null) {
+    if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
     }
     
-    if (this.props.listData && this.state.columnWidths === null) {
-      const columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
+    if (this.state.columnWidths === null || this.state.columnWidths !== this.props.fieldsmap.length) {
+      let columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
-        const size = measureSpanSize(name, '16px Source Sans Pro')
+        const size = measureSpanSize(name, '16px Source Sans Pro');
         return size.width > 60 ? size.width : 60;
       });
 
@@ -184,6 +186,7 @@ class ListTable extends Component {
         });
        
       }
+
       this.setState({columnWidths}, _ => {
         if (this._HeaderGrid && this._DataGrid) {
           this._HeaderGrid.recomputeGridSize();
@@ -196,9 +199,11 @@ class ListTable extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.listId !== this.props.listId) {
       // essentially reload
-      let columnWidths = this.getColumnStorage();
+      let columnWidths = this.state.columnWidths;
       if (columnWidths.length === nextProps.fieldsmap.length) {
         this.setState({columnWidths});
+      } else {
+        this.clearColumnStorage();
       }
 
       if (nextProps.searchQuery) {
@@ -215,7 +220,7 @@ class ListTable extends Component {
     }
 
     // initialize columnWidths
-    if (nextProps.listData && this.state.columnWidths === null) {
+    if (!this.props.listData && nextProps.listData && this.state.columnWidths === null) {
       const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
@@ -242,24 +247,23 @@ class ListTable extends Component {
       if (nextProps.contacts.length > 0 && !this.state.dragged) {
         if (columnWidths === null || nextProps.fieldsmap.length !== columnWidths) columnWidths = Array(nextProps.fieldsmap.length).fill(60);
         nextProps.fieldsmap.map((fieldObj, i) => {
-        let max = columnWidths[i];
-        nextProps.contacts.map(contact => {
-          let content;
-          if (fieldObj.customfield) {
-            if (contact.customfields === null) return;
-            if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
-            content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
-          } else if (fieldObj.tableOnly) {
-            return;
-          } else {
-            content = contact[fieldObj.value];
-          }
-          const size = measureSpanSize(content, '16px Source Sans Pro')
-          if (size.width > max) max = size.width;
+          let max = columnWidths[i];
+          nextProps.contacts.map(contact => {
+            let content;
+            if (fieldObj.customfield) {
+              if (contact.customfields === null) return;
+              if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
+              content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+            } else if (fieldObj.tableOnly) {
+              return;
+            } else {
+              content = contact[fieldObj.value];
+            }
+            const size = measureSpanSize(content, '16px Source Sans Pro')
+            if (size.width > max) max = size.width;
+          });
+          columnWidths[i] = max;
         });
-        columnWidths[i] = max;
-      });
-
       }
 
       this.setState({columnWidths}, _ => {
@@ -688,7 +692,14 @@ class ListTable extends Component {
                 className='HeaderGrid'
                 cellRenderer={this.headerRenderer}
                 columnCount={props.fieldsmap.length}
-                columnWidth={({index}) => state.columnWidths[index] + 10}
+                columnWidth={({index}) => {
+                  const wid = state.columnWidths[index];
+                  if (!wid) {
+                    window.localStorage.clear();
+                    return 70;
+                  }
+                  return wid + 10;
+                }}
                 height={45}
                 autoContainerWidth
                 width={state.screenWidth}
@@ -707,7 +718,14 @@ class ListTable extends Component {
                   className='BodyGrid'
                   cellRenderer={this.cellRenderer}
                   columnCount={props.fieldsmap.length}
-                  columnWidth={({index}) => state.columnWidths[index] + 10}
+                  columnWidth={({index}) => {
+                    const wid = state.columnWidths[index];
+                    if (!wid) {
+                      window.localStorage.clear();
+                      return 70;
+                    }
+                    return wid + 10;
+                  }}
                   overscanRowCount={30}
                   overscanColumnCount={3}
                   height={args.height}
