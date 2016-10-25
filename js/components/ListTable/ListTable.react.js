@@ -240,7 +240,7 @@ class ListTable extends Component {
       }
 
       if (nextProps.contacts.length > 0 && !this.state.dragged) {
-        if (columnWidths === null) columnWidths = Array(nextProps.fieldsmap.length).fill(60);
+        if (columnWidths === null || nextProps.fieldsmap.length !== columnWidths) columnWidths = Array(nextProps.fieldsmap.length).fill(60);
         nextProps.fieldsmap.map((fieldObj, i) => {
         let max = columnWidths[i];
         nextProps.contacts.map(contact => {
@@ -311,13 +311,21 @@ class ListTable extends Component {
     } else if (sortDirection === -1) {
       directionIcon = 'fa fa-caret-down';
     }
+    let customSpan;
+    if (content === 'selected') {
+      customSpan = <span onClick={_ =>
+        this.setState({
+          selected: this.state.selected.length === this.props.listData.contacts.length ?
+          [] : this.props.listData.contacts.slice()
+        })} style={{whiteSpace: 'nowrap', cursor: 'pointer'}}>{content}</span>;
+    }
 
     return (
       <div
       className='headercell'
       key={key}
       style={style}>
-        <span style={{whiteSpace: 'nowrap'}}>{content}</span>
+        {customSpan || <span style={{whiteSpace: 'nowrap'}}>{content}</span>}
         {sortDirection !== 2 &&
           <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
           className={`${directionIcon} sort-icon`}
