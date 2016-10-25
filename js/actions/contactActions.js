@@ -21,16 +21,6 @@ function requestContact() {
   };
 }
 
-function receiveContact(contact) {
-  return dispatch => {
-    // if (contact.employers !== null) contact.employers.map( pubId => dispatch(publicationActions.fetchPublication(pubId)));
-    return dispatch({
-      type: contactConstant.RECEIVE,
-      contact
-    });
-  };
-}
-
 // helper function
 function stripOutEmployers(publicationReducer, contacts, ids) {
   const newContacts = {};
@@ -54,6 +44,16 @@ function receiveContacts(contacts, ids) {
       type: contactConstant.RECEIVE_MULTIPLE,
       contacts: contactsWithEmployers,
       ids
+    });
+  };
+}
+
+function receiveContact(contact) {
+  return dispatch => {
+    // if (contact.employers !== null) contact.employers.map( pubId => dispatch(publicationActions.fetchPublication(pubId)));
+    return dispatch({
+      type: contactConstant.RECEIVE,
+      contact
     });
   };
 }
@@ -84,7 +84,7 @@ export function patchContact(contactId, contactBody) {
     return api.patch(`/contacts/${contactId}`, contact)
     .then(response => {
       // const res = normalize(response, {data: contactSchema});
-      return dispatch(receiveContact(response.data));
+      return dispatch(receiveContacts({[response.data.id]: response.data}, [response.data.id]));
     })
     .catch( message => dispatch(requestContactFail(message)));
   };
