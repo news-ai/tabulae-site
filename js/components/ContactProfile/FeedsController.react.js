@@ -56,10 +56,14 @@ class FeedsController extends Component {
         <div className='row' style={{marginTop: 10, marginBottom: 10}}>
           <div className='large-10 medium-8 small-12 columns'>
             <span style={{marginBottom: 10}}>Currently Attached Feeds</span>
-            {props.feeds && props.feeds.map((feed, i) => <Chip
+            {props.feeds && props.feeds.map((feed, i) => (
+              <Chip
               style={{margin: 4}}
+              labelStyle={{userSelect: 'all'}}
               key={i}
-              onRequestDelete={_ => props.deleteFeed(feed.id).then(_ => props.fetchContactFeeds(props.contactId))}>{feed.url}</Chip>)}
+              onRequestDelete={_ => props.deleteFeed(feed.id).then(_ => props.fetchContactFeeds(props.contactId))}>
+              {feed.url}
+              </Chip>))}
             {props.feeds && props.feeds.length === 0 && <span style={{color: 'grey', marginLeft: 10}}>--- None ---</span>}
           </div>
           <div className='large-2 medium-4 small-12 columns vertical-center'>

@@ -99,11 +99,11 @@ class SearchBar extends Component {
             <div className='large-12 columns' style={{marginBottom: 30}}>
               {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} query={props.searchQuery} /></div>)}
             </div>
+          </div>
           {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 &&
           <div className='row horizontal-center'>
-            <p>Scroll to load more</p>
+            <span>Scroll to load more</span>
           </div>}
-        </div>
       </InfiniteScroll>
       );
   }

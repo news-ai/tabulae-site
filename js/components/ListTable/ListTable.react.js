@@ -240,6 +240,7 @@ class ListTable extends Component {
       }
 
       if (nextProps.contacts.length > 0 && !this.state.dragged) {
+        console.log('eyyyyy');
         if (columnWidths === null) columnWidths = Array(nextProps.fieldsmap.length).fill(60);
         nextProps.fieldsmap.map((fieldObj, i) => {
         let max = columnWidths[i];
