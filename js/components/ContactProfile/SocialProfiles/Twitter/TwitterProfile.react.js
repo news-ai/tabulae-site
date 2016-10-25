@@ -45,7 +45,7 @@ class TwitterProfile extends Component {
     const profile = props.profile;
     return (
       <div>
-        <Dialog autoScrollBodyContent open={state.open} title='Twitter' onRequestClose={_ => this.setState({open: false})}>
+        <Dialog autoScrollBodyContent open={state.open} title='Twitter Profile' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           {props.profile &&
             <div className='row' style={{marginTop: 15}}>
@@ -56,13 +56,15 @@ class TwitterProfile extends Component {
                 <div className='horizontal-center'>{profile.verified && <Chip style={{margin: 10}} backgroundColor={lightBlue100}>Verified</Chip>}</div>
               </div>
               <div className='large-9 medium-8 small-12 columns'>
-                <div style={{margin: 8}}>
+                <div>
+                  <div><span style={{fontSize: '0.9em'}}>Favorites: </span><span>{profile.favourites_count}</span></div>
+                  <div><span style={{fontSize: '0.9em'}}>Followers: </span><span>{profile.followers_count}</span></div>
+                  <div><span style={{fontSize: '0.9em'}}>Following: </span><span>{profile.friends_count}</span></div>
+                  <div><span style={{fontSize: '0.9em'}}>Location: </span><span>{profile.location}</span></div>
+                </div>
+                <div style={{margin: 10}}>
                   <span>{profile.description}</span>
                 </div>
-                <div><span style={{fontSize: '0.9em'}}>Favorites: </span><span>{profile.favourites_count}</span></div>
-                <div><span style={{fontSize: '0.9em'}}>Followers: </span><span>{profile.followers_count}</span></div>
-                <div><span style={{fontSize: '0.9em'}}>Following: </span><span>{profile.friends_count}</span></div>
-                <div><span style={{fontSize: '0.9em'}}>Location: </span><span>{profile.location}</span></div>
               </div>
             </div>}
           {props.graphdata &&

@@ -97,6 +97,7 @@ export function createPublication(data) {
 
 export function createPublicationThenPatchContact(contactId, pubName, which) {
   return (dispatch, getState) => {
+    dispatch({type: 'CREATE_PUBLICATION_THEN_PATCH_CONTACT'});
     const pubId = getState().publicationReducer[pubName];
     if (pubId) {
       const contact = getState().contactReducer[contactId];

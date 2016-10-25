@@ -270,7 +270,7 @@ export function addContacts(contactList) {
   return dispatch => {
     dispatch({type: ADDING_CONTACT, contactList});
     return api.post(`/contacts`, contactList)
-    .then( response => {
+    .then(response => {
       const res = normalize(response, {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
