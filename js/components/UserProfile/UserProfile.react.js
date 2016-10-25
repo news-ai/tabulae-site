@@ -56,6 +56,21 @@ class UserProfile extends Component {
   render() {
     const {person} = this.props;
     const state = this.state;
+     /*<div className='row vertical-center' style={inputHeight}>
+          <div className='large-4 medium-4 columns'>
+            <span style={spanStyle}>Password</span>
+          </div>
+          <div className='large-6 medium-8 columns'>
+            {person.googleid > 0 ?
+              <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>Logged in with Google</span> :
+              <RaisedButton
+              label='Change Password' labelStyle={{textTransform: 'none'}}
+              onClick={_ => {
+                window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword';
+              }}
+              />}
+          </div>
+        </div>*/
     return (
     <div className='row horizontal-center' style={{marginTop: 60}}>
       <div className='large-6 medium-8 small-12 columns'>
@@ -102,21 +117,6 @@ class UserProfile extends Component {
           </div>
           <div className='large-4 small-12 columns'>
             {person.instagramid.length === 0 && <span style={{color: grey600, fontSize: '0.8em'}}>To track Instagram feeds, you must authenticate with your Instagram account!</span>}
-          </div>
-        </div>
-        <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-4 columns'>
-            <span style={spanStyle}>Password</span>
-          </div>
-          <div className='large-6 medium-8 columns'>
-            {person.googleid > 0 ?
-              <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>Logged in with Google</span> :
-              <RaisedButton
-              label='Change Password' labelStyle={{textTransform: 'none'}}
-              onClick={_ => {
-                window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword';
-              }}
-              />}
           </div>
         </div>
         <div className='vertical-center horizontal-center' style={{height: 250}}>

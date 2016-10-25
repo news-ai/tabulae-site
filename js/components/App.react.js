@@ -146,6 +146,7 @@ class App extends Component {
           <div className='small-4 medium-2 large-2 columns vertical-center horizontal-center'>
             <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
           </div>
+          <div className='large-offset-10 mediums-offset-9 small-offset-4 columns' style={{position: 'fixed', backgroundColor: 'red', width: 100, height: 100}} />
         </div>
         <div style={{height: 60}}></div>
         <Dialog
