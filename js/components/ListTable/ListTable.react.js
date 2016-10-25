@@ -163,7 +163,7 @@ class ListTable extends Component {
       let columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro');
-        return size.width > 60 ? size.width : 60;
+        return size.width > 70 ? size.width : 70;
       });
 
       if (this.props.contacts.length > 0 && !this.state.dragged) {
@@ -224,7 +224,7 @@ class ListTable extends Component {
       const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
-        return size.width > 60 ? size.width : 60;
+        return size.width > 70 ? size.width : 70;
       });
       this.setState({columnWidths}, _ => {
         if (this._HeaderGrid && this._DataGrid) {
@@ -236,16 +236,15 @@ class ListTable extends Component {
 
     if (this.props.listData && nextProps.listData) {
       let columnWidths = this.state.columnWidths;
-      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length) {
+      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || nextProps.fieldsmap.length !== columnWidths.length) {
         columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
           const name = fieldObj.name;
           const size = measureSpanSize(name, '16px Source Sans Pro')
-          return size.width > 60 ? size.width : 60;
+          return size.width > 70 ? size.width : 70;
         });
       }
 
       if (nextProps.contacts.length > 0 && !this.state.dragged) {
-        if (columnWidths === null || nextProps.fieldsmap.length !== columnWidths) columnWidths = Array(nextProps.fieldsmap.length).fill(60);
         nextProps.fieldsmap.map((fieldObj, i) => {
           let max = columnWidths[i];
           nextProps.contacts.map(contact => {
@@ -695,7 +694,8 @@ class ListTable extends Component {
                 columnWidth={({index}) => {
                   const wid = state.columnWidths[index];
                   if (!wid) {
-                    window.localStorage.clear();
+                    this.clearColumnStorage();
+                    console.log('eh');
                     return 70;
                   }
                   return wid + 10;
@@ -721,7 +721,7 @@ class ListTable extends Component {
                   columnWidth={({index}) => {
                     const wid = state.columnWidths[index];
                     if (!wid) {
-                      window.localStorage.clear();
+                      this.clearColumnStorage();
                       return 70;
                     }
                     return wid + 10;
