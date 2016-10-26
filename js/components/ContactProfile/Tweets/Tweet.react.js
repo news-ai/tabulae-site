@@ -8,10 +8,11 @@ const defaultStyle = {
   marginBottom: 10,
   border: `dotted 1px ${grey400}`,
   borderRadius: '0.4em',
-  minHeight: 100
+  minHeight: 100,
+  width: 'auto'
 };
 
-const Tweet = ({style, text, username, createdat, tweetidstr, screenWidth}) => {
+const Tweet = ({style, text, username, createdat, tweetidstr}) => {
   const date = new Date(createdat);
   const containerStyle = style ? Object.assign({}, defaultStyle, style) : Object.assign({}, defaultStyle);
   return (
@@ -19,10 +20,12 @@ const Tweet = ({style, text, username, createdat, tweetidstr, screenWidth}) => {
       <div className='large-12 medium-12 small-12 columns'><span style={{fontSize: '0.8em', color: grey400}}>from Twitter</span></div>
       <div className='large-12 medium-12 small-12 columns'>
         <span style={{float: 'right'}}>
-          {tweetidstr ? <a target='_blank' href={`https://twitter.com/statuses/${tweetidstr}`}>{username}</a> : username}
+          {tweetidstr ? <a target='_blank' href={`https://twitter.com/${username}`}>{username}</a> : username}
         </span>
       </div>
-      <div className='large-10 medium-9 small-12 columns'><span>{text}</span></div>
+      <div className='large-10 medium-9 small-12 columns'><span>
+      {tweetidstr ? <a target='_blank' href={`https://twitter.com/statuses/${tweetidstr}`}>{text}</a> : text}
+      </span></div>
       <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
         <span>{date.toDateString()}</span><span style={{marginLeft: 8}}>{date.toTimeString()}</span>
       </div>

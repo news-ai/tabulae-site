@@ -197,6 +197,7 @@ class ListTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
     if (nextProps.listId !== this.props.listId) {
       // essentially reload
       let columnWidths = this.state.columnWidths;
@@ -784,6 +785,7 @@ const mapStateToProps = (state, props) => {
     person: state.personReducer.person,
     firstTimeUser: state.personReducer.firstTimeUser,
     contactReducer: state.contactReducer,
+    listDidInvalidate: state.listReducer.didInvalidate,
   };
 };
 

@@ -34,6 +34,7 @@ function listReducer(state = initialState.listReducer, action) {
     case LIST_CONTACTS_SEARCH_RECEIVED:
       obj[action.listId] = assignToEmpty(state[action.listId], {searchResults: action.ids});
       obj.isReceiving = false;
+      obj.didInvalidate = false;
       return obj;
     case 'CLEAR_LIST_SEARCH':
       obj[action.listId].searchResults = undefined;
@@ -61,6 +62,7 @@ function listReducer(state = initialState.listReducer, action) {
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
       obj.isReceiving = false;
+      obj.didInvalidate = false;
       if (action.archivedOffset === undefined) obj.offset = action.offset;
       if (action.offset === undefined) obj.archivedOffset = action.archivedOffset;
       return obj;
@@ -83,6 +85,7 @@ function listReducer(state = initialState.listReducer, action) {
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
       obj[action.id].offset = 0;
+      obj.didInvalidate = false;
       return obj;
     case listConstant.PATCH:
       obj.isReceiving = true;

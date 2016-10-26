@@ -10,7 +10,7 @@ import * as api from './api';
 import * as publicationActions from './publicationActions';
 import _ from 'lodash';
 
-import { normalize, Schema, arrayOf } from 'normalizr';
+import {normalize, Schema, arrayOf} from 'normalizr';
 
 const contactSchema = new Schema('contacts', { idAttribute: 'id' });
 const publicationSchema = new Schema('publications', { idAttribute: 'id' });
@@ -86,7 +86,7 @@ export function patchContact(contactId, contactBody) {
       // const res = normalize(response, {data: contactSchema});
       return dispatch(receiveContacts({[response.data.id]: response.data}, [response.data.id]));
     })
-    .catch( message => dispatch(requestContactFail(message)));
+    .catch(message => dispatch(requestContactFail(message)));
   };
 }
 
@@ -144,7 +144,7 @@ function fetchContactsPage(listId, pageLimit, offset) {
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.included));
       return dispatch(receiveContacts(res.entities.contacts, res.result.data));
     })
-    .catch( message => dispatch(requestContactFail(message)));
+    .catch(message => dispatch(requestContactFail(message)));
   };
 }
 

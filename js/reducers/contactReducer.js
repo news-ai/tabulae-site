@@ -36,6 +36,10 @@ function contactReducer(state = initialState.contactReducer, action) {
     case contactConstant.REQUEST:
       obj.isReceiving = true;
       return obj;
+    case contactConstant.REQUEST_FAIL:
+      obj.isReceiving = false;
+      obj.didInvalidate = true;
+      return obj;
     case contactConstant.RECEIVE:
       obj.isReceiving = false;
       if (!state[action.contact.id]) obj.received = [...state.received, action.contact.id];
@@ -45,6 +49,7 @@ function contactReducer(state = initialState.contactReducer, action) {
           obj[action.contact.id][field.name] = field.value;
         });
       }
+      obj.didInvalidate = false;
       return obj;
     case contactConstant.RECEIVE_MULTIPLE:
       obj = assignToEmpty(state, action.contacts);
@@ -57,6 +62,7 @@ function contactReducer(state = initialState.contactReducer, action) {
           });
         }
       });
+      obj.didInvalidate = false;
       return obj;
     case 'PATCH_CONTACTS':
       obj.isReceiving = true;

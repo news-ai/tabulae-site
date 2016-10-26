@@ -84,11 +84,13 @@ class ContactProfile extends Component {
     this.props.fetchList(this.props.listId);
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.listDidInvalidate) window.location.href = window.location.origin + '/notfound';
+    if (nextProps.contactDidInvalidate) window.location.href = window.location.origin + '/notfound';
     const node = ReactDOM.findDOMNode(this.refs.tabs);
     if (node) {
       let containerWidth = node.offsetWidth;
-      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
       if (screenWidth < containerWidth) containerWidth = screenWidth;
       this.setState({containerWidth});
     }
@@ -326,7 +328,9 @@ function mapStateToProps(state, props) {
     list: state.listReducer[listId],
     firstTimeUser: state.personReducer.firstTimeUser,
     showUploadGuide: state.joyrideReducer.showUploadGuide,
-    showGeneralGuide: state.joyrideReducer.showGeneralGuide
+    showGeneralGuide: state.joyrideReducer.showGeneralGuide,
+    listDidInvalidate: state.listReducer.didInvalidate,
+    contactDidInvalidate: state.contactReducer.didInvalidate
   };
 }
 
