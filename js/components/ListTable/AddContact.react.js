@@ -40,6 +40,7 @@ class AddContact extends Component {
     const list = this.props.list;
     const pub1input = this.state.pub1input;
     list.fieldsmap
+    .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
     .map(fieldObj => {
       if (fieldObj.customfield && this.refs[fieldObj.value]) {
         const value = this.refs[fieldObj.value].getValue();
@@ -154,7 +155,9 @@ class AddContact extends Component {
               />
             </div>
             {props.list && props.list.fieldsmap !== null &&
-              props.list.fieldsmap.map((fieldObj, i) => fieldObj.customfield && (
+              props.list.fieldsmap
+              .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
+              .map((fieldObj, i) => fieldObj.customfield && (
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
                   <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
                 </div>
