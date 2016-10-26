@@ -144,7 +144,7 @@ class App extends Component {
               />
             </div>
           </div>
-          <div className='hide-for-small-only medium-3 large-3 columns vertical-center horizontal-center clearfix'>
+          <div className='hide-for-small-only medium-4 large-3 columns vertical-center horizontal-center clearfix'>
             <RaisedButton
             className='right'
             label='Invite friends, get 1 month'
@@ -153,7 +153,7 @@ class App extends Component {
             labelStyle={{textTransform: 'none'}}
             onClick={_ => props.router.push('/settings')}/>
           </div>
-          <div className='small-6 medium-2 large-1 columns vertical-center horizontal-center clearfix'>
+          <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
             <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
