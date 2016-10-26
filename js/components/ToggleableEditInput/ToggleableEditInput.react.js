@@ -5,9 +5,9 @@ import TextField from 'material-ui/TextField';
 const styles = {
   nameBlock: {
     title: {
-      marginLeft: '5px',
-      marginRight: '5px',
-      width: '500px',
+      marginLeft: 5,
+      marginRight: 5,
+      width: 500,
       fontSize: '1.2em'
     }
   },
@@ -21,7 +21,14 @@ const styles = {
   }
 };
 
-function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, name, nameStyle}) {
+function ToggleableEditInput({
+  isTitleEditing,
+  onToggleTitleEdit,
+  onUpdateName,
+  name,
+  nameStyle,
+  hideIcon
+}) {
   const spanStyle = nameStyle ? Object.assign({}, styles.nameBlock.title, nameStyle) : styles.nameBlock.title;
   const renderNode = isTitleEditing ? (
     <TextField
@@ -40,10 +47,10 @@ function ToggleableEditInput({isTitleEditing, onToggleTitleEdit, onUpdateName, n
       className='print'
       style={[spanStyle]}
       >{name}</span>
-      <i
+      {!hideIcon && <i
       className='fa fa-pencil-square-o noprint'
       style={[styles.icon]}
-      aria-hidden='true'></i>
+      aria-hidden='true'></i>}
     </div>
     );
   return <div>{renderNode}</div>;
