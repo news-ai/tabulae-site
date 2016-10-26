@@ -154,7 +154,7 @@ class UserProfile extends Component {
               </div>
             </div>
             <div className='horizontal-center'>
-              <span style={{fontSize: '0.8em'}}>{state.count} friends away from a free month</span>
+              <span style={{fontSize: '0.8em'}}>{5 - state.count} friends away from a free month</span>
             </div>
             <div className='horizontal-center' style={{margin: '20px 0'}}>
               <Invite className='vertical-center' />
