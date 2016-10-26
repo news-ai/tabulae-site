@@ -16,7 +16,7 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import {grey700, grey500, blue600, blue300} from 'material-ui/styles/colors';
+import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
@@ -64,6 +64,11 @@ class App extends Component {
         custom_launcher_selector: '#custom_intercom_launcher',
         user_id: nextProps.person.id
       });
+      if (!window.isDev) {
+        if (Raven.isSetup()) Raven.setUserContext({email: nextProps.person.email, id: nextProps.person.id});
+        else Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
+      }
+
       if (nextProps.firstTimeUser) {
         this.props.setFirstTimeUser();
         this.setState({firstTimeUser: true});

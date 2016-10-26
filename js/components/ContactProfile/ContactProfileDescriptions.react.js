@@ -65,6 +65,8 @@ const ControlledInput = props => {
         name={name}
         onUpdateName={onUpdateName}
         nameStyle={props.nameStyle}
+        hideIcon={props.hideIcon}
+        style={props.nameStyle}
         />}
     </ToggleableEditInputHOC>);
 };
@@ -83,16 +85,21 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
   return (
     <div id='contact_profile_default_hop' className={className} style={{marginTop: 5}}>
       <div className='row' style={{margin: '5px 0'}}>
-        <div className='large-12 medium-12 small-12 columns'>
+        <div className='large-12 medium-12 small-12 columns vertical-center'>
+          <ControlledInput
+          hideIcon
+          nameStyle={{fontSize: '1.3em'}}
+          name={contact.firstname}
+          onBlur={firstname => {
+            if (firstname === contact.firstname) return;
+            patchContact(contact.id, {firstname});
+          }}/>
           <ControlledInput
           nameStyle={{fontSize: '1.3em'}}
-          name={`${contact.firstname} ${contact.lastname}`}
-          onBlur={val => {
-            if (val === `${contact.firstname} ${contact.lastname}`) return;
-            const fullname = val.split(' ');
-            const firstname = fullname[0];
-            const lastname = fullname.filter((name, i) => i > 0).join(' ');
-            patchContact(contact.id, {firstname, lastname});
+          name={contact.lastname}
+          onBlur={lastname => {
+            if (lastname === contact.lastname) return;
+            patchContact(contact.id, {lastname});
           }}/>
         </div>
       </div>
