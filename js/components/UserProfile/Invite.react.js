@@ -1,56 +1,60 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import {invite} from './actions';
+import {invite, getInviteCount} from './actions';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import isEmail from 'validator/lib/isEmail';
-
-import alertify from 'alertifyjs';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import Snackbar from 'material-ui/Snackbar';
 
 class Invite extends Component {
   constructor(props) {
     super(props);
     this.state = {
       errorText: null,
-      value: ''
+      value: '',
+      snackbar: false,
+      msg: '',
     };
+    this.onInvite = this._onInvite.bind(this);
+  }
+
+  _onInvite() {
+    const email = this.state.value;
+    let errorText = null;
+    if (isEmail(email)) {
+      this.props.onInvite(email)
+      .then(res => {
+        if (res) this.setState({msg: `Whee, invite sent to ${email}`, snackbar: true});
+        else this.setState({msg: 'Something went wrong. Let us know and we can help you resolve this issue.', snackbar: true});
+      });
+    } else errorText = 'Not an Email';
+    this.setState({errorText, value: ''});
   }
 
   render() {
     const state = this.state;
     const props = this.props;
     return (
-      <div>
-        <div className='row'>
-          <div className='large-12 columns'>
-            <TextField
-            value={state.value}
-            onChange={e => this.setState({value: e.target.value})}
-            errorText={state.errorText}
-            hintText='Email' floatingLabelText='Email' />
-          </div>
+      <div className={props.className}>
+        <TextField
+        value={state.value}
+        onChange={e => this.setState({value: e.target.value})}
+        errorText={state.errorText}
+        hintText='Email'
+        />
+        <div>
+          <RaisedButton
+          label='Invite a friend'
+          onClick={this.onInvite}
+          primary
+          />
         </div>
-        <div className='row'>
-          <div className='large-12 columns'>
-            <RaisedButton
-            label='Invite a friend to the Beta'
-            onClick={_ => {
-              const email = state.value;
-              let errorText = null;
-              if (isEmail(email)) {
-                props.onInvite(email).then(res => {
-                  if (res) alertify.success(`Whee, invite sent to ${email}.`);
-                  else alertify.error('Oops, something weird happened. Try again later.');
-                });
-              } else errorText = 'Not an Email';
-              this.setState({errorText, value: ''});
-            }}
-            primary
-            />
-          </div>
-        </div>
+        <Snackbar
+        onRequestClose={_ => this.setState({snackbar: false})}
+        open={state.snackbar}
+        message={state.msg}
+        autoHideDuration={4000}/>
       </div>);
   }
 }
