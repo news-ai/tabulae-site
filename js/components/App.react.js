@@ -16,7 +16,7 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import {grey700, grey500, blue600} from 'material-ui/styles/colors';
+import {grey700, grey500, blue600, blue300} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
@@ -81,7 +81,6 @@ class App extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const welcomeMsg = props.firstTimeUser ? 'Hi, ' : 'Welcome back, ';
     const NavBar = (state.showNavBar && props.person) && (
       <div>
         {
@@ -124,10 +123,10 @@ class App extends Component {
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/settings')} rightIcon={<i className='fa fa-cogs' aria-hidden='true' />}>Settings</MenuItem>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
-          <div className='small-8 medium-3 large-1 columns vertical-center'>
+          <div className='small-6 medium-1 large-1 columns vertical-center'>
             <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
-          <div className='hide-for-small-only medium-4 large-6 columns vertical-center'>
+          <div className='hide-for-small-only medium-3 large-6 columns vertical-center'>
             <div>
               <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
@@ -139,14 +138,18 @@ class App extends Component {
               />
             </div>
           </div>
-          <div className='hide-for-small-only medium-3 large-3 columns vertical-center horizontal-center'>
-            <IconButton tooltip='How-to Videos' iconClassName='fa fa-question' iconStyle={{color: grey500}} onClick={this.toggleModal} />
-            <span style={{color: 'gray', float: 'right'}}>{welcomeMsg}{props.person.firstname}</span>
+          <div className='hide-for-small-only medium-3 large-3 columns vertical-center horizontal-center clearfix'>
+            <RaisedButton
+            className='right'
+            label='Invite friends, get 1 month'
+            labelColor='white'
+            backgroundColor={blue300}
+            labelStyle={{textTransform: 'none'}}
+            onClick={_ => props.router.push('/settings')}/>
           </div>
-          <div className='small-4 medium-2 large-2 columns vertical-center horizontal-center'>
+          <div className='small-6 medium-2 large-1 columns vertical-center horizontal-center clearfix'>
             <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
           </div>
-          <div className='large-offset-10 mediums-offset-9 small-offset-4 columns' style={{position: 'fixed', backgroundColor: 'red', width: 100, height: 100}} />
         </div>
         <div style={{height: 60}}></div>
         <Dialog

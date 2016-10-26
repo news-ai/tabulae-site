@@ -2,9 +2,10 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
 import {fromJS, is} from 'immutable';
+import {getInviteCount} from './actions';
 
-import {grey500, grey600} from 'material-ui/styles/colors';
-import IconButton from 'material-ui/IconButton';
+import {grey500, cyan500, blueGrey900} from 'material-ui/styles/colors';
+import Avatar from 'material-ui/Avatar';
 import RaisedButton from 'material-ui/RaisedButton';
 import Invite from './Invite.react';
 
@@ -29,7 +30,8 @@ const inputHeight = {
 
 const spanStyle = {
   color: grey500,
-  marginRight: 15
+  marginRight: 15,
+  float: 'right'
 };
 
 class UserProfile extends Component {
@@ -39,7 +41,14 @@ class UserProfile extends Component {
     this.state = {
       immuperson: fromJS(this.props.person),
       newPerson: fromJS(this.props.person),
+      count: 0
     };
+  }
+
+  componentWillMount() {
+    this.props.getInviteCount().then(count => {
+      this.setState({count});
+    });
   }
 
   componentWillUnmount() {
@@ -56,7 +65,7 @@ class UserProfile extends Component {
   render() {
     const {person} = this.props;
     const state = this.state;
-     /*<div className='row vertical-center' style={inputHeight}>
+     /* <div className='row vertical-center' style={inputHeight}>
           <div className='large-4 medium-4 columns'>
             <span style={spanStyle}>Instagram</span>
           </div>
@@ -75,54 +84,83 @@ class UserProfile extends Component {
           </div>
         </div>*/
     return (
-    <div className='row horizontal-center' style={{marginTop: 60}}>
-      <div className='large-6 medium-8 small-12 columns'>
-        <div className='row' style={{marginBottom: 10}}>
+      <div>
+        <div className='row horizontal-center' style={{marginTop: 60, marginBottom: 10}}>
           <h4>Settings</h4>
         </div>
-        <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-4 columns'>
-            <span style={spanStyle}>First Name</span>
-          </div>
-          <div className='large-6 medium-8 columns'>
-            <ControlledInput name={person.firstname} onBlur={value => this.setNewPerson('firstname', value)} />
+        <div className='row horizontal-center'>
+          <div className='large-6 medium-8 small-12 columns'>
+            <div className='row vertical-center' style={inputHeight}>
+              <div className='large-4 medium-4 columns'>
+                <span style={spanStyle}>First Name</span>
+              </div>
+              <div className='large-6 medium-8 columns'>
+                <ControlledInput name={person.firstname} onBlur={value => this.setNewPerson('firstname', value)} />
+              </div>
+            </div>
+            <div className='row vertical-center' style={inputHeight}>
+              <div className='large-4 medium-4 columns'>
+                <span style={spanStyle}>Last Name</span>
+              </div>
+              <div className='large-6 medium-8 columns'>
+                <ControlledInput name={person.lastname} onBlur={value => this.setNewPerson('lastname', value)} />
+              </div>
+            </div>
+            <div className='row vertical-center' style={inputHeight}>
+              <div className='large-4 medium-4 columns'>
+                <span style={spanStyle}>Email</span>
+              </div>
+              <div className='large-6 medium-8 columns'>
+                <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>{person.email}</span>
+              </div>
+            </div>
+            <div className='row vertical-center' style={inputHeight}>
+              <div className='large-4 medium-4 columns'>
+                <span style={spanStyle}>Password</span>
+              </div>
+              <div className='large-6 medium-8 columns'>
+                {person.googleid > 0 ?
+                  <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>Logged in with Google</span> :
+                  <RaisedButton
+                  label='Change Password'
+                  labelStyle={{textTransform: 'none'}}
+                  onClick={_ => {
+                    window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword';
+                  }}
+                  />}
+              </div>
+            </div>
           </div>
         </div>
-        <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-4 columns'>
-            <span style={spanStyle}>Last Name</span>
-          </div>
-          <div className='large-6 medium-8 columns'>
-            <ControlledInput name={person.lastname} onBlur={value => this.setNewPerson('lastname', value)} />
-          </div>
-        </div>
-        <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-4 columns'>
-            <span style={spanStyle}>Email</span>
-          </div>
-          <div className='large-6 medium-8 columns'>
-            <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>{person.email}</span>
-          </div>
-        </div>
-        <div className='row vertical-center' style={inputHeight}>
-          <div className='large-4 medium-4 columns'>
-            <span style={spanStyle}>Password</span>
-          </div>
-          <div className='large-6 medium-8 columns'>
-            {person.googleid > 0 ?
-              <span className='print' style={{marginLeft: 5, marginRight: 5, width: 500, fontSize: '1.2em'}}>Logged in with Google</span> :
-              <RaisedButton
-              label='Change Password' labelStyle={{textTransform: 'none'}}
-              onClick={_ => {
-                window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword';
-              }}
-              />}
+        <div className='row horizontal-center'>
+          <div className='large-8 medium-8 small-12 columns'>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              margin: '20px 0',
+              padding: '30px'
+            }}>
+              <div>
+                <Avatar backgroundColor={cyan500} size={30}><strong>1</strong></Avatar>
+                <span style={{color: blueGrey900, margin: '0 5px'}}>Invite friends</span>
+              </div>
+              <div>
+                <Avatar backgroundColor={cyan500} size={30}><strong>2</strong></Avatar>
+                <span style={{color: blueGrey900, margin: '0 5px'}}>5 friends set up accounts</span>
+              </div>
+              <div>
+                <Avatar backgroundColor={cyan500} size={30}><strong>3</strong></Avatar>
+                <span style={{color: blueGrey900, margin: '0 5px'}}>You get 1 month FREE. Yay!</span>
+              </div>
+            </div>
+            <div className='horizontal-center'>
+              <span style={{fontSize: '0.8em'}}>{state.count} friends away from a free month</span>
+            </div>
+            <div className='horizontal-center' style={{margin: '20px 0'}}>
+              <Invite className='vertical-center' />
+            </div>
           </div>
         </div>
-        <div className='vertical-center horizontal-center' style={{height: 250}}>
-          <Invite />
-        </div>
-      </div>
     </div>
     );
   }
@@ -137,6 +175,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     patchPerson: body => dispatch(actionCreators.patchPerson(body)),
+    getInviteCount: _ => dispatch(getInviteCount())
   };
 };
 
