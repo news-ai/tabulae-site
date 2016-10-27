@@ -107,18 +107,25 @@ class App extends Component {
           </Dialog>
         }
         {
-          props.isLogin && !props.person.isactive &&
-          <Dialog open={!props.person.isactive} modal>
+          props.isLogin &&
+          <Dialog open={!props.person.isactive && props.location.pathname !== '/settings'} modal>
             <div className='horizontal-center'>
               <p>Your subscription is over. To re-subscribe please visit the our billing page.</p>
             </div>
-            <div className='horizontal-center'>
+            <div className='horizontal-center' style={{margin: 10}}>
               <RaisedButton primary label='Go to Billing' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} />
+            </div>
+            <div className='horizontal-center' style={{margin: 10}}>
+             <RaisedButton
+              label='Invite friends, get 1 month'
+              labelColor='white'
+              backgroundColor={blue300}
+              onClick={_ => props.router.push('/settings')}/>
             </div>
           </Dialog>
         }
         <Drawer
-        ontainerClassName='noprint'
+        containerClassName='noprint'
         docked={false}
         open={state.isDrawerOpen}
         onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>

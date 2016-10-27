@@ -25,6 +25,7 @@ function headlineReducer(state = initialState.headlineReducer, action) {
         offset: action.offset
       });
       obj.isReceiving = false;
+      obj.didInvalidate = false;
       return obj;
     case headlineConstant.REQUEST_FAIL:
       obj.didInvalidate = true;

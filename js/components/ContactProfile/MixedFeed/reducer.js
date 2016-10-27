@@ -26,6 +26,7 @@ function mixedReducer(state = initialState.mixedReducer, action) {
         offset: action.offset
       });
       obj.isReceiving = false;
+      obj.didInvalidate = false;
       return obj;
     case mixedConstant.REQUEST_MULTIPLE_FAIL:
       obj.didInvalidate = true;

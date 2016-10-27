@@ -1,7 +1,61 @@
 // helper function to add extra tableOnly columns like index, selected, etc.
 
+function divideTwoDecimal(numerator, denomenator) {
+  const res = Math.round(numerator * 1000.0 / denomenator) / 1000;
+  if (!isNaN(res)) return res;
+}
+
+function instagramLikesToComments(listData) {
+  const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
+  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
+  if (likesColumn && commentsColumn) {
+    return {
+      name: 'likes-to-comments',
+      value: 'likes_to_comments',
+      hidden: false,
+      tableOnly: true,
+      customfield: false,
+      sortEnabled: true,
+      strategy: contact => contact.instagramlikes && contact.instagramcomments && divideTwoDecimal(contact.instagramlikes, contact.instagramcomments)
+    };
+  }
+}
+
+function instagramLikesToFollowers(listData) {
+  const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
+  const followersColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramfollowers' && !fieldObj.hidden);
+  if (likesColumn && followersColumn) {
+    return {
+      name: 'likes-to-followers',
+      value: 'likes_to_followers',
+      hidden: false,
+      tableOnly: true,
+      customfield: false,
+      sortEnabled: true,
+      strategy: contact => contact.instagramlikes && contact.instagramfollowers && divideTwoDecimal(contact.instagramlikes, contact.instagramfollowers)
+    };
+  }
+}
+
+function instagramCommentsToFollowers(listData) {
+  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
+  const followersColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramfollowers' && !fieldObj.hidden);
+  if (commentsColumn && followersColumn) {
+    return {
+      name: 'comments-to-followers',
+      value: 'comments_to_followers',
+      hidden: false,
+      tableOnly: true,
+      customfield: false,
+      sortEnabled: true,
+      strategy: contact => contact.instagramcomments && contact.instagramlikes && divideTwoDecimal(contact.instagramcomments, contact.instagramlikes)
+    };
+  }
+}
+
+
 export function generateTableFieldsmap(listData) {
-  return [
+  const fieldsmap = [
     {
       name: '#',
       hidden: false,
@@ -25,6 +79,9 @@ export function generateTableFieldsmap(listData) {
     },
     ...listData.fieldsmap
     .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
+    instagramLikesToComments(listData),
+    instagramLikesToFollowers(listData),
+    instagramCommentsToFollowers(listData),
     {
       customfield: false,
       name: 'publication 1',
@@ -42,6 +99,7 @@ export function generateTableFieldsmap(listData) {
       tableOnly: true
     }
   ];
+  return fieldsmap.filter(fieldObj => fieldObj);
 }
 
 

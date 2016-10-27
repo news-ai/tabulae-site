@@ -42,7 +42,7 @@ const PanelOverlay = ({
         top: profileY,
         left: profileX + 8,
         zIndex: 200,
-        width: 510,
+        width: 610,
         height: 305 + titleStyleHeight,
         border: `1px solid ${grey300}`,
         borderRadius: '0.2em',
@@ -75,7 +75,7 @@ const PanelOverlay = ({
           style={{position: 'fixed', margin: '20px', zIndex: 201}}
           />}
         <MixedFeed
-        containerWidth={500}
+        containerWidth={600}
         containerHeight={300}
         contactId={contactId}
         listId={listId}

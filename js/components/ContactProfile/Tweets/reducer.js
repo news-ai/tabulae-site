@@ -25,6 +25,7 @@ function tweetReducer(state = initialState.tweetReducer, action) {
         offset: action.offset
       });
       obj.isReceiving = false;
+      obj.didInvalidate = false;
       return obj;
     case tweetConstant.REQUEST_MULTIPLE_FAIL:
       obj.didInvalidate = true;

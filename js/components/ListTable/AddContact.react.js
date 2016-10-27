@@ -1,18 +1,34 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
+import * as feedActions from '../ContactProfile/actions';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
+import Textarea from 'react-textarea-autosize';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import 'react-select/dist/react-select.css';
+import isURL from 'validator/lib/isURL';
+import {yellow50} from 'material-ui/styles/colors';
 
 const textfieldStyle = {
   marginLeft: 10
 };
+
+function removeDupe(list) {
+  let m = {};
+  let ret;
+  return list.filter(item => {
+    if (m[item] === true) ret = false;
+    else ret = true;
+    m[item] = true;
+    return ret;
+  });
+}
 
 class AddContact extends Component {
   constructor(props) {
@@ -21,11 +37,13 @@ class AddContact extends Component {
       open: false,
       contactBody: {},
       pub1input: '',
-      employerAutocompleteList: []
+      employerAutocompleteList: [],
+      rssfeedsTextarea: ''
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
+    this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -55,6 +73,7 @@ class AddContact extends Component {
       if (pub1input.length > 0) {
         ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
       }
+      ids.map(id => this.handleRSSTextarea(id));
       const listBody = {
         listId: list.id,
         name: list.name,
@@ -81,6 +100,14 @@ class AddContact extends Component {
     }, 500);
   }
 
+  _handleRSSTextarea(id) {
+    const feeds = removeDupe(this.state.rssfeedsTextarea
+      .split('\n')
+      .filter(line => line.length > 0 && isURL(line)));
+    if (feeds.length === 0) return;
+    this.props.addFeeds(id, feeds);
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -102,6 +129,7 @@ class AddContact extends Component {
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add Contact' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
+
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
               <TextField style={textfieldStyle} value={state.contactBody.firstname || ''} name='firstname' onChange={e => this.onChange('firstname', e.target.value)}/>
@@ -116,11 +144,11 @@ class AddContact extends Component {
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Twitter</span>
-              <TextField style={textfieldStyle} value={state.contactBody.twitter || ''} name='twitter' onChange={e => this.onChange('twitter', e.target.value)}/>
+              <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.twitter || ''} name='twitter' onChange={e => this.onChange('twitter', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Instagram</span>
-              <TextField style={textfieldStyle} value={state.contactBody.instagram || ''} name='instagram' onChange={e => this.onChange('instagram', e.target.value)}/>
+              <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.instagram || ''} name='instagram' onChange={e => this.onChange('instagram', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>LinkedIn</span>
@@ -162,6 +190,28 @@ class AddContact extends Component {
                   <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
                 </div>
                 ))}
+            <div className='panel' style={{
+              backgroundColor: yellow50,
+              margin: 10,
+              padding: 10
+            }}>
+              <span style={{fontSize: '0.8em'}}>
+              Many websites can be followed with RSS if they are powered by WordPress or Tumblr. You can discover their feed link by simply adding <strong>/feed</strong> or <strong>/rss</strong>.
+              For example:
+                https://vogue.com/feed,
+                https://nypost.com/author/firstname-lastname/feed,
+                https://nycstreetfile.tumblr.com/rss
+              </span>
+            </div>
+            <div className='large-12 medium-12 small-12 columns'>
+              <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
+              <span style={{whiteSpace: 'nowrap', fontSize: '0.8em'}}> * Separate feeds with a new line</span>
+              <Textarea
+              value={state.rssfeedsTextarea}
+              maxRows={10}
+              onChange={e => this.setState({rssfeedsTextarea: e.target.value})}
+              />
+            </div>
           </div>
         </Dialog>
         {props.children({
@@ -184,6 +234,8 @@ const mapDispatchToProps = (dispatch, props) => {
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
+    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
+
   };
 };
 
