@@ -1,7 +1,7 @@
 // helper function to add extra tableOnly columns like index, selected, etc.
 
 function divideTwoDecimal(numerator, denomenator) {
-  const res = Math.round(numerator * 100.0 / denomenator) / 100;
+  const res = Math.round(numerator * 1000.0 / denomenator) / 1000;
   if (!isNaN(res)) return res;
 }
 

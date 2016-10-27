@@ -76,7 +76,8 @@ function _getter(contact, fieldObj) {
     else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
     else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
   } else {
-    return contact[fieldObj.value];
+    if (fieldObj.strategy) return fieldObj.strategy(contact);
+    else return contact[fieldObj.value];
   }
 }
 
@@ -344,14 +345,7 @@ class ListTable extends Component {
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
 
-    let content = '';
-    if (fieldObj.customfield) {
-      if (contacts[rowIndex].customfields !== null && contacts[rowIndex].customfields.some(obj => obj.name == fieldObj.value)) {
-        content = contacts[rowIndex].customfields.find(obj => obj.name === fieldObj.value).value;
-      }
-    } else {
-      content = fieldObj.strategy ? fieldObj.strategy(contacts[rowIndex]) : contacts[rowIndex][fieldObj.value];
-    }
+    let content = _getter(contacts[rowIndex], fieldObj) || '';
 
     let contentBody;
     if (fieldObj.tableOnly) {
@@ -460,8 +454,8 @@ class ListTable extends Component {
         filteredIds = contactIds.filter(id => _getter(this.props.contactReducer[id], fieldObj));
         emptyIds = contactIds.filter(id => !_getter(this.props.contactReducer[id], fieldObj));
       } else {
-        filteredIds = contactIds.filter(id => this.props.contactReducer[id][fieldObj.value]);
-        emptyIds = contactIds.filter(id => !this.props.contactReducer[id][fieldObj.value]);
+        filteredIds = contactIds.filter(id => _getter(this.props.contactReducer[id], fieldObj));
+        emptyIds = contactIds.filter(id => !_getter(this.props.contactReducer[id], fieldObj));
       }
       filteredIds.sort((a, b) => {
         let valA = _getter(this.props.contactReducer[a], fieldObj);
