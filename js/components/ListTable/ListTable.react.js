@@ -113,9 +113,14 @@ class ListTable extends Component {
     }
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
     this.getColumnStorage = _ => {
-      const store = JSON.parse(localStorage.getItem(this.props.listId));
-      if (!store) return undefined;
-      else return store.columnWidths;
+      try {
+        const store = JSON.parse(localStorage.getItem(this.props.listId));
+        if (!store) return undefined;
+        else return store.columnWidths;
+      } catch (e) {
+        console.log(e);
+        return undefined;
+      }
     }
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
@@ -615,7 +620,7 @@ class ListTable extends Component {
                 id='add_remove_columns_hop'
                 tooltip='Show/Hide columns'
                 tooltipPosition='top-left'
-                iconClassName='fa fa-edit'
+                iconClassName='fa fa-table'
                 iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
