@@ -1,18 +1,33 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
+import * as feedActions from '../ContactProfile/actions';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
+import Textarea from 'react-textarea-autosize';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import 'react-select/dist/react-select.css';
+import isURL from 'validator/lib/isURL';
 
 const textfieldStyle = {
   marginLeft: 10
 };
+
+function removeDupe(list) {
+  let m = {};
+  let ret;
+  return list.filter(item => {
+    if (m[item] === true) ret = false;
+    else ret = true;
+    m[item] = true;
+    return ret;
+  });
+}
 
 class AddContact extends Component {
   constructor(props) {
@@ -21,11 +36,13 @@ class AddContact extends Component {
       open: false,
       contactBody: {},
       pub1input: '',
-      employerAutocompleteList: []
+      employerAutocompleteList: [],
+      rssfeedsTextarea: ''
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
+    this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -55,6 +72,7 @@ class AddContact extends Component {
       if (pub1input.length > 0) {
         ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
       }
+      ids.map(id => this.handleRSSTextarea(id));
       const listBody = {
         listId: list.id,
         name: list.name,
@@ -79,6 +97,12 @@ class AddContact extends Component {
         employerAutocompleteList: response,
       }));
     }, 500);
+  }
+
+  _handleRSSTextarea(id) {
+    const feeds = removeDupe(this.state.rssfeedsTextarea.split('\n').filter(line => line.length > 0));
+    if (feeds.length === 0) return;
+    this.props.addFeeds(id, feeds);
   }
 
   render() {
@@ -162,6 +186,15 @@ class AddContact extends Component {
                   <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
                 </div>
                 ))}
+            <div className='large-12 medium-12 small-12 columns'>
+              <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
+              <span style={{whiteSpace: 'nowrap', fontSize: '0.8em'}}> * Separate feeds with a new line</span>
+              <Textarea
+              value={state.rssfeedsTextarea}
+              maxRows={10}
+              onChange={e => this.setState({rssfeedsTextarea: e.target.value})}
+              />
+            </div>
           </div>
         </Dialog>
         {props.children({
@@ -184,6 +217,8 @@ const mapDispatchToProps = (dispatch, props) => {
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
+    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
+
   };
 };
 

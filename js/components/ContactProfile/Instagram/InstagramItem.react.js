@@ -39,7 +39,7 @@ const InstagramItem = ({
 }) => {
   const containerStyle = style ? Object.assign({}, defaultStyle, style) : defaultStyle;
   const date = new Date(createdat);
-  const imgContainerStyle = (screenWidth && screenWidth - IMG_CONTAINER_OFFSET < defaultImgContainerStyle.width) ?
+  let imgContainerStyle = (screenWidth && screenWidth - IMG_CONTAINER_OFFSET < defaultImgContainerStyle.width) ?
   Object.assign(
     {},
     defaultImgContainerStyle, {
