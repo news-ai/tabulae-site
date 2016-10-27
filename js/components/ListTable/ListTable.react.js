@@ -129,12 +129,8 @@ class ListTable extends Component {
     this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
     this.onSort = this._onSort.bind(this);
     this.onRemoveContacts = this._onRemoveContacts.bind(this);
-    this.setDataGridRef = ref => {
-      this._DataGrid = ref;
-    };
-    this.setHeaderGridRef = ref => {
-      this._HeaderGrid = ref;
-    }
+    this.setDataGridRef = ref => (this._DataGrid = ref);
+    this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
   }
 
   componentWillMount() {
@@ -354,7 +350,7 @@ class ListTable extends Component {
         content = contacts[rowIndex].customfields.find(obj => obj.name === fieldObj.value).value;
       }
     } else {
-      content = contacts[rowIndex][fieldObj.value];
+      content = fieldObj.strategy ? fieldObj.strategy(contacts[rowIndex]) : contacts[rowIndex][fieldObj.value];
     }
 
     let contentBody;
