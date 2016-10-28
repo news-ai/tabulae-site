@@ -35,19 +35,31 @@ class EditContact extends Component {
     this.state = {
       open: false,
       contactBody: this.props.contact,
+      customfields: this.props.contact.customfields,
       pub1input: '',
       employerAutocompleteList: [],
       rssfeedsTextarea: ''
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
+    this.onCustomChange = this._onCustomChange.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
+  }
+
+  componentWillMount() {
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.open === false && this.state.open === true) {
       // onRequestOpen hit
+      if (!this.props.feeds) this.props.fetchFeeds();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.feeds !== nextProps.feeds) {
+      this.setState({rssfeedsTextarea: nextProps.feeds ? nextProps.feeds.map(feed => feed.url).join('\n') : ''});
     }
   }
 
@@ -89,6 +101,20 @@ class EditContact extends Component {
     });
   }
 
+  _onCustomChange(name, value) {
+    let customfields = this.state.customfields;
+    if (customfields === null) customfields = [];
+    if (customfields.some(field => field.name === name)) {
+      customfields = customfields.map(field => field.name === name ? ({name, value}) : field);
+    } else {
+      customfields = [...customfields, {name, value}];
+    }
+    this.setState({
+      customfields,
+      contactBody: Object.assign({}, this.state.contactBody, {customfields})
+    });
+  }
+
   _updateAutoInput(val) {
     this.setState({pub1input: val});
     setTimeout(_ => {
@@ -114,7 +140,11 @@ class EditContact extends Component {
       <FlatButton
         label='Cancel'
         primary
-        onTouchTap={_ => this.setState({open: false})}
+        onTouchTap={_ => this.setState({
+          open: false,
+          contactBody: props.contact,
+          customfields: props.contact.customfields
+        })}
       />,
       <FlatButton
         label='Submit'
@@ -185,7 +215,14 @@ class EditContact extends Component {
               .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
               .map((fieldObj, i) => fieldObj.customfield && (
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
-                  <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
+                  <span>{fieldObj.name}</span>
+                  <TextField
+                  value={state.customfields.some(field => field.name === fieldObj.value) ? state.customfields.find(field => field.name === fieldObj.value).value : ''}
+                  style={textfieldStyle}
+                  ref={fieldObj.value}
+                  name={fieldObj.value}
+                  onChange={e => this.onCustomChange(fieldObj.value, e.target.value)}
+                  />
                 </div>
                 ))}
             <div className='panel' style={{
@@ -220,10 +257,12 @@ class EditContact extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const feeds = state.feedReducer[props.contactId] && state.feedReducer[props.contactId].map(id => state.feedReducer[id]);
   return {
     contact: state.contactReducer[props.contactId],
     list: state.listReducer[props.listId],
-    publicationReducer: state.publicationReducer
+    publicationReducer: state.publicationReducer,
+    feeds
   };
 };
 
@@ -233,8 +272,8 @@ const mapDispatchToProps = (dispatch, props) => {
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
-    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
-
+    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
+    fetchFeeds: _ => dispatch(feedActions.fetchContactFeeds(props.contactId)),
   };
 };
 
