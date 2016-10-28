@@ -7,12 +7,13 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {yellow50} from 'material-ui/styles/colors';
+import {fromJS, is} from 'immutable';
+import pickBy from 'lodash/pickBy';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -29,25 +30,42 @@ function removeDupe(list) {
   });
 }
 
+const _getter = contact => {
+  if (!contact) return;
+  const {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website} = contact;
+  return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
+};
+
 class EditContact extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
-      contactBody: this.props.contact,
+      contactBody: _getter(this.props.contact),
+      immutableContactBody: fromJS(_getter(this.props.contact)),
       customfields: this.props.contact.customfields,
-      pub1input: '',
-      employerAutocompleteList: [],
       rssfeedsTextarea: ''
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
-    this.updateAutoInput = this._updateAutoInput.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
   }
 
   componentWillMount() {
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.feeds !== nextProps.feeds) {
+      this.setState({
+        rssfeedsTextarea: nextProps.feeds ? nextProps.feeds.map(feed => feed.url).join('\n') : ''
+      });
+    }
+
+    const immutableContactBody = fromJS(nextProps.contact);
+    if (nextProps.contact && !is(immutableContactBody, this.state.immutableContactBody)) {
+      this.setState({contactBody: _getter(nextProps.contact), immutableContactBody});
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -57,42 +75,13 @@ class EditContact extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.feeds !== nextProps.feeds) {
-      this.setState({rssfeedsTextarea: nextProps.feeds ? nextProps.feeds.map(feed => feed.url).join('\n') : ''});
-    }
-  }
-
   _onSubmit() {
-    let customRow = [];
     let contactBody = this.state.contactBody;
-    const list = this.props.list;
-    const pub1input = this.state.pub1input;
-    list.fieldsmap
-    .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
-    .map(fieldObj => {
-      if (fieldObj.customfield && this.refs[fieldObj.value]) {
-        const value = this.refs[fieldObj.value].getValue();
-        if (value.length > 0) customRow.push({name: fieldObj.value, value});
-      }
-    });
-    if (customRow.length > 0) contactBody.customfields = customRow;
-
-    this.props.addContacts([contactBody])
-    .then(contacts => {
-      const ids = contacts.map(contact => contact.id);
-      if (pub1input.length > 0) {
-        ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
-      }
-      ids.map(id => this.handleRSSTextarea(id));
-      const listBody = {
-        listId: list.id,
-        name: list.name,
-        contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
-      };
-      this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}});
-    });
+    if (this.state.customfields !== null && this.state.customfields.length > 0) {
+      contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
+    }
+    this.props.patchContact(this.props.contact.id, pickBy(contactBody));
+    this.setState({open: false});
   }
 
   _onChange(name, value) {
@@ -115,16 +104,6 @@ class EditContact extends Component {
     });
   }
 
-  _updateAutoInput(val) {
-    this.setState({pub1input: val});
-    setTimeout(_ => {
-      this.props.searchPublications(this.state.pub1input)
-      .then(response => this.setState({
-        employerAutocompleteList: response,
-      }));
-    }, 500);
-  }
-
   _handleRSSTextarea(id) {
     const feeds = removeDupe(this.state.rssfeedsTextarea
       .split('\n')
@@ -142,7 +121,7 @@ class EditContact extends Component {
         primary
         onTouchTap={_ => this.setState({
           open: false,
-          contactBody: props.contact,
+          contactBody: _getter(props.contact),
           customfields: props.contact.customfields
         })}
       />,
@@ -155,7 +134,7 @@ class EditContact extends Component {
     ];
     return (
       <div className={props.className}>
-        <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add Contact' onRequestClose={_ => this.setState({open: false})}>
+        <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
@@ -198,18 +177,6 @@ class EditContact extends Component {
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span style={{whiteSpace: 'nowrap'}}>Publication</span>
-              <AutoComplete
-              id='pub1input'
-              style={textfieldStyle}
-              filter={AutoComplete.noFilter}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            </div>
             {props.list && props.list.fieldsmap !== null &&
               props.list.fieldsmap
               .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
@@ -217,7 +184,7 @@ class EditContact extends Component {
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
                   <span>{fieldObj.name}</span>
                   <TextField
-                  value={state.customfields.some(field => field.name === fieldObj.value) ? state.customfields.find(field => field.name === fieldObj.value).value : ''}
+                  value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : state.customfields.find(field => field.name === fieldObj.value).value}
                   style={textfieldStyle}
                   ref={fieldObj.value}
                   name={fieldObj.value}
@@ -269,6 +236,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
+    patchContact: (contactId, body) => dispatch(actionCreators.patchContact(contactId, body)),
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),

@@ -27,6 +27,7 @@ export const createEmptyList = untitledNum => listActions.createEmptyList(untitl
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);
 export const patchContacts = (listId, contactList) => contactActions.patchContacts(listId, contactList);
+export const patchContact = (contactId, contactBody) => contactActions.patchContact(contactId, contactBody);
 // export const fetchContacts = listId => contactActions.fetchPaginatedContacts(listId);
 export const fetchContacts = listId => contactActions.fetchManyContacts(listId, 200);
 export const updateContact = id => contactActions.updateContact(id);

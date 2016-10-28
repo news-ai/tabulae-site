@@ -396,7 +396,7 @@ class ListTable extends Component {
               <i
               id='profile_hop'
               className='fa fa-arrow-right'
-              style={{color: blue300, cursor: 'pointer', marginRight: 8}}
+              style={{color: blue300, cursor: 'pointer', marginRight: 5}}
               onMouseEnter={e =>
                 this.setState({
                   showProfileTooltip: true,
