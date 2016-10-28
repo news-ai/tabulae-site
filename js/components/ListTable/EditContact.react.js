@@ -71,7 +71,7 @@ class EditContact extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.open === false && this.state.open === true) {
       // onRequestOpen hit
-      if (!this.props.feeds) this.props.fetchFeeds();
+      // if (!this.props.feeds) this.props.fetchFeeds();
     }
   }
 
@@ -80,6 +80,7 @@ class EditContact extends Component {
     if (this.state.customfields !== null && this.state.customfields.length > 0) {
       contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
     }
+    contactBody.listid = this.props.listId;
     this.props.patchContact(this.props.contact.id, pickBy(contactBody));
     this.setState({open: false});
   }
@@ -192,7 +193,8 @@ class EditContact extends Component {
                   />
                 </div>
                 ))}
-            <div className='panel' style={{
+            {
+              /*<div className='panel' style={{
               backgroundColor: yellow50,
               margin: 10,
               padding: 10
@@ -204,7 +206,9 @@ class EditContact extends Component {
                 https://nypost.com/author/firstname-lastname/feed,
                 https://nycstreetfile.tumblr.com/rss
               </span>
-            </div>
+            </div>*/
+          }
+          {/*
             <div className='large-12 medium-12 small-12 columns'>
               <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
               <span style={{whiteSpace: 'nowrap', fontSize: '0.8em'}}> * Separate feeds with a new line</span>
@@ -213,7 +217,8 @@ class EditContact extends Component {
               maxRows={10}
               onChange={e => this.setState({rssfeedsTextarea: e.target.value})}
               />
-            </div>
+            </div>*/
+          }
           </div>
         </Dialog>
         {props.children({
