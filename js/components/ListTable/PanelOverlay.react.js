@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
-import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeedContainer.react';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import {grey500, grey300, lightBlue300} from 'material-ui/styles/colors';

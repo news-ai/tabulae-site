@@ -16,6 +16,7 @@ function instagramLikesToComments(listData) {
       tableOnly: true,
       customfield: false,
       sortEnabled: true,
+      comment: 'Auto-generated when likes and comments are visible',
       strategy: contact => contact.instagramlikes && contact.instagramcomments && divideTwoDecimal(contact.instagramlikes, contact.instagramcomments)
     };
   }
@@ -32,6 +33,7 @@ function instagramLikesToFollowers(listData) {
       tableOnly: true,
       customfield: false,
       sortEnabled: true,
+      comment: 'Auto-generated when likes and followers are not hidden',
       strategy: contact => contact.instagramlikes && contact.instagramfollowers && divideTwoDecimal(contact.instagramlikes, contact.instagramfollowers)
     };
   }
@@ -48,6 +50,7 @@ function instagramCommentsToFollowers(listData) {
       tableOnly: true,
       customfield: false,
       sortEnabled: true,
+      comment: 'Auto-generated when comments and followers are not hidden',
       strategy: contact => contact.instagramcomments && contact.instagramlikes && divideTwoDecimal(contact.instagramcomments, contact.instagramlikes)
     };
   }
@@ -64,14 +67,14 @@ export function generateTableFieldsmap(listData) {
       tableOnly: true
     },
     {
-      name: 'profile',
+      name: 'Profile',
       hidden: false,
       value: 'profile',
       customfield: false,
       tableOnly: true
     },
     {
-      name: 'selected',
+      name: 'Selected',
       hidden: false,
       value: 'selected',
       customfield: false,
@@ -84,20 +87,12 @@ export function generateTableFieldsmap(listData) {
     instagramCommentsToFollowers(listData),
     {
       customfield: false,
-      name: 'publication 1',
+      name: 'Publication',
       value: 'publication_name_1',
       hidden: false,
       sortEnabled: true,
       tableOnly: true
     },
-    {
-      customfield: false,
-      name: 'publication 2',
-      value: 'publication_name_2',
-      hidden: false,
-      sortEnabled: true,
-      tableOnly: true
-    }
   ];
   return fieldsmap.filter(fieldObj => fieldObj);
 }

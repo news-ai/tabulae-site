@@ -8,8 +8,7 @@ import * as AppActions from 'actions/AppActions';
 import HeadlineItem from '../ContactProfile/Headlines/HeadlineItem.react';
 import Tweet from '../ContactProfile/Tweets/Tweet.react';
 import InstagramItem from '../ContactProfile/Instagram/InstagramItem.react';
-import InfiniteScroll from '../InfiniteScroll';
-import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -26,46 +25,21 @@ const FEED_PADDING = 20;
 class ListFeed extends Component {
   constructor(props) {
     super(props);
-    this.rowRenderer = this._rowRenderer.bind(this);
     this.state = {
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING,
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
       firsttime: this.props.firstTimeUser
-    }
+    };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING;
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
       this.setState({screenWidth, screenHeight});
-    }
+    };
   }
 
   componentWillMount() {
     this.props.fetchListFeed(this.props.listId);
     if (!this.props.list) this.props.fetchList(this.props.listId);
-  }
-
-  _rowRenderer({key, index, style}) {
-    const feedItem = this.props.listfeed[index];
-    let row;
-    switch (feedItem.type) {
-      case 'headlines':
-        row = <HeadlineItem showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
-        break;
-      case 'tweets':
-        row = <Tweet showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
-        break;
-      case 'instagrams':
-        row = <InstagramItem showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
-        break;
-      default:
-        row = <HeadlineItem showProfile screenWidth={this.state.screenWidth} {...feedItem} />;
-    }
-    let newStyle = style;
-    if (newStyle) newStyle.padding = '0 15px';
-    return (
-      <div key={key} style={newStyle}>
-        {row}
-      </div>);
   }
 
   render() {
@@ -87,7 +61,7 @@ class ListFeed extends Component {
             </div>
           </Dialog>
         }
-        <div className='row horizontal-center' style={{marginTop: 20}}>
+        <div className='row horizontal-center' style={{marginTop: 30}}>
           <h4>{props.list ? props.list.name : 'List Feed'}</h4>
           <FlatButton
           id='read_only_btn_hop'
@@ -98,36 +72,12 @@ class ListFeed extends Component {
           labelStyle={{textTransform: 'none', color: grey400}}
           icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
         </div>
-        {props.listfeed && props.listfeed.length === 0 &&
+        {props.feed && props.feed.length === 0 &&
           <div className='row horizontal-center vertical-center' style={{height: 400}}>
             <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
           </div>}
-        <div className='row horizontal-center' style={{padding: `0 ${FEED_PADDING/2}px`}}>
-        {props.listfeed && props.listfeed.length > 0 &&
-          <WindowScroller>
-          {({height, scrollTop}) => (
-            <CellMeasurer
-            cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
-            columnCount={1}
-            rowCount={props.listfeed.length}
-            >
-            {({getRowHeight}) => (
-              <List
-              width={state.screenWidth < 800 ? state.screenWidth : 800}
-              autoHeight
-              height={height}
-              scrollTop={scrollTop}
-              rowCount={props.listfeed.length}
-              rowRenderer={this.rowRenderer}
-              overscanRowCount={10}
-              rowHeight={getRowHeight}
-              onScroll={(args) => {
-                if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchListFeed(props.listId);
-              }}
-              />
-              )}
-            </CellMeasurer>)}
-          </WindowScroller>}
+        <div className='row horizontal-center'>
+         <MixedFeed rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}} containerWidth={state.screenWidth < 800 ? state.screenWidth : 800} fetchFeed={props.fetchListFeed} {...props}/>
         </div>
       </div>);
   }
@@ -138,7 +88,7 @@ const mapStateToProps = (state, props) => {
   return {
     listId,
     list: state.listReducer[listId],
-    listfeed: state.listfeedReducer[listId] && state.listfeedReducer[listId].received,
+    feed: state.listfeedReducer[listId] && state.listfeedReducer[listId].received,
     didInvalidate: state.listfeedReducer.didInvalidate,
     offset: state.listfeedReducer[listId] && state.listfeedReducer[listId].offset,
     firstTimeUser: state.personReducer.firstTimeUser
@@ -146,9 +96,10 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
+  const listId = parseInt(props.params.listId, 10);
   return {
-    fetchListFeed: listId => dispatch(listfeedActions.fetchListFeed(listId)),
-    fetchList: listId => dispatch(actionCreators.fetchList(listId)),
+    fetchListFeed: _ => dispatch(listfeedActions.fetchListFeed(listId)),
+    fetchList: _ => dispatch(actionCreators.fetchList(listId)),
     removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser())
   };
 };
