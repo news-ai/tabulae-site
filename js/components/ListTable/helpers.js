@@ -14,6 +14,7 @@ function instagramLikesToComments(listData) {
       value: 'likes_to_comments',
       hidden: false,
       tableOnly: true,
+      hideCheckbox: true,
       customfield: false,
       sortEnabled: true,
       comment: 'Auto-generated when likes and comments are visible',
@@ -31,6 +32,7 @@ function instagramLikesToFollowers(listData) {
       value: 'likes_to_followers',
       hidden: false,
       tableOnly: true,
+      hideCheckbox: true,
       customfield: false,
       sortEnabled: true,
       comment: 'Auto-generated when likes and followers are not hidden',
@@ -48,6 +50,7 @@ function instagramCommentsToFollowers(listData) {
       value: 'comments_to_followers',
       hidden: false,
       tableOnly: true,
+      hideCheckbox: true,
       customfield: false,
       sortEnabled: true,
       comment: 'Auto-generated when comments and followers are not hidden',
@@ -56,6 +59,22 @@ function instagramCommentsToFollowers(listData) {
   }
 }
 
+function publicationColumn(listData) {
+  return {
+    customfield: false,
+    name: 'Publication',
+    value: 'publication_name_1',
+    hidden: listData.fieldsmap.find(fieldObj => fieldObj.value === 'employers').hidden,
+    sortEnabled: true,
+    tableOnly: true,
+    hideCheckbox: false,
+    checkboxStrategy: (fieldsmap, checked) => fieldsmap.map(fieldObj => {
+      if (fieldObj.value === 'publication_name_1' || fieldObj.value === 'employers') return Object.assign({}, fieldObj, {hidden: checked})
+      return fieldObj;
+    }),
+    strategy: contact => contact.publication_name_1
+  };
+}
 
 export function generateTableFieldsmap(listData) {
   const fieldsmap = [
@@ -64,35 +83,31 @@ export function generateTableFieldsmap(listData) {
       hidden: false,
       value: 'index',
       customfield: false,
-      tableOnly: true
+      tableOnly: true,
+      hideCheckbox: true,
     },
     {
       name: 'Profile',
       hidden: false,
       value: 'profile',
       customfield: false,
-      tableOnly: true
+      tableOnly: true,
+      hideCheckbox: true,
     },
     {
       name: 'Selected',
       hidden: false,
       value: 'selected',
       customfield: false,
-      tableOnly: true
+      tableOnly: true,
+      hideCheckbox: true,
     },
     ...listData.fieldsmap
     .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     instagramLikesToComments(listData),
     instagramLikesToFollowers(listData),
     instagramCommentsToFollowers(listData),
-    {
-      customfield: false,
-      name: 'Publication',
-      value: 'publication_name_1',
-      hidden: false,
-      sortEnabled: true,
-      tableOnly: true
-    },
+    publicationColumn(listData)
   ];
   return fieldsmap.filter(fieldObj => fieldObj);
 }
