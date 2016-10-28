@@ -8,7 +8,7 @@ const createMarkup = markup => ({__html: markup});
 const defaultStyle = {
   paddingTop: 10,
   paddingBottom: 10,
-  marginTop: 10,
+  marginTop: 15,
   marginBottom: 10,
   border: `dotted 1px ${grey400}`,
   borderRadius: '0.4em'

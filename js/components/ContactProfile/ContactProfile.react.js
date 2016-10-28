@@ -22,7 +22,7 @@ import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
 
 import TweetFeed from './Tweets/TweetFeed.react';
-import MixedFeed from './MixedFeed/MixedFeed.react';
+import MixedFeed from './MixedFeed/MixedFeedContainer.react';
 import Headlines from './Headlines/Headlines.react';
 import InstagramFeed from './Instagram/InstagramFeed.react';
 import ContactEmails from './ContactEmails.react';

@@ -114,6 +114,7 @@ class ListTable extends Component {
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
     this.getColumnStorage = _ => {
       try {
+        const item = localStorage.getItem(this.props.listId);
         const store = JSON.parse(localStorage.getItem(this.props.listId));
         if (!store) return undefined;
         else return store.columnWidths;
@@ -247,7 +248,7 @@ class ListTable extends Component {
         });
       }
 
-      if (nextProps.contacts.length > 0 && !this.state.dragged) {
+      if (nextProps.contacts.length > 0 && !this.state.dragged && (columnWidths === null || nextProps.fieldsmap.length !== columnWidths.length)) {
         nextProps.fieldsmap.map((fieldObj, i) => {
           let max = columnWidths[i];
           nextProps.contacts.map(contact => {
