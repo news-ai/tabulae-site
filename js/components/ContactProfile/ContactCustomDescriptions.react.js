@@ -23,12 +23,13 @@ function ContactCustomDescriptions({contact, patchContact, list}) {
               if (contact.customfields === null) {
                 customfields = [{name: fieldObj.value, value}];
               } else if (!contact.customfields.some(customObj => customObj.name === fieldObj.value)) {
-                customfields = [...contact.customfields, {name: fieldObj.value, value}];
+                customfields = [...contact.customfields.filter(field => !list.fieldsmap.some(obj => obj.readonly && obj.value === field.name)), {name: fieldObj.value, value}];
               } else {
                 customfields = contact.customfields.map(customObj => {
                   if (customObj.name === fieldObj.value) return {name: fieldObj.value, value};
                   return customObj;
-                });
+                })
+                .filter(field => !list.fieldsmap.some(obj => obj.readonly && obj.value === field.name));
               }
               patchContact(contact.id, {customfields});
             }}

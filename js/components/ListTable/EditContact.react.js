@@ -7,13 +7,13 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
-import RaisedButton from 'material-ui/RaisedButton';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {yellow50} from 'material-ui/styles/colors';
+import {fromJS, is} from 'immutable';
+import pickBy from 'lodash/pickBy';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -30,59 +30,59 @@ function removeDupe(list) {
   });
 }
 
-class AddContact extends Component {
+const _getter = contact => {
+  if (!contact) return;
+  const {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website} = contact;
+  return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
+};
+
+class EditContact extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
-      contactBody: {},
-      pub1input: '',
-      employerAutocompleteList: [],
+      contactBody: _getter(this.props.contact),
+      immutableContactBody: fromJS(_getter(this.props.contact)),
+      customfields: this.props.contact.customfields,
       rssfeedsTextarea: ''
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
-    this.updateAutoInput = this._updateAutoInput.bind(this);
+    this.onCustomChange = this._onCustomChange.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
+  }
+
+  componentWillMount() {
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.feeds !== nextProps.feeds) {
+      this.setState({
+        rssfeedsTextarea: nextProps.feeds ? nextProps.feeds.map(feed => feed.url).join('\n') : ''
+      });
+    }
+
+    const immutableContactBody = fromJS(nextProps.contact);
+    if (nextProps.contact && !is(immutableContactBody, this.state.immutableContactBody)) {
+      this.setState({contactBody: _getter(nextProps.contact), immutableContactBody});
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.open === false && this.state.open === true) {
       // onRequestOpen hit
+      // if (!this.props.feeds) this.props.fetchFeeds();
     }
   }
 
   _onSubmit() {
-    let customRow = [];
     let contactBody = this.state.contactBody;
-    const list = this.props.list;
-    const pub1input = this.state.pub1input;
-    list.fieldsmap
-    .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
-    .map(fieldObj => {
-      if (fieldObj.customfield && this.refs[fieldObj.value]) {
-        const value = this.refs[fieldObj.value].getValue();
-        if (value.length > 0) customRow.push({name: fieldObj.value, value});
-      }
-    });
-    if (customRow.length > 0) contactBody.customfields = customRow;
-    contactBody.listid = list.id;
-
-    this.props.addContacts([contactBody])
-    .then(contacts => {
-      const ids = contacts.map(contact => contact.id);
-      if (pub1input.length > 0) {
-        ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
-      }
-      ids.map(id => this.handleRSSTextarea(id));
-      const listBody = {
-        listId: list.id,
-        name: list.name,
-        contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
-      };
-      this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
-    });
+    if (this.state.customfields !== null && this.state.customfields.length > 0) {
+      contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
+    }
+    contactBody.listid = this.props.listId;
+    this.props.patchContact(this.props.contact.id, pickBy(contactBody));
+    this.setState({open: false});
   }
 
   _onChange(name, value) {
@@ -91,14 +91,18 @@ class AddContact extends Component {
     });
   }
 
-  _updateAutoInput(val) {
-    this.setState({pub1input: val});
-    setTimeout(_ => {
-      this.props.searchPublications(this.state.pub1input)
-      .then(response => this.setState({
-        employerAutocompleteList: response,
-      }));
-    }, 500);
+  _onCustomChange(name, value) {
+    let customfields = this.state.customfields;
+    if (customfields === null) customfields = [];
+    if (customfields.some(field => field.name === name)) {
+      customfields = customfields.map(field => field.name === name ? ({name, value}) : field);
+    } else {
+      customfields = [...customfields, {name, value}];
+    }
+    this.setState({
+      customfields,
+      contactBody: Object.assign({}, this.state.contactBody, {customfields})
+    });
   }
 
   _handleRSSTextarea(id) {
@@ -116,7 +120,11 @@ class AddContact extends Component {
       <FlatButton
         label='Cancel'
         primary
-        onTouchTap={_ => this.setState({open: false, rssfeedsTextarea: ''})}
+        onTouchTap={_ => this.setState({
+          open: false,
+          contactBody: _getter(props.contact),
+          customfields: props.contact.customfields
+        })}
       />,
       <FlatButton
         label='Submit'
@@ -126,8 +134,8 @@ class AddContact extends Component {
       />,
     ];
     return (
-      <div>
-        <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add Contact' onRequestClose={_ => this.setState({open: false})}>
+      <div className={props.className}>
+        <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
@@ -170,27 +178,23 @@ class AddContact extends Component {
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span style={{whiteSpace: 'nowrap'}}>Publication</span>
-              <AutoComplete
-              id='pub1input'
-              style={textfieldStyle}
-              filter={AutoComplete.noFilter}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            </div>
             {props.list && props.list.fieldsmap !== null &&
               props.list.fieldsmap
               .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
               .map((fieldObj, i) => fieldObj.customfield && (
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
-                  <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
+                  <span>{fieldObj.name}</span>
+                  <TextField
+                  value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : state.customfields.find(field => field.name === fieldObj.value).value}
+                  style={textfieldStyle}
+                  ref={fieldObj.value}
+                  name={fieldObj.value}
+                  onChange={e => this.onCustomChange(fieldObj.value, e.target.value)}
+                  />
                 </div>
                 ))}
-            <div className='panel' style={{
+            {
+              /*<div className='panel' style={{
               backgroundColor: yellow50,
               margin: 10,
               padding: 10
@@ -202,7 +206,9 @@ class AddContact extends Component {
                 https://nypost.com/author/firstname-lastname/feed,
                 https://nycstreetfile.tumblr.com/rss
               </span>
-            </div>
+            </div>*/
+          }
+          {/*
             <div className='large-12 medium-12 small-12 columns'>
               <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
               <span style={{whiteSpace: 'nowrap', fontSize: '0.8em'}}> * Separate feeds with a new line</span>
@@ -211,7 +217,8 @@ class AddContact extends Component {
               maxRows={10}
               onChange={e => this.setState({rssfeedsTextarea: e.target.value})}
               />
-            </div>
+            </div>*/
+          }
           </div>
         </Dialog>
         {props.children({
@@ -222,22 +229,25 @@ class AddContact extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const feeds = state.feedReducer[props.contactId] && state.feedReducer[props.contactId].map(id => state.feedReducer[id]);
   return {
+    contact: state.contactReducer[props.contactId],
     list: state.listReducer[props.listId],
-    publicationReducer: state.publicationReducer
+    publicationReducer: state.publicationReducer,
+    feeds
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
+    patchContact: (contactId, body) => dispatch(actionCreators.patchContact(contactId, body)),
     patchList: listBody => dispatch(actionCreators.patchList(listBody)),
     searchPublications: query => dispatch(actionCreators.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
-    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
-
+    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
+    fetchFeeds: _ => dispatch(feedActions.fetchContactFeeds(props.contactId)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddContact);
-
+export default connect(mapStateToProps, mapDispatchToProps)(EditContact);

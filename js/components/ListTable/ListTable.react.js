@@ -20,7 +20,7 @@ import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Checkbox from 'material-ui/Checkbox';
-import {blue200, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
+import {blue100, blue200, blue300, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
@@ -33,6 +33,7 @@ import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 import AddOrHideColumns from './AddOrHideColumns.react';
 import AddContact from './AddContact.react';
+import EditContact from './EditContact.react';
 import PanelOverlay from './PanelOverlay.react';
 
 import {
@@ -68,7 +69,6 @@ const styles = {
     position: 'fixed'
   },
 };
-
 
 function _getter(contact, fieldObj) {
   if (fieldObj.customfield) {
@@ -392,20 +392,37 @@ class ListTable extends Component {
         case 'profile':
           const state = this.state;
           contentBody = (
-            <Link
-            onMouseEnter={e =>
-              this.setState({
-                showProfileTooltip: true,
-                profileX: e.pageX,
-                profileY: e.pageY,
-                profileContactId: rowData.id
-              })}
-            onMouseLeave={e => setTimeout(
-              _ => !state.onPanel ? this.setState({showProfileTooltip: true}) :
-              null, 500)}
-            to={`/tables/${this.props.listId}/${rowData.id}`}>
-              <i id='profile_hop' className='fa fa-arrow-right' aria-hidden='true'/>
-            </Link>);
+            <div className='row vertical-center'>
+              <i
+              id='profile_hop'
+              className='fa fa-arrow-right'
+              style={{color: blue300, cursor: 'pointer', marginRight: 5}}
+              onMouseEnter={e =>
+                this.setState({
+                  showProfileTooltip: true,
+                  profileX: e.pageX,
+                  profileY: e.pageY,
+                  profileContactId: rowData.id
+                })}
+              onMouseLeave={e => setTimeout(
+                _ => !state.onPanel ? this.setState({showProfileTooltip: true}) :
+                null, 500)}
+              onClick={e => {
+                e.preventDefault();
+                this.props.router.push(`/tables/${this.props.listId}/${rowData.id}`);
+              }}
+              />
+              <EditContact listId={this.props.listId} contactId={rowData.id}>
+              {({onRequestOpen}) => (
+                <i
+                onClick={onRequestOpen}
+                className='fa fa-edit'
+                style={{color: blue300, cursor: 'pointer'}}
+                />
+                )}
+              </EditContact>
+            </div>
+            );
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -701,7 +718,7 @@ class ListTable extends Component {
                 autoContainerWidth
                 width={state.screenWidth}
                 rowCount={1}
-                rowHeight={30}
+                rowHeight={32}
                 scrollLeft={scrollLeft}
                 overscanColumnCount={3}
                 />
@@ -729,7 +746,7 @@ class ListTable extends Component {
                   scrollTop={args.scrollTop}
                   width={state.screenWidth}
                   rowCount={props.received.length}
-                  rowHeight={30}
+                  rowHeight={32}
                   onScroll={onScroll}
                   />)}
                 </WindowScroller>
