@@ -15,7 +15,7 @@ import './react_sortable_hoc.css';
 
 const DragHandle = SortableHandle(() => <i className='fa fa-bars pointer' aria-hidden='true' />);
 
-const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal, comment, onCheck, onRemove}) => {
+const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal, comment, hideCheckbox, onCheck, onRemove}) => {
   let typeLabel = 'Editable';
   if (tableOnly) typeLabel = 'Table Only';
   if (customfield) typeLabel = 'Custom Editable';
@@ -27,7 +27,7 @@ const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal
         <DragHandle />
       </div>
       <div className='large-1 medium-1 small-6 columns'>
-        <Checkbox disabled={tableOnly || internal} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
+        <Checkbox disabled={internal || hideCheckbox} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
       </div>
       <div className='large-4 medium-5 small-12 columns'>
         <span style={{fontSize: '0.9em'}}>{name}</span>
@@ -107,10 +107,15 @@ class AddOrHideColumns extends Component {
   }
 
   _onCheck(e, checked, value) {
-    const items = this.state.items.map(fieldObj => {
-      if (fieldObj.value === value) return Object.assign({}, fieldObj, {hidden: checked});
-      return fieldObj;
-    });
+    let items;
+    if (this.state.items.some(item => item.value === value && item.checkboxStrategy)) {
+      items = this.state.items.find(item => item.value === value && item.checkboxStrategy).checkboxStrategy(this.state.items, checked);
+    } else {
+      items = this.state.items.map(fieldObj => {
+        if (fieldObj.value === value) return Object.assign({}, fieldObj, {hidden: checked});
+        return fieldObj;
+      });
+    }
     this.setState({items});
   }
 
@@ -129,8 +134,8 @@ class AddOrHideColumns extends Component {
 
   _onAddColumn() {
     const value = this.state.textvalue;
-    if (this.state.items.some(fieldObj => fieldObj.name === value)) {
-      console.log('duplicate');
+    if (this.state.items.some(fieldObj => fieldObj.name === value || fieldObj.value === value)) {
+      this.setState({errorText: 'duplicate'});
       return;
     }
     const prevFieldsmap = this.state.items
@@ -138,7 +143,7 @@ class AddOrHideColumns extends Component {
     .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}));
     const fieldsmap = [...prevFieldsmap, {
       name: value,
-      value,
+      value: value.toLowerCase().split(' ').join('_'),
       customfield: true,
       hidden: false
     }];
@@ -148,7 +153,6 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
-    window.localStorage.clear();
     this.setState({open: false, textvalue: ''});
   }
 
@@ -163,7 +167,6 @@ class AddOrHideColumns extends Component {
       fieldsmap
     };
     this.props.patchList(listBody);
-    window.localStorage.clear();
   }
 
   render() {
@@ -207,6 +210,7 @@ class AddOrHideColumns extends Component {
               id='custom-column'
               style={{marginLeft: 15, marginRight: 15}}
               value={state.textvalue}
+              errorText={state.errorText}
               onChange={e => this.setState({textvalue: e.target.value})}
               />
               <RaisedButton

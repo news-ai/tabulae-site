@@ -248,7 +248,7 @@ class ListTable extends Component {
         });
       }
 
-      if (nextProps.contacts.length > 0 && !this.state.dragged && (columnWidths === null || nextProps.fieldsmap.length !== columnWidths.length)) {
+      if (nextProps.contacts.length > 0 && !this.state.dragged && this.props.fieldsmap.length !== nextProps.fieldsmap.length) {
         nextProps.fieldsmap.map((fieldObj, i) => {
           let max = columnWidths[i];
           nextProps.contacts.map(contact => {
@@ -773,7 +773,7 @@ const mapStateToProps = (state, props) => {
     listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData,
-    fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden) : null,
+    fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal) : null,
     rawFieldsmap,
     contacts: contacts,
     contactIsReceiving: state.contactReducer.isReceiving,
