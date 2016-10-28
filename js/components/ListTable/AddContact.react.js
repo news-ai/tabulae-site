@@ -66,6 +66,7 @@ class AddContact extends Component {
       }
     });
     if (customRow.length > 0) contactBody.customfields = customRow;
+    contactBody.listid = list.id;
 
     this.props.addContacts([contactBody])
     .then(contacts => {
@@ -80,7 +81,7 @@ class AddContact extends Component {
         contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
       };
       this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}});
+      this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
     });
   }
 
@@ -115,7 +116,7 @@ class AddContact extends Component {
       <FlatButton
         label='Cancel'
         primary
-        onTouchTap={_ => this.setState({open: false})}
+        onTouchTap={_ => this.setState({open: false, rssfeedsTextarea: ''})}
       />,
       <FlatButton
         label='Submit'
@@ -129,7 +130,6 @@ class AddContact extends Component {
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add Contact' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
-
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
               <TextField style={textfieldStyle} value={state.contactBody.firstname || ''} name='firstname' onChange={e => this.onChange('firstname', e.target.value)}/>
