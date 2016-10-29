@@ -81,7 +81,7 @@ class EditContact extends Component {
       contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
     }
     contactBody.listid = this.props.listId;
-    this.props.patchContact(this.props.contact.id, pickBy(contactBody));
+    this.props.patchContact(this.props.contact.id, contactBody);
     this.setState({open: false});
   }
 
