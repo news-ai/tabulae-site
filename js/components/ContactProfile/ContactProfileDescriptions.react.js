@@ -8,7 +8,7 @@ import IconButton from 'material-ui/IconButton';
 import ContactCustomDescriptions from './ContactCustomDescriptions.react';
 import TwitterProfile from './SocialProfiles/Twitter/TwitterProfile.react';
 import InstagramProfile from './SocialProfiles/Instagram/InstagramProfile.react';
-import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInput';
+import {ControlledInput} from '../ToggleableEditInput';
 
 const styles = {
   smallIcon: {
@@ -55,22 +55,6 @@ const WrappedInstagram = props => {
     );
 };
 
-const ControlledInput = props => {
-  return (
-    <ToggleableEditInputHOC {...props}>
-      {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
-      <ToggleableEditInput
-        onToggleTitleEdit={onToggleTitleEdit}
-        isTitleEditing={isTitleEditing}
-        name={name}
-        onUpdateName={onUpdateName}
-        nameStyle={props.nameStyle}
-        hideIcon={props.hideIcon}
-        style={props.nameStyle}
-        />}
-    </ToggleableEditInputHOC>);
-};
-
 const contactDescriptorClassname = 'large-12 medium-8 small-12 columns';
 
 function ContactProfileDescriptions({contact, patchContact, className, list}) {
@@ -108,20 +92,20 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       className={contactDescriptorClassname}
       content={contact.email}
       contentTitle='Email'
-      onClick={(e, value) => isEmail(value) && patchContact(contact.id, {email: value})}/>
+      onBlur={(email) => isEmail(email) && patchContact(contact.id, {email})}/>
       <ContactDescriptor
       iconClassName='fa fa-rss'
       className={contactDescriptorClassname}
       content={contact.blog}
       contentTitle='Blog'
-      onClick={(e, value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
+      onBlur={(value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
       <ContactDescriptor
       iconClassName='fa fa-twitter'
       className={contactDescriptorClassname}
       errorText={twitterErrorText}
       content={contact.twitter}
       contentTitle='Twitter'
-      onClick={(e, value) => patchContact(contact.id, {twitter: value}).then(_ => window.location.reload())}
+      onBlur={(value) => patchContact(contact.id, {twitter: value}).then(_ => window.location.reload())}
       extraIcons={contact.twitter && [
         <WrappedTwitter key={0} contactId={contact.id} />
         ]}
@@ -132,7 +116,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       errorText={instagramErrorText}
       content={contact.instagram}
       contentTitle='Instagram'
-      onClick={(e, value) => patchContact(contact.id, {instagram: value}).then(_ => window.location.reload())}
+      onBlur={(value) => patchContact(contact.id, {instagram: value}).then(_ => window.location.reload())}
       extraIcons={contact.instagram && [
         <WrappedInstagram key={0} contactId={contact.id} />
         ]}
@@ -142,13 +126,13 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       className={contactDescriptorClassname}
       content={contact.linkedin}
       contentTitle='LinkedIn'
-      onClick={(e, value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
+      onBlur={(value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
       <ContactDescriptor
       iconClassName='fa fa-external-link'
       className={contactDescriptorClassname}
       content={contact.website}
       contentTitle='Website'
-      onClick={(e, value) => isURL(value) && patchContact(contact.id, {website: value})}
+      onBlur={(value) => isURL(value) && patchContact(contact.id, {website: value})}
       />
       <ContactCustomDescriptions contact={contact} patchContact={patchContact} list={list} />
     </div>);

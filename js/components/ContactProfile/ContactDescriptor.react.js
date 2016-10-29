@@ -1,11 +1,9 @@
 import React from 'react';
-import alertify from 'alertifyjs';
 import isURL from 'validator/lib/isURL';
 import isEmail from 'validator/lib/isEmail';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 import {grey700, grey800, red600} from 'material-ui/styles/colors';
-import IconButton from 'material-ui/IconButton';
+import {ControlledInput} from '../ToggleableEditInput';
 
 const styles = {
   smallIcon: {
@@ -34,7 +32,7 @@ function ContactDescriptor({
   showTitle,
   content,
   contentTitle,
-  onClick,
+  onBlur,
   className,
   iconClassName,
   errorText,
@@ -51,14 +49,11 @@ function ContactDescriptor({
       {iconClassName && icon}
       {showTitle && <span style={styles.iconStyle}>{contentTitle}</span>}
       {errorText !== null && <span style={{fontSize: '0.7em', color: red600}}>{errorText}</span>}
-      <span style={contentStyle}>{content ? content : `---- ${contentTitle} empty ----`}</span>
-      <IconButton
-      iconStyle={styles.smallIcon}
-      style={styles.small}
-      iconClassName={content ? 'fa fa-edit' : 'fa fa-plus'}
-      tooltip={`${content ? 'Edit' : 'Add'} ${contentTitle}`}
-      tooltipPosition='top-right'
-      onClick={_ => alertify.prompt(`Enter ${contentTitle}`, '', onClick, function() {})}
+      <ControlledInput
+      nameStyle={contentStyle}
+      name={content}
+      placeholder={`---- ${contentTitle} empty ----`}
+      onBlur={onBlur}
       />
       {extraIcons}
   </div>);
