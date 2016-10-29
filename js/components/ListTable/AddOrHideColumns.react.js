@@ -8,7 +8,7 @@ import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import {grey400, grey700} from 'material-ui/styles/colors';
+import {grey400, grey700, yellow50} from 'material-ui/styles/colors';
 import {SortableContainer, SortableHandle, SortableElement, arrayMove} from 'react-sortable-hoc';
 
 import './react_sortable_hoc.css';
@@ -192,6 +192,16 @@ class AddOrHideColumns extends Component {
             <div style={{margin: '20px 0'}}>
               <span style={{fontSize: '0.9em'}}>
                 Use the drag handle icon <i style={{margin: '0 3px'}} className='fa fa-bars' aria-hidden='true'/> to reorder the order of you columns. Activate or de-activate default columns. Create or delete custom columns that you can use as template variable in emails.
+              </span>
+            </div>
+            <div className='panel' style={{
+              backgroundColor: yellow50,
+              margin: 10,
+              padding: 10
+            }}>
+              <span style={{fontSize: '0.8em'}}>
+              There is a number of auto-generated columns that are activated when certain columns are not hidden. For example,
+              activating <strong>Instagram Likes</strong> and <strong>Instagram Comments</strong> also activates <strong>Likes-to-Comments ratio</strong>.
               </span>
             </div>
             {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}

@@ -310,6 +310,7 @@ class ListTable extends Component {
 
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.fieldsmap[columnIndex].name;
+    const value = this.props.fieldsmap[columnIndex].value;
     const sortDirection = this.state.sortPositions[columnIndex];
 
     let directionIcon = 'fa fa-circle-o';
@@ -319,7 +320,7 @@ class ListTable extends Component {
       directionIcon = 'fa fa-caret-down';
     }
     let customSpan;
-    if (content === 'selected') {
+    if (value === 'selected') {
       customSpan = <span onClick={_ =>
         this.setState({
           selected: this.state.selected.length === this.props.listData.contacts.length ?
@@ -709,7 +710,6 @@ class ListTable extends Component {
                   const wid = state.columnWidths[index];
                   if (!wid) {
                     this.clearColumnStorage();
-                    console.log('eh');
                     return 70;
                   }
                   return wid + 10;
@@ -742,7 +742,7 @@ class ListTable extends Component {
                   }}
                   overscanRowCount={30}
                   overscanColumnCount={3}
-                  height={args.height}
+                  height={args.height + 20}
                   scrollTop={args.scrollTop}
                   width={state.screenWidth}
                   rowCount={props.received.length}
