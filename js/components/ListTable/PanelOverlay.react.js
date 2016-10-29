@@ -39,7 +39,7 @@ const PanelOverlay = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
-        top: profileY,
+        top: profileY > (window.screen.height / 2) ? profileY - (305 + titleStyleHeight) : profileY,
         left: profileX + 8,
         zIndex: 200,
         width: 610,
