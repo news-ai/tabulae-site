@@ -1,6 +1,5 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import {grey700} from 'material-ui/styles/colors';
 import Chip from 'material-ui/Chip';
 import * as contactActions from '../../actions/contactActions';
 
@@ -16,9 +15,7 @@ class ContactEmployerDescriptor extends Component {
     contactBody[props.which] = contactEmployers;
     return (
       <div className={props.className} style={props.style}>
-        <Chip
-        onRequestDelete={_ => props.patchContact(props.contact.id, contactBody)}
-        >
+        <Chip onRequestDelete={_ => props.patchContact(props.contact.id, contactBody)}>
         {props.employer.name}
         </Chip>
       </div>
@@ -36,8 +33,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(ContactEmployerDescriptor);
-  
+export default connect(mapStateToProps, mapDispatchToProps)(ContactEmployerDescriptor);
