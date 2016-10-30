@@ -1,7 +1,7 @@
 // helper function to add extra tableOnly columns like index, selected, etc.
 
-function divideTwoDecimal(numerator, denomenator) {
-  const res = Math.round(numerator * 1000.0 / denomenator) / 1000;
+function divide(numerator, denomenator, fixedTo) {
+  const res = Math.round(numerator * (1 / fixedTo) / denomenator) / (1 / fixedTo);
   if (!isNaN(res)) return res;
 }
 
@@ -18,7 +18,10 @@ function instagramLikesToComments(listData) {
       customfield: false,
       sortEnabled: true,
       comment: 'Auto-generated when likes and comments are visible',
-      strategy: contact => contact.instagramlikes && contact.instagramcomments && divideTwoDecimal(contact.instagramlikes, contact.instagramcomments)
+      strategy: contact =>
+      contact.instagramlikes &&
+      contact.instagramcomments &&
+      divide(contact.instagramlikes, contact.instagramcomments, 0.001)
     };
   }
 }
@@ -36,7 +39,10 @@ function instagramLikesToFollowers(listData) {
       customfield: false,
       sortEnabled: true,
       comment: 'Auto-generated when likes and followers are not hidden',
-      strategy: contact => contact.instagramlikes && contact.instagramfollowers && divideTwoDecimal(contact.instagramlikes, contact.instagramfollowers)
+      strategy: contact =>
+      contact.instagramlikes &&
+      contact.instagramfollowers &&
+      divide(contact.instagramlikes, contact.instagramfollowers, 0.001)
     };
   }
 }
@@ -54,7 +60,10 @@ function instagramCommentsToFollowers(listData) {
       customfield: false,
       sortEnabled: true,
       comment: 'Auto-generated when comments and followers are not hidden',
-      strategy: contact => contact.instagramcomments && contact.instagramlikes && divideTwoDecimal(contact.instagramcomments, contact.instagramlikes)
+      strategy: contact =>
+      contact.instagramcomments &&
+      contact.instagramlikes &&
+      divide(contact.instagramcomments, contact.instagramlikes, 0.001)
     };
   }
 }
