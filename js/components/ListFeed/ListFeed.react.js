@@ -42,6 +42,10 @@ class ListFeed extends Component {
     if (!this.props.list) this.props.fetchList(this.props.listId);
   }
 
+  componentWillUnmount() {
+    window.resize = undefined;
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
