@@ -30,6 +30,12 @@ function removeDupe(list) {
   });
 }
 
+function createParser(url) {
+  let parser = document.createElement('a');
+  parser.href = url;
+  return parser;
+}
+
 class AddContact extends Component {
   constructor(props) {
     super(props);
@@ -85,9 +91,10 @@ class AddContact extends Component {
     });
   }
 
-  _onChange(name, value) {
+  _onChange(name, value, validator) {
+    const content = validator ? validator(value) : value;
     this.setState({
-      contactBody: Object.assign({}, this.state.contactBody, {[name]: value})
+      contactBody: Object.assign({}, this.state.contactBody, {[name]: content})
     });
   }
 
@@ -144,11 +151,52 @@ class AddContact extends Component {
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Twitter</span>
-              <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.twitter || ''} name='twitter' onChange={e => this.onChange('twitter', e.target.value)}/>
+              <TextField
+              hintText='adding will populate the feed'
+              style={textfieldStyle}
+              value={state.contactBody.twitter || ''}
+              name='twitter'
+              onChange={e => this.onChange(
+                'twitter',
+                e.target.value,
+                value => {
+                  if (isURL(value)) {
+                    const parser = createParser(value);
+                    if (parser.hostname === 'twitter.com') {
+                      const path = parser.pathname.split('/');
+                      return path[path.length - 1];
+                    } else {
+                      return value;
+                    }
+                  }
+                  return value;
+                }
+                )}
+              />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Instagram</span>
-              <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.instagram || ''} name='instagram' onChange={e => this.onChange('instagram', e.target.value)}/>
+              <TextField
+              hintText='adding will populate the feed'
+              style={textfieldStyle}
+              value={state.contactBody.instagram || ''}
+              name='instagram'
+              onChange={e => this.onChange(
+                'instagram',
+                e.target.value,
+                value => {
+                  if (isURL(value)) {
+                    const parser = createParser(value);
+                    if (parser.hostname === 'instagram.com' || parser.hostname === 'www.instagram.com') {
+                      const path = parser.pathname.split('/').filter(val => val.length > 0);
+                      return path[path.length - 1];
+                    } else {
+                      return value;
+                    }
+                  }
+                  return value;
+                }
+                )}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>LinkedIn</span>
