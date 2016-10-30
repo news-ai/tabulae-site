@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import ListItem from './ListItem.react';
 import ListsTitle from './ListsTitle.react';
-import Waiting from '../Waiting';
+import Waiting from '../../Waiting';
 import {listPropTypes} from 'constants/CommonPropTypes';
 
 const loading = {

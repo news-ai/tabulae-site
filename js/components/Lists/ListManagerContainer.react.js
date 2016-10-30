@@ -4,10 +4,12 @@ import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';
 import {skylightStyles} from 'constants/StyleConstants';
 import SkyLight from 'react-skylight';
-import Lists from '../Lists';
 import RaisedButton from 'material-ui/RaisedButton';
+
+import Lists from './Lists';
 import InfiniteScroll from '../InfiniteScroll';
-import DropFileWrapper from './DropFileWrapper.react';
+import DropFileWrapper from '../pages/DropFileWrapper.react';
+
 import {grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';

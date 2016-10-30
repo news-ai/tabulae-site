@@ -62,14 +62,14 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
         onClick={_ => router.push(`/lists/${list.id}`)}
         tooltipPosition='top-left'
         />
-        <IconButton
+        {onToggle && <IconButton
         tooltip={tooltip}
         iconStyle={styles.smallIcon}
         style={styles.small}
         iconClassName={iconName}
         onClick={_ => onToggle(list.id)}
         tooltipPosition='top-left'
-        />
+        />}
       </div>
     </div>
     );
