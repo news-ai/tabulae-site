@@ -18,7 +18,7 @@ function ContactCustomDescriptions({contact, patchContact, list}) {
             showTitle
             content={customValue && customValue.value}
             contentTitle={fieldObj.name}
-            onClick={(e, value) => {
+            onBlur={(value) => {
               let customfields;
               if (contact.customfields === null) {
                 customfields = [{name: fieldObj.value, value}];

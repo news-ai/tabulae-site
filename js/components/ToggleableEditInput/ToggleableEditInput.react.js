@@ -27,9 +27,11 @@ function ToggleableEditInput({
   onUpdateName,
   name,
   nameStyle,
+  placeholder,
   hideIcon
 }) {
   const spanStyle = nameStyle ? Object.assign({}, styles.nameBlock.title, nameStyle) : styles.nameBlock.title;
+  const content = placeholder && (!name || name.length === 0) ? placeholder : name;
   const renderNode = isTitleEditing ? (
     <TextField
     className='u-full-width noprint'
@@ -46,7 +48,7 @@ function ToggleableEditInput({
       <span
       className='print'
       style={[spanStyle]}
-      >{name}</span>
+      >{content}</span>
       {!hideIcon && <i
       className='fa fa-pencil-square-o noprint'
       style={[styles.icon]}

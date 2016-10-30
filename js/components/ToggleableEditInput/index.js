@@ -10,7 +10,10 @@ function ControlledInput(props) {
         onToggleTitleEdit={onToggleTitleEdit}
         isTitleEditing={isTitleEditing}
         name={name}
+        placeholder={props.placeholder}
         onUpdateName={onUpdateName}
+        nameStyle={props.nameStyle}
+        hideIcon={props.hideIcon}
         />}
     </ToggleableEditInputHOC>);
 }
