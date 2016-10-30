@@ -401,8 +401,8 @@ class ListTable extends Component {
               onMouseEnter={e =>
                 this.setState({
                   showProfileTooltip: true,
-                  profileX: e.pageX,
-                  profileY: e.pageY,
+                  profileX: e.clientX,
+                  profileY: e.clientY,
                   profileContactId: rowData.id
                 })}
               onMouseLeave={e => setTimeout(
@@ -746,7 +746,7 @@ class ListTable extends Component {
                   scrollTop={args.scrollTop}
                   width={state.screenWidth}
                   rowCount={props.received.length}
-                  rowHeight={32}
+                  rowHeight={30}
                   onScroll={onScroll}
                   />)}
                 </WindowScroller>
