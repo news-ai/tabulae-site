@@ -33,7 +33,7 @@ class FeedsController extends Component {
     const props = this.props;
     const state = this.state;
 
-    return (
+    return props.contact ? (
       <div>
         <Dialog autoScrollBodyContent open={state.isPanelOpen} onRequestClose={this.togglePanel}>
           <h5>Settings</h5>
@@ -71,7 +71,7 @@ class FeedsController extends Component {
           </div>
         </div>
       </div>
-      );
+      ) : null;
   }
 }
 

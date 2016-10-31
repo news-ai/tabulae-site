@@ -124,6 +124,9 @@ class Table extends Component {
   }
 
   componentWillMount() {
+    if (this.props.listData && this.props.listData.readonly) {
+      this.props.router.push(`/tables/${this.props.listData.id}`);
+    }
     if (this.props.searchQuery) {
       this._fetchOperations().
       then(_ => this.onSearchClick(this.props.searchQuery));
@@ -156,6 +159,9 @@ class Table extends Component {
     if (this.state.person === null) this.setState({person: nextProps.person});
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
+    }
+    if (nextProps.listData && nextProps.listData.readonly) {
+      this.props.router.push(`/tables/${nextProps.listData.id}`);
     }
   }
 
@@ -501,4 +507,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withRouter(Radium(Table)));
-
