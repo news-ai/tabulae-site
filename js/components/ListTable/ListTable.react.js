@@ -81,6 +81,10 @@ function _getter(contact, fieldObj) {
   }
 }
 
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 const localStorage = window.localStorage;
 
 class ListTable extends Component {
@@ -484,7 +488,10 @@ class ListTable extends Component {
       filteredIds.sort((a, b) => {
         let valA = _getter(this.props.contactReducer[a], fieldObj);
         let valB = _getter(this.props.contactReducer[b], fieldObj);
-        if (typeof valA === 'string') {
+        if (isNumber(valA)) {
+          valA = parseFloat(valA);
+          valB = parseFloat(valB);
+        } else if (typeof valA === 'string') {
           valA = valA.toUpperCase();
           valB = valB.toUpperCase();
         }

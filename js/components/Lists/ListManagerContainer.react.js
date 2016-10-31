@@ -82,7 +82,7 @@ const mapStateToProps = state => {
     }
   });
   return {
-    lists: lists,
+    lists,
     untitledNum,
     isReceiving: listReducer.isReceiving,
     statementIfEmpty: 'It looks like you haven\'t created any list. Go ahead and make one!',
