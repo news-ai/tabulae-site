@@ -10,6 +10,7 @@ function ControlledInput(props) {
         onToggleTitleEdit={onToggleTitleEdit}
         isTitleEditing={isTitleEditing}
         name={name}
+        disabled={props.disabled}
         placeholder={props.placeholder}
         onUpdateName={onUpdateName}
         nameStyle={props.nameStyle}

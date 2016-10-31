@@ -14,6 +14,7 @@ function ContactCustomDescriptions({contact, patchContact, list}) {
           const customValue = contact.customfields !== null && contact.customfields.find(customObj => customObj.name === fieldObj.value);
           return (
             <ContactDescriptor
+            disabled={contact.readonly}
             key={i}
             showTitle
             content={customValue && customValue.value}

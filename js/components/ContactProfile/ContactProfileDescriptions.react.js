@@ -72,6 +72,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
         <div className='large-12 medium-12 small-12 columns vertical-center'>
           <ControlledInput
           hideIcon
+          disabled={contact.readonly}
           nameStyle={{fontSize: '1.3em'}}
           name={contact.firstname}
           onBlur={firstname => {
@@ -79,6 +80,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
             patchContact(contact.id, {firstname});
           }}/>
           <ControlledInput
+          disabled={contact.readonly}
           nameStyle={{fontSize: '1.3em'}}
           name={contact.lastname}
           onBlur={lastname => {
@@ -88,18 +90,21 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
         </div>
       </div>
       <ContactDescriptor
+      disabled={contact.readonly}
       iconClassName='fa fa-envelope'
       className={contactDescriptorClassname}
       content={contact.email}
       contentTitle='Email'
       onBlur={(email) => isEmail(email) && patchContact(contact.id, {email})}/>
       <ContactDescriptor
+      disabled={contact.readonly}
       iconClassName='fa fa-rss'
       className={contactDescriptorClassname}
       content={contact.blog}
       contentTitle='Blog'
       onBlur={(value) => isURL(value) && patchContact(contact.id, {blog: value})}/>
       <ContactDescriptor
+      disabled={contact.readonly}
       iconClassName='fa fa-twitter'
       className={contactDescriptorClassname}
       errorText={twitterErrorText}
@@ -111,6 +116,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
         ]}
       />
       <ContactDescriptor
+      disabled={contact.readonly}
       iconClassName='fa fa-instagram'
       className={contactDescriptorClassname}
       errorText={instagramErrorText}
@@ -122,12 +128,14 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
         ]}
       />
       <ContactDescriptor
+      disabled={contact.readonly}
       iconClassName='fa fa-linkedin'
       className={contactDescriptorClassname}
       content={contact.linkedin}
       contentTitle='LinkedIn'
       onBlur={(value) => isURL(value) && patchContact(contact.id, {linkedin: value})}/>
       <ContactDescriptor
+      disabled={contact.readonly}
       iconClassName='fa fa-external-link'
       className={contactDescriptorClassname}
       content={contact.website}

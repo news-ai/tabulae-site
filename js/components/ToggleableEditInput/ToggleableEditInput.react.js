@@ -28,11 +28,12 @@ function ToggleableEditInput({
   name,
   nameStyle,
   placeholder,
-  hideIcon
+  hideIcon,
+  disabled
 }) {
   const spanStyle = nameStyle ? Object.assign({}, styles.nameBlock.title, nameStyle) : styles.nameBlock.title;
   const content = placeholder && (!name || name.length === 0) ? placeholder : name;
-  const renderNode = isTitleEditing ? (
+  const renderNode = isTitleEditing && !disabled ? (
     <TextField
     className='u-full-width noprint'
     style={{left: 0, float: 'left'}}
@@ -49,7 +50,7 @@ function ToggleableEditInput({
       className='print'
       style={[spanStyle]}
       >{content}</span>
-      {!hideIcon && <i
+      {!hideIcon && !disabled && <i
       className='fa fa-pencil-square-o noprint'
       style={[styles.icon]}
       aria-hidden='true'></i>}
