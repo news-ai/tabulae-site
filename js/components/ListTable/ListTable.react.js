@@ -613,7 +613,7 @@ class ListTable extends Component {
             iconClassName='fa fa-envelope'
             iconStyle={{color: grey500}}
             onClick={_ => this.setState({isEmailPanelOpen: true})}
-            disabled={state.isEmailPanelOpen}
+            disabled={state.isEmailPanelOpen || props.listData.readonly}
             />
             <IconButton
             tooltip='Export'
