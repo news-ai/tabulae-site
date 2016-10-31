@@ -15,7 +15,7 @@ import './react_sortable_hoc.css';
 
 const DragHandle = SortableHandle(() => <i className='fa fa-bars pointer' aria-hidden='true' />);
 
-const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal, comment, hideCheckbox, onCheck, onRemove}) => {
+const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal, description, hideCheckbox, onCheck, onRemove}) => {
   let typeLabel = 'Editable';
   if (tableOnly) typeLabel = 'Table Only';
   if (customfield) typeLabel = 'Custom Editable';
@@ -37,7 +37,7 @@ const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal
       </div>
       <div className='large-4 medium-2 small-12 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
         {customfield && !readonly && <i className='fa fa-trash hoverable-icon' aria-hidden='true' onClick={_ => onRemove(value)} />}
-        {!customfield && tableOnly && comment && <span style={{fontSize: '0.8em'}}>{comment}</span>}
+        {description && <span style={{fontSize: '0.8em'}}>{description}</span>}
       </div>
     </div>
     );
@@ -61,6 +61,7 @@ const SortableList = SortableContainer(({items, onCheck, onRemove}) => {
           <span>Type</span>
         </div>
         <div className='large-4 medium-2 columns'>
+          <span>Description</span>
         </div>
       </div>
       {items
