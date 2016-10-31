@@ -220,8 +220,8 @@ class ContactProfile extends Component {
                     <Textarea
                     value={state.notes}
                     maxRows={7}
-                    onChange={e => this.setState({notes: e.target.value})}
-                    onBlur={_ => props.contact.notes !== state.notes ? props.patchContact(props.contactId, {notes: state.notes}) : null}
+                    onChange={e => !props.contact.readonly && this.setState({notes: e.target.value})}
+                    onBlur={_ => props.contact.notes !== state.notes ? !props.contact.readonly && props.patchContact(props.contactId, {notes: state.notes}) : null}
                     />
                     <span style={{color: grey500, margin: 5, fontSize: '0.7em', float: 'right'}}>{props.contact.notes !== state.notes ? 'Unsaved' : 'Saved'}</span>
                   </div>
@@ -230,6 +230,7 @@ class ContactProfile extends Component {
                   <div className='row vertical-center' style={{marginTop: 20}}>
                     <h5>Current Publications/Employers</h5>
                     <IconButton
+                    disabled={props.contact.readonly}
                     iconStyle={styles.smallIcon}
                     style={styles.small}
                     iconClassName='fa fa-plus'
@@ -249,6 +250,7 @@ class ContactProfile extends Component {
                     </div>
                       <h5>Past Publications/Employers</h5>
                       <IconButton
+                      disabled={props.contact.readonly}
                       style={{marginLeft: 3}}
                       iconStyle={styles.smallIcon}
                       style={styles.small}
