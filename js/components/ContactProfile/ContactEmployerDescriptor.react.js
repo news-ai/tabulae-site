@@ -15,7 +15,8 @@ class ContactEmployerDescriptor extends Component {
     contactBody[props.which] = contactEmployers;
     return (
       <div className={props.className} style={props.style}>
-        <Chip onRequestDelete={_ => props.patchContact(props.contact.id, contactBody)}>
+        <Chip
+        onRequestDelete={_ => !props.contact.readonly && props.patchContact(props.contact.id, contactBody)}>
         {props.employer.name}
         </Chip>
       </div>

@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import * as actionCreators from 'actions/AppActions';
-import { connect } from 'react-redux';
-import Lists from '../Lists';
+import {connect} from 'react-redux';
+
+import Lists from './Lists';
 import InfiniteScroll from '../InfiniteScroll';
 
 class ArchiveContainer extends Component {
@@ -16,7 +17,7 @@ class ArchiveContainer extends Component {
   render() {
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
-        <div className='row'>
+        <div className='row' style={{marginTop: 10}}>
           <div className='large-offset-1 large-10 columns'>
           <Lists {...this.props} />
           </div>

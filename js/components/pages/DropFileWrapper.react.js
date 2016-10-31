@@ -5,8 +5,9 @@ import RaisedButton from 'material-ui/RaisedButton';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
 import Dropzone from 'react-dropzone';
-import Waiting from '../Waiting';
 import Radium from 'radium';
+
+import Waiting from '../Waiting';
 
 const styles = {
   dropzone: {

@@ -33,7 +33,7 @@ class FeedsController extends Component {
     const props = this.props;
     const state = this.state;
 
-    return (
+    return props.contact ? (
       <div>
         <Dialog autoScrollBodyContent open={state.isPanelOpen} onRequestClose={this.togglePanel}>
           <h5>Settings</h5>
@@ -67,11 +67,11 @@ class FeedsController extends Component {
             {props.feeds && props.feeds.length === 0 && <span style={{color: 'grey', marginLeft: 10}}>--- None ---</span>}
           </div>
           <div className='large-2 medium-4 small-12 columns vertical-center'>
-            <RaisedButton id='rss_settings_hop' style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Settings' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
+            <RaisedButton disabled={props.contact.readonly} id='rss_settings_hop' style={{marginTop: 10, marginBottom: 10, float: 'right'}} label='Settings' onClick={this.togglePanel} labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
       </div>
-      );
+      ) : null;
   }
 }
 

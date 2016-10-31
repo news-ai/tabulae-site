@@ -36,8 +36,9 @@ import configureStore from './configureStore';
 // Import the pages
 import NotFound from './components/NotFound';
 import App from './components/App.react';
-import ListManagerContainer from './components/pages/ListManagerContainer.react';
-import ArchiveContainer from './components/pages/ArchiveContainer.react';
+import ListManagerContainer from './components/Lists/ListManagerContainer.react';
+import ArchiveContainer from './components/Lists/ArchiveContainer.react';
+import PublicListsContainer from './components/Lists/PublicListsContainer.react';
 import Table from './components/pages/Table.react';
 import SearchBar from './components/Search';
 import OnboardingWrapper from './components/OnboardingWrapper';
@@ -98,6 +99,7 @@ ReactDOM.render(
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
             <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
+            <Route path='public' name='Public Lists' component={PublicListsContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
             <Route path='emailstats' name='Email Analytics' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />

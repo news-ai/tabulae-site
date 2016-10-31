@@ -37,6 +37,7 @@ function ContactDescriptor({
   iconClassName,
   errorText,
   extraIcons,
+  disabled
 }) {
   const icon = content && isURL(content) && !isEmail(content) ?
   <a href={content.substring(0, 4) === 'http' ? content : `https://${content}`} style={styles.iconStyle} target='_blank'>
@@ -50,6 +51,7 @@ function ContactDescriptor({
       {showTitle && <span style={styles.iconStyle}>{contentTitle}</span>}
       {errorText !== null && <span style={{fontSize: '0.7em', color: red600}}>{errorText}</span>}
       <ControlledInput
+      disabled={disabled}
       nameStyle={contentStyle}
       name={content}
       placeholder={`---- ${contentTitle} empty ----`}

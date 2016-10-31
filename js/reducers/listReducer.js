@@ -23,6 +23,7 @@ function listReducer(state = initialState.listReducer, action) {
 
   let unarchivedLists = [];
   let archivedLists = [];
+  let publicLists = [];
   let obj = assignToEmpty(state, {});
   switch (action.type) {
     case 'CLEAR_LIST_REDUCER':
@@ -56,15 +57,18 @@ function listReducer(state = initialState.listReducer, action) {
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.received.map(id => {
         const list = obj[id];
-        if (!list.archived) unarchivedLists.push(list.id);
+        if (!list.archived && !list.publiclist) unarchivedLists.push(list.id);
         if (list.archived) archivedLists.push(list.id);
+        if (list.publiclist && list.readonly) publicLists.push(list.id);
       });
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
+      obj.publicLists = publicLists;
       obj.isReceiving = false;
       obj.didInvalidate = false;
-      if (action.archivedOffset === undefined) obj.offset = action.offset;
-      if (action.offset === undefined) obj.archivedOffset = action.archivedOffset;
+      if (action.offset !== undefined) obj.offset = action.offset;
+      if (action.archivedOffset !== undefined) obj.archivedOffset = action.archivedOffset;
+      if (action.publicOffset !== undefined) obj.publicOffset = action.publicOffset;
       return obj;
     case listConstant.REQUEST_FAIL:
       obj.isReceiving = false;

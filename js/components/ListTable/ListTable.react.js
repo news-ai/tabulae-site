@@ -413,15 +413,15 @@ class ListTable extends Component {
                 this.props.router.push(`/tables/${this.props.listId}/${rowData.id}`);
               }}
               />
-              <EditContact listId={this.props.listId} contactId={rowData.id}>
-              {({onRequestOpen}) => (
-                <i
-                onClick={onRequestOpen}
-                className='fa fa-edit'
-                style={{color: blue300, cursor: 'pointer'}}
-                />
-                )}
-              </EditContact>
+              {!this.props.listData.readonly && <EditContact listId={this.props.listId} contactId={rowData.id}>
+                {({onRequestOpen}) => (
+                  <i
+                  onClick={onRequestOpen}
+                  className='fa fa-edit'
+                  style={{color: blue300, cursor: 'pointer'}}
+                  />
+                  )}
+                </EditContact>}
             </div>
             );
           break;
@@ -587,6 +587,7 @@ class ListTable extends Component {
           onClick={_ => props.router.push(`/listfeeds/${props.listId}`)} />
           <FlatButton
           label='Go to Bulk Edit'
+          disabled={props.listData && props.listData.readonly}
           icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
           labelStyle={{color: grey400, textTransform: 'none'}}
           onClick={_ => props.router.push(`/lists/${props.listId}`)}
@@ -603,66 +604,69 @@ class ListTable extends Component {
           />}
         <div className='row vertical-center' style={{margin: 15}}>
           <div className='large-3 medium-4 columns vertical-center'>
-            <ControlledInput async name={props.listData ? props.listData.name : ''} onBlur={value => props.patchList({listId: props.listId, name: value})} />
+            {props.listData && <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>}
           </div>
-           <div className='large-4 medium-4 columns vertical-center'>
+          {props.listData && <div className='large-4 medium-4 columns vertical-center'>
+            <IconButton
+            tooltip='Email'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-envelope'
+            iconStyle={{color: grey500}}
+            onClick={_ => this.setState({isEmailPanelOpen: true})}
+            disabled={state.isEmailPanelOpen}
+            />
+            <IconButton
+            tooltip='Export'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-download'
+            iconStyle={{color: grey500}}
+            onClick={this.onExportClick}
+            />
+            <CopyOrMoveTo
+            selected={state.selected}>
+            {({onRequestOpen}) => (
               <IconButton
-              tooltip='Email'
+              id='copy_contacts_hop'
+              tooltip='Copy to Another Table'
               tooltipPosition='top-left'
-              iconClassName='fa fa-envelope'
+              iconClassName='fa fa-copy'
               iconStyle={{color: grey500}}
-              onClick={_ => this.setState({isEmailPanelOpen: true})}
-              disabled={state.isEmailPanelOpen}
-              />
+              onClick={onRequestOpen}
+              />)}
+            </CopyOrMoveTo>
+            <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
+            {({onRequestOpen}) => (
               <IconButton
-              tooltip='Export'
+              id='add_remove_columns_hop'
+              disabled={props.listData.readonly}
+              tooltip='Show/Hide columns'
               tooltipPosition='top-left'
-              iconClassName='fa fa-download'
+              iconClassName='fa fa-table'
               iconStyle={{color: grey500}}
-              onClick={this.onExportClick}
-              />
-              <CopyOrMoveTo
-              selected={state.selected}>
-              {({onRequestOpen}) => (
-                <IconButton
-                id='copy_contacts_hop'
-                tooltip='Copy to Another Table'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-copy'
-                iconStyle={{color: grey500}}
-                onClick={onRequestOpen}
-                />)}
-              </CopyOrMoveTo>
-              <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
-              {({onRequestOpen}) => (
-                <IconButton
-                id='add_remove_columns_hop'
-                tooltip='Show/Hide columns'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-table'
-                iconStyle={{color: grey500}}
-                onClick={onRequestOpen}
-                />)}
-              </AddOrHideColumns>
-              <AddContact listId={props.listId}>
-              {({onRequestOpen}) => (
-                <IconButton
-                tooltip='Add New Contact'
-                id='add_contact_hop'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-plus'
-                iconStyle={{color: grey500}}
-                onClick={onRequestOpen}
-                />)}
-              </AddContact>
+              onClick={onRequestOpen}
+              />)}
+            </AddOrHideColumns>
+            <AddContact listId={props.listId}>
+            {({onRequestOpen}) => (
               <IconButton
-              tooltip='Delete Contact'
+              tooltip='Add New Contact'
+              id='add_contact_hop'
+              disabled={props.listData.readonly}
               tooltipPosition='top-left'
-              iconClassName='fa fa-trash'
+              iconClassName='fa fa-plus'
               iconStyle={{color: grey500}}
-              onClick={this.onRemoveContacts}
-              />
-            </div>
+              onClick={onRequestOpen}
+              />)}
+            </AddContact>
+            <IconButton
+            tooltip='Delete Contact'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-trash'
+            disabled={props.listData.readonly}
+            iconStyle={{color: grey500}}
+            onClick={this.onRemoveContacts}
+            />
+          </div>}
           <div className='large-5 columns vertical-center'>
             <TextField
             id='search-input'
@@ -673,7 +677,7 @@ class ListTable extends Component {
             errorText={state.errorText}
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-            <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />
+            {props.listData && !props.listData.readonly && <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />}
           </div>
         </div>
         {state.isEmailPanelOpen &&
