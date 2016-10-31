@@ -76,7 +76,6 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
     );
 }
 
-
 ListItem.PropTypes = {
   list: listPropTypes.isRequired,
   key: PropTypes.number,

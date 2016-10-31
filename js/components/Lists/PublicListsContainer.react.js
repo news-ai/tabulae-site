@@ -30,12 +30,10 @@ class PublicListsContainer extends Component {
 const mapStateToProps = state => {
   const lists = state.listReducer.publicLists.map(id => state.listReducer[id]);
   return {
-    lists: lists,
+    lists,
     isReceiving: lists === undefined ? true : false,
     statementIfEmpty: 'There are no public lists available.',
     listItemIcon: 'fa fa-arrow-left',
-    backRoute: '/',
-    backRouteTitle: 'Media Lists',
     title: 'Public Lists',
     tooltip: 'put back',
   };
