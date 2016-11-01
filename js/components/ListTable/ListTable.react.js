@@ -42,6 +42,7 @@ import {
   escapeHtml,
   convertToCsvString,
   exportOperations,
+  isNumber
 } from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -81,9 +82,6 @@ function _getter(contact, fieldObj) {
   }
 }
 
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
 
 const localStorage = window.localStorage;
 

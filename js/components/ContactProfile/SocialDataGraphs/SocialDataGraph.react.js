@@ -4,23 +4,35 @@ import Checkbox from 'material-ui/Checkbox';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 
+function divide(numerator, denomenator, fixedTo) {
+  const res = Math.round(numerator * (1 / fixedTo) / denomenator) / (1 / fixedTo);
+  if (!isNaN(res)) return res;
+}
+
 class SocialDataGraph extends Component {
   constructor(props) {
     super(props);
     this.state = {
       params: this.props.params,
       dataKeys: this.props.dataKeys,
-      normalizeBy: null
+      averageBy: null
     };
   }
 
   render() {
     const props = this.props;
     const state = this.state;
-    //console.log(props.data);
-    //const normalizedData = props.data.map(dataObj => {
-
-    //});
+    console.log(props.averageBy);
+    console.log(props.data);
+    let data = props.data;
+    const dataKeys = props.dataKeys.filter(key => state.params[key]);
+    if (state.averageBy !== null) {
+      data = props.data.map(dataObj => {
+        let newDataObj = Object.assign({}, dataObj);
+        dataKeys.map(key => (newDataObj[key] = divide(dataObj[key], dataObj[state.averageBy], 0.0001)));
+        return newDataObj;
+      });
+    }
 
     return (
       <div className='row' style={{marginTop: '10px', marginBottom: '10px'}}>
@@ -29,8 +41,9 @@ class SocialDataGraph extends Component {
         </div>
         <div className='large-9 medium-12 small-12 columns horizontal-center'>
           <LineGraph
-          data={props.data}
-          dataKeys={props.dataKeys.filter(key => state.params[key])} />
+          data={data}
+          dataKeys={dataKeys}
+          />
         </div>
         <div className='large-3 medium-12 small-12 columns'>
           {props.dataKeys.map((dataKey, i) =>
@@ -41,14 +54,16 @@ class SocialDataGraph extends Component {
             onCheck={(e, checked) =>
               this.setState({params: Object.assign({}, state.params, {[dataKey]: checked})})
             }/>)}
-        </div>
-        <div>
-          <span>Normalize by:</span>
-          <DropDownMenu value={state.normalizeBy} onChange={(e, index, val) => this.setState({normalizeBy: val})}>
-          {props.dataKeys
-            .filter(dataKey => state.params[dataKey])
-            .map((dataKey, i) => <MenuItem key={i} value={dataKey} primaryText={dataKey}/>)}
-          </DropDownMenu>
+          {props.averageBy &&
+            <div style={{margin: '20px 0'}}>
+              <span>Average By: </span>
+              <DropDownMenu value={state.averageBy} onChange={(e, index, val) => this.setState({averageBy: val})}>
+              {[<MenuItem key={-1} value={null} primaryText='None' />,
+                ...props.averageBy.map((dataKey, i) => <MenuItem key={i} value={dataKey} primaryText={dataKey}/>)
+                ]}
+              </DropDownMenu>
+            </div>
+          }
         </div>
       </div>);
   }

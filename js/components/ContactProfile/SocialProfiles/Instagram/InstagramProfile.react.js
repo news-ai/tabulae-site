@@ -16,6 +16,7 @@ const graphParams = {
 };
 
 const graphDataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets', 'Comments'];
+const graphAverageKeys = ['Posts', 'Followers'];
 
 class InstagramProfile extends Component {
   constructor(props) {
@@ -67,6 +68,7 @@ class InstagramProfile extends Component {
             title='Instagram'
             dataKeys={graphDataKeys}
             params={graphParams}
+            averageBy={graphAverageKeys}
             />}
         </Dialog>
         {props.children({
