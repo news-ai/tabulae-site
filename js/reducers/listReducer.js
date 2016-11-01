@@ -59,7 +59,7 @@ function listReducer(state = initialState.listReducer, action) {
         const list = obj[id];
         if (!list.archived && !list.publiclist) unarchivedLists.push(list.id);
         if (list.archived) archivedLists.push(list.id);
-        if (list.publiclist && list.readonly) publicLists.push(list.id);
+        if (list.publiclist) publicLists.push(list.id);
       });
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
