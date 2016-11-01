@@ -5,6 +5,10 @@ function divide(numerator, denomenator, fixedTo) {
   if (!isNaN(res)) return res;
 }
 
+export function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function instagramLikesToComments(listData) {
   const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
   const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
