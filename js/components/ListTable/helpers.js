@@ -17,7 +17,7 @@ function instagramLikesToComments(listData) {
       hideCheckbox: true,
       customfield: false,
       sortEnabled: true,
-      comment: 'Auto-generated when likes and comments are visible',
+      description: 'Auto-generated when likes and comments are visible',
       strategy: contact =>
       contact.instagramlikes &&
       contact.instagramcomments &&
@@ -38,7 +38,7 @@ function instagramLikesToFollowers(listData) {
       hideCheckbox: true,
       customfield: false,
       sortEnabled: true,
-      comment: 'Auto-generated when likes and followers are not hidden',
+      description: 'Auto-generated when likes and followers are visible',
       strategy: contact =>
       contact.instagramlikes &&
       contact.instagramfollowers &&
@@ -59,7 +59,7 @@ function instagramCommentsToFollowers(listData) {
       hideCheckbox: true,
       customfield: false,
       sortEnabled: true,
-      comment: 'Auto-generated when comments and followers are not hidden',
+      description: 'Auto-generated when comments and followers are visible',
       strategy: contact =>
       contact.instagramcomments &&
       contact.instagramlikes &&

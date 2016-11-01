@@ -8,7 +8,6 @@ import * as joyrideActions from './Joyride/actions';
 
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
-import FAQ from './FAQ';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
@@ -42,17 +41,19 @@ class App extends Component {
     this.state = {
       isLogin: false,
       isDrawerOpen: false,
-      isModalOpen: false,
       showNavBar: true,
-      firstTimeUser: false
+      firstTimeUser: false,
+      didScroll: false
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
-    this.toggleModal = _ => this.setState({isModalOpen: !this.state.isModalOpen});
   }
 
   componentWillMount() {
     this.props.getAuth();
+  }
+
+  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -166,15 +167,6 @@ class App extends Component {
           </div>
         </div>
         <div style={{height: 60}}></div>
-        <Dialog
-        title='How-to Videos'
-        modal={false}
-        open={state.isModalOpen}
-        onRequestClose={this.toggleModal}
-        autoScrollBodyContent
-        >
-          <FAQ />
-        </Dialog>
       </div>
       );
     return (
@@ -182,21 +174,20 @@ class App extends Component {
         <StyleRoot>
         {
           props.isLogin ?
-          <div>
-            {state.showNavBar && NavBar}
-            {props.children}
-            <FloatingActionButton
-            id='custom_intercom_launcher'
-            backgroundColor={blue600}
-            style={{
-              position: 'fixed',
-              bottom: 20,
-              right: 20
-            }}
-            iconClassName='fa fa-comment-o'
-            />
-          </div> :
-          <Login />
+            <div>
+              {state.showNavBar && NavBar}
+              {props.children}
+              <FloatingActionButton
+              id='custom_intercom_launcher'
+              backgroundColor={blue600}
+              style={{
+                position: 'fixed',
+                bottom: 20,
+                right: 20
+              }}
+              iconClassName='fa fa-comment-o'
+              />
+            </div> : <Login />
         }
         </StyleRoot>
       </div>
