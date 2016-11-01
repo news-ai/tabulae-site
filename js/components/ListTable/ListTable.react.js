@@ -350,7 +350,7 @@ class ListTable extends Component {
       </div>);
   }
 
-  _cellRenderer({columnIndex, rowIndex, key, style}, isScrolling) {
+  _cellRenderer({columnIndex, rowIndex, key, style}) {
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
 
@@ -364,8 +364,8 @@ class ListTable extends Component {
           contentBody = <span>{rowIndex + 1}</span>;
           break;
         case 'selected':
-          const isChecked = !isScrolling && this.state.selected.some(id => id === rowData.id);
-          contentBody = isScrolling ? '...' : (
+          const isChecked = this.state.selected.some(id => id === rowData.id);
+          contentBody = (
             <Checkbox
             iconStyle={{fill: isChecked ? blue200 : grey400}}
             checked={isChecked}
@@ -394,7 +394,7 @@ class ListTable extends Component {
           break;
         case 'profile':
           const state = this.state;
-          contentBody = isScrolling ? '...' : (
+          contentBody = (
             <div className='row vertical-center'>
               <i
               id='profile_hop'
@@ -739,7 +739,7 @@ class ListTable extends Component {
                   autoHeight
                   ref={ref => this.setDataGridRef(ref)}
                   className='BodyGrid'
-                  cellRenderer={cellArgs => this.cellRenderer(cellArgs, args.isScrolling)}
+                  cellRenderer={this.cellRenderer}
                   columnCount={props.fieldsmap.length}
                   columnWidth={({index}) => {
                     const wid = state.columnWidths[index];
