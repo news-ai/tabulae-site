@@ -43,7 +43,7 @@ function contactReducer(state = initialState.contactReducer, action) {
     case contactConstant.RECEIVE:
       obj.isReceiving = false;
       if (!state[action.contact.id]) obj.received = [...state.received, action.contact.id];
-      obj[action.contact.id] = action.contact;
+      obj[action.contact.id] = Object.assign(state[action.contact.id], action.contact);
       if (action.contact.customfields && action.contact.customfields !== null) {
         action.contact.customfields.map( field => {
           obj[action.contact.id][field.name] = field.value;

@@ -18,7 +18,7 @@ const DragHandle = SortableHandle(() => <i className='fa fa-bars pointer' aria-h
 const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal, description, hideCheckbox, onCheck, onRemove}) => {
   let typeLabel = 'Editable';
   if (tableOnly) typeLabel = 'Table Only';
-  if (customfield) typeLabel = 'Custom Editable';
+  if (customfield) typeLabel = 'Custom';
   if (internal) typeLabel = 'Internal';
   if (readonly) typeLabel = 'Read Only';
   return (
