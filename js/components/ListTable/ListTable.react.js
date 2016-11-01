@@ -35,6 +35,7 @@ import AddOrHideColumns from './AddOrHideColumns.react';
 import AddContact from './AddContact.react';
 import EditContact from './EditContact.react';
 import PanelOverlay from './PanelOverlay.react';
+import AnalyzeSelected from './AnalyzeSelected.react';
 
 import {
   generateTableFieldsmap,
@@ -73,6 +74,7 @@ const styles = {
 
 function _getter(contact, fieldObj) {
   if (fieldObj.customfield) {
+    if (fieldObj.readonly) return contact[fieldObj.value];
     if (contact.customfields === null) return undefined;
     else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
     else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
@@ -415,7 +417,8 @@ class ListTable extends Component {
                 this.props.router.push(`/tables/${this.props.listId}/${rowData.id}`);
               }}
               />
-              {!this.props.listData.readonly && <EditContact listId={this.props.listId} contactId={rowData.id}>
+              {!this.props.listData.readonly &&
+                <EditContact listId={this.props.listId} contactId={rowData.id}>
                 {({onRequestOpen}) => (
                   <i
                   onClick={onRequestOpen}
@@ -671,6 +674,19 @@ class ListTable extends Component {
             iconStyle={{color: grey500}}
             onClick={this.onRemoveContacts}
             />
+            {
+              /*<AnalyzeSelected
+              selected={state.selected}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Analyze Selected Contacts'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-line-chart'
+                iconStyle={{color: grey500}}
+                onClick={onRequestOpen}
+                />)}
+              </AnalyzeSelected>*/
+            }
           </div>}
           <div className='large-5 columns vertical-center'>
             <TextField
