@@ -4,6 +4,7 @@ import moment from 'moment';
 import AnalyzeSelected from './AnalyzeSelected.react';
 
 const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets'];
+const averageBy = ['Posts', 'Followers'];
 
 const mapStateToProps = (state, props) => {
   const filledIds = props.selected.filter(id => state.twitterDataReducer[id]);
@@ -32,6 +33,7 @@ const mapStateToProps = (state, props) => {
     contacts: filledIds,
     syncid: 'sync-twitter',
     handles: filledIds.map(id => state.contactReducer[id].twitter),
+    averageBy,
     dataMap,
     dataKeys,
     isReceiving: filledIds.length !== props.selected.length

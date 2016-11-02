@@ -4,7 +4,7 @@ import moment from 'moment';
 import AnalyzeSelected from './AnalyzeSelected.react';
 
 const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Comments'];
-const graphAverageKeys = ['Posts', 'Followers'];
+const averageBy = ['Posts', 'Followers'];
 
 const mapStateToProps = (state, props) => {
   const filledIds = props.selected.filter(id => state.instagramDataReducer[id]);
@@ -14,11 +14,13 @@ const mapStateToProps = (state, props) => {
     dataKeys.map(dataKey => {
       let data = [];
       for (let i = 0; i < state.instagramDataReducer[filledIds[0]].received.length; i++) {
+        // reformat date for graph
         const dateObj = moment(state.instagramDataReducer[filledIds[0]].received[i].CreatedAt);
         let obj = {
           CreatedAt: state.instagramDataReducer[filledIds[0]].received[i].CreatedAt,
           dateString: dateObj.format('M-DD')
         };
+        // reformat data to username for graph
         filledIds.map(contactId => {
           if (state.instagramDataReducer[contactId].received[i]) {
             obj[state.contactReducer[contactId].instagram] = state.instagramDataReducer[contactId].received[i][dataKey];
@@ -34,6 +36,7 @@ const mapStateToProps = (state, props) => {
     contacts: filledIds,
     syncid: 'sync-instagram',
     handles: filledIds.map(id => state.contactReducer[id].instagram),
+    averageBy,
     dataMap,
     dataKeys,
     isReceiving: filledIds.length !== props.selected.length
