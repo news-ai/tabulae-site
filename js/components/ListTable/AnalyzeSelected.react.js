@@ -96,9 +96,12 @@ class AnalyzeSelected extends Component {
             </div>
           }
           {props.selected.length > 0 && state.open && !props.isReceiving &&
-            props.dataKeys.map((dataKey, i) =>
+            props.dataKeys.map((dataKey, i) => {
+              if (state.averageBySelected && state.averageBySelected !== null && state.averageBySelected === dataKey) return null;
+              return (
               <GraphSeriesItem averageBySelected={state.averageBySelected} key={i} dataKey={dataKey} {...props}/>
-              )}
+              );
+            })}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})

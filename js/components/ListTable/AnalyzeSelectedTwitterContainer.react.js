@@ -3,7 +3,7 @@ import * as twitterDataActions from '../ContactProfile/SocialDataGraphs/Twitter/
 import moment from 'moment';
 import AnalyzeSelected from './AnalyzeSelected.react';
 
-const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets'];
+const dataKeys = ['Likes', 'Retweets', 'Posts', 'Followers', 'Following'];
 const averageBy = ['Posts', 'Followers'];
 
 const mapStateToProps = (state, props) => {
