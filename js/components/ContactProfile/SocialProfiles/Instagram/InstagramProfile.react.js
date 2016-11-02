@@ -15,7 +15,7 @@ const graphParams = {
   Comments: true,
 };
 
-const graphDataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets', 'Comments'];
+const graphDataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Comments'];
 const graphAverageKeys = ['Posts', 'Followers'];
 
 class InstagramProfile extends Component {

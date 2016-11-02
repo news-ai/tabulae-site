@@ -3,7 +3,7 @@ import * as instagramDataActions from '../ContactProfile/SocialDataGraphs/Instag
 import moment from 'moment';
 import AnalyzeSelected from './AnalyzeSelected.react';
 
-const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets', 'Comments'];
+const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Comments'];
 const graphAverageKeys = ['Posts', 'Followers'];
 
 const mapStateToProps = (state, props) => {
