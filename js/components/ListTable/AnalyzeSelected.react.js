@@ -35,6 +35,7 @@ class AnalyzeSelected extends Component {
   render() {
     const state = this.state;
     const props = this.props;
+    console.log(props.dataMap);
     return (
       <div>
         <Dialog
@@ -62,8 +63,8 @@ class AnalyzeSelected extends Component {
                     <YAxis/>
                     <CartesianGrid strokeDasharray='3 3'/>
                     <Tooltip/>
-                    {props.contacts.map((id, index) => (
-                      <Line key={`${dataKey}-${index}`} type='monotone' dataKey={id} stroke={colors[i]} activeDot={{r: 8}}/>
+                    {props.twitterHandles.map((handle, index) => (
+                      <Line key={`${dataKey}-${index}`} type='monotone' dataKey={handle} stroke={colors[i]} activeDot={{r: 8}}/>
                       ))}
                   </LineChart>
                 </div>
@@ -92,7 +93,7 @@ const mapStateToProps = (state, props) => {
         };
         filledIds.map(contactId => {
           if (state.twitterDataReducer[contactId].received[i]) {
-            obj[contactId] = state.twitterDataReducer[contactId].received[i][dataKey];
+            obj[state.contactReducer[contactId].twitter] = state.twitterDataReducer[contactId].received[i][dataKey];
           }
         });
         data.push(obj);
@@ -103,6 +104,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     contacts: filledIds,
+    twitterHandles: filledIds.map(id => state.contactReducer[id].twitter),
     dataMap,
     dataKeys,
     isReceiving: filledIds.length !== props.selected.length
