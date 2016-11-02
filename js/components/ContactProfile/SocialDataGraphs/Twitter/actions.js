@@ -21,3 +21,24 @@ export function fetchContactTwitterData(contactId) {
     .catch(err => dispatch({type: twitterDataConstant.REQUEST_FAIL, message: err}));
   };
 }
+
+export function fetchMultipleContactTwitterData(listId, contacts, days) {
+  return (dispatch, getState) => {
+    dispatch({type: twitterDataConstant.REQUEST_MULTIPLE, contacts, days, listId});
+    return api.post(`/lists/${listId}/twittertimeseries`, {ids: contacts, days})
+    .then(response => {
+      let contact, contactData;
+      contacts.map(contactId => {
+        contact = getState().contactReducer[contactId];
+        contactData = response.data.filter(obj => obj.Username === contact.twitter);
+        dispatch({
+          type: twitterDataConstant.RECEIVE,
+          contactId: contact.id,
+          data: contactData,
+          offset: getState().twitterDataReducer[contact.id]
+        });
+      });
+    })
+    .catch(err => dispatch({type: twitterDataConstant.REQUEST_MULTIPLE_FAIL, message: err}));
+  };
+}

@@ -23,9 +23,9 @@ import Checkbox from 'material-ui/Checkbox';
 import {blue100, blue200, blue300, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
-import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import Dialog from 'material-ui/Dialog';
 
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
@@ -36,15 +36,9 @@ import AddContact from './AddContact.react';
 import EditContact from './EditContact.react';
 import PanelOverlay from './PanelOverlay.react';
 import AnalyzeSelected from './AnalyzeSelected.react';
+import EmptyListStatement from './EmptyListStatement.react';
 
-import {
-  generateTableFieldsmap,
-  measureSpanSize,
-  escapeHtml,
-  convertToCsvString,
-  exportOperations,
-  isNumber
-} from './helpers';
+import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
@@ -83,7 +77,6 @@ function _getter(contact, fieldObj) {
     else return contact[fieldObj.value];
   }
 }
-
 
 const localStorage = window.localStorage;
 
@@ -191,7 +184,6 @@ class ListTable extends Component {
           });
           columnWidths[i] = max;
         });
-       
       }
 
       this.setState({columnWidths}, _ => {
@@ -674,19 +666,16 @@ class ListTable extends Component {
             iconStyle={{color: grey500}}
             onClick={this.onRemoveContacts}
             />
-            {
-              /*<AnalyzeSelected
-              selected={state.selected}>
-              {({onRequestOpen}) => (
-                <IconButton
-                tooltip='Analyze Selected Contacts'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-line-chart'
-                iconStyle={{color: grey500}}
-                onClick={onRequestOpen}
-                />)}
-              </AnalyzeSelected>*/
-            }
+            <AnalyzeSelected selected={state.selected} listId={props.listId}>
+            {({onRequestOpen}) => (
+              <IconButton
+              tooltip='Analyze Selected Contacts'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-line-chart'
+              iconStyle={{color: grey500}}
+              onClick={onRequestOpen}
+              />)}
+            </AnalyzeSelected>
           </div>}
           <div className='large-5 columns vertical-center'>
             <TextField
@@ -711,20 +700,11 @@ class ListTable extends Component {
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div>
-        {props.listData && props.listData.contacts === null &&
-          <div className='row horizontal-center vertical-center' style={{height: 400}}>
+        {props.listData && props.listData.contacts === null && <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+        {props.listData && props.received.length > 0 && state.columnWidths !== null &&
+          <ScrollSync>
+          {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
             <div>
-              <p>You haven't added any contacts. You will see a master sheet of them here after you added some.</p>
-              <ul>
-                <li>"Add Contact" icon on top to add ONE contact</li>
-                <li>"Go to Bulk Edit" to add MULTIPLE contacts</li>
-                <li>Go back to Home and "Upload from Existing" Excel sheet</li>
-              </ul>
-            </div>
-          </div>}
-          {props.listData && props.received.length > 0 && state.columnWidths !== null &&
-            <ScrollSync>
-            {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
               <div className='HeaderGridContainer'>
                 <Grid
                 ref={ref => this.setHeaderGridRef(ref)}
@@ -800,8 +780,8 @@ const mapStateToProps = (state, props) => {
       listData.contacts.map((contactId, i) => {
         if (state.contactReducer[contactId]) {
           let contact = state.contactReducer[contactId];
-          contacts.push(contact);
           received.push(contactId);
+          contacts.push(contact);
         }
       });
     }
