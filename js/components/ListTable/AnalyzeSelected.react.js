@@ -34,7 +34,8 @@ class AnalyzeSelected extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    console.log(props.data);
+    console.log(props.isReceiving);
+    console.log(props.dataMap);
     return (
       <div>
         <Dialog
@@ -44,20 +45,27 @@ class AnalyzeSelected extends Component {
         autoScrollBodyContent
         onRequestClose={_ => this.setState({open: false})}
         >
-          <LineChart
-          width={550}
-          height={300}
-          data={props.data}
-          margin={{top: 5, right: 40, left: 20, bottom: 5}}>
-            <XAxis dataKey='CreatedAt'/>
-            <YAxis/>
-            <CartesianGrid strokeDasharray='3 3'/>
-            <Tooltip/>
-            <Legend />
-            {props.contacts.map((id, i) => (
-              <Line key={i} type='monotone' dataKey={id} stroke={colors[i]} activeDot={{r: 8}}/>
-              ))}
-          </LineChart>
+        {props.selected.length > 0 && state.open && props.isReceiving &&
+          props.dataKeys.map((dataKey, i) => (
+            <div>
+              <span>{dataKey}</span>
+              <LineChart
+              key={i}
+              width={550}
+              height={300}
+              data={props.dataMap[dataKey]}
+              margin={{top: 5, right: 40, left: 20, bottom: 5}}>
+                <XAxis dataKey='CreatedAt'/>
+                <YAxis/>
+                <CartesianGrid strokeDasharray='3 3'/>
+                <Tooltip/>
+                {props.contacts.map((id, index) => (
+                  <Line key={index} type='monotone' dataKey={id} stroke={colors[i]} activeDot={{r: 8}}/>
+                  ))}
+              </LineChart>
+            </div>
+              ))
+        }
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
@@ -68,24 +76,30 @@ class AnalyzeSelected extends Component {
 
 const mapStateToProps = (state, props) => {
   const filledIds = props.selected.filter(id => state.twitterDataReducer[id]);
-  const graphDataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets'];
+  const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets'];
   // likes
-  let data = [];
+  let dataMap = {};
   if (props.selected.length > 0 && filledIds.length === props.selected.length) {
-    for (let i = 0; i < state.twitterDataReducer[filledIds[0]].received.length; i++) {
-      let obj = {CreatedAt: state.twitterDataReducer[filledIds[0]].received[i].CreatedAt};
-      filledIds.map(contactId => {
-        if (state.twitterDataReducer[contactId].received[i]) {
-          obj[contactId] = state.twitterDataReducer[contactId].received[i]['Likes'];
-        }
-      });
-      data.push(obj);
-    }
+    dataKeys.map(dataKey => {
+      let data = [];
+      for (let i = 0; i < state.twitterDataReducer[filledIds[0]].received.length; i++) {
+        let obj = {CreatedAt: state.twitterDataReducer[filledIds[0]].received[i].CreatedAt};
+        filledIds.map(contactId => {
+          if (state.twitterDataReducer[contactId].received[i]) {
+            obj[contactId] = state.twitterDataReducer[contactId].received[i][dataKey];
+          }
+        });
+        data.push(obj);
+      }
+      dataMap[dataKey] = data;
+    });
   }
 
   return {
     contacts: filledIds,
-    data
+    dataMap,
+    dataKeys,
+    isReceiving: filledIds.length !== props.selected.length
   };
 };
 
