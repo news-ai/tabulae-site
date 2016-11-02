@@ -1,8 +1,4 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import * as actionCreators from '../../actions/AppActions';
-import * as twitterDataActions from '../ContactProfile/SocialDataGraphs/Twitter/actions';
-import withRouter from 'react-router/lib/withRouter';
 
 import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
@@ -28,14 +24,13 @@ class AnalyzeSelected extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.open && this.state.open) {
-      this.props.fetchTwitterData(this.props.selected);
+      this.props.fetchData(this.props.selected);
     }
   }
 
   render() {
     const state = this.state;
     const props = this.props;
-    console.log(props.dataMap);
     return (
       <div>
         <Dialog
@@ -55,7 +50,7 @@ class AnalyzeSelected extends Component {
                   </div>
                   <div className='row'>
                     <LineChart
-                    syncId='syncdiz'
+                    syncId={props.syncid}
                     key={i}
                     width={720}
                     height={250}
@@ -65,7 +60,7 @@ class AnalyzeSelected extends Component {
                       <YAxis/>
                       <CartesianGrid strokeDasharray='3 3'/>
                       <Tooltip/>
-                      {props.twitterHandles.map((handle, index) => (
+                      {props.handles.map((handle, index) => (
                         <Line key={`${dataKey}-${index}`} type='monotone' dataKey={handle} stroke={colors[index]} activeDot={{r: 8}}/>
                         ))}
                     </LineChart>
@@ -81,45 +76,4 @@ class AnalyzeSelected extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  const filledIds = props.selected.filter(id => state.twitterDataReducer[id]);
-  const dataKeys = ['Likes', 'Posts', 'Followers', 'Following', 'Retweets'];
-  // likes
-  let dataMap = {};
-  if (props.selected.length > 0 && filledIds.length === props.selected.length) {
-    dataKeys.map(dataKey => {
-      let data = [];
-      for (let i = 0; i < state.twitterDataReducer[filledIds[0]].received.length; i++) {
-        const dateObj = new Date(state.twitterDataReducer[filledIds[0]].received[i].CreatedAt);
-        let obj = {
-          CreatedAt: state.twitterDataReducer[filledIds[0]].received[i].CreatedAt,
-          dateString: dateObj.toDateString()
-        };
-        filledIds.map(contactId => {
-          if (state.twitterDataReducer[contactId].received[i]) {
-            obj[state.contactReducer[contactId].twitter] = state.twitterDataReducer[contactId].received[i][dataKey];
-          }
-        });
-        data.push(obj);
-      }
-      dataMap[dataKey] = data;
-    });
-  }
-
-  return {
-    contacts: filledIds,
-    twitterHandles: filledIds.map(id => state.contactReducer[id].twitter),
-    dataMap,
-    dataKeys,
-    isReceiving: filledIds.length !== props.selected.length
-  };
-};
-
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    fetchLists: _ => dispatch(actionCreators.fetchLists()),
-    fetchTwitterData: selected => dispatch(twitterDataActions.fetchMultipleContactTwitterData(props.listId, selected, 7)),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AnalyzeSelected));
+export default AnalyzeSelected;

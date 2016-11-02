@@ -35,8 +35,9 @@ import AddOrHideColumns from './AddOrHideColumns.react';
 import AddContact from './AddContact.react';
 import EditContact from './EditContact.react';
 import PanelOverlay from './PanelOverlay.react';
-import AnalyzeSelected from './AnalyzeSelected.react';
 import EmptyListStatement from './EmptyListStatement.react';
+import AnalyzeSelectedTwitterContainer from './AnalyzeSelectedTwitterContainer.react';
+import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContainer.react';
 
 import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
 import alertify from 'alertifyjs';
@@ -666,7 +667,7 @@ class ListTable extends Component {
             iconStyle={{color: grey500}}
             onClick={this.onRemoveContacts}
             />
-            <AnalyzeSelected selected={state.selected} listId={props.listId}>
+            <AnalyzeSelectedTwitterContainer selected={state.selected} listId={props.listId}>
             {({onRequestOpen}) => (
               <IconButton
               tooltip='Analyze Selected Contacts'
@@ -675,7 +676,17 @@ class ListTable extends Component {
               iconStyle={{color: grey500}}
               onClick={onRequestOpen}
               />)}
-            </AnalyzeSelected>
+            </AnalyzeSelectedTwitterContainer>
+            <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
+            {({onRequestOpen}) => (
+              <IconButton
+              tooltip='Analyze Selected Contacts'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-line-chart'
+              iconStyle={{color: grey500}}
+              onClick={onRequestOpen}
+              />)}
+            </AnalyzeSelectedInstagramContainer>
           </div>}
           <div className='large-5 columns vertical-center'>
             <TextField
