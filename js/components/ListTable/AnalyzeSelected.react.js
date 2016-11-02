@@ -17,8 +17,6 @@ function divide(numerator, denomenator, fixedTo) {
 
 const GraphSeriesItem = props => {
   let data = props.dataMap[props.dataKey];
-  console.log(props.averageBySelected);
-  console.log(props.dataMap[props.averageBySelected]);
   if (props.averageBySelected && props.averageBySelected !== null) {
     data = data.map((oldDataObj, i) => {
       let dataObj = Object.assign({}, oldDataObj);
@@ -27,7 +25,6 @@ const GraphSeriesItem = props => {
       ));
       return dataObj;
     });
-    console.log(data);
   }
 
   return (
@@ -39,7 +36,7 @@ const GraphSeriesItem = props => {
         <div className='row'>
           <LineChart
           syncId={props.syncid}
-          key={`graph-${props.key}`}
+          key={`graph-${props.passdownkey}`}
           width={720}
           height={250}
           data={data}
@@ -100,7 +97,7 @@ class AnalyzeSelected extends Component {
             props.dataKeys.map((dataKey, i) => {
               if (state.averageBySelected && state.averageBySelected !== null && state.averageBySelected === dataKey) return null;
               return (
-              <GraphSeriesItem key={i} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
+              <GraphSeriesItem passdownkey={i} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
               );
             })}
         </Dialog>
