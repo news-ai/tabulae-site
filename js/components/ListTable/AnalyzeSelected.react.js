@@ -36,7 +36,6 @@ const GraphSeriesItem = props => {
         <div className='row'>
           <LineChart
           syncId={props.syncid}
-          key={`graph-${props.passdownkey}`}
           width={720}
           height={250}
           data={data}
@@ -46,7 +45,7 @@ const GraphSeriesItem = props => {
             <CartesianGrid strokeDasharray='3 3'/>
             <Tooltip/>
             {props.handles.map((handle, index) => (
-              <Line key={`${props.dataKey}-${index}`} type='monotone' dataKey={handle} stroke={colors[index]} activeDot={{r: 8}}/>
+              <Line key={`${props.dataKey}-${props.passdownkey}-${index}`} type='monotone' dataKey={handle} stroke={colors[index]} activeDot={{r: 8}}/>
               ))}
           </LineChart>
         </div>
@@ -97,7 +96,7 @@ class AnalyzeSelected extends Component {
             props.dataKeys.map((dataKey, i) => {
               if (state.averageBySelected && state.averageBySelected !== null && state.averageBySelected === dataKey) return null;
               return (
-              <GraphSeriesItem passdownkey={i} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
+              <GraphSeriesItem key={`wrapper-graph-${i}`} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
               );
             })}
         </Dialog>
