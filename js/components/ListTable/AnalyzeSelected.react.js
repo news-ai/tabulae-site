@@ -39,7 +39,7 @@ const GraphSeriesItem = props => {
         <div className='row'>
           <LineChart
           syncId={props.syncid}
-          key={props.key}
+          key={`graph-${props.key}`}
           width={720}
           height={250}
           data={data}
@@ -100,7 +100,7 @@ class AnalyzeSelected extends Component {
             props.dataKeys.map((dataKey, i) => {
               if (state.averageBySelected && state.averageBySelected !== null && state.averageBySelected === dataKey) return null;
               return (
-              <GraphSeriesItem key={`graph-${i}`} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
+              <GraphSeriesItem key={i} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
               );
             })}
         </Dialog>
