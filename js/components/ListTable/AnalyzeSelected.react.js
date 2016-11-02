@@ -100,7 +100,7 @@ class AnalyzeSelected extends Component {
             props.dataKeys.map((dataKey, i) => {
               if (state.averageBySelected && state.averageBySelected !== null && state.averageBySelected === dataKey) return null;
               return (
-              <GraphSeriesItem averageBySelected={state.averageBySelected} key={i} dataKey={dataKey} {...props}/>
+              <GraphSeriesItem key={`graph-${i}`} averageBySelected={state.averageBySelected} dataKey={dataKey} {...props}/>
               );
             })}
         </Dialog>
