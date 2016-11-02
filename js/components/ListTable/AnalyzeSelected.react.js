@@ -39,6 +39,7 @@ const GraphSeriesItem = props => {
         <div className='row'>
           <LineChart
           syncId={props.syncid}
+          key={props.key}
           width={720}
           height={250}
           data={data}
