@@ -63,13 +63,11 @@ class AnalyzeSelected extends Component {
                     <CartesianGrid strokeDasharray='3 3'/>
                     <Tooltip/>
                     {props.contacts.map((id, index) => (
-                      <Line key={index} type='monotone' dataKey={id} stroke={colors[i]} activeDot={{r: 8}}/>
+                      <Line key={`${dataKey}-${index}`} type='monotone' dataKey={id} stroke={colors[i]} activeDot={{r: 8}}/>
                       ))}
                   </LineChart>
                 </div>
-              </div>
-                ))
-          }
+              </div>))}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
@@ -90,7 +88,7 @@ const mapStateToProps = (state, props) => {
         const dateObj = new Date(state.twitterDataReducer[filledIds[0]].received[i].CreatedAt);
         let obj = {
           CreatedAt: state.twitterDataReducer[filledIds[0]].received[i].CreatedAt,
-          dateString: `${dateObj.getMonth()}-${dateObj.getDay()}`
+          dateString: dateObj.toDateString()
         };
         filledIds.map(contactId => {
           if (state.twitterDataReducer[contactId].received[i]) {
