@@ -87,6 +87,7 @@ class ScatterPlot extends Component {
     const props = this.props;
     return (
       <div>
+      {/*
         <Dialog
         title='Who are beating the Average?'
         open={state.open}
@@ -106,7 +107,8 @@ class ScatterPlot extends Component {
               <Tooltip cursor={{strokeDasharray: '3 3'}}/>
             </ScatterChart>
           }
-        </Dialog>
+        </Dialog>*/
+      }
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
         })}

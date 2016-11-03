@@ -36,7 +36,7 @@ function createParser(url) {
   return parser;
 }
 
-class AddContact extends Component {
+class AddContactHOC extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -287,5 +287,5 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddContact);
+export default connect(mapStateToProps, mapDispatchToProps)(AddContactHOC);
 
