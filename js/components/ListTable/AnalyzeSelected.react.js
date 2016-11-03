@@ -4,6 +4,7 @@ import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import FlatButton from 'material-ui/FlatButton';
 import {XAxis, YAxis, CartesianGrid, Line, Tooltip, LineChart} from 'recharts';
 import * as c from 'material-ui/styles/colors';
 
@@ -83,7 +84,8 @@ class AnalyzeSelected extends Component {
         <Dialog
         title='Analyze Selected'
         open={state.open}
-        modal={false}
+        modal
+        actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
         autoScrollBodyContent
         onRequestClose={_ => this.setState({open: false})}
         >

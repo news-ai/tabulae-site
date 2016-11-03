@@ -39,6 +39,7 @@ import PanelOverlay from './PanelOverlay.react';
 import EmptyListStatement from './EmptyListStatement.react';
 import AnalyzeSelectedTwitterContainer from './AnalyzeSelectedTwitterContainer.react';
 import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContainer.react';
+import ScatterPlot from './ScatterPlot.react';
 
 import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
 import alertify from 'alertifyjs';
@@ -86,7 +87,6 @@ class ListTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      analyzeMenuOpen: false,
       searchValue: '',
       isSearchOn: false,
       errorText: '',
@@ -683,33 +683,40 @@ class ListTable extends Component {
             }
           </div>
           <div className='large-2 columns vertical-center'>
-            <IconMenu
-            open={state.analyzeMenuOpen}
-            onRequestChange={analyzeMenuOpen => this.setState({analyzeMenuOpen})}
-            onItemTuchTap={_ => this.setState({analyzeMenuOpen: false})}
-            iconButtonElement={<FontIcon className='fa fa-line-chart'/>}
-            anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-            >
-             <AnalyzeSelectedTwitterContainer selected={state.selected} listId={props.listId}>
-              {({onRequestOpen}) => (
-                <MenuItem
-                primaryText='Twitter Contacts'
-                leftIcon={<FontIcon className='fa fa-twitter'/>}
-                iconStyle={{color: grey500}}
-                onClick={onRequestOpen}
-                />)}
-              </AnalyzeSelectedTwitterContainer>
+            <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
+            {sc => (
               <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
-              {({onRequestOpen}) => (
-                <MenuItem
-                primaryText='Instagram Contacts'
-                leftIcon={<FontIcon className='fa fa-instagram'/>}
-                iconStyle={{color: grey500}}
-                onClick={onRequestOpen}
-                />)}
+              {inst => (
+               <AnalyzeSelectedTwitterContainer selected={state.selected} listId={props.listId}>
+                {twt => (
+                  <IconMenu
+                  iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
+                  anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+                  targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                  >
+                    <MenuItem
+                    primaryText='Twitter Contacts'
+                    leftIcon={<FontIcon className='fa fa-twitter'/>}
+                    iconStyle={{color: grey500}}
+                    onTouchTap={twt.onRequestOpen}
+                    />
+                    <MenuItem
+                    primaryText='Instagram Contacts'
+                    leftIcon={<FontIcon className='fa fa-instagram'/>}
+                    iconStyle={{color: grey500}}
+                    onTouchTap={inst.onRequestOpen}
+                    />
+                    <MenuItem
+                    primaryText='Which is Best'
+                    leftIcon={<FontIcon className='fa fa-area-chart'/>}
+                    iconStyle={{color: grey500}}
+                    onTouchTap={sc.onRequestOpen}
+                    />
+                  </IconMenu>)}
+                </AnalyzeSelectedTwitterContainer>)}
               </AnalyzeSelectedInstagramContainer>
-            </IconMenu>
+              )}
+           </ScatterPlot>
           </div>
         </div>
         {state.isEmailPanelOpen &&
