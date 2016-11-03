@@ -540,12 +540,7 @@ class ListTable extends Component {
   }
 
   _onExportClick() {
-    if (this.props.contacts.length < this.props.listData.contacts.length) {
-      this.props.fetchAllContacts(this.props.listId)
-      .then(_ => exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name));
-    } else {
-      exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name);
-    }
+    exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name);
   }
 
   _onRemoveContacts() {
