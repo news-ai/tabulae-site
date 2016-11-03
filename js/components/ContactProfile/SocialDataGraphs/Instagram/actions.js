@@ -21,3 +21,24 @@ export function fetchContactInstagramData(contactId) {
     .catch(err => dispatch({type: instagramDataConstant.REQUEST_FAIL, message: err}));
   };
 }
+
+export function fetchMultipleContactInstagramData(listId, contacts, days) {
+  return (dispatch, getState) => {
+    dispatch({type: instagramDataConstant.REQUEST_MULTIPLE, contacts, days, listId});
+    return api.post(`/lists/${listId}/instagramtimeseries`, {ids: contacts, days})
+    .then(response => {
+      let contact, contactData;
+      contacts.map(contactId => {
+        contact = getState().contactReducer[contactId];
+        contactData = response.data.filter(obj => obj.Username === contact.instagram);
+        dispatch({
+          type: instagramDataConstant.RECEIVE,
+          contactId: contact.id,
+          data: contactData,
+          offset: getState().instagramDataReducer[contact.id]
+        });
+      });
+    })
+    .catch(err => dispatch({type: instagramDataConstant.REQUEST_MULTIPLE_FAIL, message: err}));
+  };
+}

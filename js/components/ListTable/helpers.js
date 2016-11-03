@@ -9,6 +9,27 @@ export function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+function instagramLikesToPosts(listData) {
+  const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
+  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
+  if (likesColumn && commentsColumn) {
+    return {
+      name: 'likes-to-posts',
+      value: 'likes_to_posts',
+      hidden: false,
+      tableOnly: true,
+      hideCheckbox: true,
+      customfield: false,
+      sortEnabled: true,
+      description: 'Auto-generated when likes and posts are visible',
+      strategy: contact =>
+      contact.instagramlikes &&
+      contact.instagramposts &&
+      divide(contact.instagramlikes, contact.instagramposts, 0.001)
+    };
+  }
+}
+
 function instagramLikesToComments(listData) {
   const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
   const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
@@ -118,6 +139,7 @@ export function generateTableFieldsmap(listData) {
     ...listData.fieldsmap
     .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     instagramLikesToComments(listData),
+    instagramLikesToPosts(listData),
     instagramLikesToFollowers(listData),
     instagramCommentsToFollowers(listData),
     publicationColumn(listData)
@@ -149,7 +171,7 @@ export function escapeHtml(unsafe) {
 export function convertToCsvString(contacts, fieldsmap) {
   let base = 'data:text/csv;charset=utf-8,';
   const filteredfieldsmap = fieldsmap
-  .filter(fieldObj => fieldObj.value !== 'selected' || fieldObj.data !== 'profile' || !fieldObj.hidden);
+  .filter(fieldObj => !fieldObj.hidden && !fieldObj.tableOnly);
   base += filteredfieldsmap.map(fieldObj => fieldObj.name).toString() + '\n';
   contacts.map(contact => {
     let rowStringArray = [];

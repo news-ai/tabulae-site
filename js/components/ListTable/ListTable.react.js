@@ -12,6 +12,7 @@ import {tour} from './tour';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
+import IconMenu from 'material-ui/IconMenu';
 import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -23,9 +24,9 @@ import Checkbox from 'material-ui/Checkbox';
 import {blue100, blue200, blue300, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
-import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import Dialog from 'material-ui/Dialog';
 
+import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
@@ -35,16 +36,12 @@ import AddOrHideColumns from './AddOrHideColumns.react';
 import AddContact from './AddContact.react';
 import EditContact from './EditContact.react';
 import PanelOverlay from './PanelOverlay.react';
-import AnalyzeSelected from './AnalyzeSelected.react';
+import EmptyListStatement from './EmptyListStatement.react';
+import AnalyzeSelectedTwitterContainer from './AnalyzeSelectedTwitterContainer.react';
+import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContainer.react';
+import ScatterPlot from './ScatterPlot.react';
 
-import {
-  generateTableFieldsmap,
-  measureSpanSize,
-  escapeHtml,
-  convertToCsvString,
-  exportOperations,
-  isNumber
-} from './helpers';
+import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
@@ -83,7 +80,6 @@ function _getter(contact, fieldObj) {
     else return contact[fieldObj.value];
   }
 }
-
 
 const localStorage = window.localStorage;
 
@@ -191,7 +187,6 @@ class ListTable extends Component {
           });
           columnWidths[i] = max;
         });
-       
       }
 
       this.setState({columnWidths}, _ => {
@@ -547,12 +542,7 @@ class ListTable extends Component {
   }
 
   _onExportClick() {
-    if (this.props.contacts.length < this.props.listData.contacts.length) {
-      this.props.fetchAllContacts(this.props.listId)
-      .then(_ => exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name));
-    } else {
-      exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name);
-    }
+    exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name);
   }
 
   _onRemoveContacts() {
@@ -614,81 +604,70 @@ class ListTable extends Component {
           <div className='large-3 medium-4 columns vertical-center'>
             {props.listData && <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>}
           </div>
-          {props.listData && <div className='large-4 medium-4 columns vertical-center'>
-            <IconButton
-            tooltip='Email'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-envelope'
-            iconStyle={{color: grey500}}
-            onClick={_ => this.setState({isEmailPanelOpen: true})}
-            disabled={state.isEmailPanelOpen || props.listData.readonly}
-            />
-            <IconButton
-            tooltip='Export'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-download'
-            iconStyle={{color: grey500}}
-            onClick={this.onExportClick}
-            />
-            <CopyOrMoveTo
-            selected={state.selected}>
-            {({onRequestOpen}) => (
+          {props.listData &&
+            <div className='large-4 medium-4 columns vertical-center'>
               <IconButton
-              id='copy_contacts_hop'
-              tooltip='Copy to Another Table'
+              tooltip='Email'
               tooltipPosition='top-left'
-              iconClassName='fa fa-copy'
+              iconClassName='fa fa-envelope'
               iconStyle={{color: grey500}}
-              onClick={onRequestOpen}
-              />)}
-            </CopyOrMoveTo>
-            <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
-            {({onRequestOpen}) => (
+              onClick={_ => this.setState({isEmailPanelOpen: true})}
+              disabled={state.isEmailPanelOpen || props.listData.readonly}
+              />
               <IconButton
-              id='add_remove_columns_hop'
-              disabled={props.listData.readonly}
-              tooltip='Show/Hide columns'
+              tooltip='Export'
               tooltipPosition='top-left'
-              iconClassName='fa fa-table'
+              iconClassName='fa fa-download'
               iconStyle={{color: grey500}}
-              onClick={onRequestOpen}
-              />)}
-            </AddOrHideColumns>
-            <AddContact listId={props.listId}>
-            {({onRequestOpen}) => (
-              <IconButton
-              tooltip='Add New Contact'
-              id='add_contact_hop'
-              disabled={props.listData.readonly}
-              tooltipPosition='top-left'
-              iconClassName='fa fa-plus'
-              iconStyle={{color: grey500}}
-              onClick={onRequestOpen}
-              />)}
-            </AddContact>
-            <IconButton
-            tooltip='Delete Contact'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-trash'
-            disabled={props.listData.readonly}
-            iconStyle={{color: grey500}}
-            onClick={this.onRemoveContacts}
-            />
-            {
-              /*<AnalyzeSelected
+              onClick={this.onExportClick}
+              />
+              <CopyOrMoveTo
               selected={state.selected}>
               {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Analyze Selected Contacts'
+                id='copy_contacts_hop'
+                tooltip='Copy to Another Table'
                 tooltipPosition='top-left'
-                iconClassName='fa fa-line-chart'
+                iconClassName='fa fa-copy'
                 iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
-              </AnalyzeSelected>*/
-            }
-          </div>}
-          <div className='large-5 columns vertical-center'>
+              </CopyOrMoveTo>
+              <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
+              {({onRequestOpen}) => (
+                <IconButton
+                id='add_remove_columns_hop'
+                disabled={props.listData.readonly}
+                tooltip='Show/Hide columns'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-table'
+                iconStyle={{color: grey500}}
+                onClick={onRequestOpen}
+                />)}
+              </AddOrHideColumns>
+              <AddContact listId={props.listId}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Add New Contact'
+                id='add_contact_hop'
+                disabled={props.listData.readonly}
+                tooltipPosition='top-left'
+                iconClassName='fa fa-plus'
+                iconStyle={{color: grey500}}
+                onClick={onRequestOpen}
+                />)}
+              </AddContact>
+              <IconButton
+              tooltip='Delete Contact'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-trash'
+              disabled={props.listData.readonly}
+              iconStyle={{color: grey500}}
+              onClick={this.onRemoveContacts}
+              />
+              
+            </div>}
+          <div className='large-3 columns vertical-center'>
             <TextField
             id='search-input'
             hintText='Search...'
@@ -698,8 +677,50 @@ class ListTable extends Component {
             errorText={state.errorText}
             />
             <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-            {props.listData && !props.listData.readonly && <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />}
+            {
+              /*props.listData && !props.listData.readonly &&
+              <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />*/
+            }
           </div>
+          {
+            /*props.fieldsmap !== null && <div className='large-2 columns vertical-center'>
+            <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
+            {sc => (
+              <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
+              {inst => (
+               <AnalyzeSelectedTwitterContainer selected={state.selected} listId={props.listId}>
+                {twt => (
+                  <IconMenu
+                  iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
+                  anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+                  targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                  >
+                    <MenuItem
+                    primaryText='Twitter Contacts'
+                    leftIcon={<FontIcon className='fa fa-twitter'/>}
+                    onTouchTap={twt.onRequestOpen}
+                    />
+                    <MenuItem
+                    primaryText='Instagram Contacts'
+                    leftIcon={<FontIcon className='fa fa-instagram'/>}
+                    onTouchTap={inst.onRequestOpen}
+                    />
+                    <MenuItem
+                    primaryText='Which is Best'
+                    leftIcon={<FontIcon className='fa fa-area-chart'/>}
+                    onTouchTap={sc.onRequestOpen}
+                    disabled={
+                      !props.fieldsmap.some(fieldObj => fieldObj.value === 'likes_to_posts') ||
+                      !props.fieldsmap.some(fieldObj => fieldObj.value === 'instagramfollowers')
+                    }
+                    />
+                  </IconMenu>)}
+                </AnalyzeSelectedTwitterContainer>)}
+              </AnalyzeSelectedInstagramContainer>
+              )}
+           </ScatterPlot>
+          </div>*/
+          }
         </div>
         {state.isEmailPanelOpen &&
           <EmailPanel
@@ -711,20 +732,11 @@ class ListTable extends Component {
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div>
-        {props.listData && props.listData.contacts === null &&
-          <div className='row horizontal-center vertical-center' style={{height: 400}}>
+        {props.listData && props.listData.contacts === null && <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+        {props.listData && props.received.length > 0 && state.columnWidths !== null &&
+          <ScrollSync>
+          {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
             <div>
-              <p>You haven't added any contacts. You will see a master sheet of them here after you added some.</p>
-              <ul>
-                <li>"Add Contact" icon on top to add ONE contact</li>
-                <li>"Go to Bulk Edit" to add MULTIPLE contacts</li>
-                <li>Go back to Home and "Upload from Existing" Excel sheet</li>
-              </ul>
-            </div>
-          </div>}
-          {props.listData && props.received.length > 0 && state.columnWidths !== null &&
-            <ScrollSync>
-            {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) => <div>
               <div className='HeaderGridContainer'>
                 <Grid
                 ref={ref => this.setHeaderGridRef(ref)}
@@ -800,8 +812,8 @@ const mapStateToProps = (state, props) => {
       listData.contacts.map((contactId, i) => {
         if (state.contactReducer[contactId]) {
           let contact = state.contactReducer[contactId];
-          contacts.push(contact);
           received.push(contactId);
+          contacts.push(contact);
         }
       });
     }

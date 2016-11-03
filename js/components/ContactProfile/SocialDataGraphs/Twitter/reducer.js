@@ -10,21 +10,35 @@ function twitterDataReducer(state = initialState.twitterDataReducer, action) {
   if (!canAccessReducer(action.type, types)) return state;
 
   let obj = assignToEmpty(state, {});
+  let oldContact, filteredData;
   switch (action.type) {
     case twitterDataConstant.REQUEST:
       obj.isReceiving = true;
       return obj;
     case twitterDataConstant.RECEIVE:
-      const oldContact = state[action.contactId] || {received: []};
+      oldContact = state[action.contactId] || {received: []};
+      filteredData = action.data.filter(dataObj => !oldContact.received.some(dObj => dObj.CreatedAt === dataObj.CreatedAt));
       obj[action.contactId] = assignToEmpty(
         state[action.contactId], {
           received: [
-            ...action.data.reverse(),
+            ...filteredData.reverse(),
             ...oldContact.received,
           ],
           offset: action.offset
         });
       obj.isReceiving = false;
+      return obj;
+    case twitterDataConstant.REQUEST_MULTIPLE:
+      obj.isReceiving = true;
+      obj.didInvalidate = false;
+      return obj;
+    case twitterDataReducer.RECEIVE_MULTIPLE:
+      obj.isReceiving = false;
+      obj.didInvalidate = false;
+      return obj;
+    case twitterDataConstant.REQUEST_MULTIPLE_FAIL:
+      obj.isReceiving = true;
+      obj.didInvalidate = true;
       return obj;
     case twitterDataConstant.REQUEST_FAIL:
       obj.didInvalidate = true;
