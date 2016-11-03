@@ -682,7 +682,8 @@ class ListTable extends Component {
               <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />*/
             }
           </div>
-          <div className='large-2 columns vertical-center'>
+          {
+            /*props.fieldsmap !== null && <div className='large-2 columns vertical-center'>
             <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
             {sc => (
               <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
@@ -697,27 +698,29 @@ class ListTable extends Component {
                     <MenuItem
                     primaryText='Twitter Contacts'
                     leftIcon={<FontIcon className='fa fa-twitter'/>}
-                    iconStyle={{color: grey500}}
                     onTouchTap={twt.onRequestOpen}
                     />
                     <MenuItem
                     primaryText='Instagram Contacts'
                     leftIcon={<FontIcon className='fa fa-instagram'/>}
-                    iconStyle={{color: grey500}}
                     onTouchTap={inst.onRequestOpen}
                     />
                     <MenuItem
                     primaryText='Which is Best'
                     leftIcon={<FontIcon className='fa fa-area-chart'/>}
-                    iconStyle={{color: grey500}}
                     onTouchTap={sc.onRequestOpen}
+                    disabled={
+                      !props.fieldsmap.some(fieldObj => fieldObj.value === 'likes_to_posts') ||
+                      !props.fieldsmap.some(fieldObj => fieldObj.value === 'instagramfollowers')
+                    }
                     />
                   </IconMenu>)}
                 </AnalyzeSelectedTwitterContainer>)}
               </AnalyzeSelectedInstagramContainer>
               )}
            </ScatterPlot>
-          </div>
+          </div>*/
+          }
         </div>
         {state.isEmailPanelOpen &&
           <EmailPanel

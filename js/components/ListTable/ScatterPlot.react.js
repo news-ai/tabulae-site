@@ -3,8 +3,19 @@ import React, {Component} from 'react';
 import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import {ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Line, Tooltip, LineChart} from 'recharts';
+import {
+  ComposedChart,
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Line,
+  Tooltip,
+  LineChart
+} from 'recharts';
 import * as c from 'material-ui/styles/colors';
+import regression from 'regression';
 
 const colors = [
   c.red300, c.blue300, c.purple300, c.cyan300, c.green300, c.indigo300, c.orange300,
@@ -21,15 +32,6 @@ function divide(numerator, denomenator, fixedTo) {
   if (!isNaN(res)) return res;
 }
 
-// const data = [
-// {x: 100, y: 200, z: 200},
-// {x: 120, y: 100, z: 260},
-// {x: 170, y: 300, z: 400},
-// {x: 140, y: 250, z: 280},
-// {x: 150, y: 400, z: 500},
-// {x: 110, y: 280, z: 200}
-// ];
-
 class ScatterPlot extends Component {
   constructor(props) {
     super(props);
@@ -37,8 +39,10 @@ class ScatterPlot extends Component {
       open: false,
       value: [],
       averageBySelected: null,
-      data: null
+      data: null,
+      dataArray: [],
     };
+    this.getRegression = this._getRegression.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -48,23 +52,32 @@ class ScatterPlot extends Component {
       nextProps.contacts.length > 0
       ) {
       const xfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === 'likes_to_posts');
+      if (!xfieldObj) return;
       const data = nextProps.contacts.map(contactObj => {
-        contactObj[xfieldObj.value] = parseFloat(xfieldObj.strategy(contactObj));
-        contactObj.instagramfollowers = parseFloat(contactObj.instagramfollowers);
-        return contactObj;
+        let obj = {};
+        obj.x = parseFloat(xfieldObj.strategy(contactObj));
+        obj.y = parseFloat(contactObj.instagramfollowers);
+        return obj;
       })
-      .filter(contactObj => contactObj[xfieldObj.value] && contactObj.instagramfollowers);
+      .filter(obj => obj.x && obj.y);
       this.setState({data});
     }
+  }
+
+  _getRegression() {
+    const dataArray = this.state.data.map(obj => [obj.x, obj.y]);
+    const result = regression('linear', dataArray);
+    const m = result[0];
+    const c = result[1];
   }
 
   render() {
     const state = this.state;
     const props = this.props;
-    console.log(state.data);
     return (
       <div>
-        <Dialog
+        {/*
+          <Dialog
         title='Who are beating the Average?'
         open={state.open}
         modal
@@ -73,14 +86,17 @@ class ScatterPlot extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <Waiting isReceiving={props.isReceiving}/>
-          {state.open && <ScatterChart width={400} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-            <XAxis dataKey={'likes_to_posts'} name='stature' unit='cm'/>
-            <YAxis dataKey={'instagramfollowers'} name='weight' unit='kg'/>
-            <Scatter name='A school' data={state.data} fill='#8884d8'/>
-            <CartesianGrid />
-            <Tooltip cursor={{strokeDasharray: '3 3'}}/>
-          </ScatterChart>}
-        </Dialog>
+          {state.open &&
+            <ComposedChart data={state.data} width={400} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+              <XAxis dataKey={'x'} name='likes_to_posts'/>
+              <YAxis dataKey={'y'} name='followers'/>
+              <Scatter fill='#8884d8'/>
+              <CartesianGrid/>
+              <Tooltip cursor={{strokeDasharray: '3 3'}}/>
+            </ComposedChart>
+          }
+        </Dialog>*/
+      }
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
         })}
