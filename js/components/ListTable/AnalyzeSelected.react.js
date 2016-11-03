@@ -5,9 +5,16 @@ import Dialog from 'material-ui/Dialog';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {XAxis, YAxis, CartesianGrid, Line, Tooltip, LineChart} from 'recharts';
-import {red300, blue300, purple300, cyan300, green300, indigo300, orange300} from 'material-ui/styles/colors';
+import * as c from 'material-ui/styles/colors';
 
-const colors = [red300, blue300, purple300, cyan300, green300, indigo300, orange300];
+const colors = [
+  c.red300, c.blue300, c.purple300, c.cyan300, c.green300, c.indigo300, c.orange300,
+  c.red400, c.blue400, c.purple400, c.cyan400, c.green400, c.indigo400, c.orange400,
+  c.red500, c.blue500, c.purple500, c.cyan500, c.green500, c.indigo500, c.orange500,
+  c.red600, c.blue600, c.purple600, c.cyan600, c.green600, c.indigo600, c.orange600,
+  c.red700, c.blue700, c.purple700, c.cyan700, c.green700, c.indigo700, c.orange700,
+  c.red800, c.blue800, c.purple800, c.cyan800, c.green800, c.indigo800, c.orange800,
+];
 
 function divide(numerator, denomenator, fixedTo) {
   if (numerator === undefined || denomenator === undefined) return undefined;
@@ -45,7 +52,7 @@ const GraphSeriesItem = props => {
             <CartesianGrid strokeDasharray='3 3'/>
             <Tooltip/>
             {props.handles.map((handle, index) => (
-              <Line key={`${props.dataKey}-${props.passdownkey}-${index}`} type='monotone' dataKey={handle} stroke={colors[index]} activeDot={{r: 8}}/>
+              <Line key={`${props.dataKey}-${props.passdownkey}-${index}`} type='monotone' dataKey={handle} stroke={index - 1 > colors.length ? colors[index % colors.length] : colors[index]} activeDot={{r: 8}}/>
               ))}
           </LineChart>
         </div>
@@ -92,7 +99,9 @@ class AnalyzeSelected extends Component {
               </DropDownMenu>
             </div>
           }
-          {props.selected.length > 0 && state.open && !props.isReceiving &&
+          {props.selected.length > 0 &&
+            state.open &&
+            !props.isReceiving &&
             props.dataKeys.map((dataKey, i) => {
               if (state.averageBySelected && state.averageBySelected !== null && state.averageBySelected === dataKey) return null;
               return (
