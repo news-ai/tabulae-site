@@ -75,9 +75,6 @@ class ScatterPlot extends Component {
       if (this.state.data[i].x < min) min = this.state.data[i].x;
       if (this.state.data[i].x > max) max = this.state.data[i].x;
     }
-    console.log(min);
-    console.log(max);
-    console.log(result);
     this.setState({
       regressionData: [
         {y: m * min + cc, x: min},
@@ -88,7 +85,6 @@ class ScatterPlot extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    console.log(state.regressionData);
     return (
       <div>
         <Dialog
