@@ -124,8 +124,8 @@ export function fetchTagLists(tagQuery) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     let OFFSET = getState().listReducer.tagOffset;
-    if (OFFSET === null || getState().listReducer.isReceiving) return;
     if (tagQuery !== getState().listReducer.tagQuery) OFFSET = 0;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
     dispatch(requestLists());
     return api.get(`/lists?q=tag:${tagQuery}&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {

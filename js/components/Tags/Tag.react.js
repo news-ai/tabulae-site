@@ -11,7 +11,7 @@ const Tag = ({text, onDeleteTag, hideDelete, router}) => (
     borderRight: `1px solid ${blue200}`,
     borderBottom: `1px solid ${blue200}`,
   }}>
-    <span onClick={_ => router.push(`?tag=${text}`)} style={{color: grey800, fontSize: '0.8em', cursor: 'pointer'}}>{text}</span>
+    <span onClick={_ => router.push(`/tags/${text}`)} style={{color: grey800, fontSize: '0.8em', cursor: 'pointer'}}>{text}</span>
     {!hideDelete &&
       <FontIcon
       onClick={onDeleteTag}
