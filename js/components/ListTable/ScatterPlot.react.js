@@ -82,7 +82,7 @@ class ScatterPlot extends Component {
       objX = this.state.data[i].x;
       objY = this.state.data[i].y;
       tempY = m * objX + cc;
-      if (objY > tempY) above.push(Object.assign({}, this.state.data[i]));
+      if (objY >= tempY) above.push(Object.assign({}, this.state.data[i]));
       else below.push(Object.assign({}, this.state.data[i]));
       if (objX < min) min = objX;
       if (objX > max) max = objX;
@@ -113,7 +113,7 @@ class ScatterPlot extends Component {
           <Waiting isReceiving={props.isReceiving}/>
           {state.open &&
             <div>
-              <ScatterChart data={state.data} width={600} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+              <ScatterChart data={state.data} width={700} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
                 <XAxis dataKey={'x'} name='likes_to_posts'/>
                 <YAxis dataKey={'y'} name='followers'/>
                 <ZAxis dataKey={'username'} name='username'/>
@@ -123,8 +123,22 @@ class ScatterPlot extends Component {
                 <Tooltip cursor={{strokeDasharray: '3 3'}}/>
               </ScatterChart>
               <div>
-                {state.above.map(obj => <Chip style={{margin: 2}} backgroundColor={c.blue200} key={`chip-${obj.id}`} onTouchTap={_ => props.router(`/tables/${props.listId}/${obj.id}`)}>{obj.username}</Chip>)}
-                {state.below.map(obj => <Chip style={{margin: 2}} backgroundColor={c.red200} key={`chip-${obj.id}`} onTouchTap={_ => props.router(`/tables/${props.listId}/${obj.id}`)}>{obj.username}</Chip>)}
+                {state.above.map(obj =>
+                  <Chip
+                  style={{margin: 2}}
+                  backgroundColor={c.blue200}
+                  key={`chip-${obj.id}`}
+                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                  {obj.username}
+                  </Chip>)}
+                {state.below.map(obj =>
+                  <Chip
+                  style={{margin: 2}}
+                  backgroundColor={c.red200}
+                  key={`chip-${obj.id}`}
+                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                  {obj.username}
+                  </Chip>)}
               </div>
             </div>
           }
