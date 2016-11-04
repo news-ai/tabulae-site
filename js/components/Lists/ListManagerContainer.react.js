@@ -9,6 +9,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Lists from './Lists';
 import InfiniteScroll from '../InfiniteScroll';
 import DropFileWrapper from '../pages/DropFileWrapper.react';
+import TextField from 'material-ui/TextField';
 
 import {grey500} from 'material-ui/styles/colors';
 
@@ -19,6 +20,9 @@ import {tour} from './tour';
 class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      tagValue: this.props.tagQuery
+    }
   }
 
   componentDidMount() {
@@ -33,9 +37,17 @@ class ListManagerContainer extends Component {
     if (nextProps.showGeneralGuide !== this.props.showGeneralGuide) {
       hopscotch.startTour(tour);
     }
+
+    if (nextProps.tagQuery !== this.props.tagQuery) {
+      this.setState({tagValue: nextProps.tagQuery});
+      if (nextProps.tagQuery && nextProps.tagQuery.length > 0) {
+        nextProps.fetchLists();
+      }
+    }
   }
 
   render() {
+    const state = this.state;
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <SkyLight
@@ -63,6 +75,10 @@ class ListManagerContainer extends Component {
             icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
             />
           </div>
+          {/*<div className='vertical-center'>
+            <TextField name='tag-search' value={state.tagValue} onChange={e => this.setState({tagValue: e.target.value})}/>
+          </div>*/
+          }
           <Lists {...this.props} />
         </div>
       </InfiniteScroll>
@@ -71,9 +87,10 @@ class ListManagerContainer extends Component {
 }
 
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
+  const tagQuery = props.location.query.tag;
   const listReducer = state.listReducer;
-  const lists = listReducer.lists.map(id => listReducer[id]);
+  let lists = listReducer.lists.map(id => listReducer[id]);
   let untitledNum = 0;
   lists.map(list => {
     if (list.name.substring(0, 9) === 'untitled-') {
@@ -81,9 +98,13 @@ const mapStateToProps = state => {
       if (!isNaN(num) && num >= untitledNum) untitledNum = num + 1;
     }
   });
+  if (tagQuery && tagQuery.length > 0) {
+    lists = listReducer.tagLists.map(id => listReducer[id]);
+  }
   return {
     lists,
     untitledNum,
+    tagQuery,
     isReceiving: listReducer.isReceiving,
     statementIfEmpty: 'It looks like you haven\'t created any list. Go ahead and make one!',
     listItemIcon: 'fa fa-archive',
@@ -97,7 +118,8 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, props) => {
+  const tagQuery = props.location.query.tag;
   return {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
@@ -106,7 +128,15 @@ const mapDispatchToProps = dispatch => {
       dispatch(actionCreators.createEmptyList(untitledNum))
       .then(response => browserHistory.push(`/lists/${response.data.id}`));
     },
-    fetchLists: _ => dispatch(actionCreators.fetchLists())
+    fetchLists: _ => (tagQuery && tagQuery.length > 0) ? dispatch(actionCreators.fetchTagLists(tagQuery)) : dispatch(actionCreators.fetchLists())
+  };
+};
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+  return {
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps
   };
 };
 

@@ -19,6 +19,7 @@ export const patchPerson = person => loginActions.patchPerson(person);
 export const fetchLists = _ => listActions.fetchLists();
 export const fetchArchivedLists = _ => listActions.fetchArchivedLists();
 export const fetchPublicLists = _ => listActions.fetchPublicLists();
+export const fetchTagLists = tagQuery => listActions.fetchTagLists(tagQuery);
 export const addListWithoutContacts = name => listActions.addListWithoutContacts(name);
 export const fetchList = listId => listActions.fetchList(listId);
 export const patchList = (listId, name, contactList, customfields) => listActions.patchList(listId, name, contactList, customfields);

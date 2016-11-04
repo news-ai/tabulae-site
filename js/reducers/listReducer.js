@@ -24,6 +24,7 @@ function listReducer(state = initialState.listReducer, action) {
   let unarchivedLists = [];
   let archivedLists = [];
   let publicLists = [];
+  let tagLists = [];
   let obj = assignToEmpty(state, {});
   switch (action.type) {
     case 'CLEAR_LIST_REDUCER':
@@ -69,6 +70,11 @@ function listReducer(state = initialState.listReducer, action) {
       if (action.offset !== undefined) obj.offset = action.offset;
       if (action.archivedOffset !== undefined) obj.archivedOffset = action.archivedOffset;
       if (action.publicOffset !== undefined) obj.publicOffset = action.publicOffset;
+      if (action.tagOffset !== undefined) obj.tagOffset = action.tagOffset;
+      if (action.tagQuery !== undefined) {
+        obj.tagLists = action.tagQuery === state.tagQuery ? [...state.tagLists, ...action.ids] : [...action.ids];
+        obj.tagQuery = action.tagQuery;
+      }
       return obj;
     case listConstant.REQUEST_FAIL:
       obj.isReceiving = false;

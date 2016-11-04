@@ -19,6 +19,7 @@ export const initialState = {
     offset: 0,
     archivedOffset: 0,
     publicOffset: 0,
+    tagLists: []
   },
   stagingReducer: {
     isReceiving: false,
