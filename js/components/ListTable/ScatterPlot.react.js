@@ -103,7 +103,7 @@ class ScatterPlot extends Component {
     return (
       <div>
         <Dialog
-        title='Who are beating the Average?'
+        title='Hunger Game: the Fashion Influencer Edition'
         open={state.open}
         modal
         actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
@@ -122,7 +122,7 @@ class ScatterPlot extends Component {
                 <CartesianGrid/>
                 <Tooltip cursor={{strokeDasharray: '3 3'}}/>
               </ScatterChart>
-              <div>
+              <div className='row'>
                 {state.above.map(obj =>
                   <Chip
                   style={{margin: 2}}
