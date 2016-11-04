@@ -9,7 +9,9 @@ const Tags = props => {
       <div className='vertical-center'>
         {props.list && props.list.tags !== null &&
           props.list.tags
-          .map((name, i) => <Tag key={`tag-${i}`} text={name} onDeleteTag={_ => props.onDeleteTag(name)}/>)}
+          .map((name, i) =>
+            <Tag hideDelete={props.hideDelete} key={`tag-${i}`} text={name} onDeleteTag={_ => props.onDeleteTag(name)}/>
+            )}
       </div>
     </div>);
 };
@@ -35,6 +37,7 @@ const mergeProps = ({list}, {patchList}, ownProps) => {
       name: list.name,
       tags: list.tags.filter(tagName => tagName !== name)
     }),
+    ...ownProps
   };
 };
 

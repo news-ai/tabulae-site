@@ -2,8 +2,8 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
-import FlatButton from 'material-ui/FlatButton';
-import {blue50, blue100, grey700} from 'material-ui/styles/colors';
+import RaisedButton from 'material-ui/RaisedButton';
+import {blue100} from 'material-ui/styles/colors';
 import * as actionCreators from 'actions/AppActions';
 
 class AddTagDialogHOC extends Component {
@@ -22,7 +22,7 @@ class AddTagDialogHOC extends Component {
       <div>
         <Dialog open={state.open} title='Add Tag' onRequestClose={_ => this.setState({open: false, value: ''})}>
           <TextField underlineFocusStyle={{borderColor: blue100}} hintText='New Tag Name' value={state.value} onChange={e => this.setState({value: e.target.value})}/>
-          <FlatButton style={{margin: '0 5px'}} backgroundColor={blue50} hoverColor={blue100} labelStyle={{textTransform: 'none', color: grey700}} label='Submit' onClick={_ => {
+          <RaisedButton style={{margin: '0 5px'}} primary labelStyle={{textTransform: 'none'}} label='Submit' onClick={_ => {
             props.onAddTag(state.value);
             this.setState({open: false, value: ''});
           }}/>

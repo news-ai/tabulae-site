@@ -41,7 +41,7 @@ import EmptyListStatement from './EmptyListStatement.react';
 import AnalyzeSelectedTwitterContainer from './AnalyzeSelectedTwitterContainer.react';
 import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContainer.react';
 import ScatterPlot from './ScatterPlot.react';
-import Tags from './Tags.react';
+import Tags from '../Tags/Tags.react';
 
 import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
 import alertify from 'alertifyjs';
@@ -672,7 +672,7 @@ class ListTable extends Component {
                   <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag' tooltipPosition='top-right'/>}
                 </AddTagDialogHOC>
               </div>}
-            <div className='large-3 columns vertical-center'>
+            <div className='large-4 columns vertical-center'>
               <TextField
               id='search-input'
               hintText='Search...'
@@ -689,7 +689,7 @@ class ListTable extends Component {
             </div>
           {
             /*props.fieldsmap !== null &&
-            <div className='large-2 columns vertical-center'>
+            <div className='large-1 columns vertical-center'>
               <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
               {sc => (
                 <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
@@ -737,7 +737,7 @@ class ListTable extends Component {
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        <div className='row vertical-center right' style={{margin: '10px 0'}}>
+        <div className='row vertical-center' style={{margin: '10px 0'}}>
           <Tags listId={props.listId}/>
         </div>
         <div>
