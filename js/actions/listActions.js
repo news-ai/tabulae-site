@@ -143,11 +143,12 @@ export function fetchArchivedLists() {
   };
 }
 
-export function patchList({listId, name, contacts, fieldsmap}) {
+export function patchList({listId, name, contacts, fieldsmap, tags}) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
   if (fieldsmap !== undefined) listBody.fieldsmap = fieldsmap;
+  if (tags !== undefined) listBody.tags = tags;
   return dispatch => {
     dispatch({type: listConstant.PATCH, listId, listBody});
     return api.patch(`/lists/${listId}`, listBody)

@@ -4,15 +4,12 @@ import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {
-  ComposedChart,
   ScatterChart,
   Scatter,
   XAxis,
   YAxis,
   CartesianGrid,
-  Line,
   Tooltip,
-  LineChart
 } from 'recharts';
 import * as c from 'material-ui/styles/colors';
 import regression from 'regression';
@@ -41,6 +38,7 @@ class ScatterPlot extends Component {
       averageBySelected: null,
       data: null,
       dataArray: [],
+      regressionData: []
     };
     this.getRegression = this._getRegression.bind(this);
   }
@@ -60,15 +58,28 @@ class ScatterPlot extends Component {
         return obj;
       })
       .filter(obj => obj.x && obj.y);
+      this.getRegression();
       this.setState({data});
     }
   }
 
   _getRegression() {
+    if (this.state.data === null) return;
     const dataArray = this.state.data.map(obj => [obj.x, obj.y]);
     const result = regression('linear', dataArray);
-    const m = result[0];
-    const c = result[1];
+    const m = result.equation[0];
+    const cc = result.equation[1];
+    let min = this.state.data[0].x;
+    let max = this.state.data[0].x;
+    for (let i = 1; i < this.state.data.length; i++) {
+      if (this.state.data[i].x < min) min = this.state.data[i].x;
+      if (this.state.data[i].x > max) max = this.state.data[i].x;
+    }
+    this.setState({
+      regressionData: [
+        {y: m * min + cc, x: min},
+        {y: m * max + cc, x: max}
+      ]});
   }
 
   render() {
@@ -76,8 +87,8 @@ class ScatterPlot extends Component {
     const props = this.props;
     return (
       <div>
-        {/*
-          <Dialog
+      {/*
+        <Dialog
         title='Who are beating the Average?'
         open={state.open}
         modal
@@ -87,13 +98,14 @@ class ScatterPlot extends Component {
         >
           <Waiting isReceiving={props.isReceiving}/>
           {state.open &&
-            <ComposedChart data={state.data} width={400} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+            <ScatterChart data={state.data} width={400} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
               <XAxis dataKey={'x'} name='likes_to_posts'/>
               <YAxis dataKey={'y'} name='followers'/>
-              <Scatter fill='#8884d8'/>
+              <Scatter data={state.data} fill={colors[0]}/>
+              <Scatter data={state.regressionData} line fill={colors[1]}/>
               <CartesianGrid/>
               <Tooltip cursor={{strokeDasharray: '3 3'}}/>
-            </ComposedChart>
+            </ScatterChart>
           }
         </Dialog>*/
       }

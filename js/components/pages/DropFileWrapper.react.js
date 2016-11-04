@@ -47,7 +47,8 @@ class DropFileWrapper extends Component {
       value: this.props.defaultValue || '',
       isFileDropped: false,
       isFileSubmitted: false,
-      file: null
+      file: null,
+      clicked: false
     };
     this.onDrop = this._onDrop.bind(this);
     this.onUploadClick = this._onUploadClick.bind(this);
@@ -55,6 +56,7 @@ class DropFileWrapper extends Component {
 
   _onUploadClick() {
     const props = this.props;
+    this.setState({clicked: true});
     props.createEmptyList(this.state.value)
     .then(response => {
       this.setState({listId: response.data.id});
@@ -113,7 +115,7 @@ class DropFileWrapper extends Component {
             <div>Try dropping an Excel (xlsx) file here, or click to select file to upload.</div>
           </Dropzone>}
           </div>
-          <RaisedButton style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
+          <RaisedButton disabled={state.clicked} style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
         </div>
         );
     } else {
