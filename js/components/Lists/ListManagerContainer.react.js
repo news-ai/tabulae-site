@@ -9,6 +9,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Lists from './Lists';
 import InfiniteScroll from '../InfiniteScroll';
 import DropFileWrapper from '../pages/DropFileWrapper.react';
+import TextField from 'material-ui/TextField';
 
 import {grey500} from 'material-ui/styles/colors';
 
@@ -71,9 +72,9 @@ class ListManagerContainer extends Component {
 }
 
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
-  const lists = listReducer.lists.map(id => listReducer[id]);
+  let lists = listReducer.lists.map(id => listReducer[id]);
   let untitledNum = 0;
   lists.map(list => {
     if (list.name.substring(0, 9) === 'untitled-') {
@@ -81,6 +82,7 @@ const mapStateToProps = state => {
       if (!isNaN(num) && num >= untitledNum) untitledNum = num + 1;
     }
   });
+
   return {
     lists,
     untitledNum,
@@ -97,7 +99,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, props) => {
   return {
     dispatch: action => dispatch(action),
     onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
@@ -110,7 +112,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(ListManagerContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(ListManagerContainer);

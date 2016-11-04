@@ -37,6 +37,7 @@ import configureStore from './configureStore';
 import NotFound from './components/NotFound';
 import App from './components/App.react';
 import ListManagerContainer from './components/Lists/ListManagerContainer.react';
+import TagListsContainer from './components/Lists/TagListsContainer.react';
 import ArchiveContainer from './components/Lists/ArchiveContainer.react';
 import PublicListsContainer from './components/Lists/PublicListsContainer.react';
 import Table from './components/pages/Table.react';
@@ -96,6 +97,7 @@ ReactDOM.render(
               <IndexRoute component={OnboardingTable}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
+            <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer}/>
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
             <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
