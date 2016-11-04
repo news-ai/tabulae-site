@@ -604,7 +604,12 @@ class ListTable extends Component {
           />}
         <div className='row vertical-center' style={{margin: 15}}>
             <div className='large-3 medium-4 columns vertical-center'>
-              {props.listData && <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>}
+              {props.listData &&
+                <div>
+                  <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
+                  <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
+                </div>
+              }
             </div>
             {props.listData &&
               <div className='large-4 medium-4 columns vertical-center'>
