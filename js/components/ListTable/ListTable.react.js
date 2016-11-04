@@ -674,7 +674,7 @@ class ListTable extends Component {
                 />
                 <AddTagDialogHOC listId={props.listId}>
                   {({onRequestOpen}) =>
-                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag' tooltipPosition='top-right'/>}
+                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
                 </AddTagDialogHOC>
               </div>}
             <div className='large-4 columns vertical-center'>
@@ -693,7 +693,7 @@ class ListTable extends Component {
               }
             </div>
           {
-            /*props.fieldsmap !== null &&
+            props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
               <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
               {sc => (
@@ -730,8 +730,8 @@ class ListTable extends Component {
                 </AnalyzeSelectedInstagramContainer>
                 )}
              </ScatterPlot>
-            </div>*/
-            }
+            </div>
+          }
         </div>
         {state.isEmailPanelOpen &&
           <EmailPanel

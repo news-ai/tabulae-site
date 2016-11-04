@@ -8,6 +8,7 @@ import {
   Scatter,
   XAxis,
   YAxis,
+  ZAxis,
   CartesianGrid,
   Tooltip,
 } from 'recharts';
@@ -38,7 +39,8 @@ class ScatterPlot extends Component {
       averageBySelected: null,
       data: null,
       dataArray: [],
-      regressionData: []
+      regressionData: [],
+      labels: []
     };
     this.getRegression = this._getRegression.bind(this);
   }
@@ -55,6 +57,7 @@ class ScatterPlot extends Component {
         let obj = {};
         obj.x = parseFloat(xfieldObj.strategy(contactObj));
         obj.y = parseFloat(contactObj.instagramfollowers);
+        obj.name = contactObj.instagram;
         return obj;
       })
       .filter(obj => obj.x && obj.y);
@@ -87,7 +90,6 @@ class ScatterPlot extends Component {
     const props = this.props;
     return (
       <div>
-      {/*
         <Dialog
         title='Who are beating the Average?'
         open={state.open}
@@ -98,17 +100,17 @@ class ScatterPlot extends Component {
         >
           <Waiting isReceiving={props.isReceiving}/>
           {state.open &&
-            <ScatterChart data={state.data} width={400} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+            <ScatterChart data={state.data} width={600} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
               <XAxis dataKey={'x'} name='likes_to_posts'/>
               <YAxis dataKey={'y'} name='followers'/>
+              <ZAxis dataKey={'name'} name='username'/>
               <Scatter data={state.data} fill={colors[0]}/>
               <Scatter data={state.regressionData} line fill={colors[1]}/>
               <CartesianGrid/>
               <Tooltip cursor={{strokeDasharray: '3 3'}}/>
             </ScatterChart>
           }
-        </Dialog>*/
-      }
+        </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
         })}
