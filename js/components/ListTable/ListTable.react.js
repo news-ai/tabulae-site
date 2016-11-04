@@ -34,6 +34,7 @@ import Waiting from '../Waiting';
 import CopyOrMoveTo from './CopyOrMoveTo.react';
 import AddOrHideColumns from './AddOrHideColumns.react';
 import AddContactHOC from './AddContactHOC.react';
+import AddTagDialogHOC from './AddTagDialogHOC.react';
 import EditContact from './EditContact.react';
 import PanelOverlay from './PanelOverlay.react';
 import EmptyListStatement from './EmptyListStatement.react';
@@ -666,7 +667,10 @@ class ListTable extends Component {
                 iconStyle={{color: grey500}}
                 onClick={this.onRemoveContacts}
                 />
-                
+                <AddTagDialogHOC listId={props.listId}>
+                  {({onRequestOpen}) =>
+                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag' tooltipPosition='top-right'/>}
+                </AddTagDialogHOC>
               </div>}
             <div className='large-3 columns vertical-center'>
               <TextField
@@ -733,8 +737,8 @@ class ListTable extends Component {
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        <div className='row vertical-center' style={{margin: '10px 0'}}>
-          <Tags className='large-6 columns right' listId={props.listId}/>
+        <div className='row vertical-center right' style={{margin: '10px 0'}}>
+          <Tags listId={props.listId}/>
         </div>
         <div>
         {props.listData && props.listData.contacts === null &&
