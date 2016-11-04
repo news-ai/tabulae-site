@@ -695,7 +695,7 @@ class ListTable extends Component {
           {
             props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
+              <ScatterPlot listId={props.listId} fieldsmap={props.fieldsmap} contacts={props.contacts}>
               {sc => (
                 <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
                 {inst => (

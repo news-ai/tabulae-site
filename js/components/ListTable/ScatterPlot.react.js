@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-
+import withRouter from 'react-router/lib/withRouter';
 import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import Chip from 'material-ui/Chip';
 import {
   ScatterChart,
   Scatter,
@@ -57,12 +58,12 @@ class ScatterPlot extends Component {
         let obj = {};
         obj.x = parseFloat(xfieldObj.strategy(contactObj));
         obj.y = parseFloat(contactObj.instagramfollowers);
-        obj.name = contactObj.instagram;
+        obj.username = contactObj.instagram;
+        obj.id = contactObj.id;
         return obj;
       })
       .filter(obj => obj.x && obj.y);
-      this.getRegression();
-      this.setState({data});
+      this.setState({data}, _ => this.getRegression());
     }
   }
 
@@ -74,11 +75,22 @@ class ScatterPlot extends Component {
     const cc = result.equation[1];
     let min = this.state.data[0].x;
     let max = this.state.data[0].x;
+    let objX, objY, tempY;
+    let above = [];
+    let below = [];
     for (let i = 1; i < this.state.data.length; i++) {
-      if (this.state.data[i].x < min) min = this.state.data[i].x;
-      if (this.state.data[i].x > max) max = this.state.data[i].x;
+      objX = this.state.data[i].x;
+      objY = this.state.data[i].y;
+      tempY = m * objX + cc;
+      if (objY > tempY) above.push(Object.assign({}, this.state.data[i]));
+      else below.push(Object.assign({}, this.state.data[i]));
+      if (objX < min) min = objX;
+      if (objX > max) max = objX;
     }
+
     this.setState({
+      above,
+      below,
       regressionData: [
         {y: m * min + cc, x: min},
         {y: m * max + cc, x: max}
@@ -100,15 +112,21 @@ class ScatterPlot extends Component {
         >
           <Waiting isReceiving={props.isReceiving}/>
           {state.open &&
-            <ScatterChart data={state.data} width={600} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-              <XAxis dataKey={'x'} name='likes_to_posts'/>
-              <YAxis dataKey={'y'} name='followers'/>
-              <ZAxis dataKey={'name'} name='username'/>
-              <Scatter data={state.data} fill={colors[0]}/>
-              <Scatter data={state.regressionData} line fill={colors[1]}/>
-              <CartesianGrid/>
-              <Tooltip cursor={{strokeDasharray: '3 3'}}/>
-            </ScatterChart>
+            <div>
+              <ScatterChart data={state.data} width={600} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+                <XAxis dataKey={'x'} name='likes_to_posts'/>
+                <YAxis dataKey={'y'} name='followers'/>
+                <ZAxis dataKey={'username'} name='username'/>
+                <Scatter data={state.data} fill={colors[0]}/>
+                <Scatter data={state.regressionData} line fill={colors[1]}/>
+                <CartesianGrid/>
+                <Tooltip cursor={{strokeDasharray: '3 3'}}/>
+              </ScatterChart>
+              <div>
+                {state.above.map(obj => <Chip style={{margin: 2}} backgroundColor={c.blue200} key={`chip-${obj.id}`} onTouchTap={_ => props.router(`/tables/${props.listId}/${obj.id}`)}>{obj.username}</Chip>)}
+                {state.below.map(obj => <Chip style={{margin: 2}} backgroundColor={c.red200} key={`chip-${obj.id}`} onTouchTap={_ => props.router(`/tables/${props.listId}/${obj.id}`)}>{obj.username}</Chip>)}
+              </div>
+            </div>
           }
         </Dialog>
         {props.children({
@@ -118,4 +136,4 @@ class ScatterPlot extends Component {
   }
 }
 
-export default ScatterPlot;
+export default withRouter(ScatterPlot);
