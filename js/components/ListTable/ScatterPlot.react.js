@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import * as c from 'material-ui/styles/colors';
 import regression from 'regression';
+import {_getter} from './helpers';
 
 const colors = [
   c.red300, c.blue300, c.purple300, c.cyan300, c.green300, c.indigo300, c.orange300,
@@ -52,23 +53,23 @@ class ScatterPlot extends Component {
       nextProps.contacts !== null &&
       nextProps.contacts.length > 0
       ) {
-      const xfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === 'likes_to_posts');
-      if (!xfieldObj) return;
+      const xfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === nextProps.xfieldname);
+      const yfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === nextProps.yfieldname);
+      if (!xfieldObj || !yfieldObj) return;
       const data = nextProps.contacts.map(contactObj => {
         let obj = {};
-        obj.x = parseFloat(xfieldObj.strategy(contactObj));
-        obj.y = parseFloat(contactObj.instagramfollowers);
+        obj.x = parseFloat(_getter(contactObj, xfieldObj));
+        obj.y = parseFloat(_getter(contactObj, yfieldObj));
         obj.username = contactObj.instagram;
         obj.id = contactObj.id;
         return obj;
-      })
-      .filter(obj => obj.x && obj.y);
+      }).filter(obj => obj.x && obj.y);
       this.setState({data}, _ => this.getRegression());
     }
   }
 
   _getRegression() {
-    if (this.state.data === null) return;
+    if (this.state.data === null || this.state.data.length === 0) return;
     const dataArray = this.state.data.map(obj => [obj.x, obj.y]);
     const result = regression('linear', dataArray);
     const m = result.equation[0];
@@ -111,11 +112,11 @@ class ScatterPlot extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <Waiting isReceiving={props.isReceiving}/>
-          {state.open &&
+          {state.open && state.data &&
             <div>
               <ScatterChart data={state.data} width={700} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-                <XAxis dataKey={'x'} name='likes_to_posts'/>
-                <YAxis dataKey={'y'} name='followers'/>
+                <XAxis dataKey={'x'} name={props.xfieldname}/>
+                <YAxis dataKey={'y'} name={props.yfieldname}/>
                 <ZAxis dataKey={'username'} name='username'/>
                 <Scatter data={state.data} fill={colors[0]}/>
                 <Scatter data={state.regressionData} line fill={colors[1]}/>
@@ -123,7 +124,7 @@ class ScatterPlot extends Component {
                 <Tooltip cursor={{strokeDasharray: '3 3'}}/>
               </ScatterChart>
               <div className='row'>
-                {state.above.map(obj =>
+                {state.above && state.above.map(obj =>
                   <Chip
                   style={{margin: 2}}
                   backgroundColor={c.blue200}
@@ -131,7 +132,7 @@ class ScatterPlot extends Component {
                   onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
                   {obj.username}
                   </Chip>)}
-                {state.below.map(obj =>
+                {state.below && state.below.map(obj =>
                   <Chip
                   style={{margin: 2}}
                   backgroundColor={c.red200}

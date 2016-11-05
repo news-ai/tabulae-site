@@ -115,5 +115,15 @@
     "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors",
     "serve": "cross-env NODE_ENV=production node server.prod.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2"
+  },
+  "babel": {
+    "env": {
+      "production": {
+        "plugins": [
+          "transform-react-constant-elements",
+          "transform-react-inline-elements"
+        ]
+      }
+    }
   }
 }

@@ -43,7 +43,15 @@ import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContain
 import ScatterPlot from './ScatterPlot.react';
 import Tags from '../Tags/Tags.react';
 
-import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
+import {
+  generateTableFieldsmap,
+  measureSpanSize,
+  escapeHtml,
+  convertToCsvString,
+  exportOperations,
+  isNumber,
+  _getter
+} from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
@@ -71,17 +79,7 @@ const styles = {
   },
 };
 
-function _getter(contact, fieldObj) {
-  if (fieldObj.customfield) {
-    if (fieldObj.readonly) return contact[fieldObj.value];
-    if (contact.customfields === null) return undefined;
-    else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-    else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
-  } else {
-    if (fieldObj.strategy) return fieldObj.strategy(contact);
-    else return contact[fieldObj.value];
-  }
-}
+
 
 const localStorage = window.localStorage;
 
@@ -695,7 +693,7 @@ class ListTable extends Component {
           {
             props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlot listId={props.listId} fieldsmap={props.fieldsmap} contacts={props.contacts}>
+              <ScatterPlot yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap} contacts={props.contacts}>
               {sc => (
                 <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
                 {inst => (
