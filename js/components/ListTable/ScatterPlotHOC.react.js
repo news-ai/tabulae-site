@@ -33,7 +33,7 @@ function divide(numerator, denomenator, fixedTo) {
   if (!isNaN(res)) return res;
 }
 
-class ScatterPlot extends Component {
+class ScatterPlotHOC extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -173,4 +173,4 @@ const mapDispatchToProps = (dispatch, props) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ScatterPlot));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ScatterPlotHOC));

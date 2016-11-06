@@ -7,13 +7,10 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import Textarea from 'react-textarea-autosize';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
-import {yellow50} from 'material-ui/styles/colors';
 import {fromJS, is} from 'immutable';
-import pickBy from 'lodash/pickBy';
 
 const textfieldStyle = {
   marginLeft: 10

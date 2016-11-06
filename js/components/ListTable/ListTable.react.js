@@ -31,16 +31,16 @@ import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
-import CopyOrMoveTo from './CopyOrMoveTo.react';
-import AddOrHideColumns from './AddOrHideColumns.react';
+import CopyToHOC from './CopyToHOC.react';
+import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
-import EditContact from './EditContact.react';
-import PanelOverlay from './PanelOverlay.react';
+import EditContactHOC from './EditContactHOC.react';
+import PanelOverlayHOC from './PanelOverlayHOC.react';
 import EmptyListStatement from './EmptyListStatement.react';
-import AnalyzeSelectedTwitterContainer from './AnalyzeSelectedTwitterContainer.react';
-import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContainer.react';
-import ScatterPlot from './ScatterPlot.react';
+import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
+import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
+import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from '../Tags/Tags.react';
 
 import {
@@ -413,7 +413,7 @@ class ListTable extends Component {
               }}
               />
               {!this.props.listData.readonly &&
-                <EditContact listId={this.props.listId} contactId={rowData.id}>
+                <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
                 {({onRequestOpen}) => (
                   <i
                   onClick={onRequestOpen}
@@ -421,7 +421,7 @@ class ListTable extends Component {
                   style={{color: blue300, cursor: 'pointer'}}
                   />
                   )}
-                </EditContact>}
+                </EditContactHOC>}
             </div>
             );
           break;
@@ -592,7 +592,7 @@ class ListTable extends Component {
           />
         </div>
         {state.showProfileTooltip &&
-          <PanelOverlay
+          <PanelOverlayHOC
           onMouseEnter={_ => this.setState({showProfileTooltip: true, onTooltipPanel: true})}
           onMouseLeave={_ => this.setState({showProfileTooltip: false, onTooltipPanel: false})}
           profileX={state.profileX}
@@ -626,7 +626,7 @@ class ListTable extends Component {
                 iconStyle={{color: grey500}}
                 onClick={this.onExportClick}
                 />
-                <CopyOrMoveTo
+                <CopyToHOC
                 selected={state.selected}>
                 {({onRequestOpen}) => (
                   <IconButton
@@ -637,8 +637,8 @@ class ListTable extends Component {
                   iconStyle={{color: grey500}}
                   onClick={onRequestOpen}
                   />)}
-                </CopyOrMoveTo>
-                <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
+                </CopyToHOC>
+                <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
                 {({onRequestOpen}) => (
                   <IconButton
                   id='add_remove_columns_hop'
@@ -649,7 +649,7 @@ class ListTable extends Component {
                   iconStyle={{color: grey500}}
                   onClick={onRequestOpen}
                   />)}
-                </AddOrHideColumns>
+                </AddOrRemoveColumnHOC>
                 <AddContactHOC listId={props.listId}>
                 {({onRequestOpen}) => (
                   <IconButton
@@ -691,13 +691,13 @@ class ListTable extends Component {
               }
             </div>
           {
-            /*props.fieldsmap !== null &&
+            props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlot selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
+              <ScatterPlotHOC selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
-                <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
+                <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
                 {inst => (
-                 <AnalyzeSelectedTwitterContainer selected={state.selected} listId={props.listId}>
+                 <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
                   {twt => (
                     <IconMenu
                     iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
@@ -724,11 +724,11 @@ class ListTable extends Component {
                       }
                       />
                     </IconMenu>)}
-                  </AnalyzeSelectedTwitterContainer>)}
-                </AnalyzeSelectedInstagramContainer>
+                  </AnalyzeSelectedTwitterHOC>)}
+                </AnalyzeSelectedInstagramHOC>
                 )}
-             </ScatterPlot>
-            </div>*/
+             </ScatterPlotHOC>
+            </div>
           }
         </div>
         {state.isEmailPanelOpen &&

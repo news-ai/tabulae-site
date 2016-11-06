@@ -23,7 +23,7 @@ const styles = {
   },
 };
 
-const PanelOverlay = ({
+const PanelOverlayHOC = ({
   router,
   contact,
   profileY,
@@ -95,4 +95,4 @@ const mapDispatchToProps = (dispatch, props) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PanelOverlay));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PanelOverlayHOC));
