@@ -1,18 +1,22 @@
 import React, {Component} from 'react';
-
+import {connect} from 'react-redux';
+import withRouter from 'react-router/lib/withRouter';
 import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import Chip from 'material-ui/Chip';
 import {
   ScatterChart,
   Scatter,
   XAxis,
   YAxis,
+  ZAxis,
   CartesianGrid,
   Tooltip,
 } from 'recharts';
 import * as c from 'material-ui/styles/colors';
 import regression from 'regression';
+import {_getter} from './helpers';
 
 const colors = [
   c.red300, c.blue300, c.purple300, c.cyan300, c.green300, c.indigo300, c.orange300,
@@ -38,44 +42,65 @@ class ScatterPlot extends Component {
       averageBySelected: null,
       data: null,
       dataArray: [],
-      regressionData: []
+      regressionData: [],
+      labels: [],
     };
     this.getRegression = this._getRegression.bind(this);
+    this.setData = this._setData.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.fieldsmap !== null &&
-      nextProps.contacts !== null &&
-      nextProps.contacts.length > 0
-      ) {
-      const xfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === 'likes_to_posts');
-      if (!xfieldObj) return;
-      const data = nextProps.contacts.map(contactObj => {
-        let obj = {};
-        obj.x = parseFloat(xfieldObj.strategy(contactObj));
-        obj.y = parseFloat(contactObj.instagramfollowers);
-        return obj;
-      })
-      .filter(obj => obj.x && obj.y);
-      this.getRegression();
-      this.setState({data});
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.open === true && prevState.open === false) {
+      this.setData();
     }
   }
 
+  componentWillReceiveProps() {
+  }
+
+  _setData() {
+    const xfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.props.xfieldname);
+    const yfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.props.yfieldname);
+    if (!xfieldObj || !yfieldObj) return;
+    const data = this.props.contacts
+    .map(contactObj => {
+      let obj = {};
+      obj.x = parseFloat(_getter(contactObj, xfieldObj));
+      obj.y = parseFloat(_getter(contactObj, yfieldObj));
+      obj.username = contactObj.instagram;
+      obj.id = contactObj.id;
+      return obj;
+    }).filter(obj => obj.x && obj.y);
+    this.setState({data}, _ => this.getRegression());
+  }
+
   _getRegression() {
-    if (this.state.data === null) return;
+    if (this.state.data === null || this.state.data.length === 0) return;
     const dataArray = this.state.data.map(obj => [obj.x, obj.y]);
     const result = regression('linear', dataArray);
     const m = result.equation[0];
     const cc = result.equation[1];
     let min = this.state.data[0].x;
     let max = this.state.data[0].x;
+    let objX, objY, tempY;
+    let above = [];
+    let below = [];
     for (let i = 1; i < this.state.data.length; i++) {
-      if (this.state.data[i].x < min) min = this.state.data[i].x;
-      if (this.state.data[i].x > max) max = this.state.data[i].x;
+      objX = this.state.data[i].x;
+      objY = this.state.data[i].y;
+      tempY = m * objX + cc;
+      if (objY >= tempY) above.push(Object.assign({}, this.state.data[i]));
+      else below.push(Object.assign({}, this.state.data[i]));
+      if (objX < min) min = objX;
+      if (objX > max) max = objX;
     }
+
     this.setState({
+      above,
+      below,
       regressionData: [
         {y: m * min + cc, x: min},
         {y: m * max + cc, x: max}
@@ -87,9 +112,8 @@ class ScatterPlot extends Component {
     const props = this.props;
     return (
       <div>
-      {/*
         <Dialog
-        title='Who are beating the Average?'
+        title='Hunger Game: the Fashion Influencer Edition'
         open={state.open}
         modal
         actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
@@ -97,18 +121,41 @@ class ScatterPlot extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <Waiting isReceiving={props.isReceiving}/>
-          {state.open &&
-            <ScatterChart data={state.data} width={400} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-              <XAxis dataKey={'x'} name='likes_to_posts'/>
-              <YAxis dataKey={'y'} name='followers'/>
-              <Scatter data={state.data} fill={colors[0]}/>
-              <Scatter data={state.regressionData} line fill={colors[1]}/>
-              <CartesianGrid/>
-              <Tooltip cursor={{strokeDasharray: '3 3'}}/>
-            </ScatterChart>
+          {state.open && state.data &&
+            <div>
+              <ScatterChart data={state.data} width={700} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+                <XAxis dataKey={'x'} name={props.xfieldname}/>
+                <YAxis dataKey={'y'} name={props.yfieldname}/>
+                <ZAxis dataKey={'username'} name='username'/>
+                <Scatter data={state.data} fill={colors[0]}/>
+                <Scatter data={state.regressionData} line fill={colors[1]}/>
+                <CartesianGrid/>
+                <Tooltip cursor={{strokeDasharray: '3 3'}}/>
+              </ScatterChart>
+              <div className='row'>
+                <div>
+                  <span><span style={{color: c.blue500}}>Blue</span> are contacts above the line. <span style={{color: c.red500}}>Red</span> are contacts below the line.</span>
+                </div>
+                {state.above && state.above.map(obj =>
+                  <Chip
+                  style={{margin: 2}}
+                  backgroundColor={c.blue200}
+                  key={`chip-${obj.id}`}
+                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                  {obj.username}
+                  </Chip>)}
+                {state.below && state.below.map(obj =>
+                  <Chip
+                  style={{margin: 2}}
+                  backgroundColor={c.red200}
+                  key={`chip-${obj.id}`}
+                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                  {obj.username}
+                  </Chip>)}
+              </div>
+            </div>
           }
-        </Dialog>*/
-      }
+        </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
         })}
@@ -116,4 +163,14 @@ class ScatterPlot extends Component {
   }
 }
 
-export default ScatterPlot;
+const mapStateToProps = (state, props) => {
+  return {
+    contacts: props.selected.map(id => state.contactReducer[id])
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ScatterPlot));

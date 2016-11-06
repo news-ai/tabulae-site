@@ -43,7 +43,15 @@ import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContain
 import ScatterPlot from './ScatterPlot.react';
 import Tags from '../Tags/Tags.react';
 
-import {generateTableFieldsmap, measureSpanSize, escapeHtml, convertToCsvString, exportOperations, isNumber} from './helpers';
+import {
+  generateTableFieldsmap,
+  measureSpanSize,
+  escapeHtml,
+  convertToCsvString,
+  exportOperations,
+  isNumber,
+  _getter
+} from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
@@ -71,17 +79,7 @@ const styles = {
   },
 };
 
-function _getter(contact, fieldObj) {
-  if (fieldObj.customfield) {
-    if (fieldObj.readonly) return contact[fieldObj.value];
-    if (contact.customfields === null) return undefined;
-    else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-    else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
-  } else {
-    if (fieldObj.strategy) return fieldObj.strategy(contact);
-    else return contact[fieldObj.value];
-  }
-}
+
 
 const localStorage = window.localStorage;
 
@@ -604,7 +602,12 @@ class ListTable extends Component {
           />}
         <div className='row vertical-center' style={{margin: 15}}>
             <div className='large-3 medium-4 columns vertical-center'>
-              {props.listData && <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>}
+              {props.listData &&
+                <div>
+                  <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
+                  <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
+                </div>
+              }
             </div>
             {props.listData &&
               <div className='large-4 medium-4 columns vertical-center'>
@@ -669,7 +672,7 @@ class ListTable extends Component {
                 />
                 <AddTagDialogHOC listId={props.listId}>
                   {({onRequestOpen}) =>
-                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag' tooltipPosition='top-right'/>}
+                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
                 </AddTagDialogHOC>
               </div>}
             <div className='large-4 columns vertical-center'>
@@ -690,7 +693,7 @@ class ListTable extends Component {
           {
             /*props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlot fieldsmap={props.fieldsmap} contacts={props.contacts}>
+              <ScatterPlot selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
                 <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
                 {inst => (
@@ -726,7 +729,7 @@ class ListTable extends Component {
                 )}
              </ScatterPlot>
             </div>*/
-            }
+          }
         </div>
         {state.isEmailPanelOpen &&
           <EmailPanel

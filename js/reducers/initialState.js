@@ -19,7 +19,8 @@ export const initialState = {
     offset: 0,
     archivedOffset: 0,
     publicOffset: 0,
-    tagLists: []
+    tagLists: [],
+    clientLists: [],
   },
   stagingReducer: {
     isReceiving: false,
@@ -109,5 +110,9 @@ export const initialState = {
     showUploadGuide: false,
     showGeneralGuide: false,
     currentStep: 0
+  },
+  clientReducer: {
+    isReceiving: false,
+    didInvalidate: false,
   }
 };

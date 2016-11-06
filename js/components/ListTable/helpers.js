@@ -9,10 +9,22 @@ export function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+export function _getter(contact, fieldObj) {
+  if (fieldObj.customfield) {
+    if (fieldObj.readonly) return contact[fieldObj.value];
+    if (contact.customfields === null) return undefined;
+    else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
+    else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+  } else {
+    if (fieldObj.strategy) return fieldObj.strategy(contact);
+    else return contact[fieldObj.value];
+  }
+}
+
 function instagramLikesToPosts(listData) {
   const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
-  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
-  if (likesColumn && commentsColumn) {
+  const postsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
+  if (likesColumn && postsColumn) {
     return {
       name: 'likes-to-posts',
       value: 'likes_to_posts',
@@ -93,6 +105,27 @@ function instagramCommentsToFollowers(listData) {
   }
 }
 
+function instagramCommentsToPosts(listData) {
+  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
+  const postsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
+  if (commentsColumn && postsColumn) {
+    return {
+      name: 'comments-to-followers',
+      value: 'comments_to_followers',
+      hidden: false,
+      tableOnly: true,
+      hideCheckbox: true,
+      customfield: false,
+      sortEnabled: true,
+      description: 'Auto-generated when comments and followers are visible',
+      strategy: contact =>
+      contact.instagramcomments &&
+      contact.instagramposts &&
+      divide(contact.instagramcomments, contact.instagramposts, 0.001)
+    };
+  }
+}
+
 function publicationColumn(listData) {
   return {
     customfield: false,
@@ -140,6 +173,7 @@ export function generateTableFieldsmap(listData) {
     .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     instagramLikesToComments(listData),
     instagramLikesToPosts(listData),
+    instagramCommentsToPosts(listData),
     instagramLikesToFollowers(listData),
     instagramCommentsToFollowers(listData),
     publicationColumn(listData)

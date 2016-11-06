@@ -79,6 +79,7 @@
     "expect": "^1.10.0",
     "extract-text-webpack-plugin": "0.9.1",
     "file-loader": "^0.8.4",
+    "flow-bin": "^0.34.0",
     "html-webpack-plugin": "^1.6.1",
     "ip": "1.1.0",
     "json-loader": "^0.5.2",
@@ -112,6 +113,17 @@
     "test:watch": "npm test -- --watch",
     "start": "cross-env NODE_ENV=development node server.dev.js",
     "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors",
-    "serve": "cross-env NODE_ENV=production node server.prod.js"
+    "serve": "cross-env NODE_ENV=production node server.prod.js",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2"
+  },
+  "babel": {
+    "env": {
+      "production": {
+        "plugins": [
+          "transform-react-constant-elements",
+          "transform-react-inline-elements"
+        ]
+      }
+    }
   }
 }

@@ -145,6 +145,7 @@ export function fetchTagLists(tagQuery) {
   };
 }
 
+
 export function fetchArchivedLists() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
@@ -168,12 +169,13 @@ export function fetchArchivedLists() {
   };
 }
 
-export function patchList({listId, name, contacts, fieldsmap, tags}) {
+export function patchList({listId, name, contacts, fieldsmap, tags, client}) {
   const listBody = {};
   if (name !== undefined) listBody.name = name;
   if (contacts !== undefined) listBody.contacts = contacts;
   if (fieldsmap !== undefined) listBody.fieldsmap = fieldsmap;
   if (tags !== undefined) listBody.tags = tags;
+  if (client !== undefined) listBody.client = client;
   return dispatch => {
     dispatch({type: listConstant.PATCH, listId, listBody});
     return api.patch(`/lists/${listId}`, listBody)
@@ -211,3 +213,4 @@ export function archiveListToggle(listId) {
     .catch( message => console.log(message));
   };
 }
+

@@ -51,6 +51,8 @@ import ListTable from './components/ListTable';
 import UserProfile from './components/UserProfile';
 import ListFeed from './components/ListFeed';
 import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
+import ClientDirectories from './components/ClientDirectories/ClientDirectories.react';
+import ClientDirectory from './components/ClientDirectories/ClientDirectory.react';
 
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -98,6 +100,9 @@ ReactDOM.render(
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer}/>
+            <Route path='clients' staticName name='Clients' component={ClientDirectories}>
+              <Route path=':clientname' component={ClientDirectory}/>
+            </Route>
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
             <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
