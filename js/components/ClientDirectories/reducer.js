@@ -24,6 +24,11 @@ function clientReducer(state = initialState.clientReducer, action) {
       obj.didInvalidate = true;
       obj.isReceiving = false;
       return obj;
+    case constants.CLIENT_LISTS_REQUEST:
+      return obj;
+    case constants.CLIENT_LISTS_RECEIVED:
+      obj[action.clientQuery] = action.ids;
+      return obj;
     default:
       return state;
   }

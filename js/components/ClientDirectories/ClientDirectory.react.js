@@ -1,23 +1,47 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
+import * as actions from './actions';
+import Waiting from '../Waiting';
 
 const ClientDirectory = props => {
-  console.log(props.clientname);
-  return (
-    <div>CLIENT ITEM: {props.clientname}</div>
-    );
+  return (<div>
+  {props.lists.map(list => <span>{list.name}</span>)}
+  </div>);
 };
+
+class ClientDirectoryContainer extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentWillMount() {
+    if (!this.props.listIds) this.props.fetchLists();
+  }
+
+  render() {
+    const props = this.props;
+    return !props.lists ?
+      <Waiting style={{float: 'right'}} isReceiving={props.isReceiving} /> :
+    <ClientDirectory {...props}/>;
+  }
+}
 
 const mapStateToProps = (state, props) => {
   const clientname = props.params.clientname;
-  console.log(props);
+  const listIds = state.clientReducer[clientname];
   return {
-    clientname
+    clientname,
+    listIds,
+    lists: listIds && listIds.map(id => state.listReducer[id]),
+    isReceiving: state.listReducer.isReceiving
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  return {};
+  const clientname = props.params.clientname;
+  return {
+    fetchLists: _ => dispatch(actions.fetchClientLists(clientname))
+  };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ClientDirectory);
+export default connect(mapStateToProps, mapDispatchToProps)(ClientDirectoryContainer);

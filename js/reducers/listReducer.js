@@ -4,6 +4,7 @@ import {
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL,
 } from '../constants/AppConstants';
+import {CLIENT_LISTS_REQUEST, CLIENT_LISTS_RECEIVED} from 'components/ClientDirectories/constants';
 
 import { assignToEmpty } from '../utils/assign';
 import { initialState } from './initialState';
@@ -14,7 +15,9 @@ const types = _.values(listConstant);
 types.push(
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_REQUEST,
-  'CLEAR_LIST_SEARCH'
+  'CLEAR_LIST_SEARCH',
+  CLIENT_LISTS_REQUEST,
+  CLIENT_LISTS_RECEIVED
   );
 
 function listReducer(state = initialState.listReducer, action) {
@@ -45,6 +48,14 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = true;
       return obj;
     case listConstant.MANUALLY_SET_ISRECEIVING_OFF:
+      obj.isReceiving = false;
+      return obj;
+    case CLIENT_LISTS_REQUEST:
+      obj.isReceiving = true;
+      return obj;
+    case CLIENT_LISTS_RECEIVED:
+      obj = assignToEmpty(state, action.lists);
+      obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.isReceiving = false;
       return obj;
     case listConstant.REQUEST_MULTIPLE:

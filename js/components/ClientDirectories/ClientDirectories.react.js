@@ -19,7 +19,6 @@ class ClientDirectories extends Component {
 
   render() {
     const props = this.props;
-    console.log(props.clientname);
     return (
       <div style={{marginTop: 60}}>
         CLIENT DIRECTORIES
