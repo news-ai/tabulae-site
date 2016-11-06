@@ -16,7 +16,7 @@ class ClientDirectoryContainer extends Component {
   }
 
   componentWillMount() {
-    if (!this.props.listIds) this.props.fetchLists();
+    this.props.fetchLists();
   }
 
   render() {
