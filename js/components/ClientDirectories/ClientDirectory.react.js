@@ -2,10 +2,11 @@ import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import * as actions from './actions';
 import Waiting from '../Waiting';
+import ListItem from '../Lists/Lists/ListItem.react';
 
 const ClientDirectory = props => {
   return (<div>
-  {props.lists.map(list => <span>{list.name}</span>)}
+  {props.lists.map((list, i) => <ListItem key={`client-list-${i}`} list={list}/>)}
   </div>);
 };
 
