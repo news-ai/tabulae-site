@@ -693,7 +693,7 @@ class ListTable extends Component {
           {
             props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlot yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap} contacts={props.contacts}>
+              <ScatterPlot selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
                 <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
                 {inst => (

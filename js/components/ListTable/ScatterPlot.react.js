@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
@@ -50,13 +51,14 @@ class ScatterPlot extends Component {
   componentWillReceiveProps(nextProps) {
     if (
       nextProps.fieldsmap !== null &&
-      nextProps.contacts !== null &&
-      nextProps.contacts.length > 0
+      nextProps.contacts &&
+      nextProps.contacts.length !== this.props.contacts.length
       ) {
       const xfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === nextProps.xfieldname);
       const yfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === nextProps.yfieldname);
       if (!xfieldObj || !yfieldObj) return;
-      const data = nextProps.contacts.map(contactObj => {
+      const data = nextProps.contacts
+      .map(contactObj => {
         let obj = {};
         obj.x = parseFloat(_getter(contactObj, xfieldObj));
         obj.y = parseFloat(_getter(contactObj, yfieldObj));
@@ -151,4 +153,14 @@ class ScatterPlot extends Component {
   }
 }
 
-export default withRouter(ScatterPlot);
+const mapStateToProps = (state, props) => {
+  return {
+    contacts: props.selected.map(id => state.contactReducer[id])
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ScatterPlot));
