@@ -43,31 +43,38 @@ class ScatterPlot extends Component {
       data: null,
       dataArray: [],
       regressionData: [],
-      labels: []
+      labels: [],
     };
     this.getRegression = this._getRegression.bind(this);
+    this.setData = this._setData.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.fieldsmap !== null &&
-      nextProps.contacts &&
-      nextProps.contacts.length !== this.props.contacts.length
-      ) {
-      const xfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === nextProps.xfieldname);
-      const yfieldObj = nextProps.fieldsmap.find(fieldObj => fieldObj.value === nextProps.yfieldname);
-      if (!xfieldObj || !yfieldObj) return;
-      const data = nextProps.contacts
-      .map(contactObj => {
-        let obj = {};
-        obj.x = parseFloat(_getter(contactObj, xfieldObj));
-        obj.y = parseFloat(_getter(contactObj, yfieldObj));
-        obj.username = contactObj.instagram;
-        obj.id = contactObj.id;
-        return obj;
-      }).filter(obj => obj.x && obj.y);
-      this.setState({data}, _ => this.getRegression());
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.open === true && prevState.open === false) {
+      this.setData();
     }
+  }
+
+  componentWillReceiveProps() {
+  }
+
+  _setData() {
+    const xfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.props.xfieldname);
+    const yfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.props.yfieldname);
+    if (!xfieldObj || !yfieldObj) return;
+    const data = this.props.contacts
+    .map(contactObj => {
+      let obj = {};
+      obj.x = parseFloat(_getter(contactObj, xfieldObj));
+      obj.y = parseFloat(_getter(contactObj, yfieldObj));
+      obj.username = contactObj.instagram;
+      obj.id = contactObj.id;
+      return obj;
+    }).filter(obj => obj.x && obj.y);
+    this.setState({data}, _ => this.getRegression());
   }
 
   _getRegression() {
@@ -126,6 +133,9 @@ class ScatterPlot extends Component {
                 <Tooltip cursor={{strokeDasharray: '3 3'}}/>
               </ScatterChart>
               <div className='row'>
+                <div>
+                  <span><span style={{color: c.blue500}}>Blue</span> are contacts above the line. <span style={{color: c.red500}}>Red</span> are contacts below the line.</span>
+                </div>
                 {state.above && state.above.map(obj =>
                   <Chip
                   style={{margin: 2}}

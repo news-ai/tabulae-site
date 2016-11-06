@@ -131,8 +131,9 @@ class App extends Component {
         open={state.isDrawerOpen}
         onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/clients')} rightIcon={<i className='fa fa-folder' aria-hidden='true' />}>Clients</MenuItem>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Email Analytics</MenuItem>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/settings')} rightIcon={<i className='fa fa-cogs' aria-hidden='true' />}>Settings</MenuItem>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<i className='fa fa-credit-card' aria-hidden='true' />}>Billing</MenuItem>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/public')} rightIcon={<i className='fa fa-table' aria-hidden='true' />}>Public Lists</MenuItem>
