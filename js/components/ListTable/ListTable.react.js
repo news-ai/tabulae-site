@@ -691,7 +691,7 @@ class ListTable extends Component {
               }
             </div>
           {
-            props.fieldsmap !== null &&
+            /*props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
               <ScatterPlot selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
@@ -728,7 +728,7 @@ class ListTable extends Component {
                 </AnalyzeSelectedInstagramContainer>
                 )}
              </ScatterPlot>
-            </div>
+            </div>*/
           }
         </div>
         {state.isEmailPanelOpen &&

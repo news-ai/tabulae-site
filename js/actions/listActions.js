@@ -145,30 +145,6 @@ export function fetchTagLists(tagQuery) {
   };
 }
 
-export function fetchClientLists(clientQuery) {
-  const PAGE_LIMIT = 50;
-  return (dispatch, getState) => {
-    let OFFSET = getState().listReducer.clientOffset;
-    if (clientQuery !== getState().listReducer.clientQuery) OFFSET = 0;
-    if (OFFSET === null || getState().listReducer.isReceiving) return;
-    dispatch(requestLists());
-    return api.get(`/lists?q=client:${clientQuery}&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
-    .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(listSchema),
-      });
-      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch({
-        type: listConstant.RECEIVE_MULTIPLE,
-        lists: res.entities.lists,
-        ids: res.result.data,
-        clientOffset: newOffset,
-        clientQuery
-      });
-    })
-    .catch(message => dispatch(requestListsFail(message)));
-  };
-}
 
 export function fetchArchivedLists() {
   const PAGE_LIMIT = 50;

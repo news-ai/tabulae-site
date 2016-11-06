@@ -21,7 +21,6 @@ export function fetchClientLists(clientQuery) {
       const res = normalize(response, {
         data: arrayOf(listSchema),
       });
-      console.log(response);
       dispatch({
         type: constants.CLIENT_LISTS_RECEIVED,
         clientQuery,

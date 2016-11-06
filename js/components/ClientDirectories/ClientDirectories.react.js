@@ -41,8 +41,9 @@ class ClientDirectories extends Component {
         <ListsTitle title='Clients Directory'/>
         {props.isReceiving && <Waiting isReceiving={props.isReceiving} style={{float: 'right'}}/>}
         <div style={{marginTop: 20}}>
-          {props.clientnames && props.clientnames.map(name =>
+          {props.clientnames && props.clientnames.map((name, i) =>
             <DirectoryParent
+            key={`directory-parent-${i}`}
             open={name === props.clientname}
             children={props.children}
             onClick={_ => props.router.push(`/clients/${name === props.clientname ? '' : name}`)}
