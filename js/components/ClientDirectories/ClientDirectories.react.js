@@ -37,7 +37,7 @@ class ClientDirectories extends Component {
   render() {
     const props = this.props;
     return (
-      <div className='large-offset-1 large-10 columns' style={{marginTop: 60}}>
+      <div className='large-offset-1 large-10 columns' style={{marginTop: 40}}>
         <ListsTitle title='Clients Directory'/>
         {props.isReceiving && <Waiting isReceiving={props.isReceiving} style={{float: 'right'}}/>}
         <div style={{marginTop: 20}}>
@@ -48,6 +48,11 @@ class ClientDirectories extends Component {
             onClick={_ => props.router.push(`/clients/${name === props.clientname ? '' : name}`)}
             name={name}
             />)}
+          {props.clientnames && props.clientnames.length === 0 &&
+            <div className='horizontal-center vertical-center' style={{height: 400}}>
+              <span>No Client name attached with any list. Try adding clientname in a list by clicking "Add Tag & Client" button on top.</span>
+            </div>
+          }
         </div>
       </div>
       );
