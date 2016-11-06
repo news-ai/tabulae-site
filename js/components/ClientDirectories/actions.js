@@ -6,7 +6,7 @@ export function fetchClientNames() {
   return dispatch => {
     dispatch({type: constants.CLIENT_NAMES_REQUEST});
     return api.get('/lists/clients')
-    .then(response => dispatch({type: constants.CLIENT_NAMES_RECEIVED, clientnames: response.data}))
+    .then(response => dispatch({type: constants.CLIENT_NAMES_RECEIVED, clientnames: response.data.clients}))
     .catch(err => dispatch({type: constants.CLIENT_NAMES_REQUEST_FAIL, err}));
   };
 }

@@ -110,5 +110,9 @@ export const initialState = {
     showUploadGuide: false,
     showGeneralGuide: false,
     currentStep: 0
+  },
+  clientReducer: {
+    isReceiving: false,
+    didInvalidate: false,
   }
 };

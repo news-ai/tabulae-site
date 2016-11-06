@@ -1,77 +1,55 @@
 import React, {Component, PropTypes} from 'react';
 import * as actionCreators from 'actions/AppActions';
-import browserHistory from 'react-router/lib/browserHistory';
+import * as actions from './actions';
+import withRouter from 'react-router/lib/withRouter';
+import Waiting from '../Waiting';
 import {connect} from 'react-redux';
 
-import Lists from './Lists';
-import InfiniteScroll from '../InfiniteScroll';
-
-import {grey500} from 'material-ui/styles/colors';
-
-import hopscotch from 'hopscotch';
-import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
-import {tour} from './tour';
-
-class TagListsContainer extends Component {
+class ClientDirectories extends Component {
   constructor(props) {
     super(props);
   }
 
   componentDidMount() {
-    this.props.fetchLists();
+    this.props.fetchClientNames();
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.showUploadGuide !== this.props.showUploadGuide) {
-      setTimeout(_ => this.refs.input.show(), 1000);
-    }
-
-    if (nextProps.showGeneralGuide !== this.props.showGeneralGuide) {
-      hopscotch.startTour(tour);
-    }
-
-    if (nextProps.tag !== this.props.tag) {
-      nextProps.fetchLists();
-    }
   }
 
   render() {
+    const props = this.props;
+    console.log(props.clientname);
     return (
-      <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
-        <div className='large-offset-1 large-10 columns'>
-          <Lists {...this.props} />
-        </div>
-      </InfiniteScroll>
+      <div style={{marginTop: 60}}>
+        CLIENT DIRECTORIES
+        {props.isReceiving && <Waiting isReceiving={props.isReceiving} style={{float: 'right'}}/>}
+        {props.clientnames && props.clientnames.map(name => name === props.clientname ? (
+          <div onClick={_ => props.router.push(`/clients`)}>
+            {name}
+            {props.children}
+          </div>
+          ) :
+        <div onClick={_ => props.router.push(`/clients/${name}`)}>{name}</div>)}
+      </div>
       );
   }
 }
 
 
 const mapStateToProps = (state, props) => {
-  const tag = props.params.tag;
-  const listReducer = state.listReducer;
-  const lists = listReducer.tagLists.map(id => listReducer[id]);
+  const clientname = props.params.clientname;
   return {
-    lists,
-    tag,
-    isReceiving: listReducer.isReceiving,
-    statementIfEmpty: `There is no list tagged with :${tag}`,
-    title: `Tag: ${tag}`,
-    tooltip: 'archive',
+    clientname,
+    clientnames: state.clientReducer.clientnames,
+    isReceiving: state.clientReducer.isReceiving,
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  const clientname = props.params.clientname;
   return {
-    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
-    .then( _ => dispatch(actionCreators.fetchLists())),
-    newListOnClick: untitledNum => {
-      dispatch(actionCreators.createEmptyList(untitledNum))
-      .then(response => browserHistory.push(`/lists/${response.data.id}`));
-    },
-    fetchLists: _ => dispatch(actionCreators.fetchClientLists(clientname)),
+    fetchClientNames: _ => dispatch(actions.fetchClientNames())
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(TagListsContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ClientDirectories));
