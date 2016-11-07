@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import Waiting from '../Waiting';
+import EmptySelected from './EmptySelected.react';
 import Dialog from 'material-ui/Dialog';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -72,7 +73,7 @@ class AnalyzeSelected extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.open && this.state.open) {
-      this.props.fetchData(this.props.selected);
+      if (this.props.selected.length > 0) this.props.fetchData(this.props.selected);
     }
   }
 
@@ -90,6 +91,7 @@ class AnalyzeSelected extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <Waiting isReceiving={props.isReceiving}/>
+          <EmptySelected {...props}/>
           {props.averageBy && state.open && props.selected.length > 0 &&
             <div style={{margin: '20px 0'}}>
               <span>Average By: </span>

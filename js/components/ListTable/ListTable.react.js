@@ -693,7 +693,7 @@ class ListTable extends Component {
           {
             props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlotHOC selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
+              <ScatterPlotHOC selected={state.selected} defaultYFieldname='likes_to_posts' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
                 <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
                 {inst => (
@@ -715,7 +715,7 @@ class ListTable extends Component {
                       onTouchTap={inst.onRequestOpen}
                       />
                       <MenuItem
-                      primaryText='Which is Best'
+                      primaryText='Trendline'
                       leftIcon={<FontIcon className='fa fa-area-chart'/>}
                       onTouchTap={sc.onRequestOpen}
                       disabled={
