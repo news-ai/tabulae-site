@@ -36,7 +36,7 @@ const mapStateToProps = (state, props) => {
     averageBy,
     dataMap,
     dataKeys,
-    isReceiving: filledIds.length !== props.selected.length
+    isReceiving: state.twitterDataReducer.isReceiving
   };
 };
 

@@ -25,6 +25,7 @@ import {blue100, blue200, blue300, grey500, grey400, grey300, grey700} from 'mat
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
+import LinearProgress from 'material-ui/LinearProgress';
 
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
@@ -577,6 +578,7 @@ class ListTable extends Component {
             </div>
           </Dialog>
         }
+        
         <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
@@ -746,6 +748,10 @@ class ListTable extends Component {
         <div>
         {props.listData && props.listData.contacts === null &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+        <div>
+          {props.listData && props.listData.contacts && props.listData.contacts !== null && props.contacts &&
+          <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
+        </div>
         {props.listData && props.received.length > 0 && state.columnWidths !== null &&
           <ScrollSync>
           {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
@@ -842,7 +848,7 @@ const mapStateToProps = (state, props) => {
     listData,
     fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal) : null,
     rawFieldsmap,
-    contacts: contacts,
+    contacts,
     contactIsReceiving: state.contactReducer.isReceiving,
     publicationReducer,
     person: state.personReducer.person,

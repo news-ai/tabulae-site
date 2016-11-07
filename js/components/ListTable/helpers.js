@@ -110,8 +110,8 @@ function instagramCommentsToPosts(listData) {
   const postsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
   if (commentsColumn && postsColumn) {
     return {
-      name: 'comments-to-followers',
-      value: 'comments_to_followers',
+      name: 'comments-to-posts',
+      value: 'comments_to_posts',
       hidden: false,
       tableOnly: true,
       hideCheckbox: true,
