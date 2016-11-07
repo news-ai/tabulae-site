@@ -115,7 +115,7 @@ class ScatterPlotHOC extends Component {
     return (
       <div>
         <Dialog
-        title='Hunger Game: the Fashion Influencer Edition'
+        title='Trendline'
         open={state.open}
         modal
         actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
