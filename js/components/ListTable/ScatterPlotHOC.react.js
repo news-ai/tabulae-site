@@ -60,9 +60,6 @@ class ScatterPlotHOC extends Component {
     }
   }
 
-  componentWillReceiveProps() {
-  }
-
   _setData() {
     const xfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.state.xfieldname);
     const yfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.state.yfieldname);
@@ -90,7 +87,7 @@ class ScatterPlotHOC extends Component {
     let objX, objY, tempY;
     let above = [];
     let below = [];
-    for (let i = 1; i < this.state.data.length; i++) {
+    for (let i = 0; i < this.state.data.length; i++) {
       objX = this.state.data[i].x;
       objY = this.state.data[i].y;
       tempY = m * objX + cc;
@@ -125,7 +122,6 @@ class ScatterPlotHOC extends Component {
           <Waiting isReceiving={props.isReceiving}/>
           <EmptySelected {...props}/>
           {state.open && state.data && props.selected.length > 0 &&
-            <div>
               <ScatterChart data={state.data} width={700} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
                 <XAxis dataKey={'x'} name={state.xfieldname}/>
                 <YAxis dataKey={'y'} name={state.yfieldname}/>
@@ -135,49 +131,48 @@ class ScatterPlotHOC extends Component {
                 <CartesianGrid/>
                 <Tooltip cursor={{strokeDasharray: '3 3'}}/>
               </ScatterChart>
-              <div className='row vertical-center'>
-                  <span>X-Axis</span>
-                  <DropDownMenu value={state.xfieldname} onChange={(e, index, xfieldname) => this.setState({xfieldname})}>
-                  {
-                    props.fieldsmap
-                    .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
-                    .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
-                  }
-                  </DropDownMenu>
-              </div>
-              <div className='row vertical-center'>
-                <span>Y-Axis</span>
-                <DropDownMenu value={state.yfieldname} onChange={(e, index, yfieldname) => this.setState({yfieldname})}>
-                  {
-                    props.fieldsmap
-                    .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
-                    .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
-                  }
+            }
+            <div className='row vertical-center'>
+                <span>X-Axis</span>
+                <DropDownMenu value={state.xfieldname} onChange={(e, index, xfieldname) => this.setState({xfieldname})}>
+                {
+                  props.fieldsmap
+                  .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
+                  .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
+                }
                 </DropDownMenu>
-              </div>
-              <div className='row' style={{margin: '15px 0'}}>
-                <div>
-                  <span><span style={{color: c.blue500}}>Blue</span> are contacts above the line. <span style={{color: c.red500}}>Red</span> are contacts below the line.</span>
-                </div>
-                {state.above && state.above.map(obj =>
-                  <Chip
-                  style={{margin: 2}}
-                  backgroundColor={c.blue200}
-                  key={`chip-${obj.id}`}
-                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
-                  {obj.username}
-                  </Chip>)}
-                {state.below && state.below.map(obj =>
-                  <Chip
-                  style={{margin: 2}}
-                  backgroundColor={c.red200}
-                  key={`chip-${obj.id}`}
-                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
-                  {obj.username}
-                  </Chip>)}
-              </div>
             </div>
-          }
+            <div className='row vertical-center'>
+              <span>Y-Axis</span>
+              <DropDownMenu value={state.yfieldname} onChange={(e, index, yfieldname) => this.setState({yfieldname})}>
+                {
+                  props.fieldsmap
+                  .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
+                  .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
+                }
+              </DropDownMenu>
+            </div>
+            <div className='row' style={{margin: '15px 0'}}>
+              <div>
+                <span><span style={{color: c.blue500}}>Blue</span> are contacts above the line. <span style={{color: c.red500}}>Red</span> are contacts below the line.</span>
+              </div>
+              {state.above && state.above.map(obj =>
+                <Chip
+                style={{margin: 2}}
+                backgroundColor={c.blue200}
+                key={`chip-${obj.id}`}
+                onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                {obj.username}
+                </Chip>)}
+              {state.below && state.below.map(obj =>
+                <Chip
+                style={{margin: 2}}
+                backgroundColor={c.red200}
+                key={`chip-${obj.id}`}
+                onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                {obj.username}
+                </Chip>)}
+            </div>
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
