@@ -720,10 +720,7 @@ class ListTable extends Component {
                       primaryText='Trendline'
                       leftIcon={<FontIcon className='fa fa-area-chart'/>}
                       onTouchTap={sc.onRequestOpen}
-                      disabled={
-                        !props.fieldsmap.some(fieldObj => fieldObj.value === 'likes_to_posts') ||
-                        !props.fieldsmap.some(fieldObj => fieldObj.value === 'instagramfollowers')
-                      }
+                      disabled={state.selected.length === 0}
                       />
                     </IconMenu>)}
                   </AnalyzeSelectedTwitterHOC>)}
