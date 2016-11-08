@@ -55,6 +55,7 @@ function ContactDescriptor({
       nameStyle={contentStyle}
       name={content}
       placeholder={`---- ${contentTitle} empty ----`}
+      maxTextLength={50}
       onBlur={onBlur}
       />
       {extraIcons}

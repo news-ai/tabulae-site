@@ -207,7 +207,7 @@ class ContactProfile extends Component {
             </div>
           </Dialog>
         }
-        <div className='large-9 columns'>
+        <div className='large-9 medium-12 small-12 columns'>
           {props.contact && (
             <div className='row' style={{marginTop: 40}}>
               <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
