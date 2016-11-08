@@ -724,8 +724,7 @@ class ListTable extends Component {
                       />
                     </IconMenu>)}
                   </AnalyzeSelectedTwitterHOC>)}
-                </AnalyzeSelectedInstagramHOC>
-                )}
+                </AnalyzeSelectedInstagramHOC>)}
              </ScatterPlotHOC>
             </div>
           }

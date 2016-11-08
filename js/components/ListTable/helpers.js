@@ -10,14 +10,18 @@ export function isNumber(n) {
 }
 
 export function _getter(contact, fieldObj) {
-  if (fieldObj.customfield) {
-    if (fieldObj.readonly) return contact[fieldObj.value];
-    if (contact.customfields === null) return undefined;
-    else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-    else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
-  } else {
-    if (fieldObj.strategy) return fieldObj.strategy(contact);
-    else return contact[fieldObj.value];
+  try {
+    if (fieldObj.customfield) {
+      if (fieldObj.readonly) return contact[fieldObj.value];
+      if (contact.customfields === null) return undefined;
+      else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
+      else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+    } else {
+      if (fieldObj.strategy) return fieldObj.strategy(contact);
+      else return contact[fieldObj.value];
+    }
+  } catch (e) {
+    return undefined;
   }
 }
 
