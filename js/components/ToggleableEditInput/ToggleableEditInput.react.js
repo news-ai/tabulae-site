@@ -29,7 +29,8 @@ function ToggleableEditInput({
   nameStyle,
   placeholder,
   hideIcon,
-  disabled
+  disabled,
+  maxTextLength
 }) {
   const spanStyle = nameStyle ? Object.assign({}, styles.nameBlock.title, nameStyle) : styles.nameBlock.title;
   const content = placeholder && (!name || name.length === 0) ? placeholder : name;
@@ -49,11 +50,12 @@ function ToggleableEditInput({
       <span
       className='print'
       style={[spanStyle]}
-      >{content}</span>
-      {!hideIcon && !disabled && <i
-      className='fa fa-pencil-square-o noprint'
-      style={[styles.icon]}
-      aria-hidden='true'></i>}
+      >{maxTextLength && content.length >= maxTextLength - 4 ? `${content.substring(0, maxTextLength - 4)} ...` : content}</span>
+      {!hideIcon && !disabled &&
+        <i
+        className='fa fa-pencil-square-o noprint'
+        style={[styles.icon]}
+        aria-hidden='true'/>}
     </div>
     );
   return <div>{renderNode}</div>;

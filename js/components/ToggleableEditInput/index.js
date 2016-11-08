@@ -15,6 +15,7 @@ function ControlledInput(props) {
         onUpdateName={onUpdateName}
         nameStyle={props.nameStyle}
         hideIcon={props.hideIcon}
+        maxTextLength={props.maxTextLength}
         />}
     </ToggleableEditInputHOC>);
 }

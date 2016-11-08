@@ -142,7 +142,7 @@ class App extends Component {
           <div className='small-6 medium-1 large-1 columns vertical-center'>
             <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
-          <div className='hide-for-small-only medium-3 large-6 columns vertical-center'>
+          <div className='hide-for-small-only medium-4 large-6 columns vertical-center'>
             <div>
               <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
