@@ -25,22 +25,23 @@ import {blue100, blue200, blue300, grey500, grey400, grey300, grey700} from 'mat
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
+import LinearProgress from 'material-ui/LinearProgress';
 
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
-import CopyOrMoveTo from './CopyOrMoveTo.react';
-import AddOrHideColumns from './AddOrHideColumns.react';
+import CopyToHOC from './CopyToHOC.react';
+import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
-import EditContact from './EditContact.react';
-import PanelOverlay from './PanelOverlay.react';
+import EditContactHOC from './EditContactHOC.react';
+import PanelOverlayHOC from './PanelOverlayHOC.react';
 import EmptyListStatement from './EmptyListStatement.react';
-import AnalyzeSelectedTwitterContainer from './AnalyzeSelectedTwitterContainer.react';
-import AnalyzeSelectedInstagramContainer from './AnalyzeSelectedInstagramContainer.react';
-import ScatterPlot from './ScatterPlot.react';
+import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
+import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
+import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from '../Tags/Tags.react';
 
 import {
@@ -413,7 +414,7 @@ class ListTable extends Component {
               }}
               />
               {!this.props.listData.readonly &&
-                <EditContact listId={this.props.listId} contactId={rowData.id}>
+                <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
                 {({onRequestOpen}) => (
                   <i
                   onClick={onRequestOpen}
@@ -421,7 +422,7 @@ class ListTable extends Component {
                   style={{color: blue300, cursor: 'pointer'}}
                   />
                   )}
-                </EditContact>}
+                </EditContactHOC>}
             </div>
             );
           break;
@@ -577,6 +578,7 @@ class ListTable extends Component {
             </div>
           </Dialog>
         }
+        
         <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
@@ -592,7 +594,7 @@ class ListTable extends Component {
           />
         </div>
         {state.showProfileTooltip &&
-          <PanelOverlay
+          <PanelOverlayHOC
           onMouseEnter={_ => this.setState({showProfileTooltip: true, onTooltipPanel: true})}
           onMouseLeave={_ => this.setState({showProfileTooltip: false, onTooltipPanel: false})}
           profileX={state.profileX}
@@ -626,7 +628,7 @@ class ListTable extends Component {
                 iconStyle={{color: grey500}}
                 onClick={this.onExportClick}
                 />
-                <CopyOrMoveTo
+                <CopyToHOC
                 selected={state.selected}>
                 {({onRequestOpen}) => (
                   <IconButton
@@ -637,8 +639,8 @@ class ListTable extends Component {
                   iconStyle={{color: grey500}}
                   onClick={onRequestOpen}
                   />)}
-                </CopyOrMoveTo>
-                <AddOrHideColumns listId={props.listId} fieldsmap={props.rawFieldsmap}>
+                </CopyToHOC>
+                <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
                 {({onRequestOpen}) => (
                   <IconButton
                   id='add_remove_columns_hop'
@@ -649,7 +651,7 @@ class ListTable extends Component {
                   iconStyle={{color: grey500}}
                   onClick={onRequestOpen}
                   />)}
-                </AddOrHideColumns>
+                </AddOrRemoveColumnHOC>
                 <AddContactHOC listId={props.listId}>
                 {({onRequestOpen}) => (
                   <IconButton
@@ -691,13 +693,13 @@ class ListTable extends Component {
               }
             </div>
           {
-            /*props.fieldsmap !== null &&
+            props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlot selected={state.selected} yfieldname='likes_to_posts' xfieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
+              <ScatterPlotHOC selected={state.selected} defaultYFieldname='likes_to_posts' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
-                <AnalyzeSelectedInstagramContainer selected={state.selected} listId={props.listId}>
+                <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
                 {inst => (
-                 <AnalyzeSelectedTwitterContainer selected={state.selected} listId={props.listId}>
+                 <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
                   {twt => (
                     <IconMenu
                     iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
@@ -715,20 +717,16 @@ class ListTable extends Component {
                       onTouchTap={inst.onRequestOpen}
                       />
                       <MenuItem
-                      primaryText='Which is Best'
+                      primaryText='Trendline'
                       leftIcon={<FontIcon className='fa fa-area-chart'/>}
                       onTouchTap={sc.onRequestOpen}
-                      disabled={
-                        !props.fieldsmap.some(fieldObj => fieldObj.value === 'likes_to_posts') ||
-                        !props.fieldsmap.some(fieldObj => fieldObj.value === 'instagramfollowers')
-                      }
+                      disabled={state.selected.length === 0}
                       />
                     </IconMenu>)}
-                  </AnalyzeSelectedTwitterContainer>)}
-                </AnalyzeSelectedInstagramContainer>
-                )}
-             </ScatterPlot>
-            </div>*/
+                  </AnalyzeSelectedTwitterHOC>)}
+                </AnalyzeSelectedInstagramHOC>)}
+             </ScatterPlotHOC>
+            </div>
           }
         </div>
         {state.isEmailPanelOpen &&
@@ -746,6 +744,10 @@ class ListTable extends Component {
         <div>
         {props.listData && props.listData.contacts === null &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+        <div>
+          {props.listData && props.listData.contacts && props.listData.contacts !== null && props.contacts &&
+          <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
+        </div>
         {props.listData && props.received.length > 0 && state.columnWidths !== null &&
           <ScrollSync>
           {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
@@ -842,7 +844,7 @@ const mapStateToProps = (state, props) => {
     listData,
     fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal) : null,
     rawFieldsmap,
-    contacts: contacts,
+    contacts,
     contactIsReceiving: state.contactReducer.isReceiving,
     publicationReducer,
     person: state.personReducer.person,

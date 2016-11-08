@@ -4,6 +4,8 @@ import withRouter from 'react-router/lib/withRouter';
 import Waiting from '../Waiting';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
+import DropDownMenu from 'material-ui/DropDownMenu';
+import MenuItem from 'material-ui/MenuItem';
 import Chip from 'material-ui/Chip';
 import {
   ScatterChart,
@@ -14,9 +16,10 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
+import EmptySelected from './EmptySelected.react';
 import * as c from 'material-ui/styles/colors';
 import regression from 'regression';
-import {_getter} from './helpers';
+import {_getter, divide, isNumber} from './helpers';
 
 const colors = [
   c.red300, c.blue300, c.purple300, c.cyan300, c.green300, c.indigo300, c.orange300,
@@ -27,13 +30,7 @@ const colors = [
   c.red800, c.blue800, c.purple800, c.cyan800, c.green800, c.indigo800, c.orange800,
 ];
 
-function divide(numerator, denomenator, fixedTo) {
-  if (numerator === undefined || denomenator === undefined) return undefined;
-  const res = Math.round(numerator * (1 / fixedTo) / denomenator) / (1 / fixedTo);
-  if (!isNaN(res)) return res;
-}
-
-class ScatterPlot extends Component {
+class ScatterPlotHOC extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,6 +41,8 @@ class ScatterPlot extends Component {
       dataArray: [],
       regressionData: [],
       labels: [],
+      xfieldname: this.props.defaultXFieldname,
+      yfieldname: this.props.defaultYFieldname
     };
     this.getRegression = this._getRegression.bind(this);
     this.setData = this._setData.bind(this);
@@ -54,16 +53,16 @@ class ScatterPlot extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.open === true && prevState.open === false) {
-      this.setData();
+      if (this.props.contacts.length > 0) this.setData();
+    }
+    if (this.state.xfieldname !== prevState.xfieldname || this.state.yfieldname !== prevState.yfieldname) {
+      if (this.props.contacts.length > 0) this.setData();
     }
   }
 
-  componentWillReceiveProps() {
-  }
-
   _setData() {
-    const xfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.props.xfieldname);
-    const yfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.props.yfieldname);
+    const xfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.state.xfieldname);
+    const yfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.state.yfieldname);
     if (!xfieldObj || !yfieldObj) return;
     const data = this.props.contacts
     .map(contactObj => {
@@ -88,7 +87,7 @@ class ScatterPlot extends Component {
     let objX, objY, tempY;
     let above = [];
     let below = [];
-    for (let i = 1; i < this.state.data.length; i++) {
+    for (let i = 0; i < this.state.data.length; i++) {
       objX = this.state.data[i].x;
       objY = this.state.data[i].y;
       tempY = m * objX + cc;
@@ -113,7 +112,7 @@ class ScatterPlot extends Component {
     return (
       <div>
         <Dialog
-        title='Hunger Game: the Fashion Influencer Edition'
+        title='Trendline'
         open={state.open}
         modal
         actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
@@ -121,40 +120,59 @@ class ScatterPlot extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <Waiting isReceiving={props.isReceiving}/>
-          {state.open && state.data &&
-            <div>
+          <EmptySelected {...props}/>
+          {state.open && state.data && props.selected.length > 0 &&
               <ScatterChart data={state.data} width={700} height={400} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-                <XAxis dataKey={'x'} name={props.xfieldname}/>
-                <YAxis dataKey={'y'} name={props.yfieldname}/>
+                <XAxis dataKey={'x'} name={state.xfieldname}/>
+                <YAxis dataKey={'y'} name={state.yfieldname}/>
                 <ZAxis dataKey={'username'} name='username'/>
                 <Scatter data={state.data} fill={colors[0]}/>
                 <Scatter data={state.regressionData} line fill={colors[1]}/>
                 <CartesianGrid/>
                 <Tooltip cursor={{strokeDasharray: '3 3'}}/>
               </ScatterChart>
-              <div className='row'>
-                <div>
-                  <span><span style={{color: c.blue500}}>Blue</span> are contacts above the line. <span style={{color: c.red500}}>Red</span> are contacts below the line.</span>
-                </div>
-                {state.above && state.above.map(obj =>
-                  <Chip
-                  style={{margin: 2}}
-                  backgroundColor={c.blue200}
-                  key={`chip-${obj.id}`}
-                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
-                  {obj.username}
-                  </Chip>)}
-                {state.below && state.below.map(obj =>
-                  <Chip
-                  style={{margin: 2}}
-                  backgroundColor={c.red200}
-                  key={`chip-${obj.id}`}
-                  onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
-                  {obj.username}
-                  </Chip>)}
-              </div>
+            }
+            <div className='row vertical-center'>
+                <span>X-Axis</span>
+                <DropDownMenu value={state.xfieldname} onChange={(e, index, xfieldname) => this.setState({xfieldname})}>
+                {
+                  props.fieldsmap
+                  .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
+                  .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
+                }
+                </DropDownMenu>
             </div>
-          }
+            <div className='row vertical-center'>
+              <span>Y-Axis</span>
+              <DropDownMenu value={state.yfieldname} onChange={(e, index, yfieldname) => this.setState({yfieldname})}>
+                {
+                  props.fieldsmap
+                  .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
+                  .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
+                }
+              </DropDownMenu>
+            </div>
+            <div className='row' style={{margin: '15px 0'}}>
+              <div>
+                <span><span style={{color: c.blue500}}>Blue</span> are contacts above the line. <span style={{color: c.red500}}>Red</span> are contacts below the line.</span>
+              </div>
+              {state.above && state.above.map(obj =>
+                <Chip
+                style={{margin: 2}}
+                backgroundColor={c.blue200}
+                key={`chip-${obj.id}`}
+                onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                {obj.username}
+                </Chip>)}
+              {state.below && state.below.map(obj =>
+                <Chip
+                style={{margin: 2}}
+                backgroundColor={c.red200}
+                key={`chip-${obj.id}`}
+                onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                {obj.username}
+                </Chip>)}
+            </div>
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
@@ -173,4 +191,4 @@ const mapDispatchToProps = (dispatch, props) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ScatterPlot));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ScatterPlotHOC));

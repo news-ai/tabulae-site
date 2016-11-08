@@ -11,7 +11,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 
 
-class CopyOrMoveTo extends Component {
+class CopyToHOC extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -128,4 +128,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CopyOrMoveTo));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CopyToHOC));

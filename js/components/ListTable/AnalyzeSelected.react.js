@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import Waiting from '../Waiting';
+import EmptySelected from './EmptySelected.react';
 import Dialog from 'material-ui/Dialog';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -16,6 +17,8 @@ const colors = [
   c.red700, c.blue700, c.purple700, c.cyan700, c.green700, c.indigo700, c.orange700,
   c.red800, c.blue800, c.purple800, c.cyan800, c.green800, c.indigo800, c.orange800,
 ];
+
+const SELECT_THRESHOLD = 10;
 
 function divide(numerator, denomenator, fixedTo) {
   if (numerator === undefined || denomenator === undefined) return undefined;
@@ -72,7 +75,7 @@ class AnalyzeSelected extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.open && this.state.open) {
-      this.props.fetchData(this.props.selected);
+      if (this.props.selected.length > 0 && this.props.selected.length < SELECT_THRESHOLD) this.props.fetchData(this.props.selected);
     }
   }
 
@@ -90,7 +93,13 @@ class AnalyzeSelected extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <Waiting isReceiving={props.isReceiving}/>
-          {props.averageBy && state.open && props.selected.length > 0 &&
+          <EmptySelected {...props}/>
+          {props.selected.length > SELECT_THRESHOLD &&
+            <div>
+              <span>You selected {props.selected.length} contacts, which makes the graph data points. Please select less than {SELECT_THRESHOLD} contacts.</span>
+            </div>
+          }
+          {props.averageBy && state.open && props.selected.length > 0 && props.selected.length <= SELECT_THRESHOLD &&
             <div style={{margin: '20px 0'}}>
               <span>Average By: </span>
               <DropDownMenu value={state.averageBySelected} onChange={(e, index, val) => this.setState({averageBySelected: val})}>
