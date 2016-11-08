@@ -5,9 +5,6 @@ import withRouter from 'react-router/lib/withRouter';
 import * as listfeedActions from './actions';
 import * as actionCreators from '../../actions/AppActions';
 import * as AppActions from 'actions/AppActions';
-import HeadlineItem from '../ContactProfile/Headlines/HeadlineItem.react';
-import Tweet from '../ContactProfile/Tweets/Tweet.react';
-import InstagramItem from '../ContactProfile/Instagram/InstagramItem.react';
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 
 import hopscotch from 'hopscotch';
@@ -81,7 +78,12 @@ class ListFeed extends Component {
             <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
           </div>}
         <div className='row horizontal-center'>
-         <MixedFeed rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}} containerWidth={state.screenWidth < 800 ? state.screenWidth : 800} fetchFeed={props.fetchListFeed} {...props}/>
+         <MixedFeed
+         autoSizer
+         rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}}
+         containerWidth={state.screenWidth < 800 ? state.screenWidth : 800}
+         fetchFeed={props.fetchListFeed}
+         {...props}/>
         </div>
       </div>);
   }

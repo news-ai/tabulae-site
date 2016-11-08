@@ -52,7 +52,7 @@ const InstagramItem = ({
         <span style={{fontSize: '0.8em', color: grey400}}>from Instagram</span>
       </div>
       <div className='large-10 medium-12 small-12 columns'>
-        {text
+        {text && text
         .split(' ')
         .map((block, i) => <a key={`${instagramid}-${i}`} style={{color: grey800}} target='_blank' href={isURL(block) ? block : instagramlink}>{block} </a>)}
       </div>

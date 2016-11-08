@@ -8,8 +8,8 @@ const createMarkup = markup => ({__html: markup});
 const defaultStyle = {
   paddingTop: 10,
   paddingBottom: 10,
-  marginTop: 15,
-  marginBottom: 10,
+  marginTop: 20,
+  marginBottom: 20,
   border: `dotted 1px ${grey400}`,
   borderRadius: '0.4em'
 };
@@ -29,7 +29,7 @@ const HeadlineItem = ({style, url, title, createdat, summary, publisherName}) =>
     <div className='large-12 medium-12 small-12 columns'>
       <span style={{fontWeight: 500}}>{publisherName}</span>
     </div>
-    <div className='large-12 medium-12 small-12 columns'>
+    <div className='large-12 medium-12 small-12 columns rss-feed-markup-item' style={{margin: '20px 0'}}>
       <div dangerouslySetInnerHTML={createMarkup(summary)} />
     </div>
   </div>
