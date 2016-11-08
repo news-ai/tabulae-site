@@ -1,8 +1,9 @@
 import React, {PropTypes} from 'react';
-import {grey400, grey50} from 'material-ui/styles/colors';
+import {grey400, grey50, grey800} from 'material-ui/styles/colors';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
+import isURL from 'validator/lib/isURL';
 
 const defaultStyle = {
   paddingTop: 10,
@@ -43,7 +44,7 @@ const InstagramItem = ({
   Object.assign(
     {},
     defaultImgContainerStyle, {
-     width: screenWidth - IMG_CONTAINER_OFFSET > containerStyle.width ? containerStyle.width - IMG_CONTAINER_OFFSET : screenWidth - IMG_CONTAINER_OFFSET
+      width: screenWidth - IMG_CONTAINER_OFFSET > containerStyle.width ? containerStyle.width - IMG_CONTAINER_OFFSET : screenWidth - IMG_CONTAINER_OFFSET
     }) : defaultImgContainerStyle;
   return (
     <div className='row' style={containerStyle}>
@@ -51,7 +52,9 @@ const InstagramItem = ({
         <span style={{fontSize: '0.8em', color: grey400}}>from Instagram</span>
       </div>
       <div className='large-10 medium-12 small-12 columns'>
-        <a target='_blank' style={{float: 'left'}} href={instagramlink}>{text ? text : instagramlink}</a>
+        {text
+        .split(' ')
+        .map((block, i) => <a key={`${instagramid}-${i}`} style={{color: grey800}} target='_blank' href={isURL(block) ? block : instagramlink}>{block} </a>)}
       </div>
       <div className='large-12 medium-12 small-12 columns'>
         <span style={{float: 'right'}}>
