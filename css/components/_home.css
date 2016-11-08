@@ -122,7 +122,7 @@ input {
   border-color: #31708f;
 }
 
-.headline-item img {
-  height: 300px;
-  display: block
+.rss-feed-markup-item img {
+  max-height: 300px;
+  width: auto;
 }
