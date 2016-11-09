@@ -133,7 +133,7 @@ class UserProfile extends Component {
                   />}
               </div>
             </div>
-            <div className='row vertical-center'>
+            <div className='row vertical-center' style={inputHeight}>
               <div className='large-4 medium-4 columns'>
                 <span style={spanStyle}>Subscribe to Emails</span>
               </div>
