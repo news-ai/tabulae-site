@@ -6,6 +6,7 @@ import {getInviteCount} from './actions';
 
 import {grey500, cyan500, blueGrey900} from 'material-ui/styles/colors';
 import Avatar from 'material-ui/Avatar';
+import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
 import Invite from './Invite.react';
 
@@ -57,6 +58,7 @@ class UserProfile extends Component {
       const person = {
         firstname: newPerson.get('firstname'),
         lastname: newPerson.get('lastname'),
+        getdailyemails: newPerson.get('getdailyemails')
       };
       this.props.patchPerson(person);
     }
@@ -83,6 +85,7 @@ class UserProfile extends Component {
             {person.instagramid.length === 0 && <span style={{color: grey600, fontSize: '0.8em'}}>To track Instagram feeds, you must authenticate with your Instagram account!</span>}
           </div>
         </div>*/
+    const toggled = state.newPerson.get('getdailyemails');
     return (
       <div>
         <div className='row horizontal-center' style={{marginTop: 60, marginBottom: 10}}>
@@ -130,6 +133,14 @@ class UserProfile extends Component {
                   />}
               </div>
             </div>
+            <div className='row vertical-center'>
+              <div className='large-4 medium-4 columns'>
+                <span style={spanStyle}>Subscribe to Emails</span>
+              </div>
+              <div className='large-8 medium-8 columns'>
+                <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !toggled)}/>
+              </div>
+            </div>
           </div>
         </div>
         <div className='row horizontal-center'>
@@ -157,7 +168,7 @@ class UserProfile extends Component {
               <span style={{fontSize: '0.8em'}}>{5 - state.count} friends away from a free month</span>
             </div>
             <div className='horizontal-center' style={{margin: '20px 0'}}>
-              <Invite className='vertical-center' />
+              <Invite className='vertical-center'/>
             </div>
           </div>
         </div>
