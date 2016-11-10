@@ -30,7 +30,7 @@ const iconStyle = {
 
 const emailIconStyle = Object.assign({}, iconStyle, {
   float: 'right',
-  margin: '2px'
+  margin: 2
 });
 
 
@@ -255,8 +255,8 @@ class EmailPanel extends Component {
               debounce={500}
               person={props.person}
               >
-                <div>
-                  <SelectField value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
+                <div className='vertical-center'>
+                  <SelectField style={{overflowX: 'hidden'}} value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
                   {templateMenuItems}
                   </SelectField>
                   <IconMenu
