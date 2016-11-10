@@ -51,6 +51,10 @@ class GenericFeed extends Component {
        <WindowScroller>
         {({height, scrollTop}) => (<BasicFeed {...props} containerHeight={height} scrollTop={scrollTop}/>)}
         </WindowScroller>);
+    const autoSizedList = props.feed && (
+        <AutoSizer>
+        {({height}) => (<BasicFeed {...props} containerHeight={height}/>)}
+        </AutoSizer>);
     const renderNode = (
       <div>
         {props.feed
@@ -62,7 +66,7 @@ class GenericFeed extends Component {
           <p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right chat button to leave us a message and we'll try to resolve this for you as fast as we can.</p>
           </div>
         }
-        {props.feed && (props.containerHeight ? limitedHeightList : windowScrollableList)}
+        {props.feed && !props.autoSizer && (props.containerHeight ? limitedHeightList : windowScrollableList)}
       </div>
       );
     

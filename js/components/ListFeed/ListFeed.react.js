@@ -25,13 +25,15 @@ class ListFeed extends Component {
     this.state = {
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING,
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
-      firsttime: this.props.firstTimeUser
+      firsttime: this.props.firstTimeUser,
+      height: 400
     };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0) - FEED_PADDING;
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
       this.setState({screenWidth, screenHeight});
     };
+    this.getPosition = this._getPosition.bind(this);
   }
 
   componentWillMount() {
@@ -39,15 +41,24 @@ class ListFeed extends Component {
     if (!this.props.list) this.props.fetchList(this.props.listId);
   }
 
+  componentDidMount() {
+    this.getPosition();
+  }
+
   componentWillUnmount() {
     window.resize = undefined;
+  }
+
+  _getPosition() {
+    const containerY = this.refs.listfeedNameContainer.offsetTop + this.refs.listfeedNameContainer.clientHeight;
+    this.setState({height: document.body.clientHeight - containerY});
   }
 
   render() {
     const props = this.props;
     const state = this.state;
     return (
-      <div>
+      <div style={{paddingTop: 30}}>
         {
           props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
@@ -62,7 +73,7 @@ class ListFeed extends Component {
             </div>
           </Dialog>
         }
-        <div className='row horizontal-center' style={{marginTop: 30}}>
+        <div ref='listfeedNameContainer' className='row horizontal-center'>
           <h4>{props.list ? props.list.name : 'List Feed'}</h4>
           <FlatButton
           id='read_only_btn_hop'
@@ -78,12 +89,13 @@ class ListFeed extends Component {
             <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
           </div>}
         <div className='row horizontal-center'>
-         <MixedFeed
-         autoSizer
-         rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}}
-         containerWidth={state.screenWidth < 800 ? state.screenWidth : 800}
-         fetchFeed={props.fetchListFeed}
-         {...props}/>
+          <MixedFeed
+          containerHeight={state.height}
+          rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}}
+          containerWidth={state.screenWidth < 800 ? state.screenWidth : 800}
+          fetchFeed={props.fetchListFeed}
+          {...props}
+          />
         </div>
       </div>);
   }
