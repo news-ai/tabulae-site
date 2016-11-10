@@ -23,13 +23,13 @@ const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, quer
         backgroundColor: grey50
       }}>
         <div className='row'>
-        <div className='large-10 columns'>
+        <div className='large-10 medium-10 columns'>
           <div><span>{firstname} {lastname}</span></div>
           <div><span>{email}</span></div>
           <span style={smallSpan}>belongs in</span>
           <Link to={`/lists/${listid}`}><span style={{marginLeft: '5px'}}>{listname}</span></Link>
         </div>
-        <div className='large-2 columns vertical-center'>
+        <div className='large-2 medium-2 columns vertical-center'>
           {listid ? <IconButton
             tooltip='Go to Profile'
             tooltipPosition='top-right'
