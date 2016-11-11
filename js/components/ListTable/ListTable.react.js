@@ -629,6 +629,7 @@ class ListTable extends Component {
                 onClick={this.onExportClick}
                 />
                 <CopyToHOC
+                listId={props.listId}
                 selected={state.selected}>
                 {({onRequestOpen}) => (
                   <IconButton

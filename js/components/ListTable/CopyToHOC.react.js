@@ -9,7 +9,7 @@ import withRouter from 'react-router/lib/withRouter';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-
+import TextField from 'material-ui/TextField';
 
 class CopyToHOC extends Component {
   constructor(props) {
@@ -19,6 +19,7 @@ class CopyToHOC extends Component {
       value: []
     };
     this.onSubmit = this._onSubmit.bind(this);
+    this.onNewSheetSubmit = this._onNewSheetSubmit.bind(this);
   }
 
   componentWillMount() {
@@ -28,9 +29,16 @@ class CopyToHOC extends Component {
   _onSubmit() {
     const props = this.props;
     const state = this.state;
-    if (state.value.length === 0) return;
+    if (state.value.length === 0 || props.selectedContacts.length === 0) return;
     const selectedLists = state.value.map(obj => props.listReducer[obj.value]);
     selectedLists.map(list => props.addContactsThenPatchList(props.selectedContacts, list));
+  }
+
+  _onNewSheetSubmit() {
+    const props = this.props;
+    const state = this.state;
+    const val = this.refs.copyToHOC_newSheetName.input.value;
+    props.copyToNewList(props.selectedContacts, val);
   }
 
   render() {
@@ -46,7 +54,7 @@ class CopyToHOC extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <div className='row'>
-            <div className='large-12 medium-12 small-12 columns' style={{margin: '20px 0'}}>
+            <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
               <span style={{fontWeight: 'bold', marginRight: 8}}>Selected</span>
               {props.selected.length === 0 && <span>none selected</span>}
               {props.selectedContacts &&
@@ -54,7 +62,7 @@ class CopyToHOC extends Component {
                 .map(contact => contact.firstname)
                 .join(', ')}</span>}
             </div>
-            <div className='large-12 medium-12 small-12 columns' style={{margin: '20px 0'}}>
+            <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
               <p>Select the List(s) to Copy these selected contacts to:</p>
               {props.lists &&
                 <Select
@@ -65,13 +73,35 @@ class CopyToHOC extends Component {
                 onValueClick={({value}) => props.router.push(`/tables/${value}`)}
                 />}
             </div>
-            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 80}}>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 5, marginBottom: 20}}>
               <RaisedButton
               label='Submit'
               primary
               disabled={!props.selectedContacts || state.value.length === 0}
               icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
-              onClick={this.onSubmit} />
+              onClick={this.onSubmit}
+              />
+            </div>
+            <div className='large-12 medium-12 small-12 columns'>
+              <span>Or, copy to a a brand new list:</span>
+            </div>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 30}}>
+              <div className='vertical-center'>
+                <span style={{marginRight: 10, fontSize: '0.9em'}}>New Sheet Name</span>
+                <TextField
+                id='copyToHOC_newSheetName'
+                ref='copyToHOC_newSheetName'
+                defaultValue={`${props.list.name} (Copy)`}
+                />
+                <RaisedButton
+                primary
+                style={{marginLeft: 10}}
+                disabled={state.value.length > 0 || !props.selectedContacts}
+                label='Copy to New List'
+                onClick={this.onNewSheetSubmit}
+                icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
+                />
+              </div>
             </div>
           </div>
         </Dialog>
@@ -86,6 +116,7 @@ const mapStateToProps = (state, props) => {
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   return {
     lists,
+    list: state.listReducer[props.listId],
     options: lists.map(list => ({label: list.name, value: list.id})),
     selectedContacts: props.selected && props.selected.length > 0 && props.selected.map(id => state.contactReducer[id]),
     listReducer: state.listReducer,
@@ -94,37 +125,39 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
+  const addContactsThenPatchList = (rawContacts, list) => {
+    if (rawContacts.length === 0) return;
+    const contacts = rawContacts.map(contact => {
+      let obj = {listid: list.id};
+      list.fieldsmap
+      .filter(fieldObj => !fieldObj.customfield)
+      .map(fieldObj => {
+        if (!isEmpty(contact[fieldObj.value])) obj[fieldObj.value] = contact[fieldObj.value];
+      });
+      obj.customfields = contact.customfields;
+      return obj;
+    });
+    return dispatch(actionCreators.addContacts(contacts))
+    .then(addedContacts => {
+      // copy feeds over
+      for (let i = 0; i < addedContacts.length; i++) {
+        dispatch(feedActions.copyFeeds(rawContacts[i].id, addedContacts[i].id, list.id));
+      }
+      const ids = addedContacts.map(contact => contact.id);
+      // update list
+      const listBody = {
+        listId: list.id,
+        name: list.name,
+        contacts: list.contacts !== null ? [...list.contacts, ...ids] : ids
+      };
+      return dispatch(actionCreators.patchList(listBody));
+    });
+  };
   return {
     fetchLists: _ => dispatch(actionCreators.fetchLists()),
-    addContactsThenPatchList: (rawContacts, list) => {
-      if (rawContacts.length === 0) return;
-      const contacts = rawContacts.map(contact => {
-        let obj = {listid: list.id};
-        list.fieldsmap
-        .filter(fieldObj => !fieldObj.customfield)
-        .map(fieldObj => {
-          if (!isEmpty(contact[fieldObj.value])) obj[fieldObj.value] = contact[fieldObj.value];
-        });
-        obj.customfields = contact.customfields;
-        return obj;
-      });
-      return dispatch(actionCreators.addContacts(contacts))
-      .then(addedContacts => {
-        // copy feeds over
-        for (let i = 0; i < addedContacts.length; i++) {
-          dispatch(feedActions.copyFeeds(rawContacts[i].id, addedContacts[i].id, list.id));
-        }
-        const ids = addedContacts.map(contact => contact.id);
-
-        // update list
-        const listBody = {
-          listId: list.id,
-          name: list.name,
-          contacts: list.contacts !== null ? [...list.contacts, ...ids] : ids
-        };
-        return dispatch(actionCreators.patchList(listBody));
-      });
-    },
+    addContactsThenPatchList,
+    copyToNewList: (rawContacts, name) => dispatch(actionCreators.createEmptyList(name))
+    .then(response => addContactsThenPatchList(rawContacts, response.data))
   };
 };
 
