@@ -39,16 +39,16 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
   const updatedDate = new Date(list.updated);
   return (
     <div key='parent' className='row align-middle' style={[styles.parent]}>
-      <div id={list.name === 'My first list!' && 'listitem_table_hop'} className='small-8 medium-5 large-7 columns' style={[styles.pointer]}>
+      <div id={list.name === 'My first list!' && 'listitem_table_hop'} className='small-8 medium-7 large-7 columns' style={[styles.pointer]}>
         <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
           <div style={{float: 'right'}}>
             <Tags hideDelete listId={list.id}/>
           </div>
       </div>
-      <div className='small-4 medium-4 large-3 columns' onClick={_ => router.push(`/lists/${list.id}`)}>
+      <div className='small-4 medium-3 large-3 columns' onClick={_ => router.push(`/lists/${list.id}`)}>
         <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
       </div>
-      <div className='hide-for-small-only medium-3 large-2 columns'>
+      <div className='hide-for-small-only medium-2 large-2 columns'>
         <IconButton
         tooltip='List Feed'
         id={list.name === 'My first list!' && 'listitem_listfeed_hop'}

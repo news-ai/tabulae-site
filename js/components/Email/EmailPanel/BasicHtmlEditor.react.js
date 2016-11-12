@@ -42,7 +42,7 @@ class BasicHtmlEditor extends React.Component {
     super(props);
     const decorator = new CompositeDecorator([
       {
-        strategy: findEntities.bind(null, 'link'),
+        strategy: findEntities.bind(null, 'LINK'),
         component: Link
       },
       {
@@ -103,8 +103,9 @@ class BasicHtmlEditor extends React.Component {
     };
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
+      console.log(raw);
       let html = draftRawToHtml(raw);
-      // console.log(html);
+      console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -197,9 +198,11 @@ class BasicHtmlEditor extends React.Component {
     if (selection.isCollapsed()) {
       return;
     }
-    const href = alertify.prompt('', 'Enter a URL', 'https://',
-      (e, href) => {
-        const entityKey = Entity.create('link', 'MUTABLE', {href});
+    alertify.prompt(
+      '',
+      'Enter a URL', 'https://',
+      (e, url) => {
+        const entityKey = Entity.create('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
       },
       _ => {});
@@ -258,15 +261,15 @@ class BasicHtmlEditor extends React.Component {
         }}>
           <div className={className} onClick={this.focus}>
             <Editor
-              blockStyleFn={getBlockStyle}
-              customStyleMap={styleMap}
-              editorState={editorState}
-              handleKeyCommand={this.handleKeyCommand}
-              handleReturn={this.handleReturn}
-              onChange={this.onChange}
-              placeholder={placeholder}
-              ref='editor'
-              spellCheck
+            blockStyleFn={getBlockStyle}
+            customStyleMap={styleMap}
+            editorState={editorState}
+            handleKeyCommand={this.handleKeyCommand}
+            handleReturn={this.handleReturn}
+            onChange={this.onChange}
+            placeholder={placeholder}
+            ref='editor'
+            spellCheck
             />
           </div>
           <RaisedButton
@@ -308,7 +311,7 @@ class BasicHtmlEditor extends React.Component {
           position: 'absolute',
           bottom: 3,
           width: props.width,
-         }}>
+          }}>
            <div>
               <Tooltip show={state.hoveredTooltip}
               style={{
@@ -344,6 +347,9 @@ const styleMap = {
     fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
     fontSize: 16,
     padding: 2
+  },
+  LINK: {
+    color: 'blue'
   }
 };
 
@@ -355,4 +361,3 @@ function getBlockStyle(block) {
 }
 
 export default BasicHtmlEditor;
-

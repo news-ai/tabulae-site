@@ -36,7 +36,6 @@ class CopyToHOC extends Component {
 
   _onNewSheetSubmit() {
     const props = this.props;
-    const state = this.state;
     const val = this.refs.copyToHOC_newSheetName.input.value;
     props.copyToNewList(props.selectedContacts, val);
   }
