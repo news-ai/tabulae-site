@@ -127,6 +127,7 @@ class ListTable extends Component {
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.onCheckSelected = this._onCheckSelected.bind(this);
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -196,6 +197,11 @@ class ListTable extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.contactIsReceiving) return false;
+    return true;
+  }
+
   componentWillReceiveProps(nextProps) {
     console.log(nextProps);
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
@@ -207,33 +213,11 @@ class ListTable extends Component {
       } else {
         this.clearColumnStorage();
       }
-
-      if (nextProps.searchQuery) {
-        this.fetchOperations(nextProps).
-        then(_ => this.onSearchClick(nextProps.searchQuery));
-      } else {
-        this.fetchOperations(nextProps);
-      }
     }
 
     if (this.props.listData && this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
-    }
-
-    // initialize columnWidths
-    if (!this.props.listData && nextProps.listData && this.state.columnWidths === null) {
-      const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
-        const name = fieldObj.name;
-        const size = measureSpanSize(name, '16px Source Sans Pro')
-        return size.width > 70 ? size.width : 70;
-      });
-      this.setState({columnWidths}, _ => {
-        if (this._HeaderGrid && this._DataGrid) {
-          this._HeaderGrid.recomputeGridSize();
-          this._DataGrid.recomputeGridSize();
-        }
-      })
     }
 
     if (this.props.listData && nextProps.listData) {
@@ -306,6 +290,38 @@ class ListTable extends Component {
     });
   }
 
+  _onCheck(e, contactId, {columnIndex, rowIndex, key, style}) {
+    const lastRowIndexChecked = this.state.lastRowIndexChecked;
+    if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
+      let selected = this.state.selected.slice();
+      let last = null;
+      if (rowIndex < lastRowIndexChecked) {
+        for (let i = rowIndex; i < lastRowIndexChecked; i++) {
+          const checked = this.state.selected.some(id => id === contacts[i].id);
+          selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+        }
+      } else {
+        for (let i = rowIndex; i > lastRowIndexChecked; i--) {
+          const checked = this.state.selected.some(id => id === contacts[i].id);
+          selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+        }
+      }
+      this.setState({lastRowIndexChecked: rowIndex, selected});
+    } else {
+      this.onCheckSelected(contactId);
+      this.setState({lastRowIndexChecked: rowIndex});
+    }
+  }
+
+  
+  _onCheckSelected(contactId) {
+    const checked = this.state.selected.some(id => id === contactId);
+    const selected = !checked ?
+    [...this.state.selected, contactId] :
+    this.state.selected.filter(id => id !== contactId);
+    this.setState({selected});
+  }
+
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.fieldsmap[columnIndex].name;
     const value = this.props.fieldsmap[columnIndex].value;
@@ -346,7 +362,8 @@ class ListTable extends Component {
       </div>);
   }
 
-  _cellRenderer({columnIndex, rowIndex, key, style}) {
+  _cellRenderer(cellProps) {
+    const {columnIndex, rowIndex, key, style} = cellProps;
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
 
@@ -362,31 +379,11 @@ class ListTable extends Component {
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
           contentBody = (
-            <Checkbox
-            iconStyle={{fill: isChecked ? blue200 : grey400}}
-            checked={isChecked}
-            onCheck={(e, checked) => {
-              const lastRowIndexChecked = this.state.lastRowIndexChecked;
-              if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
-                let selected = this.state.selected.slice();
-                let last = null;
-                if (rowIndex < lastRowIndexChecked) {
-                  for (let i = rowIndex; i < lastRowIndexChecked; i++) {
-                    const checked = this.state.selected.some(id => id === contacts[i].id);
-                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
-                  }
-                } else {
-                  for (let i = rowIndex; i > lastRowIndexChecked; i--) {
-                    const checked = this.state.selected.some(id => id === contacts[i].id);
-                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
-                  }
-                }
-                this.setState({lastRowIndexChecked: rowIndex, selected});
-              } else {
-                this.onCheck(rowData.id);
-                this.setState({lastRowIndexChecked: rowIndex});
-              }
-            }}/>);
+            <i
+            onClick={(e) => this.onCheck(e, rowData.id, cellProps)}
+            style={{color: blue200, cursor: 'pointer'}}
+            className={isChecked ? 'fa fa-square' : 'fa fa-square-o'}
+            />);
           break;
         case 'profile':
           const state = this.state;
@@ -412,15 +409,17 @@ class ListTable extends Component {
               }}
               />
               {!this.props.listData.readonly &&
-                <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
+                /* <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
                 {({onRequestOpen}) => (
-                  <i
                   onClick={onRequestOpen}
+                */
+                  <i
                   className='fa fa-edit'
                   style={{color: blue300, cursor: 'pointer'}}
                   />
-                  )}
-                </EditContactHOC>}
+                  /*)}
+                </EditContactHOC>*/
+                }
             </div>
             );
           break;
@@ -433,7 +432,7 @@ class ListTable extends Component {
 
     return (
       <div
-      className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
+      className={rowIndex % 2 === 0 ? 'vertical-center cell evenRow' : 'vertical-center cell oddRow'}
       key={key}
       style={style}>
       {contentBody}
@@ -494,13 +493,6 @@ class ListTable extends Component {
     this.setState({sortPositions, onSort, sortedIds});
   }
 
-  _onCheck(contactId) {
-    const checked = this.state.selected.some(id => id === contactId);
-    const selected = !checked ?
-    [...this.state.selected, contactId] :
-    this.state.selected.filter(id => id !== contactId);
-    this.setState({selected});
-  }
 
   _onSearchClick(searchValue) {
     const props = this.props;
@@ -766,32 +758,26 @@ class ListTable extends Component {
                 />
               </div>
               <div>
-                <WindowScroller>
-                {args => (
-                  <Grid
-                  autoHeight
-                  ref={ref => this.setDataGridRef(ref)}
-                  className='BodyGrid'
-                  cellRenderer={this.cellRenderer}
-                  columnCount={props.fieldsmap.length}
-                  columnWidth={({index}) => {
-                    const wid = state.columnWidths[index];
-                    if (!wid) {
-                      this.clearColumnStorage();
-                      return 70;
-                    }
-                    return wid + 10;
-                  }}
-                  overscanRowCount={30}
-                  overscanColumnCount={3}
-                  height={args.height + 20}
-                  scrollTop={args.scrollTop}
-                  width={state.screenWidth}
-                  rowCount={props.received.length}
-                  rowHeight={30}
-                  onScroll={onScroll}
-                  />)}
-                </WindowScroller>
+                <Grid
+                ref={ref => this.setDataGridRef(ref)}
+                className='BodyGrid'
+                cellRenderer={this.cellRenderer}
+                columnCount={props.fieldsmap.length}
+                columnWidth={({index}) => {
+                  const wid = state.columnWidths[index];
+                  if (!wid) {
+                    this.clearColumnStorage();
+                    return 70;
+                  }
+                  return wid + 10;
+                }}
+                overscanRowCount={10}
+                height={600}
+                width={state.screenWidth}
+                rowCount={props.received.length}
+                rowHeight={35}
+                onScroll={onScroll}
+                />)
               </div>
             </div>}
           </ScrollSync>}
@@ -809,22 +795,20 @@ const mapStateToProps = (state, props) => {
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   let received = [];
   let contacts = [];
-  if (listData) {
-    if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
-      received = listData.searchResults;
-      contacts = received.map(id => state.contactReducer[id]);
-    } else if (!_.isEmpty(listData.contacts)) {
-      listData.contacts.map((contactId, i) => {
-        if (state.contactReducer[contactId]) {
-          let contact = state.contactReducer[contactId];
-          received.push(contactId);
-          contacts.push(contact);
-        }
-      });
-    }
+  if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
+    received = listData.searchResults;
+    contacts = received.map(id => state.contactReducer[id]);
+  } else if (!_.isEmpty(listData.contacts)) {
+    listData.contacts.map((contactId, i) => {
+      if (state.contactReducer[contactId]) {
+        let contact = state.contactReducer[contactId];
+        received.push(contactId);
+        contacts.push(contact);
+      }
+    });
   }
 
-  const rawFieldsmap = listData ? generateTableFieldsmap(listData) : null;
+  const rawFieldsmap = generateTableFieldsmap(listData);
 
   return {
     received,
@@ -832,7 +816,7 @@ const mapStateToProps = (state, props) => {
     listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData,
-    fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal) : null,
+    fieldsmap: rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal),
     rawFieldsmap,
     contacts,
     contactIsReceiving: state.contactReducer.isReceiving,
