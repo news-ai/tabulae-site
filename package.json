@@ -6,7 +6,7 @@
     "alertifyjs": "^1.8.0",
     "axios": "^0.9.1",
     "draft-convert": "^1.2.0",
-    "draft-js": "^0.7.0",
+    "draft-js": "^0.9.1",
     "es6-promise": "^4.0.5",
     "fontfaceobserver": "^1.5.1",
     "fuzzy": "^0.1.1",

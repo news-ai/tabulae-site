@@ -42,7 +42,7 @@ class BasicHtmlEditor extends React.Component {
     super(props);
     const decorator = new CompositeDecorator([
       {
-        strategy: findEntities.bind(null, 'link'),
+        strategy: findEntities.bind(null, 'LINK'),
         component: Link
       },
       {
@@ -85,15 +85,7 @@ class BasicHtmlEditor extends React.Component {
     };
 
     this.focus = () => this.refs.editor.focus();
-    this.onChange = (editorState) => {
-      let previousContent = this.state.editorState.getCurrentContent();
-      this.setState({editorState});
-
-      // only emit html when content changes
-      if (previousContent !== editorState.getCurrentContent()) {
-        this.emitHTML(editorState);
-      }
-    };
+    this.onChange = this._onChange.bind(this);
     this.handleTouchTap = (event) => {
       event.preventDefault();
       this.setState({
@@ -104,18 +96,18 @@ class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
-      // console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
     this.insertText = this._insertText.bind(this);
-    this.handleKeyCommand = (command) => this._handleKeyCommand(command);
-    this.toggleBlockType = (type) => this._toggleBlockType(type);
-    this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
-    this.handleReturn = (e) => this._handleReturn(e);
+    this.handleKeyCommand = this._handleKeyCommand.bind(this);
+    this.toggleBlockType = this._toggleBlockType.bind(this);
+    this.toggleInlineStyle = this._toggleInlineStyle.bind(this);
+    this.handleReturn = this._handleReturn.bind(this);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
     this.onCheck = (e, checked) => this.setState({isStyleBlockOpen: checked});
+    this.handlePastedText = this._handlePastedText.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -126,6 +118,16 @@ class BasicHtmlEditor extends React.Component {
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
+    }
+  }
+
+  _onChange(editorState) {
+    let previousContent = this.state.editorState.getCurrentContent();
+    this.setState({editorState});
+
+    // only emit html when content changes
+    if (previousContent !== editorState.getCurrentContent()) {
+      this.emitHTML(editorState);
     }
   }
 
@@ -197,9 +199,11 @@ class BasicHtmlEditor extends React.Component {
     if (selection.isCollapsed()) {
       return;
     }
-    const href = alertify.prompt('', 'Enter a URL', 'https://',
-      (e, href) => {
-        const entityKey = Entity.create('link', 'MUTABLE', {href});
+    alertify.prompt(
+      '',
+      'Enter a URL', 'https://',
+      (e, url) => {
+        const entityKey = Entity.create('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
       },
       _ => {});
@@ -212,6 +216,14 @@ class BasicHtmlEditor extends React.Component {
       return;
     }
     this.onChange( RichUtils.toggleLink(editorState, selection, null));
+  }
+
+  _handlePastedText(text, html) {
+    const {editorState} = this.state;
+    const blockMap = ContentState.createFromText(text.trim()).blockMap;
+    const newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
+    return true;
   }
 
   render() {
@@ -258,15 +270,16 @@ class BasicHtmlEditor extends React.Component {
         }}>
           <div className={className} onClick={this.focus}>
             <Editor
-              blockStyleFn={getBlockStyle}
-              customStyleMap={styleMap}
-              editorState={editorState}
-              handleKeyCommand={this.handleKeyCommand}
-              handleReturn={this.handleReturn}
-              onChange={this.onChange}
-              placeholder={placeholder}
-              ref='editor'
-              spellCheck
+            blockStyleFn={getBlockStyle}
+            customStyleMap={styleMap}
+            editorState={editorState}
+            handleKeyCommand={this.handleKeyCommand}
+            handleReturn={this.handleReturn}
+            handlePastedText={this.handlePastedText}
+            onChange={this.onChange}
+            placeholder={placeholder}
+            ref='editor'
+            spellCheck
             />
           </div>
           <RaisedButton
@@ -304,17 +317,18 @@ class BasicHtmlEditor extends React.Component {
             onToggle={this.toggleBlockType}
             />
           </div>}
-         <div className='vertical-center' style={{
-          position: 'absolute',
-          bottom: 3,
-          width: props.width,
-         }}>
+          <div className='vertical-center' style={{
+            position: 'absolute',
+            bottom: 3,
+            width: props.width,
+          }}>
            <div>
               <Tooltip show={state.hoveredTooltip}
               style={{
-                fontSize: '10px',
-                lineHeight: '22px',
-                padding: '0 8px'}}
+                fontSize: 10,
+                lineHeight: 22,
+                padding: '0 8px'
+              }}
               label='Toolbar'
               horizontalPosition='center'
               verticalPosition='top'
@@ -344,7 +358,7 @@ const styleMap = {
     fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
     fontSize: 16,
     padding: 2
-  }
+  },
 };
 
 function getBlockStyle(block) {
@@ -355,4 +369,3 @@ function getBlockStyle(block) {
 }
 
 export default BasicHtmlEditor;
-
