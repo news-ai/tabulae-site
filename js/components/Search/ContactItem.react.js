@@ -11,7 +11,8 @@ const smallSpan = {
   fontColor: 'gray'
 };
 
-const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, query, id, router}) => {
+const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, query, id, router, publications}) => {
+  console.log(publications);
   return (
     <div className='row horizontal-center'>
       <div className='large-10 columns' style={{
@@ -42,6 +43,7 @@ const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, quer
             iconClassName='fa fa-list-alt'
             onClick={_ => router.push(`/tables/${listid}?search=${query}`)}
             /> : null}
+          {publications && publications.map((publication, i) => <p key={`${id}-${publication.id}`}>{publication.name}</p>)}
         </div>
         </div>
       </div>
@@ -53,7 +55,8 @@ ContactItem.PropTypes = contactPropTypes;
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
   return {
-    listname: listReducer[props.listid] ? listReducer[props.listid].name : props.listid
+    listname: listReducer[props.listid] ? listReducer[props.listid].name : props.listid,
+    publications: props.employers !== null && props.employers.map(pubid => state.publicationReducer[pubid])
   };
 };
 

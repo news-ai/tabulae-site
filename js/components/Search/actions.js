@@ -6,7 +6,9 @@ import * as api from '../../actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 const contactSchema = new Schema('contacts');
 const listSchema = new Schema('lists');
+const publicationSchema = new Schema('publications');
 import * as listActions from '../../actions/listActions';
+import * as publicationActions from '../../actions/publicationActions';
 
 
 export function clearSearchCache() {
@@ -25,13 +27,17 @@ export function fetchSearch(query) {
     return api.get(`/contacts?q="${query}"&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const listOnly = response.included.filter(item => item.type === 'lists');
-      response.included = listOnly;
+      const pubOnly = response.included.filter(item => item.type === 'publications');
+      response.lists = listOnly;
+      response.publications = pubOnly;
       const res = normalize(response, {
         data: arrayOf(contactSchema),
-        included: arrayOf(listSchema)
+        lists: arrayOf(listSchema),
+        publications: arrayOf(publicationSchema)
       });
 
-      dispatch(listActions.receiveLists(res.entities.lists, res.result.included, null));
+      dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, null));
+      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.publications));
       dispatch({type: searchConstant.SET_OFFSET, offset: response.count === PAGE_LIMIT ? (OFFSET + PAGE_LIMIT) : null, query});
       return dispatch({type: searchConstant.RECEIVE_MULTIPLE, contacts: res.entities.contacts, ids: res.result.data, query});
     })
