@@ -10,6 +10,7 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
+import {yellow50} from 'material-ui/styles/colors';
 
 class CopyToHOC extends Component {
   constructor(props) {
@@ -53,6 +54,15 @@ class CopyToHOC extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <div className='row'>
+            <div className='panel large-12 medium-12 small-12 columns' style={{
+              backgroundColor: yellow50,
+              margin: 10,
+              padding: 10
+            }}>
+              <span style={{fontSize: '0.8em'}}>
+              The bigger the migration, the slower it is! Don't navigate from the page during migration.
+              </span>
+            </div>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
               <span style={{fontWeight: 'bold', marginRight: 8}}>Selected</span>
               {props.selected.length === 0 && <span>none selected</span>}
