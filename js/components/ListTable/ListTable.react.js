@@ -409,16 +409,15 @@ class ListTable extends Component {
               }}
               />
               {!this.props.listData.readonly &&
-                /* <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
+                <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
                 {({onRequestOpen}) => (
-                  onClick={onRequestOpen}
-                */
                   <i
+                  onClick={onRequestOpen}
                   className='fa fa-edit'
                   style={{color: blue300, cursor: 'pointer'}}
                   />
-                  /*)}
-                </EditContactHOC>*/
+                  )}
+                </EditContactHOC>
                 }
             </div>
             );
