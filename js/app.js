@@ -48,6 +48,7 @@ import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.rea
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable';
+import ListFetchingContainer from './components/ListTable/ListFetchingContainer.react';
 import UserProfile from './components/UserProfile';
 import ListFeed from './components/ListFeed';
 import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
@@ -81,7 +82,6 @@ if (module.hot) {
 
 // wrap components that we want onboarding to, pass down props like routes
 const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
-const OnboardingListTable = props => <OnboardingWrapper {...props}><ListTable /></OnboardingWrapper>;
 
 ReactDOM.render(
   <MultiThemeProvider>
@@ -92,7 +92,7 @@ ReactDOM.render(
             <Route path='lists' name='List Manager' component={ListManagerContainer} />
             <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='tables/:listId' staticName name='Table'>
-              <IndexRoute component={OnboardingListTable}/>
+              <IndexRoute component={ListFetchingContainer}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='lists/:listId' staticName name='List'>

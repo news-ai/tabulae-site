@@ -155,9 +155,6 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.listData) return;
-    if (this.props.listData.name !== this.state.name) this.setState({name: this.props.listData.name});
-
     if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
@@ -200,6 +197,7 @@ class ListTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
     if (nextProps.listId !== this.props.listId) {
       // essentially reload
@@ -443,16 +441,11 @@ class ListTable extends Component {
     }
 
   _fetchOperations(props) {
-    if (!props.listData) {
-      return props.fetchList(props.listId)
-      .then(_ => props.loadAllContacts(props.listId));
-    } else {
-      if (
-        props.listData.contacts !== null &&
-        props.received.length < props.listData.contacts.length
-        ) {
-        return props.loadAllContacts(props.listId);
-      }
+    if (
+      props.listData.contacts !== null &&
+      props.received.length < props.listData.contacts.length
+      ) {
+      return props.loadAllContacts(props.listId);
     }
   }
 
@@ -578,7 +571,6 @@ class ListTable extends Component {
             </div>
           </Dialog>
         }
-        
         <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
@@ -604,94 +596,91 @@ class ListTable extends Component {
           />}
         <div className='row vertical-center' style={{margin: 15}}>
             <div className='large-3 medium-4 columns vertical-center'>
-              {props.listData &&
-                <div>
-                  <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
-                  <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
-                </div>
-              }
+              <div>
+                <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
+                <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
+              </div>
             </div>
-            {props.listData &&
-              <div className='large-4 medium-4 columns vertical-center'>
+            <div className='large-4 medium-4 columns vertical-center'>
+              <IconButton
+              tooltip='Email'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-envelope'
+              iconStyle={{color: grey500}}
+              onClick={_ => this.setState({isEmailPanelOpen: true})}
+              disabled={state.isEmailPanelOpen || props.listData.readonly}
+              />
+              <IconButton
+              tooltip='Export'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-download'
+              iconStyle={{color: grey500}}
+              onClick={this.onExportClick}
+              />
+              <CopyToHOC
+              listId={props.listId}
+              selected={state.selected}>
+              {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Email'
+                id='copy_contacts_hop'
+                tooltip='Copy to Another Table'
                 tooltipPosition='top-left'
-                iconClassName='fa fa-envelope'
+                iconClassName='fa fa-copy'
                 iconStyle={{color: grey500}}
-                onClick={_ => this.setState({isEmailPanelOpen: true})}
-                disabled={state.isEmailPanelOpen || props.listData.readonly}
-                />
+                onClick={onRequestOpen}
+                />)}
+              </CopyToHOC>
+              <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
+              {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Export'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-download'
-                iconStyle={{color: grey500}}
-                onClick={this.onExportClick}
-                />
-                <CopyToHOC
-                listId={props.listId}
-                selected={state.selected}>
-                {({onRequestOpen}) => (
-                  <IconButton
-                  id='copy_contacts_hop'
-                  tooltip='Copy to Another Table'
-                  tooltipPosition='top-left'
-                  iconClassName='fa fa-copy'
-                  iconStyle={{color: grey500}}
-                  onClick={onRequestOpen}
-                  />)}
-                </CopyToHOC>
-                <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
-                {({onRequestOpen}) => (
-                  <IconButton
-                  id='add_remove_columns_hop'
-                  disabled={props.listData.readonly}
-                  tooltip='Show/Hide columns'
-                  tooltipPosition='top-left'
-                  iconClassName='fa fa-table'
-                  iconStyle={{color: grey500}}
-                  onClick={onRequestOpen}
-                  />)}
-                </AddOrRemoveColumnHOC>
-                <AddContactHOC listId={props.listId}>
-                {({onRequestOpen}) => (
-                  <IconButton
-                  tooltip='Add New Contact'
-                  id='add_contact_hop'
-                  disabled={props.listData.readonly}
-                  tooltipPosition='top-left'
-                  iconClassName='fa fa-plus'
-                  iconStyle={{color: grey500}}
-                  onClick={onRequestOpen}
-                  />)}
-                </AddContactHOC>
-                <IconButton
-                tooltip='Delete Contact'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-trash'
+                id='add_remove_columns_hop'
                 disabled={props.listData.readonly}
+                tooltip='Show/Hide columns'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-table'
                 iconStyle={{color: grey500}}
-                onClick={this.onRemoveContacts}
-                />
-                <AddTagDialogHOC listId={props.listId}>
-                  {({onRequestOpen}) =>
-                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
-                </AddTagDialogHOC>
-              </div>}
+                onClick={onRequestOpen}
+                />)}
+              </AddOrRemoveColumnHOC>
+              <AddContactHOC listId={props.listId}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Add New Contact'
+                id='add_contact_hop'
+                disabled={props.listData.readonly}
+                tooltipPosition='top-left'
+                iconClassName='fa fa-plus'
+                iconStyle={{color: grey500}}
+                onClick={onRequestOpen}
+                />)}
+              </AddContactHOC>
+              <IconButton
+              tooltip='Delete Contact'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-trash'
+              disabled={props.listData.readonly}
+              iconStyle={{color: grey500}}
+              onClick={this.onRemoveContacts}
+              />
+              <AddTagDialogHOC listId={props.listId}>
+                {({onRequestOpen}) =>
+                <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
+              </AddTagDialogHOC>
+            </div>
             <div className='large-4 columns vertical-center'>
               <TextField
               id='search-input'
               hintText='Search...'
               value={state.searchValue}
-              onChange={e => this.setState({searchValue: e.target.value})}
+              onChange={e => {
+                const searchValue = e.target.value;
+                if (this.state.searchValue.length > 0 && searchValue.length === 0) this.onSearchClearClick();
+                this.setState({searchValue});
+              }}
               onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
               errorText={state.errorText}
               />
-              <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-              {
-                /*props.listData && !props.listData.readonly &&
-                <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />*/
-              }
+              <RaisedButton className='noprint' style={{marginLeft: 5}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             </div>
           {
             props.fieldsmap !== null &&
@@ -743,13 +732,13 @@ class ListTable extends Component {
           <Tags listId={props.listId}/>
         </div>
         <div>
-        {props.listData && props.listData.contacts === null &&
+        {props.listData.contacts === null &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
         <div>
-          {props.listData && props.listData.contacts && props.listData.contacts !== null && props.contacts &&
+          {props.listData.contacts && props.listData.contacts !== null && props.contacts &&
           <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
         </div>
-        {props.listData && props.received.length > 0 && state.columnWidths !== null &&
+        {props.received.length > 0 && state.columnWidths !== null &&
           <ScrollSync>
           {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
             <div>
@@ -812,7 +801,7 @@ class ListTable extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const listId = parseInt(props.params.listId, 10);
+  const listId = props.listId;
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
   const searchQuery = props.location.query.search;
