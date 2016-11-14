@@ -106,10 +106,18 @@ class ListTable extends Component {
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
       firsttime: this.props.firstTimeUser,
+      leftoverHeight: undefined,
     };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      const headerContainer = document.getElementById('HeaderGridContainerId');
+      if (headerContainer) {
+        const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
+        if (leftoverHeight !== this.state.leftoverHeight) {
+          this.setState({leftoverHeight});
+        }
+      }
       this.setState({screenWidth, screenHeight});
     }
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
@@ -204,32 +212,30 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
-    if (nextProps.listId !== this.props.listId) {
-      // essentially reload
-      let columnWidths = this.state.columnWidths;
-      if (columnWidths.length === nextProps.fieldsmap.length) {
-        this.setState({columnWidths});
-      } else {
-        this.clearColumnStorage();
+    const headerContainer = document.getElementById('HeaderGridContainerId');
+    if (headerContainer) {
+      const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
+      if (leftoverHeight !== this.state.leftoverHeight) {
+        this.setState({leftoverHeight});
       }
     }
-
-    if (this.props.listData && this.state.sortPositions === null) {
-      const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
+  
+    if (this.state.sortPositions === null) {
+      const sortPositions = nextProps.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
     }
 
-    if (this.props.listData && nextProps.listData) {
-      let columnWidths = this.state.columnWidths;
-      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || columnWidths === null || nextProps.fieldsmap.length !== columnWidths.length) {
-        columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
-          const name = fieldObj.name;
-          const size = measureSpanSize(name, '16px Source Sans Pro')
-          return size.width > 70 ? size.width : 70;
-        });
-      }
+    let columnWidths = this.state.columnWidths;
+    if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || columnWidths === null || nextProps.fieldsmap.length !== columnWidths.length) {
+      columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
+        const name = fieldObj.name;
+        const size = measureSpanSize(name, '16px Source Sans Pro')
+        return size.width > 70 ? size.width : 70;
+      });
+    }
 
-      if (nextProps.contacts.length > 0 && !this.state.dragged && this.props.fieldsmap.length !== nextProps.fieldsmap.length) {
+    if (nextProps.contacts.length > 0 && !this.state.dragged) {
+      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || this.state.columnWidths === null) {
         nextProps.fieldsmap.map((fieldObj, i) => {
           let max = columnWidths[i];
           nextProps.contacts.map(contact => {
@@ -249,14 +255,14 @@ class ListTable extends Component {
           columnWidths[i] = max;
         });
       }
-
-      this.setState({columnWidths}, _ => {
-        if (this._HeaderGrid && this._DataGrid) {
-          this._HeaderGrid.recomputeGridSize();
-          this._DataGrid.recomputeGridSize();
-        }
-      })
     }
+
+    this.setState({columnWidths}, _ => {
+      if (this._HeaderGrid && this._DataGrid) {
+        this._HeaderGrid.recomputeGridSize();
+        this._DataGrid.recomputeGridSize();
+      }
+    })
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
@@ -731,7 +737,7 @@ class ListTable extends Component {
           <ScrollSync>
           {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
             <div>
-              <div className='HeaderGridContainer'>
+              <div id='HeaderGridContainerId' className='HeaderGridContainer'>
                 <Grid
                 ref={ref => this.setHeaderGridRef(ref)}
                 className='HeaderGrid'
@@ -754,7 +760,6 @@ class ListTable extends Component {
                 overscanColumnCount={3}
                 />
               </div>
-              <div>
                 <Grid
                 ref={ref => this.setDataGridRef(ref)}
                 className='BodyGrid'
@@ -769,13 +774,12 @@ class ListTable extends Component {
                   return wid + 10;
                 }}
                 overscanRowCount={10}
-                height={600}
+                height={state.leftoverHeight || 500}
                 width={state.screenWidth}
                 rowCount={props.received.length}
-                rowHeight={35}
+                rowHeight={30}
                 onScroll={onScroll}
-                />)
-              </div>
+                />
             </div>}
           </ScrollSync>}
         </div>
