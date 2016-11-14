@@ -335,11 +335,11 @@ class ListTable extends Component {
     }
     let customSpan;
     if (value === 'selected') {
-      customSpan = <span onClick={_ =>
+      customSpan = <span className='pointer' onClick={_ =>
         this.setState({
           selected: this.state.selected.length === this.props.listData.contacts.length ?
           [] : this.props.listData.contacts.slice()
-        })} style={{whiteSpace: 'nowrap', cursor: 'pointer'}}>{content}</span>;
+        })} style={{whiteSpace: 'nowrap'}}>{content}</span>;
     }
 
     return (
@@ -381,8 +381,8 @@ class ListTable extends Component {
           contentBody = (
             <i
             onClick={(e) => this.onCheck(e, rowData.id, cellProps)}
-            style={{color: blue200, cursor: 'pointer'}}
-            className={isChecked ? 'fa fa-square' : 'fa fa-square-o'}
+            style={{color: blue200}}
+            className={isChecked ? 'fa fa-square pointer' : 'fa fa-square-o pointer'}
             />);
           break;
         case 'profile':
@@ -391,8 +391,8 @@ class ListTable extends Component {
             <div className='row vertical-center'>
               <i
               id='profile_hop'
-              className='fa fa-arrow-right'
-              style={{color: blue300, cursor: 'pointer', marginRight: 5}}
+              className='fa fa-arrow-right pointer'
+              style={{color: blue300, marginRight: 5}}
               onMouseEnter={e =>
                 this.setState({
                   showProfileTooltip: true,
@@ -413,8 +413,8 @@ class ListTable extends Component {
                 {({onRequestOpen}) => (
                   <i
                   onClick={onRequestOpen}
-                  className='fa fa-edit'
-                  style={{color: blue300, cursor: 'pointer'}}
+                  className='fa fa-edit pointer'
+                  style={{color: blue300}}
                   />
                   )}
                 </EditContactHOC>
@@ -548,7 +548,7 @@ class ListTable extends Component {
     const state = this.state;
 
     return (
-      <div style={{marginTop: 30}}>
+      <div style={{marginTop: 10}}>
         {
           props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
@@ -585,7 +585,7 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-        <div className='row vertical-center' style={{margin: 15}}>
+        <div className='row vertical-center' style={{margin: 5}}>
             <div className='large-3 medium-4 columns vertical-center'>
               <div>
                 <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
