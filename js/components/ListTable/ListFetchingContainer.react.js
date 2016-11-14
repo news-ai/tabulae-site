@@ -13,7 +13,12 @@ class ListFetchingContainer extends Component {
   }
 
   render() {
-    return this.props.list ? <ListTable {...this.props}/> : <div>LOADING...</div>;
+    return this.props.list ?
+    <ListTable {...this.props}/> : (
+      <div style={{margin: 20}}>
+        <span style={{margin: '0 10px'}}>LIST LOADING...</span>
+        <i className='fa fa-cog fa-spin'/>
+      </div>);
   }
 }
 
