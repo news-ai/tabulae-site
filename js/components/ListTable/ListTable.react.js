@@ -203,7 +203,6 @@ class ListTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
     if (nextProps.listId !== this.props.listId) {
       // essentially reload
@@ -290,7 +289,7 @@ class ListTable extends Component {
     });
   }
 
-  _onCheck(e, contactId, {columnIndex, rowIndex, key, style}) {
+  _onCheck(e, contactId, contacts, {columnIndex, rowIndex, key, style}) {
     const lastRowIndexChecked = this.state.lastRowIndexChecked;
     if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
       let selected = this.state.selected.slice();
@@ -366,7 +365,6 @@ class ListTable extends Component {
     const {columnIndex, rowIndex, key, style} = cellProps;
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
-
     let content = _getter(contacts[rowIndex], fieldObj) || '';
 
     let contentBody;
@@ -380,7 +378,7 @@ class ListTable extends Component {
           const isChecked = this.state.selected.some(id => id === rowData.id);
           contentBody = (
             <i
-            onClick={(e) => this.onCheck(e, rowData.id, cellProps)}
+            onClick={(e) => this.onCheck(e, rowData.id, contacts, cellProps)}
             style={{color: blue200}}
             className={isChecked ? 'fa fa-square pointer' : 'fa fa-square-o pointer'}
             />);
