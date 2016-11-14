@@ -106,10 +106,18 @@ class ListTable extends Component {
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
       firsttime: this.props.firstTimeUser,
+      leftoverHeight: undefined,
     };
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      const headerContainer = document.getElementById('HeaderGridContainerId');
+      if (headerContainer) {
+        const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
+        if (leftoverHeight !== this.state.leftoverHeight) {
+          this.setState({leftoverHeight});
+        }
+      }
       this.setState({screenWidth, screenHeight});
     }
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
@@ -127,6 +135,7 @@ class ListTable extends Component {
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.onCheckSelected = this._onCheckSelected.bind(this);
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -155,9 +164,6 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.listData) return;
-    if (this.props.listData.name !== this.state.name) this.setState({name: this.props.listData.name});
-
     if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
@@ -199,56 +205,37 @@ class ListTable extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.contactIsReceiving) return false;
+    return true;
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
-    if (nextProps.listId !== this.props.listId) {
-      // essentially reload
-      let columnWidths = this.state.columnWidths;
-      if (columnWidths.length === nextProps.fieldsmap.length) {
-        this.setState({columnWidths});
-      } else {
-        this.clearColumnStorage();
-      }
-
-      if (nextProps.searchQuery) {
-        this.fetchOperations(nextProps).
-        then(_ => this.onSearchClick(nextProps.searchQuery));
-      } else {
-        this.fetchOperations(nextProps);
+    const headerContainer = document.getElementById('HeaderGridContainerId');
+    if (headerContainer) {
+      const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
+      if (leftoverHeight !== this.state.leftoverHeight) {
+        this.setState({leftoverHeight});
       }
     }
-
-    if (this.props.listData && this.state.sortPositions === null) {
-      const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
+  
+    if (this.state.sortPositions === null) {
+      const sortPositions = nextProps.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
     }
 
-    // initialize columnWidths
-    if (!this.props.listData && nextProps.listData && this.state.columnWidths === null) {
-      const columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
+    let columnWidths = this.state.columnWidths;
+    if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || columnWidths === null || nextProps.fieldsmap.length !== columnWidths.length) {
+      columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
         const size = measureSpanSize(name, '16px Source Sans Pro')
         return size.width > 70 ? size.width : 70;
       });
-      this.setState({columnWidths}, _ => {
-        if (this._HeaderGrid && this._DataGrid) {
-          this._HeaderGrid.recomputeGridSize();
-          this._DataGrid.recomputeGridSize();
-        }
-      })
     }
 
-    if (this.props.listData && nextProps.listData) {
-      let columnWidths = this.state.columnWidths;
-      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || columnWidths === null || nextProps.fieldsmap.length !== columnWidths.length) {
-        columnWidths = nextProps.fieldsmap.map((fieldObj, i) => {
-          const name = fieldObj.name;
-          const size = measureSpanSize(name, '16px Source Sans Pro')
-          return size.width > 70 ? size.width : 70;
-        });
-      }
-
-      if (nextProps.contacts.length > 0 && !this.state.dragged && this.props.fieldsmap.length !== nextProps.fieldsmap.length) {
+    if (nextProps.contacts.length > 0 && !this.state.dragged) {
+      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || this.state.columnWidths === null) {
         nextProps.fieldsmap.map((fieldObj, i) => {
           let max = columnWidths[i];
           nextProps.contacts.map(contact => {
@@ -268,14 +255,14 @@ class ListTable extends Component {
           columnWidths[i] = max;
         });
       }
-
-      this.setState({columnWidths}, _ => {
-        if (this._HeaderGrid && this._DataGrid) {
-          this._HeaderGrid.recomputeGridSize();
-          this._DataGrid.recomputeGridSize();
-        }
-      })
     }
+
+    this.setState({columnWidths}, _ => {
+      if (this._HeaderGrid && this._DataGrid) {
+        this._HeaderGrid.recomputeGridSize();
+        this._DataGrid.recomputeGridSize();
+      }
+    })
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
@@ -308,6 +295,38 @@ class ListTable extends Component {
     });
   }
 
+  _onCheck(e, contactId, contacts, {columnIndex, rowIndex, key, style}) {
+    const lastRowIndexChecked = this.state.lastRowIndexChecked;
+    if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
+      let selected = this.state.selected.slice();
+      let last = null;
+      if (rowIndex < lastRowIndexChecked) {
+        for (let i = rowIndex; i < lastRowIndexChecked; i++) {
+          const checked = this.state.selected.some(id => id === contacts[i].id);
+          selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+        }
+      } else {
+        for (let i = rowIndex; i > lastRowIndexChecked; i--) {
+          const checked = this.state.selected.some(id => id === contacts[i].id);
+          selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
+        }
+      }
+      this.setState({lastRowIndexChecked: rowIndex, selected});
+    } else {
+      this.onCheckSelected(contactId);
+      this.setState({lastRowIndexChecked: rowIndex});
+    }
+  }
+
+  
+  _onCheckSelected(contactId) {
+    const checked = this.state.selected.some(id => id === contactId);
+    const selected = !checked ?
+    [...this.state.selected, contactId] :
+    this.state.selected.filter(id => id !== contactId);
+    this.setState({selected});
+  }
+
   _headerRenderer({columnIndex, key, style}) {
     const content = this.props.fieldsmap[columnIndex].name;
     const value = this.props.fieldsmap[columnIndex].value;
@@ -321,11 +340,11 @@ class ListTable extends Component {
     }
     let customSpan;
     if (value === 'selected') {
-      customSpan = <span onClick={_ =>
+      customSpan = <span className='pointer' onClick={_ =>
         this.setState({
           selected: this.state.selected.length === this.props.listData.contacts.length ?
           [] : this.props.listData.contacts.slice()
-        })} style={{whiteSpace: 'nowrap', cursor: 'pointer'}}>{content}</span>;
+        })} style={{whiteSpace: 'nowrap'}}>{content}</span>;
     }
 
     return (
@@ -348,10 +367,10 @@ class ListTable extends Component {
       </div>);
   }
 
-  _cellRenderer({columnIndex, rowIndex, key, style}) {
+  _cellRenderer(cellProps) {
+    const {columnIndex, rowIndex, key, style} = cellProps;
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
-
     let content = _getter(contacts[rowIndex], fieldObj) || '';
 
     let contentBody;
@@ -364,31 +383,11 @@ class ListTable extends Component {
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
           contentBody = (
-            <Checkbox
-            iconStyle={{fill: isChecked ? blue200 : grey400}}
-            checked={isChecked}
-            onCheck={(e, checked) => {
-              const lastRowIndexChecked = this.state.lastRowIndexChecked;
-              if (e.nativeEvent.shiftKey && lastRowIndexChecked !== rowIndex && lastRowIndexChecked !== null) {
-                let selected = this.state.selected.slice();
-                let last = null;
-                if (rowIndex < lastRowIndexChecked) {
-                  for (let i = rowIndex; i < lastRowIndexChecked; i++) {
-                    const checked = this.state.selected.some(id => id === contacts[i].id);
-                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
-                  }
-                } else {
-                  for (let i = rowIndex; i > lastRowIndexChecked; i--) {
-                    const checked = this.state.selected.some(id => id === contacts[i].id);
-                    selected = !checked ? [...selected, contacts[i].id] : selected.filter(id => id !== contacts[i].id);
-                  }
-                }
-                this.setState({lastRowIndexChecked: rowIndex, selected});
-              } else {
-                this.onCheck(rowData.id);
-                this.setState({lastRowIndexChecked: rowIndex});
-              }
-            }}/>);
+            <i
+            onClick={(e) => this.onCheck(e, rowData.id, contacts, cellProps)}
+            style={{color: blue200}}
+            className={isChecked ? 'fa fa-square pointer' : 'fa fa-square-o pointer'}
+            />);
           break;
         case 'profile':
           const state = this.state;
@@ -396,8 +395,8 @@ class ListTable extends Component {
             <div className='row vertical-center'>
               <i
               id='profile_hop'
-              className='fa fa-arrow-right'
-              style={{color: blue300, cursor: 'pointer', marginRight: 5}}
+              className='fa fa-arrow-right pointer'
+              style={{color: blue300, marginRight: 5}}
               onMouseEnter={e =>
                 this.setState({
                   showProfileTooltip: true,
@@ -418,11 +417,12 @@ class ListTable extends Component {
                 {({onRequestOpen}) => (
                   <i
                   onClick={onRequestOpen}
-                  className='fa fa-edit'
-                  style={{color: blue300, cursor: 'pointer'}}
+                  className='fa fa-edit pointer'
+                  style={{color: blue300}}
                   />
                   )}
-                </EditContactHOC>}
+                </EditContactHOC>
+                }
             </div>
             );
           break;
@@ -435,7 +435,7 @@ class ListTable extends Component {
 
     return (
       <div
-      className={rowIndex % 2 === 0 ? 'cell evenRow' : 'cell oddRow'}
+      className={rowIndex % 2 === 0 ? 'vertical-center cell evenRow' : 'vertical-center cell oddRow'}
       key={key}
       style={style}>
       {contentBody}
@@ -443,16 +443,11 @@ class ListTable extends Component {
     }
 
   _fetchOperations(props) {
-    if (!props.listData) {
-      return props.fetchList(props.listId)
-      .then(_ => props.loadAllContacts(props.listId));
-    } else {
-      if (
-        props.listData.contacts !== null &&
-        props.received.length < props.listData.contacts.length
-        ) {
-        return props.loadAllContacts(props.listId);
-      }
+    if (
+      props.listData.contacts !== null &&
+      props.received.length < props.listData.contacts.length
+      ) {
+      return props.loadAllContacts(props.listId);
     }
   }
 
@@ -501,13 +496,6 @@ class ListTable extends Component {
     this.setState({sortPositions, onSort, sortedIds});
   }
 
-  _onCheck(contactId) {
-    const checked = this.state.selected.some(id => id === contactId);
-    const selected = !checked ?
-    [...this.state.selected, contactId] :
-    this.state.selected.filter(id => id !== contactId);
-    this.setState({selected});
-  }
 
   _onSearchClick(searchValue) {
     const props = this.props;
@@ -564,7 +552,7 @@ class ListTable extends Component {
     const state = this.state;
 
     return (
-      <div style={{marginTop: 30}}>
+      <div style={{marginTop: 10}}>
         {
           props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
@@ -578,7 +566,6 @@ class ListTable extends Component {
             </div>
           </Dialog>
         }
-        
         <div className='vertical-center'>
           <FlatButton
           labelStyle={{textTransform: 'none', color: grey400}}
@@ -602,96 +589,93 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-        <div className='row vertical-center' style={{margin: 15}}>
+        <div className='row vertical-center' style={{margin: 5}}>
             <div className='large-3 medium-4 columns vertical-center'>
-              {props.listData &&
-                <div>
-                  <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
-                  <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
-                </div>
-              }
+              <div>
+                <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
+                <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
+              </div>
             </div>
-            {props.listData &&
-              <div className='large-4 medium-4 columns vertical-center'>
+            <div className='large-4 medium-4 columns vertical-center'>
+              <IconButton
+              tooltip='Email'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-envelope'
+              iconStyle={{color: grey500}}
+              onClick={_ => this.setState({isEmailPanelOpen: true})}
+              disabled={state.isEmailPanelOpen || props.listData.readonly}
+              />
+              <IconButton
+              tooltip='Export'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-download'
+              iconStyle={{color: grey500}}
+              onClick={this.onExportClick}
+              />
+              <CopyToHOC
+              listId={props.listId}
+              selected={state.selected}>
+              {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Email'
+                id='copy_contacts_hop'
+                tooltip='Copy to Another Table'
                 tooltipPosition='top-left'
-                iconClassName='fa fa-envelope'
+                iconClassName='fa fa-copy'
                 iconStyle={{color: grey500}}
-                onClick={_ => this.setState({isEmailPanelOpen: true})}
-                disabled={state.isEmailPanelOpen || props.listData.readonly}
-                />
+                onClick={onRequestOpen}
+                />)}
+              </CopyToHOC>
+              <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
+              {({onRequestOpen}) => (
                 <IconButton
-                tooltip='Export'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-download'
-                iconStyle={{color: grey500}}
-                onClick={this.onExportClick}
-                />
-                <CopyToHOC
-                listId={props.listId}
-                selected={state.selected}>
-                {({onRequestOpen}) => (
-                  <IconButton
-                  id='copy_contacts_hop'
-                  tooltip='Copy to Another Table'
-                  tooltipPosition='top-left'
-                  iconClassName='fa fa-copy'
-                  iconStyle={{color: grey500}}
-                  onClick={onRequestOpen}
-                  />)}
-                </CopyToHOC>
-                <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
-                {({onRequestOpen}) => (
-                  <IconButton
-                  id='add_remove_columns_hop'
-                  disabled={props.listData.readonly}
-                  tooltip='Show/Hide columns'
-                  tooltipPosition='top-left'
-                  iconClassName='fa fa-table'
-                  iconStyle={{color: grey500}}
-                  onClick={onRequestOpen}
-                  />)}
-                </AddOrRemoveColumnHOC>
-                <AddContactHOC listId={props.listId}>
-                {({onRequestOpen}) => (
-                  <IconButton
-                  tooltip='Add New Contact'
-                  id='add_contact_hop'
-                  disabled={props.listData.readonly}
-                  tooltipPosition='top-left'
-                  iconClassName='fa fa-plus'
-                  iconStyle={{color: grey500}}
-                  onClick={onRequestOpen}
-                  />)}
-                </AddContactHOC>
-                <IconButton
-                tooltip='Delete Contact'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-trash'
+                id='add_remove_columns_hop'
                 disabled={props.listData.readonly}
+                tooltip='Show/Hide columns'
+                tooltipPosition='top-left'
+                iconClassName='fa fa-table'
                 iconStyle={{color: grey500}}
-                onClick={this.onRemoveContacts}
-                />
-                <AddTagDialogHOC listId={props.listId}>
-                  {({onRequestOpen}) =>
-                  <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
-                </AddTagDialogHOC>
-              </div>}
+                onClick={onRequestOpen}
+                />)}
+              </AddOrRemoveColumnHOC>
+              <AddContactHOC listId={props.listId}>
+              {({onRequestOpen}) => (
+                <IconButton
+                tooltip='Add New Contact'
+                id='add_contact_hop'
+                disabled={props.listData.readonly}
+                tooltipPosition='top-left'
+                iconClassName='fa fa-plus'
+                iconStyle={{color: grey500}}
+                onClick={onRequestOpen}
+                />)}
+              </AddContactHOC>
+              <IconButton
+              tooltip='Delete Contact'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-trash'
+              disabled={props.listData.readonly}
+              iconStyle={{color: grey500}}
+              onClick={this.onRemoveContacts}
+              />
+              <AddTagDialogHOC listId={props.listId}>
+                {({onRequestOpen}) =>
+                <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
+              </AddTagDialogHOC>
+            </div>
             <div className='large-4 columns vertical-center'>
               <TextField
               id='search-input'
               hintText='Search...'
               value={state.searchValue}
-              onChange={e => this.setState({searchValue: e.target.value})}
+              onChange={e => {
+                const searchValue = e.target.value;
+                if (this.state.searchValue.length > 0 && searchValue.length === 0) this.onSearchClearClick();
+                this.setState({searchValue});
+              }}
               onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
               errorText={state.errorText}
               />
-              <RaisedButton className='noprint' style={{marginLeft: '5px'}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
-              {
-                /*props.listData && !props.listData.readonly &&
-                <RaisedButton className='noprint' style={{margin: '3px'}} onClick={this.onSearchClearClick} label='Clear' labelStyle={{textTransform: 'none'}} />*/
-              }
+              <RaisedButton className='noprint' style={{marginLeft: 5}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
             </div>
           {
             props.fieldsmap !== null &&
@@ -743,17 +727,17 @@ class ListTable extends Component {
           <Tags listId={props.listId}/>
         </div>
         <div>
-        {props.listData && props.listData.contacts === null &&
+        {props.listData.contacts === null &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
         <div>
-          {props.listData && props.listData.contacts && props.listData.contacts !== null && props.contacts &&
+          {props.listData.contacts && props.listData.contacts !== null && props.contacts &&
           <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
         </div>
-        {props.listData && props.received.length > 0 && state.columnWidths !== null &&
+        {props.received.length > 0 && state.columnWidths !== null &&
           <ScrollSync>
           {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
             <div>
-              <div className='HeaderGridContainer'>
+              <div id='HeaderGridContainerId' className='HeaderGridContainer'>
                 <Grid
                 ref={ref => this.setHeaderGridRef(ref)}
                 className='HeaderGrid'
@@ -776,34 +760,26 @@ class ListTable extends Component {
                 overscanColumnCount={3}
                 />
               </div>
-              <div>
-                <WindowScroller>
-                {args => (
-                  <Grid
-                  autoHeight
-                  ref={ref => this.setDataGridRef(ref)}
-                  className='BodyGrid'
-                  cellRenderer={this.cellRenderer}
-                  columnCount={props.fieldsmap.length}
-                  columnWidth={({index}) => {
-                    const wid = state.columnWidths[index];
-                    if (!wid) {
-                      this.clearColumnStorage();
-                      return 70;
-                    }
-                    return wid + 10;
-                  }}
-                  overscanRowCount={30}
-                  overscanColumnCount={3}
-                  height={args.height + 20}
-                  scrollTop={args.scrollTop}
-                  width={state.screenWidth}
-                  rowCount={props.received.length}
-                  rowHeight={30}
-                  onScroll={onScroll}
-                  />)}
-                </WindowScroller>
-              </div>
+                <Grid
+                ref={ref => this.setDataGridRef(ref)}
+                className='BodyGrid'
+                cellRenderer={this.cellRenderer}
+                columnCount={props.fieldsmap.length}
+                columnWidth={({index}) => {
+                  const wid = state.columnWidths[index];
+                  if (!wid) {
+                    this.clearColumnStorage();
+                    return 70;
+                  }
+                  return wid + 10;
+                }}
+                overscanRowCount={10}
+                height={state.leftoverHeight || 500}
+                width={state.screenWidth}
+                rowCount={props.received.length}
+                rowHeight={30}
+                onScroll={onScroll}
+                />
             </div>}
           </ScrollSync>}
         </div>
@@ -812,7 +788,7 @@ class ListTable extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const listId = parseInt(props.params.listId, 10);
+  const listId = props.listId;
   const listData = state.listReducer[listId];
   const publicationReducer = state.publicationReducer;
   const searchQuery = props.location.query.search;
@@ -820,22 +796,20 @@ const mapStateToProps = (state, props) => {
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   let received = [];
   let contacts = [];
-  if (listData) {
-    if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
-      received = listData.searchResults;
-      contacts = received.map(id => state.contactReducer[id]);
-    } else if (!_.isEmpty(listData.contacts)) {
-      listData.contacts.map((contactId, i) => {
-        if (state.contactReducer[contactId]) {
-          let contact = state.contactReducer[contactId];
-          received.push(contactId);
-          contacts.push(contact);
-        }
-      });
-    }
+  if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
+    received = listData.searchResults;
+    contacts = received.map(id => state.contactReducer[id]);
+  } else if (!_.isEmpty(listData.contacts)) {
+    listData.contacts.map((contactId, i) => {
+      if (state.contactReducer[contactId]) {
+        let contact = state.contactReducer[contactId];
+        received.push(contactId);
+        contacts.push(contact);
+      }
+    });
   }
 
-  const rawFieldsmap = listData ? generateTableFieldsmap(listData) : null;
+  const rawFieldsmap = generateTableFieldsmap(listData);
 
   return {
     received,
@@ -843,7 +817,7 @@ const mapStateToProps = (state, props) => {
     listId,
     listIsReceiving: state.listReducer.isReceiving,
     listData,
-    fieldsmap: listData ? rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal) : null,
+    fieldsmap: rawFieldsmap.filter(fieldObj => !fieldObj.hidden && !fieldObj.internal),
     rawFieldsmap,
     contacts,
     contactIsReceiving: state.contactReducer.isReceiving,

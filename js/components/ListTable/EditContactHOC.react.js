@@ -132,7 +132,7 @@ class EditContact extends Component {
     ];
     return (
       <div className={props.className}>
-        <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
+        {state.open && <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
@@ -217,7 +217,7 @@ class EditContact extends Component {
             </div>*/
           }
           </div>
-        </Dialog>
+        </Dialog>}
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
         })}
