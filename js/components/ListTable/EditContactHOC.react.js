@@ -191,7 +191,7 @@ class EditContact extends Component {
                 </div>
                 ))}
             {
-              /*<div className='panel' style={{
+              /* <div className='panel' style={{
               backgroundColor: yellow50,
               margin: 10,
               padding: 10

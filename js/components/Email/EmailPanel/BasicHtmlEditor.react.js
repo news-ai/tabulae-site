@@ -284,7 +284,7 @@ class BasicHtmlEditor extends React.Component {
           </div>
           <RaisedButton
           style={{margin: 18}}
-          label='Insert Content'
+          label='Insert Property'
           labelStyle={{textTransform: 'none'}}
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />

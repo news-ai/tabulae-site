@@ -54,11 +54,11 @@ const InstagramItem = ({
       <div className='large-10 medium-12 small-12 columns'>
         {text && text
         .split(' ')
-        .map((block, i) => <a key={`${instagramid}-${i}`} style={{color: grey800}} target='_blank' href={isURL(block) ? block : instagramlink}>{block} </a>)}
+        .map((block, i) => <a className='pointer' key={`${instagramid}-${i}`} style={{color: grey800}} target='_blank' href={isURL(block) ? block : instagramlink}>{block} </a>)}
       </div>
       <div className='large-12 medium-12 small-12 columns'>
         <span style={{float: 'right'}}>
-          {instagramusername ? <a target='_blank' href={`https://instagram.com/${instagramusername}`}>{instagramusername}</a> : instagramusername}
+          {instagramusername ? <a className='pointer' target='_blank' href={`https://instagram.com/${instagramusername}`}>{instagramusername}</a> : instagramusername}
         </span>
       </div>
       <div className='large-12 medium-12 small-12 columns' style={{fontSize: '0.8em'}}>
