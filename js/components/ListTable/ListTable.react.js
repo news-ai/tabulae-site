@@ -111,13 +111,7 @@ class ListTable extends Component {
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
-      const headerContainer = document.getElementById('HeaderGridContainerId');
-      if (headerContainer) {
-        const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
-        if (leftoverHeight !== this.state.leftoverHeight) {
-          this.setState({leftoverHeight});
-        }
-      }
+      this.setGridHeight();
       this.setState({screenWidth, screenHeight});
     }
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
@@ -148,6 +142,7 @@ class ListTable extends Component {
     this.onRemoveContacts = this._onRemoveContacts.bind(this);
     this.setDataGridRef = ref => (this._DataGrid = ref);
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
+    this.setGridHeight = this._setGridHeight.bind(this);
   }
 
   componentWillMount() {
@@ -164,6 +159,7 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
+    setTimeout(this.setGridHeight, 2000);
     if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
@@ -212,13 +208,7 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
-    const headerContainer = document.getElementById('HeaderGridContainerId');
-    if (headerContainer) {
-      const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
-      if (leftoverHeight !== this.state.leftoverHeight) {
-        this.setState({leftoverHeight});
-      }
-    }
+    this.setGridHeight();
   
     if (this.state.sortPositions === null) {
       const sortPositions = nextProps.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
@@ -271,6 +261,16 @@ class ListTable extends Component {
 
   componentWillUnmount() {
     window.onresize = undefined;
+  }
+
+  _setGridHeight() {
+    const headerContainer = document.getElementById('HeaderGridContainerId');
+    if (headerContainer) {
+      const leftoverHeight = document.body.clientHeight - (headerContainer.getBoundingClientRect().top + 45);
+      if (leftoverHeight !== this.state.leftoverHeight) {
+        this.setState({leftoverHeight});
+      }
+    }
   }
 
   _onHeaderDragStart(e, {x, y}, columnIndex) {
