@@ -81,7 +81,6 @@ class BasicHtmlEditor extends React.Component {
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
-      hoveredTooltip: false
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -106,7 +105,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleReturn = this._handleReturn.bind(this);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
-    this.onCheck = (e, checked) => this.setState({isStyleBlockOpen: checked});
+    this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
   }
 
@@ -322,27 +321,12 @@ class BasicHtmlEditor extends React.Component {
             bottom: 3,
             width: props.width,
           }}>
-           <div>
-              <Tooltip show={state.hoveredTooltip}
-              style={{
-                fontSize: 10,
-                lineHeight: 22,
-                padding: '0 8px'
-              }}
-              label='Toolbar'
-              horizontalPosition='center'
-              verticalPosition='top'
-              touch
-              />
-              <Checkbox
-              onMouseEnter={_ => this.setState({hoveredTooltip: true})}
-              onMouseOut={_ => this.setState({hoveredTooltip: false})}
-              checked={state.isStyleBlockOpen}
-              checkedIcon={<FontIcon className='fa fa-file-text' color={blue200}/>}
-              uncheckedIcon={<FontIcon className='fa fa-file-text' color={grey300} />}
-              onCheck={this.onCheck}
-              iconStyle={{marginRight: 20}}
-              />
+          <div style={{padding: 3, marginRight: 10}}>
+            <i
+            className='fa fa-circle pointer'
+            style={{color: state.isStyleBlockOpen ? blue200 : grey300}}
+            onClick={this.onCheck}
+            />
           </div>
            {props.children}
          </div>
