@@ -71,17 +71,10 @@ class ContactProfile extends Component {
   componentWillMount() {
     this.props.fetchContact(this.props.contactId)
     .then(_ => {
-      const {contact, employers, pastemployers} = this.props;
-      if (contact.employers !== null) if (employers.length !== contact.employers) contact.employers
-        .filter(pubId => !employers.some(obj => obj.id === pubId))
-        .map(pubId => this.props.fetchPublication(pubId));
-      if (contact.pastemployers !== null) if (pastemployers.length !== contact.pastemployers) contact.pastemployers
-      .filter(pubId => !pastemployers.some(obj => obj.id === pubId))
-      .map(pubId => this.props.fetchPublication(pubId));
+      const {contact} = this.props;
       this.setState({notes: contact.notes});
     });
     this.props.fetchContactFeeds(this.props.contactId);
-    this.props.fetchList(this.props.listId);
   }
 
   componentWillReceiveProps(nextProps) {

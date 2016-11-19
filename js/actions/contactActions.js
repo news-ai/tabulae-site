@@ -8,12 +8,14 @@ import {
 } from '../constants/AppConstants';
 import * as api from './api';
 import * as publicationActions from './publicationActions';
+import * as listActions from './listActions';
 import _ from 'lodash';
 
 import {normalize, Schema, arrayOf} from 'normalizr';
 
 const contactSchema = new Schema('contacts', { idAttribute: 'id' });
 const publicationSchema = new Schema('publications', { idAttribute: 'id' });
+const listSchema = new Schema('lists', { idAttribute: 'id' });
 
 function requestContact() {
   return {
@@ -69,9 +71,19 @@ export function fetchContact(contactId) {
   return dispatch => {
     dispatch(requestContact());
     return api.get(`/contacts/${contactId}`)
-    .then( response => {
-      // const res = normalize(response, {data: contactSchema});
-      return dispatch(receiveContact(response.data));
+    .then(response => {
+      const listOnly = response.included.filter(item => item.type === 'lists');
+      const pubOnly = response.included.filter(item => item.type === 'publications');
+      response.lists = listOnly;
+      response.publications = pubOnly;
+      const res = normalize(response, {
+        data: contactSchema,
+        lists: arrayOf(listSchema),
+        publications: arrayOf(publicationSchema)
+      });
+      dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, null));
+      dispatch(publicationActions.receivePublications(res.entities.publications, res.result.publications));
+      return dispatch(receiveContacts(res.entities.contacts, [res.result.data]));
     })
     .catch( message => dispatch(requestContactFail(message)));
   };
