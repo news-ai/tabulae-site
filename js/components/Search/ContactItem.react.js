@@ -33,7 +33,7 @@ const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, quer
             </div>
           }
           <span style={smallSpan}>belongs in</span>
-          <Link to={`/lists/${listid}`}><span>{listname}</span></Link>
+          <Link to={`/tables/${listid}`}><span>{listname}</span></Link>
         </div>
         <div className='large-2 medium-2 columns vertical-center'>
           {listid ? <IconButton
