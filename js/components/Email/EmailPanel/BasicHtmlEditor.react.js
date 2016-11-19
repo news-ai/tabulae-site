@@ -17,10 +17,7 @@ import {convertFromHTML} from 'draft-convert';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import Checkbox from 'material-ui/Checkbox';
 import Popover from 'material-ui/Popover';
-import FontIcon from 'material-ui/FontIcon';
-import Tooltip from 'material-ui/internal/Tooltip';
 import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';

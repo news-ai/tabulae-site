@@ -449,6 +449,7 @@ class ListTable extends Component {
       ) {
       return props.loadAllContacts(props.listId);
     }
+    return undefined;
   }
 
   _onSort(columnIndex) {
