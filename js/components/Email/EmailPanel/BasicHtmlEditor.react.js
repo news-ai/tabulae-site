@@ -321,7 +321,7 @@ class BasicHtmlEditor extends React.Component {
             bottom: 3,
             width: props.width,
           }}>
-          <div style={{padding: 3, margin: '0 5px'}}>
+          <div style={{padding: 3, marginRight: 10}}>
             <i
             className='fa fa-circle pointer'
             style={{color: state.isStyleBlockOpen ? blue200 : grey300}}
