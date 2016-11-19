@@ -76,6 +76,22 @@ function PlainMinimizedView(props) {
       </Paper>);
 }
 
+export function _getter(contact, fieldObj) {
+  try {
+    if (fieldObj.customfield) {
+      if (fieldObj.readonly) return contact[fieldObj.value];
+      if (contact.customfields === null) return undefined;
+      else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
+      else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+    } else {
+      if (fieldObj.strategy) return fieldObj.strategy(contact);
+      else return contact[fieldObj.value];
+    }
+  } catch (e) {
+    return undefined;
+  }
+}
+
 const MinimizedView = Radium(PlainMinimizedView);
 
 class EmailPanel extends Component {
@@ -135,10 +151,11 @@ class EmailPanel extends Component {
   _replaceAll(html, contact) {
     const {fieldsmap} = this.state;
     let newHtml = html;
-    fieldsmap.map(field => {
-      if (contact[field.value] && contact[field.value] !== null) {
-        newHtml = newHtml.replace(new RegExp('\{' + field.name + '\}', 'g'), contact[field.value]);
-      }
+    fieldsmap.map(fieldObj => {
+      let value = '';
+      const replaceValue = _getter(contact, fieldObj);
+      if (replaceValue) value = replaceValue;
+      newHtml = newHtml.replace(new RegExp('\{' + fieldObj.name + '\}', 'g'), value);
     });
     return newHtml;
   }
