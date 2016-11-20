@@ -20,7 +20,7 @@
     "lodash": "^4.13.1",
     "material-ui": "^0.15.4",
     "moment": "^2.14.1",
-    "moment-timezone": "^0.5.3",
+    "moment-timezone": "^0.5.9",
     "normalizr": "^2.2.1",
     "npm": "^3.10.6",
     "numbro": "^1.9.3",
