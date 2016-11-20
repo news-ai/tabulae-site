@@ -121,6 +121,7 @@ class DatePickerHOC extends Component {
 
   _onToggle(e, toggled) {
     const state = this.state;
+    if (!toggled) this.props.clearUTCTime();
     const date = moment(state.date).minutes(state.minute).hour(state.hour);
     if (date < moment()) {
       alert(`Can't select date that is earlier than right now. Please pick another time.`);
@@ -148,12 +149,9 @@ class DatePickerHOC extends Component {
     if (this.state.toggled) {
       const date = this.state.date;
       const datestring = date.format(DATE_FORMAT);
-      console.log(datestring);
-      console.log(this.state.timezone);
       const localtime = moment.tz(datestring, this.state.timezone);
-      console.log(localtime.format());
       const utctime = localtime.clone().tz(UTC_ZONE);
-      console.log(localtime.utc().format());
+      this.props.setUTCTime(localtime.utc().format());
       this.setState({
         open: false
       });
@@ -211,6 +209,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
+    setUTCTime: utctime => dispatch({type: 'SET_SCHEDULE_TIME', utctime}),
+    clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'})
   };
 };
 

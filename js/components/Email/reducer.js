@@ -18,7 +18,9 @@ const types = [
   RECEIVE_EMAIL,
   REQUEST_MULTIPLE_EMAILS,
   RECEIVE_MULTIPLE_EMAILS,
-  EMAIL_SET_OFFSET
+  EMAIL_SET_OFFSET,
+  SET_SCHEDULE_TIME,
+  CLEAR_SCHEDULE_TIME
 ];
 
 function stagingReducer(state = initialState.stagingReducer, action) {
@@ -56,10 +58,10 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.offset = action.offset;
       return obj;
     case SET_SCHEDULE_TIME:
-      obj.scheduleddate = action.date;
+      obj.utctime = action.utctime;
       return obj;
     case CLEAR_SCHEDULE_TIME:
-      obj.scheduleddate = null;
+      obj.utctime = null;
       return obj;
     default:
       return state;
