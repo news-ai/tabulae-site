@@ -4,7 +4,9 @@ import {
   RECEIVE_EMAIL,
   REQUEST_MULTIPLE_EMAILS,
   RECEIVE_MULTIPLE_EMAILS,
-  EMAIL_SET_OFFSET
+  EMAIL_SET_OFFSET,
+  SET_SCHEDULE_TIME,
+  CLEAR_SCHEDULE_TIME,
 } from './constants';
 
 import { initialState } from '../../reducers/initialState';
@@ -52,6 +54,12 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return obj;
     case EMAIL_SET_OFFSET:
       obj.offset = action.offset;
+      return obj;
+    case SET_SCHEDULE_TIME:
+      obj.scheduleddate = action.date;
+      return obj;
+    case CLEAR_SCHEDULE_TIME:
+      obj.scheduleddate = null;
       return obj;
     default:
       return state;

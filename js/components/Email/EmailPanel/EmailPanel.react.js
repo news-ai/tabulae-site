@@ -17,6 +17,7 @@ import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
+import DatePickerHOC from './DatePickerHOC.react';
 
 import {grey50} from 'material-ui/styles/colors';
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
@@ -291,6 +292,9 @@ class EmailPanel extends Component {
                     disabled={state.currentTemplateId ? false : true}
                     primaryText='Delete Template' />
                   </IconMenu>
+                  <DatePickerHOC>
+                    {({onRequestOpen}) => <IconButton onClick={onRequestOpen} iconClassName='fa fa-calendar' tooltip='Schedule & Send Later' tooltipPosition='top-right'/>}
+                  </DatePickerHOC>
                 </div>
                 <div style={{marginLeft: 100}}>
                   <RaisedButton primary label='Preview' onClick={this._onPreviewEmailsClick} />
