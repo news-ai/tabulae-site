@@ -102,7 +102,7 @@ module.exports = function(options) {
         },
         {
           include: /\.json$/, loaders: ['json-loader']
-        }
+        },
       ]
     },
     resolve: {

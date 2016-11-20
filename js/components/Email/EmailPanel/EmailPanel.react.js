@@ -17,8 +17,9 @@ import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
+import DatePickerHOC from './DatePickerHOC.react';
 
-import {grey50} from 'material-ui/styles/colors';
+import {grey50, grey800, blue400} from 'material-ui/styles/colors';
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
 const iconStyle = {
   color: 'lightgray',
@@ -166,14 +167,16 @@ class EmailPanel extends Component {
       if (contact && contact !== null) {
         const replacedBody = this._replaceAll(body, selectedContacts[i]);
         const replacedSubject = this._replaceAll(subject, selectedContacts[i]);
-        contactEmails.push({
+        let emailObj = {
           listid: this.props.listId,
           to: contact.email,
           subject: replacedSubject,
           body: replacedBody,
           contactid: contact.id,
-          templateid: this.state.currentTemplateId
-        });
+          templateid: this.state.currentTemplateId,
+        };
+        if (this.props.scheduledtime !== null) emailObj.sendat = this.props.scheduledtime;
+        contactEmails.push(emailObj);
       }
     });
     return contactEmails;
@@ -291,6 +294,16 @@ class EmailPanel extends Component {
                     disabled={state.currentTemplateId ? false : true}
                     primaryText='Delete Template' />
                   </IconMenu>
+                  <DatePickerHOC>
+                    {({onRequestOpen}) =>
+                    <IconButton
+                    iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
+                    onClick={onRequestOpen}
+                    iconClassName='fa fa-calendar'
+                    tooltip='Schedule & Send Later'
+                    tooltipPosition='top-right'
+                    />}
+                  </DatePickerHOC>
                 </div>
                 <div style={{marginLeft: 100}}>
                   <RaisedButton primary label='Preview' onClick={this._onPreviewEmailsClick} />
@@ -320,6 +333,7 @@ class EmailPanel extends Component {
 const mapStateToProps = (state, props) => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
   return {
+    scheduledtime: state.stagingReducer.utctime,
     isReceiving: state.stagingReducer.isReceiving,
     previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails
     .map(pEmail => state.stagingReducer[pEmail.id])

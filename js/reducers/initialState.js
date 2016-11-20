@@ -28,7 +28,8 @@ export const initialState = {
     previewEmails: [],
     received: [],
     offset: 0,
-    contactOffset: {}
+    contactOffset: {},
+    utctime: null
   },
   publicationReducer: {
     isReceiving: false,
