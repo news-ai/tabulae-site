@@ -57,7 +57,7 @@ for (let i = 0; i < 60; i++) {
   {offset: 12.0, text: '(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka'}
 ]; */
 
-const DATE_FORMAT = 'MM-DD-YYYY HH:mm';
+const DATE_FORMAT = 'YYYY-MM-DD HH:mm';
 const UTC_ZONE = 'Europe/London';
 
 const timezone_names = [
@@ -151,9 +151,9 @@ class DatePickerHOC extends Component {
       console.log(datestring);
       console.log(this.state.timezone);
       const localtime = moment.tz(datestring, this.state.timezone);
-      console.log(localtime);
+      console.log(localtime.format());
       const utctime = localtime.clone().tz(UTC_ZONE);
-      console.log(utctime);
+      console.log(localtime.utc().format());
       this.setState({
         open: false
       });
@@ -182,10 +182,10 @@ class DatePickerHOC extends Component {
             <div>
               <div className='vertical-center' style={{margin: '5px 0'}}>
                {m.isValid() && <span style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
-                <DropDownMenu maxHeight={200} value={state.hour} onChange={(e, i, hour) => this.setState({hour})}>
+                <DropDownMenu maxHeight={200} value={state.hour} onChange={(e, i, hour) => this.setState({date: state.date.hours(hour), hour})}>
                   {hours}
                 </DropDownMenu> : 
-                <DropDownMenu maxHeight={200} value={state.minute} onChange={(e, i, minute) => this.setState({minute})}>
+                <DropDownMenu maxHeight={200} value={state.minute} onChange={(e, i, minute) => this.setState({date: state.date.minutes(minute), minute})}>
                   {minutes}
                 </DropDownMenu>
               </div>
