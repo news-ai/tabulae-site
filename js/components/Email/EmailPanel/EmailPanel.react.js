@@ -132,6 +132,10 @@ class EmailPanel extends Component {
     this.setState({fieldsmap});
   }
 
+  componentWillUnmount() {
+    this.props.clearUTCTime();
+  }
+
   _onArchiveTemplate() {
     this.props.toggleArchiveTemplate(this.state.currentTemplateId)
     .then(_ => this._handleTemplateValueChange(null, null, 0));
@@ -351,7 +355,8 @@ const mapDispatchToProps = dispatch => {
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body)),
     fetchTemplates: _ => dispatch(actionCreators.getTemplates()),
     createTemplate: (name, subject, body) => dispatch(actionCreators.createTemplate(name, subject, body)),
-    toggleArchiveTemplate: templateId => dispatch(actionCreators.toggleArchiveTemplate(templateId))
+    toggleArchiveTemplate: templateId => dispatch(actionCreators.toggleArchiveTemplate(templateId)),
+    clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'})
   };
 };
 

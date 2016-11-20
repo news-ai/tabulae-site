@@ -4,7 +4,6 @@ import Dialog from 'material-ui/Dialog';
 import DatePicker from 'react-datepicker';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import FlatButton from 'material-ui/FlatButton';
 import Toggle from 'material-ui/Toggle';
 
 import moment from 'moment-timezone';
