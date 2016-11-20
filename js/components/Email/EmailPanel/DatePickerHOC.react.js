@@ -57,6 +57,9 @@ for (let i = 0; i < 60; i++) {
   {offset: 12.0, text: '(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka'}
 ]; */
 
+const DATE_FORMAT = 'MM-DD-YYYY HH:mm';
+const UTC_ZONE = 'Europe/London';
+
 const timezone_names = [
   {offset: -12.0, text: 'Pacific/Kwajalein'},
   {offset: -11.0, text: 'Pacific/Samoa'},
@@ -93,7 +96,7 @@ const timezone_names = [
 ];
 
 const timezones = timezone_names
-.map((timezone, i) => <MenuItem value={timezone.offset} key={`timezone-${i}`} primaryText={timezone.text}/>);
+.map((timezone, i) => <MenuItem value={timezone.text} key={`timezone-${i}`} primaryText={timezone.text}/>);
 
 class DatePickerHOC extends Component {
   constructor(props) {
@@ -106,7 +109,7 @@ class DatePickerHOC extends Component {
       hour: rightNow.hours(),
       minute: rightNow.minutes(),
       toggled: false,
-      timezone: timezone_names[7].offset,
+      timezone: timezone_names[7].text,
     };
     this.onToggle = this._onToggle.bind(this);
     this.onRequestOpen = this._onRequestOpen.bind(this);
@@ -144,10 +147,13 @@ class DatePickerHOC extends Component {
   _onRequestClose() {
     if (this.state.toggled) {
       const date = this.state.date;
-      const datestring = date.utcOffset(parseInt(this.state.timezone * 60, 10)).format('YYYYMMDD HHmmss ZZ');
-      console.log(date);
+      const datestring = date.format(DATE_FORMAT);
       console.log(datestring);
       console.log(this.state.timezone);
+      const localtime = moment.tz(datestring, this.state.timezone);
+      console.log(localtime);
+      const utctime = localtime.clone().tz(UTC_ZONE);
+      console.log(utctime);
       this.setState({
         open: false
       });
