@@ -30,7 +30,7 @@ function StaticEmailContent({to, subject, body, sendat}) {
    <div className='u-full-width' style={styles.content}>
       <p style={styles.span}><strong style={styles.strong}>To</strong>{to}</p>
       <p style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</p>
-      {sendat !== null && <p style={styles.span}><span style={{fontSize: '0.9em', color: grey600}}>Scheduled: {date.tz(moment.tz.guess()).format(FORMAT)}</span></p>}
+      {sendat !== null && <p style={styles.span}><span style={{fontSize: '0.9em', color: grey600}}>Scheduled: {date.tz(moment.tz.guess()).format(FORMAT)} {moment.tz.guess()} (local)</span></p>}
       <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
     </div>
     );
