@@ -23,7 +23,7 @@ for (let i = 0; i < 60; i++) {
   minutes.push(<MenuItem value={i} key={`minute-${i}`} primaryText={`${i}`} />);
 }
 
-const timezone_names = [
+/* const timezone_names = [
   {offset: -11.0, text: '(GMT -11:00) Midway Island, Samoa'},
   {offset: -10.0, text: '(GMT -10:00) Hawaii'},
   {offset: -9.0, text: '(GMT -9:00) Alaska'},
@@ -55,10 +55,45 @@ const timezone_names = [
   {offset: 10.0, text: '(GMT +10:00) Eastern Australia, Guam, Vladivostok'},
   {offset: 11.0, text: '(GMT +11:00) Magadan, Solomon Islands, New Caledonia'},
   {offset: 12.0, text: '(GMT +12:00) Auckland, Wellington, Fiji, Kamchatka'}
+]; */
+
+const timezone_names = [
+  {offset: -12.0, text: 'Pacific/Kwajalein'},
+  {offset: -11.0, text: 'Pacific/Samoa'},
+  {offset: -10.0, text: 'Pacific/Honolulu'},
+  {offset: -9.0, text: 'America/Anchorage'},
+  {offset: -8.0, text: 'America/Los_Angeles'},
+  {offset: -7.0, text: 'America/Denver'},
+  {offset: -6.0, text: 'America/Chicago'},
+  {offset: -5.0, text: 'America/New_York'},
+  {offset: -4.0, text: 'Canada/Atlantic'},
+  {offset: -3.5, text: 'Canada/Newfoundland'},
+  {offset: -3.0, text: 'America/Buenos_Aires'},
+  {offset: -2.0, text: 'America/Noronha'},
+  {offset: -1.0, text: 'Atlantic/Azores'},
+  {offset: 0.0, text: 'Europe/London'},
+  {offset: 1.0, text: 'Europe/Brussels'},
+  {offset: 2.0, text: 'Europe/Copenhagen'},
+  {offset: 3.0, text: 'Europe/Moscow'},
+  {offset: 3.5, text: 'Asia/Tehran'},
+  {offset: 4.0, text: 'Asia/Dubai'},
+  {offset: 4.5, text: 'Asia/Kabul'},
+  {offset: 5.0, text: 'Asia/Ashkhabad'},
+  {offset: 5.5, text: 'Asia/Calcutta'},
+  {offset: 5.75, text: 'Asia/Katmandu'},
+  {offset: 6.0, text: 'Asia/Thimbu'},
+  {offset: 6.5, text: 'Asia/Rangoon'},
+  {offset: 7.0, text: 'Asia/Bangkok'},
+  {offset: 8.0, text: 'Asia/Taipei'},
+  {offset: 9.0, text: 'Asia/Tokyo'},
+  {offset: 9.5, text: 'Australia/Darwin'},
+  {offset: 10.0, text: 'Australia/Victoria'},
+  {offset: 11.0, text: 'Asia/Magadan'},
+  {offset: 12.0, text: 'Pacific/Auckland'}
 ];
 
 const timezones = timezone_names
-.map((timezone, i) => <MenuItem value={timezone.text} key={`timezone-${i}`} primaryText={timezone.text}/>);
+.map((timezone, i) => <MenuItem value={timezone.offset} key={`timezone-${i}`} primaryText={timezone.text}/>);
 
 class DatePickerHOC extends Component {
   constructor(props) {
@@ -71,22 +106,14 @@ class DatePickerHOC extends Component {
       hour: rightNow.hours(),
       minute: rightNow.minutes(),
       toggled: false,
-      timezone: moment.tz.guess(),
+      timezone: timezone_names[7].offset,
     };
     this.onToggle = this._onToggle.bind(this);
+    this.onRequestOpen = this._onRequestOpen.bind(this);
+    this.onRequestClose = this._onRequestClose.bind(this);
   }
 
   componentDidUpdate(prevState) {
-    if (!prevState.open && this.state.open && !this.state.toggled) {
-      const today = new Date();
-      const rightNow = moment(today);
-      this.state = {
-        open: true,
-        date: rightNow,
-        hour: rightNow.hours(),
-        minute: rightNow.minutes(),
-      };
-    }
   }
 
   _onToggle(e, toggled) {
@@ -99,13 +126,45 @@ class DatePickerHOC extends Component {
     }
   }
 
+  _onRequestOpen() {
+    const today = new Date();
+    const rightNow = moment(today);
+    if (this.state.toggled) {
+      this.setState({open: true});
+    } else {
+      this.setState({
+        open: true,
+        date: rightNow,
+        hour: rightNow.hours(),
+        minute: rightNow.minutes(),
+      });
+    }
+  }
+
+  _onRequestClose() {
+    if (this.state.toggled) {
+      const date = this.state.date;
+      const datestring = date.utcOffset(parseInt(this.state.timezone * 60, 10)).format('YYYYMMDD HHmmss ZZ');
+      console.log(date);
+      console.log(datestring);
+      console.log(this.state.timezone);
+      this.setState({
+        open: false
+      });
+    } else {
+      this.setState({
+        open: false
+      });
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
     const m = moment(state.date);
     return (
       <div>
-        <Dialog title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={_ => this.setState({open: false, date: null})}>
+        <Dialog title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
           <div className='horizontal-center' style={{margin: '20px 0'}}>
             <DatePicker
             inline
@@ -134,7 +193,7 @@ class DatePickerHOC extends Component {
             </div>
           </div>
         </Dialog>
-      {props.children({onRequestOpen: _ => this.setState({open: true})})}
+      {props.children({onRequestOpen: this.onRequestOpen})}
       </div>
       );
   }
@@ -145,7 +204,8 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  return {};
+  return {
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(DatePickerHOC);
