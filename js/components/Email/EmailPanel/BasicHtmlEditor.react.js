@@ -49,8 +49,6 @@ class BasicHtmlEditor extends React.Component {
     ]);
 
     this.ENTITY_CONTROLS = [
-      // {label: 'Add Link', action: this._addLink.bind(this)},
-      // {label: 'Remove Link', action: this._removeLink.bind(this)},
       {label: 'Manage', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
     ];
 
