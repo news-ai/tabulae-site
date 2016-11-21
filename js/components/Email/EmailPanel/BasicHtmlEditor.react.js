@@ -51,7 +51,7 @@ class BasicHtmlEditor extends React.Component {
     this.ENTITY_CONTROLS = [
       // {label: 'Add Link', action: this._addLink.bind(this)},
       // {label: 'Remove Link', action: this._removeLink.bind(this)},
-      {label: 'Manage', action: this._manageLink.bind(this)}
+      {label: 'Manage', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
     ];
 
     this.INLINE_STYLES = [
@@ -201,15 +201,18 @@ class BasicHtmlEditor extends React.Component {
     const blockAtLinkBeginning = editorState.getCurrentContent().getBlockForKey(startKey);
     let i;
     let linkKey;
-    let hasLink = false;
+    let hasEntityType = false;
     for (i = startOffset; i < endOffset; i++) {
       linkKey = blockAtLinkBeginning.getEntityAt(i);
       if (linkKey !== null) {
-        hasLink = true;
-        break;
+        const type = Entity.get(linkKey).getType();
+        if (type === 'LINK') {
+          hasEntityType = true;
+          break;
+        }
       }
     }
-    if (hasLink) {
+    if (hasEntityType) {
       // REMOVE LINK
       this.removeLink();
     } else {
