@@ -10,6 +10,7 @@ export default function ExternalControls(props) {
         <StyleButton
         key={type.label}
         label={type.label}
+        active={props.active}
         onToggle={type.onToggle}
         style={type.style}
         icon={type.icon}

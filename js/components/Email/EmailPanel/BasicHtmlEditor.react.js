@@ -57,7 +57,7 @@ const FilePreview = ({name, size, preview, onRemoveClick, maxLength}) => {
     <div style={{margin: 5}}>
       <div>
         <span style={{fontSize: '0.9em'}}>{name.length > maxLength - 4 ? `${name.substring(0, maxLength)} ...` : name}</span>
-        <FontIcon color={grey600} hoverColor={grey400} style={{fontSize: '14px', margin: '0 5px'}} className='fa fa-times pointer' onClick={onRemoveClick}/>
+        <FontIcon color={grey600} hoverColor={grey400} style={{fontSize: '16px', margin: '0 8px'}} className='fa fa-times pointer' onClick={onRemoveClick}/>
       </div>
       <div>
         <span style={{fontSize: '0.8em'}}>{size} bytes</span>
@@ -323,8 +323,8 @@ class BasicHtmlEditor extends React.Component {
           </div>
           {this.state.files.length > 0 && (
             <div>
-              <h4>Uploading {this.state.files.length} files...</h4>
-              <div style={{display: 'inline-block'}}>
+              <h4>Attached {this.state.files.length} files...</h4>
+              <div className='row'>
               {this.state.files.map((file, i) =>
                 <FilePreview
                 onRemoveClick={_ => this.setState({files: state.files.filter((f, fi) => fi !== i)})}
@@ -395,10 +395,12 @@ class BasicHtmlEditor extends React.Component {
             editorState={editorState}
             entityControls={this.ENTITY_CONTROLS}
             />
-            <ExternalControls
+            {/*<ExternalControls
             editorState={editorState}
             externalControls={this.EXTERNAL_CONTROLS}
-            />
+            active={state.files.length > 0}
+            />*/
+            }
             <BlockStyleControls
             editorState={editorState}
             blockTypes={this.BLOCK_TYPES}
