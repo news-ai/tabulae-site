@@ -5,28 +5,26 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = function(options) {
-  var entry, jsLoaders, plugins, cssLoaders;
+  var entry, plugins, cssLoaders;
 
   // If production is true
   if (options.prod) {
-    // Entry
     entry = [
       path.resolve(__dirname, 'js/config.shared.js'),
       path.resolve(__dirname, 'js/config.prod.js'),
-      path.resolve(__dirname, 'js/app.js') // Start with js/app.js...
+      path.resolve(__dirname, 'js/app.js')
     ];
     cssLoaders = ExtractTextPlugin.extract('style-loader', ['css-loader', 'postcss-loader', 'sass-loader']);
-    // Plugins
-    plugins = [ // Plugins for Webpack
+    plugins = [
       new ExtractTextPlugin('react-toolbox.css', {allChunks: true}),
-      new webpack.optimize.UglifyJsPlugin({ // Optimize the JavaScript...
+      new webpack.optimize.UglifyJsPlugin({
         compress: {
-          warnings: false // ...but do not show warnings in the console (there is a lot of them)
+          warnings: false
         }
       }),
       new HtmlWebpackPlugin({
-        template: 'index.html', // Move the index.html file...
-        minify: { // Minifying it while it is parsed
+        template: 'index.html',
+        minify: {
           removeComments: true,
           collapseWhitespace: true,
           removeRedundantAttributes: true,
@@ -49,21 +47,17 @@ module.exports = function(options) {
       }),
       new webpack.optimize.AggressiveMergingPlugin()
     ];
-
-  // If app is in development
   } else {
-    // Entry
     entry = [
-      'webpack-dev-server/client?http://localhost:3000', // Needed for hot reloading
-      'webpack/hot/only-dev-server', // See above
+      'webpack-dev-server/client?http://localhost:3000',
+      'webpack/hot/only-dev-server',
       path.resolve(__dirname, 'js/config.shared.js'),
       path.resolve(__dirname, 'js/config.dev.js'),
       path.resolve(__dirname, 'js/app.js')
     ];
     cssLoaders = 'style-loader!css-loader!postcss-loader!sass-loader';
-    // Only plugin is the hot module replacement plugin
     plugins = [
-      new webpack.HotModuleReplacementPlugin(), // Make hot loading work
+      new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
         template: 'index.html',
         inject: true,
@@ -93,8 +87,8 @@ module.exports = function(options) {
           exclude: path.join(__dirname, '/node_modules/') // ...except for the node_modules folder.
         },
         {
-          test: /\.css$/, // Transform all .css files required somewhere within an entry point...
-          loader: cssLoaders // ...with PostCSS
+          test: /\.css$/,
+          loader: cssLoaders
         },
         {
           test: /\.jpe?g$|\.gif$|\.png$/i,

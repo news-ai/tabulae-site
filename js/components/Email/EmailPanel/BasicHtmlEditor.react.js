@@ -49,15 +49,16 @@ class BasicHtmlEditor extends React.Component {
     ]);
 
     this.ENTITY_CONTROLS = [
-      {label: 'Add Link', action: this._addLink.bind(this) },
-      {label: 'Remove Link', action: this._removeLink.bind(this) }
+      // {label: 'Add Link', action: this._addLink.bind(this)},
+      // {label: 'Remove Link', action: this._removeLink.bind(this)},
+      {label: 'Manage', action: this._manageLink.bind(this)}
     ];
 
     this.INLINE_STYLES = [
       {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
       {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
       {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
-      {label: 'Monospace', style: 'CODE'},
+      // {label: 'Monospace', style: 'CODE'},
       {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
     ];
 
@@ -102,6 +103,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleReturn = this._handleReturn.bind(this);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
+    this.manageLink = this._manageLink.bind(this);
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
   }
@@ -189,12 +191,37 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
+  _manageLink() {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (selection.isCollapsed()) return;
+    const startKey = selection.getStartKey();
+    const startOffset = selection.getStartOffset();
+    const endOffset = selection.getEndOffset();
+    const blockAtLinkBeginning = editorState.getCurrentContent().getBlockForKey(startKey);
+    let i;
+    let linkKey;
+    let hasLink = false;
+    for (i = startOffset; i < endOffset; i++) {
+      linkKey = blockAtLinkBeginning.getEntityAt(i);
+      if (linkKey !== null) {
+        hasLink = true;
+        break;
+      }
+    }
+    if (hasLink) {
+      // REMOVE LINK
+      this.removeLink();
+    } else {
+      // ADD LINK
+      this.addLink();
+    }
+  }
+
   _addLink(/* e */) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
-    if (selection.isCollapsed()) {
-      return;
-    }
+    if (selection.isCollapsed()) return;
     alertify.prompt(
       '',
       'Enter a URL', 'https://',
@@ -211,7 +238,7 @@ class BasicHtmlEditor extends React.Component {
     if (selection.isCollapsed()) {
       return;
     }
-    this.onChange( RichUtils.toggleLink(editorState, selection, null));
+    this.onChange(RichUtils.toggleLink(editorState, selection, null));
   }
 
   _handlePastedText(text, html) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {blueA400} from 'material-ui/styles/colors';
+import {blueA400, grey800} from 'material-ui/styles/colors';
 
 export default class StyleButton extends React.Component {
   constructor() {
@@ -13,7 +13,7 @@ export default class StyleButton extends React.Component {
   render() {
     const props = this.props;
     const buttonStyle = {
-      color: props.active ? blueA400 : 'black',
+      color: props.active ? blueA400 : grey800,
       cursor: 'pointer',
       marginRight: '10px'
     };
