@@ -1,18 +1,16 @@
 import React from 'react';
 import StyleButton from './StyleButton';
 
-export default function InlineStyleControls(props) {
-  let {inlineStyles} = props;
-  var currentStyle = props.editorState.getCurrentInlineStyle();
+export default function ExternalControls(props) {
+  let {externalControls} = props;
 
   return (
     <div className='RichEditor-controls' style={{display: 'flex'}}>
-      {inlineStyles.map(type =>
+      {externalControls.map(type =>
         <StyleButton
         key={type.label}
-        active={currentStyle.has(type.style)}
         label={type.label}
-        onToggle={props.onToggle}
+        onToggle={type.onToggle}
         style={type.style}
         icon={type.icon}
         />

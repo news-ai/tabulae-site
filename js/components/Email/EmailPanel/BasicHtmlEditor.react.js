@@ -18,7 +18,10 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
-import {blue100, blue200, grey300} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
+import Dialog from 'material-ui/Dialog';
+import Dropzone from 'react-dropzone';
+import {blue100, blue200, grey300, grey400, grey600} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -26,6 +29,7 @@ import CurlySpan from './components/CurlySpan.react';
 import EntityControls from './components/EntityControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
+import ExternalControls from './components/ExternalControls';
 import alertify from 'alertifyjs';
 
 import 'node_modules/draft-js/dist/Draft.css';
@@ -33,6 +37,35 @@ import 'node_modules/draft-js/dist/Draft.css';
 import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
+
+const controlsStyle = {
+  position: 'fixed',
+  height: 40,
+  zIndex: 200,
+  overflow: 'hidden',
+  paddingLeft: 10,
+  paddingRight: 10,
+  bottom: 60,
+  border: `solid 1px ${blue100}`,
+  borderRadius: '0.8em',
+  backgroundColor: 'white',
+  files: []
+};
+
+const FilePreview = ({name, size, preview, onRemoveClick, maxLength}) => {
+  return (
+    <div style={{margin: 5}}>
+      <div>
+        <span style={{fontSize: '0.9em'}}>{name.length > maxLength - 4 ? `${name.substring(0, maxLength)} ...` : name}</span>
+        <FontIcon color={grey600} hoverColor={grey400} style={{fontSize: '14px', margin: '0 5px'}} className='fa fa-times pointer' onClick={onRemoveClick}/>
+      </div>
+      <div>
+        <span style={{fontSize: '0.8em'}}>{size} bytes</span>
+      </div>
+      <img width={100} height={100} src={preview}/>
+    </div>
+    );
+};
 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
@@ -49,7 +82,15 @@ class BasicHtmlEditor extends React.Component {
     ]);
 
     this.ENTITY_CONTROLS = [
-      {label: 'Manage', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
+      {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
+    ];
+
+    this.EXTERNAL_CONTROLS = [
+      {
+        label: 'File Upload',
+        onToggle: _ => this.setState({filePanelOpen: true}),
+        icon: 'fa fa-paperclip',
+      }
     ];
 
     this.INLINE_STYLES = [
@@ -77,6 +118,8 @@ class BasicHtmlEditor extends React.Component {
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
+      filePanelOpen: false,
+      files: [],
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -104,6 +147,7 @@ class BasicHtmlEditor extends React.Component {
     this.manageLink = this._manageLink.bind(this);
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
+    this.onDrop = this._onDrop.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -115,6 +159,11 @@ class BasicHtmlEditor extends React.Component {
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
+  }
+
+  _onDrop(acceptedFiles, rejectedFiles) {
+    const files = [...this.state.files, ...acceptedFiles];
+    this.setState({files});
   }
 
   _onChange(editorState) {
@@ -264,9 +313,31 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-
     return (
       <div>
+        <Dialog title='File Upload' autoScrollBodyContent open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}>
+          <div style={{margin: 10}} className='horizontal-center'>
+            <Dropzone maxSize={5000000} onDrop={this.onDrop}>
+              <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>
+            </Dropzone>
+          </div>
+          {this.state.files.length > 0 && (
+            <div>
+              <h4>Uploading {this.state.files.length} files...</h4>
+              <div style={{display: 'inline-block'}}>
+              {this.state.files.map((file, i) =>
+                <FilePreview
+                onRemoveClick={_ => this.setState({files: state.files.filter((f, fi) => fi !== i)})}
+                key={`file-${i}`}
+                name={file.name}
+                preview={file.preview}
+                size={file.size}
+                maxLength={17}
+                />)}
+              </div>
+            </div>
+            )}
+        </Dialog>
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
@@ -282,7 +353,7 @@ class BasicHtmlEditor extends React.Component {
             }} />)}
           </Menu>
         </Popover>
-        <div style={{marginTop: '8px'}}>
+        <div style={{marginTop: 8}}>
           <Subject
           onSubjectChange={props.onSubjectChange}
           subjectHtml={props.subjectHtml}
@@ -314,26 +385,19 @@ class BasicHtmlEditor extends React.Component {
           />
         </div>
         {state.isStyleBlockOpen &&
-          <div className='row vertical-center clearfix' style={{
-            position: 'fixed',
-            height: 40,
-            zIndex: 200,
-            overflow: 'hidden',
-            paddingLeft: 10,
-            paddingRight: 10,
-            bottom: 60,
-            border: `solid 1px ${blue100}`,
-            borderRadius: '0.8em',
-            backgroundColor: 'white'
-          }}>
+          <div className='row vertical-center clearfix' style={controlsStyle}>
             <InlineStyleControls
-              editorState={editorState}
-              onToggle={this.toggleInlineStyle}
-              inlineStyles={this.INLINE_STYLES}
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={this.INLINE_STYLES}
             />
             <EntityControls
-              editorState={editorState}
-              entityControls={this.ENTITY_CONTROLS}
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+            />
+            <ExternalControls
+            editorState={editorState}
+            externalControls={this.EXTERNAL_CONTROLS}
             />
             <BlockStyleControls
             editorState={editorState}
