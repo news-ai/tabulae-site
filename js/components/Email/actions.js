@@ -26,15 +26,53 @@ export function postBatchEmails(emails) {
         previewEmails: response.data
       });
     })
+    .catch( message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
+  };
+}
+
+export function postAttachments(emailid) {
+  return (dispatch, getState) => {
+    const files = getState().emailAttachmentReducer.attached;
+    if (files.length === 0) return;
+
+    let data = new FormData();
+    files.map(file => {
+      data.append('file', file);
+    });
+    dispatch({type: 'ATTACHING_EMAIL_FILES', files});
+    return api.postFile(`/emails/${emailid}/attach`, data)
+    .then(response => {
+      return dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data});
+    });
+  };
+}
+
+export function postBatchEmailsWithAttachments(emails) {
+  return dispatch => {
+    dispatch({ type: SENDING_STAGED_EMAILS, emails });
+    return api.post(`/emails`, emails)
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(emailSchema)
+      });
+      const ids = res.result.data;
+      ids.map(id => dispatch(postAttachments(id)));
+      return dispatch({
+        type: RECEIVE_STAGED_EMAILS,
+        emails: res.entities.emails,
+        ids,
+        previewEmails: response.data
+      });
+    })
     .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message}));
   };
 }
 
 export function sendEmail(id) {
   return dispatch => {
-    dispatch({ type: 'SEND_EMAIL', id });
+    dispatch({type: 'SEND_EMAIL', id});
     return api.get(`/emails/${id}/send`)
-    .then( response => {
+    .then(response => {
       const res = normalize(response.data, emailSchema);
       dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result});
     })

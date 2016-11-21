@@ -1,5 +1,6 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
+import {connect} from 'react-redux';
 import {
   Editor,
   EditorState,
@@ -18,11 +19,11 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
-import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, grey300, grey400, grey600} from 'material-ui/styles/colors';
+import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
+import AttachmentPreview from '../EmailAttachment/AttachmentPreview.react';
 import Subject from './Subject.react';
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
@@ -50,21 +51,6 @@ const controlsStyle = {
   borderRadius: '0.8em',
   backgroundColor: 'white',
   files: []
-};
-
-const FilePreview = ({name, size, preview, onRemoveClick, maxLength}) => {
-  return (
-    <div style={{margin: 5}}>
-      <div>
-        <span style={{fontSize: '0.9em'}}>{name.length > maxLength - 4 ? `${name.substring(0, maxLength)} ...` : name}</span>
-        <FontIcon color={grey600} hoverColor={grey400} style={{fontSize: '16px', margin: '0 8px'}} className='fa fa-times pointer' onClick={onRemoveClick}/>
-      </div>
-      <div>
-        <span style={{fontSize: '0.8em'}}>{size} bytes</span>
-      </div>
-      <img width={100} height={100} src={preview}/>
-    </div>
-    );
 };
 
 class BasicHtmlEditor extends React.Component {
@@ -119,7 +105,6 @@ class BasicHtmlEditor extends React.Component {
       isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
       filePanelOpen: false,
-      files: [],
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -150,6 +135,11 @@ class BasicHtmlEditor extends React.Component {
     this.onDrop = this._onDrop.bind(this);
   }
 
+  componentWillMount() {
+    if (this.props.person.emailsignature.length > 0) {
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
@@ -160,10 +150,13 @@ class BasicHtmlEditor extends React.Component {
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
   }
+  componentWillUnmount() {
+    this.props.clearAttachments();
+  }
 
   _onDrop(acceptedFiles, rejectedFiles) {
-    const files = [...this.state.files, ...acceptedFiles];
-    this.setState({files});
+    const files = [...this.props.files, ...acceptedFiles];
+    this.props.setAttachments(files);
   }
 
   _onChange(editorState) {
@@ -321,13 +314,13 @@ class BasicHtmlEditor extends React.Component {
               <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>
             </Dropzone>
           </div>
-          {this.state.files.length > 0 && (
+          {props.files.length > 0 && (
             <div>
-              <h4>Attached {this.state.files.length} files...</h4>
+              <h4>Attached {props.files.length} files...</h4>
               <div className='row'>
-              {this.state.files.map((file, i) =>
-                <FilePreview
-                onRemoveClick={_ => this.setState({files: state.files.filter((f, fi) => fi !== i)})}
+              {props.files.map((file, i) =>
+                <AttachmentPreview
+                onRemoveClick={_ => props.setAttachments(props.files.filter((f, fi) => fi !== i))}
                 key={`file-${i}`}
                 name={file.name}
                 preview={file.preview}
@@ -395,12 +388,11 @@ class BasicHtmlEditor extends React.Component {
             editorState={editorState}
             entityControls={this.ENTITY_CONTROLS}
             />
-            {/*<ExternalControls
+            <ExternalControls
             editorState={editorState}
             externalControls={this.EXTERNAL_CONTROLS}
-            active={state.files.length > 0}
-            />*/
-            }
+            active={props.files.length > 0}
+            />
             <BlockStyleControls
             editorState={editorState}
             blockTypes={this.BLOCK_TYPES}
@@ -443,4 +435,17 @@ function getBlockStyle(block) {
   }
 }
 
-export default BasicHtmlEditor;
+const mapStateToProps = (state, props) => {
+  return {
+    files: state.emailAttachmentReducer.attached,
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
+    clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'})
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(BasicHtmlEditor);

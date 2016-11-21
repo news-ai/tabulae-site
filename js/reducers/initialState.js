@@ -31,6 +31,9 @@ export const initialState = {
     contactOffset: {},
     utctime: null
   },
+  emailAttachmentReducer: {
+    attached: []
+  },
   publicationReducer: {
     isReceiving: false,
     didInvalidate: false,
