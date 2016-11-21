@@ -9,6 +9,7 @@ import Avatar from 'material-ui/Avatar';
 import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
 import Invite from './Invite.react';
+import Textarea from 'react-textarea-autosize';
 
 import * as actionCreators from '../../actions/AppActions';
 
@@ -35,6 +36,26 @@ const spanStyle = {
   float: 'right'
 };
 
+const InviteSteps = props => <div style={{
+  display: 'flex',
+  justifyContent: 'space-around',
+  margin: '20px 0',
+  padding: 30
+}}>
+  <div>
+    <Avatar backgroundColor={cyan500} size={30}><strong>1</strong></Avatar>
+    <span style={{color: blueGrey900, margin: '0 5px'}}>Invite friends</span>
+  </div>
+  <div>
+    <Avatar backgroundColor={cyan500} size={30}><strong>2</strong></Avatar>
+    <span style={{color: blueGrey900, margin: '0 5px'}}>5 friends set up accounts</span>
+  </div>
+  <div>
+    <Avatar backgroundColor={cyan500} size={30}><strong>3</strong></Avatar>
+    <span style={{color: blueGrey900, margin: '0 5px'}}>You get 1 month FREE. Yay!</span>
+  </div>
+</div>;
+
 class UserProfile extends Component {
   constructor(props) {
     super(props);
@@ -58,7 +79,8 @@ class UserProfile extends Component {
       const person = {
         firstname: newPerson.get('firstname'),
         lastname: newPerson.get('lastname'),
-        getdailyemails: newPerson.get('getdailyemails')
+        getdailyemails: newPerson.get('getdailyemails'),
+        emailsignature: newPerson.get('emailsignature')
       };
       this.props.patchPerson(person);
     }
@@ -127,9 +149,7 @@ class UserProfile extends Component {
                   <RaisedButton
                   label='Change Password'
                   labelStyle={{textTransform: 'none'}}
-                  onClick={_ => {
-                    window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword';
-                  }}
+                  onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/changepassword')}
                   />}
               </div>
             </div>
@@ -141,29 +161,23 @@ class UserProfile extends Component {
                 <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !toggled)}/>
               </div>
             </div>
+            <div className='row vertical-center' style={inputHeight}>
+              <div className='large-4 medium-4 columns'>
+                <span style={spanStyle}>Email Signature</span>
+              </div>
+              <div className='large-8 medium-8 columns'>
+                <Textarea
+                value={state.newPerson.get('emailsignature')}
+                onChange={e => this.setNewPerson('emailsignature', e.target.value)}
+                maxRows={7}
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div className='row horizontal-center'>
           <div className='large-8 medium-8 small-12 columns'>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-around',
-              margin: '20px 0',
-              padding: '30px'
-            }}>
-              <div>
-                <Avatar backgroundColor={cyan500} size={30}><strong>1</strong></Avatar>
-                <span style={{color: blueGrey900, margin: '0 5px'}}>Invite friends</span>
-              </div>
-              <div>
-                <Avatar backgroundColor={cyan500} size={30}><strong>2</strong></Avatar>
-                <span style={{color: blueGrey900, margin: '0 5px'}}>5 friends set up accounts</span>
-              </div>
-              <div>
-                <Avatar backgroundColor={cyan500} size={30}><strong>3</strong></Avatar>
-                <span style={{color: blueGrey900, margin: '0 5px'}}>You get 1 month FREE. Yay!</span>
-              </div>
-            </div>
+            <InviteSteps/>
             <div className='horizontal-center'>
               <span style={{fontSize: '0.8em'}}>{5 - state.count} friends away from a free month</span>
             </div>
