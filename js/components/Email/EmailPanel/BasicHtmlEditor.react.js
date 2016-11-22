@@ -33,6 +33,8 @@ import EntityControls from './components/EntityControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
 import ExternalControls from './components/ExternalControls';
+import Image from './Image.react';
+
 import alertify from 'alertifyjs';
 
 import 'node_modules/draft-js/dist/Draft.css';
@@ -55,11 +57,7 @@ const controlsStyle = {
   files: []
 };
 
-const Image = (props) => {
-  return <img src={props.src} />;
-};
-
-const Media = (props) => {
+const Media = props => {
   const entity = Entity.get(props.block.getEntityAt(0));
   const {src} = entity.getData();
   const type = entity.getType();
