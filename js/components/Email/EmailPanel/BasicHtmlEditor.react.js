@@ -7,6 +7,7 @@ import {
   ContentState,
   Entity,
   RichUtils,
+  AtomicBlockUtils,
   convertToRaw,
   CompositeDecorator,
   Modifier,
@@ -52,6 +53,33 @@ const controlsStyle = {
   backgroundColor: 'white',
   files: []
 };
+
+const Image = (props) => {
+  return <img src={props.src} />;
+};
+
+const Media = (props) => {
+  const entity = Entity.get(props.block.getEntityAt(0));
+  const {src} = entity.getData();
+  const type = entity.getType();
+
+  let media;
+  if (type === 'image') {
+    media = <Image src={src} />;
+  }
+  return media;
+};
+
+function mediaBlockRenderer(block) {
+  if (block.getType() === 'atomic') {
+    return {
+      component: Media,
+      editable: false
+    };
+  }
+  return null;
+}
+
 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
@@ -119,6 +147,11 @@ class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
+      // let newHTML = convertToHTML(editorState.getCurrentContent());
+      // console.log('html');
+      // console.log(html);
+      // console.log('newHTML');
+      // console.log(newHTML);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -132,7 +165,9 @@ class BasicHtmlEditor extends React.Component {
     this.manageLink = this._manageLink.bind(this);
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
+    this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
     this.onDrop = this._onDrop.bind(this);
+    this.handleImage = this._handleImage.bind(this);
   }
 
   componentWillMount() {
@@ -231,6 +266,15 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
+  _handleImage() {
+    const {editorState} = this.state;
+    const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
+    console.log('wha');
+    const entityKey = Entity.create('image', 'IMMUTABLE', {src: url});
+    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+    return newEditorState;
+  }
+
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -290,6 +334,12 @@ class BasicHtmlEditor extends React.Component {
     const newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
     return true;
+  }
+
+  _handleDroppedFiles(selection, files) {
+    console.log(files);
+    const newEditorState = this.handleImage();
+    this.onChange(newEditorState);
   }
 
   render() {
@@ -359,11 +409,13 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
+            blockRendererFn={mediaBlockRenderer}
             customStyleMap={styleMap}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}
             handlePastedText={this.handlePastedText}
+            handleDroppedFiles={this.handleDroppedFiles}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'
