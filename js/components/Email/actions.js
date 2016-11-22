@@ -36,14 +36,10 @@ export function postAttachments(emailid) {
     if (files.length === 0) return;
 
     let data = new FormData();
-    files.map(file => {
-      data.append('file', file);
-    });
+    files.map(file => data.append('file', file));
     dispatch({type: 'ATTACHING_EMAIL_FILES', files});
     return api.postFile(`/emails/${emailid}/attach`, data)
-    .then(response => {
-      return dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data});
-    });
+    .then(response => dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data}));
   };
 }
 
