@@ -149,7 +149,6 @@ class BasicHtmlEditor extends React.Component {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
       // let newHTML = convertToHTML(editorState.getCurrentContent());
-      // console.log('html');
       // console.log(html);
       // console.log('newHTML');
       // console.log(newHTML);

@@ -8,6 +8,7 @@ let blockTagMap = {
   'blockquote':               ['<blockquote>','</blockquote>\n'],
   'ordered-list-item':        ['<li>','</li>\n'],
   'unordered-list-item':      ['<li>','</li>\n'],
+  'atomic':                   ['<figure>','</figure>\n'],
   'default':                  ['<p>','</p>\n']
 };
 
@@ -21,7 +22,8 @@ let inlineTagMap = {
 };
 
 let entityTagMap = {
-  'LINK': ['<a href="<%= url %>">', '</a>']
+  'LINK': ['<a href="<%= url %>">', '</a>'],
+  'image': ['<img src="<%= src %>">', '</img>'],
 };
 
 let nestedTagMap = {
