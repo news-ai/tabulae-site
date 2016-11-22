@@ -261,7 +261,11 @@ class EmailPanel extends Component {
               person={props.person}
               >
                 <div className='vertical-center'>
-                  <SelectField style={{overflowX: 'hidden'}} value={state.currentTemplateId} onChange={this.handleTemplateValueChange}>
+                  <SelectField
+                  style={{overflowX: 'hidden'}}
+                  value={state.currentTemplateId}
+                  onChange={this.handleTemplateValueChange}
+                  >
                   {templateMenuItems}
                   </SelectField>
                   <IconMenu
