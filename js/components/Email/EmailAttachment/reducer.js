@@ -3,8 +3,9 @@ import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
 
 const types = [
   'SET_ATTACHMENTS',
-  'REMOVE_ATTACHMENT',
-  'CLEAR_ATTACHMENTS'
+  'CLEAR_ATTACHMENTS',
+  'ALL_EMAIL_ATTACHMENTS_START',
+  'ALL_EMAIL_ATTACHMENTS_FINISHED'
 ];
 
 function emailAttachmentReducer(state = initialState.emailAttachmentReducer, action) {
@@ -18,6 +19,12 @@ function emailAttachmentReducer(state = initialState.emailAttachmentReducer, act
       return obj;
     case 'CLEAR_ATTACHMENTS':
       obj.attached = [];
+      return obj;
+    case 'ALL_EMAIL_ATTACHMENTS_START':
+      obj.isReceiving = true;
+      return obj;
+    case 'ALL_EMAIL_ATTACHMENTS_FINISHED':
+      obj.isReceiving = false;
       return obj;
     default:
       return state;

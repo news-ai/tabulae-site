@@ -54,14 +54,17 @@ export function postBatchEmailsWithAttachments(emails) {
       });
       const ids = res.result.data;
       const postFilePromises = ids.map(id => dispatch(postAttachments(id)));
+      dispatch({type: 'ALL_EMAIL_ATTACHMENTS_START'});
       return Promise.all(postFilePromises)
-        .then(results => dispatch({
-          type: RECEIVE_STAGED_EMAILS,
-          emails: res.entities.emails,
-          ids,
-          previewEmails: response.data
-        })
-      );
+        .then(results => {
+          dispatch({type: 'ALL_EMAIL_ATTACHMENTS_FINISHED'});
+          dispatch({
+            type: RECEIVE_STAGED_EMAILS,
+            emails: res.entities.emails,
+            ids,
+            previewEmails: response.data
+          });
+        });
     })
     .catch( message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
   };

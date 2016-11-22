@@ -19,6 +19,7 @@ import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
 import MinimizedView from './MinimizedView.react';
+import FontIcon from 'material-ui/FontIcon';
 
 import {grey800, blue400} from 'material-ui/styles/colors';
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
@@ -289,8 +290,13 @@ class EmailPanel extends Component {
                     />}
                   </DatePickerHOC>
                 </div>
-                <div style={{marginLeft: 100}}>
-                  <RaisedButton primary label='Preview' onClick={this._onPreviewEmailsClick} />
+                <div style={{marginLeft: 60}}>
+                  <RaisedButton
+                  primary
+                  label='Preview'
+                  onClick={this._onPreviewEmailsClick}
+                  icon={<FontIcon className={props.isAttaching || props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
+                  />
                 </div>
               </BasicHtmlEditor>
             </div>
@@ -326,7 +332,8 @@ const mapStateToProps = (state, props) => {
     stagingReducer: state.stagingReducer,
     templates: templates,
     selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
-    attachedfiles: state.emailAttachmentReducer.attached
+    attachedfiles: state.emailAttachmentReducer.attached,
+    isAttaching: state.emailAttachmentReducer.isReceiving
   };
 };
 

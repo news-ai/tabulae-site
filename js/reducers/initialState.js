@@ -32,7 +32,8 @@ export const initialState = {
     utctime: null
   },
   emailAttachmentReducer: {
-    attached: []
+    attached: [],
+    isReceiving: false
   },
   publicationReducer: {
     isReceiving: false,
