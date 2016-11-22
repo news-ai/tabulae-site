@@ -178,22 +178,24 @@ class ContactProfile extends Component {
                 this.setState({firsttime: false});
                 if (props.showUploadGuide) {
                   hopscotch.startTour(Object.assign({}, tour, {
-                    steps: [...tour.steps, {
-                      title: 'Check out the Sample Table at Home',
-                      content: 'Discover the full power of Tabulae when feeds are subscribed to on contacts. Check it out in the sample Table.',
-                      target: 'breadcrumbs_hop',
-                      placement: 'bottom'
-                    }]
-                  }));
+                    steps: [
+                      ...tour.steps,
+                      {
+                        title: 'Check out the Sample Table at Home',
+                        content: 'Discover the full power of Tabulae when feeds are subscribed to on contacts. Check it out in the sample Table.',
+                        target: 'breadcrumbs_hop',
+                        placement: 'bottom'
+                      }]}));
                 } else if (props.showGeneralGuide) {
                   hopscotch.startTour(Object.assign({}, tour, {
-                    steps: [...tour.steps, {
-                      title: 'That\'s it!',
-                      content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
-                      target: 'breadcrumbs_hop',
-                      placement: 'bottom'
-                    }]
-                  }));
+                    steps: [
+                      ...tour.steps,
+                      {
+                        title: 'That\'s it!',
+                        content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
+                        target: 'breadcrumbs_hop',
+                        placement: 'bottom'
+                      }]}));
                 }
                 props.removeFirstTimeUser();
               }}/>

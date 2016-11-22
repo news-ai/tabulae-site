@@ -4,6 +4,7 @@ import personReducer from '../components/Login/reducer';
 import contactReducer from './contactReducer';
 import listReducer from './listReducer';
 import stagingReducer from '../components/Email/reducer';
+import emailAttachmentReducer from '../components/Email/EmailAttachment/reducer';
 import publicationReducer from './publicationReducer';
 import fileReducer from '../components/ImportFile/fileReducer';
 import headerReducer from '../components/ImportFile/headerReducer';
@@ -43,7 +44,8 @@ const rootReducer = combineReducers({
   twitterDataReducer,
   instagramDataReducer,
   joyrideReducer,
-  clientReducer
+  clientReducer,
+  emailAttachmentReducer
 });
 
 export default rootReducer;

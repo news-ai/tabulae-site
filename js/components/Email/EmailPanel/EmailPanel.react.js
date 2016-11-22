@@ -18,8 +18,10 @@ import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
+import MinimizedView from './MinimizedView.react';
+import FontIcon from 'material-ui/FontIcon';
 
-import {grey50, grey800, blue400} from 'material-ui/styles/colors';
+import {grey800, blue400} from 'material-ui/styles/colors';
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
 const iconStyle = {
   color: 'lightgray',
@@ -57,26 +59,6 @@ const styles = {
   }
 };
 
-function PlainMinimizedView(props) {
-  return (
-      <Paper zDepth={2} style={{
-        width: 300,
-        height: 50,
-        backgroundColor: grey50,
-        zIndex: 200,
-        display: 'inline-block',
-        textAlign: 'center'
-      }}>
-        <i
-        style={[iconStyle]}
-        key={props.name}
-        className='fa fa-chevron-up fa-3x'
-        aria-hidden='true'
-        onClick={props.toggleMinimize}
-        />
-      </Paper>);
-}
-
 export function _getter(contact, fieldObj) {
   try {
     if (fieldObj.customfield) {
@@ -93,7 +75,6 @@ export function _getter(contact, fieldObj) {
   }
 }
 
-const MinimizedView = Radium(PlainMinimizedView);
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -187,7 +168,7 @@ class EmailPanel extends Component {
   }
 
   _sendGeneratedEmails(contactEmails) {
-    this.props.dispatch(actionCreators.postBatchEmails(contactEmails))
+    this.props.postEmails(contactEmails)
     .then(_ => this.refs.preview.show());
   }
 
@@ -309,8 +290,13 @@ class EmailPanel extends Component {
                     />}
                   </DatePickerHOC>
                 </div>
-                <div style={{marginLeft: 100}}>
-                  <RaisedButton primary label='Preview' onClick={this._onPreviewEmailsClick} />
+                <div style={{marginLeft: 60}}>
+                  <RaisedButton
+                  primary
+                  label='Preview'
+                  onClick={this._onPreviewEmailsClick}
+                  icon={<FontIcon className={props.isAttaching || props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
+                  />
                 </div>
               </BasicHtmlEditor>
             </div>
@@ -339,28 +325,42 @@ const mapStateToProps = (state, props) => {
   return {
     scheduledtime: state.stagingReducer.utctime,
     isReceiving: state.stagingReducer.isReceiving,
+    stagedEmailIds: state.stagingReducer.previewEmails,
     previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails
     .map(pEmail => state.stagingReducer[pEmail.id])
     .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,
     templates: templates,
-    selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id])
+    selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
+    attachedfiles: state.emailAttachmentReducer.attached,
+    isAttaching: state.emailAttachmentReducer.isReceiving
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    dispatch: action => dispatch(action),
     onSendEmailClick: id => dispatch(actionCreators.sendEmail(id)),
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body)),
     fetchTemplates: _ => dispatch(actionCreators.getTemplates()),
     createTemplate: (name, subject, body) => dispatch(actionCreators.createTemplate(name, subject, body)),
     toggleArchiveTemplate: templateId => dispatch(actionCreators.toggleArchiveTemplate(templateId)),
-    clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'})
+    clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
+    postBatchEmails: emails => dispatch(actionCreators.postBatchEmails(emails)),
+    postBatchEmailsWithAttachments: emails => dispatch(actionCreators.postBatchEmailsWithAttachments(emails)),
+  };
+};
+
+const mergeProps = (sProps, dProps, oProps) => {
+  return {
+    postEmails: emails => sProps.attachedfiles.length > 0 ? dProps.postBatchEmailsWithAttachments(emails) : dProps.postBatchEmails(emails),
+    ...sProps,
+    ...dProps,
+    ...oProps,
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
+  mergeProps
 )(Radium(EmailPanel));

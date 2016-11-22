@@ -39,6 +39,7 @@ export const deleteContact = contactId => contactActions.deleteContact(contactId
 export const deleteContacts = ids => contactActions.deleteContacts(ids);
 
 export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);
+export const postBatchEmailsWithAttachments = emails => stagingActions.postBatchEmailsWithAttachments(emails);
 export const sendEmail = id => stagingActions.sendEmail(id);
 export const getStagedEmails = _ => stagingActions.getStagedEmails();
 
