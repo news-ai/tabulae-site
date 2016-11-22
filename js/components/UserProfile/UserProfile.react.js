@@ -161,7 +161,7 @@ class UserProfile extends Component {
                 <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !toggled)}/>
               </div>
             </div>
-            <div className='row vertical-center' style={inputHeight}>
+            {/*<div className='row vertical-center' style={inputHeight}>
               <div className='large-4 medium-4 columns'>
                 <span style={spanStyle}>Email Signature</span>
               </div>
@@ -172,7 +172,8 @@ class UserProfile extends Component {
                 maxRows={7}
                 />
               </div>
-            </div>
+            </div>*/
+          }
           </div>
         </div>
         <div className='row horizontal-center'>
