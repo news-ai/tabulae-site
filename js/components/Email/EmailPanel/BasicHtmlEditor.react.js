@@ -15,6 +15,7 @@ import {
 import draftRawToHtml from './utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
+import * as actionCreators from 'actions/AppActions';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -266,10 +267,9 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
-  _handleImage() {
+  _handleImage(url) {
     const {editorState} = this.state;
-    const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    console.log('wha');
+    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
     const entityKey = Entity.create('image', 'IMMUTABLE', {src: url});
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -337,9 +337,19 @@ class BasicHtmlEditor extends React.Component {
   }
 
   _handleDroppedFiles(selection, files) {
-    console.log(files);
-    const newEditorState = this.handleImage();
-    this.onChange(newEditorState);
+    files.map(file => {
+      if (file.type === 'image/png' || file.type === 'image/jpg') {
+        if (file.size <= 5000000) {
+          // const newEditorState = this.handleImage();
+          // this.onChange(newEditorState);
+          this.props.uploadImage(file)
+          .then(url => {
+            const newEditorState = this.handleImage(url);
+            this.onChange(newEditorState);
+          });
+        }
+      }
+    });
   }
 
   render() {
@@ -356,6 +366,7 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+
     return (
       <div>
         <Dialog title='File Upload' autoScrollBodyContent open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}>
@@ -496,7 +507,8 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
-    clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'})
+    clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
+    uploadImage: file => dispatch(actionCreators.uploadImage(file))
   };
 };
 
