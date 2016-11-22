@@ -39,7 +39,8 @@ export function postAttachments(emailid) {
     files.map(file => data.append('file', file));
     dispatch({type: 'ATTACHING_EMAIL_FILES', files});
     return api.postFile(`/emails/${emailid}/attach`, data)
-    .then(response => dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data}));
+    .then(response => dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data}))
+    .catch(err => dispatch({type: 'ATTACHED_EMAIL_FILES_FAIL', err}));
   };
 }
 
@@ -52,15 +53,17 @@ export function postBatchEmailsWithAttachments(emails) {
         data: arrayOf(emailSchema)
       });
       const ids = res.result.data;
-      ids.map(id => dispatch(postAttachments(id)));
-      return dispatch({
-        type: RECEIVE_STAGED_EMAILS,
-        emails: res.entities.emails,
-        ids,
-        previewEmails: response.data
-      });
+      const postFilePromises = ids.map(id => dispatch(postAttachments(id)));
+      return Promise.all(postFilePromises)
+        .then(results => dispatch({
+          type: RECEIVE_STAGED_EMAILS,
+          emails: res.entities.emails,
+          ids,
+          previewEmails: response.data
+        })
+      );
     })
-    .catch( message => dispatch({ type: 'STAGING_EMAILS_FAIL', message}));
+    .catch( message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
   };
 }
 
