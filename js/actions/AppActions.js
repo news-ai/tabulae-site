@@ -42,6 +42,7 @@ export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);
 export const postBatchEmailsWithAttachments = emails => stagingActions.postBatchEmailsWithAttachments(emails);
 export const sendEmail = id => stagingActions.sendEmail(id);
 export const getStagedEmails = _ => stagingActions.getStagedEmails();
+export const uploadImage = file => stagingActions.uploadImage(file);
 
 export const fetchPublication = id => publicationActions.fetchPublication(id);
 export const createPublication = data => publicationActions.createPublication(data);

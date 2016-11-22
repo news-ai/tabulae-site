@@ -89,7 +89,7 @@ class EmailPanel extends Component {
       minimized: false
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
-    this.updateBodyHtml = (html) => this.setState({body: html});
+    this.updateBodyHtml = html => this.setState({body: html});
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this._replaceAll = this._replaceAll.bind(this);
     this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
