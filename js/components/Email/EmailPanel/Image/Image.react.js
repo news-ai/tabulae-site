@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
-import {grey50, grey800} from 'material-ui/styles/colors';
+import {grey50} from 'material-ui/styles/colors';
 import './Image.css';
 
 const SpanButton = props => {
@@ -15,7 +15,8 @@ const SpanButton = props => {
 };
 
 const Image = ({size, src}) => {
-  return <img src={src} style={{transform: `scale(${size}, ${size})`}}/>;
+  const pSize = ~~(size * 100);
+  return <img src={src} style={{maxWidth: `${pSize}%`, maxHeight: `${pSize}%`}}/>;
 };
 
 class ImageContainer extends Component {
@@ -35,7 +36,6 @@ class ImageContainer extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.image);
     return (
       <div
       onMouseEnter={this.onFocus}
@@ -49,12 +49,13 @@ class ImageContainer extends Component {
             backgroundColor: 'white',
             position: 'absolute',
             bottom: 3,
-            right: 3,
+            lef: 3,
             padding: 2
           }}
           >
-            <SpanButton onClick={_ => props.setImageSize(0.25)} size={props.size} scale={0.5} text='25%'/>
+            <SpanButton onClick={_ => props.setImageSize(0.25)} size={props.size} scale={0.25} text='25%'/>
             <SpanButton onClick={_ => props.setImageSize(0.5)} size={props.size} scale={0.5} text='50%'/>
+            <SpanButton onClick={_ => props.setImageSize(0.75)} size={props.size} scale={0.75} text='75%'/>
             <SpanButton onClick={_ => props.setImageSize(1)} size={props.size} scale={1} text='100%'/>
             <FontIcon style={{fontSize: '14px'}} className='fa fa-link span-button pointer'/>
           </div>

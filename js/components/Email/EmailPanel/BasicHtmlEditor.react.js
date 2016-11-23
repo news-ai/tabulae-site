@@ -121,7 +121,8 @@ class BasicHtmlEditor extends React.Component {
       {label: 'Blockquote', style: 'blockquote'},
       {label: 'Unordered List', style: 'unordered-list-item'},
       {label: 'Ordered List', style: 'ordered-list-item'},
-      {label: 'Code Block', style: 'code-block'}
+      {label: 'Code Block', style: 'code-block'},
+      {label: 'Atomic', style: 'atomic'}
     ];
 
     this.state = {

@@ -17,7 +17,7 @@ function emailImageReducer(state = initialState.emailImageReducer, action) {
     case imgConstant.RECEIVE:
       obj.isReceiving = false;
       obj[action.src] = {
-        size: '100%'
+        size: 1
       };
       return obj;
     case imgConstant.REQUEST_FAIL:
