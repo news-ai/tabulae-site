@@ -1,0 +1,10 @@
+.span-button:hover {
+  border: solid 1px lightgray;
+  border-radius: 10%;
+}
+
+.span-button {
+  font-size: 0.8em;
+  margin: 2px;
+  padding: 3px;
+}

@@ -107,6 +107,8 @@ module.exports = function(options) {
         'constants': __dirname + '/js/constants',
         'actions': __dirname + '/js/actions',
         'components': __dirname + '/js/components',
+        'reducers': __dirname + '/js/reducers',
+        'utils': __dirname + '/js/utils',
         // temporary fix for missing require in `react-ga`
         // cf. https://github.com/react-ga/react-ga/issues/53
         'react/lib/Object.assign': 'object-assign'

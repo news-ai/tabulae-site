@@ -33,7 +33,7 @@ import EntityControls from './components/EntityControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
 import ExternalControls from './components/ExternalControls';
-import Image from './Image.react';
+import Image from './Image/Image.react';
 
 import alertify from 'alertifyjs';
 

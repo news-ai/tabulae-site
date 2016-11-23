@@ -11,20 +11,6 @@ import * as api from '../../actions/api';
 
 const emailSchema = new Schema('emails');
 
-export function uploadImage(file) {
-  return dispatch => {
-    dispatch({type: 'UPLOAD_IMAGE_REQUEST', file});
-    let data = new FormData();
-    data.append('file', file);
-    return api.postFile(`/emails/upload`, data)
-    .then(response => {
-      dispatch({type: 'UPLOAD_IMAGE_RECEIVED', response});
-      return response.data[0].url;
-    })
-    .catch(err => dispatch({type: 'UPLOAD_IMAGE_FAILED', err}));
-  };
-}
-
 export function postBatchEmails(emails) {
   return dispatch => {
     dispatch({type: SENDING_STAGED_EMAILS, emails});
