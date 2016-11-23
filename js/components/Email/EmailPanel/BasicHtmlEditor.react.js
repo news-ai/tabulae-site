@@ -148,7 +148,7 @@ class BasicHtmlEditor extends React.Component {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
       // let newHTML = convertToHTML(editorState.getCurrentContent());
-      // console.log(html);
+      console.log(html);
       // console.log('newHTML');
       // console.log(newHTML);
       this.props.onBodyChange(html);
@@ -182,6 +182,13 @@ class BasicHtmlEditor extends React.Component {
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
+    }
+
+    if (!this.props.updated && nextProps.updated) {
+      const emailImageObject = nextProps.emailImageReducer[nextProps.current];
+      const entityKey = emailImageObject.entityKey;
+      Entity.replaceData(entityKey, {src: nextProps.current, size: `${~~(emailImageObject.size * 100)}%`});
+      this.props.onImageUpdated();
     }
   }
   componentWillUnmount() {
@@ -268,7 +275,9 @@ class BasicHtmlEditor extends React.Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = Entity.create('image', 'IMMUTABLE', {src: url});
+    const entityKey = Entity.create('image', 'IMMUTABLE', {src: url, size: `${~~(this.props.emailImageReducer[url].size * 100)}%`});
+    this.props.saveImageEntityKey(url, entityKey);
+
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
   }
@@ -499,6 +508,9 @@ function getBlockStyle(block) {
 const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
+    emailImageReducer: state.emailImageReducer,
+    updated: state.emailImageReducer.updated,
+    current: state.emailImageReducer.current
   };
 };
 
@@ -506,7 +518,9 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
-    uploadImage: file => dispatch(actionCreators.uploadImage(file))
+    uploadImage: file => dispatch(actionCreators.uploadImage(file)),
+    saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
+    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'})
   };
 };
 

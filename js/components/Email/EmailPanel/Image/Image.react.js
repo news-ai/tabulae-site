@@ -67,13 +67,14 @@ class ImageContainer extends Component {
 const mapStateToProps = (state, props) => {
   return {
     image: state.emailImageReducer[props.src],
-    size: state.emailImageReducer[props.src].size
+    size: state.emailImageReducer[props.src].size,
+    entityKey: state.emailImageReducer[props.src].entityKey
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    setImageSize: size => dispatch({type: 'SET_IMAGE_SIZE', size, src: props.src})
+    setImageSize: (size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: props.src})
   };
 };
 

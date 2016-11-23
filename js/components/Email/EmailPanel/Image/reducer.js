@@ -3,7 +3,7 @@ import {assignToEmpty, canAccessReducer} from 'utils/assign';
 import {imgConstant} from './constants';
 import values from 'lodash/values';
 
-const types = [...values(imgConstant), 'SET_IMAGE_SIZE'];
+const types = [...values(imgConstant), 'SET_IMAGE_SIZE', 'SAVE_IMAGE_ENTITY_KEY', 'ON_IMAGE_UPDATED'];
 
 function emailImageReducer(state = initialState.emailImageReducer, action) {
   if (window.isDev) Object.freeze(state);
@@ -26,6 +26,15 @@ function emailImageReducer(state = initialState.emailImageReducer, action) {
       return obj;
     case 'SET_IMAGE_SIZE':
       obj[action.src] = Object.assign({}, state[action.src], {size: action.size});
+      obj.updated = true;
+      obj.current = action.src;
+      return obj;
+    case 'ON_IMAGE_UPDATED':
+      obj.updated = false;
+      obj.current = null;
+      return obj;
+    case 'SAVE_IMAGE_ENTITY_KEY':
+      obj[action.src] = Object.assign({}, state[action.src], {entityKey: action.entityKey});
       return obj;
     default:
       return state;
