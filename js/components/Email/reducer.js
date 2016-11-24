@@ -32,6 +32,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
       return obj;
     case REQUEST_MULTIPLE_EMAILS:
+      obj = assignToEmpty(state, action.emails);
       obj.isReceiving = true;
       return obj;
     case RECEIVE_MULTIPLE_EMAILS:
