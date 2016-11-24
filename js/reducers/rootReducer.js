@@ -22,6 +22,7 @@ import twitterDataReducer from '../components/ContactProfile/SocialDataGraphs/Tw
 import instagramDataReducer from '../components/ContactProfile/SocialDataGraphs/Instagram/reducer';
 import joyrideReducer from '../components/Joyride/reducer';
 import clientReducer from '../components/ClientDirectories/reducer';
+import emailImageReducer from '../components/Email/EmailPanel/Image/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -45,7 +46,8 @@ const rootReducer = combineReducers({
   instagramDataReducer,
   joyrideReducer,
   clientReducer,
-  emailAttachmentReducer
+  emailAttachmentReducer,
+  emailImageReducer
 });
 
 export default rootReducer;

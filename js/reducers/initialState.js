@@ -119,5 +119,9 @@ export const initialState = {
   clientReducer: {
     isReceiving: false,
     didInvalidate: false,
+  },
+  emailImageReducer: {
+    isReceiving: false,
+    didInvalidate: false
   }
 };

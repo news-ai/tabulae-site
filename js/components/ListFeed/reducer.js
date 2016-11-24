@@ -1,21 +1,19 @@
 import {listfeedConstant} from './constants';
-import _ from 'lodash';
-
 import {initialState} from '../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../utils/assign';
-const types = _.values(listfeedConstant);
+import {assignToEmpty} from '../../utils/assign';
 
 function listfeedReducer(state = initialState.listfeedReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case listfeedConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       obj.didInvalidate = false;
       return obj;
     case listfeedConstant.RECEIVE_MULTIPLE:
+      obj = assignToEmpty(state, {});
       const oldContact = state[action.listId] || {received: []};
       obj[action.listId] = assignToEmpty(state[action.listId], {
         received: [
@@ -28,6 +26,7 @@ function listfeedReducer(state = initialState.listfeedReducer, action) {
       obj.didInvalidate = false;
       return obj;
     case listfeedConstant.REQUEST_MULTIPLE_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;

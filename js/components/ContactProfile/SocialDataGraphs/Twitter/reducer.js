@@ -1,21 +1,19 @@
 import {twitterDataConstant} from './constants';
-import _ from 'lodash';
-
 import {initialState} from '../../../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../../../utils/assign';
-const types = _.values(twitterDataConstant);
+import {assignToEmpty} from '../../../../utils/assign';
 
 function twitterDataReducer(state = initialState.twitterDataReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   let oldContact, filteredData;
   switch (action.type) {
     case twitterDataConstant.REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case twitterDataConstant.RECEIVE:
+      obj = assignToEmpty(state, {});
       oldContact = state[action.contactId] || {received: []};
       filteredData = action.data.filter(dataObj => !oldContact.received.some(dObj => dObj.CreatedAt === dataObj.CreatedAt));
       obj[action.contactId] = assignToEmpty(
@@ -29,18 +27,22 @@ function twitterDataReducer(state = initialState.twitterDataReducer, action) {
       obj.isReceiving = false;
       return obj;
     case twitterDataConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       obj.didInvalidate = false;
       return obj;
     case twitterDataReducer.RECEIVE_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = false;
       return obj;
     case twitterDataConstant.REQUEST_MULTIPLE_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       obj.didInvalidate = true;
       return obj;
     case twitterDataConstant.REQUEST_FAIL:
+      obj = assignToEmpty(state, {});
       obj.didInvalidate = true;
       return obj;
     default:

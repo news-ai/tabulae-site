@@ -13,9 +13,9 @@ const emailSchema = new Schema('emails');
 
 export function postBatchEmails(emails) {
   return dispatch => {
-    dispatch({ type: SENDING_STAGED_EMAILS, emails });
+    dispatch({type: SENDING_STAGED_EMAILS, emails});
     return api.post(`/emails`, emails)
-    .then( response => {
+    .then(response => {
       const res = normalize(response, {
         data: arrayOf(emailSchema)
       });
@@ -34,9 +34,8 @@ export function postAttachments(emailid) {
   return (dispatch, getState) => {
     const files = getState().emailAttachmentReducer.attached;
     if (files.length === 0) return;
-
     let data = new FormData();
-    files.map(file => data.append('file', file));
+    files.map(file => data.append('file', file, file.name));
     dispatch({type: 'ATTACHING_EMAIL_FILES', files});
     return api.postFile(`/emails/${emailid}/attach`, data)
     .then(response => dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data}))

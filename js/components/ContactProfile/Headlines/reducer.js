@@ -1,17 +1,14 @@
 import {headlineConstant} from './constants';
-import _ from 'lodash';
-
 import {initialState} from '../../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
-const types = _.values(headlineConstant);
+import {assignToEmpty} from '../../../utils/assign';
 
 function headlineReducer(state = initialState.headlineReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case headlineConstant.REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case headlineConstant.RECEIVE:
@@ -28,6 +25,7 @@ function headlineReducer(state = initialState.headlineReducer, action) {
       obj.didInvalidate = false;
       return obj;
     case headlineConstant.REQUEST_FAIL:
+      obj = assignToEmpty(state, {});
       obj.didInvalidate = true;
       return obj;
     default:

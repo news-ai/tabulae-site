@@ -7,6 +7,7 @@ import {
   ContentState,
   Entity,
   RichUtils,
+  AtomicBlockUtils,
   convertToRaw,
   CompositeDecorator,
   Modifier,
@@ -14,6 +15,7 @@ import {
 import draftRawToHtml from './utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
+import * as actionCreators from 'actions/AppActions';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -31,6 +33,8 @@ import EntityControls from './components/EntityControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
 import ExternalControls from './components/ExternalControls';
+import Image from './Image/Image.react';
+
 import alertify from 'alertifyjs';
 
 import 'node_modules/draft-js/dist/Draft.css';
@@ -52,6 +56,29 @@ const controlsStyle = {
   backgroundColor: 'white',
   files: []
 };
+
+const Media = props => {
+  const entity = Entity.get(props.block.getEntityAt(0));
+  const {src} = entity.getData();
+  const type = entity.getType();
+
+  let media;
+  if (type === 'image') {
+    media = <Image src={src} />;
+  }
+  return media;
+};
+
+function mediaBlockRenderer(block) {
+  if (block.getType() === 'atomic') {
+    return {
+      component: Media,
+      editable: false
+    };
+  }
+  return null;
+}
+
 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
@@ -94,7 +121,8 @@ class BasicHtmlEditor extends React.Component {
       {label: 'Blockquote', style: 'blockquote'},
       {label: 'Unordered List', style: 'unordered-list-item'},
       {label: 'Ordered List', style: 'ordered-list-item'},
-      {label: 'Code Block', style: 'code-block'}
+      {label: 'Code Block', style: 'code-block'},
+      {label: 'Atomic', style: 'atomic'}
     ];
 
     this.state = {
@@ -132,7 +160,9 @@ class BasicHtmlEditor extends React.Component {
     this.manageLink = this._manageLink.bind(this);
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
+    this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
     this.onDrop = this._onDrop.bind(this);
+    this.handleImage = this._handleImage.bind(this);
   }
 
   componentWillMount() {
@@ -148,6 +178,17 @@ class BasicHtmlEditor extends React.Component {
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
+    }
+
+    if (!this.props.updated && nextProps.updated) {
+      const emailImageObject = nextProps.emailImageReducer[nextProps.current];
+      const entityKey = emailImageObject.entityKey;
+      Entity.replaceData(entityKey, {
+        src: nextProps.current,
+        size: `${~~(emailImageObject.size * 100)}%`,
+        imageLink: emailImageObject.imageLink || '#'
+      });
+      this.props.onImageUpdated();
     }
   }
   componentWillUnmount() {
@@ -231,6 +272,20 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
+  _handleImage(url) {
+    const {editorState} = this.state;
+    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
+    const entityKey = Entity.create('image', 'IMMUTABLE', {
+      src: url,
+      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
+      imageLink: '#'
+    });
+    this.props.saveImageEntityKey(url, entityKey);
+
+    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+    return newEditorState;
+  }
+
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -267,7 +322,8 @@ class BasicHtmlEditor extends React.Component {
     if (selection.isCollapsed()) return;
     alertify.prompt(
       '',
-      'Enter a URL', 'https://',
+      'Enter a URL',
+      'https://',
       (e, url) => {
         const entityKey = Entity.create('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
@@ -292,6 +348,22 @@ class BasicHtmlEditor extends React.Component {
     return true;
   }
 
+  _handleDroppedFiles(selection, files) {
+    files.map(file => {
+      if (file.type === 'image/png' || file.type === 'image/jpg') {
+        if (file.size <= 5000000) {
+          // const newEditorState = this.handleImage();
+          // this.onChange(newEditorState);
+          this.props.uploadImage(file)
+          .then(url => {
+            const newEditorState = this.handleImage(url);
+            this.onChange(newEditorState);
+          });
+        }
+      }
+    });
+  }
+
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -306,6 +378,7 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+
     return (
       <div>
         <Dialog title='File Upload' autoScrollBodyContent open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}>
@@ -359,11 +432,13 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
+            blockRendererFn={mediaBlockRenderer}
             customStyleMap={styleMap}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}
             handlePastedText={this.handlePastedText}
+            handleDroppedFiles={this.handleDroppedFiles}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'
@@ -438,13 +513,19 @@ function getBlockStyle(block) {
 const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
+    emailImageReducer: state.emailImageReducer,
+    updated: state.emailImageReducer.updated,
+    current: state.emailImageReducer.current
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
-    clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'})
+    clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
+    uploadImage: file => dispatch(actionCreators.uploadImage(file)),
+    saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
+    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'})
   };
 };
 

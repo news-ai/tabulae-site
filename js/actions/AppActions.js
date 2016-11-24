@@ -5,6 +5,7 @@ import * as loginActions from '../components/Login/actions';
 import * as publicationActions from './publicationActions';
 import * as fileActions from '../components/ImportFile/actions';
 import * as templateActions from '../components/Email/Template/actions';
+import * as imgActions from '../components/Email/EmailPanel/Image/actions';
 
 export const loginWithGoogle = _ => loginActions.loginWithGoogle();
 export const register = _ => loginActions.register();
@@ -42,6 +43,8 @@ export const postBatchEmails = emails => stagingActions.postBatchEmails(emails);
 export const postBatchEmailsWithAttachments = emails => stagingActions.postBatchEmailsWithAttachments(emails);
 export const sendEmail = id => stagingActions.sendEmail(id);
 export const getStagedEmails = _ => stagingActions.getStagedEmails();
+
+export const uploadImage = file => imgActions.uploadImage(file);
 
 export const fetchPublication = id => publicationActions.fetchPublication(id);
 export const createPublication = data => publicationActions.createPublication(data);

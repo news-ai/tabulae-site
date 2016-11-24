@@ -1,25 +1,22 @@
-import {
-  feedConstant,
-} from './constants';
-import _ from 'lodash';
-
+import {feedConstant} from './constants';
 import {initialState} from '../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../utils/assign';
-const types = _.values(feedConstant);
+import {assignToEmpty} from '../../utils/assign';
 
 function feedReducer(state = initialState.feedReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case feedConstant.ADD_REQUESTED:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case feedConstant.ADD_RECEIVED:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       return obj;
     case feedConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case feedConstant.RECEIVE_MULTIPLE:

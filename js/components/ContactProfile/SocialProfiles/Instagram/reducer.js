@@ -1,24 +1,23 @@
 import {instagramProfileConstant} from './constants';
-import _ from 'lodash';
-
 import {initialState} from '../../../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../../../utils/assign';
-const types = _.values(instagramProfileConstant);
+import {assignToEmpty} from '../../../../utils/assign';
 
 function instagramProfileReducer(state = initialState.instagramProfileReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case instagramProfileConstant.REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case instagramProfileConstant.RECEIVE:
+      obj = assignToEmpty(state, {});
       obj[action.contactId] = action.profile;
       obj.isReceiving = false;
       return obj;
     case instagramProfileConstant.REQUEST_FAIL:
+      obj = assignToEmpty(state, {});
       obj.didInvalidate = true;
       return obj;
     default:
