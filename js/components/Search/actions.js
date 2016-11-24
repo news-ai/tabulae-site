@@ -36,7 +36,7 @@ export function fetchSearch(query) {
         publications: arrayOf(publicationSchema)
       });
 
-      dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, null));
+      dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, 0));
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.publications));
       dispatch({type: searchConstant.SET_OFFSET, offset: response.count === PAGE_LIMIT ? (OFFSET + PAGE_LIMIT) : null, query});
       return dispatch({type: searchConstant.RECEIVE_MULTIPLE, contacts: res.entities.contacts, ids: res.result.data, query});

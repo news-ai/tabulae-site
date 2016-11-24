@@ -81,7 +81,7 @@ export function fetchContact(contactId) {
         lists: arrayOf(listSchema),
         publications: arrayOf(publicationSchema)
       });
-      dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, null));
+      dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, 0));
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.publications));
       return dispatch(receiveContacts(res.entities.contacts, [res.result.data]));
     })
