@@ -58,6 +58,22 @@ export function listLastUsed() {
   };
 }
 
+export function copyEntireList(id, name) {
+  return dispatch => {
+    dispatch({type: 'COPY_LIST_REQUEST', id});
+    dispatch({type: listConstant.REQUEST, id});
+    const postObj = name ? {name} : {};
+    return api.post(`/lists/${id}/duplicate`, postObj)
+    .then(response => {
+      dispatch({type: 'COPY_LIST_RECEIVE', id});
+      const res = normalize(response.data, listSchema);
+      dispatch(receiveList(res.entities.lists, res.result));
+      return response.data.id;
+    })
+    .catch(err => dispatch({type: 'COPY_LIST_FAIL', err}));
+  };
+}
+
 function requestListFail(message) {
   // window.location.href = `${window.location.origin}/NotFound`;
   return {

@@ -208,6 +208,11 @@ class ListTable extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
+    if (nextProps.listId !== this.props.listId) {
+      // underlying list changed
+      this.fetchOperations(nextProps);
+    }
+
     this.setGridHeight();
   
     if (this.state.sortPositions === null) {

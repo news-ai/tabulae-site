@@ -26,6 +26,7 @@ export const fetchList = listId => listActions.fetchList(listId);
 export const patchList = (listId, name, contactList, customfields) => listActions.patchList(listId, name, contactList, customfields);
 export const archiveListToggle = listId => listActions.archiveListToggle(listId);
 export const createEmptyList = untitledNum => listActions.createEmptyList(untitledNum);
+export const copyEntireList = (id, name) => listActions.copyEntireList(id, name);
 
 export const addContact = body => contactActions.addContact(body);
 export const addContacts = (listId, contactList) => contactActions.addContacts(listId, contactList);

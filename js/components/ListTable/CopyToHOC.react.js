@@ -21,6 +21,7 @@ class CopyToHOC extends Component {
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onNewSheetSubmit = this._onNewSheetSubmit.bind(this);
+    this.onWholeSheetCopy = this._onWholeSheetCopy.bind(this);
   }
 
   componentWillMount() {
@@ -41,6 +42,14 @@ class CopyToHOC extends Component {
     props.copyToNewList(props.selectedContacts, val);
   }
 
+  _onWholeSheetCopy() {
+    const val = this.refs.copyToHOC_whole_list.input.value;
+    let name;
+    if (val.length > 0) name = val;
+    this.props.copyEntireList(this.props.list.id, name)
+    .then(newListId => this.props.router.push(`/tables/${newListId}`));
+  }
+
   render() {
     const state = this.state;
     const props = this.props;
@@ -54,7 +63,9 @@ class CopyToHOC extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <div className='row'>
-            <div className='panel large-12 medium-12 small-12 columns' style={{
+            <div
+            className='panel large-12 medium-12 small-12 columns'
+            style={{
               backgroundColor: yellow50,
               margin: 10,
               padding: 10
@@ -64,7 +75,7 @@ class CopyToHOC extends Component {
               </span>
             </div>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
-              <span style={{fontWeight: 'bold', marginRight: 8}}>Selected</span>
+              <span style={{fontWeight: 'bold', marginRight: 8}}>Selected Contacts</span>
               {props.selected.length === 0 && <span>none selected</span>}
               {props.selectedContacts &&
                 <span>{props.selectedContacts
@@ -112,6 +123,23 @@ class CopyToHOC extends Component {
                 />
               </div>
             </div>
+            <div className='large-12 medium-12 small-12 columns'>
+              <span>Or, copy the WHOLE list (every contact in this list) to a new list:</span>
+            </div>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 30}}>
+              <div className='vertical-center'>
+                <TextField
+                id='copyToHOC_whole_list'
+                ref='copyToHOC_whole_list'
+                placeholder={`Copy of ${props.list.name} (default)`}
+                />
+                <RaisedButton
+                label='Copy Whole List'
+                onClick={this.onWholeSheetCopy}
+                icon={<FontIcon className={props.isListReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
+                />
+              </div>
+            </div>
           </div>
         </Dialog>
         {props.children({
@@ -129,7 +157,8 @@ const mapStateToProps = (state, props) => {
     options: lists.map(list => ({label: list.name, value: list.id})),
     selectedContacts: props.selected && props.selected.length > 0 && props.selected.map(id => state.contactReducer[id]),
     listReducer: state.listReducer,
-    isReceiving: state.contactReducer.isReceiving
+    isReceiving: state.contactReducer.isReceiving,
+    isListReceiving: state.listReducer.isReceiving
   };
 };
 
@@ -166,7 +195,8 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchLists: _ => dispatch(actionCreators.fetchLists()),
     addContactsThenPatchList,
     copyToNewList: (rawContacts, name) => dispatch(actionCreators.createEmptyList(name))
-    .then(response => addContactsThenPatchList(rawContacts, response.data))
+    .then(response => addContactsThenPatchList(rawContacts, response.data)),
+    copyEntireList: (id, name) => dispatch(actionCreators.copyEntireList(id, name))
   };
 };
 
