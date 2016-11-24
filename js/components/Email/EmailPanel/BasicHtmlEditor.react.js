@@ -147,10 +147,6 @@ class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
-      // let newHTML = convertToHTML(editorState.getCurrentContent());
-      console.log(html);
-      // console.log('newHTML');
-      // console.log(newHTML);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -187,7 +183,11 @@ class BasicHtmlEditor extends React.Component {
     if (!this.props.updated && nextProps.updated) {
       const emailImageObject = nextProps.emailImageReducer[nextProps.current];
       const entityKey = emailImageObject.entityKey;
-      Entity.replaceData(entityKey, {src: nextProps.current, size: `${~~(emailImageObject.size * 100)}%`});
+      Entity.replaceData(entityKey, {
+        src: nextProps.current,
+        size: `${~~(emailImageObject.size * 100)}%`,
+        imageLink: emailImageObject.imageLink || '#'
+      });
       this.props.onImageUpdated();
     }
   }
@@ -275,7 +275,11 @@ class BasicHtmlEditor extends React.Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = Entity.create('image', 'IMMUTABLE', {src: url, size: `${~~(this.props.emailImageReducer[url].size * 100)}%`});
+    const entityKey = Entity.create('image', 'IMMUTABLE', {
+      src: url,
+      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
+      imageLink: '#'
+    });
     this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
@@ -318,7 +322,8 @@ class BasicHtmlEditor extends React.Component {
     if (selection.isCollapsed()) return;
     alertify.prompt(
       '',
-      'Enter a URL', 'https://',
+      'Enter a URL',
+      'https://',
       (e, url) => {
         const entityKey = Entity.create('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));

@@ -4,7 +4,9 @@
 }
 
 .span-button {
+  border: solid 1px white;
+  border-radius: 10%;
   font-size: 0.8em;
-  margin: 2px;
-  padding: 3px;
+  margin: 0 1px;
+  padding: 2px;
 }

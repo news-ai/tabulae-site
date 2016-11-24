@@ -23,7 +23,7 @@ let inlineTagMap = {
 
 let entityTagMap = {
   'LINK': ['<a href="<%= url %>">', '</a>'],
-  'image': ['<img src="<%= src %>" style="max-height: <%= size %>;max-width: <%= size %>;">', '</img>'],
+  'image': ['<a href="<%= imageLink %>" target="_blank"><img src="<%= src %>" style="max-height: <%= size %>;max-width: <%= size %>;">', '</img></a>'],
 };
 
 let nestedTagMap = {
