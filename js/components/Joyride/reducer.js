@@ -9,43 +9,39 @@ import {
 import {REMOVE_FIRST_TIME_USER} from '../Login/constants';
 
 import {initialState} from '../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../utils/assign';
-
-const types = [
-  TURN_ON_UPLOAD_GUIDE,
-  TURN_OFF_UPLOAD_GUIDE,
-  TURN_ON_GENERAL_GUIDE,
-  TURN_OFF_GENERAL_GUIDE,
-  FORWARD_STEP,
-  BACKWARD_STEP,
-  REMOVE_FIRST_TIME_USER
-];
+import {assignToEmpty} from '../../utils/assign';
 
 function joyrideReducer(state = initialState.joyrideReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case REMOVE_FIRST_TIME_USER:
+      obj = assignToEmpty(state, {});
       obj.showUploadGuide = false;
       obj.showGeneralGuide = false;
       return obj;
     case TURN_ON_UPLOAD_GUIDE:
+      obj = assignToEmpty(state, {});
       obj.showUploadGuide = true;
       return obj;
     case TURN_OFF_UPLOAD_GUIDE:
+      obj = assignToEmpty(state, {});
       obj.showUploadGuide = false;
       return obj;
     case TURN_ON_GENERAL_GUIDE:
+      obj = assignToEmpty(state, {});
       obj.showGeneralGuide = true;
       return obj;
     case TURN_OFF_GENERAL_GUIDE:
+      obj = assignToEmpty(state, {});
       obj.showGeneralGuide = false;
       return obj;
     case FORWARD_STEP:
+      obj = assignToEmpty(state, {});
       return obj;
     case BACKWARD_STEP:
+      obj = assignToEmpty(state, {});
       return obj;
     default:
       return state;

@@ -1,22 +1,18 @@
-import {
-  mixedConstant,
-} from './constants';
-import _ from 'lodash';
-
+import {mixedConstant} from './constants';
 import {initialState} from '../../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
-const types = _.values(mixedConstant);
+import {assignToEmpty} from '../../../utils/assign';
 
 function mixedReducer(state = initialState.mixedReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case mixedConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case mixedConstant.RECEIVE_MULTIPLE:
+      obj = assignToEmpty(state, {});
       const oldContact = state[action.contactId] || {received: []};
       obj[action.contactId] = assignToEmpty(state[action.contactId], {
         received: [
@@ -29,6 +25,7 @@ function mixedReducer(state = initialState.mixedReducer, action) {
       obj.didInvalidate = false;
       return obj;
     case mixedConstant.REQUEST_MULTIPLE_FAIL:
+      obj = assignToEmpty(state, {});
       obj.didInvalidate = true;
       return obj;
     default:

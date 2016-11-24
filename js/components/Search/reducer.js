@@ -2,20 +2,17 @@ import {
   searchConstant,
   SEARCH_CLEAR_CACHE
 } from './constants';
-import _ from 'lodash';
 
-import { initialState } from '../../reducers/initialState';
-import { assignToEmpty, canAccessReducer } from '../../utils/assign';
-const types = _.values(searchConstant);
-types.push(SEARCH_CLEAR_CACHE);
+import {initialState} from '../../reducers/initialState';
+import {assignToEmpty} from '../../utils/assign';
 
 function searchReducer(state = initialState.searchReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case searchConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case searchConstant.RECEIVE_MULTIPLE:
@@ -25,13 +22,16 @@ function searchReducer(state = initialState.searchReducer, action) {
       obj.query = action.query;
       return obj;
     case searchConstant.REQUEST_MULTIPLE_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = false;
       return obj;
     case searchConstant.SET_OFFSET:
+      obj = assignToEmpty(state, {});
       obj.offset = action.offset;
       return obj;
     case SEARCH_CLEAR_CACHE:
+      obj = assignToEmpty(state, {});
       obj.received = [];
       obj.offset = 0;
       return obj;

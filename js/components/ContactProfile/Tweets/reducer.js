@@ -1,17 +1,14 @@
 import {tweetConstant} from './constants';
-import _ from 'lodash';
-
 import {initialState} from '../../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
-const types = _.values(tweetConstant);
+import {assignToEmpty} from '../../../utils/assign';
 
 function tweetReducer(state = initialState.tweetReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case tweetConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case tweetConstant.RECEIVE_MULTIPLE:
@@ -28,6 +25,7 @@ function tweetReducer(state = initialState.tweetReducer, action) {
       obj.didInvalidate = false;
       return obj;
     case tweetConstant.REQUEST_MULTIPLE_FAIL:
+      obj = assignToEmpty(state, {});
       obj.didInvalidate = true;
       return obj;
     default:

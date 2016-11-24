@@ -3,21 +3,20 @@ import {
 } from './constants';
 
 import {initialState} from '../../../reducers/initialState';
-import {assignToEmpty, canAccessReducer} from '../../../utils/assign';
-import _ from 'lodash';
+import {assignToEmpty} from '../../../utils/assign';
 
-const types = _.values(templateConstant);
 
 function templateReducer(state = initialState.templateReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case templateConstant.REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case templateConstant.CREATE_REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case templateConstant.RECEIVE:
@@ -31,6 +30,7 @@ function templateReducer(state = initialState.templateReducer, action) {
       obj.isReceiving = false;
       return obj;
     case templateConstant.REQUEST_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;
@@ -40,6 +40,7 @@ function templateReducer(state = initialState.templateReducer, action) {
       obj.received = newReceived;
       return obj;
     case templateConstant.REQUEST_MULTIPLE_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;

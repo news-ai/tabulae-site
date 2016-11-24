@@ -6,59 +6,56 @@ import {
 } from '../constants/AppConstants';
 import {CLIENT_LISTS_REQUEST, CLIENT_LISTS_RECEIVED} from 'components/ClientDirectories/constants';
 
-import { assignToEmpty } from '../utils/assign';
-import { initialState } from './initialState';
-import { canAccessReducer } from './utils';
-import _ from 'lodash';
+import {assignToEmpty} from '../utils/assign';
+import {initialState} from './initialState';
 
-const types = _.values(listConstant);
-types.push(
-  LIST_CONTACTS_SEARCH_RECEIVED,
-  LIST_CONTACTS_SEARCH_REQUEST,
-  'CLEAR_LIST_SEARCH',
-  CLIENT_LISTS_REQUEST,
-  CLIENT_LISTS_RECEIVED
-  );
 
 function listReducer(state = initialState.listReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
   let unarchivedLists = [];
   let archivedLists = [];
   let publicLists = [];
   let tagLists = [];
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case 'CLEAR_LIST_REDUCER':
       obj = assignToEmpty(initialState.listReducer, {});
       return obj;
     case LIST_CONTACTS_SEARCH_REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case LIST_CONTACTS_SEARCH_RECEIVED:
+      obj = assignToEmpty(state, {});
       obj[action.listId] = assignToEmpty(state[action.listId], {searchResults: action.ids});
       obj.isReceiving = false;
       obj.didInvalidate = false;
       return obj;
     case 'CLEAR_LIST_SEARCH':
+      obj = assignToEmpty(state, {});
       obj[action.listId].searchResults = undefined;
       return obj;
     case listConstant.MANUALLY_SET_ISRECEIVING_ON:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case listConstant.MANUALLY_SET_ISRECEIVING_OFF:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       return obj;
     case CLIENT_LISTS_REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case CLIENT_LISTS_RECEIVED:
+      obj = assignToEmpty(state, {});
       obj = assignToEmpty(state, action.lists);
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.isReceiving = false;
       return obj;
     case listConstant.REQUEST_MULTIPLE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case listConstant.RECEIVE_MULTIPLE:
@@ -88,10 +85,12 @@ function listReducer(state = initialState.listReducer, action) {
       }
       return obj;
     case listConstant.REQUEST_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;
     case listConstant.REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case listConstant.RECEIVE:
@@ -109,12 +108,15 @@ function listReducer(state = initialState.listReducer, action) {
       obj.didInvalidate = false;
       return obj;
     case listConstant.PATCH:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case listConstant.PATCH_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       return obj;
     case listConstant.SET_OFFSET:
+      obj = assignToEmpty(state, {});
       obj[action.listId].offset = action.offset;
       return obj;
     default:

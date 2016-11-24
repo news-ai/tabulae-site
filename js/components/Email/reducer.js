@@ -9,27 +9,16 @@ import {
   CLEAR_SCHEDULE_TIME,
 } from './constants';
 
-import { initialState } from '../../reducers/initialState';
-import { assignToEmpty, canAccessReducer } from '../../utils/assign';
-
-const types = [
-  RECEIVE_STAGED_EMAILS,
-  SENDING_STAGED_EMAILS,
-  RECEIVE_EMAIL,
-  REQUEST_MULTIPLE_EMAILS,
-  RECEIVE_MULTIPLE_EMAILS,
-  EMAIL_SET_OFFSET,
-  SET_SCHEDULE_TIME,
-  CLEAR_SCHEDULE_TIME
-];
+import {initialState} from '../../reducers/initialState';
+import {assignToEmpty} from '../../utils/assign';
 
 function stagingReducer(state = initialState.stagingReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
 
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case SENDING_STAGED_EMAILS:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case RECEIVE_STAGED_EMAILS:
@@ -55,12 +44,15 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.isReceiving = false;
       return obj;
     case EMAIL_SET_OFFSET:
+      obj = assignToEmpty(state, {});
       obj.offset = action.offset;
       return obj;
     case SET_SCHEDULE_TIME:
+      obj = assignToEmpty(state, {});
       obj.utctime = action.utctime;
       return obj;
     case CLEAR_SCHEDULE_TIME:
+      obj = assignToEmpty(state, {});
       obj.utctime = null;
       return obj;
     default:

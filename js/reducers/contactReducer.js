@@ -5,42 +5,37 @@ import {
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL
 } from '../constants/AppConstants';
-import { assignToEmpty } from '../utils/assign';
-import { initialState } from './initialState';
-import { canAccessReducer } from './utils';
+import {initialState} from './initialState';
+import {assignToEmpty} from 'utils/assign';
 import _ from 'lodash';
-
-const types = _.values(contactConstant);
-types.push(
-  ADDING_CONTACT,
-  LIST_CONTACTS_SEARCH_REQUEST,
-  LIST_CONTACTS_SEARCH_RECEIVED,
-  LIST_CONTACTS_SEARCH_FAIL,
-  );
 
 function contactReducer(state = initialState.contactReducer, action) {
   if (window.isDev) Object.freeze(state);
-  if (!canAccessReducer(action.type, types)) return state;
-
-  let obj = assignToEmpty(state, {});
+  let obj;
   switch (action.type) {
     case contactConstant.MANUALLY_SET_ISRECEIVING_ON:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case contactConstant.MANUALLY_SET_ISRECEIVING_OFF:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       return obj;
     case ADDING_CONTACT:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case contactConstant.REQUEST:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     case contactConstant.REQUEST_FAIL:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = true;
       return obj;
     case contactConstant.RECEIVE:
+      obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       if (!state[action.contact.id]) obj.received = [...state.received, action.contact.id];
       obj[action.contact.id] = Object.assign(state[action.contact.id], action.contact);
@@ -65,6 +60,7 @@ function contactReducer(state = initialState.contactReducer, action) {
       obj.didInvalidate = false;
       return obj;
     case 'PATCH_CONTACTS':
+      obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
     default:
