@@ -137,8 +137,10 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.state = {
-      editorState: EditorState.createEmpty(decorator),
-      bodyHtml: null,
+      editorState: this.props.bodyHtml.length > 0 ?
+        EditorState.createWithContent(convertFromHTML(this.props.bodyHtml), decorator) :
+        EditorState.createEmpty(decorator),
+      bodyHtml: this.props.bodyHtml || null,
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,

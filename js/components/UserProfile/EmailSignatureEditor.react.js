@@ -72,7 +72,6 @@ class EmailSignatureEditor extends Component {
     this.emitHTML = (editorState) => {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
-      console.log(html);
       this.setState({html});
     };
     this.showToolbar = this._showToolbar.bind(this);
