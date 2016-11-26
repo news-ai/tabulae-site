@@ -230,26 +230,24 @@ class ListTable extends Component {
     }
 
     if (nextProps.contacts.length > 0 && !this.state.dragged) {
-      if (this.props.fieldsmap.length !== nextProps.fieldsmap.length || this.state.columnWidths === null) {
-        nextProps.fieldsmap.map((fieldObj, i) => {
-          let max = columnWidths[i];
-          nextProps.contacts.map(contact => {
-            let content;
-            if (fieldObj.customfield) {
-              if (contact.customfields === null) return;
-              if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
-              content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
-            } else if (fieldObj.tableOnly) {
-              return;
-            } else {
-              content = contact[fieldObj.value];
-            }
-            const size = measureSpanSize(content, '16px Source Sans Pro')
-            if (size.width > max) max = size.width;
-          });
-          columnWidths[i] = max;
+      nextProps.fieldsmap.map((fieldObj, i) => {
+        let max = columnWidths[i];
+        nextProps.contacts.map(contact => {
+          let content;
+          if (fieldObj.customfield) {
+            if (contact.customfields === null) return;
+            if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
+            content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+          } else if (fieldObj.tableOnly) {
+            return;
+          } else {
+            content = contact[fieldObj.value];
+          }
+          const size = measureSpanSize(content, '16px Source Sans Pro')
+          if (size.width > max) max = size.width;
         });
-      }
+        columnWidths[i] = max;
+      });
     }
 
     this.setState({columnWidths}, _ => {
