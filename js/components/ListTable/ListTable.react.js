@@ -535,7 +535,7 @@ class ListTable extends Component {
   }
 
   _onExportClick() {
-    exportOperations(this.props.contacts, this.props.fieldsmap, this.state.name);
+    exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name);
   }
 
   _onRemoveContacts() {
