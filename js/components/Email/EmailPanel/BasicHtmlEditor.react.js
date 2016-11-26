@@ -43,17 +43,6 @@ import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
-const convertObj = {
-  htmlToEntity: (nodeName, node) => {
-  },
-  htmlToBlock: (nodeName, node) => {
-  },
-  htmlToStyle: (nodeName, node) => {
-  },
-  textToEntity: (text) => {
-  }
-};
-
 const controlsStyle = {
   position: 'fixed',
   height: 40,
@@ -70,12 +59,12 @@ const controlsStyle = {
 
 const Media = props => {
   const entity = Entity.get(props.block.getEntityAt(0));
-  const {src} = entity.getData();
+  const {src, size, imageLink} = entity.getData();
   const type = entity.getType();
 
   let media;
   if (type === 'image') {
-    media = <Image src={src} />;
+    media = <Image src={src}/>;
   }
   return media;
 };
@@ -135,6 +124,44 @@ class BasicHtmlEditor extends React.Component {
       {label: 'Code Block', style: 'code-block'},
       {label: 'Atomic', style: 'atomic'}
     ];
+    this.CONVERT_CONFIGS = {
+      htmlToEntity: (nodeName, node) => {
+        if (nodeName === 'a') {
+          if (node.firstElementChild === null) {
+            // LINK ENTITY
+            return Entity.create('LINK', 'MUTABLE', {url: node.href});
+          } else if (node.firstElementChild.nodeName === 'IMG') {
+            // IMG ENTITY
+            const imgNode = node.firstElementChild;
+            const src = imgNode.src;
+            const size = parseFloat(imgNode.style['max-height']) / 100;
+            const imageLink = node.href;
+            const entityKey = Entity.create('image', 'IMMUTABLE', {
+              src,
+              size,
+              imageLink
+            });
+            this.props.saveImageData(src);
+            this.props.saveImageEntityKey(src, entityKey);
+            this.props.setImageSize(src, size);
+            if (imageLink.length > 0) {
+              this.props.setImageLink(src, imageLink);
+            } else {
+              this.props.setImageLink(src, undefined);
+            }
+            return entityKey;
+          }
+        }
+      },
+      htmlToBlock: (nodeName, node) => {
+        if (nodeName === 'figure') {
+          return {
+            type: 'atomic',
+            data: {}
+          };
+        }
+      },
+    };
 
     this.state = {
       editorState: this.props.bodyHtml.length > 0 ?
@@ -178,18 +205,14 @@ class BasicHtmlEditor extends React.Component {
     this.handleImage = this._handleImage.bind(this);
   }
 
-  componentWillMount() {
-    if (this.props.person.emailsignature.length > 0) {
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
       console.log(nextProps.bodyHtml);
+      const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
-      const content = convertFromHTML(nextProps.bodyHtml);
-      const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      // const content = convertFromHTML(nextProps.bodyHtml);
+      const editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
@@ -203,6 +226,7 @@ class BasicHtmlEditor extends React.Component {
         imageLink: emailImageObject.imageLink || '#'
       });
       this.props.onImageUpdated();
+      this.emitHTML(this.state.editorState);
     }
   }
   componentWillUnmount() {
@@ -538,7 +562,10 @@ const mapDispatchToProps = (dispatch, props) => {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
     uploadImage: file => dispatch(actionCreators.uploadImage(file)),
+    saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
     saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
+    setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
+    setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
     onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'})
   };
 };
