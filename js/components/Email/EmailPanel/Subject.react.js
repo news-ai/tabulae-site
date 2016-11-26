@@ -9,7 +9,7 @@ import {
 
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
-import { curlyStrategy, findEntities } from './utils/strategies';
+import {curlyStrategy, findEntities} from './utils/strategies';
 
 class Subject extends Component {
   constructor(props) {

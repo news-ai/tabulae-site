@@ -9,7 +9,7 @@ import Avatar from 'material-ui/Avatar';
 import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
 import Invite from './Invite.react';
-import Textarea from 'react-textarea-autosize';
+import EmailSignatureEditor from './EmailSignatureEditor.react';
 
 import * as actionCreators from '../../actions/AppActions';
 
@@ -161,19 +161,14 @@ class UserProfile extends Component {
                 <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !toggled)}/>
               </div>
             </div>
-            {/*<div className='row vertical-center' style={inputHeight}>
+            <div className='row vertical-center' style={inputHeight}>
               <div className='large-4 medium-4 columns'>
                 <span style={spanStyle}>Email Signature</span>
               </div>
               <div className='large-8 medium-8 columns'>
-                <Textarea
-                value={state.newPerson.get('emailsignature')}
-                onChange={e => this.setNewPerson('emailsignature', e.target.value)}
-                maxRows={7}
-                />
+                <EmailSignatureEditor/>
               </div>
-            </div>*/
-          }
+            </div>
           </div>
         </div>
         <div className='row horizontal-center'>

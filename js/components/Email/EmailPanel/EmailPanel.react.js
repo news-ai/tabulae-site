@@ -84,7 +84,7 @@ class EmailPanel extends Component {
       bodyEditorState: null,
       fieldsmap: [],
       currentTemplateId: 0,
-      bodyHtml: null,
+      bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : null,
       subjectHtml: null,
       minimized: false
     };
@@ -337,7 +337,8 @@ const mapStateToProps = (state, props) => {
     templates: templates,
     selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
     attachedfiles: state.emailAttachmentReducer.attached,
-    isAttaching: state.emailAttachmentReducer.isReceiving
+    isAttaching: state.emailAttachmentReducer.isReceiving,
+    emailsignature: state.personReducer.person.emailsignature || null
   };
 };
 

@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React from 'react';
 import {grey400, grey800} from 'material-ui/styles/colors';
 import isURL from 'validator/lib/isURL';
 
@@ -10,7 +10,8 @@ const defaultStyle = {
   border: `dotted 1px ${grey400}`,
   borderRadius: '0.4em',
   minHeight: 100,
-  width: 'auto'
+  width: '100%',
+  maxWidth: '100%'
 };
 
 const Tweet = ({style, text, username, createdat, tweetidstr}) => {

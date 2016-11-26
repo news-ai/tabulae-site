@@ -43,6 +43,17 @@ import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
+const convertObj = {
+  htmlToEntity: (nodeName, node) => {
+  },
+  htmlToBlock: (nodeName, node) => {
+  },
+  htmlToStyle: (nodeName, node) => {
+  },
+  textToEntity: (text) => {
+  }
+};
+
 const controlsStyle = {
   position: 'fixed',
   height: 40,
@@ -126,8 +137,10 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.state = {
-      editorState: EditorState.createEmpty(decorator),
-      bodyHtml: null,
+      editorState: this.props.bodyHtml.length > 0 ?
+        EditorState.createWithContent(convertFromHTML(this.props.bodyHtml), decorator) :
+        EditorState.createEmpty(decorator),
+      bodyHtml: this.props.bodyHtml || null,
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
@@ -173,6 +186,7 @@ class BasicHtmlEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
+      console.log(nextProps.bodyHtml);
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       const content = convertFromHTML(nextProps.bodyHtml);
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
