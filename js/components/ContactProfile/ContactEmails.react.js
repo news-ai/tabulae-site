@@ -40,6 +40,7 @@ const mapStateToProps = (state, props) => {
   const contactId = props.contactId;
   const emails = state.stagingReducer.received.map(id => state.stagingReducer[id])
   .filter(email => email.contactId === contactId)
+  .filter(email => email.issent)
   .map(email => {
     if (email.listid !== 0 && state.listReducer[email.listid]) {
       email.listname = state.listReducer[email.listid].name;
