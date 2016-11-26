@@ -66,8 +66,7 @@ const Media = props => {
 
   let media;
   if (type === 'image') {
-    console.log(entity.getData());
-    media = <Image src={src} size={size} imageLink={imageLink}/>;
+    media = <Image src={src}/>;
   }
   return media;
 };
@@ -137,7 +136,7 @@ class BasicHtmlEditor extends React.Component {
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
-            const size = imgNode.style['max-height'];
+            const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = '#' || node.href;
             const entityKey = Entity.create('image', 'IMMUTABLE', {
               src,
@@ -212,9 +211,7 @@ class BasicHtmlEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
-      console.log(nextProps.bodyHtml);
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      console.log(configuredContent);
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
       const editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
