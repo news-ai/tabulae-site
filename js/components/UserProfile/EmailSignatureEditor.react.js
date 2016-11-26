@@ -15,6 +15,8 @@ import draftRawToHtml from '../Email/EmailPanel/utils/draftRawToHtml';
 import Link from '../Email/EmailPanel/components/Link';
 import CurlySpan from '../Email/EmailPanel/components/CurlySpan.react';
 import {convertFromHTML} from 'draft-convert';
+import {grey500} from 'material-ui/styles/colors';
+import * as actionCreators from '../../actions/AppActions';
 
 export function findEntities(entityType, contentBlock, callback) {
   contentBlock.findEntityRanges(
@@ -59,46 +61,96 @@ class EmailSignatureEditor extends Component {
     ]);
 
     this.state = {
-      editorState: EditorState.createEmpty(decorator),
-      html: null
+      editorState: this.props.html !== null ?
+        EditorState.createWithContent(convertFromHTML(this.props.html), decorator) :
+        EditorState.createEmpty(decorator),
+      html: this.props.html,
+      editing: false,
+      finished: false
     };
 
     this.emitHTML = (editorState) => {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
+      console.log(html);
       this.setState({html});
     };
-
-    this.onChange = (editorState) => this.setState({editorState});
+    this.showToolbar = this._showToolbar.bind(this);
+    this.onChange = this._onChange.bind(this);
+    this.onSave = this._onSave.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.html !== this.state.html) {
-      const content = ContentState.createFromText(nextProps.subjectHtml);
+      const content = convertFromHTML(nextProps.html);
       const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
       this.setState({html: nextProps.html});
       this.onChange(editorState);
     }
   }
 
+  _showToolbar(editorState) {
+
+  }
+
+  _onChange(editorState) {
+    let previousContent = this.state.editorState.getCurrentContent();
+    this.setState({editorState});
+    const selection = editorState.getSelection();
+    if (!selection.isCollapsed()) {
+      this.showToolbar(editorState);
+    }
+    // only emit html when content changes
+    if (previousContent !== editorState.getCurrentContent()) {
+      this.emitHTML(editorState);
+    }
+  }
+
+  _onSave() {
+    const oldPerson = this.props.person;
+    const person = {
+      firstname: oldPerson.firstname,
+      lastname: oldPerson.lastname,
+      getdailyemails: oldPerson.getdailyemails,
+      emailsignature: this.state.html
+    };
+    this.setState({editing: false});
+    this.props.patchPerson(person).then(_ => this.setState({finished: true}));
+  }
+
   render() {
     const {editorState} = this.state;
+    const state = this.state;
     return (
-       <Editor
-        editorState={editorState}
-        onChange={this.onChange}
-        placeholder='Email Signature goes here...'
-      />
+      <div>
+        <div style={{border: 'dotted 1px lightgrey', maxHeight: 90, overflowY: 'scroll'}}>
+         <Editor
+          editorState={editorState}
+          onChange={this.onChange}
+          placeholder='Email Signature goes here...'
+          onBlur={this.onSave}
+          onFocus={_ => this.setState({editing: true, finished: false})}
+          />
+        </div>
+        <span
+        style={{fontSize: '0.8em', color: grey500, float: 'right'}}
+        >{state.finished ? 'Saved.' : (state.editing ? 'Editing...' : '')}</span>
+      </div>
       );
   }
 }
 
 const mapStateToProps = (state, props) => {
-  return {};
+  return {
+    person: state.personReducer.person,
+    html: state.personReducer.person.emailsignature || null
+  };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  return {};
+  return {
+    patchPerson: body => dispatch(actionCreators.patchPerson(body)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmailSignatureEditor);
