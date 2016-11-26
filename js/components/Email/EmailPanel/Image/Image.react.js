@@ -6,8 +6,6 @@ import './Image.css';
 
 const Image = ({size, src, imageLink}) => {
   const pSize = ~~(size * 100);
-  console.log(src);
-  console.log(size);
   const img = <img src={src} style={{maxWidth: `${pSize}%`, maxHeight: `${pSize}%`}}/>;
   return imageLink ? <a href={imageLink} target='_blank'>{img}</a> : img;
 };

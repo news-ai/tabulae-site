@@ -43,8 +43,6 @@ import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
-
-
 const controlsStyle = {
   position: 'fixed',
   height: 40,
@@ -137,7 +135,7 @@ class BasicHtmlEditor extends React.Component {
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
-            const imageLink = '#' || node.href;
+            const imageLink = node.href;
             const entityKey = Entity.create('image', 'IMMUTABLE', {
               src,
               size,
@@ -146,7 +144,11 @@ class BasicHtmlEditor extends React.Component {
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
-            this.props.setImageLink(src, imageLink);
+            if (imageLink.length > 0) {
+              this.props.setImageLink(src, imageLink);
+            } else {
+              this.props.setImageLink(src, undefined);
+            }
             return entityKey;
           }
         }
@@ -203,14 +205,10 @@ class BasicHtmlEditor extends React.Component {
     this.handleImage = this._handleImage.bind(this);
   }
 
-  componentWillMount() {
-    if (this.props.person.emailsignature.length > 0) {
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
+      console.log(nextProps.bodyHtml);
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
@@ -228,6 +226,7 @@ class BasicHtmlEditor extends React.Component {
         imageLink: emailImageObject.imageLink || '#'
       });
       this.props.onImageUpdated();
+      this.emitHTML(this.state.editorState);
     }
   }
   componentWillUnmount() {

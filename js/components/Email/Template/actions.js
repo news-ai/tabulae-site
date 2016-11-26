@@ -30,7 +30,9 @@ export function patchTemplate(templateId, subject, body) {
   let templateBody = {};
   if (subject) templateBody.subject = subject;
   if (body) templateBody.body = body;
-  return dispatch => {
+  return (dispatch, getState) => {
+    const currTemplate = getState().templateReducer[templateId];
+    if (currTemplate.name) templateBody.name = currTemplate.name;
     dispatch({type: 'PATCH_TEMPLATE', templateId});
     return api.patch(`/templates/${templateId}`, templateBody)
     .then(response => {
