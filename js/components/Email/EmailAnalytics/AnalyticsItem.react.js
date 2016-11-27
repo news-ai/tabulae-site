@@ -85,11 +85,11 @@ class AnalyticsItem extends Component {
           </div>
         }
         <Dialog
-          open={this.state.isPreviewOpen}
-          onRequestClose={_ => this.setState({isPreviewOpen: false})}
-          >
-            <StaticEmailContent {...this.props} />
-          </Dialog>
+        open={this.state.isPreviewOpen}
+        onRequestClose={_ => this.setState({isPreviewOpen: false})}
+        >
+          <StaticEmailContent {...this.props} />
+        </Dialog>
         <div className='email-analytics row' style={styles.analytics}>
           <div className='small-12 medium-3 large-3 columns'>
             <span style={styles.to}>To</span>

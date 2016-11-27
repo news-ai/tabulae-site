@@ -52,7 +52,7 @@ class EmailAnalytics extends Component {
       <InfiniteScroll onScrollBottom={props.fetchSentEmails}>
         <div className='row'>
           <div className='large-10 large-offset-1 columns'>
-            <ScheduledEmails/>
+          <ScheduledEmails/>
             <div style={{margin: '20px 0'}}>
               <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
             </div>
