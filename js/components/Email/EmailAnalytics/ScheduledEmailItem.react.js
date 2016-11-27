@@ -7,7 +7,8 @@ import {connect} from 'react-redux';
 import * as actions from '../actions';
 import {
   grey50,
-  grey800
+  grey800,
+  deepOrange600
 } from 'material-ui/styles/colors';
 import moment from 'moment-timezone';
 
@@ -65,13 +66,20 @@ class ScheduledEmailItem extends Component {
       listid,
       listname,
       updated,
-      sendat
+      sendat,
+      onCancelClick,
+      cancel
     } = this.props;
     const wrapperStyle = styles.wrapper;
     const SUBTRING_LIMIT = 18;
     let date = moment(sendat);
     return (
       <div style={wrapperStyle}>
+        {cancel && <div className='row'>
+          <div className='small-12 large-6 columns left'>
+          <span style={{color: deepOrange600}}>Canceled Delivery</span>
+          </div>
+        </div>}
         {
           listid !== 0 && <div className='row'>
             <div className='small-12 large-6 columns left'>
@@ -98,7 +106,7 @@ class ScheduledEmailItem extends Component {
             <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
           </div>
           <div className='small-12 medium-3 large-4 columns horizontal-center'>
-            <FlatButton label='Cancel' style={{backgroundColor: 'white'}}/>
+            {!cancel && <FlatButton onClick={onCancelClick} label='Cancel' secondary/>}
           </div>
         </div>
       </div>
@@ -108,7 +116,7 @@ class ScheduledEmailItem extends Component {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onCancelClick: _ => dispatch(actions.cancelScheduledEmail(props.id))
+    onCancelClick: _ => dispatch(actions.cancelScheduledEmail(props.id)),
   };
 };
 
