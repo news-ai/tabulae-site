@@ -3,7 +3,8 @@ import {connect} from 'react-redux';
 import ScheduledEmailItem from './ScheduledEmailItem.react';
 
 const ScheduledEmails = ({emails}) => {
- return (
+  console.log(emails);
+  return (
     <div className='large-12 medium-12 small-12 columns'>
       <div style={{margin: '20px 0'}}>
         <span style={{fontSize: '1.3em', marginRight: '10px'}}>Scheduled Emails</span>
@@ -20,7 +21,7 @@ const ScheduledEmails = ({emails}) => {
 const mapStateToProps = (state, props) => {
   const rightNow = new Date();
   const emails = state.stagingReducer.received
-  .filter(id => !state.stagingReducer[id].issent)
+  .filter(id => !state.stagingReducer[id].delivered)
   .map(id => {
     let email = state.stagingReducer[id];
     if (email.listid !== 0 && state.listReducer[email.listid]) email.listname = state.listReducer[email.listid].name;
@@ -32,8 +33,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ScheduledEmails);
+export default connect(mapStateToProps)(ScheduledEmails);

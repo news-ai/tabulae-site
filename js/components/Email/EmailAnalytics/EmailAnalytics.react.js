@@ -85,7 +85,7 @@ class EmailAnalytics extends Component {
 
 const mapStateToProps = (state, props) => {
   const sentEmails = state.stagingReducer.received
-  .filter(id => state.stagingReducer[id].issent)
+  .filter(id => state.stagingReducer[id].delivered)
   .map(id => {
     let email = state.stagingReducer[id];
     if (email.listid !== 0 && state.listReducer[email.listid]) {

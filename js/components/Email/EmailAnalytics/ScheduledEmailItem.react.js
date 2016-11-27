@@ -3,6 +3,8 @@ import Link from 'react-router/lib/Link';
 import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
 import FlatButton from 'material-ui/FlatButton';
+import {connect} from 'react-redux';
+import * as actions from '../actions';
 import {
   grey50,
   grey800
@@ -92,10 +94,10 @@ class ScheduledEmailItem extends Component {
             <span style={styles.to}>To</span>
             <span style={{color: grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
-          <div className='small-12 medium-5 large-6 columns'>
+          <div className='small-12 medium-3 large-5 columns'>
             <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
           </div>
-          <div className='small-12 medium-2 large-3 columns horizontal-center'>
+          <div className='small-12 medium-3 large-4 columns horizontal-center'>
             <FlatButton label='Cancel' style={{backgroundColor: 'white'}}/>
           </div>
         </div>
@@ -104,4 +106,10 @@ class ScheduledEmailItem extends Component {
   }
 }
 
-export default ScheduledEmailItem;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onCancelClick: _ => dispatch(actions.cancelScheduledEmail(props.id))
+  };
+};
+
+export default connect(null, mapDispatchToProps)(ScheduledEmailItem);
