@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import * as actions from '../actions';
 import * as actionCreators from '../../../actions/AppActions';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
@@ -10,6 +10,7 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Toggle from 'material-ui/Toggle';
 import InfiniteScroll from '../../InfiniteScroll';
+import ScheduledEmails from './ScheduledEmails.react';
 
 const toggleStyle = {
   block: {
@@ -51,29 +52,30 @@ class EmailAnalytics extends Component {
       <InfiniteScroll onScrollBottom={props.fetchSentEmails}>
         <div className='row'>
           <div className='large-10 large-offset-1 columns'>
-          <div style={{marginTop: '20px', marginBottom: '20px'}}>
-            <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
-          </div>
-          {props.lists &&
-            <div>
+          <ScheduledEmails/>
+            <div style={{margin: '20px 0'}}>
+              <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
+            </div>
+            {props.lists &&
               <div>
-                <span>Filter by List: </span>
-                <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
-                {selectable}
-                </DropDownMenu>
-              </div>
-            </div>}
-          <div style={{marginTop: '30px', marginBottom: '30px'}}>
-          {emails.map((email, i) =>
-            <AnalyticsItem
-            key={i}
-            {...email}
-            />)}
-          </div>
-           {state.canLoadMore && <p style={{
-            display: 'flex',
-            justifyContent: 'center'
-          }}>Scroll to load more</p>}
+                <div>
+                  <span>Filter by List: </span>
+                  <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+                  {selectable}
+                  </DropDownMenu>
+                </div>
+              </div>}
+            <div style={{margin: '30px 0'}}>
+              {emails.map((email, i) =>
+                <AnalyticsItem
+                key={i}
+                {...email}
+                />)}
+            </div>
+             {state.canLoadMore && <p style={{
+              display: 'flex',
+              justifyContent: 'center'
+            }}>Scroll to load more</p>}
           </div>
         </div>
       </InfiniteScroll>
@@ -83,7 +85,7 @@ class EmailAnalytics extends Component {
 
 const mapStateToProps = (state, props) => {
   const sentEmails = state.stagingReducer.received
-  .filter(id => state.stagingReducer[id].issent)
+  .filter(id => state.stagingReducer[id].delivered)
   .map(id => {
     let email = state.stagingReducer[id];
     if (email.listid !== 0 && state.listReducer[email.listid]) {

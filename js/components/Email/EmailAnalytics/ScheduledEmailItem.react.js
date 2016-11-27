@@ -1,15 +1,18 @@
 import React, {PropTypes, Component} from 'react';
-import CountViewItem from './CountViewItem.react';
 import Link from 'react-router/lib/Link';
 import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
+import FlatButton from 'material-ui/FlatButton';
+import {connect} from 'react-redux';
+import * as actions from '../actions';
 import {
-  deepOrange100,
-  deepOrange700,
-  deepOrange900,
   grey50,
-  grey800
+  grey800,
+  deepOrange600
 } from 'material-ui/styles/colors';
+import moment from 'moment-timezone';
+
+const FORMAT = 'dddd, MMMM HH:mm';
 
 const styles = {
   analytics: {
@@ -31,10 +34,6 @@ const styles = {
     alignSelf: 'flex-start',
     marginRight: '5px'
   },
-  errorText: {
-    color: deepOrange700,
-    float: 'right'
-  },
   subjectText: {
     fontWeight: 500,
     cursor: 'pointer'
@@ -46,7 +45,7 @@ const styles = {
 };
 
 
-class AnalyticsItem extends Component {
+class ScheduledEmailItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -66,21 +65,29 @@ class AnalyticsItem extends Component {
       delivered,
       listid,
       listname,
-      updated
+      updated,
+      sendat,
+      onCancelClick,
+      cancel
     } = this.props;
-    const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
+    const wrapperStyle = styles.wrapper;
     const SUBTRING_LIMIT = 18;
-    const date = new Date(updated);
+    let date = moment(sendat);
     return (
       <div style={wrapperStyle}>
+        {cancel && <div className='row'>
+          <div className='small-12 large-6 columns left'>
+          <span style={{color: deepOrange600}}>Canceled Delivery</span>
+          </div>
+        </div>}
         {
           listid !== 0 && <div className='row'>
             <div className='small-12 large-6 columns left'>
-              <span style={styles.sentFrom}>Sent from List</span>
+              <span style={styles.sentFrom}>Sending from List</span>
               <span style={{marginLeft: 10}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
             </div>
             <div className='small-12 large-6 columns right'>
-              <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
+              <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>Schdeuled: {date.tz(moment.tz.guess()).format(FORMAT)}</span>
             </div>
           </div>
         }
@@ -93,22 +100,13 @@ class AnalyticsItem extends Component {
         <div className='email-analytics row' style={styles.analytics}>
           <div className='small-12 medium-3 large-3 columns'>
             <span style={styles.to}>To</span>
-            <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
+            <span style={{color: grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
           <div className='small-12 medium-3 large-5 columns'>
             <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
-            {!delivered && <div style={styles.errorText}>
-              <span>Something went wrong on our end. Let us know!</span>
-              <p>Email ID: {id}</p>
-              </div>}
-            {bounced && <span style={styles.errorText}>email bounced</span>}
-            {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
           </div>
-          <div className='small-12 medium-3 large-2 columns' style={{marginTop: 10}}>
-            {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />}
-          </div>
-          <div className='small-12 medium-3 large-2 columns' style={{marginTop: 10}}>
-            {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>}
+          <div className='small-12 medium-3 large-4 columns horizontal-center'>
+            {!cancel && <FlatButton onClick={onCancelClick} label='Cancel' secondary/>}
           </div>
         </div>
       </div>
@@ -116,22 +114,10 @@ class AnalyticsItem extends Component {
   }
 }
 
-AnalyticsItem.PropTypes = {
-  id: PropTypes.number.isRequired,
-  listid: PropTypes.number.isRequired,
-  to: PropTypes.string.isRequired,
-  subject: PropTypes.string.isRequired,
-  body: PropTypes.string.isRequired,
-  onSendEmailClick: PropTypes.func,
-  issent: PropTypes.bool.isRequired,
-  bounced: PropTypes.bool.isRequired,
-  bouncedreason: PropTypes.string,
-  clicked: PropTypes.number,
-  opened: PropTypes.number,
-  delivered: PropTypes.bool,
-  templateid: PropTypes.number,
-  onPreviewOpen: PropTypes.func,
-  listname: PropTypes.string
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    onCancelClick: _ => dispatch(actions.cancelScheduledEmail(props.id)),
+  };
 };
 
-export default AnalyticsItem;
+export default connect(null, mapDispatchToProps)(ScheduledEmailItem);
