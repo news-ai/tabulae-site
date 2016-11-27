@@ -46,7 +46,7 @@ const styles = {
 };
 
 
-class AnalyticsItem extends Component {
+class ScheduledEmailItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -93,22 +93,10 @@ class AnalyticsItem extends Component {
         <div className='email-analytics row' style={styles.analytics}>
           <div className='small-12 medium-3 large-3 columns'>
             <span style={styles.to}>To</span>
-            <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
+            <span style={{color: grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
           <div className='small-12 medium-3 large-5 columns'>
             <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
-            {!delivered && <div style={styles.errorText}>
-              <span>Something went wrong on our end. Let us know!</span>
-              <p>Email ID: {id}</p>
-              </div>}
-            {bounced && <span style={styles.errorText}>email bounced</span>}
-            {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
-          </div>
-          <div className='small-12 medium-3 large-2 columns' style={{marginTop: 10}}>
-            {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />}
-          </div>
-          <div className='small-12 medium-3 large-2 columns' style={{marginTop: 10}}>
-            {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>}
           </div>
         </div>
       </div>
@@ -116,7 +104,7 @@ class AnalyticsItem extends Component {
   }
 }
 
-AnalyticsItem.PropTypes = {
+ScheduledEmailItem.PropTypes = {
   id: PropTypes.number.isRequired,
   listid: PropTypes.number.isRequired,
   to: PropTypes.string.isRequired,
@@ -134,4 +122,4 @@ AnalyticsItem.PropTypes = {
   listname: PropTypes.string
 };
 
-export default AnalyticsItem;
+export default ScheduledEmailItem;

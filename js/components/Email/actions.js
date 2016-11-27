@@ -11,6 +11,18 @@ import * as api from '../../actions/api';
 
 const emailSchema = new Schema('emails');
 
+export function cancelScheduledEmail(id) {
+  return (dispatch, getState) => {
+    dispatch({type: 'CANCEL_SCHEDULED_EMAIL', id});
+    return api.get(`/emails/${id}/cancel`)
+    .then(response => {
+      const res = normalize(response.data, emailSchema);
+      dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result});
+    })
+    .catch(err => console.log(err));
+  };
+}
+
 export function postBatchEmails(emails) {
   return dispatch => {
     dispatch({type: SENDING_STAGED_EMAILS, emails});
