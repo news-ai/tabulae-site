@@ -3,8 +3,7 @@ import {connect} from 'react-redux';
 import ScheduledEmailItem from './ScheduledEmailItem.react';
 
 const ScheduledEmails = ({emails}) => {
-  console.log(emails);
-  return (
+  return emails.length > 0 ? (
     <div className='large-12 medium-12 small-12 columns'>
       <div style={{margin: '20px 0'}}>
         <span style={{fontSize: '1.3em', marginRight: '10px'}}>Scheduled Emails</span>
@@ -15,7 +14,7 @@ const ScheduledEmails = ({emails}) => {
         {...email}
         />)}
     </div>
-  );
+  ) : null;
 };
 
 const mapStateToProps = (state, props) => {
