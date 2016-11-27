@@ -9,6 +9,7 @@ import {lightBlue100} from 'material-ui/styles/colors';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const graphParams = {
   Likes: true,
@@ -76,6 +77,7 @@ class TwitterProfile extends Component {
             params={graphParams}
             averageBy={graphAverageKeys}
             />}
+          {props.graphdata && props.graphdata.offset !== null && <RaisedButton label='Load More' onClick={props.fetchGraphData}/>}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})

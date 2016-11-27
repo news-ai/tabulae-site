@@ -830,6 +830,7 @@ const mapStateToProps = (state, props) => {
     firstTimeUser: state.personReducer.firstTimeUser,
     contactReducer: state.contactReducer,
     listDidInvalidate: state.listReducer.didInvalidate,
+    contactReducer: state.contactReducer,
   };
 };
 

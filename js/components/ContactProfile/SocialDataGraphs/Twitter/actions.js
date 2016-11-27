@@ -22,8 +22,9 @@ export function fetchContactTwitterData(contactId) {
   };
 }
 
-export function fetchMultipleContactTwitterData(listId, contacts, days) {
+export function fetchMultipleContactTwitterData(listId, selected, days) {
   return (dispatch, getState) => {
+    const contacts = selected.filter(id => getState().contactReducer[id].twitter !== null);
     dispatch({type: twitterDataConstant.REQUEST_MULTIPLE, contacts, days, listId});
     return api.post(`/lists/${listId}/twittertimeseries`, {ids: contacts, days})
     .then(response => {

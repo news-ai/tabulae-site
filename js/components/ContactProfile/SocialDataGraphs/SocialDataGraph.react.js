@@ -3,6 +3,8 @@ import LineGraph from './LineGraph.react';
 import Checkbox from 'material-ui/Checkbox';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import moment from 'moment';
+import {connect} from 'react-redux';
 
 function divide(numerator, denomenator, fixedTo) {
   const res = Math.round(numerator * (1 / fixedTo) / denomenator) / (1 / fixedTo);
@@ -44,7 +46,8 @@ class SocialDataGraph extends Component {
           />
         </div>
         <div className='large-3 medium-12 small-12 columns'>
-          {props.dataKeys.map((dataKey, i) =>
+          {
+            props.dataKeys.map((dataKey, i) =>
             <Checkbox
             key={i}
             label={dataKey}
@@ -52,7 +55,8 @@ class SocialDataGraph extends Component {
             onCheck={(e, checked) =>
               this.setState({params: Object.assign({}, state.params, {[dataKey]: checked})})
             }/>)}
-          {props.averageBy &&
+          {
+            props.averageBy &&
             <div style={{margin: '20px 0'}}>
               <span>Average By: </span>
               <DropDownMenu value={state.averageBy} onChange={(e, index, val) => this.setState({averageBy: val})}>
@@ -67,4 +71,11 @@ class SocialDataGraph extends Component {
   }
 }
 
-export default SocialDataGraph;
+const mapStateToProps = (state, props) => {
+  const transformedData = props.data.map(obj => Object.assign({}, obj, {datestring: moment(obj.CreatedAt).format('M-DD')}));
+  return {
+    data: transformedData
+  };
+};
+
+export default connect(mapStateToProps)(SocialDataGraph);

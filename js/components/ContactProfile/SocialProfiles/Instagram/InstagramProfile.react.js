@@ -6,6 +6,7 @@ import SocialDataGraph from '../../SocialDataGraphs/SocialDataGraph.react';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const graphParams = {
   Likes: true,
@@ -70,6 +71,7 @@ class InstagramProfile extends Component {
             params={graphParams}
             averageBy={graphAverageKeys}
             />}
+          {props.graphdata && props.graphdata.offset !== null && <RaisedButton label='Load More' onClick={props.fetchGraphData}/>}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})

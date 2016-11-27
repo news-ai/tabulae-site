@@ -18,7 +18,7 @@ class LineGraph extends Component {
       height={300}
       data={props.data}
       margin={{top: 5, right: 40, left: 20, bottom: 5}}>
-        <XAxis dataKey='CreatedAt'/>
+        <XAxis dataKey='datestring'/>
         <YAxis/>
         <CartesianGrid strokeDasharray='3 3'/>
         <Tooltip/>
