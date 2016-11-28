@@ -10,6 +10,9 @@ import {
   grey50,
   grey800
 } from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
+import {connect} from 'react-redux';
+import * as actions from '../EmailAttachment/actions';
 
 const styles = {
   analytics: {
@@ -18,18 +21,18 @@ const styles = {
   },
   wrapper: {
     width: '100%',
-    padding: '15px',
+    padding: 15,
     // border: '1px gray solid',
     borderRadius: '1.2em',
-    margin: '5px',
-    marginBottom: '10px',
+    margin: 5,
+    marginBottom: 10,
     backgroundColor: grey50
   },
   to: {
     color: 'gray',
     fontSize: '0.8em',
     alignSelf: 'flex-start',
-    marginRight: '5px'
+    marginRight: 5
   },
   errorText: {
     color: deepOrange700,
@@ -37,7 +40,6 @@ const styles = {
   },
   subjectText: {
     fontWeight: 500,
-    cursor: 'pointer'
   },
   sentFrom: {
     color: 'gray',
@@ -52,6 +54,12 @@ class AnalyticsItem extends Component {
     this.state = {
       isPreviewOpen: false
     };
+    this.onPreviewOpen = this._onPreviewOpen.bind(this);
+  }
+
+  _onPreviewOpen() {
+    this.props.fetchAttachments();
+    this.setState({isPreviewOpen: true});
   }
 
   render() {
@@ -66,7 +74,8 @@ class AnalyticsItem extends Component {
       delivered,
       listid,
       listname,
-      updated
+      updated,
+      attachments
     } = this.props;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 18;
@@ -77,7 +86,8 @@ class AnalyticsItem extends Component {
           listid !== 0 && <div className='row'>
             <div className='small-12 large-6 columns left'>
               <span style={styles.sentFrom}>Sent from List</span>
-              <span style={{marginLeft: 10}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
+              <span style={{margin: '0 5px'}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
+              {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
             </div>
             <div className='small-12 large-6 columns right'>
               <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
@@ -96,7 +106,7 @@ class AnalyticsItem extends Component {
             <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
           <div className='small-12 medium-3 large-5 columns'>
-            <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
+            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
             {!delivered && <div style={styles.errorText}>
               <span>Something went wrong on our end. Let us know!</span>
               <p>Email ID: {id}</p>
@@ -116,22 +126,14 @@ class AnalyticsItem extends Component {
   }
 }
 
-AnalyticsItem.PropTypes = {
-  id: PropTypes.number.isRequired,
-  listid: PropTypes.number.isRequired,
-  to: PropTypes.string.isRequired,
-  subject: PropTypes.string.isRequired,
-  body: PropTypes.string.isRequired,
-  onSendEmailClick: PropTypes.func,
-  issent: PropTypes.bool.isRequired,
-  bounced: PropTypes.bool.isRequired,
-  bouncedreason: PropTypes.string,
-  clicked: PropTypes.number,
-  opened: PropTypes.number,
-  delivered: PropTypes.bool,
-  templateid: PropTypes.number,
-  onPreviewOpen: PropTypes.func,
-  listname: PropTypes.string
+const mapStateToProps = (state, props) => {
+  return {};
 };
 
-export default AnalyticsItem;
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(actions.fetchAttachment(id)))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsItem);

@@ -1,15 +1,15 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import {grey600} from 'material-ui/styles/colors';
 import moment from 'moment-timezone';
+import {connect} from 'react-redux';
+import FontIcon from 'material-ui/FontIcon';
 
 const styles = {
   content: {
     // margin: '5px',
   },
   span: {
-    marginLeft: 5,
-    marginRight: 5,
-    marginBottom: 10
+    margin: '10px 5px'
   },
   strong: {
     color: 'gray',
@@ -23,23 +23,35 @@ function createMarkUp(html) {
   return { __html: html };
 }
 
-function StaticEmailContent({to, subject, body, sendat}) {
+const AttachmentLineItem = props => {
+  return (
+    <div className='vertical-center'>
+      <FontIcon style={{fontSize: '0.8em', margin: 5}} className='fa fa-paperclip'/>
+      <span style={{fontSize: '0.8em'}}>{props.originalname}</span>
+    </div>);
+};
+
+function StaticEmailContent({to, subject, body, sendat, attachments, files}) {
   let date;
   if (sendat !== null && sendat !== '0001-01-01T00:00:00Z') date = moment(sendat);
   return (
-   <div className='u-full-width' style={styles.content}>
-      <p style={styles.span}><strong style={styles.strong}>To</strong>{to}</p>
-      <p style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</p>
+    <div className='u-full-width' style={styles.content}>
+      <div className='vertical-center' style={styles.span}><strong style={styles.strong}>To</strong>{to}</div>
+      <div className='vertical-center' style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</div>
+      {attachments !== null &&
+        <div>
+          {files.map((file, i) => <AttachmentLineItem key={`attachment-${file.id}`} {...file}/>)}
+        </div>}
       {date && <p style={styles.span}><span style={{fontSize: '0.9em', color: grey600}}>Scheduled: {date.tz(moment.tz.guess()).format(FORMAT)} {moment.tz.guess()} (adjusted)</span></p>}
       <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
     </div>
     );
 }
 
-StaticEmailContent.PropTypes = {
-  to: PropTypes.string.isRequired,
-  subject: PropTypes.string.isRequired,
-  body: PropTypes.string.isRequired,
+const mapStateToProps = (state, props) => {
+  return {
+    files: props.attachments !== null && props.attachments.map(fileId => state.emailAttachmentReducer[fileId])
+  };
 };
 
-export default StaticEmailContent;
+export default connect(mapStateToProps)(StaticEmailContent);

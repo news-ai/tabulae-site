@@ -19,7 +19,7 @@ export function cancelScheduledEmail(id) {
       const res = normalize(response.data, emailSchema);
       dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result});
     })
-    .catch(err => console.log(err));
+    .catch(err => dispatch({type: 'CANCEL_SCHEDULED_EMAIL_FAIL', err}));
   };
 }
 
@@ -57,7 +57,7 @@ export function postAttachments(emailid) {
 
 export function postBatchEmailsWithAttachments(emails) {
   return dispatch => {
-    dispatch({ type: SENDING_STAGED_EMAILS, emails });
+    dispatch({type: SENDING_STAGED_EMAILS, emails});
     return api.post(`/emails`, emails)
     .then(response => {
       const res = normalize(response, {
