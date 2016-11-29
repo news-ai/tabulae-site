@@ -50,7 +50,7 @@ function StaticEmailContent({to, subject, body, sendat, attachments, files}) {
 
 const mapStateToProps = (state, props) => {
   return {
-    files: props.attachments !== null && props.attachments.map(fileId => state.emailAttachmentReducer[fileId])
+    files: props.attachments !== null && props.attachments.filter(fileId => state.emailAttachmentReducer[fileId]).map(fileId => state.emailAttachmentReducer[fileId])
   };
 };
 

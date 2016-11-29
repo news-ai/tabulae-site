@@ -159,7 +159,7 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
-    setTimeout(this.setGridHeight, 2000);
+    setTimeout(this.setGridHeight, 1500);
     if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
