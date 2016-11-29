@@ -21,7 +21,7 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
-import {blue100, blue200, grey300} from 'material-ui/styles/colors';
+import {blue100, blue200, blue400, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -171,6 +171,10 @@ class BasicHtmlEditor extends React.Component {
       isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
       filePanelOpen: false,
+      ccPanelOn: false,
+      bccPanelOn: false,
+      cc: '',
+      bcc: '',
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -427,6 +431,14 @@ class BasicHtmlEditor extends React.Component {
             }} />)}
           </Menu>
         </Popover>
+        {state.ccPanelOn && <div className='vertical-center'>
+          <span style={{fontSize: '0.8em', margin: '0 3px'}}>CC</span>
+          <input placeholder='emails here...' style={{fontSize: '0.9em', margin: 0}} type='text' onChange={e => this.setState({cc: e.target.value})}/>
+        </div>}
+        {state.bccPanelOn && <div className='vertical-center'>
+          <span style={{fontSize: '0.8em', margin: '0 3px'}}>BCC</span>
+          <input placeholder='emails here...' style={{fontSize: '0.9em', margin: 0}} type='text' onChange={e => this.setState({bcc: e.target.value})}/>
+        </div>}
         <div className='vertical-center'>
           <div style={{marginTop: 8, width: 550, overflowX: 'scroll'}}>
             <Subject
@@ -435,8 +447,8 @@ class BasicHtmlEditor extends React.Component {
             />
           </div>
           <div>
-            <span className='pointer' style={{fontSize: '0.8em', margin: '0 2px'}}>CC</span>
-            <span className='pointer' style={{fontSize: '0.8em', margin: '0 2px'}}>BCC</span>
+            <span onClick={_ => this.setState({ccPanelOn: !state.ccPanelOn, cc: ''})} className='pointer' style={{fontSize: '0.8em', margin: '0 2px', color: state.ccPanelOn ? blue400 : 'black'}}>CC</span>
+            <span onClick={_ => this.setState({bccPanelOn: !state.bccPanelOn, bcc: ''})} className='pointer' style={{fontSize: '0.8em', margin: '0 2px', color: state.ccPanelOn ? blue400 : 'black'}}>BCC</span>
           </div>
         </div>
         <div style={{
