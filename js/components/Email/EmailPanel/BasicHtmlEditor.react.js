@@ -434,18 +434,6 @@ class BasicHtmlEditor extends React.Component {
             subjectHtml={props.subjectHtml}
             />
           </div>
-          <div>
-            <span
-            onClick={_ => props.onInputChange('ccPanelOn')}
-            className='pointer'
-            style={{fontSize: '0.8em', margin: '0 2px', color: props.ccPanelOn || props.cc.length > 0 ? blue400 : 'black'}}
-            >CC</span>
-            <span
-            onClick={_ => props.onInputChange('bccPanelOn')}
-            className='pointer'
-            style={{fontSize: '0.8em', margin: '0 2px', color: props.bccPanelOn || props.bcc.length > 0 ? blue400 : 'black'}}
-            >BCC</span>
-          </div>
         </div>
         <div style={{
           height: 480,

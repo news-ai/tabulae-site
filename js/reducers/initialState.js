@@ -123,5 +123,7 @@ export const initialState = {
   emailImageReducer: {
     isReceiving: false,
     didInvalidate: false
+  },
+  emailDraftReducer: {
   }
 };

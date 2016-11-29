@@ -5,7 +5,6 @@ import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
 import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
-import isEmail from 'validator/lib/isEmail';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
 
@@ -18,11 +17,12 @@ import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
+import AddCCPanelHOC from './AddCCPanelHOC.react';
 import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
-import {WithContext as ReactTags} from 'react-tag-input';
+import get from 'lodash/get';
 
-import {grey800, blue400} from 'material-ui/styles/colors';
+import {grey800, blue400, lightBlue500} from 'material-ui/styles/colors';
 
 const styles = {
   emailPanelOuterPosition: {
@@ -74,10 +74,6 @@ class EmailPanel extends Component {
       bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : null,
       subjectHtml: null,
       minimized: false,
-      cc: [],
-      bcc: [],
-      ccPanelOn: false,
-      bccPanelOn: false,
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = html => this.setState({body: html});
@@ -92,11 +88,11 @@ class EmailPanel extends Component {
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
-    this.handleEmailInputAddition = this._handleEmailInputAddition.bind(this);
   }
 
   componentWillMount() {
     this.props.fetchTemplates();
+    this.props.initializeEmailDraft();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -107,6 +103,7 @@ class EmailPanel extends Component {
 
   componentWillUnmount() {
     this.props.clearUTCTime();
+    this.props.initializeEmailDraft();
   }
 
   _onArchiveTemplate() {
@@ -151,8 +148,8 @@ class EmailPanel extends Component {
           body: replacedBody,
           contactid: contact.id,
           templateid: this.state.currentTemplateId,
-          cc: this.state.cc.map(item => item.text),
-          bcc: this.state.bcc.map(item => item.text),
+          cc: this.props.cc.map(item => item.text),
+          bcc: this.props.bcc.map(item => item.text),
         };
         if (this.props.scheduledtime !== null) emailObj.sendat = this.props.scheduledtime;
         contactEmails.push(emailObj);
@@ -199,10 +196,7 @@ class EmailPanel extends Component {
       _ => console.log('template saving cancelled'));
   }
 
-  _handleEmailInputAddition(tag, type) {
-    if (!isEmail(tag)) return;
-    this.setState({[type]: [...this.state[type], {text: tag, id: this.state[type].length + 1}]});
-  }
+ 
 
   render() {
     const props = this.props;
@@ -239,24 +233,6 @@ class EmailPanel extends Component {
               <div>
                 <span>Emails are sent from: {props.person.email}</span>
               </div>
-              {state.ccPanelOn && <div style={{display: 'inline-block'}}>
-                <span style={{fontSize: '0.8em', margin: '0 3px'}}>CC</span>
-                <ReactTags
-                tags={state.cc}
-                placeholder='Hit Enter after input'
-                handleDelete={i => this.setState({cc: state.cc.filter((item, index) => index !== i)})}
-                handleAddition={tag => this.handleEmailInputAddition(tag, 'cc')}
-                />
-                </div>}
-              {state.bccPanelOn && <div className='vertical-center'>
-                <span style={{fontSize: '0.8em', margin: '0 3px'}}>BCC</span>
-                <ReactTags
-                tags={state.bcc}
-                placeholder='Hit Enter after input'
-                handleDelete={i => this.setState({bcc: state.bcc.filter((item, index) => index !== i)})}
-                handleAddition={tag => this.handleEmailInputAddition(tag, 'bcc')}
-                />
-              </div>}
               <BasicHtmlEditor
               fieldsmap={state.fieldsmap}
               width={styles.emailPanel.width}
@@ -267,10 +243,6 @@ class EmailPanel extends Component {
               debounce={500}
               person={props.person}
               onInputChange={varName => this.setState({[varName]: !state[varName]})}
-              ccPanelOn={state.ccPanelOn}
-              cc={state.cc}
-              bccPanelOn={state.bccPanelOn}
-              bcc={state.bcc}
               >
                 <div className='vertical-center'>
                   <SelectField
@@ -281,7 +253,7 @@ class EmailPanel extends Component {
                   {templateMenuItems}
                   </SelectField>
                   <IconMenu
-                  iconButtonElement={<IconButton tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
+                  iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
                   anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                   targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
                   >
@@ -306,13 +278,25 @@ class EmailPanel extends Component {
                     tooltipPosition='top-right'
                     />}
                   </DatePickerHOC>
+                  <AddCCPanelHOC listId={props.listId}>
+                  {({onRequestOpen}) =>
+                    <IconButton
+                    iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
+                    iconClassName='fa fa-user-plus'
+                    onClick={onRequestOpen}
+                    tooltip='CC/BCC'
+                    tooltipPosition='top-right'
+                    />}
+                  </AddCCPanelHOC>
                 </div>
-                <div style={{marginLeft: 70}}>
-                  <RaisedButton
-                  primary
-                  label='Preview'
+                <div style={{marginLeft: 100}}>
+                  <IconButton
+                  iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
-                  icon={<FontIcon className={props.isAttaching || props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
+                  tooltip='Preview then Send'
+                  tooltipPosition='top-right'
+                  iconStyle={{color: 'white'}}
+                  style={{backgroundColor: lightBlue500}}
                   />
                 </div>
               </BasicHtmlEditor>
@@ -351,11 +335,13 @@ const mapStateToProps = (state, props) => {
     selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
     attachedfiles: state.emailAttachmentReducer.attached,
     isAttaching: state.emailAttachmentReducer.isReceiving,
-    emailsignature: state.personReducer.person.emailsignature || null
+    emailsignature: state.personReducer.person.emailsignature || null,
+    cc: get(state, `emailDraftReducer[${props.listId}].cc`) || [],
+    bcc: get(state, `emailDraftReducer[${props.listId}].bcc`) || [],
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, props) => {
   return {
     onSendEmailClick: id => dispatch(actionCreators.sendEmail(id)),
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body)),
@@ -365,6 +351,7 @@ const mapDispatchToProps = dispatch => {
     clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
     postBatchEmails: emails => dispatch(actionCreators.postBatchEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(actionCreators.postBatchEmailsWithAttachments(emails)),
+    initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId})
   };
 };
 
