@@ -8,6 +8,7 @@ import {grey500, cyan500, blueGrey900} from 'material-ui/styles/colors';
 import Avatar from 'material-ui/Avatar';
 import Toggle from 'material-ui/Toggle';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import Invite from './Invite.react';
 import EmailSignatureEditor from './EmailSignatureEditor.react';
 import ConnectToGmail from './ConnectToGmail.react';
@@ -136,7 +137,7 @@ class UserProfile extends Component {
                 <span style={spanStyle}>Password</span>
               </div>
               <div className='large-6 medium-7 columns'>
-                {person.googleid > 0 ?
+                {person.googleid ?
                   <span className='print' style={staticSpanStyle}>Logged in with Google</span> :
                   <RaisedButton
                   label='Change Password'
@@ -153,12 +154,17 @@ class UserProfile extends Component {
                 <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !toggled)}/>
               </div>
             </div>
-            {props.person.googleid && <div className='row vertical-center' style={inputHeight}>
+            {person.googleid && <div className='row vertical-center' style={inputHeight}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Connect to Gmail</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                {props.person.gmail ? <span style={staticSpanStyle}>Connected</span> : <ConnectToGmail/>}
+                {person.gmail ?
+                  <FlatButton
+                  secondary
+                  label='Remove'
+                  onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
+                  /> : <ConnectToGmail/>}
               </div>
             </div>}
             <div className='row vertical-center' style={{height: 70, margin: '5px 0'}}>

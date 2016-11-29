@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
 import {connect} from 'react-redux';
 import {blue600} from 'material-ui/styles/colors';
 
@@ -51,7 +50,7 @@ class ConnectToGmail extends Component {
             Just as a reminder, you logged in with: <span style={{color: blue600}}>{this.props.person.email}</span>
           </p>
         </Dialog>
-        <FlatButton label='Connect' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/gmail')}/>
+        <FlatButton primary label='Connect' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/gmail')}/>
       </div>
       );
   }
