@@ -57,7 +57,7 @@ const controlsStyle = {
 
 const Media = props => {
   const entity = Entity.get(props.block.getEntityAt(0));
-  const {src, size, imageLink} = entity.getData();
+  const {src} = entity.getData();
   const type = entity.getType();
 
   let media;
@@ -171,10 +171,6 @@ class BasicHtmlEditor extends React.Component {
       isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
       filePanelOpen: false,
-      ccPanelOn: false,
-      bccPanelOn: false,
-      cc: '',
-      bcc: '',
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -431,14 +427,6 @@ class BasicHtmlEditor extends React.Component {
             }} />)}
           </Menu>
         </Popover>
-        {state.ccPanelOn && <div className='vertical-center'>
-          <span style={{fontSize: '0.8em', margin: '0 3px'}}>CC</span>
-          <input placeholder='emails here...' style={{fontSize: '0.9em', margin: 0}} type='text' onChange={e => this.setState({cc: e.target.value})}/>
-        </div>}
-        {state.bccPanelOn && <div className='vertical-center'>
-          <span style={{fontSize: '0.8em', margin: '0 3px'}}>BCC</span>
-          <input placeholder='emails here...' style={{fontSize: '0.9em', margin: 0}} type='text' onChange={e => this.setState({bcc: e.target.value})}/>
-        </div>}
         <div className='vertical-center'>
           <div style={{marginTop: 8, width: 550, overflowX: 'scroll'}}>
             <Subject
@@ -447,8 +435,16 @@ class BasicHtmlEditor extends React.Component {
             />
           </div>
           <div>
-            <span onClick={_ => this.setState({ccPanelOn: !state.ccPanelOn, cc: ''})} className='pointer' style={{fontSize: '0.8em', margin: '0 2px', color: state.ccPanelOn ? blue400 : 'black'}}>CC</span>
-            <span onClick={_ => this.setState({bccPanelOn: !state.bccPanelOn, bcc: ''})} className='pointer' style={{fontSize: '0.8em', margin: '0 2px', color: state.ccPanelOn ? blue400 : 'black'}}>BCC</span>
+            <span
+            onClick={_ => props.onInputChange('ccPanelOn')}
+            className='pointer'
+            style={{fontSize: '0.8em', margin: '0 2px', color: props.ccPanelOn || props.cc.length > 0 ? blue400 : 'black'}}
+            >CC</span>
+            <span
+            onClick={_ => props.onInputChange('bccPanelOn')}
+            className='pointer'
+            style={{fontSize: '0.8em', margin: '0 2px', color: props.bccPanelOn || props.bcc.length > 0 ? blue400 : 'black'}}
+            >BCC</span>
           </div>
         </div>
         <div style={{

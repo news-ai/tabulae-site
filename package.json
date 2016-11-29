@@ -44,6 +44,7 @@
     "react-skylight": "^0.4.0",
     "react-sortable-hoc": "0.0.11",
     "react-sticky": "^5.0.5",
+    "react-tag-input": "^4.4.0",
     "react-tap-event-plugin": "^1.0.0",
     "react-textarea-autosize": "^4.0.5",
     "react-virtualized": "^8.5.1",

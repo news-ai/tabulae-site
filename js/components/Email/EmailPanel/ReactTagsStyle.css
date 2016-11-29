@@ -1,0 +1,28 @@
+.ReactTags__tags {
+  max-height: 100px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+
+.ReactTags__tagInput {
+  display: inline-block;
+}
+
+.ReactTags__tagInput input {
+  font-size: 12px;
+}
+
+div.ReactTags__selected span.ReactTags__tag {
+  border: 1px solid #ddd;
+  background: #eee;
+  font-size: 12px;
+  display: inline-block;
+  padding: 5px;
+  margin: 0 5px;
+  border-radius: 2px;
+}
+
+div.ReactTags__selected a.ReactTags__remove {
+  color: #aaa;
+  margin-left: 5px;
+}

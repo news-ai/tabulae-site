@@ -5,10 +5,11 @@ import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
 import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
+import isEmail from 'validator/lib/isEmail';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import './ReactTagsStyle.css';
 
 import PreviewEmails from '../PreviewEmails';
-
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
@@ -19,9 +20,9 @@ import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
 import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
+import {WithContext as ReactTags} from 'react-tag-input';
 
 import {grey800, blue400} from 'material-ui/styles/colors';
-// import PopoverMenu from '../../pieces/PopoverMenu.react';
 
 const styles = {
   emailPanelOuterPosition: {
@@ -72,7 +73,11 @@ class EmailPanel extends Component {
       currentTemplateId: 0,
       bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : null,
       subjectHtml: null,
-      minimized: false
+      minimized: false,
+      cc: [],
+      bcc: [],
+      ccPanelOn: false,
+      bccPanelOn: false,
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = html => this.setState({body: html});
@@ -87,6 +92,7 @@ class EmailPanel extends Component {
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
+    this.handleEmailInputAddition = this._handleEmailInputAddition.bind(this);
   }
 
   componentWillMount() {
@@ -145,6 +151,8 @@ class EmailPanel extends Component {
           body: replacedBody,
           contactid: contact.id,
           templateid: this.state.currentTemplateId,
+          cc: this.state.cc.map(item => item.text),
+          bcc: this.state.bcc.map(item => item.text),
         };
         if (this.props.scheduledtime !== null) emailObj.sendat = this.props.scheduledtime;
         contactEmails.push(emailObj);
@@ -191,6 +199,11 @@ class EmailPanel extends Component {
       _ => console.log('template saving cancelled'));
   }
 
+  _handleEmailInputAddition(tag, type) {
+    if (!isEmail(tag)) return;
+    this.setState({[type]: [...this.state[type], {text: tag, id: this.state[type].length + 1}]});
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -223,7 +236,27 @@ class EmailPanel extends Component {
                 <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
                 <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
               </div>
-              <span>Emails are sent from: {props.person.email}</span>
+              <div>
+                <span>Emails are sent from: {props.person.email}</span>
+              </div>
+              {state.ccPanelOn && <div style={{display: 'inline-block'}}>
+                <span style={{fontSize: '0.8em', margin: '0 3px'}}>CC</span>
+                <ReactTags
+                tags={state.cc}
+                placeholder='Hit Enter after input'
+                handleDelete={i => this.setState({cc: state.cc.filter((item, index) => index !== i)})}
+                handleAddition={tag => this.handleEmailInputAddition(tag, 'cc')}
+                />
+                </div>}
+              {state.bccPanelOn && <div className='vertical-center'>
+                <span style={{fontSize: '0.8em', margin: '0 3px'}}>BCC</span>
+                <ReactTags
+                tags={state.bcc}
+                placeholder='Hit Enter after input'
+                handleDelete={i => this.setState({bcc: state.bcc.filter((item, index) => index !== i)})}
+                handleAddition={tag => this.handleEmailInputAddition(tag, 'bcc')}
+                />
+              </div>}
               <BasicHtmlEditor
               fieldsmap={state.fieldsmap}
               width={styles.emailPanel.width}
@@ -233,6 +266,11 @@ class EmailPanel extends Component {
               onSubjectChange={this.onSubjectChange}
               debounce={500}
               person={props.person}
+              onInputChange={varName => this.setState({[varName]: !state[varName]})}
+              ccPanelOn={state.ccPanelOn}
+              cc={state.cc}
+              bccPanelOn={state.bccPanelOn}
+              bcc={state.bcc}
               >
                 <div className='vertical-center'>
                   <SelectField
