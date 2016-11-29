@@ -234,20 +234,8 @@ class EmailPanel extends Component {
           <Paper style={emailPanelWrapper} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
-                <i
-                style={[emailIconStyle]}
-                key='email-fa-times'
-                className='fa fa-times'
-                aria-hidden='true'
-                onClick={_ => props.onClose()}
-                />
-                <i
-                style={[emailIconStyle]}
-                key='email-fa-minus'
-                className='fa fa-minus'
-                aria-hidden='true'
-                onClick={this.toggleMinimize}
-                />
+                <FontIcon style={{margin: 2, fontSize: '0.8em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
+                <FontIcon style={{margin: 2, fontSize: '0.8em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
               </div>
               <span>Emails are sent from: {props.person.email}</span>
               <BasicHtmlEditor
@@ -283,9 +271,7 @@ class EmailPanel extends Component {
                     disabled={state.currentTemplateId ? false : true}
                     primaryText='Delete Template' />
                   </IconMenu>
-                  <DatePickerWrapper/>
-                  {
-                    /*<DatePickerHOC>
+                  <DatePickerHOC>
                     {({onRequestOpen}) =>
                     <IconButton
                     iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
@@ -294,8 +280,7 @@ class EmailPanel extends Component {
                     tooltip='Schedule & Send Later'
                     tooltipPosition='top-right'
                     />}
-                  </DatePickerHOC>*/
-                }
+                  </DatePickerHOC>
                 </div>
                 <div style={{marginLeft: 70}}>
                   <RaisedButton
