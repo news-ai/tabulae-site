@@ -22,19 +22,6 @@ import FontIcon from 'material-ui/FontIcon';
 
 import {grey800, blue400} from 'material-ui/styles/colors';
 // import PopoverMenu from '../../pieces/PopoverMenu.react';
-const iconStyle = {
-  color: 'lightgray',
-  ':hover': {
-    color: 'gray',
-    cursor: 'pointer'
-  }
-};
-
-const emailIconStyle = Object.assign({}, iconStyle, {
-  float: 'right',
-  margin: 2
-});
-
 
 const styles = {
   emailPanelOuterPosition: {
@@ -228,13 +215,13 @@ class EmailPanel extends Component {
       <div style={styles.emailPanelOuterPosition}>
         <div style={styles.emailPanelPosition}>
           <div>
-          {state.minimized && <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1} />}
+          {state.minimized && <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
           </div>
           <Paper style={emailPanelWrapper} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
-                <FontIcon style={{margin: 2, fontSize: '0.8em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
-                <FontIcon style={{margin: 2, fontSize: '0.8em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
+                <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
+                <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
               </div>
               <span>Emails are sent from: {props.person.email}</span>
               <BasicHtmlEditor
@@ -263,7 +250,8 @@ class EmailPanel extends Component {
                     <MenuItem
                     disabled={state.currentTemplateId ? false : true}
                     onClick={_ => props.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
-                    primaryText='Save Text to Existing Template' />
+                    primaryText='Save Text to Existing Template'
+                    />
                     <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
                     <MenuItem
                     onClick={this.onDeleteTemplate}

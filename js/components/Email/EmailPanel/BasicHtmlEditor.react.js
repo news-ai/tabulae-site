@@ -21,11 +21,8 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
-import Dialog from 'material-ui/Dialog';
-import Dropzone from 'react-dropzone';
 import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
-import AttachmentPreview from '../EmailAttachment/AttachmentPreview.react';
 import Subject from './Subject.react';
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
@@ -34,6 +31,7 @@ import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
 import ExternalControls from './components/ExternalControls';
 import Image from './Image/Image.react';
+import FileWrapper from './FileWrapper.react';
 
 import alertify from 'alertifyjs';
 
@@ -201,7 +199,6 @@ class BasicHtmlEditor extends React.Component {
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
-    this.onDrop = this._onDrop.bind(this);
     this.handleImage = this._handleImage.bind(this);
   }
 
@@ -231,11 +228,6 @@ class BasicHtmlEditor extends React.Component {
   }
   componentWillUnmount() {
     this.props.clearAttachments();
-  }
-
-  _onDrop(acceptedFiles, rejectedFiles) {
-    const files = [...this.props.files, ...acceptedFiles];
-    this.props.setAttachments(files);
   }
 
   _onChange(editorState) {
@@ -419,29 +411,7 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <Dialog title='File Upload' autoScrollBodyContent open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}>
-          <div style={{margin: 10}} className='horizontal-center'>
-            <Dropzone maxSize={5000000} onDrop={this.onDrop}>
-              <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>
-            </Dropzone>
-          </div>
-          {props.files.length > 0 && (
-            <div>
-              <h4>Attached {props.files.length} files...</h4>
-              <div className='row'>
-              {props.files.map((file, i) =>
-                <AttachmentPreview
-                onRemoveClick={_ => props.setAttachments(props.files.filter((f, fi) => fi !== i))}
-                key={`file-${i}`}
-                name={file.name}
-                preview={file.preview}
-                size={file.size}
-                maxLength={17}
-                />)}
-              </div>
-            </div>
-            )}
-        </Dialog>
+        <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
