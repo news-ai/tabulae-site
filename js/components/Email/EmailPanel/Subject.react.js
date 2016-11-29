@@ -50,9 +50,9 @@ class Subject extends Component {
     const {editorState} = this.state;
     return (
         <Editor
-          editorState={editorState}
-          onChange={this.onChange}
-          placeholder='Subject...'
+        editorState={editorState}
+        onChange={this.onChange}
+        placeholder='Subject...'
         />
     );
   }

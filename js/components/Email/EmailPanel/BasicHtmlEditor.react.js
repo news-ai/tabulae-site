@@ -427,11 +427,17 @@ class BasicHtmlEditor extends React.Component {
             }} />)}
           </Menu>
         </Popover>
-        <div style={{marginTop: 8}}>
-          <Subject
-          onSubjectChange={props.onSubjectChange}
-          subjectHtml={props.subjectHtml}
-          />
+        <div className='vertical-center'>
+          <div style={{marginTop: 8, width: 550, overflowX: 'scroll'}}>
+            <Subject
+            onSubjectChange={props.onSubjectChange}
+            subjectHtml={props.subjectHtml}
+            />
+          </div>
+          <div>
+            <span className='pointer' style={{fontSize: '0.8em', margin: '0 2px'}}>CC</span>
+            <span className='pointer' style={{fontSize: '0.8em', margin: '0 2px'}}>BCC</span>
+          </div>
         </div>
         <div style={{
           height: 480,
