@@ -55,7 +55,9 @@ import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
 import ClientDirectories from './components/ClientDirectories/ClientDirectories.react';
 import ClientDirectory from './components/ClientDirectories/ClientDirectory.react';
 
+import enUS from 'antd/lib/locale-provider/en_US';
 
+import LocaleProvider from 'antd/lib/locale-provider';
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -84,38 +86,40 @@ if (module.hot) {
 const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
 
 ReactDOM.render(
-  <MultiThemeProvider>
-    <Provider store={store}>
-        <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
-          <Route path='/' name='Home' component={App}>
-            <IndexRoute component={ListManagerContainer} />
-            <Route path='lists' name='List Manager' component={ListManagerContainer} />
-            <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
-            <Route path='tables/:listId' staticName name='Table'>
-              <IndexRoute component={ListFetchingContainer}/>
-              <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
+  <LocaleProvider locale={enUS}>
+    <MultiThemeProvider>
+      <Provider store={store}>
+          <Router onUpdate={() => window.scrollTo(0, 0)} history={browserHistory}>
+            <Route path='/' name='Home' component={App}>
+              <IndexRoute component={ListManagerContainer} />
+              <Route path='lists' name='List Manager' component={ListManagerContainer} />
+              <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
+              <Route path='tables/:listId' staticName name='Table'>
+                <IndexRoute component={ListFetchingContainer}/>
+                <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
+              </Route>
+              <Route path='lists/:listId' staticName name='List'>
+                <IndexRoute component={OnboardingTable}/>
+                <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
+              </Route>
+              <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer}/>
+              <Route path='clients' staticName name='Clients' component={ClientDirectories}>
+                <Route path=':clientname' component={ClientDirectory}/>
+              </Route>
+              <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
+              <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
+              <Route path='archive' name='Archive' component={ArchiveContainer} />
+              <Route path='public' name='Public Lists' component={PublicListsContainer} />
+              <Route path='settings' name='Profile Settings' component={UserProfile} />
+              <Route path='emailstats' name='Sent Emails' component={EmailAnalytics} />
+              <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
+              <Route path='search' name='Search' component={SearchBar} />
+              <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
+              <Route path='*' staticName name='Not Found' component={NotFound} />
             </Route>
-            <Route path='lists/:listId' staticName name='List'>
-              <IndexRoute component={OnboardingTable}/>
-              <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
-            </Route>
-            <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer}/>
-            <Route path='clients' staticName name='Clients' component={ClientDirectories}>
-              <Route path=':clientname' component={ClientDirectory}/>
-            </Route>
-            <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
-            <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
-            <Route path='archive' name='Archive' component={ArchiveContainer} />
-            <Route path='public' name='Public Lists' component={PublicListsContainer} />
-            <Route path='settings' name='Profile Settings' component={UserProfile} />
-            <Route path='emailstats' name='Sent Emails' component={EmailAnalytics} />
-            <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
-            <Route path='search' name='Search' component={SearchBar} />
-            <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
-            <Route path='*' staticName name='Not Found' component={NotFound} />
-          </Route>
-        </Router>
-      </Provider>
-    </MultiThemeProvider>,
+          </Router>
+        </Provider>
+      </MultiThemeProvider>
+    </LocaleProvider>,
   document.getElementById('app')
 );

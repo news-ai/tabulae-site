@@ -7,6 +7,9 @@ import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 
 import moment from 'moment-timezone';
+import DatePickerA from 'antd/lib/date-picker';
+import enUS from 'antd/lib/date-picker/locale/en_US';
+import 'antd/lib/date-picker/style/css';
 
 import 'node_modules/react-datepicker/dist/react-datepicker.css';
 
@@ -130,14 +133,22 @@ class DatePickerHOC extends Component {
     const props = this.props;
     const state = this.state;
     const m = moment(state.date);
+  /*   <DatePicker
+            inline
+            onChange={date => this.setState({date})}
+            selected={state.date}
+            />*/
     return (
       <div>
         <Dialog title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
           <div className='horizontal-center' style={{margin: '20px 0'}}>
-            <DatePicker
-            inline
-            onChange={date => this.setState({date})}
-            selected={state.date}
+            <DatePickerA
+            showTime
+            format='YYYY-MM-DD HH:mm:ss'
+            placeholder='Select Time'
+            value={state.date}
+            onChange={(date, datestring) => this.setState({date})}
+            locale={enUS}
             />
           </div>
           <div className='horizontal-center'>

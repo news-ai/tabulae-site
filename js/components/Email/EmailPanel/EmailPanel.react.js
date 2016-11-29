@@ -5,7 +5,6 @@ import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
 import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
-
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 import PreviewEmails from '../PreviewEmails';
@@ -18,6 +17,7 @@ import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
+import DatePickerWrapper from './DatePickerWrapper.react';
 import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
 
@@ -283,7 +283,9 @@ class EmailPanel extends Component {
                     disabled={state.currentTemplateId ? false : true}
                     primaryText='Delete Template' />
                   </IconMenu>
-                  <DatePickerHOC>
+                  <DatePickerWrapper/>
+                  {
+                    /*<DatePickerHOC>
                     {({onRequestOpen}) =>
                     <IconButton
                     iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
@@ -292,9 +294,10 @@ class EmailPanel extends Component {
                     tooltip='Schedule & Send Later'
                     tooltipPosition='top-right'
                     />}
-                  </DatePickerHOC>
+                  </DatePickerHOC>*/
+                }
                 </div>
-                <div style={{marginLeft: 60}}>
+                <div style={{marginLeft: 70}}>
                   <RaisedButton
                   primary
                   label='Preview'
