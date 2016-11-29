@@ -5,11 +5,10 @@ import SkyLight from 'react-skylight';
 import * as actionCreators from 'actions/AppActions';
 import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
-
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import './ReactTagsStyle.css';
 
 import PreviewEmails from '../PreviewEmails';
-
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
@@ -18,24 +17,12 @@ import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
+import AddCCPanelHOC from './AddCCPanelHOC.react';
 import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
+import get from 'lodash/get';
 
-import {grey800, blue400} from 'material-ui/styles/colors';
-// import PopoverMenu from '../../pieces/PopoverMenu.react';
-const iconStyle = {
-  color: 'lightgray',
-  ':hover': {
-    color: 'gray',
-    cursor: 'pointer'
-  }
-};
-
-const emailIconStyle = Object.assign({}, iconStyle, {
-  float: 'right',
-  margin: 2
-});
-
+import {grey800, blue400, lightBlue500} from 'material-ui/styles/colors';
 
 const styles = {
   emailPanelOuterPosition: {
@@ -86,7 +73,7 @@ class EmailPanel extends Component {
       currentTemplateId: 0,
       bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : null,
       subjectHtml: null,
-      minimized: false
+      minimized: false,
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = html => this.setState({body: html});
@@ -105,6 +92,7 @@ class EmailPanel extends Component {
 
   componentWillMount() {
     this.props.fetchTemplates();
+    this.props.initializeEmailDraft();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -115,6 +103,7 @@ class EmailPanel extends Component {
 
   componentWillUnmount() {
     this.props.clearUTCTime();
+    this.props.initializeEmailDraft();
   }
 
   _onArchiveTemplate() {
@@ -159,6 +148,8 @@ class EmailPanel extends Component {
           body: replacedBody,
           contactid: contact.id,
           templateid: this.state.currentTemplateId,
+          cc: this.props.cc.map(item => item.text),
+          bcc: this.props.bcc.map(item => item.text),
         };
         if (this.props.scheduledtime !== null) emailObj.sendat = this.props.scheduledtime;
         contactEmails.push(emailObj);
@@ -205,6 +196,8 @@ class EmailPanel extends Component {
       _ => console.log('template saving cancelled'));
   }
 
+ 
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -229,27 +222,17 @@ class EmailPanel extends Component {
       <div style={styles.emailPanelOuterPosition}>
         <div style={styles.emailPanelPosition}>
           <div>
-          {state.minimized && <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1} />}
+          {state.minimized && <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
           </div>
           <Paper style={emailPanelWrapper} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
-                <i
-                style={[emailIconStyle]}
-                key='email-fa-times'
-                className='fa fa-times'
-                aria-hidden='true'
-                onClick={_ => props.onClose()}
-                />
-                <i
-                style={[emailIconStyle]}
-                key='email-fa-minus'
-                className='fa fa-minus'
-                aria-hidden='true'
-                onClick={this.toggleMinimize}
-                />
+                <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
+                <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
               </div>
-              <span>Emails are sent from: {props.person.email}</span>
+              <div>
+                <span>Emails are sent from: {props.person.email}</span>
+              </div>
               <BasicHtmlEditor
               fieldsmap={state.fieldsmap}
               width={styles.emailPanel.width}
@@ -259,6 +242,7 @@ class EmailPanel extends Component {
               onSubjectChange={this.onSubjectChange}
               debounce={500}
               person={props.person}
+              onInputChange={varName => this.setState({[varName]: !state[varName]})}
               >
                 <div className='vertical-center'>
                   <SelectField
@@ -269,14 +253,15 @@ class EmailPanel extends Component {
                   {templateMenuItems}
                   </SelectField>
                   <IconMenu
-                  iconButtonElement={<IconButton tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
+                  iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
                   anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                   targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
                   >
                     <MenuItem
                     disabled={state.currentTemplateId ? false : true}
                     onClick={_ => props.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
-                    primaryText='Save Text to Existing Template' />
+                    primaryText='Save Text to Existing Template'
+                    />
                     <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
                     <MenuItem
                     onClick={this.onDeleteTemplate}
@@ -293,13 +278,25 @@ class EmailPanel extends Component {
                     tooltipPosition='top-right'
                     />}
                   </DatePickerHOC>
+                  <AddCCPanelHOC listId={props.listId}>
+                  {({onRequestOpen}) =>
+                    <IconButton
+                    iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
+                    iconClassName='fa fa-user-plus'
+                    onClick={onRequestOpen}
+                    tooltip='CC/BCC'
+                    tooltipPosition='top-right'
+                    />}
+                  </AddCCPanelHOC>
                 </div>
-                <div style={{marginLeft: 60}}>
-                  <RaisedButton
-                  primary
-                  label='Preview'
+                <div style={{marginLeft: 100}}>
+                  <IconButton
+                  iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
-                  icon={<FontIcon className={props.isAttaching || props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
+                  tooltip='Preview then Send'
+                  tooltipPosition='top-right'
+                  iconStyle={{color: 'white'}}
+                  style={{backgroundColor: lightBlue500}}
                   />
                 </div>
               </BasicHtmlEditor>
@@ -338,11 +335,13 @@ const mapStateToProps = (state, props) => {
     selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
     attachedfiles: state.emailAttachmentReducer.attached,
     isAttaching: state.emailAttachmentReducer.isReceiving,
-    emailsignature: state.personReducer.person.emailsignature || null
+    emailsignature: state.personReducer.person.emailsignature || null,
+    cc: get(state, `emailDraftReducer[${props.listId}].cc`) || [],
+    bcc: get(state, `emailDraftReducer[${props.listId}].bcc`) || [],
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, props) => {
   return {
     onSendEmailClick: id => dispatch(actionCreators.sendEmail(id)),
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body)),
@@ -352,6 +351,7 @@ const mapDispatchToProps = dispatch => {
     clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
     postBatchEmails: emails => dispatch(actionCreators.postBatchEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(actionCreators.postBatchEmailsWithAttachments(emails)),
+    initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId})
   };
 };
 

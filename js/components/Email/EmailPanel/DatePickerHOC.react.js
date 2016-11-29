@@ -7,7 +7,6 @@ import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 
 import moment from 'moment-timezone';
-
 import 'node_modules/react-datepicker/dist/react-datepicker.css';
 
 const FORMAT = 'dddd, MMMM';
@@ -130,6 +129,7 @@ class DatePickerHOC extends Component {
     const props = this.props;
     const state = this.state;
     const m = moment(state.date);
+
     return (
       <div>
         <Dialog title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>

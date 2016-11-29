@@ -55,7 +55,8 @@ function ToggleableEditInput({
         <i
         className='fa fa-pencil-square-o noprint'
         style={[styles.icon]}
-        aria-hidden='true'/>}
+        aria-hidden='true'
+        />}
     </div>
     );
   return <div>{renderNode}</div>;

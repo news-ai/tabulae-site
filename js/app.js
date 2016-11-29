@@ -55,7 +55,6 @@ import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
 import ClientDirectories from './components/ClientDirectories/ClientDirectories.react';
 import ClientDirectory from './components/ClientDirectories/ClientDirectory.react';
 
-
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();

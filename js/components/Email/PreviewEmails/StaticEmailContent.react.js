@@ -43,14 +43,14 @@ function StaticEmailContent({to, subject, body, sendat, attachments, files}) {
           {files.map((file, i) => <AttachmentLineItem key={`attachment-${file.id}`} {...file}/>)}
         </div>}
       {date && <p style={styles.span}><span style={{fontSize: '0.9em', color: grey600}}>Scheduled: {date.tz(moment.tz.guess()).format(FORMAT)} {moment.tz.guess()} (adjusted)</span></p>}
-      <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)} />
+      <div style={styles.span} dangerouslySetInnerHTML={createMarkUp(body)}/>
     </div>
     );
 }
 
 const mapStateToProps = (state, props) => {
   return {
-    files: props.attachments !== null && props.attachments.map(fileId => state.emailAttachmentReducer[fileId])
+    files: props.attachments !== null && props.attachments.filter(fileId => state.emailAttachmentReducer[fileId]).map(fileId => state.emailAttachmentReducer[fileId])
   };
 };
 
