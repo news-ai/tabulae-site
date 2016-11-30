@@ -21,7 +21,7 @@ import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Checkbox from 'material-ui/Checkbox';
-import {blue100, blue200, blue300, grey500, grey400, grey300, grey700} from 'material-ui/styles/colors';
+import {blue100, blue200, blue300, grey500, grey400, grey300, grey700, blue400} from 'material-ui/styles/colors';
 import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
@@ -101,13 +101,17 @@ class ListTable extends Component {
       onSort: false,
       sortedIds: [],
       lastRowIndexChecked: null,
-      showProfileTooltip: false,
       profileContactId: null,
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
       firsttime: this.props.firstTimeUser,
       leftoverHeight: undefined,
     };
+
+    // store outside of state to update synchronously for PanelOverlay
+    this.showProfileTooltip = false;
+    this.onTooltipPanel = false;
+
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
@@ -377,6 +381,7 @@ class ListTable extends Component {
     let content = _getter(contacts[rowIndex], fieldObj) || '';
 
     let contentBody;
+    let contentBody2 = null;
     if (fieldObj.tableOnly) {
       const rowData = contacts[rowIndex];
       switch (fieldObj.value) {
@@ -386,48 +391,55 @@ class ListTable extends Component {
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
           contentBody = (
-            <i
+            <FontIcon
             onClick={(e) => this.onCheck(e, rowData.id, contacts, cellProps)}
-            style={{color: blue200}}
+            color={blue200}
+            style={{fontSize: '0.9em'}}
             className={isChecked ? 'fa fa-square pointer' : 'fa fa-square-o pointer'}
             />);
           break;
         case 'profile':
           const state = this.state;
           contentBody = (
-            <div className='row vertical-center'>
-              <i
-              id='profile_hop'
-              className='fa fa-arrow-right pointer'
-              style={{color: blue300, marginRight: 5}}
-              onMouseEnter={e =>
+              <div
+              className='pointer'
+              style={{padding: '0 1px', marginRight: 15}}
+              onMouseEnter={e => {
+                this.showProfileTooltip = true;
                 this.setState({
-                  showProfileTooltip: true,
                   profileX: e.clientX,
                   profileY: e.clientY,
                   profileContactId: rowData.id
-                })}
-              onMouseLeave={e => setTimeout(
-                _ => !state.onPanel ? this.setState({showProfileTooltip: true}) :
-                null, 500)}
+                });
+              }}
+              onMouseLeave={e => {
+                setTimeout(_ => {
+                  this.showProfileTooltip = this.onTooltipPanel;
+                  this.forceUpdate();
+                }, 80);
+              }}
               onClick={e => {
                 e.preventDefault();
                 this.props.router.push(`/tables/${this.props.listId}/${rowData.id}`);
               }}
-              />
-              {!this.props.listData.readonly &&
-                <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
-                {({onRequestOpen}) => (
-                  <i
-                  onClick={onRequestOpen}
-                  className='fa fa-edit pointer'
-                  style={{color: blue300}}
-                  />
-                  )}
-                </EditContactHOC>
-                }
-            </div>
-            );
+              >
+                <FontIcon
+                id='profile_hop'
+                className='fa fa-arrow-right'
+                style={{fontSize: '0.9em'}}
+                color={blue300}
+                />
+              </div>);
+          contentBody2 = !this.props.listData.readonly &&
+            <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
+              {({onRequestOpen}) => (
+              <FontIcon
+              onClick={onRequestOpen}
+              className='fa fa-edit pointer'
+              style={{fontSize: '0.9em'}}
+              color={blue300}
+              />)}
+            </EditContactHOC>;
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -441,7 +453,7 @@ class ListTable extends Component {
       className={rowIndex % 2 === 0 ? 'vertical-center cell evenRow' : 'vertical-center cell oddRow'}
       key={key}
       style={style}>
-      {contentBody}
+      {contentBody}{contentBody2}
       </div>);
     }
 
@@ -584,10 +596,17 @@ class ListTable extends Component {
           onClick={_ => props.router.push(`/lists/${props.listId}`)}
           />
         </div>
-        {state.showProfileTooltip &&
+        {this.showProfileTooltip &&
           <PanelOverlayHOC
-          onMouseEnter={_ => this.setState({showProfileTooltip: true, onTooltipPanel: true})}
-          onMouseLeave={_ => this.setState({showProfileTooltip: false, onTooltipPanel: false})}
+          onMouseEnter={_ => {
+            this.showProfileTooltip = true;
+            this.onTooltipPanel = true;
+          }}
+          onMouseLeave={_ => {
+            this.showProfileTooltip = false;
+            this.onTooltipPanel =  false;
+            this.forceUpdate();
+          }}
           profileX={state.profileX}
           profileY={state.profileY}
           contactId={state.profileContactId}

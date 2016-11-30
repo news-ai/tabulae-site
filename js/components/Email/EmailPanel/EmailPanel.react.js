@@ -242,7 +242,6 @@ class EmailPanel extends Component {
               onSubjectChange={this.onSubjectChange}
               debounce={500}
               person={props.person}
-              onInputChange={varName => this.setState({[varName]: !state[varName]})}
               >
                 <div className='vertical-center'>
                   <SelectField
