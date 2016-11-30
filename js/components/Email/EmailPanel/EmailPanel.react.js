@@ -72,13 +72,14 @@ class EmailPanel extends Component {
       fieldsmap: [],
       currentTemplateId: 0,
       bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : null,
+      body: this.props.emailsignature !== null ? this.props.emailsignature : null,
       subjectHtml: null,
       minimized: false,
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = html => this.setState({body: html});
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
-    this._replaceAll = this._replaceAll.bind(this);
+    this.replaceAll = this._replaceAll.bind(this);
     this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -139,8 +140,8 @@ class EmailPanel extends Component {
     let contactEmails = [];
     selectedContacts.map( (contact, i) => {
       if (contact && contact !== null) {
-        const replacedBody = this._replaceAll(body, selectedContacts[i]);
-        const replacedSubject = this._replaceAll(subject, selectedContacts[i]);
+        const replacedBody = this.replaceAll(body, selectedContacts[i]);
+        const replacedSubject = this.replaceAll(subject, selectedContacts[i]);
         let emailObj = {
           listid: this.props.listId,
           to: contact.email,
@@ -195,8 +196,6 @@ class EmailPanel extends Component {
         .then(currentTemplateId => this.setState({currentTemplateId})),
       _ => console.log('template saving cancelled'));
   }
-
- 
 
   render() {
     const props = this.props;
