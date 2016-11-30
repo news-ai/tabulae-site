@@ -625,7 +625,9 @@ class ListTable extends Component {
               tooltipPosition='top-left'
               iconClassName='fa fa-envelope'
               iconStyle={{color: grey500}}
-              onClick={_ => this.setState({isEmailPanelOpen: true})}
+              onClick={_ => props.person.emailconfirmed ?
+                this.setState({isEmailPanelOpen: true}) :
+                alertify.alert('You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.')}
               disabled={state.isEmailPanelOpen || props.listData.readonly}
               />
               <IconButton

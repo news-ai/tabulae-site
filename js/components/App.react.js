@@ -123,6 +123,9 @@ class App extends Component {
               backgroundColor={blue300}
               onClick={_ => props.router.push('/settings')}/>
             </div>
+            <div className='horizontal-center' style={{margin: 10}}>
+              <RaisedButton label='Logout' onClick={props.logoutClick}/>
+            </div>
           </Dialog>
         }
         <Drawer
