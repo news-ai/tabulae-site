@@ -294,7 +294,7 @@ class EmailPanel extends Component {
                   iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
                   tooltip='Preview then Send'
-                  tooltipPosition='top-right'
+                  tooltipPosition='top-left'
                   iconStyle={{color: 'white'}}
                   style={{backgroundColor: lightBlue500}}
                   />
