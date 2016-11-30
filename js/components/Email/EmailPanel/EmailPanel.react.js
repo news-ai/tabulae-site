@@ -242,7 +242,6 @@ class EmailPanel extends Component {
               onSubjectChange={this.onSubjectChange}
               debounce={500}
               person={props.person}
-              onInputChange={varName => this.setState({[varName]: !state[varName]})}
               >
                 <div className='vertical-center'>
                   <SelectField
@@ -294,7 +293,7 @@ class EmailPanel extends Component {
                   iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
                   tooltip='Preview then Send'
-                  tooltipPosition='top-right'
+                  tooltipPosition='top-left'
                   iconStyle={{color: 'white'}}
                   style={{backgroundColor: lightBlue500}}
                   />
