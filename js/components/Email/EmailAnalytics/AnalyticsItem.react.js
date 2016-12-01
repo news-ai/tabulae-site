@@ -97,6 +97,7 @@ class AnalyticsItem extends Component {
         <Dialog
         open={this.state.isPreviewOpen}
         onRequestClose={_ => this.setState({isPreviewOpen: false})}
+        autoScrollBodyContent
         >
           <StaticEmailContent {...this.props} />
         </Dialog>
