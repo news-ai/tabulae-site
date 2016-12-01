@@ -14,9 +14,11 @@ import {
 import draftRawToHtml from '../Email/EmailPanel/utils/draftRawToHtml';
 import Link from '../Email/EmailPanel/components/Link';
 import CurlySpan from '../Email/EmailPanel/components/CurlySpan.react';
+import EntityControls from '../Email/EmailPanel/components/EntityControls';
 import {convertFromHTML} from 'draft-convert';
 import {grey500} from 'material-ui/styles/colors';
 import * as actionCreators from '../../actions/AppActions';
+import alertify from 'alertifyjs';
 
 export function findEntities(entityType, contentBlock, callback) {
   contentBlock.findEntityRanges(
@@ -60,13 +62,18 @@ class EmailSignatureEditor extends Component {
       }
     ]);
 
+    this.ENTITY_CONTROLS = [
+      {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
+    ];
+
     this.state = {
       editorState: this.props.html !== null ?
         EditorState.createWithContent(convertFromHTML(this.props.html), decorator) :
         EditorState.createEmpty(decorator),
       html: this.props.html,
       editing: false,
-      finished: false
+      finished: false,
+      showToolbar: false
     };
 
     this.emitHTML = (editorState) => {
@@ -77,6 +84,8 @@ class EmailSignatureEditor extends Component {
     this.showToolbar = this._showToolbar.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onSave = this._onSave.bind(this);
+    this.addLink = this._addLink.bind(this);
+    this.removeLink = this._removeLink.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -88,17 +97,72 @@ class EmailSignatureEditor extends Component {
     }
   }
 
-  _showToolbar(editorState) {
+  _addLink(/* e */) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (selection.isCollapsed()) return;
+    alertify.prompt(
+      '',
+      'Enter a URL',
+      'https://',
+      (e, url) => {
+        const entityKey = Entity.create('LINK', 'MUTABLE', {url});
+        this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
+      },
+      _ => {});
+  }
 
+  _removeLink(/* e */) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (selection.isCollapsed()) {
+      return;
+    }
+    this.onChange(RichUtils.toggleLink(editorState, selection, null));
+  }
+
+  _manageLink() {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (selection.isCollapsed()) return;
+    const startKey = selection.getStartKey();
+    const startOffset = selection.getStartOffset();
+    const endOffset = selection.getEndOffset();
+    const blockAtLinkBeginning = editorState.getCurrentContent().getBlockForKey(startKey);
+    let i;
+    let linkKey;
+    let hasEntityType = false;
+    for (i = startOffset; i < endOffset; i++) {
+      linkKey = blockAtLinkBeginning.getEntityAt(i);
+      if (linkKey !== null) {
+        const type = Entity.get(linkKey).getType();
+        if (type === 'LINK') {
+          hasEntityType = true;
+          break;
+        }
+      }
+    }
+    if (hasEntityType) {
+      // REMOVE LINK
+      this.removeLink();
+    } else {
+      // ADD LINK
+      this.addLink();
+    }
+  }
+
+  _showToolbar(editorState) {
+    this.setState({showToolbar: true});
   }
 
   _onChange(editorState) {
-    console.log('ey');
     let previousContent = this.state.editorState.getCurrentContent();
     this.setState({editorState});
     const selection = editorState.getSelection();
     if (!selection.isCollapsed()) {
       this.showToolbar(editorState);
+    } else {
+      this.setState({showToolbar: false});
     }
     // only emit html when content changes
     if (previousContent !== editorState.getCurrentContent()) {
@@ -123,7 +187,7 @@ class EmailSignatureEditor extends Component {
     const state = this.state;
     return (
       <div>
-        <div style={{border: 'dotted 1px lightgrey', maxHeight: 90, overflowY: 'scroll'}}>
+        <div style={{border: 'dotted 1px lightgrey', maxHeight: 85, overflowY: 'scroll'}}>
          <Editor
           editorState={editorState}
           onChange={this.onChange}
@@ -132,9 +196,17 @@ class EmailSignatureEditor extends Component {
           onFocus={_ => this.setState({editing: true, finished: false})}
           />
         </div>
+        {/*state.showToolbar &&
+          <div>
+            <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+            />
+          </div>*/
+          }
         <span
-        style={{fontSize: '0.8em', color: grey500, float: 'right'}}
-        >{state.finished ? 'Saved.' : (state.editing ? 'Editing...' : '')}</span>
+        style={{fontSize: '0.8em', color: grey500, float: 'right', height: 14}}
+        >{state.finished ? 'Saved.' : (state.editing ? 'Editing...' : ' ')}</span>
       </div>
       );
   }
