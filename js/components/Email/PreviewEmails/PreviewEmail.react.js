@@ -19,7 +19,7 @@ function PreviewEmail(props) {
   return (
     <div style={styles.contentBox}>
       <StaticEmailContent {...props} />
-      <RaisedButton onClick={onSendEmailClick} labelStyle={{textTransform: 'none'}} label='Send' />
+      <RaisedButton onClick={onSendEmailClick} labelStyle={{textTransform: 'none'}} label={props.sendLater ? 'Schedule' : 'Send'} />
     </div>
     );
 }

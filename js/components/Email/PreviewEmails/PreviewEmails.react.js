@@ -3,7 +3,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import PreviewEmail from './PreviewEmail.react';
 import Waiting from '../../Waiting';
 
-function PreviewEmails({isReceiving, previewEmails, onSendEmailClick}) {
+function PreviewEmails({sendLater, isReceiving, previewEmails, onSendEmailClick}) {
   const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));
   let renderNode;
   if (isReceiving) renderNode = <Waiting isReceiving={isReceiving} text='Generating emails...' textStyle={{marginTop: '20px'}}/>;
@@ -11,8 +11,8 @@ function PreviewEmails({isReceiving, previewEmails, onSendEmailClick}) {
   else {
     renderNode = (
     <div>
-      <RaisedButton label='Send All' primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
-      {previewEmails.map((email, i) => <PreviewEmail key={i} {...email} onSendEmailClick={_ => onSendEmailClick(email.id)} />)}
+      <RaisedButton label={sendLater ? 'Schedule All Emails' : 'Send All'} primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
+      {previewEmails.map((email, i) => <PreviewEmail sendLater={sendLater} key={i} {...email} onSendEmailClick={_ => onSendEmailClick(email.id)} />)}
     </div>
     );
   }

@@ -107,7 +107,7 @@ ReactDOM.render(
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
-            <Route path='emailstats' name='Sent Emails' component={EmailAnalytics} />
+            <Route path='emailstats' name='Sent & Scheduled Emails' component={EmailAnalytics} />
             <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
