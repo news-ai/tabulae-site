@@ -52,7 +52,6 @@ const controlsStyle = {
   border: `solid 1px ${blue100}`,
   borderRadius: '0.8em',
   backgroundColor: 'white',
-  files: []
 };
 
 const Media = props => {
@@ -420,7 +419,9 @@ class BasicHtmlEditor extends React.Component {
         onRequestClose={_ => this.setState({variableMenuOpen: false})}
         >
           <Menu desktop>
-          {props.fieldsmap.map((field, i) =>
+          {props.fieldsmap
+            .filter(field => !field.hidden)
+            .map((field, i) =>
             <MenuItem key={i} primaryText={field.name} onClick={_ => {
               this.insertText(field.name);
               this.setState({variableMenuOpen: false});

@@ -11,6 +11,7 @@ import {
   deepOrange600
 } from 'material-ui/styles/colors';
 import moment from 'moment-timezone';
+import alertify from 'alertifyjs';
 
 const FORMAT = 'dddd, MMMM HH:mm';
 
@@ -94,6 +95,7 @@ class ScheduledEmailItem extends Component {
         <Dialog
         open={this.state.isPreviewOpen}
         onRequestClose={_ => this.setState({isPreviewOpen: false})}
+        autoScrollBodyContent
         >
           <StaticEmailContent {...this.props} />
         </Dialog>
@@ -106,7 +108,15 @@ class ScheduledEmailItem extends Component {
             <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
           </div>
           <div className='small-12 medium-3 large-4 columns horizontal-center'>
-            {!cancel && <FlatButton onClick={onCancelClick} label='Cancel' secondary/>}
+            {!cancel &&
+              <FlatButton
+              onClick={_ =>
+              alertify.confirm(
+              'Cancel Email Delivery',
+              'Canceling email delivery cannot be undone. You would have to resend the email. Are you sure?',
+              onCancelClick,
+              _ => ({}))}
+              label='Cancel' secondary/>}
           </div>
         </div>
       </div>
