@@ -93,6 +93,7 @@ class EmailSignatureEditor extends Component {
   }
 
   _onChange(editorState) {
+    console.log('ey');
     let previousContent = this.state.editorState.getCurrentContent();
     this.setState({editorState});
     const selection = editorState.getSelection();

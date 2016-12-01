@@ -47,7 +47,7 @@
     "react-tag-input": "^4.4.0",
     "react-tap-event-plugin": "^1.0.0",
     "react-textarea-autosize": "^4.0.5",
-    "react-virtualized": "^8.5.1",
+    "react-virtualized": "^8.6.0",
     "recharts": "^0.15.2",
     "redux": "^3.6.0",
     "redux-router": "^0.1.0",
