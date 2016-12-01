@@ -21,7 +21,7 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
-import {blue100, blue200, blue400, grey300} from 'material-ui/styles/colors';
+import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -379,7 +379,7 @@ class BasicHtmlEditor extends React.Component {
 
   _handleDroppedFiles(selection, files) {
     files.map(file => {
-      if (file.type === 'image/png' || file.type === 'image/jpg') {
+      if (file.type === 'image/png' || file.type === 'image/jpeg') {
         if (file.size <= 5000000) {
           // const newEditorState = this.handleImage();
           // this.onChange(newEditorState);
@@ -388,6 +388,8 @@ class BasicHtmlEditor extends React.Component {
             const newEditorState = this.handleImage(url);
             this.onChange(newEditorState);
           });
+        } else {
+          alertify.warning(`Image size cannot exceed 5MB. The image dropped was ${(file.size / 1000000).toFixed(2)}MB`);
         }
       }
     });
