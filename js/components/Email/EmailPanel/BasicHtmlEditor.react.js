@@ -21,7 +21,9 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
-import {blue100, blue200, blue400, grey300} from 'material-ui/styles/colors';
+import Dropzone from 'react-dropzone';
+import {blue100, blue200, grey300, grey400, grey800} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -100,6 +102,13 @@ class BasicHtmlEditor extends React.Component {
         label: 'File Upload',
         onToggle: _ => this.setState({filePanelOpen: true}),
         icon: 'fa fa-paperclip',
+        isActive: _ => this.props.files.length > 0
+      },
+      {
+        label: 'Image Upload',
+        onToggle: _ => this.imgDropzone.open(),
+        icon: 'fa fa-camera',
+        isActive: _ => false
       }
     ];
 
@@ -199,6 +208,7 @@ class BasicHtmlEditor extends React.Component {
     this.handlePastedText = this._handlePastedText.bind(this);
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
     this.handleImage = this._handleImage.bind(this);
+    this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -379,7 +389,7 @@ class BasicHtmlEditor extends React.Component {
 
   _handleDroppedFiles(selection, files) {
     files.map(file => {
-      if (file.type === 'image/png' || file.type === 'image/jpg') {
+      if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
         if (file.size <= 5000000) {
           // const newEditorState = this.handleImage();
           // this.onChange(newEditorState);
@@ -388,9 +398,19 @@ class BasicHtmlEditor extends React.Component {
             const newEditorState = this.handleImage(url);
             this.onChange(newEditorState);
           });
+        } else {
+          alertify.warning(`Image size cannot exceed 5MB. The image dropped was ${(file.size / 1000000).toFixed(2)}MB`);
         }
+      } else {
+        alertify.warning(`Image type must be PNG or JPEG. The file dropped was ${file.type}.`);
       }
     });
+  }
+
+  _onImageUploadClicked(acceptedFiles, rejectedFiles) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    this.handleDroppedFiles(selection, acceptedFiles);
   }
 
   render() {
@@ -479,6 +499,7 @@ class BasicHtmlEditor extends React.Component {
             externalControls={this.EXTERNAL_CONTROLS}
             active={props.files.length > 0}
             />
+            <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
             <BlockStyleControls
             editorState={editorState}
             blockTypes={this.BLOCK_TYPES}
@@ -493,6 +514,7 @@ class BasicHtmlEditor extends React.Component {
           <div style={{padding: 3, marginRight: 10}}>
             <i
             className='fa fa-circle pointer'
+            accept='image/*'
             style={{color: state.isStyleBlockOpen ? blue200 : grey300}}
             onClick={this.onCheck}
             />

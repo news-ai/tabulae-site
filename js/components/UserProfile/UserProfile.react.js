@@ -167,14 +167,15 @@ class UserProfile extends Component {
                   /> : <ConnectToGmail/>}
               </div>
             </div>}
-            <div className='row vertical-center' style={{height: 70, margin: '5px 0'}}>
+            {/*<div className='row vertical-center' style={{height: 100, margin: '5px 0'}}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Email Signature</span>
               </div>
               <div className='large-8 medium-7 columns'>
                 <EmailSignatureEditor/>
               </div>
-            </div>
+            </div>*/
+          }
           </div>
         </div>
         <div className='row horizontal-center'>

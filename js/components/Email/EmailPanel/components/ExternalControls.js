@@ -6,16 +6,18 @@ export default function ExternalControls(props) {
 
   return (
     <div className='RichEditor-controls' style={{display: 'flex'}}>
-      {externalControls.map(type =>
-        <StyleButton
-        key={type.label}
-        label={type.label}
-        active={props.active}
-        onToggle={type.onToggle}
-        style={type.style}
-        icon={type.icon}
-        />
-      )}
+      {externalControls.map(type => {
+        const active = type.isActive();
+        return (
+          <StyleButton
+          key={type.label}
+          label={type.label}
+          active={active}
+          onToggle={type.onToggle}
+          style={type.style}
+          icon={type.icon}
+          />);
+      })}
     </div>
   );
 }
