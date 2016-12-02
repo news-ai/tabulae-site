@@ -57,7 +57,8 @@ class GenericFeed extends Component {
         </AutoSizer>);
     const renderNode = (
       <div>
-        {props.feed
+        {
+          !props.hideEmptyPlaceholder && props.feed
           && !props.didInvalidate
           && props.feed.length === 0
           && <div className='row' style={styleEmptyRow}><p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}

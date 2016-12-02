@@ -22,7 +22,7 @@ const toggleStyle = {
   }
 };
 
-class EmailAnalytics extends Component {
+class ArchivedAnalytics extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -86,7 +86,7 @@ class EmailAnalytics extends Component {
 const mapStateToProps = (state, props) => {
   const sentEmails = state.stagingReducer.received
   .filter(id => state.stagingReducer[id].delivered)
-  .filter(id => !state.stagingReducer[id].archived)
+  .filter(id => state.stagingReducer[id].archived)
   .map(id => {
     let email = state.stagingReducer[id];
     if (email.listid !== 0 && state.listReducer[email.listid]) {
@@ -116,4 +116,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(EmailAnalytics);
+)(ArchivedAnalytics);

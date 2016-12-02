@@ -14,7 +14,7 @@ import {tour} from './tour';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-import {grey400} from 'material-ui/styles/colors';
+import {grey400, grey700} from 'material-ui/styles/colors';
 import Dialog from 'material-ui/Dialog';
 
 const FEED_PADDING = 20;
@@ -86,7 +86,7 @@ class ListFeed extends Component {
         </div>
         {props.feed && props.feed.length === 0 &&
           <div className='row horizontal-center vertical-center' style={{height: 400}}>
-            <span>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to see a master feed of all the posts here.</span>
+            <span style={{color: grey700}}>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to contacts in Table to see a master feed of all the posts here.</span>
           </div>}
         <div className='row horizontal-center'>
           <MixedFeed
@@ -94,6 +94,7 @@ class ListFeed extends Component {
           rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}}
           containerWidth={state.screenWidth < 800 ? state.screenWidth : 800}
           fetchFeed={props.fetchListFeed}
+          hideEmptyPlaceholder
           {...props}
           />
         </div>

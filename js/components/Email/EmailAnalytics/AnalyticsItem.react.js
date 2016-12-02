@@ -8,11 +8,14 @@ import {
   deepOrange700,
   deepOrange900,
   grey50,
+  grey400,
+  grey600,
   grey800
 } from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
 import * as actions from '../EmailAttachment/actions';
+import * as actionCreators from 'actions/AppActions';
 
 import moment from 'moment-timezone';
 import alertify from 'alertifyjs';
@@ -26,7 +29,7 @@ const styles = {
   },
   wrapper: {
     width: '100%',
-    padding: 15,
+    padding: 12,
     // border: '1px gray solid',
     borderRadius: '1.2em',
     margin: 5,
@@ -83,13 +86,21 @@ class AnalyticsItem extends Component {
       attachments,
       sendat,
       cc,
-      bcc
+      bcc,
+      archiveEmail
     } = this.props;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let date = moment(sendat);
     return (
       <div style={wrapperStyle}>
+        <FontIcon
+        className='pointer fa fa-times right'
+        style={{fontSize: '0.9em'}}
+        color={grey400}
+        hoverColor={grey600}
+        onClick={archiveEmail}
+        />
         {
           listid !== 0 && <div className='row'>
             <div className='small-12 medium-6 large-6 columns left'>
@@ -141,7 +152,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(actions.fetchAttachment(id)))
+    fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(actions.fetchAttachment(id))),
+    archiveEmail: _ => dispatch(actionCreators.archiveEmail(props.id)) 
   };
 };
 

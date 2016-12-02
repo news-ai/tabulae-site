@@ -11,6 +11,17 @@ import * as api from '../../actions/api';
 
 const emailSchema = new Schema('emails');
 
+export function archiveEmail(emailId) {
+  return dispatch => {
+    dispatch({type: 'ARCHIVE_EMAIL', emailId});
+    return api.get(`/emails/${emailId}/archive`)
+    .then(response => {
+      const res = normalize(response, {data: emailSchema});
+      return dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result.data});
+    });
+  };
+}
+
 export function cancelScheduledEmail(id) {
   return (dispatch, getState) => {
     dispatch({type: 'CANCEL_SCHEDULED_EMAIL', id});
