@@ -14,6 +14,11 @@ import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
 import * as actions from '../EmailAttachment/actions';
 
+import moment from 'moment-timezone';
+import alertify from 'alertifyjs';
+
+const FORMAT = 'dddd, MMMM HH:mm';
+
 const styles = {
   analytics: {
     display: 'flex',
@@ -75,22 +80,25 @@ class AnalyticsItem extends Component {
       listid,
       listname,
       updated,
-      attachments
+      attachments,
+      sendat,
+      cc,
+      bcc
     } = this.props;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
-    const SUBTRING_LIMIT = 18;
-    const date = new Date(updated);
+    const SUBTRING_LIMIT = 20;
+    let date = moment(sendat);
     return (
       <div style={wrapperStyle}>
         {
           listid !== 0 && <div className='row'>
-            <div className='small-12 large-6 columns left'>
+            <div className='small-12 medium-6 large-6 columns left'>
               <span style={styles.sentFrom}>Sent from List</span>
               <span style={{margin: '0 5px'}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
               {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
             </div>
-            <div className='small-12 large-6 columns right'>
-              <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>{date.toDateString()} {date.toTimeString()}</span>
+            <div className='small-12 medium-6 large-6 columns right'>
+              <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>Sent at: {date.tz(moment.tz.guess()).format(FORMAT)}</span>
             </div>
           </div>
         }
@@ -106,8 +114,8 @@ class AnalyticsItem extends Component {
             <span style={styles.to}>To</span>
             <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
-          <div className='small-12 medium-3 large-5 columns'>
-            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
+          <div className='small-12 medium-5 large-5 columns'>
+            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
             {!delivered && <div style={styles.errorText}>
               <span>Something went wrong on our end. Let us know!</span>
               <p>Email ID: {id}</p>
@@ -115,10 +123,10 @@ class AnalyticsItem extends Component {
             {bounced && <span style={styles.errorText}>email bounced</span>}
             {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
           </div>
-          <div className='small-12 medium-3 large-2 columns' style={{marginTop: 10}}>
+          <div className='small-12 medium-2 large-2 columns' style={{marginTop: 10}}>
             {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />}
           </div>
-          <div className='small-12 medium-3 large-2 columns' style={{marginTop: 10}}>
+          <div className='small-12 medium-2 large-2 columns' style={{marginTop: 10}}>
             {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>}
           </div>
         </div>

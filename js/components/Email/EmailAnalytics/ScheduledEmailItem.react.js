@@ -69,7 +69,9 @@ class ScheduledEmailItem extends Component {
       updated,
       sendat,
       onCancelClick,
-      cancel
+      cancel,
+      cc,
+      bcc
     } = this.props;
     const wrapperStyle = styles.wrapper;
     const SUBTRING_LIMIT = 18;
