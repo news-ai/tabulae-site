@@ -12,7 +12,7 @@ class ConnectToGmail extends Component {
 
   render() {
     const actions = [
-      <FlatButton primary keyboardFocused label='Connect to Gmail' onClick={_ => this.setState({open: false})}/>,
+      <FlatButton primary keyboardFocused label='Connect to Gmail' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/gmail')}/>,
       <FlatButton primary label='Cancel' onClick={_ => this.setState({open: false})}/>
     ];
     return (
@@ -30,12 +30,12 @@ class ConnectToGmail extends Component {
             <span>
               By connecting your Inbox, it means that <strong>Tabulae will have access to email information</strong> like:
             </span>
-            <ul>
-              <li>which email addresses you are sending emails to</li>
-              <li>which email addresses you are sending emails from</li>
-              <li>the subject lines and body content of your emails</li>
-            </ul>
           </p>
+          <ul>
+            <li>which email addresses you are sending emails to</li>
+            <li>which email addresses you are sending emails from</li>
+            <li>the subject lines and body content of your emails</li>
+          </ul>
           <p>
             <span>
               To be sure, you can remove this integration at anytime. <strong>We will only access emails sent through Tabulae and not any other emails in your Inbox.</strong>
@@ -50,7 +50,7 @@ class ConnectToGmail extends Component {
             Just as a reminder, you logged in with: <span style={{color: blue600}}>{this.props.person.email}</span>
           </p>
         </Dialog>
-        <FlatButton primary label='Connect' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/gmail')}/>
+        <FlatButton primary label='Connect' onClick={_ => this.setState({open: true})}/>
       </div>
       );
   }
