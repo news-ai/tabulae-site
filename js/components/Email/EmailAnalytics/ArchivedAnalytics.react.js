@@ -54,7 +54,7 @@ class ArchivedAnalytics extends Component {
           <div className='large-10 large-offset-1 columns'>
           <ScheduledEmails/>
             <div style={{margin: '20px 0'}}>
-              <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
+              <span style={{fontSize: '1.3em', marginRight: '10px'}}>Archived Emails</span>
             </div>
             {props.lists &&
               <div>
@@ -68,6 +68,7 @@ class ArchivedAnalytics extends Component {
             <div style={{margin: '30px 0'}}>
               {emails.map((email, i) =>
                 <AnalyticsItem
+                archived
                 key={i}
                 {...email}
                 />)}

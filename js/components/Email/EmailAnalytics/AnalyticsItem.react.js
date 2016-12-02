@@ -87,20 +87,21 @@ class AnalyticsItem extends Component {
       sendat,
       cc,
       bcc,
-      archiveEmail
+      archiveEmail,
+      archived
     } = this.props;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let date = moment(sendat);
     return (
       <div style={wrapperStyle}>
-        <FontIcon
+        {!archived && <FontIcon
         className='pointer fa fa-times right'
         style={{fontSize: '0.9em'}}
         color={grey400}
         hoverColor={grey600}
         onClick={archiveEmail}
-        />
+        />}
         {
           listid !== 0 && <div className='row'>
             <div className='small-12 medium-6 large-6 columns left'>

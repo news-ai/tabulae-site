@@ -44,7 +44,7 @@ import Table from './components/pages/Table.react';
 import SearchBar from './components/Search';
 import OnboardingWrapper from './components/OnboardingWrapper';
 import {EmailAnalytics} from './components/Email';
-import ArchivedAnalytics from './component/Email/EmailAnalytics/ArchivedAnalytics.react';
+import ArchivedAnalytics from './components/Email/EmailAnalytics/ArchivedAnalytics.react';
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
