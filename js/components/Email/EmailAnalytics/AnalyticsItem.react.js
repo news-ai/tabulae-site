@@ -17,7 +17,7 @@ import * as actions from '../EmailAttachment/actions';
 import moment from 'moment-timezone';
 import alertify from 'alertifyjs';
 
-const FORMAT = 'dddd, MMMM HH:mm';
+const FORMAT = 'dddd, MMMM Do hh:mm A';
 
 const styles = {
   analytics: {
