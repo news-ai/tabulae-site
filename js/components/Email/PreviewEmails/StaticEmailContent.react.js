@@ -31,13 +31,15 @@ const AttachmentLineItem = props => {
     </div>);
 };
 
-function StaticEmailContent({to, subject, body, sendat, attachments, files}) {
+function StaticEmailContent({to, subject, body, sendat, attachments, files, cc, bcc}) {
   let date;
   if (sendat !== null && sendat !== '0001-01-01T00:00:00Z') date = moment(sendat);
   return (
     <div className='u-full-width' style={styles.content}>
       <div className='vertical-center' style={styles.span}><strong style={styles.strong}>To</strong>{to}</div>
       <div className='vertical-center' style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</div>
+      {cc !== null && <div className='vertical-center' style={styles.span}><strong style={styles.strong}>CC</strong>{cc.join(', ')}</div>}
+      {bcc !== null && <div className='vertical-center' style={styles.span}><strong style={styles.strong}>BCC</strong>{bcc.join(', ')}</div>}
       {attachments !== null &&
         <div>
           {files.map((file, i) => <AttachmentLineItem key={`attachment-${file.id}`} {...file}/>)}

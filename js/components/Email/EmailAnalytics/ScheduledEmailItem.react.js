@@ -13,7 +13,7 @@ import {
 import moment from 'moment-timezone';
 import alertify from 'alertifyjs';
 
-const FORMAT = 'dddd, MMMM HH:mm';
+const FORMAT = 'dddd, MMMM Do hh:mm A';
 
 const styles = {
   analytics: {
@@ -69,7 +69,9 @@ class ScheduledEmailItem extends Component {
       updated,
       sendat,
       onCancelClick,
-      cancel
+      cancel,
+      cc,
+      bcc
     } = this.props;
     const wrapperStyle = styles.wrapper;
     const SUBTRING_LIMIT = 18;
