@@ -43,8 +43,13 @@ import PublicListsContainer from './components/Lists/PublicListsContainer.react'
 import Table from './components/pages/Table.react';
 import SearchBar from './components/Search';
 import OnboardingWrapper from './components/OnboardingWrapper';
+
 import {EmailAnalytics} from './components/Email';
 import ArchivedAnalytics from './components/Email/EmailAnalytics/ArchivedAnalytics.react';
+import SentEmailsPaginationContainer from './components/Email/EmailAnalytics/SentEmailsPaginationContainer.react';
+import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
+import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
+
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
@@ -109,7 +114,10 @@ ReactDOM.render(
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
-            <Route path='emailstats' name='Sent & Scheduled Emails' component={EmailAnalytics} />
+            <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsPaginationContainer}>
+              <IndexRoute component={AllSentEmailsContainer}/>
+              <Route path='lists/:listId' component={ListSentEmailsContainer}/>
+            </Route>
             <Route path='emailstats/trash' name='Emails -- Trash' component={ArchivedAnalytics} />
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />

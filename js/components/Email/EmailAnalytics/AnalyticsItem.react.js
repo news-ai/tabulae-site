@@ -148,7 +148,9 @@ class AnalyticsItem extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  return {};
+  return {
+    listname: state.listReducer[props.listid].name
+  };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
