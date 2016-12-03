@@ -36,7 +36,6 @@ class SentEmailsPaginationContainer extends Component {
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
     const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />]
     .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
-    console.log(state.filterValue);
     return (
       <div className='row'>
         <div className='large-10 large-offset-1 columns'>

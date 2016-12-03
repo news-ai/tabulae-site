@@ -95,19 +95,19 @@ class AnalyticsItem extends Component {
     let date = moment(sendat);
     return (
       <div style={wrapperStyle}>
-        {!archived && <FontIcon
-        className='pointer fa fa-times right'
-        style={{fontSize: '0.9em'}}
-        color={grey400}
-        hoverColor={grey600}
-        onClick={archiveEmail}
-        />}
         {
           listid !== 0 && <div className='row'>
             <div className='small-12 medium-6 large-6 columns left'>
               <span style={styles.sentFrom}>Sent from List</span>
               <span style={{margin: '0 5px'}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
               {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
+              {!archived && <FontIcon
+              className='pointer fa fa-trash'
+              style={{fontSize: '16px'}}
+              color={grey400}
+              hoverColor={grey600}
+              onClick={archiveEmail}
+              />}
             </div>
             <div className='small-12 medium-6 large-6 columns right'>
               <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>Sent at: {date.tz(moment.tz.guess()).format(FORMAT)}</span>

@@ -38,8 +38,12 @@ function stagingReducer(state = initialState.stagingReducer, action) {
     case RECEIVE_MULTIPLE_EMAILS:
       obj = assignToEmpty(state, action.emails);
       if (action.contactId) {
-        obj.contactOffset = assignToEmpty(state.contactOffset, {});
-        obj.contactOffset[action.contactId] = action.offset;
+        obj.contactOffsets = assignToEmpty(state.contactOffsets, {});
+        obj.contactOffsets[action.contactId] = action.offset;
+      }
+      if (action.listId) {
+        obj.listOffsets = assignToEmpty(state.listOffsets, {});
+        obj.listOffsets[action.listId] = action.offset;
       }
       const unseen = action.ids.filter(id => !state[id]);
       const unsorted = state.received.concat(unseen);

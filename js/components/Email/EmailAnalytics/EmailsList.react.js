@@ -1,15 +1,29 @@
-import React from 'react';
+import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
+import InfiniteScroll from '../../InfiniteScroll';
 
-const EmailsLists = ({emails}) => {
-  return (
-    <div style={{margin: '30px 0'}}>
-      {emails.map((email, i) =>
-        <AnalyticsItem
-        key={i}
-        {...email}
-        />)}
-    </div>);
-};
+class EmailsList extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-export default EmailsLists;
+  componentWillMount() {
+    this.props.fetchEmails();
+  }
+
+  render() {
+    return (
+      <InfiniteScroll onScrollBottom={this.props.fetchEmails}>
+        <div style={{margin: '30px 0'}}>
+          {this.props.emails.map((email, i) =>
+            <AnalyticsItem
+            key={i}
+            {...email}
+            />)}
+        </div>
+      </InfiniteScroll>
+      );
+  }
+}
+
+export default EmailsList;

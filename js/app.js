@@ -46,7 +46,7 @@ import OnboardingWrapper from './components/OnboardingWrapper';
 
 import {EmailAnalytics} from './components/Email';
 import ArchivedAnalytics from './components/Email/EmailAnalytics/ArchivedAnalytics.react';
-import SentEmailsPaginationContainer from './components/Email/EmailAnalytics/SentEmailsPaginationContainer.react';
+import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsContainer.react';
 import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
 import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
 
@@ -114,7 +114,7 @@ ReactDOM.render(
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
-            <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsPaginationContainer}>
+            <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
               <IndexRoute component={AllSentEmailsContainer}/>
               <Route path='lists/:listId' component={ListSentEmailsContainer}/>
             </Route>
