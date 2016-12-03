@@ -41,7 +41,16 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         obj.contactOffset = assignToEmpty(state.contactOffset, {});
         obj.contactOffset[action.contactId] = action.offset;
       }
-      obj.received = state.received.concat(action.ids.filter(id => !state.received.some(seenId => seenId === id)));
+      const unseen = action.ids.filter(id => !state[id]);
+      const unsorted = state.received.concat(unseen);
+      unsorted.sort( function(aId, bId) {
+        const aDate = new Date(obj[aId].sendat);
+        const bDate = new Date(obj[bId].sendat);
+        if (aDate > bDate) return -1;
+        if (aDate < bDate) return 1;
+        return 0;
+      });
+      obj.received = unsorted;
       obj.isReceiving = false;
       return obj;
     case EMAIL_SET_OFFSET:
