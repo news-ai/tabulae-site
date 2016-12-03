@@ -149,7 +149,7 @@ class AnalyticsItem extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    listname: state.listReducer[props.listid].name
+    listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined
   };
 };
 

@@ -6,6 +6,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
 
+import './SentEmails.css';
 
 class SentEmailsPaginationContainer extends Component {
   constructor(props) {
@@ -42,14 +43,16 @@ class SentEmailsPaginationContainer extends Component {
           <div style={{margin: '20px 0'}}>
             <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
           </div>
-          {props.lists &&
-            <div className='row right'>
-              <span>Filter by List: </span>
-              <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
-              {selectable}
-              </DropDownMenu>
+            <div className='row'>
+              {props.lists &&
+                <div className='large-12 columns vertical-center'>
+                  <span>Filter by List: </span>
+                  <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+                  {selectable}
+                  </DropDownMenu>
+                </div>
+              }
             </div>
-            }
           {props.children}
         </div>
       </div>
