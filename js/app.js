@@ -48,6 +48,7 @@ import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsCon
 import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
 import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSentEmailsContainer.react';
 import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
+import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
 
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
@@ -116,6 +117,7 @@ ReactDOM.render(
             <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
               <IndexRoute component={AllSentEmailsContainer}/>
               <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
+              <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
               <Route path='lists/:listId' name='List' component={ListSentEmailsContainer}/>
             </Route>
             <Route path='search' name='Search' component={SearchBar} />

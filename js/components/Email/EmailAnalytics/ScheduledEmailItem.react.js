@@ -106,10 +106,10 @@ class ScheduledEmailItem extends Component {
             <span style={styles.to}>To</span>
             <span style={{color: grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
-          <div className='small-12 medium-3 large-5 columns'>
+          <div className='small-12 medium-5 large-5 columns'>
             <span onClick={_ => this.setState({isPreviewOpen: true})} style={styles.subjectText}>{subject.substring(0, 30)} {subject.length > 20 && `...`}</span>
           </div>
-          <div className='small-12 medium-3 large-4 columns horizontal-center'>
+          <div className='small-12 medium-4 large-4 columns horizontal-center'>
             {!cancel &&
               <FlatButton
               onClick={_ =>
@@ -125,6 +125,11 @@ class ScheduledEmailItem extends Component {
       );
   }
 }
+const mapStateToProps = (state, props) => {
+  return {
+    listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined
+  };
+};
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
@@ -132,4 +137,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(null, mapDispatchToProps)(ScheduledEmailItem);
+export default connect(mapStateToProps, mapDispatchToProps)(ScheduledEmailItem);

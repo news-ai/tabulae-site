@@ -5,6 +5,9 @@ import * as actionCreators from '../../../actions/AppActions';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
+import IconButton from 'material-ui/IconButton';
+import Badge from 'material-ui/Badge';
+import Link from 'react-router/lib/Link';
 
 import './SentEmails.css';
 
@@ -41,17 +44,29 @@ class SentEmailsPaginationContainer extends Component {
       <div className='row'>
         <div className='large-10 large-offset-1 columns'>
           <div style={{margin: '20px 0'}}>
-            <span style={{fontSize: '1.3em', marginRight: '10px'}}>Emails You Sent</span>
+            <span style={{fontSize: '1.3em', marginRight: 10}}>Emails You Sent</span>
           </div>
             <div className='row'>
-              {props.lists &&
-                <div className='large-12 columns vertical-center'>
-                  <span>Filter by List: </span>
-                  <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
-                  {selectable}
-                  </DropDownMenu>
+              <div className='large-12 medium-12 small-12 columns'>
+                {props.lists &&
+                  <div className='vertical-center left'>
+                    <span>Filter by List: </span>
+                    <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+                    {selectable}
+                    </DropDownMenu>
+                  </div>
+                }
+                <div className='right'>
+                  <Link to='emailstats/trash'><IconButton tooltip='Go to Trash' iconClassName='fa fa-trash'/></Link>
+                  <Badge
+                  secondary
+                  badgeContent={10}
+                  badgeStyle={{top: 12, right: 12}}
+                  >
+                    <Link to='emailstats/scheduled'><IconButton tooltip='Scheduled Emails' iconClassName='fa fa-calendar'/></Link>
+                  </Badge>
                 </div>
-              }
+              </div>
             </div>
           {props.children}
         </div>

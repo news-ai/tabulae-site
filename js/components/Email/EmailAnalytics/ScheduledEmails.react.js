@@ -1,35 +1,36 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import ScheduledEmailItem from './ScheduledEmailItem.react';
+import * as actions from '../actions';
+import InfiniteScroll from '../../InfiniteScroll';
 
-const ScheduledEmails = ({emails}) => {
-  return emails.length > 0 ? (
-    <div className='large-12 medium-12 small-12 columns'>
-      <div style={{margin: '20px 0'}}>
-        <span style={{fontSize: '1.3em', marginRight: '10px'}}>Scheduled Emails</span>
+const ScheduledEmails = props => {
+  return (
+    <InfiniteScroll onScrollBottom={props.fetchEmails}>
+      <div style={{margin: '30px 0'}}>
+        {props.emails.map((email, i) =>
+          <ScheduledEmailItem
+          key={i}
+          {...email}
+          />)}
+        {props.emails.length === 0 && <span>No emails scheduled for delivery.</span>}
       </div>
-     {emails.map((email, i) =>
-        <ScheduledEmailItem
-        key={i}
-        {...email}
-        />)}
-    </div>
-  ) : null;
+    </InfiniteScroll>);
 };
 
 const mapStateToProps = (state, props) => {
   const rightNow = new Date();
   const emails = state.stagingReducer.received
   .filter(id => !state.stagingReducer[id].delivered)
-  .map(id => {
-    let email = state.stagingReducer[id];
-    if (email.listid !== 0 && state.listReducer[email.listid]) email.listname = state.listReducer[email.listid].name;
-    return email;
-  })
+  .map(id => state.stagingReducer[id])
   .filter(email => new Date(email.sendat) > rightNow);
+  return {emails};
+};
+
+const mapDispatchToProps = (dispatch, props) => {
   return {
-    emails
+    fetchEmails: _ => dispatch(actions.fetchSentEmails()),
   };
 };
 
-export default connect(mapStateToProps)(ScheduledEmails);
+export default connect(mapStateToProps, mapDispatchToProps)(ScheduledEmails);

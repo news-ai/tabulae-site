@@ -160,7 +160,7 @@ class App extends Component {
           <div className='hide-for-small-only medium-4 large-3 columns vertical-center horizontal-center clearfix'>
             <RaisedButton
             className='right'
-            label='Invite friends, get 1 month'
+            label='Invite friends'
             labelColor='white'
             backgroundColor={blue300}
             labelStyle={{textTransform: 'none'}}
