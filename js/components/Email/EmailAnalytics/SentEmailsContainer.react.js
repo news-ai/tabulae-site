@@ -22,7 +22,7 @@ class SentEmailsPaginationContainer extends Component {
     this.state = {
       filterValue: this.props.listId,
       isShowingArchived: false,
-      activeKey: this.props.location.pathname,
+      activeKey: this.props.listId > 0 ? '/emailstats' : this.props.location.pathname,
       start: 0,
     };
     this.handleChange = (event, index, filterValue) => {
@@ -61,7 +61,7 @@ class SentEmailsPaginationContainer extends Component {
           </div>
             <div className='row'>
             <Tabs
-            defaultActiveKey={props.location.pathname}
+            defaultActiveKey='/emailstats'
             activeKey={state.activeKey}
             onChange={this.onTabChange}
             renderTabBar={()=><ScrollableInkTabBar />}
