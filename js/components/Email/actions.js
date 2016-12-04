@@ -11,6 +11,17 @@ import * as api from '../../actions/api';
 
 const emailSchema = new Schema('emails');
 
+export function archiveEmail(emailId) {
+  return dispatch => {
+    dispatch({type: 'ARCHIVE_EMAIL', emailId});
+    return api.get(`/emails/${emailId}/archive`)
+    .then(response => {
+      const res = normalize(response, {data: emailSchema});
+      return dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result.data});
+    });
+  };
+}
+
 export function cancelScheduledEmail(id) {
   return (dispatch, getState) => {
     dispatch({type: 'CANCEL_SCHEDULED_EMAIL', id});
@@ -108,7 +119,7 @@ export function fetchSentEmails() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().stagingReducer.offset;
-    if (OFFSET === null) return;
+    if (OFFSET === null || getState().stagingReducer.isReceiving) return;
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {
@@ -130,9 +141,14 @@ export function fetchSentEmails() {
 }
 
 export function fetchListEmails(listId) {
-  return (dispatch) => {
-    dispatch({type: REQUEST_MULTIPLE_EMAILS});
-    return api.get(`/lists/${listId}/emails`)
+  const PAGE_LIMIT = 20;
+  return (dispatch, getState) => {
+    let OFFSET = getState().stagingReducer.listOffsets[listId];
+    const isReceiving = getState().stagingReducer.isReceiving;
+    if (OFFSET === null || isReceiving) return;
+    if (!OFFSET) OFFSET = 0;
+    dispatch({type: REQUEST_MULTIPLE_EMAILS, listId});
+    return api.get(`/lists/${listId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then( response => {
       const res = normalize(response, {
         data: arrayOf(emailSchema)
@@ -140,7 +156,9 @@ export function fetchListEmails(listId) {
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
         emails: res.entities.emails,
-        ids: res.result.data
+        ids: res.result.data,
+        listId,
+        offset: res.result.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT
       });
     })
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
@@ -150,11 +168,11 @@ export function fetchListEmails(listId) {
 export function fetchContactEmails(contactId) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
-    let OFFSET = getState().stagingReducer.contactOffset[contactId];
+    let OFFSET = getState().stagingReducer.contactOffsets[contactId];
     const isReceiving = getState().stagingReducer.isReceiving;
     if (OFFSET === null || isReceiving) return;
     if (!OFFSET) OFFSET = 0;
-    dispatch({type: REQUEST_MULTIPLE_EMAILS});
+    dispatch({type: REQUEST_MULTIPLE_EMAILS}, contactI);
     return api.get(`/contacts/${contactId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const res = normalize(response, {

@@ -43,7 +43,13 @@ import PublicListsContainer from './components/Lists/PublicListsContainer.react'
 import Table from './components/pages/Table.react';
 import SearchBar from './components/Search';
 import OnboardingWrapper from './components/OnboardingWrapper';
-import {EmailAnalytics} from './components/Email';
+
+import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsContainer.react';
+import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
+import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSentEmailsContainer.react';
+import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
+import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
+
 import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
 import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
@@ -81,6 +87,7 @@ if (module.hot) {
 
 // wrap components that we want onboarding to, pass down props like routes
 const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
+// <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
 
 ReactDOM.render(
   <MultiThemeProvider>
@@ -107,8 +114,12 @@ ReactDOM.render(
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
             <Route path='settings' name='Profile Settings' component={UserProfile} />
-            <Route path='emailstats' name='Sent & Scheduled Emails' component={EmailAnalytics} />
-            <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
+            <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
+              <IndexRoute component={AllSentEmailsContainer}/>
+              <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
+              <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
+              <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
+            </Route>
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
             <Route path='*' staticName name='Not Found' component={NotFound} />
