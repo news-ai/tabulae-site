@@ -68,21 +68,27 @@ class SentEmailsPaginationContainer extends Component {
             renderTabContent={()=><TabContent />}
             >
               <TabPane placeholder={<span>Placeholder</span>} tab='All Sent Emails' key='/emailstats'>
-              {props.lists &&
-                  <div className='left'>
-                    <span>Filter by List: </span>
-                    <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
-                    {selectable}
-                    </DropDownMenu>
-                  </div>
-                }
-                {props.children}
+                <div style={{margin: 5}}>
+                  {props.lists &&
+                    <div className='left'>
+                      <span>Filter by List: </span>
+                      <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+                      {selectable}
+                      </DropDownMenu>
+                    </div>
+                    }
+                    {props.children}
+                </div>
               </TabPane>
               <TabPane placeholder={<span>Placeholder</span>} tab='Scheduled Emails' key='/emailstats/scheduled'>
+                <div style={{margin: 5}}>
                 {props.children}
+                </div>
               </TabPane>
               <TabPane placeholder={<span>Placeholder</span>} tab='Trash' key='/emailstats/trash'>
+                <div style={{margin: 5}}>
                 {props.children}
+                </div>
               </TabPane>
             </Tabs>
             </div>

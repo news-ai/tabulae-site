@@ -118,7 +118,7 @@ ReactDOM.render(
               <IndexRoute component={AllSentEmailsContainer}/>
               <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
               <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
-              <Route path='lists/:listId' name='List' component={ListSentEmailsContainer}/>
+              <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
             </Route>
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
