@@ -174,8 +174,7 @@ class UserProfile extends Component {
               <div className='large-8 medium-7 columns'>
                 <EmailSignatureEditor/>
               </div>
-            </div>*/
-          }
+            </div>*/}
           </div>
         </div>
         <div className='row horizontal-center'>
