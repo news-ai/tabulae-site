@@ -26,6 +26,7 @@
     "numbro": "^1.9.3",
     "pikaday": "^1.4.0",
     "radium": "^0.18.1",
+    "rc-tabs": "^7.0.13",
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.2.1",
     "react-addons-shallow-compare": "^15.3.2",

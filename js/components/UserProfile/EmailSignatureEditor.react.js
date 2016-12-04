@@ -72,8 +72,8 @@ class EmailSignatureEditor extends Component {
         EditorState.createEmpty(decorator),
       html: this.props.html,
       editing: false,
-      finished: false,
-      showToolbar: false
+      showToolbar: false,
+      dirty: false
     };
 
     this.emitHTML = (editorState) => {
@@ -166,6 +166,7 @@ class EmailSignatureEditor extends Component {
     }
     // only emit html when content changes
     if (previousContent !== editorState.getCurrentContent()) {
+      if (!this.state.dirty) this.setState({dirty: true});
       this.emitHTML(editorState);
     }
   }
@@ -179,7 +180,7 @@ class EmailSignatureEditor extends Component {
       emailsignature: this.state.html
     };
     this.setState({editing: false});
-    this.props.patchPerson(person).then(_ => this.setState({finished: true}));
+    // this.props.patchPerson(person).then(_ => this.setState({finished: true}));
   }
 
   render() {
@@ -192,21 +193,18 @@ class EmailSignatureEditor extends Component {
           editorState={editorState}
           onChange={this.onChange}
           placeholder='Email Signature goes here...'
-          onBlur={this.onSave}
           onFocus={_ => this.setState({editing: true, finished: false})}
           />
         </div>
-        {/*state.showToolbar &&
+        {state.showToolbar &&
           <div>
             <EntityControls
             editorState={editorState}
             entityControls={this.ENTITY_CONTROLS}
             />
-          </div>*/
+          </div>
           }
-        <span
-        style={{fontSize: '0.8em', color: grey500, float: 'right', height: 14}}
-        >{state.finished ? 'Saved.' : (state.editing ? 'Editing...' : ' ')}</span>
+        {state.dirty && <button className='button' onClick={this.onSave}>Save</button>}
       </div>
       );
   }
