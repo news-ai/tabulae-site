@@ -6,6 +6,10 @@ class InfiniteScroll extends Component {
     this.onScrollBottom = this._onScrollBottom.bind(this);
   }
 
+  componentWillMount() {
+    this.props.onScrollBottom();
+  }
+
   componentDidMount() {
     window.addEventListener('scroll', this.onScrollBottom);
   }

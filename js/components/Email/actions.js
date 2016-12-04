@@ -119,7 +119,7 @@ export function fetchSentEmails() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().stagingReducer.offset;
-    if (OFFSET === null) return;
+    if (OFFSET === null || getState().stagingReducer.isReceiving) return;
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {

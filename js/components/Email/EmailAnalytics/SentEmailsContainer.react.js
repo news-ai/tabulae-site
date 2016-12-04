@@ -9,6 +9,11 @@ import IconButton from 'material-ui/IconButton';
 import Badge from 'material-ui/Badge';
 import Link from 'react-router/lib/Link';
 
+import Tabs, { TabPane } from 'rc-tabs';
+import TabContent from 'rc-tabs/lib/TabContent';
+import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
+import 'rc-tabs/assets/index.css';
+
 import './SentEmails.css';
 
 class SentEmailsPaginationContainer extends Component {
@@ -16,13 +21,20 @@ class SentEmailsPaginationContainer extends Component {
     super(props);
     this.state = {
       filterValue: this.props.listId,
-      isShowingArchived: false
+      isShowingArchived: false,
+      activeKey: this.props.location.pathname,
+      start: 0,
     };
     this.handleChange = (event, index, filterValue) => {
       if (index === 0) this.props.router.push(`/emailstats`);
       else this.props.router.push(`/emailstats/lists/${filterValue}`);
       this.setState({filterValue});
     };
+    this.onTabChange = activeKey => {
+      this.props.router.push(activeKey);
+      this.setState({activeKey});
+    };
+    this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
   }
 
   componentWillMount() {
@@ -40,6 +52,7 @@ class SentEmailsPaginationContainer extends Component {
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
     const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />]
     .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
+
     return (
       <div className='row'>
         <div className='large-10 large-offset-1 columns'>
@@ -47,28 +60,32 @@ class SentEmailsPaginationContainer extends Component {
             <span style={{fontSize: '1.3em', marginRight: 10}}>Emails You Sent</span>
           </div>
             <div className='row'>
-              <div className='large-12 medium-12 small-12 columns'>
-                {props.lists &&
-                  <div className='vertical-center left'>
+            <Tabs
+            defaultActiveKey={props.location.pathname}
+            activeKey={state.activeKey}
+            onChange={this.onTabChange}
+            renderTabBar={()=><ScrollableInkTabBar />}
+            renderTabContent={()=><TabContent />}
+            >
+              <TabPane placeholder={<span>Placeholder</span>} tab='All Sent Emails' key='/emailstats'>
+              {props.lists &&
+                  <div className='left'>
                     <span>Filter by List: </span>
                     <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
                     {selectable}
                     </DropDownMenu>
                   </div>
                 }
-                <div className='right'>
-                  <Link to='emailstats/trash'><IconButton tooltip='Go to Trash' iconClassName='fa fa-trash'/></Link>
-                  <Badge
-                  secondary
-                  badgeContent={10}
-                  badgeStyle={{top: 12, right: 12}}
-                  >
-                    <Link to='emailstats/scheduled'><IconButton tooltip='Scheduled Emails' iconClassName='fa fa-calendar'/></Link>
-                  </Badge>
-                </div>
-              </div>
+                {props.children}
+              </TabPane>
+              <TabPane placeholder={<span>Placeholder</span>} tab='Scheduled Emails' key='/emailstats/scheduled'>
+                {props.children}
+              </TabPane>
+              <TabPane placeholder={<span>Placeholder</span>} tab='Trash' key='/emailstats/trash'>
+                {props.children}
+              </TabPane>
+            </Tabs>
             </div>
-          {props.children}
         </div>
       </div>
     );
