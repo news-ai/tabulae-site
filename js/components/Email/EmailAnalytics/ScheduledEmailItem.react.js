@@ -118,7 +118,7 @@ class ScheduledEmailItem extends Component {
               'Canceling email delivery cannot be undone. You would have to resend the email. Are you sure?',
               onCancelClick,
               _ => ({}))}
-              label='Cancel' secondary/>}
+              label='Cancel Delivery' secondary/>}
           </div>
         </div>
       </div>
