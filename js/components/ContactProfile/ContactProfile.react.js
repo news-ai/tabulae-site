@@ -17,7 +17,6 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
-import {Tabs, Tab} from 'material-ui/Tabs';
 import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
 
@@ -29,6 +28,11 @@ import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
+
+import Tabs, {TabPane} from 'rc-tabs';
+import TabContent from 'rc-tabs/lib/TabContent';
+import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
+import 'rc-tabs/assets/index.css';
 
 const styles = {
   smallIcon: {
@@ -42,6 +46,7 @@ const styles = {
   },
 };
 
+const Placeholder = props => <div style={{height: 700}}><span>Placeholder</span></div>;
 
 class ContactProfile extends Component {
   constructor(props) {
@@ -52,7 +57,8 @@ class ContactProfile extends Component {
       employerAutocompleteList: [],
       autoinput: '',
       tabContainerWidth: 800,
-      firsttime: this.props.firstTimeUser
+      firsttime: this.props.firstTimeUser,
+      activeKey: 'all'
     };
     this.togglePanel = this._togglePanel.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
@@ -66,6 +72,8 @@ class ContactProfile extends Component {
         this.setState({containerWidth});
       }
     };
+    this.onTabChange = activeKey => this.setState({activeKey});
+    this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
   }
 
   componentWillMount() {
@@ -282,22 +290,83 @@ class ContactProfile extends Component {
           </Dialog>
           <div className='large-12 columns' style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
             <FeedsController {...props} />
-              <Tabs ref='tabs' tabItemContainerStyle={{backgroundColor: grey50}}>
-                <Tab label='All' className='horizontal-center' style={{color: grey700}}>
-                  <MixedFeed containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                </Tab>
-                <Tab label='RSS only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                  <Headlines refName='rss' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                </Tab>
-                <Tab label='Tweets only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                  <TweetFeed refName='twitter' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                </Tab>
-                <Tab label='Instagram only' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                  <InstagramFeed refName='instagram' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                </Tab>
-                <Tab label='Sent Emails' style={{color: grey700, paddingLeft: 5, paddingRight: 5}}>
-                  <ContactEmails refName='emails' containerWidth={state.containerWidth} contactId={props.contactId} listId={props.listId} />
-                </Tab>
+              <Tabs
+              ref='tabs'
+              defaultActiveKey='/emailstats'
+              activeKey={state.activeKey}
+              onChange={this.onTabChange}
+              renderTabBar={() => <ScrollableInkTabBar/>}
+              renderTabContent={() => <TabContent/>}
+              >
+                <TabPane
+                placeholder={<Placeholder/>}
+                tab='All'
+                key='all'>
+                  <div style={{padding: 5}}>
+                    <MixedFeed
+                    containerHeight={700}
+                    containerWidth={state.containerWidth}
+                    contactId={props.contactId}
+                    listId={props.listId}
+                    />
+                  </div>
+                </TabPane>
+                <TabPane
+                placeholder={<Placeholder/>}
+                tab='RSS Only'
+                key='rss'>
+                  <div style={{padding: 5}}>
+                    <Headlines
+                    refName='rss'
+                    containerHeight={700}
+                    containerWidth={state.containerWidth}
+                    contactId={props.contactId}
+                    listId={props.listId}
+                    />
+                  </div>
+                </TabPane>
+                <TabPane
+                placeholder={<Placeholder/>}
+                tab='Tweets Only'
+                key='tweets'>
+                  <div style={{padding: 5}}>
+                    <TweetFeed
+                    refName='twitter'
+                    containerHeight={700}
+                    containerWidth={state.containerWidth}
+                    contactId={props.contactId}
+                    listId={props.listId}
+                    />
+                  </div>
+                </TabPane>
+                <TabPane
+                placeholder={<Placeholder/>}
+                tab='Instagram Only'
+                key='instagram'>
+                  <div style={{padding: 5}}>
+                    <InstagramFeed
+                    refName='instagram'
+                    containerHeight={700}
+                    containerWidth={state.containerWidth}
+                    contactId={props.contactId}
+                    listId={props.listId}
+                    />
+                  </div>
+                </TabPane>
+                <TabPane
+                placeholder={<span>Placeholder</span>}
+                tab='Sent Emails'
+                key='emails'>
+                  <div style={{padding: 5}}>
+                    <ContactEmails
+                    refName='emails'
+                    containerHeight={680}
+                    containerWidth={state.containerWidth}
+                    contactId={props.contactId}
+                    listId={props.listId}
+                    />
+                  </div>
+                </TabPane>
               </Tabs>
           </div>
         </div>
