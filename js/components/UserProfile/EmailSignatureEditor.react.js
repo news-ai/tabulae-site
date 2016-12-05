@@ -53,7 +53,7 @@ class EmailSignatureEditor extends Component {
     super(props);
     const decorator = new CompositeDecorator([
       {
-        strategy: findEntities.bind(null, 'link'),
+        strategy: findEntities.bind(null, 'LINK'),
         component: Link
       },
       {
@@ -61,6 +61,44 @@ class EmailSignatureEditor extends Component {
         component: CurlySpan
       }
     ]);
+    this.CONVERT_CONFIGS = {
+      htmlToEntity: (nodeName, node) => {
+        if (nodeName === 'a') {
+          if (node.firstElementChild === null) {
+            // LINK ENTITY
+            return Entity.create('LINK', 'MUTABLE', {url: node.href});
+          } else if (node.firstElementChild.nodeName === 'IMG') {
+            // IMG ENTITY
+            const imgNode = node.firstElementChild;
+            const src = imgNode.src;
+            const size = parseFloat(imgNode.style['max-height']) / 100;
+            const imageLink = node.href;
+            const entityKey = Entity.create('image', 'IMMUTABLE', {
+              src,
+              size,
+              imageLink
+            });
+            this.props.saveImageData(src);
+            this.props.saveImageEntityKey(src, entityKey);
+            this.props.setImageSize(src, size);
+            if (imageLink.length > 0) {
+              this.props.setImageLink(src, imageLink);
+            } else {
+              this.props.setImageLink(src, undefined);
+            }
+            return entityKey;
+          }
+        }
+      },
+      htmlToBlock: (nodeName, node) => {
+        if (nodeName === 'figure') {
+          return {
+            type: 'atomic',
+            data: {}
+          };
+        }
+      },
+    };
 
     this.ENTITY_CONTROLS = [
       {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
@@ -68,7 +106,7 @@ class EmailSignatureEditor extends Component {
 
     this.state = {
       editorState: this.props.html !== null ?
-        EditorState.createWithContent(convertFromHTML(this.props.html), decorator) :
+        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.html), decorator) :
         EditorState.createEmpty(decorator),
       html: this.props.html,
       editing: false,
@@ -111,6 +149,7 @@ class EmailSignatureEditor extends Component {
       (e, url) => {
         const entityKey = Entity.create('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
+        this.setState({showToolbar: false});
       },
       _ => {});
   }
@@ -167,7 +206,7 @@ class EmailSignatureEditor extends Component {
   }
 
   _showToolbar(rect) {
-    this.setState({showToolbar: true});
+    this.setState({showToolbar: true, rect});
   }
 
   _onChange(editorState) {
@@ -175,8 +214,11 @@ class EmailSignatureEditor extends Component {
     this.setState({editorState});
     const selection = editorState.getSelection();
     if (!selection.isCollapsed()) {
-      const rect = this.getSelectedBlockElement().getBoundingClientRect();
-      this.showToolbar(rect);
+      const node = this.getSelectedBlockElement();
+      if (node !== null) {
+        const rect = node.getBoundingClientRect();
+        this.showToolbar(rect);
+      }
     } else {
       this.setState({showToolbar: false});
     }
@@ -195,15 +237,15 @@ class EmailSignatureEditor extends Component {
       emailsignature: this.state.html
     };
     this.setState({editing: false});
-    // this.props.patchPerson(person).then(_ => this.setState({finished: true}));
+    this.props.patchPerson(person).then(_ => this.setState({dirty: false}));
   }
 
   render() {
     const {editorState} = this.state;
     const state = this.state;
     return (
-      <div>
-        <div style={{border: 'dotted 1px lightgrey', maxHeight: 85, overflowY: 'scroll'}}>
+      <div style={{paddingLeft: 25}}>
+        <div style={{border: 'dotted 1px lightgrey', height: 200, width: 400, overflowY: 'scroll'}}>
          <Editor
           editorState={editorState}
           onChange={this.onChange}
@@ -212,7 +254,13 @@ class EmailSignatureEditor extends Component {
           />
         </div>
         {state.showToolbar &&
-          <div>
+          <div
+          style={{
+            position: 'fixed',
+            top: state.rect.top,
+            left: state.rect.left - 20,
+            zIndex: 10
+          }}>
             <EntityControls
             editorState={editorState}
             entityControls={this.ENTITY_CONTROLS}
