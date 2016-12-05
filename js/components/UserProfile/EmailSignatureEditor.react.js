@@ -245,7 +245,7 @@ class EmailSignatureEditor extends Component {
     const state = this.state;
     return (
       <div style={{paddingLeft: 25}}>
-        <div style={{border: 'dotted 1px lightgrey', height: 200, width: 400, overflowY: 'scroll'}}>
+        <div style={{border: 'dotted 1px lightgrey', height: 200, width: 250, overflowY: 'scroll'}}>
          <Editor
           editorState={editorState}
           onChange={this.onChange}
