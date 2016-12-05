@@ -61,6 +61,44 @@ class EmailSignatureEditor extends Component {
         component: CurlySpan
       }
     ]);
+    this.CONVERT_CONFIGS = {
+      htmlToEntity: (nodeName, node) => {
+        if (nodeName === 'a') {
+          if (node.firstElementChild === null) {
+            // LINK ENTITY
+            return Entity.create('LINK', 'MUTABLE', {url: node.href});
+          } else if (node.firstElementChild.nodeName === 'IMG') {
+            // IMG ENTITY
+            const imgNode = node.firstElementChild;
+            const src = imgNode.src;
+            const size = parseFloat(imgNode.style['max-height']) / 100;
+            const imageLink = node.href;
+            const entityKey = Entity.create('image', 'IMMUTABLE', {
+              src,
+              size,
+              imageLink
+            });
+            this.props.saveImageData(src);
+            this.props.saveImageEntityKey(src, entityKey);
+            this.props.setImageSize(src, size);
+            if (imageLink.length > 0) {
+              this.props.setImageLink(src, imageLink);
+            } else {
+              this.props.setImageLink(src, undefined);
+            }
+            return entityKey;
+          }
+        }
+      },
+      htmlToBlock: (nodeName, node) => {
+        if (nodeName === 'figure') {
+          return {
+            type: 'atomic',
+            data: {}
+          };
+        }
+      },
+    };
 
     this.ENTITY_CONTROLS = [
       {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
@@ -68,7 +106,7 @@ class EmailSignatureEditor extends Component {
 
     this.state = {
       editorState: this.props.html !== null ?
-        EditorState.createWithContent(convertFromHTML(this.props.html), decorator) :
+        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.html), decorator) :
         EditorState.createEmpty(decorator),
       html: this.props.html,
       editing: false,
@@ -81,7 +119,6 @@ class EmailSignatureEditor extends Component {
       let html = draftRawToHtml(raw);
       if (this.state.dirty && html === this.props.html) this.setState({dirty: false});
       else this.setState({dirty: true});
-      console.log(html);
       this.setState({html});
     };
     this.showToolbar = this._showToolbar.bind(this);
@@ -200,7 +237,7 @@ class EmailSignatureEditor extends Component {
       emailsignature: this.state.html
     };
     this.setState({editing: false});
-    // this.props.patchPerson(person).then(_ => this.setState({finished: true}));
+    this.props.patchPerson(person).then(_ => this.setState({dirty: false}));
   }
 
   render() {
