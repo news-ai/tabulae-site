@@ -5,6 +5,7 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
 import * as actions from './actions';
+import * as actionCreators from 'actions/AppActions';
 import {blue600, yellow50, blue50} from 'material-ui/styles/colors';
 import {
   Step,
@@ -72,9 +73,10 @@ class SMTPSettings extends Component {
       IMAPSSLTLS: false,
       smtpusername: '',
       smtppassword: '',
-      currentStep: 0
+      currentStep: 0 // change to 0 after
     };
     this.onSubmit = this._onSubmit.bind(this);
+    this.handleAccountSubmit = this._handleAccountSubmit.bind(this);
     this.handleNext = _ => this.setState(prev => ({currentStep: prev.currentStep + 1}));
     this.handlePrev = _ => this.setState(prev => ({currentStep: prev.currentStep - 1}));
     this.onTextValueChange = this._onTextValueChange.bind(this);
@@ -105,16 +107,21 @@ class SMTPSettings extends Component {
     }
 
     const smtpObj = {
-      SMTPServer,
-      SMTPPortTLS,
-      SMTPPortSSL,
-      SMTPSSLTLS,
-      IMAPServer,
-      IMAPPortTLS,
-      IMAPPortSSL,
-      IMAPSSLTLS
+      SMTPServer: SMTPServer,
+      SMTPPortTLS: parseInt(SMTPPortTLS, 10),
+      SMTPPortSSL: parseInt(SMTPPortSSL, 10),
+      SMTPSSLTLS: SMTPSSLTLS,
+      IMAPServer: IMAPServer,
+      IMAPPortTLS: parseInt(IMAPPortTLS, 10),
+      IMAPPortSSL: parseInt(IMAPPortSSL, 10),
+      IMAPSSLTLS: IMAPSSLTLS
     };
-    this.props.setupSMTP(smtpObj);
+    console.log(smtpObj);
+    this.props.setupSMTP(smtpObj)
+    .then(_ => {
+      this.props.fetchPerson();
+      this.handleNext();
+    })
   }
 
   _onTextValueChange(e, validator, field, errorMessage) {
@@ -127,42 +134,75 @@ class SMTPSettings extends Component {
     });
   }
 
+  _handleAccountSubmit() {
+    if (this.state.smtpusername.length === 0 || this.state.smtppassword.length === 0) {
+      alert('Empty email account credentials.');
+      return;
+    }
+
+    this.props.addSMTPEmail(this.state.smtpusername, this.state.smtppassword)
+    .then(_ => {
+      this.handleNext();
+    });
+  }
+
   render() {
     const state = this.state;
     const props = this.props;
-    const actions = [
+    let actions = [
       <FlatButton label='Cancel' onClick={_ => this.setState({open: false})}/>,
-      <FlatButton label='Back' onClick={this.handlePrev}/>,
-      <FlatButton label='Next' onClick={this.handleNext}/>
     ];
 
     let content = <span>PLACEHOLDER</span>;
     switch (state.currentStep) {
       case 0:
+        actions.push(
+          <FlatButton label='Next' onClick={this.handleNext}/>
+          );
         content = (
           <div>
-            <h5>SMTP (Outgoing Mail) Settings</h5>
-            <div style={{padding: 5, backgroundColor: blue50, fontSize: '0.9em'}}>
-              <p>You can find your email provider SMTP settings usually by googling "Godaddy SMTP settings". <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings.</p>
-            </div>
-            <TextField value={state.SMTPServer} errorText={state.SMTPServerErrorText} onChange={e => this.onTextValueChange(e, isURL, 'SMTPServer', 'Value is not a valid URL')}
-            fullWidth floatingLabelFixed hintText='e.g. smtp.gmail.com' floatingLabelText='SMTP Server'/>
-            <TextField value={state.SMTPPortTLS} errorText={state.SMTPPortTLSErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'SMTPPortTLS', 'Value is not a valid URL')}
-            fullWidth floatingLabelFixed hintText='e.g. 587' floatingLabelText='SMTP Port TLS'/>
-            <TextField value={state.SMTPPortSSL} errorText={state.SMTPPortSSLErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'SMTPPortSSL', 'Value is not a valid URL')}
-            fullWidth floatingLabelFixed hintText='e.g. 465' floatingLabelText='SMTP Port SSL'/>
-            <Toggle onToggle={(e, SMTPSSLTLS) => this.setState({SMTPSSLTLS})} toggled={state.SMTPSSLTLS} label='Requires MTP SSL/TLS?' labelPosition='right'/>
-            <h5>IMAP (Incoming Mail) Settings</h5>
-            <TextField value={state.IMAPServer} errorText={state.IMAPServerErrorText} onChange={e => this.onTextValueChanget(e, isURL, 'IMAPServer', 'Value is not a valid URL')}
-            fullWidth floatingLabelFixed hintText='e.g. imap.gmail.com' floatingLabelText='IMAP Server'/>
-            <TextField value={state.IMAPPortTLS} errorText={state.IMAPPortTLSErrorText} onChange={e => this.onTextValueChanget(e, isNumeric, 'IMAPPortTLS', 'Value should be all numbers')}
-            fullWidth floatingLabelFixed hintText='e.g. 143' floatingLabelText='IMAP Port TLS'/>
-            <TextField value={state.IMAPPortSSL} errorText={state.IMAPPortSSLErrorText} onChange={e => this.onTextValueChanget(e, isNumeric, 'IMAPPortSSL', 'Value should be all numbers')}
-            fullWidth floatingLabelFixed hintText='e.g. 993' floatingLabelText='IMAP Port SSL'/>
-            <Toggle onToggle={(e, IMAPSSLTLS) => this.setState({IMAPSSLTLS})} toggled={state.IMAPSSLTLS} label='Requires IMAP SSL/TLS?' labelPosition='right'/>
-          </div>);
+            <Warning {...props}/>
+          </div>
+          );
         break;
       case 1:
+        actions.push(
+          <FlatButton label='Next' onClick={this.onSubmit}/>
+          );
+        content = (
+          <div>
+            <div style={{padding: 5, backgroundColor: blue50, fontSize: '0.9em'}}>
+              <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings. If you don't find yours, try googling "EMAIL_PROVIDER SMTP settings".
+            </div>
+            <div style={{marginTop: 10}}>
+              <h5>SMTP (Outgoing Mail) Settings</h5>
+              <TextField value={state.SMTPServer} errorText={state.SMTPServerErrorText} onChange={e => this.onTextValueChange(e, isURL, 'SMTPServer', 'Value is not a valid URL')}
+              fullWidth floatingLabelFixed hintText='e.g. smtp.gmail.com' floatingLabelText='SMTP Server'/>
+              <TextField value={state.SMTPPortTLS} errorText={state.SMTPPortTLSErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'SMTPPortTLS', 'Value is not a valid URL')}
+              fullWidth floatingLabelFixed hintText='e.g. 587' floatingLabelText='SMTP Port TLS'/>
+              <TextField value={state.SMTPPortSSL} errorText={state.SMTPPortSSLErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'SMTPPortSSL', 'Value is not a valid URL')}
+              fullWidth floatingLabelFixed hintText='e.g. 465' floatingLabelText='SMTP Port SSL'/>
+              <Toggle onToggle={(e, SMTPSSLTLS) => this.setState({SMTPSSLTLS})} toggled={state.SMTPSSLTLS} label='Requires MTP SSL/TLS?' labelPosition='right'/>
+            </div>
+            <div style={{marginTop: 10}}>
+              <h5>IMAP (Incoming Mail) Settings</h5>
+              <TextField value={state.IMAPServer} errorText={state.IMAPServerErrorText} onChange={e => this.onTextValueChange(e, isURL, 'IMAPServer', 'Value is not a valid URL')}
+              fullWidth floatingLabelFixed hintText='e.g. imap.gmail.com' floatingLabelText='IMAP Server'/>
+              <TextField value={state.IMAPPortTLS} errorText={state.IMAPPortTLSErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'IMAPPortTLS', 'Value should be all numbers')}
+              fullWidth floatingLabelFixed hintText='e.g. 143' floatingLabelText='IMAP Port TLS'/>
+              <TextField value={state.IMAPPortSSL} errorText={state.IMAPPortSSLErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'IMAPPortSSL', 'Value should be all numbers')}
+              fullWidth floatingLabelFixed hintText='e.g. 993' floatingLabelText='IMAP Port SSL'/>
+              <Toggle onToggle={(e, IMAPSSLTLS) => this.setState({IMAPSSLTLS})} toggled={state.IMAPSSLTLS} label='Requires IMAP SSL/TLS?' labelPosition='right'/>
+            </div>
+          </div>);
+        break;
+      case 2:
+        actions.push(
+          <FlatButton label='Back' onClick={this.handlePrev}/>,
+          );
+        actions.push(
+          <FlatButton label='Next' onClick={this.handleAccountSubmit}/>
+          );
         content = (
           <div>
             <h5>Part 2 - Email Account Settings</h5>
@@ -171,8 +211,15 @@ class SMTPSettings extends Component {
           </div>
           );
         break;
-      case 2:
-        content = <Warning {...props}/>;
+      case 3:
+        actions.push(
+          <FlatButton label='Back' onClick={this.handlePrev}/>,
+          );
+        content = (
+          <div>
+            <FlatButton label='Verify' onClick={props.verifySMTPEmail}/>
+          </div>
+          );
         break;
       default:
         break;
@@ -182,6 +229,9 @@ class SMTPSettings extends Component {
         <Dialog autoScrollBodyContent title='SMTP Setup' modal actions={actions} open={state.open}>
           <div style={{margin: '10px 0'}}>
             <Stepper activeStep={state.currentStep}>
+              <Step>
+                <StepLabel>Welcome to Setup</StepLabel>
+              </Step>
               <Step>
                 <StepLabel>SMTP Settings</StepLabel>
               </Step>
@@ -209,7 +259,10 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    setupSMTP: smtpObj => dispatch(actions.setupSMTP(smtpObj))
+    setupSMTP: smtpObj => dispatch(actions.setupSMTP(smtpObj)),
+    fetchPerson: _ => dispatch(actionCreators.fetchPerson()),
+    addSMTPEmail: (username, password) => dispatch(actions.addSMTPEmail(username, password)),
+    verifySMTPEmail: _ => dispatch(actions.verifySMTPEmail()),
   };
 };
 
