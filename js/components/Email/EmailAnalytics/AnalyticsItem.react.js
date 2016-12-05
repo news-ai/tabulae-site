@@ -93,6 +93,7 @@ class AnalyticsItem extends Component {
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let date = moment(sendat);
+    console.log(delivered);
     return (
       <div style={wrapperStyle}>
         {
@@ -128,10 +129,12 @@ class AnalyticsItem extends Component {
           </div>
           <div className='small-12 medium-5 large-5 columns'>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
-            {!delivered && <div style={styles.errorText}>
-              <span>Something went wrong on our end. Let us know!</span>
-              <p>Email ID: {id}</p>
-              </div>}
+            {!delivered &&
+              <div style={styles.errorText}>
+                <span>Something went wrong on our end. Let us know!</span>
+                <p>Email ID: {id}</p>
+              </div>
+            }
             {bounced && <span style={styles.errorText}>email bounced</span>}
             {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
           </div>

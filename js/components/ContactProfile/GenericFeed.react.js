@@ -57,20 +57,25 @@ class GenericFeed extends Component {
         </AutoSizer>);
     const renderNode = (
       <div>
-        {
-          !props.hideEmptyPlaceholder && props.feed
+        {!props.hideEmptyPlaceholder && props.feed
           && !props.didInvalidate
           && props.feed.length === 0
-          && <div className='row' style={styleEmptyRow}><p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p></div>}
+          && (
+            <div className='row' style={styleEmptyRow}>
+              <p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p>
+            </div>
+            )}
         {props.didInvalidate
-          && <div className='row' style={styleEmptyRow}>
-          <p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right chat button to leave us a message and we'll try to resolve this for you as fast as we can.</p>
-          </div>
-        }
-        {props.feed && !props.autoSizer && (props.containerHeight ? limitedHeightList : windowScrollableList)}
+          && (
+            <div className='row' style={styleEmptyRow}>
+              <p>Something went wrong. Sorry about that. A bug has been filed. Check back in a while or use the bottom right chat button to leave us a message and we'll try to resolve this for you as fast as we can.</p>
+            </div>
+            )}
+        {props.feed && !props.autoSizer && (
+          props.containerHeight ? limitedHeightList : windowScrollableList)}
       </div>
       );
-    
+
     return props.value === props.name ? renderNode : null;
   }
 }

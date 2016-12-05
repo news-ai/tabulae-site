@@ -5,11 +5,8 @@ import * as actionCreators from '../../../actions/AppActions';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
-import IconButton from 'material-ui/IconButton';
-import Badge from 'material-ui/Badge';
-import Link from 'react-router/lib/Link';
 
-import Tabs, { TabPane } from 'rc-tabs';
+import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
 import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
 import 'rc-tabs/assets/index.css';
