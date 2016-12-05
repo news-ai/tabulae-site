@@ -79,6 +79,8 @@ class EmailSignatureEditor extends Component {
     this.emitHTML = (editorState) => {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
+      if (this.state.dirty && html === this.props.html) this.setState({dirty: false});
+      else this.setState({dirty: true});
       this.setState({html});
     };
     this.showToolbar = this._showToolbar.bind(this);
@@ -86,6 +88,7 @@ class EmailSignatureEditor extends Component {
     this.onSave = this._onSave.bind(this);
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
+    this.getSelectedBlockElement = this.getSelectedBlockElement.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -121,6 +124,18 @@ class EmailSignatureEditor extends Component {
     this.onChange(RichUtils.toggleLink(editorState, selection, null));
   }
 
+  getSelectedBlockElement() {
+    let selection = window.getSelection();
+    if (selection.rangeCount === 0) return null;
+    let node = selection.getRangeAt(0).startContainer;
+    do {
+      if (node.getAttribute && node.getAttribute('data-block') === 'true')
+        return node;
+      node = node.parentNode;
+    } while (node !== null);
+    return null;
+  }
+
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -151,7 +166,7 @@ class EmailSignatureEditor extends Component {
     }
   }
 
-  _showToolbar(editorState) {
+  _showToolbar(rect) {
     this.setState({showToolbar: true});
   }
 
@@ -160,13 +175,13 @@ class EmailSignatureEditor extends Component {
     this.setState({editorState});
     const selection = editorState.getSelection();
     if (!selection.isCollapsed()) {
-      this.showToolbar(editorState);
+      const rect = this.getSelectedBlockElement().getBoundingClientRect();
+      this.showToolbar(rect);
     } else {
       this.setState({showToolbar: false});
     }
     // only emit html when content changes
     if (previousContent !== editorState.getCurrentContent()) {
-      if (!this.state.dirty) this.setState({dirty: true});
       this.emitHTML(editorState);
     }
   }
@@ -204,7 +219,7 @@ class EmailSignatureEditor extends Component {
             />
           </div>
           }
-        {state.dirty && <button className='button' onClick={this.onSave}>Save</button>}
+        {state.dirty && <button className='button tiny' onClick={this.onSave}>Save</button>}
       </div>
       );
   }
