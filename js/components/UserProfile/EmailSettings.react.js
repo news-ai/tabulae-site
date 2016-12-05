@@ -49,7 +49,7 @@ class EmailSettings extends Component {
     const toggled = state.newPerson.get('getdailyemails');
     return (
        <div className='row horizontal-center' style={{margin: '50px 0'}}>
-          <div className='large-6 medium-9 small-12 columns'>
+          <div className='large-7 medium-9 small-12 columns'>
             <div className='row vertical-center' style={inputHeight}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Subscribe to Emails</span>

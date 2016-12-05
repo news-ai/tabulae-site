@@ -5,7 +5,51 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
 import * as actions from './actions';
-import {blue600, yellow50} from 'material-ui/styles/colors';
+import {blue600, yellow50, blue50} from 'material-ui/styles/colors';
+import {
+  Step,
+  Stepper,
+  StepLabel,
+} from 'material-ui/Stepper';
+import isNumeric from 'validator/lib/isNumeric';
+import isURL from 'validator/lib/isURL';
+
+const Warning = props => {
+  return (
+    <div style={{backgroundColor: yellow50, padding: 10, fontSize: '0.9em'}}>
+      <p>
+        <span>
+          By default, Tabulae used <strong>Sendgrid</strong> to send emails.
+          By granting us permission to connect your Tabulae account to your email server,
+          <strong>we'd send emails from your SMTP email server (e.g. Yahoo, GoDaddy, etc) instead of Sendgrid</strong>.
+          You'd be able to see the emails you sent from Tabulae in your <strong>SMTP Inbox</strong>.
+        </span>
+      </p>
+      <p>
+        <span>
+          By connecting your Inbox, it means that <strong>Tabulae will have access to email information</strong> like:
+        </span>
+      </p>
+      <ul>
+        <li>which email addresses you are sending emails to</li>
+        <li>which email addresses you are sending emails from</li>
+        <li>the subject lines and body content of your emails</li>
+      </ul>
+      <p>
+        <span>
+          To be sure, you can remove this integration at anytime. <strong>We will only access emails sent through Tabulae and not any other emails in your Inbox.</strong>
+        </span>
+      </p>
+      <p>
+        <strong>
+          Please make sure the SMTP email username you connect with MATCHES with the one you are logged in with.
+        </strong>
+      </p>
+      <p>
+        Just as a reminder, you logged in with: <span style={{color: blue600}}>{props.person.email}</span>
+      </p>
+    </div>);
+};
 
 class SMTPSettings extends Component {
   constructor(props) {
@@ -13,20 +57,30 @@ class SMTPSettings extends Component {
     this.state = {
       open: false,
       SMTPServer: '',
-      SMTPPortTLS: null,
-      SMTPPortSSL: null,
+      SMTPServerErrorText: '',
+      SMTPPortTLS: '',
+      SMTPPortTLSErrorText: '',
+      SMTPPortSSL: '',
+      SMTPPortSSLErrorText: '',
       SMTPSSLTLS: false,
       IMAPServer: '',
-      IMAPPortTLS: null,
-      IMAPPortSSL: null,
+      IMAPServerErrorText: '',
+      IMAPPortTLS: '',
+      IMAPPortTLSErrorText: '',
+      IMAPPortSSL: '',
+      IMAPPortSSLErrorText: '',
       IMAPSSLTLS: false,
       smtpusername: '',
-      smtppassword: ''
+      smtppassword: '',
+      currentStep: 0
     };
-    this.onSubmit = this.onSubmit.bind(this);
+    this.onSubmit = this._onSubmit.bind(this);
+    this.handleNext = _ => this.setState(prev => ({currentStep: prev.currentStep + 1}));
+    this.handlePrev = _ => this.setState(prev => ({currentStep: prev.currentStep - 1}));
+    this.onTextValueChange = this._onTextValueChange.bind(this);
   }
 
-  onSubmit() {
+  _onSubmit() {
     const {
       SMTPServer,
       SMTPPortTLS,
@@ -63,65 +117,82 @@ class SMTPSettings extends Component {
     this.props.setupSMTP(smtpObj);
   }
 
+  _onTextValueChange(e, validator, field, errorMessage) {
+    const value = e.target.value;
+    let err = '';
+    if (value.length > 0 && !validator(value)) err = errorMessage;
+    this.setState({
+      [field]: value,
+      [`${field}ErrorText`]: err
+    });
+  }
+
   render() {
     const state = this.state;
+    const props = this.props;
     const actions = [
       <FlatButton label='Cancel' onClick={_ => this.setState({open: false})}/>,
-      <FlatButton label='Submit' onClick={_ => this.setState({open: false})}/>
+      <FlatButton label='Back' onClick={this.handlePrev}/>,
+      <FlatButton label='Next' onClick={this.handleNext}/>
     ];
+
+    let content = <span>PLACEHOLDER</span>;
+    switch (state.currentStep) {
+      case 0:
+        content = (
+          <div>
+            <h5>SMTP (Outgoing Mail) Settings</h5>
+            <div style={{padding: 5, backgroundColor: blue50, fontSize: '0.9em'}}>
+              <p>You can find your email provider SMTP settings usually by googling "Godaddy SMTP settings". <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings.</p>
+            </div>
+            <TextField value={state.SMTPServer} errorText={state.SMTPServerErrorText} onChange={e => this.onTextValueChange(e, isURL, 'SMTPServer', 'Value is not a valid URL')}
+            fullWidth floatingLabelFixed hintText='e.g. smtp.gmail.com' floatingLabelText='SMTP Server'/>
+            <TextField value={state.SMTPPortTLS} errorText={state.SMTPPortTLSErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'SMTPPortTLS', 'Value is not a valid URL')}
+            fullWidth floatingLabelFixed hintText='e.g. 587' floatingLabelText='SMTP Port TLS'/>
+            <TextField value={state.SMTPPortSSL} errorText={state.SMTPPortSSLErrorText} onChange={e => this.onTextValueChange(e, isNumeric, 'SMTPPortSSL', 'Value is not a valid URL')}
+            fullWidth floatingLabelFixed hintText='e.g. 465' floatingLabelText='SMTP Port SSL'/>
+            <Toggle onToggle={(e, SMTPSSLTLS) => this.setState({SMTPSSLTLS})} toggled={state.SMTPSSLTLS} label='Requires MTP SSL/TLS?' labelPosition='right'/>
+            <h5>IMAP (Incoming Mail) Settings</h5>
+            <TextField value={state.IMAPServer} errorText={state.IMAPServerErrorText} onChange={e => this.onTextValueChanget(e, isURL, 'IMAPServer', 'Value is not a valid URL')}
+            fullWidth floatingLabelFixed hintText='e.g. imap.gmail.com' floatingLabelText='IMAP Server'/>
+            <TextField value={state.IMAPPortTLS} errorText={state.IMAPPortTLSErrorText} onChange={e => this.onTextValueChanget(e, isNumeric, 'IMAPPortTLS', 'Value should be all numbers')}
+            fullWidth floatingLabelFixed hintText='e.g. 143' floatingLabelText='IMAP Port TLS'/>
+            <TextField value={state.IMAPPortSSL} errorText={state.IMAPPortSSLErrorText} onChange={e => this.onTextValueChanget(e, isNumeric, 'IMAPPortSSL', 'Value should be all numbers')}
+            fullWidth floatingLabelFixed hintText='e.g. 993' floatingLabelText='IMAP Port SSL'/>
+            <Toggle onToggle={(e, IMAPSSLTLS) => this.setState({IMAPSSLTLS})} toggled={state.IMAPSSLTLS} label='Requires IMAP SSL/TLS?' labelPosition='right'/>
+          </div>);
+        break;
+      case 1:
+        content = (
+          <div>
+            <h5>Part 2 - Email Account Settings</h5>
+            <TextField value={state.smtpusername} onChange={e => this.setState({smtpusername: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. username123@yahoo.com' floatingLabelText='Username'/>
+            <TextField value={state.smtppassword} onChange={e => this.setState({smtppassword: e.target.value})} fullWidth floatingLabelFixed type='password' floatingLabelText='Password'/>
+          </div>
+          );
+        break;
+      case 2:
+        content = <Warning {...props}/>;
+        break;
+      default:
+        break;
+    }
     return (
       <div>
         <Dialog autoScrollBodyContent title='SMTP Setup' modal actions={actions} open={state.open}>
           <div style={{margin: '10px 0'}}>
-            <div style={{backgroundColor: yellow50, padding: 10}}>
-              <p>
-                <span>
-                  By default, Tabulae used <strong>Sendgrid</strong> to send emails.
-                  By granting us permission to connect your Tabulae account to your email server,
-                  <strong>we'd send emails from your SMTP email server (e.g. Yahoo, GoDaddy, etc) instead of Sendgrid</strong>.
-                  You'd be able to see the emails you sent from Tabulae in your <strong>SMTP Inbox</strong>.
-                </span>
-              </p>
-              <p>
-                <span>
-                  By connecting your Inbox, it means that <strong>Tabulae will have access to email information</strong> like:
-                </span>
-              </p>
-              <ul>
-                <li>which email addresses you are sending emails to</li>
-                <li>which email addresses you are sending emails from</li>
-                <li>the subject lines and body content of your emails</li>
-              </ul>
-              <p>
-                <span>
-                  To be sure, you can remove this integration at anytime. <strong>We will only access emails sent through Tabulae and not any other emails in your Inbox.</strong>
-                </span>
-              </p>
-              <p>
-                <strong>
-                  Please make sure the SMTP Username you connect with MATCHES with the one you are logged in with.
-                </strong>
-              </p>
-              <p>
-                Just as a reminder, you logged in with: <span style={{color: blue600}}>{this.props.person.email}</span>
-              </p>
-            </div>
-            <div style={{marginTop: 40}}>
-              <h5>Part 1</h5>
-              <TextField onChange={e => this.setState({SMTPServer: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. smtp.gmail.com' floatingLabelText='SMTP Server'/>
-              <TextField onChange={e => this.setState({SMTPPortTLS: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. 123' floatingLabelText='SMTP Port TLS'/>
-              <TextField onChange={e => this.setState({SMTPPortSSL: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. 123' floatingLabelText='SMTP Port SSL'/>
-              <Toggle onToggle={(e, SMTPSSLTLS) => this.setState({SMTPSSLTLS})} toggled={state.SMTPSSLTLS} label='SMTP SSL TLS' labelPosition='right'/>
-              <TextField onChange={e => this.setState({IMAPServer: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. imap.gmail.com' floatingLabelText='IMAP Server'/>
-              <TextField onChange={e => this.setState({IMAPPortTLS: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. 123' floatingLabelText='IMAP Port TLS'/>
-              <TextField onChange={e => this.setState({IMAPPortSSL: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. 123' floatingLabelText='IMAP Port SSL'/>
-              <Toggle onToggle={(e, IMAPSSLTLS) => this.setState({IMAPSSLTLS})} toggled={state.IMAPSSLTLS} label='IMAP SSL TLS' labelPosition='right'/>
-            </div>
-            <div style={{marginTop: 40}}>
-              <h5>Part 2</h5>
-              <TextField onChange={e => this.setState({smtpusername: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. username123' floatingLabelText='Username'/>
-              <TextField onChange={e => this.setState({smtppassword: e.target.value})} fullWidth floatingLabelFixed type='password' floatingLabelText='Password'/>
-            </div>
+            <Stepper activeStep={state.currentStep}>
+              <Step>
+                <StepLabel>SMTP Settings</StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>Email Account Setting</StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>Verify</StepLabel>
+              </Step>
+            </Stepper>
+            {content}
           </div>
         </Dialog>
         <FlatButton label='Connect' onClick={_ => this.setState({open: true})} primary/>
