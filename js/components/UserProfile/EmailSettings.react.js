@@ -6,6 +6,7 @@ import EmailSignatureEditor from './EmailSignatureEditor.react';
 import ConnectToGmail from './ConnectToGmail.react';
 import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
+import SMTPSettings from './SMTPSettings.react';
 
 import * as actionCreators from '../../actions/AppActions';
 
@@ -75,6 +76,7 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Connect via SMTP</span>
               </div>
               <div className='large-8 medium-7 columns'>
+                <SMTPSettings/>
               </div>
             </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>
