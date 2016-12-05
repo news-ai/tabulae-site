@@ -172,7 +172,7 @@ export function fetchContactEmails(contactId) {
     const isReceiving = getState().stagingReducer.isReceiving;
     if (OFFSET === null || isReceiving) return;
     if (!OFFSET) OFFSET = 0;
-    dispatch({type: REQUEST_MULTIPLE_EMAILS}, contactI);
+    dispatch({type: REQUEST_MULTIPLE_EMAILS}, contactId);
     return api.get(`/contacts/${contactId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const res = normalize(response, {
