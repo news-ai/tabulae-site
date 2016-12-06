@@ -75,7 +75,7 @@ class SMTPSettings extends Component {
       IMAPPortSSL: '',
       IMAPPortSSLErrorText: '',
       IMAPSSLTLS: false,
-      smtpusername: '',
+      smtpusername: this.props.person.email,
       smtppassword: '',
       currentStep: 0 // change to 0 after
     };
@@ -215,6 +215,7 @@ class SMTPSettings extends Component {
               Enter your email login credentials here.
             </div>
             <TextField
+            disabled
             value={state.smtpusername}
             onChange={e => this.onTextValueChange(e, isEmail, 'smtpusername', 'Value is not a valid email')}
             fullWidth floatingLabelFixed
@@ -267,6 +268,9 @@ class SMTPSettings extends Component {
       default:
         break;
     }
+
+    // actions.push(<FlatButton label='Next' onClick={this.handleNext}/>)
+
     return (
       <div>
         <Dialog autoScrollBodyContent title='SMTP Setup' modal actions={actions} open={state.open}>
@@ -288,13 +292,9 @@ class SMTPSettings extends Component {
             {content}
           </div>
         </Dialog>
-        <IconButton
-        tooltipPosition='top-right'
-        iconStyle={{width: 20, height: 20}}
-        style={{width: 40, height: 40, padding: 10}}
-        iconClassName='fa fa-cog'
+        <FlatButton
         onClick={_ => this.setState({open: true})}
-        tooltip='Activate SMTP Integration'/>
+        label='Connect'/>
       </div>
       );
   }

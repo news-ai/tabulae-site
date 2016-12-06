@@ -65,12 +65,13 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Connect via Gmail</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                {person.gmail ?
+                {!person.externalemail && (person.gmail ?
                   <FlatButton
                   secondary
                   label='Remove'
                   onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
-                  /> : <ConnectToGmail/>}
+                  /> : <ConnectToGmail/>)}
+                {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
               </div>
             </div>}
             <div className='row vertical-center' style={inputHeight}>
@@ -78,11 +79,9 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Connect via SMTP</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                {person.gmail ? <span>Connected to Gmail</span> :
-                  <div className='vertical-center' style={{width: 200}}>
-                    <Toggle disabled={!person.smtpvalid} toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/>
-                    <SMTPSettings/>
-                  </div>}
+                {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
+                    <Toggle toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/> :
+                    <SMTPSettings/>}
               </div>
             </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>
