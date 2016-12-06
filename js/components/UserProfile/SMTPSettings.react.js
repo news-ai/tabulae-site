@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
 import * as actions from './actions';
 import * as actionCreators from 'actions/AppActions';
-import {blue600, yellow50, blue50} from 'material-ui/styles/colors';
+import {blue600, yellow50, blue50, green500, red500} from 'material-ui/styles/colors';
 import {
   Step,
   Stepper,
@@ -14,6 +15,7 @@ import {
 } from 'material-ui/Stepper';
 import isNumeric from 'validator/lib/isNumeric';
 import isURL from 'validator/lib/isURL';
+import isEmail from 'validator/lib/isEmail';
 
 const Warning = props => {
   return (
@@ -157,7 +159,7 @@ class SMTPSettings extends Component {
     switch (state.currentStep) {
       case 0:
         actions.push(
-          <FlatButton label='Next' onClick={this.handleNext}/>
+          <FlatButton label='Agree' onClick={this.handleNext}/>
           );
         content = (
           <div>
@@ -171,8 +173,8 @@ class SMTPSettings extends Component {
           );
         content = (
           <div>
-            <div style={{padding: 5, backgroundColor: blue50, fontSize: '0.9em'}}>
-              <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings. If you don't find yours, try googling "EMAIL_PROVIDER SMTP settings".
+            <div style={{padding: 8, backgroundColor: blue50, fontSize: '0.9em'}}>
+              This step connects your incoming and outgoing emails to Tabulae by letting us know which server and port your account is using to deliver mail. <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings. If you don't find yours, try googling "YOUR_EMAIL_PROVIDER SMTP settings".
             </div>
             <div style={{marginTop: 10}}>
               <h5>SMTP (Outgoing Mail) Settings</h5>
@@ -205,8 +207,10 @@ class SMTPSettings extends Component {
           );
         content = (
           <div>
-            <h5>Part 2 - Email Account Settings</h5>
-            <TextField value={state.smtpusername} onChange={e => this.setState({smtpusername: e.target.value})} fullWidth floatingLabelFixed hintText='e.g. username123@yahoo.com' floatingLabelText='Username'/>
+            <div style={{padding: 8, backgroundColor: blue50, fontSize: '0.9em'}}>
+              Enter your email login credentials here.
+            </div>
+            <TextField value={state.smtpusername} onChange={e => this.onTextValueChange(e, isEmail, 'smtpusername', 'Value is not a valid email')} fullWidth floatingLabelFixed hintText='e.g. username123@yahoo.com' floatingLabelText='Username'/>
             <TextField value={state.smtppassword} onChange={e => this.setState({smtppassword: e.target.value})} fullWidth floatingLabelFixed type='password' floatingLabelText='Password'/>
           </div>
           );
@@ -217,13 +221,28 @@ class SMTPSettings extends Component {
           );
         content = (
           <div>
-            <FlatButton label='Verify' onClick={props.verifySMTPEmail}/>
+            <div style={{padding: 8, backgroundColor: blue50, fontSize: '0.9em'}}>
+              <p>Click on "Verify Connection" to see if Tabulae was successful in connection to your account.</p>
+              <p>Some email service providers require an change in settings to authorize Tabulae to send through your account.</p>
+              <p>If you see the error that your email/password is not right, check your email inbox. You might have received an email asking for you to authorize an external connection from Tabulae.</p>
+            </div>
+            <div className='horizontal-center' style={{margin: '20px 0'}}>
+              <div>
+                <div style={{margin: '15px 0'}}>
+                  <RaisedButton label='Verify Connection' onClick={props.verifySMTPEmail}/>
+                </div>
+                {props.verification && <div className='vertical-center'>Error:{props.verification.status ? <span style={{color: green500, margin: '0 10px'}}> None</span> : <span style={{color: red500, margin: '0 10px'}}> {props.verification.error}</span>}</div>}
+                {props.verification && <div className='vertical-center'>Status:{props.verification.status ? <span style={{color: green500, margin: '0 10px'}}> Connected</span> : <span style={{color: red500, margin: '0 10px'}}> Not Connected</span>}</div>}
+              </div>
+            </div>
           </div>
           );
         break;
       default:
         break;
     }
+    actions.push(<FlatButton label='Plain Prev' onClick={this.handlePrev}/>)
+    actions.push(<FlatButton label='Plain Next' onClick={this.handleNext}/>)
     return (
       <div>
         <Dialog autoScrollBodyContent title='SMTP Setup' modal actions={actions} open={state.open}>
@@ -236,7 +255,7 @@ class SMTPSettings extends Component {
                 <StepLabel>SMTP Settings</StepLabel>
               </Step>
               <Step>
-                <StepLabel>Email Account Setting</StepLabel>
+                <StepLabel>Email Account</StepLabel>
               </Step>
               <Step>
                 <StepLabel>Verify</StepLabel>
@@ -253,7 +272,8 @@ class SMTPSettings extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    person: state.personReducer.person
+    person: state.personReducer.person,
+    verification: state.smtpReducer.verification
   };
 };
 

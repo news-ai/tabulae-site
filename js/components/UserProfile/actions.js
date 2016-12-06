@@ -60,13 +60,10 @@ export function verifySMTPEmail() {
     dispatch({type: 'VERTIFY_SMTP_EMAIL', emailsetting});
     return api.get(`/email-settings/${emailsetting}/verify`)
     .then(response => {
-      const status = response.data.status;
-      const error = response.data.error;
-      console.log(status);
-      console.log(error);
+      return dispatch({type: 'VERTIFY_SMTP_EMAIL_RECEIVE', verification: response.data});
     })
     .catch(err => {
-      console.log(err);
+      console.log(err)
     });
   };
 }

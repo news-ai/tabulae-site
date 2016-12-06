@@ -126,5 +126,9 @@ export const initialState = {
     didInvalidate: false
   },
   emailDraftReducer: {
+  },
+  smtpReducer: {
+    isReceiving: false,
+    didInvalidate: false
   }
 };

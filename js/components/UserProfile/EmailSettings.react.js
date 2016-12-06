@@ -76,7 +76,7 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Connect via SMTP</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                {person.gmail ? <span>Connected to Gmail</span> : <SMTPSettings/>}
+                {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ? <span>Connected</span> : <SMTPSettings/>}
               </div>
             </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>
