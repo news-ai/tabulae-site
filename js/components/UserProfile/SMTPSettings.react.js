@@ -5,6 +5,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
+import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton';
 import * as actions from './actions';
 import * as actionCreators from 'actions/AppActions';
 import {blue600, yellow50, blue50, green500, red500} from 'material-ui/styles/colors';
@@ -174,7 +176,9 @@ class SMTPSettings extends Component {
         content = (
           <div>
             <div style={{padding: 8, backgroundColor: blue50, fontSize: '0.9em'}}>
-              This step connects your incoming and outgoing emails to Tabulae by letting us know which server and port your account is using to deliver mail. <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings. If you don't find yours, try googling "YOUR_EMAIL_PROVIDER SMTP settings".
+              This step connects your incoming and outgoing emails to Tabulae by letting us know which server and port your account is
+              using to deliver mail. <a href='https://www.arclab.com/en/kb/email/list-of-smtp-and-imap-servers-mailserver-list.html'>Here is a handy list</a> of common email server settings.
+              If you don't find yours, try googling "YOUR_EMAIL_PROVIDER SMTP settings".
             </div>
             <div style={{marginTop: 10}}>
               <h5>SMTP (Outgoing Mail) Settings</h5>
@@ -210,8 +214,17 @@ class SMTPSettings extends Component {
             <div style={{padding: 8, backgroundColor: blue50, fontSize: '0.9em'}}>
               Enter your email login credentials here.
             </div>
-            <TextField value={state.smtpusername} onChange={e => this.onTextValueChange(e, isEmail, 'smtpusername', 'Value is not a valid email')} fullWidth floatingLabelFixed hintText='e.g. username123@yahoo.com' floatingLabelText='Username'/>
-            <TextField value={state.smtppassword} onChange={e => this.setState({smtppassword: e.target.value})} fullWidth floatingLabelFixed type='password' floatingLabelText='Password'/>
+            <TextField
+            value={state.smtpusername}
+            onChange={e => this.onTextValueChange(e, isEmail, 'smtpusername', 'Value is not a valid email')}
+            fullWidth floatingLabelFixed
+            hintText='e.g. username123@yahoo.com'
+            floatingLabelText='Username'/>
+            <TextField
+            value={state.smtppassword}
+            onChange={e => this.setState({smtppassword: e.target.value})}
+            fullWidth floatingLabelFixed type='password'
+            floatingLabelText='Password'/>
           </div>
           );
         break;
@@ -219,17 +232,30 @@ class SMTPSettings extends Component {
         actions.push(
           <FlatButton label='Back' onClick={this.handlePrev}/>,
           );
+        if (props.verification && props.verification.status) actions.push(
+          <FlatButton label='Done' primary onClick={_ => {
+            const {firstname, lastname, emailsignature} = this.props.person;
+            props.patchPerson({
+              externalemail: true,
+              firstname, lastname, emailsignature
+            });
+            this.setState({open: false});
+          }}/>,
+          );
         content = (
           <div>
             <div style={{padding: 8, backgroundColor: blue50, fontSize: '0.9em'}}>
-              <p>Click on "Verify Connection" to see if Tabulae was successful in connection to your account.</p>
-              <p>Some email service providers require an change in settings to authorize Tabulae to send through your account.</p>
-              <p>If you see the error that your email/password is not right, check your email inbox. You might have received an email asking for you to authorize an external connection from Tabulae.</p>
+              <p>Click on "Verify Valid SMTP Account" to see if Tabulae was successful in connection to your account.</p>
+              <p>Some email service providers require an change in settings to authorize Tabulae to send through your account.
+              If you see the error that your email/password is not right, check your email inbox. You might have received an email asking for you to authorize an external connection from Tabulae.</p>
             </div>
-            <div className='horizontal-center' style={{margin: '20px 0'}}>
+            <div className='horizontal-center' style={{margin: '15px 0'}}>
               <div>
                 <div style={{margin: '15px 0'}}>
-                  <RaisedButton label='Verify Connection' onClick={props.verifySMTPEmail}/>
+                  <RaisedButton
+                  icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-check'}/>}
+                  label='Verify Valid SMTP Account'
+                  onClick={props.verifySMTPEmail}/>
                 </div>
                 {props.verification && <div className='vertical-center'>Error:{props.verification.status ? <span style={{color: green500, margin: '0 10px'}}> None</span> : <span style={{color: red500, margin: '0 10px'}}> {props.verification.error}</span>}</div>}
                 {props.verification && <div className='vertical-center'>Status:{props.verification.status ? <span style={{color: green500, margin: '0 10px'}}> Connected</span> : <span style={{color: red500, margin: '0 10px'}}> Not Connected</span>}</div>}
@@ -241,8 +267,6 @@ class SMTPSettings extends Component {
       default:
         break;
     }
-    actions.push(<FlatButton label='Plain Prev' onClick={this.handlePrev}/>)
-    actions.push(<FlatButton label='Plain Next' onClick={this.handleNext}/>)
     return (
       <div>
         <Dialog autoScrollBodyContent title='SMTP Setup' modal actions={actions} open={state.open}>
@@ -264,7 +288,17 @@ class SMTPSettings extends Component {
             {content}
           </div>
         </Dialog>
-        <FlatButton label='Connect' onClick={_ => this.setState({open: true})} primary/>
+        {props.person.smtpvalid ?
+          <IconButton
+          iconStyle={{width: 20, height: 20}}
+          style={{width: 40, height: 40, padding: 10}}
+          iconClassName='fa fa-cog'
+          onClick={_ => this.setState({open: true})}
+          tooltip='Redo Setup'/> :
+          <FlatButton
+          label='Connect'
+          onClick={_ => this.setState({open: true})}
+          primary/>}
       </div>
       );
   }
@@ -273,7 +307,8 @@ class SMTPSettings extends Component {
 const mapStateToProps = (state, props) => {
   return {
     person: state.personReducer.person,
-    verification: state.smtpReducer.verification
+    verification: state.smtpReducer.verification,
+    isReceiving: state.smtpReducer.isReceiving
   };
 };
 
@@ -283,6 +318,7 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchPerson: _ => dispatch(actionCreators.fetchPerson()),
     addSMTPEmail: (username, password) => dispatch(actions.addSMTPEmail(username, password)),
     verifySMTPEmail: _ => dispatch(actions.verifySMTPEmail()),
+    patchPerson: personBody => dispatch(actionCreators.patchPerson(personBody))
   };
 };
 

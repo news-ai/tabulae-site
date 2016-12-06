@@ -259,7 +259,7 @@ class EmailSignatureEditor extends Component {
             position: 'fixed',
             top: state.rect.top,
             left: state.rect.left - 20,
-            zIndex: 10
+            zIndex: 10,
           }}>
             <EntityControls
             editorState={editorState}

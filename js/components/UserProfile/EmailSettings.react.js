@@ -36,7 +36,10 @@ class EmailSettings extends Component {
       const newPerson = this.state.newPerson;
       const person = {
         getdailyemails: newPerson.get('getdailyemails'),
-        emailsignature: newPerson.get('emailsignature')
+        emailsignature: newPerson.get('emailsignature'),
+        firstname: newPerson.get('firstname'),
+        lastname: newPerson.get('lastname'),
+        externalemail: newPerson.get('externalemail')
       };
       this.props.patchPerson(person);
     }
@@ -46,7 +49,6 @@ class EmailSettings extends Component {
     const {person} = this.props;
     const state = this.state;
     const props = this.props;
-    const toggled = state.newPerson.get('getdailyemails');
     return (
        <div className='row horizontal-center' style={{margin: '50px 0'}}>
           <div className='large-7 medium-9 small-12 columns'>
@@ -55,7 +57,7 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Subscribe to Emails</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !toggled)}/>
+                <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !state.newPerson.get('getdailyemails'))}/>
               </div>
             </div>
             {person.googleid && <div className='row vertical-center' style={inputHeight}>
@@ -76,7 +78,11 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Connect via SMTP</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ? <span>Connected</span> : <SMTPSettings/>}
+                {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
+                  <div className='vertical-center'>
+                    <Toggle toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/>
+                    <SMTPSettings/>
+                  </div> : <SMTPSettings/>}
               </div>
             </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>
