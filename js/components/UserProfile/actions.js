@@ -44,7 +44,6 @@ export function addSMTPEmail(username, password) {
     };
     return api.post('/email-settings/add-email', smtpObj)
     .then(response => {
-      console.log(response);
       dispatch({type: 'LOGIN_RECEIVE', person: response.data});
       return true;
     })
@@ -63,7 +62,7 @@ export function verifySMTPEmail() {
       return dispatch({type: 'VERTIFY_SMTP_EMAIL_RECEIVE', verification: response.data});
     })
     .catch(err => {
-      console.log(err)
+      console.log(err);
     });
   };
 }
