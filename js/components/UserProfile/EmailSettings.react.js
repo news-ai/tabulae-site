@@ -78,11 +78,11 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Connect via SMTP</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
-                  <div className='vertical-center'>
-                    <Toggle toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/>
+                {person.gmail ? <span>Connected to Gmail</span> :
+                  <div className='vertical-center' style={{width: 200}}>
+                    <Toggle disabled={!person.smtpvalid} toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/>
                     <SMTPSettings/>
-                  </div> : <SMTPSettings/>}
+                  </div>}
               </div>
             </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>

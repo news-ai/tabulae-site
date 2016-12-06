@@ -288,17 +288,13 @@ class SMTPSettings extends Component {
             {content}
           </div>
         </Dialog>
-        {props.person.smtpvalid ?
-          <IconButton
-          iconStyle={{width: 20, height: 20}}
-          style={{width: 40, height: 40, padding: 10}}
-          iconClassName='fa fa-cog'
-          onClick={_ => this.setState({open: true})}
-          tooltip='Redo Setup'/> :
-          <FlatButton
-          label='Connect'
-          onClick={_ => this.setState({open: true})}
-          primary/>}
+        <IconButton
+        tooltipPosition='top-right'
+        iconStyle={{width: 20, height: 20}}
+        style={{width: 40, height: 40, padding: 10}}
+        iconClassName='fa fa-cog'
+        onClick={_ => this.setState({open: true})}
+        tooltip='Activate SMTP Integration'/>
       </div>
       );
   }
