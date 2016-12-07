@@ -109,6 +109,7 @@ class ScatterPlotHOC extends Component {
   render() {
     const state = this.state;
     const props = this.props;
+
     return (
       <div>
         <Dialog
@@ -137,7 +138,7 @@ class ScatterPlotHOC extends Component {
                 <DropDownMenu value={state.xfieldname} onChange={(e, index, xfieldname) => this.setState({xfieldname})}>
                 {
                   props.fieldsmap
-                  .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
+                  .filter(fieldObj => isNumber(_getter(props.contacts[0], fieldObj)))
                   .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
                 }
                 </DropDownMenu>
@@ -147,7 +148,7 @@ class ScatterPlotHOC extends Component {
               <DropDownMenu value={state.yfieldname} onChange={(e, index, yfieldname) => this.setState({yfieldname})}>
                 {
                   props.fieldsmap
-                  .filter(fieldObj => isNumber(_getter(this.props.contacts[0], fieldObj)))
+                  .filter(fieldObj => isNumber(_getter(props.contacts[0], fieldObj)))
                   .map((fieldObj, i) => <MenuItem key={`xfield-${i}`} value={fieldObj.value} primaryText={fieldObj.name}/>)
                 }
               </DropDownMenu>
@@ -183,7 +184,7 @@ class ScatterPlotHOC extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    contacts: props.selected.map(id => state.contactReducer[id])
+    contacts: props.selected.map(id => state.contactReducer[id]).filter(contact => contact.instagram !== null)
   };
 };
 

@@ -10,11 +10,7 @@ import IconButton from 'material-ui/IconButton';
 import * as actions from './actions';
 import * as actionCreators from 'actions/AppActions';
 import {blue600, yellow50, blue50, green500, red500} from 'material-ui/styles/colors';
-import {
-  Step,
-  Stepper,
-  StepLabel,
-} from 'material-ui/Stepper';
+import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import isNumeric from 'validator/lib/isNumeric';
 import isURL from 'validator/lib/isURL';
 import isEmail from 'validator/lib/isEmail';
