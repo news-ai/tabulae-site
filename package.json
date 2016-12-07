@@ -24,6 +24,7 @@
     "normalizr": "^2.2.1",
     "npm": "^3.10.6",
     "numbro": "^1.9.3",
+    "object-assign": "^4.1.0",
     "pikaday": "^1.4.0",
     "radium": "^0.18.1",
     "rc-tabs": "^7.0.13",
