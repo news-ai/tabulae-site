@@ -10,6 +10,7 @@ module.exports = function(options) {
   // If production is true
   if (options.prod) {
     entry = [
+      'babel-polyfill',
       path.resolve(__dirname, 'js/config.shared.js'),
       path.resolve(__dirname, 'js/config.prod.js'),
       path.resolve(__dirname, 'js/app.js')
