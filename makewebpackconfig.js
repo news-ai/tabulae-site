@@ -96,14 +96,6 @@ module.exports = function(options) {
         },
         {
           include: /\.json$/, loaders: ['json-loader']
-        },
-        {
-          test: /(\.js|\.jsx)$/,
-          exclude: /(node_modules)/,
-          loader: 'babel',
-          query: {
-            plugins: ['transform-object-assign']
-          }
         }
       ]
     },
