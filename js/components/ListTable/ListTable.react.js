@@ -705,7 +705,7 @@ class ListTable extends Component {
           {
             props.fieldsmap !== null &&
             <div className='large-1 columns vertical-center'>
-              <ScatterPlotHOC selected={state.selected} defaultYFieldname='likes_to_posts' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
+              <ScatterPlotHOC selected={state.selected} defaultYFieldname='instagramlikes' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
               {sc => (
                 <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
                 {inst => (

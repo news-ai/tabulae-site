@@ -245,7 +245,7 @@ class EmailSignatureEditor extends Component {
     const state = this.state;
     return (
       <div style={{paddingLeft: 25}}>
-        <div style={{border: 'dotted 1px lightgrey', height: 200, width: 400, overflowY: 'scroll'}}>
+        <div style={{border: 'dotted 1px lightgrey', height: 150, width: 280, overflowY: 'scroll'}}>
          <Editor
           editorState={editorState}
           onChange={this.onChange}
@@ -259,7 +259,7 @@ class EmailSignatureEditor extends Component {
             position: 'fixed',
             top: state.rect.top,
             left: state.rect.left - 20,
-            zIndex: 10
+            zIndex: 10,
           }}>
             <EntityControls
             editorState={editorState}

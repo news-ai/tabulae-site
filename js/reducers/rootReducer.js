@@ -24,6 +24,7 @@ import joyrideReducer from '../components/Joyride/reducer';
 import clientReducer from '../components/ClientDirectories/reducer';
 import emailImageReducer from '../components/Email/EmailPanel/Image/reducer';
 import emailDraftReducer from '../components/Email/EmailPanel/EmailDraft/reducer';
+import smtpReducer from '../components/UserProfile/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -49,7 +50,8 @@ const rootReducer = combineReducers({
   clientReducer,
   emailAttachmentReducer,
   emailImageReducer,
-  emailDraftReducer
+  emailDraftReducer,
+  smtpReducer
 });
 
 export default rootReducer;

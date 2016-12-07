@@ -113,7 +113,7 @@ ReactDOM.render(
             <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
-            <Route path='settings' name='Profile Settings' component={UserProfile} />
+            <Route path='settings' name='Settings' component={UserProfile} />
             <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
               <IndexRoute component={AllSentEmailsContainer}/>
               <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
