@@ -48,8 +48,8 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       const unseen = action.ids.filter(id => !state[id]);
       const unsorted = state.received.concat(unseen);
       unsorted.sort( function(aId, bId) {
-        const aDate = new Date(obj[aId].sendat);
-        const bDate = new Date(obj[bId].sendat);
+        const aDate = new Date(obj[aId].created);
+        const bDate = new Date(obj[bId].created);
         if (aDate > bDate) return -1;
         if (aDate < bDate) return 1;
         return 0;

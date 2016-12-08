@@ -7,6 +7,7 @@ const mapStateToProps = (state, props) => {
   .filter(id => state.stagingReducer[id].delivered)
   .filter(id => !state.stagingReducer[id].archived)
   .map(id => state.stagingReducer[id]);
+
   return {
     emails,
   };
