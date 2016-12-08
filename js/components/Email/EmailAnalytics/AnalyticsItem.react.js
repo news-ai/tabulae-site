@@ -55,6 +55,8 @@ const styles = {
   }
 };
 
+const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
+
 
 class AnalyticsItem extends Component {
   constructor(props) {
@@ -85,6 +87,7 @@ class AnalyticsItem extends Component {
       updated,
       attachments,
       sendat,
+      created,
       cc,
       bcc,
       archiveEmail,
@@ -92,13 +95,15 @@ class AnalyticsItem extends Component {
     } = this.props;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
-    let date = moment(sendat);
-    console.log(delivered);
+    let sendAtDate = moment(sendat);
+    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
+    let createdDate = moment(created);
     return (
       <div style={wrapperStyle}>
-        {
-          listid !== 0 && <div className='row'>
-            <div className='small-12 medium-6 large-6 columns left'>
+        <div className='row'>
+          <div className='small-12 medium-6 large-6 columns left'>
+          {listid !== 0 &&
+            <div>
               <span style={styles.sentFrom}>Sent from List</span>
               <span style={{margin: '0 5px'}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
               {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
@@ -109,12 +114,15 @@ class AnalyticsItem extends Component {
               hoverColor={grey600}
               onClick={archiveEmail}
               />}
-            </div>
-            <div className='small-12 medium-6 large-6 columns right'>
-              <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}>Sent at: {date.tz(moment.tz.guess()).format(FORMAT)}</span>
-            </div>
+            </div>}
           </div>
-        }
+          <div className='small-12 medium-6 large-6 columns'>
+            <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
+          </div>
+          <div className='small-12 medium-12 large-12 columns'>
+            <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Send at:</strong> {sendAtDatestring}</span>
+          </div>
+        </div>
         <Dialog
         open={this.state.isPreviewOpen}
         onRequestClose={_ => this.setState({isPreviewOpen: false})}
