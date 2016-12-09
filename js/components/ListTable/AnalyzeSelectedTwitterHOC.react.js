@@ -36,7 +36,8 @@ const mapStateToProps = (state, props) => {
     averageBy,
     dataMap,
     dataKeys,
-    isReceiving: state.twitterDataReducer.isReceiving
+    isReceiving: state.twitterDataReducer.isReceiving,
+    selected: props.selected.filter(contactId => state.contactReducer[contactId] && state.contactReducer[contactId].twitter !== null)
   };
 };
 
