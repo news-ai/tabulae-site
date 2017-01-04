@@ -1,5 +1,6 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
+import isEmpty from 'lodash/isEmpty';
 import {connect} from 'react-redux';
 import {
   Editor,
@@ -170,7 +171,7 @@ class BasicHtmlEditor extends React.Component {
     };
 
     this.state = {
-      editorState: this.props.bodyHtml.length > 0 ?
+      editorState: !isEmpty(this.props.bodyHtml) ?
         EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), decorator) :
         EditorState.createEmpty(decorator),
       bodyHtml: this.props.bodyHtml || null,
