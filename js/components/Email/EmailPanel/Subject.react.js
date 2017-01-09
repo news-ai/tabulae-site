@@ -33,18 +33,18 @@ class Subject extends Component {
       editorState: EditorState.createEmpty(decorator),
       subjectHtml: null
     };
-    this.truncateText = this._truncateText.bind(this);
+    // this.truncateText = this._truncateText.bind(this);
 
     this.onChange = (editorState) => {
-      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      if (subject.length > MAX_LENGTH) {
-        const newEditorState = this.truncateText(editorState, MAX_LENGTH);
-        this.props.onSubjectChange(newEditorState);
-        this.setState({editorState: newEditorState});
-      } else {
-        this.props.onSubjectChange(editorState);
-        this.setState({editorState});
-      }
+      // const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
+      // if (subject.length > MAX_LENGTH) {
+      //   const newEditorState = this.truncateText(editorState, MAX_LENGTH);
+      //   this.props.onSubjectChange(newEditorState);
+      //   this.setState({editorState: newEditorState});
+      // } else {
+      this.props.onSubjectChange(editorState);
+      this.setState({editorState});
+      // }
     };
   }
 
@@ -58,35 +58,35 @@ class Subject extends Component {
     }
   }
 
-  _truncateText(editorState, charCount) {
-    const contentState = editorState.getCurrentContent();
-    const blocks = contentState.getBlockMap();
+  // _truncateText(editorState, charCount) {
+  //   const contentState = editorState.getCurrentContent();
+  //   const blocks = contentState.getBlockMap();
 
-    let count = 0;
-    let isTruncated = false;
-    const truncatedBlocks = [];
-    blocks.forEach((block) => {
-      if (!isTruncated) {
-        const length = block.getLength();
-        if (count + length > charCount) {
-          isTruncated = true;
-          const truncatedText = block.getText().slice(0, charCount - count);
-          const state = ContentState.createFromText(`${truncatedText}...`);
-          truncatedBlocks.push(state.getFirstBlock());
-        } else {
-          truncatedBlocks.push(block);
-        }
-        count += length + 1;
-      }
-    });
+  //   let count = 0;
+  //   let isTruncated = false;
+  //   const truncatedBlocks = [];
+  //   blocks.forEach((block) => {
+  //     if (!isTruncated) {
+  //       const length = block.getLength();
+  //       if (count + length > charCount) {
+  //         isTruncated = true;
+  //         const truncatedText = block.getText().slice(0, charCount - count);
+  //         const state = ContentState.createFromText(`${truncatedText}...`);
+  //         truncatedBlocks.push(state.getFirstBlock());
+  //       } else {
+  //         truncatedBlocks.push(block);
+  //       }
+  //       count += length + 1;
+  //     }
+  //   });
 
-    if (isTruncated) {
-      const state = ContentState.createFromBlockArray(truncatedBlocks);
-      return EditorState.createWithContent(state);
-    }
+  //   if (isTruncated) {
+  //     const state = ContentState.createFromBlockArray(truncatedBlocks);
+  //     return EditorState.createWithContent(state);
+  //   }
 
-    return editorState;
-  }
+  //   return editorState;
+  // }
 
   render() {
     const {editorState} = this.state;
