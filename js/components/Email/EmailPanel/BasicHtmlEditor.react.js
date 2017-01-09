@@ -273,7 +273,7 @@ class BasicHtmlEditor extends React.Component {
     if (e.metaKey === true) {
       return this._addLineBreak();
     } else {
-      return false;
+      return 'not-handled';
     }
   }
 
@@ -306,10 +306,9 @@ class BasicHtmlEditor extends React.Component {
       newContent = Modifier.insertText(content, selection, '\n');
       newEditorState = EditorState.push(editorState, newContent, 'add-new-line');
       this.onChange(newEditorState);
-      return true;
-    } else {
-      return false;
+      return 'handled';
     }
+    return 'not-handled';
   }
 
   _handleImage(url) {
@@ -450,7 +449,13 @@ class BasicHtmlEditor extends React.Component {
           </Menu>
         </Popover>
         <div className='vertical-center'>
-          <div style={{marginTop: 8, width: 550, overflowX: 'scroll'}}>
+          <div
+          style={{
+            marginTop: 8,
+            width: 550,
+            height: 20,
+            overflowY: 'auto',
+          }}>
             <Subject
             onSubjectChange={props.onSubjectChange}
             subjectHtml={props.subjectHtml}
