@@ -10,10 +10,9 @@ import {
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
 import {curlyStrategy, findEntities} from './utils/strategies';
+import {grey500} from 'material-ui/styles/colors';
 
-import {is} from 'immutable';
-
-const MAX_LENGTH = 15;
+const MAX_LENGTH = 255;
 
 class Subject extends Component {
   constructor(props) {
@@ -31,20 +30,22 @@ class Subject extends Component {
 
     this.state = {
       editorState: EditorState.createEmpty(decorator),
-      subjectHtml: null
+      subjectHtml: null,
+      subjectLength: 0
     };
-    // this.truncateText = this._truncateText.bind(this);
+    this.truncateText = this._truncateText.bind(this);
 
     this.onChange = (editorState) => {
-      // const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      // if (subject.length > MAX_LENGTH) {
-      //   const newEditorState = this.truncateText(editorState, MAX_LENGTH);
-      //   this.props.onSubjectChange(newEditorState);
-      //   this.setState({editorState: newEditorState});
-      // } else {
-      this.props.onSubjectChange(editorState);
-      this.setState({editorState});
-      // }
+      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
+      const subjectLength = subject.length;
+      if (subject.length > MAX_LENGTH) {
+        const newEditorState = this.truncateText(editorState, MAX_LENGTH);
+        this.props.onSubjectChange(newEditorState);
+        this.setState({editorState: newEditorState, subjectLength});
+      } else {
+        this.props.onSubjectChange(editorState);
+        this.setState({editorState, subjectLength});
+      }
     };
   }
 
@@ -58,45 +59,62 @@ class Subject extends Component {
     }
   }
 
-  // _truncateText(editorState, charCount) {
-  //   const contentState = editorState.getCurrentContent();
-  //   const blocks = contentState.getBlockMap();
+  _truncateText(editorState, charCount) {
+    const contentState = editorState.getCurrentContent();
+    const blocks = contentState.getBlockMap();
 
-  //   let count = 0;
-  //   let isTruncated = false;
-  //   const truncatedBlocks = [];
-  //   blocks.forEach((block) => {
-  //     if (!isTruncated) {
-  //       const length = block.getLength();
-  //       if (count + length > charCount) {
-  //         isTruncated = true;
-  //         const truncatedText = block.getText().slice(0, charCount - count);
-  //         const state = ContentState.createFromText(`${truncatedText}...`);
-  //         truncatedBlocks.push(state.getFirstBlock());
-  //       } else {
-  //         truncatedBlocks.push(block);
-  //       }
-  //       count += length + 1;
-  //     }
-  //   });
+    let count = 0;
+    let isTruncated = false;
+    const truncatedBlocks = [];
+    blocks.forEach((block) => {
+      if (!isTruncated) {
+        const length = block.getLength();
+        if (count + length > charCount) {
+          isTruncated = true;
+          const truncatedText = block.getText().slice(0, charCount - count);
+          const state = ContentState.createFromText(truncatedText);
+          truncatedBlocks.push(state.getFirstBlock());
+        } else {
+          truncatedBlocks.push(block);
+        }
+        count += length + 1;
+      }
+    });
 
-  //   if (isTruncated) {
-  //     const state = ContentState.createFromBlockArray(truncatedBlocks);
-  //     return EditorState.createWithContent(state);
-  //   }
+    if (isTruncated) {
+      const state = ContentState.createFromBlockArray(truncatedBlocks);
+      return EditorState.createWithContent(state);
+    }
 
-  //   return editorState;
-  // }
+    return editorState;
+  }
 
   render() {
-    const {editorState} = this.state;
+    const {editorState, subjectLength} = this.state;
     return (
-      <Editor
-      editorState={editorState}
-      onChange={this.onChange}
-      handleReturn={e => 'handled'}
-      placeholder='Subject...'
-      />
+      <div className='vertical-center'>
+        <div
+        style={{
+          marginTop: 8,
+          width: 530,
+          height: 20,
+          overflowY: 'auto',
+        }}>
+          <Editor
+          editorState={editorState}
+          onChange={this.onChange}
+          handleReturn={e => 'handled'}
+          placeholder='Subject...'
+          />
+        </div>
+        <div
+        style={{
+          width: 20,
+          height: 20
+        }}>
+        <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
+        </div>
+      </div>
     );
   }
 }

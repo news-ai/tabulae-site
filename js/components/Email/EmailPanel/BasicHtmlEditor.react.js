@@ -23,8 +23,7 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, grey300, grey400, grey800} from 'material-ui/styles/colors';
-import FontIcon from 'material-ui/FontIcon';
+import {blue100, blue200, grey300} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -215,7 +214,7 @@ class BasicHtmlEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
-      console.log(nextProps.bodyHtml);
+      // console.log(nextProps.bodyHtml);
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
@@ -448,20 +447,10 @@ class BasicHtmlEditor extends React.Component {
             }} />)}
           </Menu>
         </Popover>
-        <div className='vertical-center'>
-          <div
-          style={{
-            marginTop: 8,
-            width: 550,
-            height: 20,
-            overflowY: 'auto',
-          }}>
-            <Subject
-            onSubjectChange={props.onSubjectChange}
-            subjectHtml={props.subjectHtml}
-            />
-          </div>
-        </div>
+        <Subject
+        onSubjectChange={props.onSubjectChange}
+        subjectHtml={props.subjectHtml}
+        />
         <div style={{
           height: 480,
           overflowY: 'scroll',
