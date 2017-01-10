@@ -138,7 +138,7 @@ class EmailPanel extends Component {
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
     let contactEmails = [];
-    selectedContacts.map( (contact, i) => {
+    selectedContacts.map((contact, i) => {
       if (contact && contact !== null) {
         const replacedBody = this.replaceAll(body, selectedContacts[i]);
         const replacedSubject = this.replaceAll(subject, selectedContacts[i]);

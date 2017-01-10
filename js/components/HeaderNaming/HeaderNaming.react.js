@@ -127,20 +127,24 @@ class HeaderNaming extends Component {
 
   _onMenuChange(event, index, value, rowIndex, prevValue) {
     if (value === undefined) {
-      const emptyOrder = this.state.order.map((val, i) => rowIndex === i ? undefined : val);
-      const emptyOptions = this.state.options.map(option => option.value === prevValue ? Object.assign({}, option, {selected: false}) : option);
+      // unselected a value
+      const unselectOrder = this.state.order.map((columnName, i) => rowIndex === i ? undefined : columnName);
+      const unselectOptions = this.state.options.map(option => option.value === prevValue ? Object.assign({}, option, {selected: false}) : option);
       this.setState({
-        order: emptyOrder,
-        options: emptyOptions
+        order: unselectOrder,
+        options: unselectOptions
       }, _ => this._headernames.recomputeGridSize());
       return;
     }
+    // selected a value
     let prevOrder = this.state.order.slice();
-    if (prevOrder[rowIndex]) prevOrder[rowIndex] = undefined;
+    if (this.state.order.some(columnName => columnName === prevValue)) {
+      prevOrder = this.state.order.map(columnName => columnName === prevValue ? undefined : columnName);
+    }
     const order = prevOrder.map((columnName, i) => i === rowIndex ? value : columnName);
     const options = this.state.options
-    .map(option => option.value === value ?
-      Object.assign({}, option, {selected: !option.selected}) : option);
+    .map((option, i) => order.some(columnName => columnName === option.value) ?
+      Object.assign({}, option, {selected: true}) : Object.assign({}, option, {selected: false}));
     this.setState({order, options}, _ => this._headernames.recomputeGridSize());
   }
 
