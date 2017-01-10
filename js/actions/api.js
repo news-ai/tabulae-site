@@ -1,9 +1,12 @@
 import fetch from 'isomorphic-fetch';
 
 export function get(endpoint) {
-  return fetch(`${window.TABULAE_API_BASE}${endpoint}`, { credentials: 'include'})
-    .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => JSON.parse(text));
+  return fetch(`${window.TABULAE_API_BASE}${endpoint}`, {
+    method: 'GET',
+    credentials: 'include'
+  })
+    .then(response => response.status === 200 ? response.text() : Promise.reject(response))
+    .then(text => JSON.parse(text));
 }
 
 export function deleteRequest(endpoint) {
@@ -11,8 +14,8 @@ export function deleteRequest(endpoint) {
     method: 'DELETE',
     credentials: 'include'
   })
-    .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => JSON.parse(text));
+    .then(response => response.status === 200 ? response.text() : Promise.reject(response))
+    .then(text => JSON.parse(text));
 }
 
 export function post(endpoint, body) {
@@ -21,8 +24,8 @@ export function post(endpoint, body) {
     credentials: 'include',
     body: JSON.stringify(body)
   })
-    .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => JSON.parse(text));
+    .then(response => response.status === 200 ? response.text() : Promise.reject(response))
+    .then(text => JSON.parse(text));
 }
 
 export function postFile(endpoint, file) {
@@ -31,8 +34,8 @@ export function postFile(endpoint, file) {
     credentials: 'include',
     body: file
   })
-    .then( response => response.status === 200 ? response.text() : Promise.reject(response.text()))
-    .then( text => JSON.parse(text));
+    .then(response => response.status === 200 ? response.text() : Promise.reject(response.text()))
+    .then(text => JSON.parse(text));
 }
 
 export function patch(endpoint, body) {
@@ -46,7 +49,7 @@ export function patch(endpoint, body) {
     credentials: 'include',
     body: JSON.stringify(body)
   })
-    .then( response => response.status === 200 ? response.text() : Promise.reject(response))
-    .then( text => JSON.parse(text));
+    .then(response => response.status === 200 ? response.text() : Promise.reject(response))
+    .then(text => JSON.parse(text));
 }
 

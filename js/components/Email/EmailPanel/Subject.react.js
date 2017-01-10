@@ -112,7 +112,7 @@ class Subject extends Component {
           width: 20,
           height: 20
         }}>
-        <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
+          <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
         </div>
       </div>
     );
