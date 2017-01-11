@@ -4,6 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import PublicationPreview from './PublicationPreview.react';
+import PublicationForm from './PublicationForm.react';
 import * as AppActions from 'actions/AppActions';
 
 class AddEmployerHOC extends Component {
@@ -13,7 +14,7 @@ class AddEmployerHOC extends Component {
       open: false,
       input: '',
       employerAutocompleteList: [],
-      autocompleteOpen: false
+      publicationFormOpen: false
     };
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.onRequestClose = this._onRequestClose.bind(this);
@@ -51,7 +52,7 @@ class AddEmployerHOC extends Component {
       primary
       keyboardFocused
       onTouchTap={_ => {
-        props.createPublicationThenPatchContact(props.contact.id, state.input, props.type);
+        props.createPublicationThenPatchContact(props.contact.id, {name: state.input}, props.type);
         this.onRequestClose();
       }}
     />,
@@ -60,7 +61,6 @@ class AddEmployerHOC extends Component {
       <div>
         <Dialog actions={actions} title={props.title} open={state.open} onRequestClose={this.onRequestClose}>
           <AutoComplete
-          open={state.autocompleteOpen}
           floatingLabelText='Autocomplete Dropdown'
           filter={AutoComplete.noFilter}
           onUpdateInput={this.updateAutoInput}
@@ -68,7 +68,8 @@ class AddEmployerHOC extends Component {
           openOnFocus
           dataSource={state.employerAutocompleteList}
           />
-           {!state.autocompleteOpen && <PublicationPreview text={state.input}/>}
+          <PublicationPreview text={state.input} onOpenForm={_ => this.setState({publicationFormOpen: true})}/>
+          {state.publicationFormOpen && <PublicationForm text={state.input} onHide={_ => this.setState({publicationFormOpen: false})}/>}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
@@ -86,7 +87,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     searchPublications: query => dispatch(AppActions.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
+    createPublicationThenPatchContact: (contactId, publicationObj, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, publicationObj, which)),
   };
 };
 

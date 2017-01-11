@@ -56,7 +56,6 @@ class ContactProfile extends Component {
       firsttime: this.props.firstTimeUser,
       activeKey: 'all'
     };
-    this.togglePanel = this._togglePanel.bind(this);
     window.onresize = _ => {
       const node = ReactDOM.findDOMNode(this.refs.tabs);
       if (node) {
@@ -93,19 +92,6 @@ class ContactProfile extends Component {
 
   componentWillUnmount() {
     window.onresize = undefined;
-  }
-
-  _togglePanel(key) {
-    switch (key) {
-      case 'employers':
-        this.setState({isEmployerPanelOpen: !this.state.isEmployerPanelOpen});
-        break;
-      case 'pastemployers':
-        this.setState({isPastEmployerPanelOpen: !this.state.isPastEmployerPanelOpen});
-        break;
-      default:
-      // do nothing
-    }
   }
 
   render() {
@@ -344,8 +330,6 @@ function mapDispatchToProps(dispatch, props) {
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
     fetchContactFeeds: (contactId) => dispatch(feedActions.fetchContactFeeds(contactId)),
     fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
-    searchPublications: query => dispatch(AppActions.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, pubName, which)),
     fetchList: listId => dispatch(AppActions.fetchList(listId)),
     removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide())

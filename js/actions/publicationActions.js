@@ -95,10 +95,10 @@ export function createPublication(data) {
   };
 }
 
-export function createPublicationThenPatchContact(contactId, pubName, which) {
+export function createPublicationThenPatchContact(contactId, pubObj, which) {
   return (dispatch, getState) => {
     dispatch({type: 'CREATE_PUBLICATION_THEN_PATCH_CONTACT'});
-    const pubId = getState().publicationReducer[pubName];
+    const pubId = getState().publicationReducer[pubObj.name];
     if (pubId) {
       const contact = getState().contactReducer[contactId];
       if (contact) {
@@ -108,7 +108,7 @@ export function createPublicationThenPatchContact(contactId, pubName, which) {
         dispatch(contactActions.patchContact(contactId, contactBody));
       }
     } else {
-      dispatch(createPublication({name: pubName}))
+      dispatch(createPublication(pubObj))
       .then(response => {
         const newPubId = response.data.id;
         const contact = getState().contactReducer[contactId];
