@@ -13,12 +13,12 @@ import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
 import {tour} from './tour';
 
-import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
+import AddEmployerHOC from './AddEmployerHOC.react';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeedContainer.react';
@@ -52,17 +52,11 @@ class ContactProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isEmployerPanelOpen: false,
-      isPastEmployerPanelOpen: false,
-      employerAutocompleteList: [],
-      autoinput: '',
       tabContainerWidth: 800,
       firsttime: this.props.firstTimeUser,
       activeKey: 'all'
     };
     this.togglePanel = this._togglePanel.bind(this);
-    this.updateAutoInput = this._updateAutoInput.bind(this);
-    this.addPublicationToContact = this._addPublicationToContact.bind(this);
     window.onresize = _ => {
       const node = ReactDOM.findDOMNode(this.refs.tabs);
       if (node) {
@@ -114,67 +108,10 @@ class ContactProfile extends Component {
     }
   }
 
-  _updateAutoInput(val) {
-    this.setState({autoinput: val});
-    setTimeout(_ => {
-      this.props.searchPublications(this.state.autoinput)
-      .then(response => this.setState({
-        employerAutocompleteList: response,
-      }));
-    }, 500);
-  }
-
-  _addPublicationToContact() {
-    this.props.createPublicationThenPatchContact(this.props.contact.id, this.state.autoinput);
-  }
-
   render() {
     const state = this.state;
     const props = this.props;
-    const addEmployerActions = [
-      <FlatButton
-        label='Cancel'
-        primary
-        onTouchTap={_ => {
-          this.togglePanel('employers');
-          this.setState({
-            autoinput: '',
-            employerAutocompleteList: []
-          });
-        }}
-      />,
-      <FlatButton
-        label='Submit'
-        primary
-        keyboardFocused
-        onTouchTap={_ => {
-          props.createPublicationThenPatchContact(props.contact.id, state.autoinput, 'employers');
-          this.togglePanel('employers');
-        }}
-      />,
-    ];
-    const addPastEmployerActions = [
-      <FlatButton
-        label='Cancel'
-        primary
-        onTouchTap={_ => {
-          this.togglePanel('pastemployers');
-          this.setState({
-            autoinput: '',
-            employerAutocompleteList: []
-          });
-        }}
-      />,
-      <FlatButton
-        label='Submit'
-        primary
-        keyboardFocused
-        onTouchTap={_ => {
-          props.createPublicationThenPatchContact(props.contact.id, state.autoinput, 'pastemployers');
-          this.togglePanel('pastemployers');
-        }}
-      />,
-    ];
+  
     return (
       <div className='row horizontal-center'>
         {
@@ -232,15 +169,22 @@ class ContactProfile extends Component {
                 <div className='large-12 medium-12 small-12 columns'>
                   <div className='row vertical-center' style={{marginTop: 20}}>
                     <h5>Current Publications/Employers</h5>
-                    <IconButton
-                    disabled={props.contact.readonly}
-                    iconStyle={styles.smallIcon}
-                    style={styles.small}
-                    iconClassName='fa fa-plus'
-                    tooltip='Add Publication'
-                    tooltipPosition='top-right'
-                    onClick={_ => this.togglePanel('employers')}
-                    />
+                    <AddEmployerHOC
+                    title='Add Current Publication'
+                    type='employers'
+                    contact={props.contact}
+                    >
+                    {({onRequestOpen}) => (
+                      <IconButton
+                      disabled={props.contact.readonly}
+                      iconStyle={styles.smallIcon}
+                      style={styles.small}
+                      iconClassName='fa fa-plus'
+                      tooltip='Add Publication'
+                      tooltipPosition='top-right'
+                      onClick={onRequestOpen}
+                      />)}
+                    </AddEmployerHOC>
                   </div>
                   <div>
                     {props.employers && props.employers.map((employer, i) =>
@@ -252,16 +196,24 @@ class ContactProfile extends Component {
                     <div className='large-12 medium-12 small-12 columns'>
                     </div>
                       <h5>Past Publications/Employers</h5>
-                      <IconButton
-                      disabled={props.contact.readonly}
-                      style={{marginLeft: 3}}
-                      iconStyle={styles.smallIcon}
-                      style={styles.small}
-                      iconClassName='fa fa-plus'
-                      tooltip='Add Publication'
-                      tooltipPosition='top-right'
-                      onClick={_ => this.togglePanel('pastemployers')}
-                      />
+                      <AddEmployerHOC
+                      title='Add Past Publication'
+                      type='pastemployers'
+                      contact={props.contact}
+                      >
+                      {({onRequestOpen}) => (
+                        <IconButton
+                        disabled={props.contact.readonly}
+                        style={{marginLeft: 3}}
+                        iconStyle={styles.smallIcon}
+                        style={styles.small}
+                        iconClassName='fa fa-plus'
+                        tooltip='Add Publication'
+                        tooltipPosition='top-right'
+                        onClick={onRequestOpen}
+                        />
+                        )}
+                      </AddEmployerHOC>
                     </div>
                   </div>
                   <div>
@@ -273,21 +225,6 @@ class ContactProfile extends Component {
               </div>
             </div>
             )}
-          <Dialog
-          actions={state.isEmployerPanelOpen ? addEmployerActions : addPastEmployerActions}
-          title={state.isEmployerPanelOpen ? 'Add Current Publication' : 'Add Past Publication'}
-          modal
-          open={state.isEmployerPanelOpen || state.isPastEmployerPanelOpen}
-          onRequestClose={_ => state.isEmployerPanelOpen ? this.togglePanel('employers') : this.togglePanel('pastemployers')}>
-            <AutoComplete
-            floatingLabelText='Autocomplete Dropdown'
-            filter={AutoComplete.noFilter}
-            onUpdateInput={this.updateAutoInput}
-            onNewRequest={autoinput => this.setState({autoinput})}
-            openOnFocus
-            dataSource={state.employerAutocompleteList}
-            />
-          </Dialog>
           <div className='large-12 columns' style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
             <FeedsController {...props} />
               <Tabs
