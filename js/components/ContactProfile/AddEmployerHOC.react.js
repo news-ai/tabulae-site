@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
+import PublicationPreview from './PublicationPreview.react';
 import * as AppActions from 'actions/AppActions';
 
 class AddEmployerHOC extends Component {
@@ -12,6 +13,7 @@ class AddEmployerHOC extends Component {
       open: false,
       input: '',
       employerAutocompleteList: [],
+      autocompleteOpen: false
     };
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.onRequestClose = this._onRequestClose.bind(this);
@@ -23,6 +25,7 @@ class AddEmployerHOC extends Component {
       this.props.searchPublications(this.state.input)
       .then(response => this.setState({
         employerAutocompleteList: response,
+        autocompleteOpen: response.length > 0
       }));
     }, 500);
   }
@@ -57,13 +60,15 @@ class AddEmployerHOC extends Component {
       <div>
         <Dialog actions={actions} title={props.title} open={state.open} onRequestClose={this.onRequestClose}>
           <AutoComplete
-            floatingLabelText='Autocomplete Dropdown'
-            filter={AutoComplete.noFilter}
-            onUpdateInput={this.updateAutoInput}
-            onNewRequest={input => this.setState({input})}
-            openOnFocus
-            dataSource={state.employerAutocompleteList}
-            />
+          open={state.autocompleteOpen}
+          floatingLabelText='Autocomplete Dropdown'
+          filter={AutoComplete.noFilter}
+          onUpdateInput={this.updateAutoInput}
+          onNewRequest={input => this.setState({input})}
+          openOnFocus
+          dataSource={state.employerAutocompleteList}
+          />
+           {!state.autocompleteOpen && <PublicationPreview text={state.input}/>}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
