@@ -14,14 +14,21 @@ class AddEmployerHOC extends Component {
       open: false,
       input: '',
       employerAutocompleteList: [],
-      publicationFormOpen: false
+      publicationFormOpen: false,
+      publicationObj: {
+        name: '',
+        url: ''
+      }
     };
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.onRequestClose = this._onRequestClose.bind(this);
   }
 
   _updateAutoInput(val) {
-    this.setState({input: val});
+    this.setState({
+      input: val,
+      publicationObj: Object.assign({}, this.state.publicationObj, {name: val})
+    });
     setTimeout(_ => {
       this.props.searchPublications(this.state.input)
       .then(response => this.setState({
@@ -52,7 +59,8 @@ class AddEmployerHOC extends Component {
       primary
       keyboardFocused
       onTouchTap={_ => {
-        props.createPublicationThenPatchContact(props.contact.id, {name: state.input}, props.type);
+        console.log(state.publicationObj);
+        props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
         this.onRequestClose();
       }}
     />,
@@ -68,8 +76,13 @@ class AddEmployerHOC extends Component {
           openOnFocus
           dataSource={state.employerAutocompleteList}
           />
-          <PublicationPreview text={state.input} onOpenForm={_ => this.setState({publicationFormOpen: true})}/>
-          {state.publicationFormOpen && <PublicationForm text={state.input} onHide={_ => this.setState({publicationFormOpen: false})}/>}
+          {!state.publicationFormOpen && <PublicationPreview text={state.input} onOpenForm={_ => this.setState({publicationFormOpen: true})}/>}
+          {state.publicationFormOpen &&
+            <PublicationForm
+            publicationObj={state.publicationObj}
+            onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
+            onHide={_ => this.setState({publicationFormOpen: false})}
+            />}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})

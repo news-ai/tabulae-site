@@ -22,13 +22,16 @@ class PublicationForm extends Component {
           <TextField
           hintText='Publication Name'
           floatingLabelText='Publication Name'
-          defaultValue={props.text}
+          value={props.publicationObj.name}
+          onChange={e => props.onValueChange(e.target.value, 'name')}
           />
         </div>
         <div className='large-12 medium-12 small-12 columns'>
           <TextField
           hintText='Website Link'
           floatingLabelText='Website Link'
+          value={props.publicationObj.url}
+          onChange={e => props.onValueChange(e.target.value, 'url')}
           />
         </div>
       </div>
