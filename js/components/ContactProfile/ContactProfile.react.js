@@ -17,7 +17,7 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
-import AddEmployerHOC from './AddEmployerHOC.react';
+import AddEmployerHOC from './ContactPublications/AddEmployerHOC.react';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeedContainer.react';
