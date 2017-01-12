@@ -6,6 +6,7 @@ import FlatButton from 'material-ui/FlatButton';
 import PublicationPreview from './PublicationPreview.react';
 import PublicationForm from './PublicationForm.react';
 import * as AppActions from 'actions/AppActions';
+import alertify from 'alertifyjs';
 
 class AddEmployerHOC extends Component {
   constructor(props) {
@@ -49,6 +50,7 @@ class AddEmployerHOC extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    const pubId = props.publicationReducer[state.input];
     const actions = [
       <FlatButton
       label='Cancel'
@@ -58,10 +60,20 @@ class AddEmployerHOC extends Component {
       label='Submit'
       primary
       keyboardFocused
+      disabled={!pubId || state.publicationFormOpen}
       onTouchTap={_ => {
-        console.log(state.publicationObj);
-        props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
-        this.onRequestClose();
+        const publicationObj = state.publicationObj;
+        if (state.publicationFormOpen) {
+          if (publicationObj.name && publicationObj.url) {
+            props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
+            this.onRequestClose();
+          } else {
+            alertify.alert('All fields must be filled to continue.');
+          }
+        } else {
+          props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
+          this.onRequestClose();
+        }
       }}
     />,
     ];
@@ -94,6 +106,7 @@ class AddEmployerHOC extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
+    publicationReducer: state.publicationReducer
   };
 };
 
