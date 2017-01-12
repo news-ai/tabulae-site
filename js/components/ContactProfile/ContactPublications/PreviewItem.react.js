@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import ContactDescriptor from './ContactDescriptor.react';
+import ContactDescriptor from '../ContactDescriptor.react';
 import {blue50} from 'material-ui/styles/colors';
 import isURL from 'validator/lib/isURL';
 import * as AppActions from 'actions/AppActions';
