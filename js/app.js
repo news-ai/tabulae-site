@@ -60,6 +60,7 @@ import ListFeed from './components/ListFeed';
 import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
 import ClientDirectories from './components/ClientDirectories/ClientDirectories.react';
 import ClientDirectory from './components/ClientDirectories/ClientDirectory.react';
+import Publication from './components/Publications/Publication.react';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -110,6 +111,7 @@ ReactDOM.render(
               <Route path=':clientname' component={ClientDirectory}/>
             </Route>
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
+            <Route path='publications/:publicationId' staticName name='Publication' component={Publication} />
             <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />

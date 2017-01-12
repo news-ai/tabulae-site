@@ -49,6 +49,7 @@ export const archiveEmail = id => stagingActions.archiveEmail(id);
 export const uploadImage = file => imgActions.uploadImage(file);
 
 export const fetchPublication = id => publicationActions.fetchPublication(id);
+export const patchPublication = (publicationId, publicationBody) => publicationActions.patchPublication(publicationId, publicationBody);
 export const createPublication = data => publicationActions.createPublication(data);
 export const searchPublications = query => publicationActions.searchPublications(query);
 export const createPublicationThenPatchContact = (contactId, pubName, which) => publicationActions.createPublicationThenPatchContact(contactId, pubName, which);

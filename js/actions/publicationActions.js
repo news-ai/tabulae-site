@@ -42,8 +42,18 @@ export function fetchPublication(id) {
     if (getState().publicationReducer[id]) if (getState().publicationReducer[id].isReceiving) return;
     dispatch(requestPublication(id));
     return api.get(`/publications/${id}`)
-    .then( response => dispatch(receivePublication(response.data)))
-    .catch( message => dispatch(requestPublicationFail(message)));
+    .then(response => dispatch(receivePublication(response.data)))
+    .catch(message => dispatch(requestPublicationFail(message)));
+  };
+}
+
+export function patchPublication(publicationId, publicationBody) {
+  return (dispatch, getState) => {
+    dispatch(requestPublication(publicationId));
+    const publication = Object.assign({}, getState().publicationReducer[publicationId], publicationBody);
+    return api.patch(`/publications/${publicationId}`, publication)
+    .then(response => dispatch(receivePublication(response.data)))
+    .catch(message => dispatch(requestPublicationFail(message)));
   };
 }
 
@@ -95,10 +105,10 @@ export function createPublication(data) {
   };
 }
 
-export function createPublicationThenPatchContact(contactId, pubName, which) {
+export function createPublicationThenPatchContact(contactId, pubObj, which) {
   return (dispatch, getState) => {
     dispatch({type: 'CREATE_PUBLICATION_THEN_PATCH_CONTACT'});
-    const pubId = getState().publicationReducer[pubName];
+    const pubId = getState().publicationReducer[pubObj.name];
     if (pubId) {
       const contact = getState().contactReducer[contactId];
       if (contact) {
@@ -108,7 +118,7 @@ export function createPublicationThenPatchContact(contactId, pubName, which) {
         dispatch(contactActions.patchContact(contactId, contactBody));
       }
     } else {
-      dispatch(createPublication({name: pubName}))
+      dispatch(createPublication(pubObj))
       .then(response => {
         const newPubId = response.data.id;
         const contact = getState().contactReducer[contactId];
