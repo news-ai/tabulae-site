@@ -1,7 +1,37 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import TextField from 'material-ui/TextField';
 import {blue50, grey700} from 'material-ui/styles/colors';
+import isURL from 'validator/lib/isURL';
+
+class ValidationHOC extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showErrorMessage: false,
+      errorMessage: ''
+    };
+    this.validateChildValue = this._validateChildValue.bind(this);
+  }
+
+  _validateChildValue(value) {
+    const rules = this.props.rules;
+    for (var i = 0; i < rules.length; i++) {
+      const {validator, errorMessage} = rules[i];
+      if (!validator(value)) {
+        this.setState({showErrorMessage: true, errorMessage});
+        return;
+      }
+    }
+    this.setState({showErrorMessage: false, errorMessage: ''});
+  }
+
+  render() {
+    return this.props.children({
+      errorMessage: this.state.showErrorMessage ? this.state.errorMessage : '',
+      onValueChange: value => this.validateChildValue(value)
+    });
+  }
+}
 
 class PublicationForm extends Component {
   constructor(props) {
@@ -27,12 +57,21 @@ class PublicationForm extends Component {
           />
         </div>
         <div className='large-12 medium-12 small-12 columns'>
-          <TextField
-          hintText='Website Link'
-          floatingLabelText='Website Link'
-          value={props.publicationObj.url}
-          onChange={e => props.onValueChange(e.target.value, 'url')}
-          />
+          <ValidationHOC
+          rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}
+          >
+          {({onValueChange, errorMessage}) => (
+            <TextField
+            errorText={errorMessage}
+            hintText='Website Link'
+            floatingLabelText='Website Link'
+            value={props.publicationObj.url}
+            onChange={e => {
+              onValueChange(e.target.value);
+              props.onValueChange(e.target.value, 'url');
+            }}
+            />)}
+          </ValidationHOC>
         </div>
       </div>
     );

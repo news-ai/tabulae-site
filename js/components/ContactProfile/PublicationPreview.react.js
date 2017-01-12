@@ -1,6 +1,25 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import RaisedButton from 'material-ui/RaisedButton';
+import {blue50, grey800, grey600} from 'material-ui/styles/colors';
+
+const PreviewItem = ({name, url}) => (
+  <div
+  style={{
+    backgroundColor: blue50,
+    margin: 5,
+    padding: 10
+  }}>
+    <div className='row'>
+      <span style={{fontWeight: 'bold'}}>{name}</span>
+    </div>
+    <div className='row'>
+      {url ?
+        <span style={{color: grey800, fontSize: '0.9em'}}>{url}</span> :
+        <span className='pointer' style={{color: grey600, fontSize: '0.9em'}}>No website url added for this publication. Add one?</span>}
+    </div>
+  </div>
+  );
 
 class PublicationPreview extends Component {
   constructor(props) {
@@ -13,16 +32,12 @@ class PublicationPreview extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const {text, publication} = props;
-    return text.length > 0 ? (
+    return props.text.length > 0 ? (
       <div>
-        {publication ? <div>
+        {props.publication ?
           <div>
-            NAME: {publication.name}
-          </div>
-          <div>
-            URL: {publication.url}
-          </div>
+          <span style={{fontSize: '0.9em'}}>Selected:</span>
+          <PreviewItem {...props.publication}/>
         </div> : <div>
           {!state.open &&
             <div>

@@ -7,6 +7,7 @@ import PublicationPreview from './PublicationPreview.react';
 import PublicationForm from './PublicationForm.react';
 import * as AppActions from 'actions/AppActions';
 import alertify from 'alertifyjs';
+import isURL from 'validator/lib/isURL';
 
 class AddEmployerHOC extends Component {
   constructor(props) {
@@ -23,6 +24,7 @@ class AddEmployerHOC extends Component {
     };
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.onRequestClose = this._onRequestClose.bind(this);
+    this.onSubmit = this._onSubmit.bind(this);
   }
 
   _updateAutoInput(val) {
@@ -47,6 +49,23 @@ class AddEmployerHOC extends Component {
     });
   }
 
+  _onSubmit() {
+    const props = this.props;
+    const state = this.state;
+    const publicationObj = state.publicationObj;
+    if (state.publicationFormOpen) {
+      if (publicationObj.name && isURL(publicationObj.url)) {
+        props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
+        this.onRequestClose();
+      } else {
+        alertify.alert('All fields must be filled to continue.');
+      }
+    } else {
+      props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
+      this.onRequestClose();
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -61,20 +80,7 @@ class AddEmployerHOC extends Component {
       primary
       keyboardFocused
       disabled={!pubId || state.publicationFormOpen}
-      onTouchTap={_ => {
-        const publicationObj = state.publicationObj;
-        if (state.publicationFormOpen) {
-          if (publicationObj.name && publicationObj.url) {
-            props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
-            this.onRequestClose();
-          } else {
-            alertify.alert('All fields must be filled to continue.');
-          }
-        } else {
-          props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
-          this.onRequestClose();
-        }
-      }}
+      onTouchTap={this.onSubmit}
     />,
     ];
     return (
