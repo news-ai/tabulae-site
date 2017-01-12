@@ -49,7 +49,7 @@ export function fetchPublication(id) {
 
 export function patchPublication(publicationId, publicationBody) {
   return (dispatch, getState) => {
-    dispatch(requestPublication());
+    dispatch(requestPublication(publicationId));
     const publication = Object.assign({}, getState().publicationReducer[publicationId], publicationBody);
     return api.patch(`/publications/${publicationId}`, publication)
     .then(response => dispatch(receivePublication(response.data)))
