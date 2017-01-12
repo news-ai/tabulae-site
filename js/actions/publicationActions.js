@@ -42,8 +42,18 @@ export function fetchPublication(id) {
     if (getState().publicationReducer[id]) if (getState().publicationReducer[id].isReceiving) return;
     dispatch(requestPublication(id));
     return api.get(`/publications/${id}`)
-    .then( response => dispatch(receivePublication(response.data)))
-    .catch( message => dispatch(requestPublicationFail(message)));
+    .then(response => dispatch(receivePublication(response.data)))
+    .catch(message => dispatch(requestPublicationFail(message)));
+  };
+}
+
+export function patchPublication(publicationId, publicationBody) {
+  return (dispatch, getState) => {
+    dispatch(requestPublication());
+    const publication = Object.assign({}, getState().publicationReducer[publicationId], publicationBody);
+    return api.patch(`/publications/${publicationId}`, publication)
+    .then(response => dispatch(receivePublication(response.data)))
+    .catch(message => dispatch(requestPublicationFail(message)));
   };
 }
 

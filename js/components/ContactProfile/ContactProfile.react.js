@@ -7,7 +7,7 @@ import * as AppActions from '../../actions/AppActions';
 import * as headlineActions from './Headlines/actions';
 import * as contactActions from '../../actions/contactActions';
 import * as joyrideActions from '../Joyride/actions';
-import {grey700, grey500, grey50} from 'material-ui/styles/colors';
+import {grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -15,7 +15,6 @@ import {tour} from './tour';
 
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
-import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
 import AddEmployerHOC from './AddEmployerHOC.react';
@@ -97,7 +96,7 @@ class ContactProfile extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-  
+
     return (
       <div className='row horizontal-center'>
         {
