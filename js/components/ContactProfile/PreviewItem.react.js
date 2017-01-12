@@ -9,22 +9,19 @@ const PreviewItem = ({name, url, patchPublication}) => (
   <div
   style={{
     backgroundColor: blue50,
-    margin: 5,
+    margin: '15px 5px',
     padding: 10
   }}>
-    <div className='row' style={{margin: '0 3px'}}>
-      <span style={{fontWeight: 'bold'}}>{name}</span>
+    <div className='row' style={{margin: '0 10px'}}>
+      <span style={{fontSize: '0.9em', marginRight: 10}}>Publication: </span><span>{name}</span>
     </div>
-    <div className='row' style={{margin: '0 3px'}}>
+    <div className='row' style={{margin: '3px 0'}}>
       <ContactDescriptor
       iconClassName='fa fa-external-link'
       className='large-12 medium-12 small-12 columns'
       content={url}
       contentTitle='Website Link'
       onBlur={url => {
-        console.log(url);
-        console.log(isURL(url));
-        console.log(patchPublication);
         if (isURL(url)) patchPublication({url});
       }}/>
     </div>

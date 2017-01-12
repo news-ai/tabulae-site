@@ -17,10 +17,7 @@ class PublicationPreview extends Component {
     return props.text.length > 0 ? (
       <div style={{margin: '0 10px'}}>
         {props.publication ?
-          <div>
-          <span style={{fontSize: '0.9em'}}>Selected:</span>
-          <PreviewItem {...props.publication}/>
-        </div> : <div>
+          <PreviewItem {...props.publication}/> : <div>
           {!state.open &&
             <div style={{margin: 10}}>
               <div className='large-9 medium-7 small-6 columns'>
