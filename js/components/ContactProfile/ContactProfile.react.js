@@ -155,7 +155,7 @@ class ContactProfile extends Component {
                   <div className='row vertical-center' style={{marginTop: 20}}>
                     <h5>Current Publications/Employers</h5>
                     <AddEmployerHOC
-                    title='Add Current Publication'
+                    title='Add Current Publication/Employer'
                     type='employers'
                     contact={props.contact}
                     >
@@ -182,7 +182,7 @@ class ContactProfile extends Component {
                     </div>
                       <h5>Past Publications/Employers</h5>
                       <AddEmployerHOC
-                      title='Add Past Publication'
+                      title='Add Past Publication/Employer'
                       type='pastemployers'
                       contact={props.contact}
                       >
@@ -193,7 +193,7 @@ class ContactProfile extends Component {
                         iconStyle={styles.smallIcon}
                         style={styles.small}
                         iconClassName='fa fa-plus'
-                        tooltip='Add Publication'
+                        tooltip='Add Publication/Employer'
                         tooltipPosition='top-right'
                         onClick={onRequestOpen}
                         />
