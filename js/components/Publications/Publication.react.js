@@ -4,25 +4,46 @@ import * as AppActions from 'actions/AppActions';
 import * as actions from './DatabaseProfile/actions';
 import ContactDescriptor from '../ContactProfile/ContactDescriptor.react';
 import isURL from 'validator/lib/isURL';
-import {blue700} from 'material-ui/styles/colors';
+import {blue700, grey400, grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
+
+const socialIconClassNames = {
+  'facebook': 'fa fa-facebook',
+  'instagram': 'fa fa-instagram',
+  'angellist': 'fa fa-angellist',
+  'pinterest': 'fa fa-pinterest',
+  'linkedincompany': 'fa fa-linkedin',
+  'twitter': 'fa fa-twitter'
+  //'crunchbasecompany': 'fa fa-',
+};
 
 const Organization = ({approxEmployees, contactInfo, founded, images, keywords, links}) => {
   return (
-  <div className='row' style={{margin: '10px 0'}}>
+  <div className='row' style={{margin: '10px 0', border: 'solid 1px black'}}>
     <div className='large-12 medium-12 small-12 columns'>
       <span style={{marginRight: 10}}>Approx. Employees:</span><span>{approxEmployees}</span>
     </div>
     <div className='large-12 medium-12 small-12 columns'>
       <span style={{marginRight: 10}}>Founded:</span><span>{founded}</span>
     </div>
+    <div className='large-12 medium-12 small-12 columns'>
+      {contactInfo && contactInfo.addresses && <div><span style={{marginRight: 10}}>Location:</span><span>{contactInfo.addresses.map(addr => addr.locality).join(', ')}</span></div>}
+    </div>
+    <div className='large-12 medium-12 small-12 columns'>
+      <span style={{marginRight: 10}}>Keywords:</span><span>{keywords.join(', ')}</span>
+    </div>
   </div>);
 };
 
-const SocialProfile = ({url, typeName, followers}) => {
+const SocialProfile = ({url, typeName, typeId, followers}) => {
   return (
-    <div className='large-12 medium-12 small-12 columns' style={{marginBottom: 5}}>
-      <a href={url} target='_blank'><span style={{marginRight: 10, color: blue700}}>{typeName}</span></a>
+    <div className='large-12 medium-12 small-12 columns vertical-center' style={{marginBottom: 5}}>
+      <a style={{color: grey700}} href={url} target='_blank'>
+        <span style={{marginRight: 10}}>{typeName}</span>
+      </a>
+      <a style={{color: grey700}} href={url} target='_blank'>
+        {typeId && socialIconClassNames[typeId] && <FontIcon style={{fontSize: '14px', marginRight: 10}} className={socialIconClassNames[typeId]}/>}
+      </a>
       {followers && <span>{followers.toLocaleString()}</span>}
     </div>);
 };
@@ -34,11 +55,16 @@ const SocialProfiles = ({socialProfiles}) => {
     </div>);
 };
 
-const Profile = ({organization, logo, socialProfiles, className}) => {
+const Profile = ({organization, logo, socialProfiles}) => {
   return (
-    <div className={className} style={{margin: '10px 0'}}>
-      {logo && <div className='row' style={{margin: '20px 0'}}><img src={logo}/></div>}
-      {organization && <Organization {...organization}/>}
+    <div className='row' style={{margin: '10px 0'}}>
+      {organization &&
+        <div className='large-6 medium-6 small-12 columns'>
+          <div className='row'>
+            <img src={logo}/>
+          </div>
+          <Organization {...organization}/>
+        </div>}
       {socialProfiles && <SocialProfiles socialProfiles={socialProfiles}/>}
     </div>
     );
@@ -50,19 +76,18 @@ const Publication = props => {
   return (
     <div style={{marginTop: 40}}>
       <div className='row'>
-        <h1>{publication.name}</h1>
+        <div className='large-12 medium-12 small-12 columns'>
+          <h1 style={{marginRight: 15}}>{publication.name}</h1>
+        </div>
       </div>
       <div className='row'>
-        <ContactDescriptor
-        iconClassName='fa fa-external-link'
-        className='large-6 medium-6 small-12 columns'
-        content={publication.url}
-        contentTitle='Website Link'
-        onBlur={url => {
-          if (isURL(url)) patchPublication({url});
-        }}/>
-        {profile && <Profile className='large-6 medium-6 small-12 columns' {...profile}/>}
+        <div className='large-12 medium-12 small-12 columns'>
+          <a href={publication.url} target='_blank'>
+            <span style={{color: grey400, fontSize: '0.9em', marginRight: 5}}>{publication.url} <i className='fa fa-external-link'/></span>
+          </a>
+        </div>
       </div>
+      {profile && <Profile {...profile}/>}
     </div>
     );
 };
