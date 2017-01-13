@@ -4,29 +4,46 @@ import * as AppActions from 'actions/AppActions';
 import * as actions from './DatabaseProfile/actions';
 import ContactDescriptor from '../ContactProfile/ContactDescriptor.react';
 import isURL from 'validator/lib/isURL';
-
+import {blue700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 
 const Organization = ({approxEmployees, contactInfo, founded, images, keywords, links}) => {
   return (
-  <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
-    <div className='row' style={{margin: '10px 5px'}}>
+  <div className='row' style={{margin: '10px 0'}}>
+    <div className='large-12 medium-12 small-12 columns'>
       <span style={{marginRight: 10}}>Approx. Employees:</span><span>{approxEmployees}</span>
     </div>
-    <div className='row' style={{margin: '10px 5px'}}>
+    <div className='large-12 medium-12 small-12 columns'>
       <span style={{marginRight: 10}}>Founded:</span><span>{founded}</span>
     </div>
   </div>);
 };
 
-const Profile = ({organization, logo}) => {
+const SocialProfile = ({url, typeName, followers}) => {
   return (
-    <div className='row' style={{margin: '10px 0'}}>
-      {logo && <div style={{margin: '10px 0'}}><img src={logo}/></div>}
+    <div className='large-12 medium-12 small-12 columns' style={{marginBottom: 5}}>
+      <a href={url} target='_blank'><span style={{marginRight: 10, color: blue700}}>{typeName}</span></a>
+      {followers && <span>{followers.toLocaleString()}</span>}
+    </div>);
+};
+
+const SocialProfiles = ({socialProfiles}) => {
+  return (
+    <div className='row'>
+      {socialProfiles.map((profile, i) => <SocialProfile key={`socialprofile-${i}`} {...profile}/>)}
+    </div>);
+};
+
+const Profile = ({organization, logo, socialProfiles, className}) => {
+  return (
+    <div className={className} style={{margin: '10px 0'}}>
+      {logo && <div className='row' style={{margin: '20px 0'}}><img src={logo}/></div>}
       {organization && <Organization {...organization}/>}
+      {socialProfiles && <SocialProfiles socialProfiles={socialProfiles}/>}
     </div>
     );
 };
+
 
 const Publication = props => {
   const {publication, profile, patchPublication} = props;
@@ -38,14 +55,14 @@ const Publication = props => {
       <div className='row'>
         <ContactDescriptor
         iconClassName='fa fa-external-link'
-        className='large-12 medium-12 small-12 columns'
+        className='large-6 medium-6 small-12 columns'
         content={publication.url}
         contentTitle='Website Link'
         onBlur={url => {
           if (isURL(url)) patchPublication({url});
         }}/>
+        {profile && <Profile className='large-6 medium-6 small-12 columns' {...profile}/>}
       </div>
-      {profile && <Profile {...profile}/>}
     </div>
     );
 };
@@ -66,7 +83,6 @@ class PublicationContainer extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.profile);
     return (props.isReceiving || !props.publication) ?
     <FontIcon className='fa fa-loading fa-spin'/> :
     <Publication {...props}/>;
