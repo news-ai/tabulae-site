@@ -35,7 +35,6 @@ class AddEmployerHOC extends Component {
     setTimeout(_ => {
       this.props.searchPublications(this.state.input)
       .then(response => {
-        console.log(response);
         this.setState({
           employerAutocompleteList: response,
           autocompleteOpen: response.length > 0
