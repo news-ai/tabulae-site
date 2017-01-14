@@ -6,6 +6,7 @@ import ContactDescriptor from '../ContactProfile/ContactDescriptor.react';
 import isURL from 'validator/lib/isURL';
 import {blue700, grey400, grey700, grey200} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
+import Waiting from '../Waiting';
 
 import alertify from 'alertifyjs';
 
@@ -22,9 +23,16 @@ const socialIconClassNames = {
 const panelStyle = {
   margin: '20px 0',
   padding: '10px 0',
-  border: `solid 1px ${grey200}`};
+  border: `solid 1px ${grey200}`
+};
 
-const Organization = ({approxEmployees, contactInfo, founded, images, keywords, links, logo}) => {
+const spanStyle = {
+  marginRight: 10,
+  color: grey700,
+  fontSize: '0.9em'
+};
+
+const Organization = ({name, approxEmployees, contactInfo, founded, images, keywords, links, logo}) => {
   return (
   <div className='row' style={panelStyle}>
     <div style={{margin: '5px'}} className='large-12 medium-12 small-12 columns'>
@@ -35,13 +43,19 @@ const Organization = ({approxEmployees, contactInfo, founded, images, keywords, 
       <img style={{margin: 20}} src={logo}/>
     </div>}
     <div className='large-12 medium-12 small-12 columns'>
-      <span style={{marginRight: 10}}>Approx. Employees:</span><span>{approxEmployees}</span>
+      <span style={spanStyle}>Name:</span><span>{name}</span>
     </div>
     <div className='large-12 medium-12 small-12 columns'>
-      <span style={{marginRight: 10}}>Founded:</span><span>{founded}</span>
+      <span style={spanStyle}>Approx. Employees:</span><span>{approxEmployees}</span>
     </div>
     <div className='large-12 medium-12 small-12 columns'>
-      {contactInfo && contactInfo.addresses && <div><span style={{marginRight: 10}}>Location:</span><span>{contactInfo.addresses.map(addr => addr.locality).join(' || ')}</span></div>}
+      <span style={spanStyle}>Founded:</span><span>{founded}</span>
+    </div>
+    <div className='large-12 medium-12 small-12 columns'>
+    {contactInfo && contactInfo.addresses &&
+      <div>
+        <span style={spanStyle}>Location(s):</span><span>{contactInfo.addresses.map(addr => `${addr.locality}, ${addr.region.name}`).join(' || ')}</span>
+      </div>}
     </div>
   </div>);
 };
@@ -114,17 +128,20 @@ const Publication = props => {
         </a>
       </div>}
     {!publication.url &&
-      <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
-        <span>No website filled in for this publication.
+      <div className='large-12 medium-12 small-12 columns' style={{margin: '20px 0'}}>
+        <span style={{marginRight: 5}}>
+        No website filled in for this publication.
         We pull in information about this publication based on the website url.
-        <span onClick={() => {
+        </span>
+        <span
+        onClick={() => {
           alertify.prompt(
             'Enter website URL',
             'https://',
             (e, url) => isURL(url) && patchPublication(Object.assign({}, publication, {url})),
             e => console.log('input cancelled')
             );
-        }} className='pointer' style={{color: blue700}}>Fill one in now?</span></span>
+        }} className='pointer' style={{color: blue700}}>Fill one in now?</span>
       </div>}
       {profile && <Profile {...profile}/>}
     </div>
@@ -157,7 +174,7 @@ class PublicationContainer extends Component {
     const props = this.props;
     const state = this.state;
     return (props.isReceiving || !props.publication) ?
-    <FontIcon className='fa fa-loading fa-spin'/> :
+    <Waiting style={{margin: 40}} isReceiving={props.isReceiving} text='Loading...'/> :
     <Publication {...props}/>;
   }
 }

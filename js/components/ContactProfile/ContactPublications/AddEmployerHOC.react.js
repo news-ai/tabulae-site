@@ -87,7 +87,13 @@ class AddEmployerHOC extends Component {
     ];
     return (
       <div>
-        <Dialog actions={actions} title={props.title} open={state.open} onRequestClose={this.onRequestClose}>
+        <Dialog
+        autoScrollBodyContent
+        actions={actions}
+        title={props.title}
+        open={state.open}
+        onRequestClose={this.onRequestClose}
+        >
           <AutoComplete
           floatingLabelText='Autocomplete Dropdown'
           filter={AutoComplete.noFilter}
@@ -96,7 +102,11 @@ class AddEmployerHOC extends Component {
           openOnFocus
           dataSource={state.employerAutocompleteList}
           />
-          {!state.publicationFormOpen && <PublicationPreview text={state.input} onOpenForm={_ => this.setState({publicationFormOpen: true})}/>}
+          {!state.publicationFormOpen &&
+            <PublicationPreview
+            text={state.input}
+            onOpenForm={_ => this.setState({publicationFormOpen: true})}
+            />}
           {state.publicationFormOpen &&
             <PublicationForm
             publicationObj={state.publicationObj}
