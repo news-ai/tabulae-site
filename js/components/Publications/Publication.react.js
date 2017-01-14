@@ -4,7 +4,7 @@ import * as AppActions from 'actions/AppActions';
 import * as actions from './DatabaseProfile/actions';
 import ContactDescriptor from '../ContactProfile/ContactDescriptor.react';
 import isURL from 'validator/lib/isURL';
-import {blue700, grey400, grey700} from 'material-ui/styles/colors';
+import {blue700, grey400, grey700, grey200} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 
 import alertify from 'alertifyjs';
@@ -19,12 +19,21 @@ const socialIconClassNames = {
   //'crunchbasecompany': 'fa fa-',
 };
 
+const panelStyle = {
+  margin: '20px 0',
+  padding: '10px 0',
+  border: `solid 1px ${grey200}`};
+
 const Organization = ({approxEmployees, contactInfo, founded, images, keywords, links, logo}) => {
   return (
-  <div className='row' style={{margin: '20px 0', padding: '10px 0', border: 'solid 1px black'}}>
+  <div className='row' style={panelStyle}>
+    <div style={{margin: '5px'}} className='large-12 medium-12 small-12 columns'>
+      <h5 style={{color: grey700}}>Organization</h5>
+    </div>
+  {logo &&
     <div className='large-12 medium-12 small-12 columns horizontal-center'>
       <img style={{margin: 20}} src={logo}/>
-    </div>
+    </div>}
     <div className='large-12 medium-12 small-12 columns'>
       <span style={{marginRight: 10}}>Approx. Employees:</span><span>{approxEmployees}</span>
     </div>
@@ -39,9 +48,9 @@ const Organization = ({approxEmployees, contactInfo, founded, images, keywords, 
 
 const Keywords = ({keywords}) => {
   return (
-    <div className='row' style={{border: 'solid 1px black'}}>
-      <div className='large-12 medium-12 small-12 columns'>
-        <h4>Keywords</h4>
+    <div className='row' style={panelStyle}>
+      <div style={{margin: '5px'}} className='large-12 medium-12 small-12 columns'>
+        <h5 style={{color: grey700}}>Keywords</h5>
       </div>
       <div className='large-12 medium-12 small-12 columns'>
         <span>{keywords.join(', ')}</span>
@@ -52,7 +61,7 @@ const Keywords = ({keywords}) => {
 
 const SocialProfile = ({url, typeName, typeId, followers}) => {
   return (
-    <div className='large-4 medium-4 small-6 columns vertical-center' style={{marginBottom: 5}}>
+    <div className='large-4 medium-6 small-6 columns vertical-center' style={{marginBottom: 5}}>
       <a style={{color: grey700}} href={url} target='_blank'>
         <span style={{marginRight: 10}}>{typeName}</span>
       </a>
@@ -65,9 +74,9 @@ const SocialProfile = ({url, typeName, typeId, followers}) => {
 
 const SocialProfiles = ({socialProfiles}) => {
   return (
-    <div className='row' style={{border: 'solid 1px black'}}>
-      <div className='large-12 medium-12 small-12 columns'>
-        <h4>Social Profiles</h4>
+    <div className='row' style={panelStyle}>
+      <div style={{margin: '5px'}} className='large-12 medium-12 small-12 columns'>
+        <h5 style={{color: grey700}}>Social Profiles</h5>
       </div>
       {socialProfiles.map((profile, i) => <SocialProfile key={`socialprofile-${i}`} {...profile}/>)}
     </div>);
