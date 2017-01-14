@@ -4,8 +4,9 @@ import ContactDescriptor from '../ContactDescriptor.react';
 import {blue50} from 'material-ui/styles/colors';
 import isURL from 'validator/lib/isURL';
 import * as AppActions from 'actions/AppActions';
+import withRouter from 'react-router/lib/withRouter';
 
-const PreviewItem = ({name, url, patchPublication}) => (
+const PreviewItem = ({id, name, url, patchPublication, router}) => (
   <div
   style={{
     backgroundColor: blue50,
@@ -13,7 +14,7 @@ const PreviewItem = ({name, url, patchPublication}) => (
     padding: 10
   }}>
     <div className='row' style={{margin: '0 10px'}}>
-      <span>{name}</span>
+      {url ? <span className='pointer' onClick={() => router.push(`/publications/${id}`)}>{name}</span> : <span>{name}</span>}
     </div>
     <div className='row' style={{margin: '3px 0'}}>
       <ContactDescriptor
@@ -39,4 +40,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PreviewItem);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PreviewItem));

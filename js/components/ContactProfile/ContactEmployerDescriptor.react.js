@@ -2,6 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import Chip from 'material-ui/Chip';
 import * as contactActions from '../../actions/contactActions';
+import withRouter from 'react-router/lib/withRouter';
 
 class ContactEmployerDescriptor extends Component {
   constructor(props) {
@@ -16,7 +17,9 @@ class ContactEmployerDescriptor extends Component {
     return (
       <div className={props.className} style={props.style}>
         <Chip
-        onRequestDelete={_ => !props.contact.readonly && props.patchContact(props.contact.id, contactBody)}>
+        onTouchTap={e => props.employer.url && props.router.push(`/publications/${props.employer.id}`)}
+        onRequestDelete={_ => !props.contact.readonly && props.patchContact(props.contact.id, contactBody)}
+        >
         {props.employer.name}
         </Chip>
       </div>
@@ -25,7 +28,8 @@ class ContactEmployerDescriptor extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  return {};
+  return {
+  };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
@@ -34,4 +38,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContactEmployerDescriptor);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ContactEmployerDescriptor));

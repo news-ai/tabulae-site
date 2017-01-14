@@ -173,7 +173,13 @@ class ContactProfile extends Component {
                   </div>
                   <div>
                     {props.employers && props.employers.map((employer, i) =>
-                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                      <ContactEmployerDescriptor
+                      style={{margin: 4}}
+                      key={i}
+                      employer={employer}
+                      which='employers'
+                      contact={props.contact}
+                      />)}
                     {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
                   </div>
                   <div style={{marginTop: 20}}>

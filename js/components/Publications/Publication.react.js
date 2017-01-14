@@ -68,7 +68,7 @@ const SocialProfile = ({url, typeName, typeId, followers}) => {
       <a style={{color: grey700}} href={url} target='_blank'>
         {typeId && socialIconClassNames[typeId] && <FontIcon style={{fontSize: '14px', marginRight: 7}} className={socialIconClassNames[typeId]}/>}
       </a>
-      {followers && <span>{followers.toLocaleString()}</span>}
+      {followers && <span style={{fontSize: '0.9em'}}>{followers.toLocaleString()}</span>}
     </div>);
 };
 
@@ -141,6 +141,8 @@ class PublicationContainer extends Component {
     if (!this.props.publication) {
       this.props.fetchPublication()
       .then(_ => this.props.fetchDatabaseProfile());
+    } else {
+      this.props.fetchDatabaseProfile();
     }
   }
 
