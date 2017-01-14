@@ -7,6 +7,8 @@ import isURL from 'validator/lib/isURL';
 import {blue700, grey400, grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 
+import alertify from 'alertifyjs';
+
 const socialIconClassNames = {
   'facebook': 'fa fa-facebook',
   'instagram': 'fa fa-instagram',
@@ -96,11 +98,25 @@ const Publication = props => {
       <div className='large-12 medium-12 small-12 columns'>
         <span style={{fontSize: '2em'}}>{publication.name}</span>
       </div>
+    {publication.url &&
       <div className='large-12 medium-12 small-12 columns'>
         <a href={publication.url} target='_blank'>
           <span style={{color: grey400, fontSize: '0.9em', marginRight: 5}}>{publication.url} <i className='fa fa-external-link'/></span>
         </a>
-      </div>
+      </div>}
+    {!publication.url &&
+      <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
+        <span>No website filled in for this publication.
+        We pull in information about this publication based on the website url.
+        <span onClick={() => {
+          alertify.prompt(
+            'Enter website URL',
+            'https://',
+            (e, url) => isURL(url) && patchPublication(Object.assign({}, publication, {url})),
+            e => console.log('input cancelled')
+            );
+        }} className='pointer' style={{color: blue700}}>Fill one in now?</span></span>
+      </div>}
       {profile && <Profile {...profile}/>}
     </div>
     );
@@ -116,6 +132,13 @@ class PublicationContainer extends Component {
     if (!this.props.publication) {
       this.props.fetchPublication()
       .then(_ => this.props.fetchDatabaseProfile());
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.publication && !this.props.publication.url && nextProps.publication.url) {
+      // user just adde URL for a publication
+      this.props.fetchDatabaseProfile();
     }
   }
 

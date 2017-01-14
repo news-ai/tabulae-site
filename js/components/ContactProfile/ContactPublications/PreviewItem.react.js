@@ -13,7 +13,7 @@ const PreviewItem = ({name, url, patchPublication}) => (
     padding: 10
   }}>
     <div className='row' style={{margin: '0 10px'}}>
-      <span style={{fontSize: '0.9em', marginRight: 10}}>Publication: </span><span>{name}</span>
+      <span>{name}</span>
     </div>
     <div className='row' style={{margin: '3px 0'}}>
       <ContactDescriptor
