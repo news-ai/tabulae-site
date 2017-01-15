@@ -25,6 +25,7 @@ import clientReducer from '../components/ClientDirectories/reducer';
 import emailImageReducer from '../components/Email/EmailPanel/Image/reducer';
 import emailDraftReducer from '../components/Email/EmailPanel/EmailDraft/reducer';
 import smtpReducer from '../components/UserProfile/reducer';
+import publicationProfileReducer from '../components/Publications/DatabaseProfile/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -51,7 +52,8 @@ const rootReducer = combineReducers({
   emailAttachmentReducer,
   emailImageReducer,
   emailDraftReducer,
-  smtpReducer
+  smtpReducer,
+  publicationProfileReducer,
 });
 
 export default rootReducer;

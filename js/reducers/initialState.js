@@ -130,5 +130,9 @@ export const initialState = {
   smtpReducer: {
     isReceiving: false,
     didInvalidate: false
-  }
+  },
+  publicationProfileReducer: {
+    isReceiving: false,
+    didInvalidate: false
+  },
 };

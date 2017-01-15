@@ -17,7 +17,7 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
-import AddEmployerHOC from './AddEmployerHOC.react';
+import AddEmployerHOC from './ContactPublications/AddEmployerHOC.react';
 
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeedContainer.react';
@@ -155,7 +155,7 @@ class ContactProfile extends Component {
                   <div className='row vertical-center' style={{marginTop: 20}}>
                     <h5>Current Publications/Employers</h5>
                     <AddEmployerHOC
-                    title='Add Current Publication'
+                    title='Add Current Publication/Employer'
                     type='employers'
                     contact={props.contact}
                     >
@@ -173,7 +173,13 @@ class ContactProfile extends Component {
                   </div>
                   <div>
                     {props.employers && props.employers.map((employer, i) =>
-                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='employers' contact={props.contact} />)}
+                      <ContactEmployerDescriptor
+                      style={{margin: 4}}
+                      key={i}
+                      employer={employer}
+                      which='employers'
+                      contact={props.contact}
+                      />)}
                     {(props.employers.length === 0 || !props.employers) && <span>None added</span>}
                   </div>
                   <div style={{marginTop: 20}}>
@@ -182,7 +188,7 @@ class ContactProfile extends Component {
                     </div>
                       <h5>Past Publications/Employers</h5>
                       <AddEmployerHOC
-                      title='Add Past Publication'
+                      title='Add Past Publication/Employer'
                       type='pastemployers'
                       contact={props.contact}
                       >
@@ -193,7 +199,7 @@ class ContactProfile extends Component {
                         iconStyle={styles.smallIcon}
                         style={styles.small}
                         iconClassName='fa fa-plus'
-                        tooltip='Add Publication'
+                        tooltip='Add Publication/Employer'
                         tooltipPosition='top-right'
                         onClick={onRequestOpen}
                         />
