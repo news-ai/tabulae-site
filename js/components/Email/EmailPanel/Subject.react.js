@@ -92,13 +92,17 @@ class Subject extends Component {
   render() {
     const {editorState, subjectLength} = this.state;
     return (
-      <div className='vertical-center'>
+      <div
+      style={{marginTop: 12}}
+      className='vertical-center'
+      >
         <div
+        className='subject-draft-container'
         style={{
-          marginTop: 8,
-          width: 530,
-          height: 20,
-          overflowY: 'auto',
+          width: 500,
+          height: 32,
+          overflowX: 'scroll',
+          marginRight: 5,
         }}>
           <Editor
           editorState={editorState}
@@ -110,7 +114,7 @@ class Subject extends Component {
         <div
         style={{
           width: 20,
-          height: 20
+          height: 32,
         }}>
           <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
         </div>
