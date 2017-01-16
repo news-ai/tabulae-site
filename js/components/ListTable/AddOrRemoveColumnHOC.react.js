@@ -10,6 +10,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {grey400, grey700, yellow50} from 'material-ui/styles/colors';
 import {SortableContainer, SortableHandle, SortableElement, arrayMove} from 'react-sortable-hoc';
+import find from 'lodash/find';
 
 import './react_sortable_hoc.css';
 
@@ -110,7 +111,7 @@ class AddOrHideColumns extends Component {
   _onCheck(e, checked, value) {
     let items;
     if (this.state.items.some(item => item.value === value && item.checkboxStrategy)) {
-      items = this.state.items.find(item => item.value === value && item.checkboxStrategy).checkboxStrategy(this.state.items, checked);
+      items = find(this.state.items, item => item.value === value && item.checkboxStrategy).checkboxStrategy(this.state.items, checked);
     } else {
       items = this.state.items.map(fieldObj => {
         if (fieldObj.value === value) return Object.assign({}, fieldObj, {hidden: checked});

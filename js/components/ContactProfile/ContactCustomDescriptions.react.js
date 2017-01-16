@@ -1,6 +1,7 @@
 import React from 'react';
 import {grey700} from 'material-ui/styles/colors';
 import ContactDescriptor from './ContactDescriptor.react';
+import find from 'lodash/find';
 
 function ContactCustomDescriptions({contact, patchContact, list}) {
   return (
@@ -11,7 +12,7 @@ function ContactCustomDescriptions({contact, patchContact, list}) {
         list.fieldsmap
         .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
         .map((fieldObj, i) => {
-          const customValue = contact.customfields !== null && contact.customfields.find(customObj => customObj.name === fieldObj.value);
+          const customValue = contact.customfields !== null && find(contact.customfields, customObj => customObj.name === fieldObj.value);
           return (
             <ContactDescriptor
             disabled={contact.readonly}

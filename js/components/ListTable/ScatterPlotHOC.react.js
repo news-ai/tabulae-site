@@ -20,6 +20,7 @@ import EmptySelected from './EmptySelected.react';
 import * as c from 'material-ui/styles/colors';
 import regression from 'regression';
 import {_getter, divide, isNumber} from './helpers';
+import find from 'lodash/find';
 
 const colors = [
   c.red300, c.blue300, c.purple300, c.cyan300, c.green300, c.indigo300, c.orange300,
@@ -61,8 +62,8 @@ class ScatterPlotHOC extends Component {
   }
 
   _setData() {
-    const xfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.state.xfieldname);
-    const yfieldObj = this.props.fieldsmap.find(fieldObj => fieldObj.value === this.state.yfieldname);
+    const xfieldObj = find(this.props.fieldsmap, fieldObj => fieldObj.value === this.state.xfieldname);
+    const yfieldObj = find(this.props.fieldsmap, fieldObj => fieldObj.value === this.state.yfieldname);
     if (!xfieldObj || !yfieldObj) return;
     const data = this.props.contacts
     .map(contactObj => {
