@@ -427,8 +427,6 @@ class BasicHtmlEditor extends React.Component {
       }
     }
 
-    console.log(className);
-
     return (
       <div>
         <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
