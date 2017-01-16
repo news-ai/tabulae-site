@@ -70,10 +70,9 @@ class SearchBar extends Component {
     }
     return (
       <InfiniteScroll onScrollBottom={_ => props.fetchSearch(state.prevQuery)}>
-          <div className='row horizontal-center' style={{
-            marginTop: 15,
-            marginBottom: 15
-          }}>
+          <div
+          className='row horizontal-center'
+          style={{margin: '20px 0'}}>
             <div>
              <TextField
               hintText='Search query here...'
@@ -85,7 +84,7 @@ class SearchBar extends Component {
               {state.isSearchReceived ? <p>We found {expectedResultsString} for "{state.prevQuery}"</p> : null}
             </div>
           </div>
-          {props.results.length > 0 &&
+          {/* props.results.length > 0 &&
           <div className='row' style={{marginTop: 20}}>
             <div className='large-offset-10 medium-offset-10 small-offset-6 columns'>
               <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' onClick={_ => {
@@ -93,7 +92,7 @@ class SearchBar extends Component {
                 props.router.push('/search/table');
               }} />
             </div>
-          </div>}
+          </div>*/}
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: 30}}>

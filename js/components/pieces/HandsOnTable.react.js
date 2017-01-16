@@ -6,7 +6,6 @@ import * as actionCreators from 'actions/AppActions';
 import {COLUMNS} from 'constants/ColumnConfigs';
 import validator from 'validator';
 import {outdatedRenderer } from 'constants/CustomRenderers';
-import _ from 'lodash';
 import {fromJS} from 'immutable';
 
 import RaisedButton from 'material-ui/RaisedButton';
@@ -19,6 +18,11 @@ import {grey100} from 'material-ui/styles/colors';
 
 import 'node_modules/handsontable/dist/handsontable.full.min.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
+
+import find from 'lodash/find';
+import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
+import difference from 'lodash/difference';
 
 const MIN_ROWS = 20;
 const BATCH_CONTACT_SIZE = 200;
@@ -100,7 +104,7 @@ class HandsOnTable extends Component {
         persistentState: true,
         minSpareRows: 10,
         observeChanges: true,
-        columns: _.cloneDeep(defaultColumns),
+        columns: cloneDeep(defaultColumns),
         cells: (row, col, prop) => {
           const cellProperties = {};
           // default to highlightable renderer when selected
@@ -120,7 +124,7 @@ class HandsOnTable extends Component {
 
           // changes[0] = [rowNum, colData, valBeforeChange, valAfterChange]
           this.props.isDirty();
-          if (_.isEmpty(this.props.listData.contacts)) return;
+          if (isEmpty(this.props.listData.contacts)) return;
 
           let rowNum;
           let rowId;
@@ -129,7 +133,7 @@ class HandsOnTable extends Component {
             rowNum = change[0];
             if (rowNum > this.props.listData.contacts.length - 1) return;
             rowId = this.state.options.data[rowNum].id;
-            if (change[1] === change[2] || _.isEmpty(change[1]) && _.isEmpty(change[2])) {
+            if (change[1] === change[2] || isEmpty(change[1]) && isEmpty(change[2])) {
               // console.log('DO NOTHING');
             } else {
               if (!dirtyRows.some(rnum => rnum === rowId)) {
@@ -153,7 +157,7 @@ class HandsOnTable extends Component {
         },
         afterScrollVertically: e => {
           const { lastFetchedIndex, contactIsReceiving, fetchContacts, listId, listData } = this.props;
-          if (_.isEmpty(listData.contacts)) return;
+          if (isEmpty(listData.contacts)) return;
           if (listData.contacts.length < BATCH_CONTACT_SIZE) return;
           if (lastFetchedIndex === listData.contacts.length - 1) return;
           const rowCount = this.table.countRows();
@@ -225,7 +229,7 @@ class HandsOnTable extends Component {
               const removeIdList = this.state.options.data.filter((row, i) => low <= i && i <= hi ).map(row => row.id);
               const removedIdList = this.state.options.data.filter((row, i) => low > i && i > hi ).map(row => row.id);
               props.deleteContacts(removeIdList);
-              const newListContacts = _.difference(props.listData.contacts, removeIdList);
+              const newListContacts = difference(props.listData.contacts, removeIdList);
               props.patchList({
                 listId: props.listId,
                 contacts: newListContacts,
@@ -331,9 +335,9 @@ class HandsOnTable extends Component {
     const fieldsmap = listData.fieldsmap;
     const immutableFieldmap = fromJS(listData.fieldsmap);
     if (this.table) this.table.runHooks('persistentStateReset', 'columnSorting');
-    if (!_.isEmpty(listData.contacts)) {
+    if (!isEmpty(listData.contacts)) {
       if (!immutableFieldmap.equals(this.state.immutableFieldmap)) {
-        let columns = _.cloneDeep(this.state.preservedColumns
+        let columns = cloneDeep(this.state.preservedColumns
           .filter(col => !fieldsmap.some(fieldObj => fieldObj.hidden && fieldObj.value === col.data)));
         fieldsmap.map(fieldObj => {
           if (fieldObj.customfield && !fieldObj.hidden) columns.push({data: fieldObj.value, title: fieldObj.name});
@@ -390,7 +394,7 @@ class HandsOnTable extends Component {
   _removeColumn(listId, columns, colProp) {
     const {fieldsmap} = this.state;
     const props = this.props;
-    const columnValue = columns.find(column => column.data === colProp).data;
+    const columnValue = find(columns, column => column.data === colProp).data;
     if (columnValue === 'publication_name_1' || columnValue === 'publication_name_2') alertify.alert('Publication fields are special. Cannot be deleted.');
     if (fieldsmap.some(fieldObj => fieldObj.value === columnValue && fieldObj.customfield)) {
       alertify.confirm('Are you sure?', 'Deleting a column is not reversible if the column is custom. Are you sure?', _ => {

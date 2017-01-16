@@ -3,7 +3,11 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import Radium from 'radium';
-import _ from 'lodash';
+
+import find from 'lodash/find';
+import difference from 'lodash/difference';
+import isEmpty from 'lodash/isEmpty';
+
 import * as actionCreators from 'actions/AppActions';
 
 import hopscotch from 'hopscotch';
@@ -185,7 +189,7 @@ class ListTable extends Component {
             if (fieldObj.customfield) {
               if (contact.customfields === null) return;
               if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
-              content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+              content = find(contact.customfields, obj => obj.name === fieldObj.value).value;
             } else {
               content = contact[fieldObj.value];
             }
@@ -206,7 +210,7 @@ class ListTable extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.contactIsReceiving) return false;
+    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
     return true;
   }
 
@@ -241,7 +245,7 @@ class ListTable extends Component {
           if (fieldObj.customfield) {
             if (contact.customfields === null) return;
             if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return;
-            content = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+            content = find(contact.customfields, obj => obj.name === fieldObj.value).value;
           } else if (fieldObj.tableOnly) {
             return;
           } else {
@@ -554,7 +558,7 @@ class ListTable extends Component {
     const selected = this.state.selected;
     const props = this.props;
     if (selected.length === 0) return;
-    const newListContacts = _.difference(props.listData.contacts, selected);
+    const newListContacts = difference(props.listData.contacts, selected);
     props.deleteContacts(selected);
     props.patchList({
       listId: props.listId,
@@ -824,7 +828,7 @@ const mapStateToProps = (state, props) => {
   if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
     received = listData.searchResults;
     contacts = received.map(id => state.contactReducer[id]);
-  } else if (!_.isEmpty(listData.contacts)) {
+  } else if (!isEmpty(listData.contacts)) {
     listData.contacts.map((contactId, i) => {
       if (state.contactReducer[contactId]) {
         let contact = state.contactReducer[contactId];

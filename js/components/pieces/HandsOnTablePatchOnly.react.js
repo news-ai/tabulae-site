@@ -7,6 +7,7 @@ import withRouter from 'react-router/lib/withRouter';
 import * as actionCreators from 'actions/AppActions';
 import * as actions from '../Search/actions';
 import RaisedButton from 'material-ui/RaisedButton';
+import find from 'lodash/find';
 
 // take out selected
 let defaultColumns = [{
@@ -136,7 +137,7 @@ class HandsOnTablePatchOnly extends Component {
       Promise.all(this._createPublicationPromises(data))
       .then(_ => {
         dirtyRows.map(rowId => {
-          const row = data.find(row => row.id === rowId);
+          const row = find(data, row => row.id === rowId);
           const contact = this.handleNormalField(row);
           patchContactList.push(contact);
         });

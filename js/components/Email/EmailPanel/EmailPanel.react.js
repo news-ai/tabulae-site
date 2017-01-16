@@ -21,6 +21,7 @@ import AddCCPanelHOC from './AddCCPanelHOC.react';
 import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
+import find from 'lodash/find';
 
 import {grey800, blue400, lightBlue500} from 'material-ui/styles/colors';
 
@@ -52,7 +53,7 @@ export function _getter(contact, fieldObj) {
       if (fieldObj.readonly) return contact[fieldObj.value];
       if (contact.customfields === null) return undefined;
       else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-      else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+      else return find(contact.customfields, obj => obj.name === fieldObj.value).value;
     } else {
       if (fieldObj.strategy) return fieldObj.strategy(contact);
       else return contact[fieldObj.value];
@@ -114,7 +115,7 @@ class EmailPanel extends Component {
 
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
-      const template = this.props.templates.find(tmp => value === tmp.id);
+      const template = find(this.props.templates, tmp => value === tmp.id);
       const bodyHtml = template.body;
       const subjectHtml = template.subject;
       this.setState({bodyHtml, subjectHtml});

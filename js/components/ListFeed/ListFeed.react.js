@@ -46,7 +46,7 @@ class ListFeed extends Component {
   }
 
   componentWillUnmount() {
-    window.resize = undefined;
+    window.onresize = undefined;
   }
 
   _getPosition() {

@@ -38,10 +38,6 @@ const Organization = ({name, approxEmployees, contactInfo, founded, images, keyw
     <div style={{margin: '5px'}} className='large-12 medium-12 small-12 columns'>
       <h5 style={{color: grey700}}>Organization</h5>
     </div>
-  {logo &&
-    <div className='large-12 medium-12 small-12 columns horizontal-center'>
-      <img style={{margin: 20}} src={logo}/>
-    </div>}
     <div className='large-12 medium-12 small-12 columns'>
       <span style={spanStyle}>Name:</span><span>{name}</span>
     </div>
@@ -57,6 +53,10 @@ const Organization = ({name, approxEmployees, contactInfo, founded, images, keyw
         <span style={spanStyle}>Location(s):</span><span>{contactInfo.addresses.map(addr => `${addr.locality}, ${addr.region.name}`).join(' || ')}</span>
       </div>}
     </div>
+  {logo &&
+    <div className='large-12 medium-12 small-12 columns horizontal-center'>
+      <img style={{margin: 20}} src={logo}/>
+    </div>}
   </div>);
 };
 

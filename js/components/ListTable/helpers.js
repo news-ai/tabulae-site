@@ -1,4 +1,5 @@
 // helper function to add extra tableOnly columns like index, selected, etc.
+import find from 'lodash/find';
 
 function divide(numerator, denomenator, fixedTo) {
   const res = Math.round(numerator * (1 / fixedTo) / denomenator) / (1 / fixedTo);
@@ -15,7 +16,7 @@ export function _getter(contact, fieldObj) {
       if (fieldObj.readonly) return contact[fieldObj.value];
       if (contact.customfields === null) return undefined;
       else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-      else return contact.customfields.find(obj => obj.name === fieldObj.value).value;
+      else return find(contact.customfields, obj => obj.name === fieldObj.value).value;
     } else {
       if (fieldObj.strategy) return fieldObj.strategy(contact);
       else return contact[fieldObj.value];
@@ -26,8 +27,8 @@ export function _getter(contact, fieldObj) {
 }
 
 function instagramLikesToPosts(listData) {
-  const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
-  const postsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
+  const likesColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
+  const postsColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
   if (likesColumn && postsColumn) {
     return {
       name: 'likes-to-posts',
@@ -47,8 +48,8 @@ function instagramLikesToPosts(listData) {
 }
 
 function instagramLikesToComments(listData) {
-  const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
-  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
+  const likesColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
+  const commentsColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
   if (likesColumn && commentsColumn) {
     return {
       name: 'likes-to-comments',
@@ -68,8 +69,8 @@ function instagramLikesToComments(listData) {
 }
 
 function instagramLikesToFollowers(listData) {
-  const likesColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
-  const followersColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramfollowers' && !fieldObj.hidden);
+  const likesColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramlikes' && !fieldObj.hidden);
+  const followersColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramfollowers' && !fieldObj.hidden);
   if (likesColumn && followersColumn) {
     return {
       name: 'likes-to-followers',
@@ -89,8 +90,8 @@ function instagramLikesToFollowers(listData) {
 }
 
 function instagramCommentsToFollowers(listData) {
-  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
-  const followersColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramfollowers' && !fieldObj.hidden);
+  const commentsColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
+  const followersColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramfollowers' && !fieldObj.hidden);
   if (commentsColumn && followersColumn) {
     return {
       name: 'comments-to-followers',
@@ -110,8 +111,8 @@ function instagramCommentsToFollowers(listData) {
 }
 
 function instagramCommentsToPosts(listData) {
-  const commentsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
-  const postsColumn = listData.fieldsmap.find(fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
+  const commentsColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramcomments' && !fieldObj.hidden);
+  const postsColumn = find(listData.fieldsmap, fieldObj => fieldObj.value === 'instagramposts' && !fieldObj.hidden);
   if (commentsColumn && postsColumn) {
     return {
       name: 'comments-to-posts',
@@ -135,12 +136,12 @@ function publicationColumn(listData) {
     customfield: false,
     name: 'Publication',
     value: 'publication_name_1',
-    hidden: listData.fieldsmap.find(fieldObj => fieldObj.value === 'employers').hidden,
+    hidden: find(listData.fieldsmap, fieldObj => fieldObj.value === 'employers').hidden,
     sortEnabled: true,
     tableOnly: true,
     hideCheckbox: false,
     checkboxStrategy: (fieldsmap, checked) => fieldsmap.map(fieldObj => {
-      if (fieldObj.value === 'publication_name_1' || fieldObj.value === 'employers') return Object.assign({}, fieldObj, {hidden: checked})
+      if (fieldObj.value === 'publication_name_1' || fieldObj.value === 'employers') return Object.assign({}, fieldObj, {hidden: checked});
       return fieldObj;
     }),
     strategy: contact => contact.publication_name_1
@@ -216,7 +217,7 @@ export function convertToCsvString(contacts, fieldsmap) {
     filteredfieldsmap.map(fieldObj => {
       let el;
       if (fieldObj.customfield && contact.customfields !== null) {
-        if (contact.customfields.some(obj => obj.name === fieldObj.value)) el = contact.customfields.find(obj => obj.name === fieldObj.value).value;
+        if (contact.customfields.some(obj => obj.name === fieldObj.value)) el = find(contact.customfields, obj => obj.name === fieldObj.value).value;
         else el = '';
       } else {
         el = contact[fieldObj.value];

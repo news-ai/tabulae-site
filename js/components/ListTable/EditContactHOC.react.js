@@ -11,6 +11,7 @@ import TextField from 'material-ui/TextField';
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {fromJS, is} from 'immutable';
+import find from 'lodash/find';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -182,7 +183,7 @@ class EditContact extends Component {
                 <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
                   <span>{fieldObj.name}</span>
                   <TextField
-                  value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : state.customfields.find(field => field.name === fieldObj.value).value}
+                  value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : find(state.customfields, field => field.name === fieldObj.value).value}
                   style={textfieldStyle}
                   ref={fieldObj.value}
                   name={fieldObj.value}
