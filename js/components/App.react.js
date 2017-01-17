@@ -134,14 +134,14 @@ class App extends Component {
             <div className='horizontal-center' style={{margin: 10}}>
               <RaisedButton label='Logout' onClick={props.logoutClick}/>
             </div>
-            {/*<div style={{margin: 30}}>
+            <div style={{margin: 30}}>
               <div onClick={_ => this.setState({feedbackPanelOpen: true})} className='horizontal-center pointer'>
                 <p style={{fontSize: 14}}>We are always looking for ways to improve. Let us know how the experience was for you!
                 <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down'/></p>
               </div>
             {state.feedbackPanelOpen &&
               <FeedbackPanel/>}
-            </div>*/}
+            </div>
           </Dialog>
         }
         <Drawer
