@@ -16,6 +16,7 @@ export const setFirstTimeUser = _ => loginActions.setFirstTimeUser();
 export const removeFirstTimeUser = _ => loginActions.removeFirstTimeUser();
 export const fetchNotifications = _ => loginActions.fetchNotifications();
 export const patchPerson = person => loginActions.patchPerson(person);
+export const postFeedback = (reason, feedback) => loginActions.postFeedback(reason, feedback);
 
 export const fetchLists = _ => listActions.fetchLists();
 export const fetchArchivedLists = _ => listActions.fetchArchivedLists();

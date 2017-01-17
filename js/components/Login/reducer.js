@@ -12,27 +12,38 @@ function personReducer(state = initialState.personReducer, action) {
   let obj;
   switch (action.type) {
     case loginConstant.REQUEST:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: true
+      });
     case loginConstant.RECEIVE:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj.person = action.person;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: false,
+        person: action.person
+      });
     case loginConstant.REQUEST_FAIL:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj.didInvalidate = true;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: false,
+        didInvalidate: true
+      });
     case SET_FIRST_TIME_USER:
-      obj = assignToEmpty(state, {});
-      obj.firstTimeUser = true;
-      return obj;
+      return assignToEmpty(state, {firstTimeUser: true});
     case REMOVE_FIRST_TIME_USER:
-      obj = assignToEmpty(state, {});
-      obj.firstTimeUser = false;
-      return obj;
+      return assignToEmpty(state, {firstTimeUser: false});
+    case 'POSTING_FEEDBACK':
+      return assignToEmpty(state, {
+        feedbackIsReceiving: true
+      });
+    case 'POSTED_FEEDBACK':
+      return assignToEmpty(state, {
+        feedback: true,
+        feedbackIsReceiving: false
+      });
+    case 'POSTED_FEEDBACK_FAIL':
+      return assignToEmpty(state, {
+        feedback: false,
+        feedbackIsReceiving: false,
+        feedbackDidInvalidate: true
+      });
     default:
       return state;
   }

@@ -5,7 +5,7 @@ const defaultStyle = {
 };
 
 const defaultTextStyle = {
-  zIndex: 160
+  zIndex: 160,
 };
 
 export default function Waiting({isReceiving, style, text, textStyle}) {

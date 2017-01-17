@@ -2,7 +2,10 @@ export const initialState = {
   personReducer: {
     isReceiving: false,
     didInvalidate: false,
-    firstTimeUser: false
+    firstTimeUser: false,
+    feedback: false,
+    feedbackDidInvalidate: false,
+    feedbackIsReceiving: false
   },
   contactReducer: {
     isReceiving: false,

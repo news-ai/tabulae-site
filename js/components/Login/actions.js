@@ -20,6 +20,17 @@ function log(argument) {
   console.log(argument);
 }
 
+export function postFeedback(reason, feedback) {
+  return (dispatch) => {
+    dispatch({type: 'POSTING_FEEDBACK', reason, feedback});
+    return api.post(`/users/me/feedback`, {reason, feedback})
+    .then(response => {
+      return dispatch({type: 'POSTED_FEEDBACK'});
+    })
+    .catch(err => dispatch({type: 'POSTED_FEEDBACK_FAIL'}));
+  };
+}
+
 export function fetchNotifications() {
   return dispatch => {
     return api.get('/users/me/token')
