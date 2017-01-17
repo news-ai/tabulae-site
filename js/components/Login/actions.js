@@ -20,6 +20,15 @@ function log(argument) {
   console.log(argument);
 }
 
+export function postFeedback(reason, feedback) {
+  return (dispatch) => {
+    dispatch({type: 'POSTING_FEEDBACK', reason, feedback});
+    return api.post(`/users/me/feedback`, {reason, feedback})
+    .then(response => console.log(response))
+    .catch(err => console.log(err));
+  };
+}
+
 export function fetchNotifications() {
   return dispatch => {
     return api.get('/users/me/token')

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import withRouter from 'react-router/lib/withRouter';
+import Link from 'react-router/lib/Link';
 import {connect} from 'react-redux';
 import intercomSetup from '../chat';
 
@@ -14,8 +15,10 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
+import FontIcon from 'material-ui/FontIcon';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import {grey700, blue600, blue300} from 'material-ui/styles/colors';
+import FeedbackPanel from './Feedback/FeedbackPanel.react';
+import {grey700, grey500, blue600, blue300} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 
@@ -43,7 +46,8 @@ class App extends Component {
       isDrawerOpen: false,
       showNavBar: true,
       firstTimeUser: false,
-      didScroll: false
+      didScroll: false,
+      feedbackPanelOpen: false
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
@@ -90,7 +94,8 @@ class App extends Component {
     const NavBar = (state.showNavBar && props.person) && (
       <div>
         {
-          props.firstTimeUser && <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
+          props.firstTimeUser &&
+          <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
             <div style={{margin: '10px 0'}}>
               <div className='horizontal-center'>
                 <RaisedButton primary style={{margin: 10}} label='Guide me through an existing sheet' onClick={_ => {
@@ -109,7 +114,10 @@ class App extends Component {
         }
         {
           props.isLogin &&
-          <Dialog open={!props.person.isactive && props.location.pathname !== '/settings'} modal>
+          <Dialog autoScrollBodyContent open={!props.person.isactive && props.location.pathname !== '/settings'} modal>
+            <div className='horizontal-center'>
+              <p style={{fontSize: 20}}>Thanks for using NewsAI Tabulae!</p>
+            </div>
             <div className='horizontal-center'>
               <p>Your subscription is over. To re-subscribe please visit the our billing page.</p>
             </div>
@@ -126,6 +134,14 @@ class App extends Component {
             <div className='horizontal-center' style={{margin: 10}}>
               <RaisedButton label='Logout' onClick={props.logoutClick}/>
             </div>
+            {/*<div style={{margin: 30}}>
+              <div onClick={_ => this.setState({feedbackPanelOpen: true})} className='horizontal-center pointer'>
+                <p style={{fontSize: 14}}>We are always looking for ways to improve. Let us know how the experience was for you!
+                <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down'/></p>
+              </div>
+            {state.feedbackPanelOpen &&
+              <FeedbackPanel/>}
+            </div>*/}
           </Dialog>
         }
         <Drawer
@@ -158,13 +174,17 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-4 large-3 columns vertical-center horizontal-center clearfix'>
-            <RaisedButton
-            className='right'
-            label='Invite friends'
-            labelColor='white'
-            backgroundColor={blue300}
-            labelStyle={{textTransform: 'none'}}
-            onClick={_ => props.router.push('/settings')}/>
+            <Link
+            to='/settings'
+            >
+              <RaisedButton
+              className='right'
+              label='Invite friends'
+              labelColor='white'
+              backgroundColor={blue300}
+              labelStyle={{textTransform: 'none'}}
+              />
+            </Link>
           </div>
           <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
             <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
