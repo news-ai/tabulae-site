@@ -74,8 +74,7 @@ class EmailSettings extends Component {
                 {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
               </div>
             </div>}
-            {
-            /*<div className='row vertical-center' style={inputHeight}>
+            <div className='row vertical-center' style={inputHeight}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Connect via SMTP</span>
               </div>
@@ -84,8 +83,7 @@ class EmailSettings extends Component {
                     <Toggle toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/> :
                     <SMTPSettings/>}
               </div>
-            </div>*/
-          }
+            </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Email Signature</span>

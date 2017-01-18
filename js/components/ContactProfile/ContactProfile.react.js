@@ -172,7 +172,8 @@ class ContactProfile extends Component {
                     </AddEmployerHOC>
                   </div>
                   <div>
-                    {props.employers && props.employers.map((employer, i) =>
+                    {props.employers &&
+                      props.employers.map((employer, i) =>
                       <ContactEmployerDescriptor
                       style={{margin: 4}}
                       key={i}
@@ -208,7 +209,8 @@ class ContactProfile extends Component {
                     </div>
                   </div>
                   <div>
-                    {props.pastemployers && props.pastemployers.map((employer, i) =>
+                    {props.pastemployers &&
+                      props.pastemployers.map((employer, i) =>
                       <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
                     {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
                   </div>

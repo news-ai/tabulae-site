@@ -50,7 +50,7 @@ const Organization = ({name, approxEmployees, contactInfo, founded, images, keyw
     <div className='large-12 medium-12 small-12 columns'>
     {contactInfo && contactInfo.addresses &&
       <div>
-        <span style={spanStyle}>Location(s):</span><span>{contactInfo.addresses.map(addr => `${addr.locality}, ${addr.region.name}`).join(' || ')}</span>
+        <span style={spanStyle}>Location:</span><span>{contactInfo.addresses.map(addr => `${addr.locality}, ${addr.region.name}`)[0]}</span>
       </div>}
     </div>
   {logo &&
@@ -67,7 +67,7 @@ const Keywords = ({keywords}) => {
         <h5 style={{color: grey700}}>Keywords</h5>
       </div>
       <div className='large-12 medium-12 small-12 columns'>
-        <span>{keywords.join(', ')}</span>
+        <span style={{fontSize: '0.9em', color: grey700}}>{keywords.filter((keyword, i) => i < 25).join(', ')}</span>
       </div>
     </div>
     );
