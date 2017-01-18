@@ -17,7 +17,7 @@ class ContactEmployerDescriptor extends Component {
     return (
       <div className={props.className} style={props.style}>
         <Chip
-        onTouchTap={e => props.employer.url && props.router.push(`/publications/${props.employer.id}`)}
+        onTouchTap={e => props.router.push(`/publications/${props.employer.id}`)}
         onRequestDelete={_ => !props.contact.readonly && props.patchContact(props.contact.id, contactBody)}
         >
         {props.employer.name}
