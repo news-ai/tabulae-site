@@ -151,6 +151,11 @@ class ListTable extends Component {
     this.setDataGridRef = ref => (this._DataGrid = ref);
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
+    this.resetSort = () => this.setState({
+        sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+        onSort: false,
+        sortedIds: [],
+      });
   }
 
   componentWillMount() {
@@ -565,6 +570,7 @@ class ListTable extends Component {
       contacts: newListContacts,
       name: props.listData.name,
     });
+    if (this.state.onSort) this.setState({sortedIds: difference(this.state.sortedIds, selected)});
   }
 
   render() {
@@ -855,7 +861,6 @@ const mapStateToProps = (state, props) => {
     firstTimeUser: state.personReducer.firstTimeUser,
     contactReducer: state.contactReducer,
     listDidInvalidate: state.listReducer.didInvalidate,
-    contactReducer: state.contactReducer,
   };
 };
 
