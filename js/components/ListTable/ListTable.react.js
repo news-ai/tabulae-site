@@ -570,7 +570,12 @@ class ListTable extends Component {
       contacts: newListContacts,
       name: props.listData.name,
     });
-    if (this.state.onSort) this.setState({sortedIds: difference(this.state.sortedIds, selected)});
+    if (this.state.onSort) {
+      this.setState({
+        sortedIds: difference(this.state.sortedIds, selected),
+        selected: []
+      });
+    }
   }
 
   render() {
