@@ -36,7 +36,7 @@ import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
-import CopyToHOC from './CopyToHOC.react';
+import CopyToHOC from './CopyToHOC';
 import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';

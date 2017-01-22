@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Select from 'react-select';
-import * as actionCreators from '../../actions/AppActions';
-import * as feedActions from '../ContactProfile/actions';
-import isEmpty from 'lodash/isEmpty';
+import * as actionCreators from 'actions/AppActions';
+import * as actions from './actions';
 import withRouter from 'react-router/lib/withRouter';
 
 import Dialog from 'material-ui/Dialog';
@@ -163,39 +162,11 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  const addContactsThenPatchList = (rawContacts, list) => {
-    if (rawContacts.length === 0) return;
-    const contacts = rawContacts.map(contact => {
-      let obj = {listid: list.id};
-      list.fieldsmap
-      .filter(fieldObj => !fieldObj.customfield)
-      .map(fieldObj => {
-        if (!isEmpty(contact[fieldObj.value])) obj[fieldObj.value] = contact[fieldObj.value];
-      });
-      obj.customfields = contact.customfields;
-      return obj;
-    });
-    return dispatch(actionCreators.addContacts(contacts))
-    .then(addedContacts => {
-      // copy feeds over
-      for (let i = 0; i < addedContacts.length; i++) {
-        dispatch(feedActions.copyFeeds(rawContacts[i].id, addedContacts[i].id, list.id));
-      }
-      const ids = addedContacts.map(contact => contact.id);
-      // update list
-      const listBody = {
-        listId: list.id,
-        name: list.name,
-        contacts: list.contacts !== null ? [...list.contacts, ...ids] : ids
-      };
-      return dispatch(actionCreators.patchList(listBody));
-    });
-  };
   return {
     fetchLists: _ => dispatch(actionCreators.fetchLists()),
-    addContactsThenPatchList,
+    addContactsThenPatchList: (rawContacts, list) => dispatch(actions.addContactsThenPatchList(rawContacts, list, props.listId)),
     copyToNewList: (rawContacts, name) => dispatch(actionCreators.createEmptyList(name))
-    .then(response => addContactsThenPatchList(rawContacts, response.data)),
+    .then(response => dispatch(actions.addContactsThenPatchList(rawContacts, response.data, props.listId))),
     copyEntireList: (id, name) => dispatch(actionCreators.copyEntireList(id, name))
   };
 };
