@@ -5,7 +5,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import PublicationPreview from './PublicationPreview.react';
 import PublicationForm from './PublicationForm.react';
-import * as AppActions from 'actions/AppActions';
+import {actions as publicationActions} from 'components/Publications';
 import alertify from 'alertifyjs';
 import isURL from 'validator/lib/isURL';
 
@@ -130,8 +130,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    searchPublications: query => dispatch(AppActions.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, publicationObj, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, publicationObj, which)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
+    createPublicationThenPatchContact: (contactId, publicationObj, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, publicationObj, which)),
   };
 };
 

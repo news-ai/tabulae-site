@@ -2,7 +2,14 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
-import * as actionCreators from 'actions/AppActions';
+import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
+import {actions as contactActions} from 'components/Contacts';
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
+import {actions as fileActions} from 'components/ImportFile';
+import {actions as loginActions} from 'components/Login';
+import {actions as stagingActions} from 'components/Email';
+import {actions as templateActions} from 'components/Email/Template';
 import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -343,14 +350,14 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onSendEmailClick: id => dispatch(actionCreators.sendEmail(id)),
-    onSaveCurrentTemplateClick: (id, subject, body) => dispatch(actionCreators.patchTemplate(id, subject, body)),
-    fetchTemplates: _ => dispatch(actionCreators.getTemplates()),
-    createTemplate: (name, subject, body) => dispatch(actionCreators.createTemplate(name, subject, body)),
-    toggleArchiveTemplate: templateId => dispatch(actionCreators.toggleArchiveTemplate(templateId)),
+    onSendEmailClick: id => dispatch(stagingActions.sendEmail(id)),
+    onSaveCurrentTemplateClick: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
+    fetchTemplates: _ => dispatch(templateActions.getTemplates()),
+    createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
+    toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
     clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
-    postBatchEmails: emails => dispatch(actionCreators.postBatchEmails(emails)),
-    postBatchEmailsWithAttachments: emails => dispatch(actionCreators.postBatchEmailsWithAttachments(emails)),
+    postBatchEmails: emails => dispatch(stagingActions.postBatchEmails(emails)),
+    postBatchEmailsWithAttachments: emails => dispatch(stagingActions.postBatchEmailsWithAttachments(emails)),
     initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId})
   };
 };

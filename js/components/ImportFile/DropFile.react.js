@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
+import * as fileActions from './actions';
 import Dropzone from 'react-dropzone';
 import Headers from './Headers.react';
 import _ from 'lodash';
@@ -150,10 +150,10 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch: action => dispatch(action),
-    uploadFile: (listId, file) => dispatch(actionCreators.uploadFile(listId, file)),
-    fetchHeaders: listId => dispatch(actionCreators.fetchHeaders(listId)),
-    addHeaders: (listId, order) => dispatch(actionCreators.addHeaders(listId, order)),
-    waitForServerProcess: _ => dispatch(actionCreators.waitForServerProcess()),
+    uploadFile: (listId, file) => dispatch(fileActions.uploadFile(listId, file)),
+    fetchHeaders: listId => dispatch(fileActions.fetchHeaders(listId)),
+    addHeaders: (listId, order) => dispatch(fileActions.addHeaders(listId, order)),
+    waitForServerProcess: _ => dispatch(fileActions.waitForServerProcess()),
     clearReducer: _ => dispatch({type: 'CLEAR_FILE_REDUCER'})
   };
 };

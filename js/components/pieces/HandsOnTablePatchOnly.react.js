@@ -4,7 +4,8 @@ import {outdatedRenderer, hightlightRenderer} from 'constants/CustomRenderers';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import {COLUMNS} from 'constants/ColumnConfigs';
 import withRouter from 'react-router/lib/withRouter';
-import * as actionCreators from 'actions/AppActions';
+import {actions as contactActions} from 'components/Contacts';
+import {actions as publicationActions} from 'components/Publications';
 import * as actions from '../Search/actions';
 import RaisedButton from 'material-ui/RaisedButton';
 import find from 'lodash/find';
@@ -234,10 +235,10 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
     clearSearchCache: _ => dispatch(actions.clearSearchCache()),
-    patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
-    createPublication: name => dispatch(actionCreators.createPublication(name)),
+    patchContacts: contacts => dispatch(contactActions.patchContacts(contacts)),
+    createPublication: name => dispatch(publicationActions.createPublication(name)),
   };
 };
 // pass in fieldsmap and contacts

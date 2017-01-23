@@ -16,7 +16,7 @@ import {
 import draftRawToHtml from './utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
-import * as actionCreators from 'actions/AppActions';
+import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -551,7 +551,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
-    uploadImage: file => dispatch(actionCreators.uploadImage(file)),
+    uploadImage: file => dispatch(imgActions.uploadImage(file)),
     saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
     saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
     setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),

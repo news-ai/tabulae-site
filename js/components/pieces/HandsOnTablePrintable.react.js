@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {outdatedRenderer, hightlightRenderer} from 'constants/CustomRenderers';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full.min';
 import {COLUMNS} from 'constants/ColumnConfigs';

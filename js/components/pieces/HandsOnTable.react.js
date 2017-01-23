@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Handsontable from 'node_modules/handsontable/dist/handsontable.full';
 import alertify from 'alertifyjs';
-import * as actionCreators from 'actions/AppActions';
+import {actions as contactActions} from 'components/Contacts';
 import {COLUMNS} from 'constants/ColumnConfigs';
 import validator from 'validator';
 import {outdatedRenderer } from 'constants/CustomRenderers';
@@ -559,8 +559,8 @@ const mapDispatchToProps = dispatch => {
     // dispatch: action => dispatch(action),
     // fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
     // patchList: listObj => dispatch(actionCreators.patchList(listObj)),
-    deleteContact: id => dispatch(actionCreators.deleteContact(id)),
-    deleteContacts: ids => dispatch(actionCreators.deleteContacts(ids)),
+    deleteContact: id => dispatch(contactActions.deleteContact(id)),
+    deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
   };
 };
 

@@ -16,8 +16,7 @@ import Link from '../Email/EmailPanel/components/Link';
 import CurlySpan from '../Email/EmailPanel/components/CurlySpan.react';
 import EntityControls from '../Email/EmailPanel/components/EntityControls';
 import {convertFromHTML} from 'draft-convert';
-import {grey500} from 'material-ui/styles/colors';
-import * as actionCreators from '../../actions/AppActions';
+import {actions as loginActions} from 'components/Login';
 import alertify from 'alertifyjs';
 
 export function findEntities(entityType, contentBlock, callback) {
@@ -282,7 +281,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchPerson: body => dispatch(actionCreators.patchPerson(body)),
+    patchPerson: body => dispatch(loginActions.patchPerson(body)),
   };
 };
 

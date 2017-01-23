@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
+import {actions as contactActions} from 'components/Contacts';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
@@ -279,9 +279,9 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
+    addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
     patchList: listBody => dispatch(listActions.patchList(listBody)),
-    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
+    searchPublications: query => dispatch(contactActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
 

@@ -5,7 +5,7 @@ import {fromJS, is} from 'immutable';
 import {grey500} from 'material-ui/styles/colors';
 import RaisedButton from 'material-ui/RaisedButton';
 
-import * as actionCreators from '../../actions/AppActions';
+import {actions as loginActions} from 'components/Login';
 
 function ControlledInput(props) {
   return (
@@ -119,7 +119,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchPerson: body => dispatch(actionCreators.patchPerson(body)),
+    patchPerson: body => dispatch(loginActions.patchPerson(body)),
   };
 };
 

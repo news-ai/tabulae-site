@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
+import {actions as contactActions} from 'components/Contacts';
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
@@ -238,11 +240,11 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
-    patchContact: (contactId, body) => dispatch(actionCreators.patchContact(contactId, body)),
-    patchList: listBody => dispatch(actionCreators.patchList(listBody)),
-    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
+    addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
+    patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
+    patchList: listBody => dispatch(listActions.patchList(listBody)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
+    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
     fetchFeeds: _ => dispatch(feedActions.fetchContactFeeds(props.contactId)),
   };

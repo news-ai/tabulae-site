@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import EmailsList from './EmailsList.react';
-import * as actions from '../actions';
+import {actions as stagingActions} from 'components/Email';
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
@@ -17,7 +17,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(actions.fetchListEmails(props.params.listId))
+    fetchEmails: _ => dispatch(stagingActions.fetchListEmails(props.params.listId))
   };
 };
 

@@ -3,7 +3,8 @@ import TextField from 'material-ui/TextField';
 import withRouter from 'react-router/lib/withRouter';
 import RaisedButton from 'material-ui/RaisedButton';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
+import {actions as listActions} from 'components/Lists';
+import {actions as fileActions} from 'components/ImportFile';
 import Dropzone from 'react-dropzone';
 import Radium from 'radium';
 
@@ -139,9 +140,9 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    createEmptyList: listname => dispatch(actionCreators.createEmptyList(listname)),
-    uploadFile: (listId, file) => dispatch(actionCreators.uploadFile(listId, file)),
-    fetchHeaders: listId => dispatch(actionCreators.fetchHeaders(listId)),
+    createEmptyList: listname => dispatch(listActions.createEmptyList(listname)),
+    uploadFile: (listId, file) => dispatch(fileActions.uploadFile(listId, file)),
+    fetchHeaders: listId => dispatch(fileActions.fetchHeaders(listId)),
   };
 };
 
