@@ -1,6 +1,6 @@
 import {feedConstant} from './constants';
-import {initialState} from '../../reducers/initialState';
-import {assignToEmpty} from '../../utils/assign';
+import {initialState} from 'reducers/initialState';
+import {assignToEmpty} from 'utils/assign';
 
 function feedReducer(state = initialState.feedReducer, action) {
   if (window.isDev) Object.freeze(state);
@@ -8,17 +8,17 @@ function feedReducer(state = initialState.feedReducer, action) {
   let obj;
   switch (action.type) {
     case feedConstant.ADD_REQUESTED:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: true
+      });
     case feedConstant.ADD_RECEIVED:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: false
+      });
     case feedConstant.REQUEST_MULTIPLE:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: true
+      });
     case feedConstant.RECEIVE_MULTIPLE:
       obj = assignToEmpty(state, action.feeds);
       obj[action.contactId] = action.ids;

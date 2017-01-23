@@ -1,7 +1,5 @@
-import {
-  feedConstant,
-} from './constants';
-import * as api from '../../actions/api';
+import {feedConstant} from './constants';
+import * as api from 'actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 const feedSchema = new Schema('feeds');
 // const listSchema = new Schema('lists');

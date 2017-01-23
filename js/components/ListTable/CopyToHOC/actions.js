@@ -1,6 +1,6 @@
-import * as feedActions from 'components/ContactProfile/actions';
+import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import * as contactActions from 'actions/contactActions';
-import * as listActions from 'actions/listActions';
+import {actions as listActions} from 'components/Lists';
 // move contactActions to another folder eventually
 import isEmpty from 'lodash/isEmpty';
 import differenceBy from 'lodash/differenceBy';

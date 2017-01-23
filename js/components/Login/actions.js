@@ -1,4 +1,4 @@
-import * as api from '../../actions/api';
+import * as api from 'actions/api';
 import {
   loginConstant,
   SET_FIRST_TIME_USER,

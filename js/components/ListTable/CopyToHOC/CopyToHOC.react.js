@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Select from 'react-select';
-import * as actionCreators from 'actions/AppActions';
+import {actions as listActions} from 'components/Lists';
 import * as actions from './actions';
 import withRouter from 'react-router/lib/withRouter';
 
@@ -163,11 +163,11 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchLists: _ => dispatch(actionCreators.fetchLists()),
+    fetchLists: _ => dispatch(listActions.fetchLists()),
     addContactsThenPatchList: (rawContacts, list) => dispatch(actions.addContactsThenPatchList(rawContacts, list, props.listId)),
-    copyToNewList: (rawContacts, name) => dispatch(actionCreators.createEmptyList(name))
+    copyToNewList: (rawContacts, name) => dispatch(listActions.createEmptyList(name))
     .then(response => dispatch(actions.addContactsThenPatchList(rawContacts, response.data, props.listId))),
-    copyEntireList: (id, name) => dispatch(actionCreators.copyEntireList(id, name))
+    copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
   };
 };
 

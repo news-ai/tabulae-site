@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as actionCreators from 'actions/AppActions';
-import * as feedActions from '../ContactProfile/actions';
+import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';

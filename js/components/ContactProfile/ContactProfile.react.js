@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
-import * as feedActions from './actions';
-import * as AppActions from '../../actions/AppActions';
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
+import {actions as loginActions} from 'components/Login';
+import {actions as contactActions} from 'components/Contacts';
+import {actions as feedActions} from './RSSFeed';
 import * as headlineActions from './Headlines/actions';
-import * as contactActions from '../../actions/contactActions';
 import * as joyrideActions from '../Joyride/actions';
 import {grey700, grey500} from 'material-ui/styles/colors';
 
@@ -336,9 +338,9 @@ function mapDispatchToProps(dispatch, props) {
     fetchContact: contactid => dispatch(contactActions.fetchContact(contactid)),
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
     fetchContactFeeds: (contactId) => dispatch(feedActions.fetchContactFeeds(contactId)),
-    fetchPublication: pubId => dispatch(AppActions.fetchPublication(pubId)),
-    fetchList: listId => dispatch(AppActions.fetchList(listId)),
-    removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser()),
+    fetchPublication: pubId => dispatch(publicationActions.fetchPublication(pubId)),
+    fetchList: listId => dispatch(listActions.fetchList(listId)),
+    removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide())
   };
 }

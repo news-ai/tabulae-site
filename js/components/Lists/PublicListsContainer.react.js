@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import * as actionCreators from 'actions/AppActions';
+import * as listActions from './actions';
 import {connect} from 'react-redux';
 
 import Lists from './Lists';
@@ -41,8 +41,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    dispatch: action => dispatch(action),
-    fetchLists: _ => dispatch(actionCreators.fetchPublicLists())
+    fetchLists: _ => dispatch(listActions.fetchPublicLists())
   };
 };
 
