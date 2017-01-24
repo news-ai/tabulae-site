@@ -760,7 +760,7 @@ class ListTable extends Component {
           <EmailPanel
           person={props.person}
           selected={state.selected}
-          fieldsmap={props.listData.fieldsmap}
+          fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
           listId={props.listId}
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           />}
