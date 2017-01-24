@@ -412,35 +412,36 @@ class ListTable extends Component {
         case 'profile':
           const state = this.state;
           contentBody = (
-              <div
-              className='pointer'
-              style={{padding: '0 1px', marginRight: 15}}
-              onMouseEnter={e => {
-                this.showProfileTooltip = true;
-                this.setState({
-                  profileX: e.clientX,
-                  profileY: e.clientY,
-                  profileContactId: rowData.id
-                });
-              }}
-              onMouseLeave={e => {
-                setTimeout(_ => {
-                  this.showProfileTooltip = this.onTooltipPanel;
-                  this.forceUpdate();
-                }, 80);
-              }}
-              onClick={e => {
-                e.preventDefault();
-                this.props.router.push(`/tables/${this.props.listId}/${rowData.id}`);
-              }}
+              <Link
+              to={`/tables/${this.props.listId}/${rowData.id}`}
               >
-                <FontIcon
-                id='profile_hop'
-                className='fa fa-arrow-right'
-                style={{fontSize: '0.9em'}}
-                color={blue300}
-                />
-              </div>);
+                <div
+                className='pointer'
+                style={{padding: '0 1px', marginRight: 15}}
+                onMouseEnter={e => {
+                  this.showProfileTooltip = true;
+                  this.setState({
+                    profileX: e.clientX,
+                    profileY: e.clientY,
+                    profileContactId: rowData.id
+                  });
+                }}
+                onMouseLeave={e => {
+                  setTimeout(_ => {
+                    this.showProfileTooltip = this.onTooltipPanel;
+                    this.forceUpdate();
+                  }, 80);
+                }}
+                >
+                  <FontIcon
+                  id='profile_hop'
+                  className='fa fa-arrow-right'
+                  style={{fontSize: '0.9em'}}
+                  color={blue300}
+                  />
+                </div>
+              </Link>
+              );
           contentBody2 = !this.props.listData.readonly &&
             <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
               {({onRequestOpen}) => (
