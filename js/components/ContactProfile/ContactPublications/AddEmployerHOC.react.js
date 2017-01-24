@@ -71,7 +71,7 @@ class AddEmployerHOC extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const pubId = props.publicationReducer[state.input];
+    const pubId = props.publicationReducer[state.publicationObj.name];
     const actions = [
       <FlatButton
       label='Cancel'
@@ -81,7 +81,9 @@ class AddEmployerHOC extends Component {
       label='Submit'
       primary
       keyboardFocused
-      disabled={!pubId || state.publicationFormOpen}
+      disabled={
+        (!pubId && !state.publicationFormOpen) ||
+        (state.publicationFormOpen && (!state.publicationObj.name || !isURL(state.publicationObj.url)))}
       onTouchTap={this.onSubmit}
     />,
     ];
