@@ -1,7 +1,7 @@
-import React, { PropTypes } from 'react';
+import React, {PropTypes} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import PreviewEmail from './PreviewEmail.react';
-import Waiting from '../../Waiting';
+import Waiting from 'components/Waiting';
 
 function PreviewEmails({sendLater, isReceiving, previewEmails, onSendEmailClick}) {
   const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
 import ListTable from './ListTable.react';
+import {actions as listActions} from 'components/Lists';
 
 class ListFetchingContainer extends Component {
   constructor(props) {
@@ -32,7 +32,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchList: listId => dispatch(actionCreators.fetchList(listId)),
+    fetchList: listId => dispatch(listActions.fetchList(listId)),
   };
 };
 

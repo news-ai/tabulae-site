@@ -4,7 +4,11 @@ import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
 import _ from 'lodash';
-import * as actionCreators from 'actions/AppActions';
+import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
+import {actions as contactActions} from 'components/Contacts';
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
+import {actions as fileActions} from 'components/ImportFile';
 import {globalStyles, skylightStyles, buttonStyle} from 'constants/StyleConstants';
 
 import Menu from 'material-ui/Menu';
@@ -490,16 +494,16 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     dispatch: action => dispatch(action),
-    searchListContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
-    patchList: listObj => dispatch(actionCreators.patchList(listObj)),
-    patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
-    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
-    createPublication: name => dispatch(actionCreators.createPublication(name)),
-    updateOutdatedContacts: contactId => dispatch(actionCreators.updateContact(contactId)),
-    fetchList: listId => dispatch(actionCreators.fetchList(listId)),
-    fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
-    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
-    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
+    searchListContacts: (listId, query) => dispatch(contactActions.searchListContacts(listId, query)),
+    patchList: listObj => dispatch(listActions.patchList(listObj)),
+    patchContacts: contacts => dispatch(contactActions.patchContacts(contacts)),
+    addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
+    createPublication: name => dispatch(publicationActions.createPublication(name)),
+    updateOutdatedContacts: contactId => dispatch(contactActions.updateContact(contactId)),
+    fetchList: listId => dispatch(listActions.fetchList(listId)),
+    fetchContacts: listId => dispatch(contactActions.fetchContacts(listId)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
+    fetchAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
   };
 };
 

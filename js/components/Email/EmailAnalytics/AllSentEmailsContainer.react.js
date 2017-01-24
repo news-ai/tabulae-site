@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import EmailsList from './EmailsList.react';
-import * as actions from '../actions';
+import {actions as stagingActions} from 'components/Email';
 
 const mapStateToProps = (state, props) => {
   const emails = state.stagingReducer.received
@@ -15,7 +15,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(actions.fetchSentEmails()),
+    fetchEmails: _ => dispatch(stagingActions.fetchSentEmails()),
   };
 };
 

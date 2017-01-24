@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
+import {actions as listActions} from 'components/Lists';
 import Tag from './Tag.react';
 
 const Tags = props => {
@@ -25,7 +25,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   const listId = props.listId;
   return {
-    patchList: listBody => dispatch(actionCreators.patchList(listBody))
+    patchList: listBody => dispatch(listActions.patchList(listBody))
   };
 };
 

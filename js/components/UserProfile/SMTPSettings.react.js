@@ -7,8 +7,8 @@ import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
-import * as actions from './actions';
-import * as actionCreators from 'actions/AppActions';
+import * as userSettingActions from './actions';
+import {actions as loginActions} from 'components/Login';
 import {blue600, yellow50, blue50, green500, red500} from 'material-ui/styles/colors';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import isNumeric from 'validator/lib/isNumeric';
@@ -306,11 +306,11 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    setupSMTP: smtpObj => dispatch(actions.setupSMTP(smtpObj)),
-    fetchPerson: _ => dispatch(actionCreators.fetchPerson()),
-    addSMTPEmail: (username, password) => dispatch(actions.addSMTPEmail(username, password)),
-    verifySMTPEmail: _ => dispatch(actions.verifySMTPEmail()),
-    patchPerson: personBody => dispatch(actionCreators.patchPerson(personBody))
+    setupSMTP: smtpObj => dispatch(userSettingActions.setupSMTP(smtpObj)),
+    fetchPerson: _ => dispatch(loginActions.fetchPerson()),
+    addSMTPEmail: (username, password) => dispatch(userSettingActions.addSMTPEmail(username, password)),
+    verifySMTPEmail: _ => dispatch(userSettingActions.verifySMTPEmail()),
+    patchPerson: personBody => dispatch(loginActions.patchPerson(personBody))
   };
 };
 

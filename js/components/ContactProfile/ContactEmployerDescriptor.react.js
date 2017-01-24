@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import Chip from 'material-ui/Chip';
-import * as contactActions from '../../actions/contactActions';
+import {actions as contactActions} from 'components/Contacts';
 import withRouter from 'react-router/lib/withRouter';
 
 class ContactEmployerDescriptor extends Component {

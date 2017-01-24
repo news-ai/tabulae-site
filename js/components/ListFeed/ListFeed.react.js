@@ -3,8 +3,8 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 
 import * as listfeedActions from './actions';
-import * as actionCreators from '../../actions/AppActions';
-import * as AppActions from 'actions/AppActions';
+import {actions as loginActions} from 'components/Login';
+import {actions as listActions} from 'components/Lists';
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 
 import hopscotch from 'hopscotch';
@@ -118,8 +118,8 @@ const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.params.listId, 10);
   return {
     fetchListFeed: _ => dispatch(listfeedActions.fetchListFeed(listId)),
-    fetchList: _ => dispatch(actionCreators.fetchList(listId)),
-    removeFirstTimeUser: _ => dispatch(AppActions.removeFirstTimeUser())
+    fetchList: _ => dispatch(listActions.fetchList(listId)),
+    removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser())
   };
 };
 

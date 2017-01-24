@@ -1,8 +1,8 @@
 import {
   ARCHIVE_LIST,
   listConstant,
-} from '../constants/AppConstants';
-import * as api from './api';
+} from 'constants/AppConstants';
+import * as api from 'actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 
 const listSchema = new Schema('lists');

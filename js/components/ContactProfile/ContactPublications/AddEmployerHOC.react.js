@@ -5,7 +5,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import FlatButton from 'material-ui/FlatButton';
 import PublicationPreview from './PublicationPreview.react';
 import PublicationForm from './PublicationForm.react';
-import * as AppActions from 'actions/AppActions';
+import {actions as publicationActions} from 'components/Publications';
 import alertify from 'alertifyjs';
 import isURL from 'validator/lib/isURL';
 
@@ -71,7 +71,7 @@ class AddEmployerHOC extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const pubId = props.publicationReducer[state.input];
+    const pubId = props.publicationReducer[state.publicationObj.name];
     const actions = [
       <FlatButton
       label='Cancel'
@@ -81,7 +81,9 @@ class AddEmployerHOC extends Component {
       label='Submit'
       primary
       keyboardFocused
-      disabled={!pubId || state.publicationFormOpen}
+      disabled={
+        (!pubId && !state.publicationFormOpen) ||
+        (state.publicationFormOpen && (!state.publicationObj.name || !isURL(state.publicationObj.url)))}
       onTouchTap={this.onSubmit}
     />,
     ];
@@ -130,8 +132,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    searchPublications: query => dispatch(AppActions.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, publicationObj, which) => dispatch(AppActions.createPublicationThenPatchContact(contactId, publicationObj, which)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
+    createPublicationThenPatchContact: (contactId, publicationObj, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, publicationObj, which)),
   };
 };
 

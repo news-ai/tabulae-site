@@ -13,7 +13,7 @@ import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
 import BasicSettings from './BasicSettings.react';
 import EmailSettings from './EmailSettings.react';
 
-import * as actionCreators from '../../actions/AppActions';
+import {actions as loginActions} from 'components/Login';
 
 const InviteSteps = props => <div style={{
   display: 'flex',
@@ -101,7 +101,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchPerson: body => dispatch(actionCreators.patchPerson(body)),
+    patchPerson: body => dispatch(loginActions.patchPerson(body)),
     getInviteCount: _ => dispatch(getInviteCount())
   };
 };

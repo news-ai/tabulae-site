@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as AppActions from 'actions/AppActions';
+import * as publicationActions from './actions';
 import * as actions from './DatabaseProfile/actions';
-import ContactDescriptor from '../ContactProfile/ContactDescriptor.react';
 import isURL from 'validator/lib/isURL';
 import {blue700, grey400, grey700, grey200} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
@@ -192,8 +191,8 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   const publicationId = parseInt(props.params.publicationId, 10);
   return {
-    fetchPublication: _ => dispatch(AppActions.fetchPublication(publicationId)),
-    patchPublication: publicationBody => dispatch(AppActions.patchPublication(publicationId, publicationBody)),
+    fetchPublication: _ => dispatch(publicationActions.fetchPublication(publicationId)),
+    patchPublication: publicationBody => dispatch(publicationActions.patchPublication(publicationId, publicationBody)),
     fetchDatabaseProfile: _ => dispatch(actions.fetchDatabaseProfile(publicationId))
   };
 };

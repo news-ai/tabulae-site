@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
-import * as feedActions from '../ContactProfile/actions';
+import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
+import {actions as contactActions} from 'components/Contacts';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
@@ -9,7 +11,6 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
-import RaisedButton from 'material-ui/RaisedButton';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -278,10 +279,10 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
-    patchList: listBody => dispatch(actionCreators.patchList(listBody)),
-    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
-    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(actionCreators.createPublicationThenPatchContact(contactId, pubName, which)),
+    addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
+    patchList: listBody => dispatch(listActions.patchList(listBody)),
+    searchPublications: query => dispatch(contactActions.searchPublications(query)),
+    createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
 
   };

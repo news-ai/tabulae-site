@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
-import * as actionCreators from 'actions/AppActions';
+import {actions as fileActions} from 'components/ImportFile';
 import {Grid} from 'react-virtualized';
 
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -242,8 +242,8 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.params.listId, 10);
   return {
-    fetchHeaders: _ => dispatch(actionCreators.fetchHeaders(listId)),
-    onAddHeaders: order => dispatch(actionCreators.addHeaders(listId, order)),
+    fetchHeaders: _ => dispatch(fileActions.fetchHeaders(listId)),
+    onAddHeaders: order => dispatch(fileActions.addHeaders(listId, order)),
   };
 };
 

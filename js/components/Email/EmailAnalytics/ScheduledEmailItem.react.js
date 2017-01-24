@@ -4,7 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
 import FlatButton from 'material-ui/FlatButton';
 import {connect} from 'react-redux';
-import * as actions from '../actions';
+import {actions as stagingActions} from 'components/Email';
 import {
   grey50,
   grey800,
@@ -133,7 +133,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onCancelClick: _ => dispatch(actions.cancelScheduledEmail(props.id)),
+    onCancelClick: _ => dispatch(stagingActions.cancelScheduledEmail(props.id)),
   };
 };
 

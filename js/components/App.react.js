@@ -4,7 +4,7 @@ import Link from 'react-router/lib/Link';
 import {connect} from 'react-redux';
 import intercomSetup from '../chat';
 
-import * as actionCreators from 'actions/AppActions';
+import {actions as loginActions} from 'components/Login';
 import * as joyrideActions from './Joyride/actions';
 
 import Login from './Login';
@@ -231,10 +231,10 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getAuth: _ => dispatch(actionCreators.fetchPerson()),
-    logoutClick: _ => dispatch(actionCreators.logout()),
-    setFirstTimeUser: _ => dispatch(actionCreators.setFirstTimeUser()),
-    fetchNotifications: _ => dispatch(actionCreators.fetchNotifications()),
+    getAuth: _ => dispatch(loginActions.fetchPerson()),
+    logoutClick: _ => dispatch(loginActions.logout()),
+    setFirstTimeUser: _ => dispatch(loginActions.setFirstTimeUser()),
+    fetchNotifications: _ => dispatch(loginActions.fetchNotifications()),
     turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
   };

@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as actionCreators from 'actions/AppActions';
-
+import {actions as listActions} from 'components/Lists';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import Checkbox from 'material-ui/Checkbox';
@@ -250,7 +249,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchList: listObj => dispatch(actionCreators.patchList(listObj)),
+    patchList: listObj => dispatch(listActions.patchList(listObj)),
   };
 };
 

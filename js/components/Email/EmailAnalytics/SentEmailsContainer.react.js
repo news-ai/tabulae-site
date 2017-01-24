@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as actions from '../actions';
-import * as actionCreators from '../../../actions/AppActions';
+import {actions as listActions} from 'components/Lists';
+import {actions as stagingActions} from 'components/Email';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
@@ -106,9 +106,9 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchSentEmails: _ => dispatch(actions.fetchSentEmails()),
-    fetchLists: listId => dispatch(actionCreators.fetchLists()),
-    fetchListEmails: listId => dispatch(actions.fetchListEmails(listId))
+    fetchSentEmails: _ => dispatch(stagingActions.fetchSentEmails()),
+    fetchLists: listId => dispatch(listActions.fetchLists()),
+    fetchListEmails: listId => dispatch(stagingActions.fetchListEmails(listId))
   };
 };
 

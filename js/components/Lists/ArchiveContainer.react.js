@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import * as actionCreators from 'actions/AppActions';
+import {actions as listActions} from 'components/Lists';
 import {connect} from 'react-redux';
 
 import Lists from './Lists';
@@ -43,10 +43,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    dispatch: action => dispatch(action),
-    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
-    .then( _ => dispatch(actionCreators.fetchLists())),
-    fetchLists: _ => dispatch(actionCreators.fetchArchivedLists())
+    onToggle: listId => dispatch(listActions.archiveListToggle(listId))
+    .then( _ => dispatch(listActions.fetchLists())),
+    fetchLists: _ => dispatch(listActions.fetchArchivedLists())
   };
 };
 

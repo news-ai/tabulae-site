@@ -3,9 +3,9 @@ import {connect} from 'react-redux';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import * as actionCreators from 'actions/AppActions';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
+import {actions as listActions} from 'components/Lists';
 
 class AddTagDialogHOC extends Component {
   constructor(props) {
@@ -52,7 +52,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   const listId = props.listId;
   return {
-    patchList: listBody => dispatch(actionCreators.patchList(listBody))
+    patchList: listBody => dispatch(listActions.patchList(listBody))
   };
 };
 

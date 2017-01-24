@@ -8,7 +8,9 @@ import find from 'lodash/find';
 import difference from 'lodash/difference';
 import isEmpty from 'lodash/isEmpty';
 
-import * as actionCreators from 'actions/AppActions';
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
+import {actions as contactActions} from 'components/Contacts';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -36,7 +38,7 @@ import {EmailPanel} from '../Email';
 import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
-import CopyToHOC from './CopyToHOC.react';
+import CopyToHOC from './CopyToHOC';
 import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
@@ -151,6 +153,11 @@ class ListTable extends Component {
     this.setDataGridRef = ref => (this._DataGrid = ref);
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
+    this.resetSort = () => this.setState({
+        sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+        onSort: false,
+        sortedIds: [],
+      });
   }
 
   componentWillMount() {
@@ -565,6 +572,12 @@ class ListTable extends Component {
       contacts: newListContacts,
       name: props.listData.name,
     });
+    if (this.state.onSort) {
+      this.setState({
+        sortedIds: difference(this.state.sortedIds, selected),
+        selected: []
+      });
+    }
   }
 
   render() {
@@ -855,26 +868,24 @@ const mapStateToProps = (state, props) => {
     firstTimeUser: state.personReducer.firstTimeUser,
     contactReducer: state.contactReducer,
     listDidInvalidate: state.listReducer.didInvalidate,
-    contactReducer: state.contactReducer,
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    dispatch: action => dispatch(action),
-    searchListContacts: (listId, query) => dispatch(actionCreators.searchListContacts(listId, query)),
-    patchList: listObj => dispatch(actionCreators.patchList(listObj)),
-    patchContacts: contacts => dispatch(actionCreators.patchContacts(contacts)),
-    addContacts: contacts => dispatch(actionCreators.addContacts(contacts)),
-    createPublication: name => dispatch(actionCreators.createPublication(name)),
-    updateOutdatedContacts: contactId => dispatch(actionCreators.updateContact(contactId)),
-    fetchList: listId => dispatch(actionCreators.fetchList(listId)),
-    fetchContacts: listId => dispatch(actionCreators.fetchContacts(listId)),
-    searchPublications: query => dispatch(actionCreators.searchPublications(query)),
-    fetchAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
+    searchListContacts: (listId, query) => dispatch(contactActions.searchListContacts(listId, query)),
+    patchList: listObj => dispatch(listActions.patchList(listObj)),
+    patchContacts: contacts => dispatch(contactActions.patchContacts(contacts)),
+    addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
+    createPublication: name => dispatch(publicationActions.createPublication(name)),
+    updateOutdatedContacts: contactId => dispatch(contactActions.updateContact(contactId)),
+    fetchList: listId => dispatch(listActions.fetchList(listId)),
+    fetchContacts: listId => dispatch(contactActions.fetchContacts(listId)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
+    fetchAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
     clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId}),
-    deleteContacts: ids => dispatch(actionCreators.deleteContacts(ids)),
-    loadAllContacts: listId => dispatch(actionCreators.loadAllContacts(listId)),
+    deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
+    loadAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
   };
 };
 

@@ -8,7 +8,7 @@ import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
 import SMTPSettings from './SMTPSettings.react';
 
-import * as actionCreators from '../../actions/AppActions';
+import {actions as loginActions} from 'components/Login';
 
 const inputHeight = {
   height: 40,
@@ -106,7 +106,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchPerson: body => dispatch(actionCreators.patchPerson(body)),
+    patchPerson: body => dispatch(loginActions.patchPerson(body)),
   };
 };
 

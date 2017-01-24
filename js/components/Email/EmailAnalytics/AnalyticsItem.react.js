@@ -14,8 +14,8 @@ import {
 } from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
-import * as actions from '../EmailAttachment/actions';
-import * as actionCreators from 'actions/AppActions';
+import {actions as stagingActions} from 'components/Email';
+import {actions as attachmentActions} from 'components/Email/EmailAttachment';
 
 import moment from 'moment-timezone';
 import alertify from 'alertifyjs';
@@ -166,8 +166,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(actions.fetchAttachment(id))),
-    archiveEmail: _ => dispatch(actionCreators.archiveEmail(props.id)) 
+    fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(attachmentActions.fetchAttachment(id))),
+    archiveEmail: _ => dispatch(stagingActions.archiveEmail(props.id))
   };
 };
 

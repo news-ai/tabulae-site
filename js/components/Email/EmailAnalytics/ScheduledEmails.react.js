@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import ScheduledEmailItem from './ScheduledEmailItem.react';
-import * as actions from '../actions';
+import {actions as stagingActions} from 'components/Email';
 import InfiniteScroll from '../../InfiniteScroll';
 
 class ScheduledEmails extends Component {
@@ -40,7 +40,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(actions.fetchSentEmails()),
+    fetchEmails: _ => dispatch(stagingActions.fetchSentEmails()),
   };
 };
 

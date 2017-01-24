@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import * as actionCreators from 'actions/AppActions';
+import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';
 
@@ -64,14 +64,13 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   const tag = props.params.tag;
   return {
-    dispatch: action => dispatch(action),
-    onToggle: listId => dispatch(actionCreators.archiveListToggle(listId))
-    .then( _ => dispatch(actionCreators.fetchLists())),
+    onToggle: listId => dispatch(listActions.archiveListToggle(listId))
+    .then( _ => dispatch(listActions.fetchLists())),
     newListOnClick: untitledNum => {
-      dispatch(actionCreators.createEmptyList(untitledNum))
+      dispatch(listActions.createEmptyList(untitledNum))
       .then(response => browserHistory.push(`/lists/${response.data.id}`));
     },
-    fetchLists: _ => dispatch(actionCreators.fetchTagLists(tag))
+    fetchLists: _ => dispatch(listActions.fetchTagLists(tag))
   };
 };
 
