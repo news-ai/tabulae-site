@@ -5,7 +5,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Textarea from 'react-textarea-autosize';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-import * as AppActions from 'actions/AppActions';
+import {actions as loginActions} from 'components/Login';
 import {blue50} from 'material-ui/styles/colors';
 
 const thankyouString = 'Feedback submitted.\n\nThank you. Your feedback is very much appreciated.';
@@ -88,7 +88,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    postFeedback: (reason, feedback) => dispatch(AppActions.postFeedback(reason, feedback))
+    postFeedback: (reason, feedback) => dispatch(loginActions.postFeedback(reason, feedback))
   };
 };
 

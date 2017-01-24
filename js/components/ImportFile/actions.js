@@ -4,7 +4,7 @@ import {
   fileConstant,
   headerConstant
 } from './constants';
-import * as api from '../../actions/api';
+import * as api from 'actions/api';
 
 function receiveFile(file, listId) {
   return {
