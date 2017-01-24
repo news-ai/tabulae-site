@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Select from 'react-select';
 import {actions as listActions} from 'components/Lists';
-import * as actions from './actions';
+import * as copyActions from './actions';
 import withRouter from 'react-router/lib/withRouter';
 
 import Dialog from 'material-ui/Dialog';
@@ -164,9 +164,9 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchLists: _ => dispatch(listActions.fetchLists()),
-    addContactsThenPatchList: (rawContacts, list) => dispatch(actions.addContactsThenPatchList(rawContacts, list, props.listId)),
+    addContactsThenPatchList: (rawContacts, list) => dispatch(copyActions.addContactsThenPatchList(rawContacts, list, props.listId)),
     copyToNewList: (rawContacts, name) => dispatch(listActions.createEmptyList(name))
-    .then(response => dispatch(actions.addContactsThenPatchList(rawContacts, response.data, props.listId))),
+    .then(response => dispatch(copyActions.addContactsThenPatchList(rawContacts, response.data, props.listId))),
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
   };
 };

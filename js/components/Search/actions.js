@@ -7,8 +7,9 @@ import {normalize, Schema, arrayOf} from 'normalizr';
 const contactSchema = new Schema('contacts');
 const listSchema = new Schema('lists');
 const publicationSchema = new Schema('publications');
-import * as listActions from '../../actions/listActions';
-import * as publicationActions from '../../actions/publicationActions';
+
+import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
 
 
 export function clearSearchCache() {
