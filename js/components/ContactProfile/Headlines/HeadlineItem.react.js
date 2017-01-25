@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import * as AppActions from '../../../actions/AppActions';
 import {grey400} from 'material-ui/styles/colors';
+import {actions as publicationActions} from 'components/Publications';
 
 const createMarkup = markup => ({__html: markup});
 
@@ -62,7 +62,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchPublication: id => dispatch(AppActions.fetchPublication(id))
+    fetchPublication: id => dispatch(publicationActions.fetchPublication(id))
   };
 };
 

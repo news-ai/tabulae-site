@@ -7,7 +7,7 @@ import _ from 'lodash';
 import alertify from 'alertifyjs';
 import Waiting from '../Waiting';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
-import * as actionCreators from 'actions/AppActions';
+import * as fileActions from './actions';
 
 // DEPRECIATED!!!
 
@@ -189,8 +189,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onProcessHeaders: order => dispatch(actionCreators.addHeaders(props.listId, order)),
-    fetchHeaders: listId => dispatch(actionCreators.fetchHeaders(listId)),
+    onProcessHeaders: order => dispatch(fileActions.addHeaders(props.listId, order)),
+    fetchHeaders: listId => dispatch(fileActions.fetchHeaders(listId)),
   };
 };
 

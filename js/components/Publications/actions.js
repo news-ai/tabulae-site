@@ -3,8 +3,7 @@ import * as api from 'actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 
 const publicationSchema = new Schema('publications');
-import * as contactActions from 'actions/contactActions';
-// FIX_THIS
+import {actions as contactActions} from 'components/Contacts';
 
 
 function requestPublication(id) {
