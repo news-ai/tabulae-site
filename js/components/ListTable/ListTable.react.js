@@ -89,6 +89,7 @@ const styles = {
 
 
 const localStorage = window.localStorage;
+let DEFAULT_WINDOW_TITLE = window.document.title;
 
 class ListTable extends Component {
   constructor(props) {
@@ -222,7 +223,14 @@ class ListTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
+    if (nextProps.listDidInvalidate) {
+      this.props.router.push('/notfound');
+    }
+
+    if (nextProps.listData) {
+      window.document.title = `${nextProps.listData.name} --- NewsAI Tabulae`;
+    }
+
     if (nextProps.listId !== this.props.listId) {
       // underlying list changed
       this.fetchOperations(nextProps);
@@ -279,6 +287,7 @@ class ListTable extends Component {
 
   componentWillUnmount() {
     window.onresize = undefined;
+    window.document.title = DEFAULT_WINDOW_TITLE;
   }
 
   _setGridHeight() {
