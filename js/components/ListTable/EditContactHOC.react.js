@@ -39,6 +39,8 @@ const _getter = contact => {
   return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
 };
 
+const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
+
 class EditContact extends Component {
   constructor(props) {
     super(props);
@@ -123,7 +125,7 @@ class EditContact extends Component {
     if (feeds.length === 0) return;
     this.props.addFeeds(id, feeds);
   }
-  
+
   _updateAutoInput(val) {
     this.setState({
       input: val,
@@ -165,43 +167,43 @@ class EditContact extends Component {
         {state.open && <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
           {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
               <TextField style={textfieldStyle} value={state.contactBody.firstname || ''} name='firstname' onChange={e => this.onChange('firstname', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span style={{whiteSpace: 'nowrap'}}>Last Name</span>
               <TextField style={textfieldStyle} value={state.contactBody.lastname || ''} name='lastname' onChange={e => this.onChange('lastname', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Email</span>
               <TextField style={textfieldStyle} value={state.contactBody.email || ''} name='email' onChange={e => this.onChange('email', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Twitter</span>
               <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.twitter || ''} name='twitter' onChange={e => this.onChange('twitter', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Instagram</span>
               <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.instagram || ''} name='instagram' onChange={e => this.onChange('instagram', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>LinkedIn</span>
               <TextField style={textfieldStyle} value={state.contactBody.linkedin || ''} name='linkedin' onChange={e => this.onChange('linkedin', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Phone #</span>
               <TextField style={textfieldStyle} value={state.contactBody.phonenumber || ''} name='phonenumber' onChange={e => this.onChange('phonenumber', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Blog</span>
               <TextField style={textfieldStyle} value={state.contactBody.blog || ''} name='blog' onChange={e => this.onChange('blog', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Website</span>
               <TextField style={textfieldStyle} value={state.contactBody.website || ''} name='website' onChange={e => this.onChange('website', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+            <div className={columnClassname}>
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
@@ -209,7 +211,7 @@ class EditContact extends Component {
               props.list.fieldsmap
               .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
               .map((fieldObj, i) => fieldObj.customfield && (
-                <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
+                <div key={i} className={columnClassname}>
                   <span>{fieldObj.name}</span>
                   <TextField
                   value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : find(state.customfields, field => field.name === fieldObj.value).value}
@@ -220,7 +222,7 @@ class EditContact extends Component {
                   />
                 </div>
                 ))}
-              <AutoComplete
+             {/* <AutoComplete
               floatingLabelText='Autocomplete Dropdown'
               filter={AutoComplete.noFilter}
               onUpdateInput={this.updateAutoInput}
@@ -228,17 +230,17 @@ class EditContact extends Component {
               openOnFocus
               dataSource={state.employerAutocompleteList}
               />
-              {!state.publicationFormOpen &&
-                <PublicationPreview
-                text={state.input}
-                onOpenForm={_ => this.setState({publicationFormOpen: true})}
-                />}
-              {state.publicationFormOpen &&
-                <PublicationForm
-                publicationObj={state.publicationObj}
-                onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
-                onHide={_ => this.setState({publicationFormOpen: false})}
-                />}
+            {!state.publicationFormOpen &&
+              <PublicationPreview
+              text={state.input}
+              onOpenForm={_ => this.setState({publicationFormOpen: true})}
+              />}
+            {state.publicationFormOpen &&
+              <PublicationForm
+              publicationObj={state.publicationObj}
+              onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
+              onHide={_ => this.setState({publicationFormOpen: false})}
+              />}*/}
             {
               /* <div className='panel' style={{
               backgroundColor: yellow50,

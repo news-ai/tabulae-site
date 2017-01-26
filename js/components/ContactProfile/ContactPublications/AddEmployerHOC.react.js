@@ -104,17 +104,17 @@ class AddEmployerHOC extends Component {
           openOnFocus
           dataSource={state.employerAutocompleteList}
           />
-          {!state.publicationFormOpen &&
-            <PublicationPreview
-            text={state.input}
-            onOpenForm={_ => this.setState({publicationFormOpen: true})}
-            />}
-          {state.publicationFormOpen &&
-            <PublicationForm
-            publicationObj={state.publicationObj}
-            onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
-            onHide={_ => this.setState({publicationFormOpen: false})}
-            />}
+        {!state.publicationFormOpen &&
+          <PublicationPreview
+          text={state.input}
+          onOpenForm={_ => this.setState({publicationFormOpen: true})}
+          />}
+        {state.publicationFormOpen &&
+          <PublicationForm
+          publicationObj={state.publicationObj}
+          onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
+          onHide={_ => this.setState({publicationFormOpen: false})}
+          />}
         </Dialog>
         {props.children({
           onRequestOpen: _ => this.setState({open: true})
