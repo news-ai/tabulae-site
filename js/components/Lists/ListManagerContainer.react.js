@@ -9,7 +9,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Lists from './Lists';
 import InfiniteScroll from '../InfiniteScroll';
 import DropFileWrapper from '../pages/DropFileWrapper.react';
-import TextField from 'material-ui/TextField';
 
 import {grey500} from 'material-ui/styles/colors';
 

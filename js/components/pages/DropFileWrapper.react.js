@@ -116,7 +116,7 @@ class DropFileWrapper extends Component {
             <div>Try dropping an Excel (xlsx) file here, or click to select file to upload.</div>
           </Dropzone>}
           </div>
-          <RaisedButton disabled={state.clicked} style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
+          <RaisedButton primary disabled={state.clicked || state.file === null} style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
         </div>
         );
     } else {

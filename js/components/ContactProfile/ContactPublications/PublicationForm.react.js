@@ -14,12 +14,20 @@ class PublicationForm extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className='row' style={{padding: 5, margin: 5, backgroundColor: blue50}}>
-        <span className='pointer right' onClick={props.onHide} style={{fontSize: '0.9em', color: grey700}}>Close</span>
-        <div className='large-12 medium-12 small-12 columns'>
-        Publication Form
+      <div style={{padding: 10, margin: 5, backgroundColor: blue50, position: 'relative'}}>
+        <span
+        className='pointer right'
+        onClick={props.onHide}
+        style={{
+          right: 5,
+          fontSize: '0.9em',
+          color: grey700,
+          position: 'absolute'
+        }}>Close</span>
+        <div className='vertical-center'>
+          <span style={{fontSize: '1.1em'}}>Publication Form</span>
         </div>
-        <div className='large-12 medium-12 small-12 columns'>
+        <div className='vertical-center'>
           <TextField
           hintStyle={{color: blue800}}
           underlineStyle={{color: blue800}}
@@ -31,10 +39,8 @@ class PublicationForm extends Component {
           onChange={e => props.onValueChange(e.target.value, 'name')}
           />
         </div>
-        <div className='large-12 medium-12 small-12 columns'>
-          <ValidationHOC
-          rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}
-          >
+        <div className='vertical-center'>
+          <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
           {({onValueChange, errorMessage}) => (
             <TextField
             hintStyle={{color: blue800}}
