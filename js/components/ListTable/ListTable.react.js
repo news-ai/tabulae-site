@@ -119,6 +119,10 @@ class ListTable extends Component {
     this.showProfileTooltip = false;
     this.onTooltipPanel = false;
 
+    if (this.props.listData) {
+      window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
+    }
+
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
