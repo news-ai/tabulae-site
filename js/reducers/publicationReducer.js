@@ -1,5 +1,5 @@
-import {publicationConstant} from '../constants/AppConstants';
-import {assignToEmpty} from '../utils/assign';
+import {publicationConstant} from 'constants/AppConstants';
+import {assignToEmpty} from 'utils/assign';
 import {initialState} from './initialState';
 
 function publicationReducer(state = initialState.publicationReducer, action) {
@@ -22,11 +22,14 @@ function publicationReducer(state = initialState.publicationReducer, action) {
       obj[action.publication.id].isReceiving = false;
       return obj;
     case publicationConstant.RECEIVE_MULTIPLE:
-      const received = state.received.concat(action.ids.filter(id => !state[id]));
+      let received = state.received;
       obj = assignToEmpty(state, action.publications);
-      action.ids.map(id => {
-        obj[action.publications[id].name] = id;
-      });
+      if (action.ids !== null) {
+        received = received.concat(action.ids.filter(id => !state[id]));
+        action.ids.map(id => {
+          obj[action.publications[id].name] = id;
+        });
+      }
       obj.received = received;
       obj.isReceiving = false;
       return obj;

@@ -9,6 +9,9 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import AutoComplete from 'material-ui/AutoComplete';
+import PublicationPreview from 'components/ContactProfile/ContactPublications/PublicationPreview.react';
+import PublicationForm from 'components/ContactProfile/ContactPublications/PublicationForm.react';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -44,8 +47,16 @@ class EditContact extends Component {
       contactBody: _getter(this.props.contact),
       immutableContactBody: fromJS(_getter(this.props.contact)),
       customfields: this.props.contact.customfields,
-      rssfeedsTextarea: ''
+      rssfeedsTextarea: '',
+      input: '',
+      employerAutocompleteList: [],
+      publicationFormOpen: false,
+      publicationObj: {
+        name: '',
+        url: ''
+      }
     };
+    this.updateAutoInput = this._updateAutoInput.bind(this);
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
@@ -111,6 +122,22 @@ class EditContact extends Component {
       .filter(line => line.length > 0 && isURL(line)));
     if (feeds.length === 0) return;
     this.props.addFeeds(id, feeds);
+  }
+  
+  _updateAutoInput(val) {
+    this.setState({
+      input: val,
+      publicationObj: Object.assign({}, this.state.publicationObj, {name: val})
+    });
+    setTimeout(_ => {
+      this.props.searchPublications(this.state.input)
+      .then(response => {
+        this.setState({
+          employerAutocompleteList: response,
+          autocompleteOpen: response.length > 0
+        });
+      });
+    }, 500);
   }
 
   render() {
@@ -193,6 +220,25 @@ class EditContact extends Component {
                   />
                 </div>
                 ))}
+              <AutoComplete
+              floatingLabelText='Autocomplete Dropdown'
+              filter={AutoComplete.noFilter}
+              onUpdateInput={this.updateAutoInput}
+              onNewRequest={input => this.setState({input})}
+              openOnFocus
+              dataSource={state.employerAutocompleteList}
+              />
+              {!state.publicationFormOpen &&
+                <PublicationPreview
+                text={state.input}
+                onOpenForm={_ => this.setState({publicationFormOpen: true})}
+                />}
+              {state.publicationFormOpen &&
+                <PublicationForm
+                publicationObj={state.publicationObj}
+                onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
+                onHide={_ => this.setState({publicationFormOpen: false})}
+                />}
             {
               /* <div className='panel' style={{
               backgroundColor: yellow50,
