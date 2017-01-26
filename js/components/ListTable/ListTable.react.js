@@ -89,6 +89,7 @@ const styles = {
 
 
 const localStorage = window.localStorage;
+let DEFAULT_WINDOW_TITLE = window.document.title;
 
 class ListTable extends Component {
   constructor(props) {
@@ -117,6 +118,10 @@ class ListTable extends Component {
     // store outside of state to update synchronously for PanelOverlay
     this.showProfileTooltip = false;
     this.onTooltipPanel = false;
+
+    if (this.props.listData) {
+      window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
+    }
 
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
@@ -222,7 +227,14 @@ class ListTable extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.listDidInvalidate) this.props.router.push('/notfound');
+    if (nextProps.listDidInvalidate) {
+      this.props.router.push('/notfound');
+    }
+
+    if (nextProps.listData) {
+      window.document.title = `${nextProps.listData.name} --- NewsAI Tabulae`;
+    }
+
     if (nextProps.listId !== this.props.listId) {
       // underlying list changed
       this.fetchOperations(nextProps);
@@ -279,6 +291,7 @@ class ListTable extends Component {
 
   componentWillUnmount() {
     window.onresize = undefined;
+    window.document.title = DEFAULT_WINDOW_TITLE;
   }
 
   _setGridHeight() {
