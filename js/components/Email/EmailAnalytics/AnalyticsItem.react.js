@@ -28,7 +28,6 @@ const styles = {
     alignItems: 'center'
   },
   wrapper: {
-    width: '100%',
     padding: 12,
     // border: '1px gray solid',
     borderRadius: '1.2em',
@@ -101,7 +100,7 @@ class AnalyticsItem extends Component {
     return (
       <div style={wrapperStyle}>
         <div className='row'>
-          <div className='small-12 medium-6 large-6 columns left'>
+          <div className='small-12 medium-6 large-6 columns'>
           {listid !== 0 &&
             <div>
               <span style={styles.sentFrom}>Sent from List</span>
