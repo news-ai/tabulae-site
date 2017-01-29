@@ -21,15 +21,11 @@ class SentEmailsPaginationContainer extends Component {
       isShowingArchived: false,
       activeKey: this.props.listId > 0 ? '/emailstats' : this.props.location.pathname,
       start: 0,
-      sortby: 0
     };
     this.handleFilterChange = (event, index, filterValue) => {
       if (index === 0) this.props.router.push(`/emailstats`);
       else this.props.router.push(`/emailstats/lists/${filterValue}`);
       this.setState({filterValue});
-    };
-    this.handleSortChange = (event, index, sortby) => {
-      this.setState({sortby});
     };
     this.onTabChange = activeKey => {
       this.props.router.push(activeKey);
@@ -53,7 +49,6 @@ class SentEmailsPaginationContainer extends Component {
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
     const selectable = [<MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
     .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
-    //console.log(props);
 
     return (
         <div className='large-10 large-offset-1 columns'>
@@ -78,14 +73,6 @@ class SentEmailsPaginationContainer extends Component {
                       {selectable}
                       </DropDownMenu>
                     </div>
-                    {/*<div className='vertical-center'>
-                      <span>Sort By: </span>
-                      <DropDownMenu value={state.sortby} onChange={this.handleSortChange}>
-                        <MenuItem key='sort-0' value={0} primaryText='Created Date' />
-                        <MenuItem key='sort-1' value={1} primaryText='Opens' />
-                        <MenuItem key='sort-2' value={2} primaryText='Clicked' />
-                      </DropDownMenu>
-                    </div>*/}
                   </div>}
                   {props.children}
                 </div>

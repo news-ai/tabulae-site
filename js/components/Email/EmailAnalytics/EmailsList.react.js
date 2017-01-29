@@ -2,6 +2,45 @@ import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
 
+
+const bucketEmailsByDate = (emails) => {
+  if (emails.length === 0) return {dateOrder: [], emailMap: {}};
+  const firstDateString = new Date(emails[0].created).toLocaleDateString();
+  let emailMap = {[firstDateString]: [emails[0]]};
+  let dateOrder = [firstDateString];
+  let dateMap = {[firstDateString]: true};
+  let datestring;
+  emails.map((email, i) => {
+    if (i === 0) return null;
+    datestring = new Date(email.created).toLocaleDateString();
+    if (dateMap[datestring]) {
+      emailMap = Object.assign({}, emailMap, {
+        [datestring]: [...emailMap[datestring], email]
+      });
+    } else {
+      dateMap[datestring] = true;
+      dateOrder.push(datestring);
+      emailMap = Object.assign({}, emailMap, {
+        [datestring]: [email]
+      });
+    }
+  });
+  return {dateOrder, emailMap};
+};
+
+const EmailDateContainer = ({datestring, emailBucket}) => (
+    <div>
+      <div style={{margin: '5px 0'}} className='vertical-center'>
+        <span>{datestring}</span>
+      </div>
+      {emailBucket && emailBucket.map((email, i) =>
+        <AnalyticsItem
+        key={`email-analytics-${i}`}
+        {...email}
+        />)}
+    </div>
+  );
+
 class EmailsList extends Component {
   constructor(props) {
     super(props);
@@ -14,14 +53,18 @@ class EmailsList extends Component {
   render() {
     let style = {margin: '30px 0'};
     if (this.props.containerHeight) style.height = this.props.containerHeight;
+
+    const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchEmails}>
         <div style={style}>
-          {this.props.emails.map((email, i) =>
-            <AnalyticsItem
-            key={i}
-            {...email}
-            />)}
+        {dateOrder.map((datestring) => (
+          <EmailDateContainer
+          key={`email-date-${datestring}`}
+          datestring={datestring}
+          emailBucket={emailMap[datestring]}
+          />
+          ))}
           {this.props.emails.length === 0 && <span>No emails scheduled for delivery.</span>}
         </div>
       </InfiniteScroll>
