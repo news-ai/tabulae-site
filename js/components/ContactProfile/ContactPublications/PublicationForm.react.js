@@ -52,7 +52,9 @@ class PublicationForm extends Component {
             floatingLabelText='Website Link'
             value={props.publicationObj.url}
             onChange={e => {
+              // for validation
               onValueChange(e.target.value);
+              // for updating value
               props.onValueChange(e.target.value, 'url');
             }}
             />)}

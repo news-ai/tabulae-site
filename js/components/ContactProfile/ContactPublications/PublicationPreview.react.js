@@ -16,16 +16,16 @@ class PublicationPreview extends Component {
     const state = this.state;
     return props.text.length > 0 ? (
       <div style={{margin: '0 10px'}}>
-        {props.publication ?
-          <PreviewItem {...props.publication}/> : <div>
-          {!state.open &&
-            <div style={{margin: 10}}>
-              <div className='large-9 medium-7 small-6 columns'>
-                <span>We couldn't find a publication under that name. </span>
-                <span className='pointer' style={{color: blue700}} onClick={props.onOpenForm}>Add one?</span>
-              </div>
-            </div>}
-        </div>}
+      {props.publication ?
+        <PreviewItem {...props.publication}/> : <div>
+        {!state.open &&
+          <div style={{margin: 10}}>
+            <div className='large-12 medium-12 small-12 columns'>
+              <span>We couldn't find a publication under that name. </span>
+              <span className='pointer' style={{color: blue700}} onClick={props.onOpenForm}>Add one?</span>
+            </div>
+          </div>}
+      </div>}
       </div>) : null;
   }
 }

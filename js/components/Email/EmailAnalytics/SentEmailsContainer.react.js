@@ -22,7 +22,7 @@ class SentEmailsPaginationContainer extends Component {
       activeKey: this.props.listId > 0 ? '/emailstats' : this.props.location.pathname,
       start: 0,
     };
-    this.handleChange = (event, index, filterValue) => {
+    this.handleFilterChange = (event, index, filterValue) => {
       if (index === 0) this.props.router.push(`/emailstats`);
       else this.props.router.push(`/emailstats/lists/${filterValue}`);
       this.setState({filterValue});
@@ -47,34 +47,34 @@ class SentEmailsPaginationContainer extends Component {
     const state = this.state;
     const props = this.props;
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
-    const selectable = [<MenuItem key={0} value={0} primaryText='All Emails' />]
+    const selectable = [<MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
     .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
 
     return (
-      <div className='row'>
         <div className='large-10 large-offset-1 columns'>
           <div style={{margin: '20px 0'}}>
             <span style={{fontSize: '1.3em', marginRight: 10}}>Emails You Sent</span>
           </div>
-            <div className='row'>
+          <div className='row'>
             <Tabs
             defaultActiveKey='/emailstats'
             activeKey={state.activeKey}
             onChange={this.onTabChange}
-            renderTabBar={()=><ScrollableInkTabBar />}
-            renderTabContent={()=><TabContent />}
+            renderTabBar={() => <ScrollableInkTabBar/>}
+            renderTabContent={() => <TabContent/>}
             >
               <TabPane placeholder={<span>Placeholder</span>} tab='All Sent Emails' key='/emailstats'>
                 <div style={{margin: 5}}>
-                  {props.lists &&
-                    <div className='left'>
+                {props.lists &&
+                  <div className='left'>
+                    <div className='vertical-center'>
                       <span>Filter by List: </span>
-                      <DropDownMenu value={state.filterValue} onChange={this.handleChange}>
+                      <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
                       {selectable}
                       </DropDownMenu>
                     </div>
-                    }
-                    {props.children}
+                  </div>}
+                  {props.children}
                 </div>
               </TabPane>
               <TabPane placeholder={<span>Placeholder</span>} tab='Scheduled Emails' key='/emailstats/scheduled'>
@@ -88,9 +88,8 @@ class SentEmailsPaginationContainer extends Component {
                 </div>
               </TabPane>
             </Tabs>
-            </div>
+          </div>
         </div>
-      </div>
     );
   }
 }

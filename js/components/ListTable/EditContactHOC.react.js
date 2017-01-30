@@ -9,9 +9,6 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
-import PublicationPreview from 'components/ContactProfile/ContactPublications/PublicationPreview.react';
-import PublicationForm from 'components/ContactProfile/ContactPublications/PublicationForm.react';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -50,15 +47,7 @@ class EditContact extends Component {
       immutableContactBody: fromJS(_getter(this.props.contact)),
       customfields: this.props.contact.customfields,
       rssfeedsTextarea: '',
-      input: '',
-      employerAutocompleteList: [],
-      publicationFormOpen: false,
-      publicationObj: {
-        name: '',
-        url: ''
-      }
     };
-    this.updateAutoInput = this._updateAutoInput.bind(this);
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
@@ -126,22 +115,6 @@ class EditContact extends Component {
     this.props.addFeeds(id, feeds);
   }
 
-  _updateAutoInput(val) {
-    this.setState({
-      input: val,
-      publicationObj: Object.assign({}, this.state.publicationObj, {name: val})
-    });
-    setTimeout(_ => {
-      this.props.searchPublications(this.state.input)
-      .then(response => {
-        this.setState({
-          employerAutocompleteList: response,
-          autocompleteOpen: response.length > 0
-        });
-      });
-    }, 500);
-  }
-
   render() {
     const props = this.props;
     const state = this.state;
@@ -207,40 +180,20 @@ class EditContact extends Component {
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
-            {props.list && props.list.fieldsmap !== null &&
-              props.list.fieldsmap
-              .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
-              .map((fieldObj, i) => fieldObj.customfield && (
-                <div key={i} className={columnClassname}>
-                  <span>{fieldObj.name}</span>
-                  <TextField
-                  value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : find(state.customfields, field => field.name === fieldObj.value).value}
-                  style={textfieldStyle}
-                  ref={fieldObj.value}
-                  name={fieldObj.value}
-                  onChange={e => this.onCustomChange(fieldObj.value, e.target.value)}
-                  />
-                </div>
-                ))}
-             {/* <AutoComplete
-              floatingLabelText='Autocomplete Dropdown'
-              filter={AutoComplete.noFilter}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={input => this.setState({input})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
+        {props.list && props.list.fieldsmap !== null &&
+          props.list.fieldsmap
+          .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
+          .map((fieldObj, i) => fieldObj.customfield && (
+            <div key={i} className={columnClassname}>
+              <span>{fieldObj.name}</span>
+              <TextField
+              value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : find(state.customfields, field => field.name === fieldObj.value).value}
+              style={textfieldStyle}
+              ref={fieldObj.value}
+              name={fieldObj.value}
+              onChange={e => this.onCustomChange(fieldObj.value, e.target.value)}
               />
-            {!state.publicationFormOpen &&
-              <PublicationPreview
-              text={state.input}
-              onOpenForm={_ => this.setState({publicationFormOpen: true})}
-              />}
-            {state.publicationFormOpen &&
-              <PublicationForm
-              publicationObj={state.publicationObj}
-              onValueChange={(value, property) => this.setState({publicationObj: Object.assign({}, state.publicationObj, {[property]: value})})}
-              onHide={_ => this.setState({publicationFormOpen: false})}
-              />}*/}
+            </div>))}
             {
               /* <div className='panel' style={{
               backgroundColor: yellow50,

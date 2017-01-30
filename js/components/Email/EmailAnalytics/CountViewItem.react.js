@@ -1,12 +1,13 @@
 import React, {PropTypes} from 'react';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
+import FontIcon from 'material-ui/FontIcon';
 
 function CountViewItem({label, count, iconName}) {
   return (
       <Chip>
-        <Avatar size={30}>{count}</Avatar>
-        {label} <i className={iconName} aria-hidden='true'/>
+        <Avatar size={25}>{count}</Avatar>
+        {label} <FontIcon style={{fontSize: 16}} className={iconName}/>
       </Chip>
     );
 }

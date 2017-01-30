@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import Radium from 'radium';
+import classNames from 'classnames';
 
 import find from 'lodash/find';
 import difference from 'lodash/difference';
@@ -113,6 +114,8 @@ class ListTable extends Component {
       screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
       firsttime: this.props.firstTimeUser,
       leftoverHeight: undefined,
+      scrollToRow: undefined,
+      currentSearchIndex: 0
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -148,6 +151,7 @@ class ListTable extends Component {
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.getNextSearchResult = this._getNextSearchResult.bind(this);
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
     this.onExportClick = this._onExportClick.bind(this);
@@ -277,7 +281,8 @@ class ListTable extends Component {
       });
     }
 
-    this.setState({columnWidths}, _ => {
+    this.setState({columnWidths},
+      _ => {
       if (this._HeaderGrid && this._DataGrid) {
         this._HeaderGrid.recomputeGridSize();
         this._DataGrid.recomputeGridSize();
@@ -285,7 +290,10 @@ class ListTable extends Component {
     })
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
-      if (nextProps.searchQuery) this.onSearchClick(nextProps.searchQuery);
+      if (nextProps.searchQuery) {
+        this.onSearchClick(nextProps.searchQuery);
+      }
+
     }
   }
 
@@ -403,6 +411,13 @@ class ListTable extends Component {
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
     let content = _getter(contacts[rowIndex], fieldObj) || '';
+    let className = classNames(
+      'vertical-center',
+      'cell',
+      {evenRow: !contacts[rowIndex].isSearchResult && rowIndex % 2 === 0},
+      {oddRow: !contacts[rowIndex].isSearchResult && rowIndex % 2 === 0},
+      {findresult: contacts[rowIndex].isSearchResult}
+      );
 
     let contentBody;
     let contentBody2 = null;
@@ -475,7 +490,7 @@ class ListTable extends Component {
 
     return (
       <div
-      className={rowIndex % 2 === 0 ? 'vertical-center cell evenRow' : 'vertical-center cell oddRow'}
+      className={className}
       key={key}
       style={style}>
       {contentBody}{contentBody2}
@@ -538,39 +553,6 @@ class ListTable extends Component {
   }
 
 
-  _onSearchClick(searchValue) {
-    const props = this.props;
-    if (searchValue !== this.state.searchValue) this.setState({searchValue});
-    props.searchListContacts(props.listId, searchValue)
-    .then(obj => {
-      // const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
-      // let errorText = null;
-      // if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({isSearchOn: true});
-    });
-  }
-
-  _onSearchClick(searchValue) {
-    const props = this.props;
-    if (searchValue !== this.state.searchValue) this.setState({searchValue});
-    props.searchListContacts(props.listId, searchValue)
-    .then(obj => {
-      const searchContacts = obj.ids.map(id => obj.searchContactMap[id]);
-      let errorText = null;
-      if (searchContacts.length === 0) errorText = 'No such term.'
-      this.setState({searchContacts, errorText, isSearchOn: true});
-    });
-  }
-
-  _onSearchClearClick() {
-    this.props.router.push(`/tables/${this.props.listId}`);
-    this.setState({
-      searchValue: '',
-      errorText: null,
-      isSearchOn: false
-    });
-  }
-
   _onExportClick() {
     exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name);
   }
@@ -592,6 +574,56 @@ class ListTable extends Component {
         selected: []
       });
     }
+  }
+
+  _onSearchClick(searchValue) {
+    const props = this.props;
+    if (searchValue !== this.state.searchValue) {
+      this.setState({searchValue});
+    }
+    props.searchListContacts(props.listId, searchValue)
+    .then(({searchContactMap, ids}) => {
+      // find where first search result is in the list
+      let scrollToFirstPosition;
+      if (ids.length > 0) {
+        for (let i = 0; props.listData.contacts.length; i++) {
+          if (props.listData.contacts[i] === ids[0]) {
+            scrollToFirstPosition = i;
+            break;
+          }
+        }
+      }
+
+      this.setState({
+        isSearchOn: true,
+        currentSearchIndex: 0,
+        scrollToRow: scrollToFirstPosition,
+      });
+    });
+  }
+
+  _onSearchClearClick() {
+    this.props.router.push(`/tables/${this.props.listId}`);
+    this.setState({
+      searchValue: '',
+      errorText: null,
+      isSearchOn: false,
+      currentSearchIndex: 0
+    });
+  }
+
+  _getNextSearchResult() {
+    const currentSearchIndex = (this.state.currentSearchIndex + 1) % this.props.listData.searchResults.length;
+    let scrollToRow;
+    if (this.props.listData.searchResults.length > 0) {
+      for (let i = 0; this.props.listData.contacts.length; i++) {
+        if (this.props.listData.contacts[i] === this.props.listData.searchResults[currentSearchIndex]) {
+          scrollToRow = i;
+          break;
+        }
+      }
+    }
+    this.setState({currentSearchIndex, scrollToRow});
   }
 
   render() {
@@ -723,15 +755,35 @@ class ListTable extends Component {
               id='search-input'
               hintText='Search...'
               value={state.searchValue}
+              floatingLabelText={state.isSearchOn ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
+              floatingLabelFixed={state.isSearchOn}
               onChange={e => {
                 const searchValue = e.target.value;
                 if (this.state.searchValue.length > 0 && searchValue.length === 0) this.onSearchClearClick();
+                if (searchValue !== this.state.searchValue) this.onSearchClearClick();
                 this.setState({searchValue});
               }}
-              onKeyDown={e => e.keyCode === 13 ? props.router.push(`/tables/${props.listId}?search=${state.searchValue}`) : null}
+              onKeyDown={e => {
+                if (e.keyCode === 13 ) {
+                  if (state.isSearchOn && props.listData.searchResults.length > 0) {
+                    this.getNextSearchResult();
+                  } else {
+                    // doing a search
+                    props.router.push(`/tables/${props.listId}?search=${state.searchValue}`);
+                  }
+                }
+                else return null;
+              }}
               errorText={state.errorText}
               />
-              <RaisedButton className='noprint' style={{marginLeft: 5}} onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)} label='Search' labelStyle={{textTransform: 'none'}} />
+              <IconButton
+              className='noprint'
+              iconClassName='fa fa-search'
+              tooltip='Search'
+              tooltipPosition='top-center'
+              style={{marginLeft: 5}}
+              onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)}
+              />
             </div>
           {
             props.fieldsmap !== null &&
@@ -789,57 +841,58 @@ class ListTable extends Component {
           {props.listData.contacts && props.listData.contacts !== null && props.contacts &&
           <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
         </div>
-        {props.received.length > 0 && state.columnWidths !== null &&
-          <ScrollSync>
-          {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
-            <div>
-              <div id='HeaderGridContainerId' className='HeaderGridContainer'>
-                <Grid
-                ref={ref => this.setHeaderGridRef(ref)}
-                className='HeaderGrid'
-                cellRenderer={this.headerRenderer}
-                columnCount={props.fieldsmap.length}
-                columnWidth={({index}) => {
-                  const wid = state.columnWidths[index];
-                  if (!wid) {
-                    this.clearColumnStorage();
-                    return 70;
-                  }
-                  return wid + 10;
-                }}
-                height={45}
-                autoContainerWidth
-                width={state.screenWidth}
-                rowCount={1}
-                rowHeight={32}
-                scrollLeft={scrollLeft}
-                overscanColumnCount={3}
-                />
-              </div>
-                <Grid
-                ref={ref => this.setDataGridRef(ref)}
-                className='BodyGrid'
-                cellRenderer={this.cellRenderer}
-                columnCount={props.fieldsmap.length}
-                columnWidth={({index}) => {
-                  const wid = state.columnWidths[index];
-                  if (!wid) {
-                    this.clearColumnStorage();
-                    return 70;
-                  }
-                  return wid + 10;
-                }}
-                overscanRowCount={10}
-                height={state.leftoverHeight || 500}
-                width={state.screenWidth}
-                rowCount={props.received.length}
-                rowHeight={30}
-                onScroll={onScroll}
-                />
-            </div>}
-          </ScrollSync>}
-        </div>
-      </div>);
+      {props.received.length > 0 && state.columnWidths !== null &&
+        <ScrollSync>
+        {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
+          <div>
+            <div id='HeaderGridContainerId' className='HeaderGridContainer'>
+              <Grid
+              ref={ref => this.setHeaderGridRef(ref)}
+              className='HeaderGrid'
+              cellRenderer={this.headerRenderer}
+              columnCount={props.fieldsmap.length}
+              columnWidth={({index}) => {
+                const wid = state.columnWidths[index];
+                if (!wid) {
+                  this.clearColumnStorage();
+                  return 70;
+                }
+                return wid + 10;
+              }}
+              height={45}
+              autoContainerWidth
+              width={state.screenWidth}
+              rowCount={1}
+              rowHeight={32}
+              scrollLeft={scrollLeft}
+              overscanColumnCount={3}
+              />
+            </div>
+            <Grid
+            ref={ref => this.setDataGridRef(ref)}
+            className='BodyGrid'
+            cellRenderer={this.cellRenderer}
+            columnCount={props.fieldsmap.length}
+            columnWidth={({index}) => {
+              const wid = state.columnWidths[index];
+              if (!wid) {
+                this.clearColumnStorage();
+                return 70;
+              }
+              return wid + 10;
+            }}
+            overscanRowCount={10}
+            height={state.leftoverHeight || 500}
+            width={state.screenWidth}
+            rowCount={props.received.length}
+            rowHeight={30}
+            onScroll={onScroll}
+            scrollToRow={state.scrollToRow}
+            />
+          </div>}
+        </ScrollSync>}
+      </div>
+    </div>);
   }
 }
 
@@ -852,13 +905,29 @@ const mapStateToProps = (state, props) => {
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   let received = [];
   let contacts = [];
-  if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
-    received = listData.searchResults;
-    contacts = received.map(id => state.contactReducer[id]);
-  } else if (!isEmpty(listData.contacts)) {
+  // if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
+  //   console.log(listData);
+  //   received = listData.searchResults;
+  //   contacts = received.map(id => state.contactReducer[id]);
+  // } else if (!isEmpty(listData.contacts)) {
+  //   listData.contacts.map((contactId, i) => {
+  //     if (state.contactReducer[contactId]) {
+  //       let contact = state.contactReducer[contactId];
+  //       received.push(contactId);
+  //       contacts.push(contact);
+  //     }
+  //   });
+  // }
+
+  if (!isEmpty(listData.contacts)) {
     listData.contacts.map((contactId, i) => {
       if (state.contactReducer[contactId]) {
         let contact = state.contactReducer[contactId];
+        if (searchQuery && listData.searchResults && listData.searchResults.some(id => contactId === id)) {
+          contact.isSearchResult = true;
+        } else {
+          contact.isSearchResult = false;
+        }
         received.push(contactId);
         contacts.push(contact);
       }
