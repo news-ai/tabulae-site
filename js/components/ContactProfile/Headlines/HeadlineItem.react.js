@@ -10,6 +10,8 @@ const defaultStyle = {
   paddingBottom: 10,
   marginTop: 20,
   marginBottom: 20,
+  marginRight: 3,
+  marginLeft: 3,
   border: `dotted 1px ${grey400}`,
   borderRadius: '0.4em'
 };
