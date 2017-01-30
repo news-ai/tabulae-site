@@ -6,7 +6,7 @@ const publicationSchema = new Schema('publications');
 import {actions as contactActions} from 'components/Contacts';
 
 
-function requestPublication(id) {
+export function requestPublication(id) {
   return {
     type: publicationConstant.REQUEST,
     id
