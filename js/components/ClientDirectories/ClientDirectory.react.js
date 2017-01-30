@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import * as actions from './actions';
-import Waiting from '../Waiting';
-import ListItem from '../Lists/Lists/ListItem.react';
+import Waiting from 'components/Waiting';
+import ListItem from 'components/Lists/Lists/ListItem.react';
 
 const ClientDirectory = props => {
   return (<div>

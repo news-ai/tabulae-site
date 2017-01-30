@@ -281,7 +281,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
     patchList: listBody => dispatch(listActions.patchList(listBody)),
-    searchPublications: query => dispatch(contactActions.searchPublications(query)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
 
