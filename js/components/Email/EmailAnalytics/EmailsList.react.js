@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
-
+import {grey600, grey700} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
+import Collapse from 'react-collapse';
 
 const bucketEmailsByDate = (emails) => {
   if (emails.length === 0) return {dateOrder: [], emailMap: {}};
@@ -28,18 +30,40 @@ const bucketEmailsByDate = (emails) => {
   return {dateOrder, emailMap};
 };
 
-const EmailDateContainer = ({datestring, emailBucket}) => (
-    <div>
-      <div style={{margin: '5px 0'}} className='vertical-center'>
-        <span>{datestring}</span>
-      </div>
-      {emailBucket && emailBucket.map((email, i) =>
-        <AnalyticsItem
-        key={`email-analytics-${i}`}
-        {...email}
-        />)}
-    </div>
-  );
+class EmailDateContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {open: true};
+  }
+
+  render() {
+    const {datestring, emailBucket} = this.props;
+    return (
+      <div style={{marginTop: 10}}>
+        <div
+        onClick={_ => this.setState({open: !this.state.open})}
+        style={{
+          margin: '8px 0',
+          color: this.state.open ? grey600 : grey700,
+        }} className='vertical-center pointer'>
+          <span
+          style={{fontSize: '1.2em'}}
+          >{datestring}</span>
+          <FontIcon
+          color={grey600}
+          style={{fontSize: '0.8em', margin: '0 5px'}}
+          className={this.state.open ? 'fa fa-chevron-down' : 'fa fa-chevron-up'}/>
+        </div>
+        <Collapse isOpened={this.state.open}>
+        {emailBucket && emailBucket.map((email, i) =>
+          <AnalyticsItem
+          key={`email-analytics-${i}`}
+          {...email}
+          />)}
+        </Collapse>
+      </div>);
+  }
+}
 
 class EmailsList extends Component {
   constructor(props) {
