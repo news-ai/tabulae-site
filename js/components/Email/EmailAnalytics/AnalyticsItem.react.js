@@ -18,7 +18,6 @@ import {actions as stagingActions} from 'components/Email';
 import {actions as attachmentActions} from 'components/Email/EmailAttachment';
 
 import moment from 'moment-timezone';
-import alertify from 'alertifyjs';
 
 const FORMAT = 'dddd, MMMM Do hh:mm A';
 
@@ -98,7 +97,7 @@ class AnalyticsItem extends Component {
     const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
     return (
-      <div style={wrapperStyle}>
+      <div className='clearfix' style={wrapperStyle}>
         <div className='row'>
           <div className='small-12 medium-6 large-6 columns'>
           {listid !== 0 &&
@@ -145,11 +144,11 @@ class AnalyticsItem extends Component {
             {bounced && <span style={styles.errorText}>email bounced</span>}
             {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
           </div>
-          <div className='small-12 medium-2 large-2 columns' style={{marginTop: 10}}>
-            {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o fa-lg' />}
+          <div className='small-12 medium-2 large-2 columns' style={{padding: 3}}>
+            {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o' />}
           </div>
-          <div className='small-12 medium-2 large-2 columns' style={{marginTop: 10}}>
-            {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o fa-lg'/>}
+          <div className='small-12 medium-2 large-2 columns' style={{padding: 3}}>
+            {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o'/>}
           </div>
         </div>
       </div>
