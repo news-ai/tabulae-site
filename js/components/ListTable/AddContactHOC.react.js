@@ -7,6 +7,7 @@ import {actions as contactActions} from 'components/Contacts';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -16,7 +17,7 @@ import PublicationFormStateful from './PublicationFormStateful.react';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
-import {yellow50, grey400, blue50} from 'material-ui/styles/colors';
+import {yellow50, grey400} from 'material-ui/styles/colors';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -104,13 +105,12 @@ class AddContactHOC extends Component {
 
   _updateAutoInput(val) {
     if (val.length > 0) this.props.requestPublication();
-    this.setState({pub1input: val});
-    setTimeout(_ => {
+    this.setState({pub1input: val}, _ => {
       this.props.searchPublications(this.state.pub1input)
       .then(response => this.setState({
         employerAutocompleteList: response,
       }));
-    }, 100);
+    });
   }
 
   _handleRSSTextarea(id) {
@@ -235,9 +235,9 @@ class AddContactHOC extends Component {
               <AutoComplete
               id='pub1input'
               style={textfieldStyle}
-              filter={AutoComplete.noFilter}
+              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
               onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input})}
+              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
               openOnFocus
               dataSource={state.employerAutocompleteList}
               />
@@ -255,7 +255,6 @@ class AddContactHOC extends Component {
               </Collapse>
             </div>
             <div className='panel' style={{
-
               backgroundColor: yellow50,
               margin: 10,
               padding: 10

@@ -5,7 +5,7 @@ import TextField from 'material-ui/TextField';
 import {blue50, blue800, grey700} from 'material-ui/styles/colors';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
-import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
 
 class PublicationFormStateful extends Component {
   constructor(props) {
@@ -61,10 +61,17 @@ class PublicationFormStateful extends Component {
             />)}
           </ValidationHOC>
         </div>
-        <div className='vertical-center'>
-          <FlatButton
+        <div className='vertical-center' style={{margin: '5px 0'}}>
+          <IconButton
           disabled={state.name.length === 0 || !isURL(state.url)}
-          label='Add Publication'
+          tooltip='Add Publication'
+          iconClassName='fa fa-arrow-right'
+          style={{
+            right: 5,
+            fontSize: '0.9em',
+            color: grey700,
+            position: 'absolute'
+          }}
           onClick={_ => {
             props.createPublication({name: state.name, url: state.url})
             .then(() => {
