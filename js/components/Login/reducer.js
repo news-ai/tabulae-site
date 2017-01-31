@@ -5,7 +5,6 @@ import {
 } from './constants';
 import {initialState} from '../../reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
-import _ from 'lodash';
 
 function personReducer(state = initialState.personReducer, action) {
   if (window.isDev) Object.freeze(state);

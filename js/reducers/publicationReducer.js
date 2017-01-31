@@ -1,6 +1,6 @@
 import {publicationConstant} from 'constants/AppConstants';
 import {assignToEmpty} from 'utils/assign';
-import {initialState} from './initialState';
+import {initialState} from 'reducers/initialState';
 
 function publicationReducer(state = initialState.publicationReducer, action) {
   if (window.isDev) Object.freeze(state);
@@ -10,8 +10,10 @@ function publicationReducer(state = initialState.publicationReducer, action) {
     case publicationConstant.REQUEST:
       obj = assignToEmpty(state, {});
       obj.isReceiving = true;
-      obj[action.id] = {};
-      obj[action.id].isReceiving = true;
+      if (action.id) {
+        obj[action.id] = {};
+        obj[action.id].isReceiving = true;
+      }
       return obj;
     case publicationConstant.RECEIVE:
       obj = assignToEmpty(state, {});

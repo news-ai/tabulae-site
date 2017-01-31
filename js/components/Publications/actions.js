@@ -6,7 +6,7 @@ const publicationSchema = new Schema('publications');
 import {actions as contactActions} from 'components/Contacts';
 
 
-function requestPublication(id) {
+export function requestPublication(id) {
   return {
     type: publicationConstant.REQUEST,
     id
@@ -60,6 +60,7 @@ export function searchPublications(query) {
     // implement search for match in cache first then after some time make the search call
     // maybe do some timeout
     dispatch({type: 'SEARCH_PUBLICATION_REQUEST', query});
+    dispatch(requestPublication());
     return api.get(`/publications?q="${query}"`)
       .then( response => {
         const res = normalize(response, {

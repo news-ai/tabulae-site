@@ -46,24 +46,16 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
         <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
       </div>
       <div className='hide-for-small-only medium-3 large-2 columns'>
-        <IconButton
-        tooltip='List Feed'
-        id={list.name === 'My first list!' && 'listitem_listfeed_hop'}
-        iconStyle={styles.smallIcon}
-        style={styles.small}
-        iconClassName='fa fa-list'
-        onClick={_ => router.push(`/listfeeds/${list.id}`)}
-        tooltipPosition='top-left'
-        />
-        {!list.readonly &&
+        <Link to={`/listfeeds/${list.id}`}>
           <IconButton
-          tooltip='Bulk Edit'
+          tooltip='List Feed'
+          id={list.name === 'My first list!' && 'listitem_listfeed_hop'}
           iconStyle={styles.smallIcon}
           style={styles.small}
-          iconClassName='fa fa-edit'
-          onClick={_ => router.push(`/lists/${list.id}`)}
+          iconClassName='fa fa-list'
           tooltipPosition='top-left'
-          />}
+          />
+        </Link>
         {!list.readonly && onToggle &&
           <IconButton
           tooltip={tooltip}

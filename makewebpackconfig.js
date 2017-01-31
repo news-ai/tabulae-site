@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 // var AppCachePlugin = require('appcache-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = function(options) {
   var entry, plugins, cssLoaders;
@@ -17,11 +18,18 @@ module.exports = function(options) {
     ];
     cssLoaders = ExtractTextPlugin.extract('style-loader', ['css-loader', 'postcss-loader', 'sass-loader']);
     plugins = [
-      new ExtractTextPlugin('react-toolbox.css', {allChunks: true}),
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new webpack.optimize.UglifyJsPlugin({
+        mangle: true,
+        sourcemap: false,
         compress: {
           warnings: false
-        }
+        },
+        // compress: { warnings: false },
+        // comments: false,
+        // sourceMap: true,
+        // minimize: false,
+        exclude: [/\.min\.js$/gi]
       }),
       new HtmlWebpackPlugin({
         template: 'index.html',
@@ -46,7 +54,16 @@ module.exports = function(options) {
           NODE_ENV: JSON.stringify('production')
         }
       }),
-      new webpack.optimize.AggressiveMergingPlugin()
+      new webpack.optimize.AggressiveMergingPlugin(),
+      new webpack.optimize.OccurenceOrderPlugin(),
+      new webpack.optimize.DedupePlugin(),
+      new CompressionPlugin({
+        asset: '[path].gz[query]',
+        algorithm: 'gzip',
+        test: /\.js$|\.css$|\.html$/,
+        threshold: 10240,
+        minRatio: 0
+      })
     ];
   } else {
     entry = [
@@ -73,7 +90,7 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: 'source-map',
+    devtool: 'cheap-source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),

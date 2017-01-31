@@ -9,7 +9,7 @@ import {
 import * as api from 'actions/api';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as listActions} from 'components/Lists';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import {normalize, Schema, arrayOf} from 'normalizr';
 
@@ -28,7 +28,7 @@ function stripOutEmployers(publicationReducer, contacts, ids) {
   const newContacts = {};
   ids.map(id => {
     newContacts[id] = Object.assign({}, contacts[id]);
-    if (!_.isEmpty(contacts[id].employers)) {
+    if (!isEmpty(contacts[id].employers)) {
       contacts[id].employers.map((employerId, i) => {
         if (publicationReducer[employerId]) newContacts[id][`publication_name_${i + 1}`] = publicationReducer[employerId].name;
       });

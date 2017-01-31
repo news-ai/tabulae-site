@@ -104,7 +104,7 @@ const mapDispatchToProps = (dispatch, props) => {
     .then( _ => dispatch(listActions.fetchLists())),
     newListOnClick: untitledNum => {
       dispatch(listActions.createEmptyList(untitledNum))
-      .then(response => browserHistory.push(`/lists/${response.data.id}`));
+      .then(response => browserHistory.push(`/tables/${response.data.id}`));
     },
     fetchLists: _ => dispatch(listActions.fetchLists())
   };

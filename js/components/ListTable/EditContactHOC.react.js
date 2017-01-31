@@ -9,10 +9,15 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import AutoComplete from 'material-ui/AutoComplete';
+import Textarea from 'react-textarea-autosize';
+import Collapse from 'react-collapse';
+import PublicationFormStateful from './PublicationFormStateful.react';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {fromJS, is} from 'immutable';
+import {grey400} from 'material-ui/styles/colors';
 import find from 'lodash/find';
 
 const textfieldStyle = {
@@ -36,6 +41,14 @@ const _getter = contact => {
   return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
 };
 
+const _getPublicationName = (contact, reducer) => {
+  if (contact.employers === null) return '';
+  else {
+    const id = contact.employers[0];
+    return reducer[id].name;
+  }
+};
+
 const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
 
 class EditContact extends Component {
@@ -47,11 +60,15 @@ class EditContact extends Component {
       immutableContactBody: fromJS(_getter(this.props.contact)),
       customfields: this.props.contact.customfields,
       rssfeedsTextarea: '',
+      pub1input: _getPublicationName(this.props.contact, this.props.publicationReducer),
+      employerAutocompleteList: [],
+      addPublicationPanelOpen: false,
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
+    this.updateAutoInput = this._updateAutoInput.bind(this);
   }
 
   componentWillMount() {
@@ -81,6 +98,10 @@ class EditContact extends Component {
     let contactBody = this.state.contactBody;
     if (this.state.customfields !== null && this.state.customfields.length > 0) {
       contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
+    }
+    const pubId = this.props.publicationReducer[this.state.pub1input];
+    if (this.state.pub1input && pubId) {
+      contactBody.employers = this.props.contact.employers === null ? [pubId] : [pubId, ...this.props.contact.employers.filter((id, i) => i > 0)];
     }
     contactBody.listid = this.props.listId;
     this.props.patchContact(this.props.contact.id, contactBody);
@@ -113,6 +134,16 @@ class EditContact extends Component {
       .filter(line => line.length > 0 && isURL(line)));
     if (feeds.length === 0) return;
     this.props.addFeeds(id, feeds);
+  }
+
+  _updateAutoInput(val) {
+    if (val.length > 0) this.props.requestPublication();
+    this.setState({pub1input: val}, _ => {
+      this.props.searchPublications(this.state.pub1input)
+      .then(response => this.setState({
+        employerAutocompleteList: response,
+      }));
+    });
   }
 
   render() {
@@ -194,6 +225,31 @@ class EditContact extends Component {
               onChange={e => this.onCustomChange(fieldObj.value, e.target.value)}
               />
             </div>))}
+           <div className='large-12 medium-12 small-12 columns vertical-center'>
+              <span style={{whiteSpace: 'nowrap'}}>Publication</span>
+              <AutoComplete
+              id='pub1input'
+              style={textfieldStyle}
+              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+              searchText={state.pub1input}
+              onUpdateInput={this.updateAutoInput}
+              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
+              openOnFocus
+              dataSource={state.employerAutocompleteList}
+              />
+            {props.publicationIsReceiving &&
+              <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>}
+            </div>
+            <div className='large-12 medium-12 small-12 columns vertical-center'>
+            {state.pub1input.length > 0 && !props.publicationReducer[state.pub1input] && !props.publicationIsReceiving && !state.addPublicationPanelOpen &&
+              <div style={{fontSize: '0.9em'}}>No publication found. <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one?</span></div>}
+              <Collapse isOpened={state.addPublicationPanelOpen}>
+                <PublicationFormStateful
+                onHide={_ => this.setState({addPublicationPanelOpen: false})}
+                bubbleUpValue={pub1input => this.setState({pub1input})}
+                />
+              </Collapse>
+            </div>
             {
               /* <div className='panel' style={{
               backgroundColor: yellow50,
@@ -248,6 +304,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
     fetchFeeds: _ => dispatch(feedActions.fetchContactFeeds(props.contactId)),
+    requestPublication: () => dispatch(publicationActions.requestPublication()),
   };
 };
 

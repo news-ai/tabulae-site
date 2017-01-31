@@ -3,11 +3,11 @@ import {connect} from 'react-redux';
 import 'node_modules/react-select/dist/react-select.css';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import _ from 'lodash';
 import alertify from 'alertifyjs';
 import Waiting from '../Waiting';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import * as fileActions from './actions';
+import isString from 'lodash/isString';
 
 // DEPRECIATED!!!
 
@@ -80,7 +80,7 @@ class Headers extends Component {
 
   _onNewRequest(req, reqIndex, headerIndex) {
     let order = this.state.order;
-    if (_.isString(req)) {
+    if (isString(req)) {
       // custom
       order[headerIndex] = req;
     } else {

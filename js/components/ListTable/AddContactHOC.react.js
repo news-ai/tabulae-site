@@ -11,10 +11,12 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
+import Collapse from 'react-collapse';
+import PublicationFormStateful from './PublicationFormStateful.react';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
-import {yellow50} from 'material-ui/styles/colors';
+import {yellow50, grey400} from 'material-ui/styles/colors';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -45,7 +47,8 @@ class AddContactHOC extends Component {
       contactBody: {},
       pub1input: '',
       employerAutocompleteList: [],
-      rssfeedsTextarea: ''
+      rssfeedsTextarea: '',
+      addPublicationPanelOpen: false,
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
@@ -74,13 +77,14 @@ class AddContactHOC extends Component {
     });
     if (customRow.length > 0) contactBody.customfields = customRow;
     contactBody.listid = list.id;
+    if (pub1input && this.props.publicationReducer[pub1input]) {
+      const pubId = this.props.publicationReducer[pub1input];
+      contactBody.employers = [pubId];
+    }
 
     this.props.addContacts([contactBody])
     .then(contacts => {
       const ids = contacts.map(contact => contact.id);
-      if (pub1input.length > 0) {
-        ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
-      }
       ids.map(id => this.handleRSSTextarea(id));
       const listBody = {
         listId: list.id,
@@ -100,13 +104,13 @@ class AddContactHOC extends Component {
   }
 
   _updateAutoInput(val) {
-    this.setState({pub1input: val});
-    setTimeout(_ => {
+    if (val.length > 0) this.props.requestPublication();
+    this.setState({pub1input: val}, _ => {
       this.props.searchPublications(this.state.pub1input)
       .then(response => this.setState({
         employerAutocompleteList: response,
       }));
-    }, 500);
+    });
   }
 
   _handleRSSTextarea(id) {
@@ -219,26 +223,37 @@ class AddContactHOC extends Component {
               <span>Notes</span>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
-            <div className='large-6 medium-12 small-12 columns vertical-center'>
+        {props.list && props.list.fieldsmap !== null &&
+          props.list.fieldsmap
+          .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
+          .map((fieldObj, i) => fieldObj.customfield && (
+            <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
+              <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
+            </div>))}
+            <div className='large-12 medium-12 small-12 columns vertical-center'>
               <span style={{whiteSpace: 'nowrap'}}>Publication</span>
               <AutoComplete
               id='pub1input'
               style={textfieldStyle}
-              filter={AutoComplete.noFilter}
+              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
               onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input})}
+              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
               openOnFocus
               dataSource={state.employerAutocompleteList}
               />
+            {props.publicationIsReceiving &&
+              <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>}
             </div>
-            {props.list && props.list.fieldsmap !== null &&
-              props.list.fieldsmap
-              .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
-              .map((fieldObj, i) => fieldObj.customfield && (
-                <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
-                  <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
-                </div>
-                ))}
+            <div className='large-12 medium-12 small-12 columns vertical-center'>
+            {state.pub1input.length > 0 && !props.publicationReducer[state.pub1input] && !props.publicationIsReceiving && !state.addPublicationPanelOpen &&
+              <div style={{fontSize: '0.9em'}}>No publication found. <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one?</span></div>}
+              <Collapse isOpened={state.addPublicationPanelOpen}>
+                <PublicationFormStateful
+                onHide={_ => this.setState({addPublicationPanelOpen: false})}
+                bubbleUpValue={pub1input => this.setState({pub1input})}
+                />
+              </Collapse>
+            </div>
             <div className='panel' style={{
               backgroundColor: yellow50,
               margin: 10,
@@ -273,7 +288,8 @@ class AddContactHOC extends Component {
 const mapStateToProps = (state, props) => {
   return {
     list: state.listReducer[props.listId],
-    publicationReducer: state.publicationReducer
+    publicationReducer: state.publicationReducer,
+    publicationIsReceiving: state.publicationReducer.isReceiving,
   };
 };
 
@@ -281,10 +297,10 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
     patchList: listBody => dispatch(listActions.patchList(listBody)),
-    searchPublications: query => dispatch(contactActions.searchPublications(query)),
+    searchPublications: query => dispatch(publicationActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
-    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed))))
-
+    addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
+    requestPublication: () => dispatch(publicationActions.requestPublication()),
   };
 };
 
