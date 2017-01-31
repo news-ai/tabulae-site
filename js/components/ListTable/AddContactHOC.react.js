@@ -7,7 +7,6 @@ import {actions as contactActions} from 'components/Contacts';
 
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
-import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';

@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import * as fileActions from './actions';
 import Dropzone from 'react-dropzone';
 import Headers from './Headers.react';
-import _ from 'lodash';
 import Radium from 'radium';
 import Waiting from '../Waiting';
 

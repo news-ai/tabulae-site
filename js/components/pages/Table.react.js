@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Radium from 'radium';
 import SkyLight from 'react-skylight';
-import _ from 'lodash';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as contactActions} from 'components/Contacts';
 import {actions as listActions} from 'components/Lists';
@@ -25,6 +24,8 @@ import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ToggleableEditInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import HandsOnTablePrintable from '../pieces/HandsOnTablePrintable.react';
+
+import isEmpty from 'lodash/isEmpty';
 
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
@@ -216,7 +217,7 @@ class Table extends Component {
     const fieldsmap = listData.fieldsmap;
     colHeaders.map(header => {
       const name = header.data;
-      if (!_.isEmpty(row[name])) {
+      if (!isEmpty(row[name])) {
         if (fieldsmap.some(fieldObj => fieldObj.value === name && !fieldObj.customfield)) {
           field[name] = row[name];
         }
@@ -267,14 +268,14 @@ class Table extends Component {
       // handle customfields
       let customRow = [];
       fieldsmap.map( fieldObj => {
-        if (!_.isEmpty(row[fieldObj.value]) && fieldObj.customfield) {
+        if (!isEmpty(row[fieldObj.value]) && fieldObj.customfield) {
           customRow.push({name: fieldObj.value, value: row[fieldObj.value]});
         }
       })
       if (customRow.length > 0) field.customfields = customRow;
 
       // filter out for empty rows with only id
-      if (!_.isEmpty(field)) {
+      if (!isEmpty(field)) {
         if (field.id) {
           if (dirtyRows.some(rowId => rowId === field.id)) patchContactList.push(field);
         } else {
@@ -463,7 +464,7 @@ const mapStateToProps = (state, props) => {
 
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   if (listData) {
-    if (!_.isEmpty(listData.contacts)) {
+    if (!isEmpty(listData.contacts)) {
       listData.contacts.map( (contactId, i) => {
         if (state.contactReducer[contactId]) {
           lastFetchedIndex = i;

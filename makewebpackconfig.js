@@ -19,6 +19,8 @@ module.exports = function(options) {
     plugins = [
       new ExtractTextPlugin('react-toolbox.css', {allChunks: true}),
       new webpack.optimize.UglifyJsPlugin({
+        mangle: true,
+        sourcemap: false,
         compress: {
           warnings: false
         }
@@ -46,7 +48,9 @@ module.exports = function(options) {
           NODE_ENV: JSON.stringify('production')
         }
       }),
-      new webpack.optimize.AggressiveMergingPlugin()
+      new webpack.optimize.AggressiveMergingPlugin(),
+      new webpack.optimize.OccurenceOrderPlugin(),
+      new webpack.optimize.DedupePlugin(),
     ];
   } else {
     entry = [
@@ -73,7 +77,7 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: 'source-map',
+    devtool: 'cheap-source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
