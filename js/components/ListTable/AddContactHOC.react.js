@@ -77,13 +77,14 @@ class AddContactHOC extends Component {
     });
     if (customRow.length > 0) contactBody.customfields = customRow;
     contactBody.listid = list.id;
+    if (pub1input && this.props.publicationReducer[pub1input]) {
+      const pubId = this.props.publicationReducer[pub1input];
+      contactBody.employers = [pubId];
+    }
 
     this.props.addContacts([contactBody])
     .then(contacts => {
       const ids = contacts.map(contact => contact.id);
-      if (pub1input.length > 0) {
-        ids.map(id => this.props.createPublicationThenPatchContact(id, pub1input, 'employers'));
-      }
       ids.map(id => this.handleRSSTextarea(id));
       const listBody = {
         listId: list.id,

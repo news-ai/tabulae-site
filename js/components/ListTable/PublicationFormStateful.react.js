@@ -61,7 +61,7 @@ class PublicationFormStateful extends Component {
             />)}
           </ValidationHOC>
         </div>
-        <div className='vertical-center' style={{margin: '5px 0'}}>
+        <div className='vertical-center' style={{margin: 10}}>
           <IconButton
           disabled={state.name.length === 0 || !isURL(state.url)}
           tooltip='Add Publication'
