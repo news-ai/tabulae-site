@@ -40,9 +40,7 @@ import ListManagerContainer from './components/Lists/ListManagerContainer.react'
 import TagListsContainer from './components/Lists/TagListsContainer.react';
 import ArchiveContainer from './components/Lists/ArchiveContainer.react';
 import PublicListsContainer from './components/Lists/PublicListsContainer.react';
-import Table from './components/pages/Table.react';
 import SearchBar from './components/Search';
-import OnboardingWrapper from './components/OnboardingWrapper';
 
 import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsContainer.react';
 import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
@@ -50,8 +48,6 @@ import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSen
 import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
 import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
 
-import HandsOnTablePrintable from './components/pieces/HandsOnTablePrintable.react';
-import HandsOnTablePatchOnly from './components/pieces/HandsOnTablePatchOnly.react';
 import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable';
 import ListFetchingContainer from './components/ListTable/ListFetchingContainer.react';
@@ -87,8 +83,6 @@ if (module.hot) {
 }
 
 // wrap components that we want onboarding to, pass down props like routes
-const OnboardingTable = props => <OnboardingWrapper {...props}><Table /></OnboardingWrapper>;
-// <Route path='emailstats/:listId' name='Email Analytics' component={EmailAnalytics} />
 
 ReactDOM.render(
   <MultiThemeProvider>
@@ -97,13 +91,8 @@ ReactDOM.render(
           <Route path='/' name='Home' component={App}>
             <IndexRoute component={ListManagerContainer} />
             <Route path='lists' name='List Manager' component={ListManagerContainer} />
-            <Route key='lists/:listId/static' staticName name='Printable Sheet' component={HandsOnTablePrintable} />
             <Route path='tables/:listId' staticName name='Table'>
               <IndexRoute component={ListFetchingContainer}/>
-              <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
-            </Route>
-            <Route path='lists/:listId' staticName name='List'>
-              <IndexRoute component={OnboardingTable}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
             <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer}/>
@@ -123,7 +112,6 @@ ReactDOM.render(
               <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
             </Route>
             <Route path='search' name='Search' component={SearchBar} />
-            <Route path='search/table' name='Temp Table from Search' component={HandsOnTablePatchOnly} />
             <Route path='*' staticName name='Not Found' component={NotFound} />
           </Route>
         </Router>

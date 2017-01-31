@@ -84,15 +84,6 @@ class SearchBar extends Component {
               {state.isSearchReceived ? <p>We found {expectedResultsString} for "{state.prevQuery}"</p> : null}
             </div>
           </div>
-          {/* props.results.length > 0 &&
-          <div className='row' style={{marginTop: 20}}>
-            <div className='large-offset-10 medium-offset-10 small-offset-6 columns'>
-              <RaisedButton labelStyle={{textTransform: 'none'}} label='Bulk Edit' onClick={_ => {
-                this.setState({navigate: true});
-                props.router.push('/search/table');
-              }} />
-            </div>
-          </div>*/}
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: 30}}>

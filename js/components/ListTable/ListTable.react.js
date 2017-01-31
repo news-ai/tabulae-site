@@ -36,7 +36,6 @@ import LinearProgress from 'material-ui/LinearProgress';
 
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
-import HandsOnTable from '../pieces/HandsOnTable.react';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
@@ -646,18 +645,13 @@ class ListTable extends Component {
           </Dialog>
         }
         <div className='vertical-center'>
-          <FlatButton
-          labelStyle={{textTransform: 'none', color: grey400}}
-          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
-          label='List Feed'
-          onClick={_ => props.router.push(`/listfeeds/${props.listId}`)} />
-          <FlatButton
-          label='Go to Bulk Edit'
-          disabled={props.listData && props.listData.readonly}
-          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
-          labelStyle={{color: grey400, textTransform: 'none'}}
-          onClick={_ => props.router.push(`/lists/${props.listId}`)}
-          />
+          <Link to={`/listfeeds/${props.listId}`}>
+            <FlatButton
+            labelStyle={{textTransform: 'none', color: grey400}}
+            icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
+            label='List Feed'
+            />
+          </Link>
         </div>
         {this.showProfileTooltip &&
           <PanelOverlayHOC
