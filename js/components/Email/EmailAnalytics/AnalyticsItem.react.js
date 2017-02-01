@@ -1,8 +1,9 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import CountViewItem from './CountViewItem.react';
 import Link from 'react-router/lib/Link';
 import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
+import LinkAnalyticsHOC from './LinkAnalyticsHOC.react';
 import {
   deepOrange100,
   deepOrange700,
@@ -60,7 +61,7 @@ class AnalyticsItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isPreviewOpen: false
+      isPreviewOpen: false,
     };
     this.onPreviewOpen = this._onPreviewOpen.bind(this);
   }
@@ -91,6 +92,7 @@ class AnalyticsItem extends Component {
       archiveEmail,
       archived
     } = this.props;
+    const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let sendAtDate = moment(sendat);
@@ -128,27 +130,34 @@ class AnalyticsItem extends Component {
         >
           <StaticEmailContent {...this.props} />
         </Dialog>
+
         <div className='email-analytics row' style={styles.analytics}>
           <div className='small-12 medium-3 large-3 columns'>
             <span style={styles.to}>To</span>
             <span style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
-          <div className='small-12 medium-5 large-5 columns'>
+          <div className='small-12 medium-5 large-5 columns' style={{margin: '10px 0'}}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
             {!delivered &&
               <div style={styles.errorText}>
                 <span>Something went wrong on our end. Let us know!</span>
                 <p>Email ID: {id}</p>
-              </div>
-            }
-            {bounced && <span style={styles.errorText}>email bounced</span>}
-            {bouncedreason && <p style={{color: deepOrange900}}>{bouncedreason}</p>}
+              </div>}
+          {bounced &&
+            <span style={styles.errorText}>email bounced</span>}
+          {bouncedreason &&
+            <p style={{color: deepOrange900}}>{bouncedreason}</p>}
           </div>
           <div className='small-12 medium-2 large-2 columns' style={{padding: 3}}>
-            {(!bounced && delivered) && <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o' />}
+          {(!bounced && delivered) &&
+            <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o' />}
           </div>
           <div className='small-12 medium-2 large-2 columns' style={{padding: 3}}>
-            {(!bounced && delivered) && <CountViewItem label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o'/>}
+          {(!bounced && delivered) &&
+            <LinkAnalyticsHOC emailId={id} count={clicked}>
+            {({onRequestOpen}) => (
+              <CountViewItem onTouchTap={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o'/>)}
+            </LinkAnalyticsHOC>}
           </div>
         </div>
       </div>

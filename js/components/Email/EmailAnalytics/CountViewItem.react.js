@@ -3,9 +3,9 @@ import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 
-function CountViewItem({label, count, iconName}) {
+function CountViewItem({label, count, iconName, onTouchTap}) {
   return (
-      <Chip>
+      <Chip onTouchTap={onTouchTap}>
         <Avatar size={25}>{count}</Avatar>
         {label} <FontIcon style={{fontSize: 16}} className={iconName}/>
       </Chip>
