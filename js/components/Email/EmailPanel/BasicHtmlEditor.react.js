@@ -24,6 +24,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
 import Dropzone from 'react-dropzone';
 import {blue100, blue200, grey300} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -507,7 +508,7 @@ class BasicHtmlEditor extends React.Component {
             width: props.width,
           }}>
           <div style={{padding: 3, marginRight: 10}}>
-            <i
+            <FontIcon
             className='fa fa-circle pointer'
             accept='image/*'
             style={{color: state.isStyleBlockOpen ? blue200 : grey300}}

@@ -7,7 +7,7 @@ import LinkAnalyticsHOC from './LinkAnalyticsHOC.react';
 import OpenAnalyticsHOC from './OpenAnalyticsHOC.react';
 import {
   deepOrange100, deepOrange700, deepOrange900,
-  grey50, grey400, grey600, grey800
+  grey400, grey600, grey800
 } from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';

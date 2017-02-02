@@ -9,6 +9,7 @@ const mapStateToProps = (state, props) => {
   .map(id => state.stagingReducer[id]);
   return {
     emails,
+    isReceiving: state.stagingReducer.isReceiving
   };
 };
 

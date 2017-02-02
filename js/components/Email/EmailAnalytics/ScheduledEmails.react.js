@@ -35,7 +35,10 @@ const mapStateToProps = (state, props) => {
   .filter(id => !state.stagingReducer[id].delivered)
   .map(id => state.stagingReducer[id])
   .filter(email => new Date(email.sendat) > rightNow);
-  return {emails};
+  return {
+    emails,
+    isReceiving: state.stagingReducer.isReceiving
+  };
 };
 
 const mapDispatchToProps = (dispatch, props) => {

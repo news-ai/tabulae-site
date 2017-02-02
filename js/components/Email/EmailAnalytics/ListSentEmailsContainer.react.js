@@ -12,6 +12,7 @@ const mapStateToProps = (state, props) => {
   .filter(email => email.listid === listId);
   return {
     emails,
+    isReceiving: state.stagingReducer.isReceiving
   };
 };
 

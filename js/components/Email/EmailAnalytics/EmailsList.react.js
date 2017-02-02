@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
-import {grey600, grey700} from 'material-ui/styles/colors';
+import {grey400, grey600, grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import Collapse from 'react-collapse';
 
@@ -84,10 +84,14 @@ class EmailsList extends Component {
           key={`email-date-${datestring}`}
           datestring={datestring}
           emailBucket={emailMap[datestring]}
-          />
-          ))}
-          {this.props.emails.length === 0 && <span>No emails scheduled for delivery.</span>}
+          />))}
+        {this.props.emails.length === 0 &&
+          <span>No emails scheduled for delivery.</span>}
         </div>
+      {this.props.isReceiving &&
+        <div className='horizontal-center'>
+          <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
+        </div>}
       </InfiniteScroll>
       );
   }
