@@ -35,8 +35,8 @@ import BlockStyleControls from './components/BlockStyleControls';
 import ExternalControls from './components/ExternalControls';
 import Image from './Image/Image.react';
 import FileWrapper from './FileWrapper.react';
-
 import alertify from 'alertifyjs';
+import sanitizeHtml from 'sanitize-html';
 
 import 'node_modules/draft-js/dist/Draft.css';
 
@@ -381,9 +381,22 @@ class BasicHtmlEditor extends React.Component {
 
   _handlePastedText(text, html) {
     const {editorState} = this.state;
-    const blockMap = ContentState.createFromText(text.trim()).blockMap;
-    const newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    let newState;
+    let blockMap;
+
+    if (html) {
+      console.log(html);
+      const saneHtml = sanitizeHtml(html);
+      console.log(saneHtml);
+      blockMap = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml).blockMap;
+      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
+      // const content = convertFromHTML(nextProps.bodyHtml);
+    } else {
+      blockMap = ContentState.createFromText(text.trim()).blockMap;
+    }
+    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
+
     return true;
   }
 
@@ -508,7 +521,7 @@ class BasicHtmlEditor extends React.Component {
             width: props.width,
           }}>
           <div style={{padding: 3, marginRight: 10}}>
-            <FontIcon
+            <i
             className='fa fa-circle pointer'
             accept='image/*'
             style={{color: state.isStyleBlockOpen ? blue200 : grey300}}

@@ -60,6 +60,7 @@
     "redux-router": "^0.1.0",
     "redux-thunk": "^1.0.3",
     "regression": "^1.2.1",
+    "sanitize-html": "^1.14.1",
     "tlds": "^1.157.0",
     "validator": "^5.5.0",
     "zeroclipboard": "^2.2.0"
