@@ -139,6 +139,7 @@ class AnalyticsItem extends Component {
           </div>
           <div className='small-12 medium-5 large-5 columns' style={{margin: '10px 0'}}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
+            {subject.length === 0 && <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>(No Subject)</span>}
             {!delivered &&
               <div style={styles.errorText}>
                 <span>Something went wrong on our end. Let us know!</span>
