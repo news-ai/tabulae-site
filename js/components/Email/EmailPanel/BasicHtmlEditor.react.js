@@ -194,6 +194,7 @@ class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
+      console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -386,7 +387,13 @@ class BasicHtmlEditor extends React.Component {
 
     if (html) {
       console.log(html);
-      const saneHtml = sanitizeHtml(html);
+      const saneHtml = sanitizeHtml(html, {
+        allowedAttributes: {
+          p: ['style'],
+          span: ['style'],
+          a: ['href']
+        }
+      });
       console.log(saneHtml);
       blockMap = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml).blockMap;
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));

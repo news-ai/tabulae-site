@@ -1,4 +1,4 @@
-import { Entity } from 'draft-js';
+import {Entity} from 'draft-js';
 
 export function findEntities(entityType, contentBlock, callback) {
   contentBlock.findEntityRanges(
