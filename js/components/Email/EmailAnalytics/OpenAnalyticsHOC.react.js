@@ -3,10 +3,10 @@ import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
-import {grey400, grey600} from 'material-ui/styles/colors';
+import {grey400, grey600, yellow50} from 'material-ui/styles/colors';
 import moment from 'moment-timezone';
 
-const FORMAT = 'dddd, MMMM Do hh:mm A';
+const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
 const OpenItem = ({Type, Created}) => {
   let createdDate = moment(Created);
@@ -15,7 +15,7 @@ const OpenItem = ({Type, Created}) => {
     <span style={{margin: '0 5px', color: grey600, fontSize: '0.9em'}}>{createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
   </div>
   );
-}
+};
 
 class OpenAnalyticsHOC extends Component {
   constructor(props) {
@@ -36,18 +36,21 @@ class OpenAnalyticsHOC extends Component {
     const state = this.state;
     return (
       <div>
-        <Dialog title='Open Timeline' open={state.open} onRequestClose={_ => this.setState({open: false})}>
+        <Dialog autoScrollBodyContent title='Open Timeline' open={state.open} onRequestClose={_ => this.setState({open: false})}>
         {props.isReceiving ?
           <FontIcon color={grey400} className='fa fa-spinner fa-spin'/> :
-          <div>
-          {props.opens &&
-            props.opens
-            .map((item, i) => <OpenItem key={`${props.emailId}-open-${i}`} {...item}/>)
-          }
+          <div style={{margin: '20px 0'}}>
+        {props.opens &&
+          props.opens
+          .map((item, i) =>
+            <OpenItem key={`${props.emailId}-open-${i}`} {...item}/>)}
           {!props.opens &&
             <span>Email was never opened.</span>}
+        </div>}
+        <div style={{backgroundColor: yellow50, padding: 10, margin: 10, fontSize: '0.9em'}}>
+          <span>Sometimes, open count might be off by +/-1 count depending on how your recipient's devices are set up to receive emails.
+          On some phones, the email is previewed on the home screens and that would count as a view.</span>
         </div>
-      }
         </Dialog>
         {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>);

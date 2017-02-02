@@ -21,7 +21,7 @@ import {actions as attachmentActions} from 'components/Email/EmailAttachment';
 
 import moment from 'moment-timezone';
 
-const FORMAT = 'dddd, MMMM Do hh:mm A';
+const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
 const styles = {
   analytics: {
