@@ -20,9 +20,7 @@ const OpenItem = ({Type, Created}) => {
 class OpenAnalyticsHOC extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      open: false
-    };
+    this.state = {open: false};
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -35,10 +33,10 @@ class OpenAnalyticsHOC extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div>
+      <div style={props.style}>
         <Dialog autoScrollBodyContent title='Open Timeline' open={state.open} onRequestClose={_ => this.setState({open: false})}>
         {props.isReceiving ?
-          <FontIcon color={grey400} className='fa fa-spinner fa-spin'/> :
+          <FontIcon style={{margin: '10px 0'}} color={grey400} className='fa fa-spinner fa-spin'/> :
           <div style={{margin: '20px 0'}}>
         {props.opens &&
           props.opens

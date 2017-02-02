@@ -34,7 +34,7 @@ class LinkAnalyticsHOC extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div>
+      <div style={props.style}>
         <Dialog title='Links Click Count' open={state.open} onRequestClose={_ => this.setState({open: false})}>
         {props.isReceiving ?
           <FontIcon color={grey400} className='fa fa-spinner fa-spin'/> :

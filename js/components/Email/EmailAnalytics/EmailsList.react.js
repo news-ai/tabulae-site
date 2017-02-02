@@ -39,13 +39,10 @@ class EmailDateContainer extends Component {
   render() {
     const {datestring, emailBucket} = this.props;
     return (
-      <div style={{marginTop: 10}}>
+      <div style={{marginTop: 25}}>
         <div
         onClick={_ => this.setState({open: !this.state.open})}
-        style={{
-          margin: '8px 0',
-          color: this.state.open ? grey600 : grey700,
-        }} className='vertical-center pointer'>
+        style={{margin: '10px 0', color: this.state.open ? grey600 : grey700}} className='vertical-center pointer'>
           <span
           style={{fontSize: '1.2em'}}
           >{datestring}</span>
