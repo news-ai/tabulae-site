@@ -4,6 +4,7 @@ import Link from 'react-router/lib/Link';
 import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
 import LinkAnalyticsHOC from './LinkAnalyticsHOC.react';
+import OpenAnalyticsHOC from './OpenAnalyticsHOC.react';
 import {
   deepOrange100,
   deepOrange700,
@@ -150,7 +151,10 @@ class AnalyticsItem extends Component {
           </div>
           <div className='small-12 medium-2 large-2 columns' style={{padding: 3}}>
           {(!bounced && delivered) &&
-            <CountViewItem label='Opened' count={opened} iconName='fa fa-paper-plane-o' />}
+            <OpenAnalyticsHOC emailId={id} count={opened}>
+            {({onRequestOpen}) => (
+              <CountViewItem onTouchTap={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o'/>)}
+            </OpenAnalyticsHOC>}
           </div>
           <div className='small-12 medium-2 large-2 columns' style={{padding: 3}}>
           {(!bounced && delivered) &&

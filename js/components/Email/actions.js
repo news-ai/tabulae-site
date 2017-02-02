@@ -74,7 +74,7 @@ export function fetchLogs(emailId) {
         type: RECEIVE_EMAIL_LOGS,
         logs,
         emailId,
-        links: isEmpty(links) ? undefined : links
+        links: isEmpty(links) ? undefined : links,
       });
     })
     .catch(err => dispatch({type: FETCH_EMAIL_LOGS_FAIL, err}));

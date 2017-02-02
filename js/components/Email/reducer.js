@@ -70,7 +70,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return Object.assign({}, state, {
         [action.emailId]: Object.assign({}, state[action.emailId], {
           logs: action.logs,
-          links: action.links
+          links: action.links,
         }),
         isReceiving: false
       });
