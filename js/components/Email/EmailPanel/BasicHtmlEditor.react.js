@@ -67,15 +67,34 @@ const Media = props => {
   return media;
 };
 
-function mediaBlockRenderer(block) {
-  if (block.getType() === 'atomic') {
-    return {
-      component: Media,
-      editable: false
-    };
-  }
-  return null;
-}
+
+const INLINE_STYLES = [
+  {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
+  {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
+  {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
+  // {label: 'Monospace', style: 'CODE'},
+  {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
+];
+
+const BLOCK_TYPES = [
+  {label: 'Normal', style: 'unstyled'},
+  {label: 'Heading - Large', style: 'header-one'},
+  {label: 'Heading - Medium', style: 'header-two'},
+  {label: 'Blockquote', style: 'blockquote'},
+  {label: 'Unordered List', style: 'unordered-list-item'},
+  {label: 'Ordered List', style: 'ordered-list-item'},
+  {label: 'Code Block', style: 'code-block'},
+  {label: 'Atomic', style: 'atomic'},
+  {label: 'Center', style: 'center-align'},
+  {label: 'Left', style: 'unstyled'},
+  {label: 'Right', style: 'right-align'},
+];
+
+const POSITION_TYPES = [
+  {label: 'Center', style: 'center-align'},
+  {label: 'Left', style: 'unstyled'},
+  {label: 'Right', style: 'right-align'},
+];
 
 
 class BasicHtmlEditor extends React.Component {
@@ -111,27 +130,6 @@ class BasicHtmlEditor extends React.Component {
       }
     ];
 
-    this.INLINE_STYLES = [
-      {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
-      {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
-      {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
-      // {label: 'Monospace', style: 'CODE'},
-      {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
-    ];
-
-    this.BLOCK_TYPES = [
-      {label: 'Normal', style: 'unstyled'},
-      {label: 'Heading - Large', style: 'header-one'},
-      {label: 'Heading - Medium', style: 'header-two'},
-      {label: 'Blockquote', style: 'blockquote'},
-      {label: 'Unordered List', style: 'unordered-list-item'},
-      {label: 'Ordered List', style: 'ordered-list-item'},
-      {label: 'Code Block', style: 'code-block'},
-      {label: 'Atomic', style: 'atomic'},
-      {label: 'Center', style: 'center-align'},
-      {label: 'Left', style: 'unstyled'},
-      {label: 'Right', style: 'right-align'},
-    ];
     this.CONVERT_CONFIGS = {
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
@@ -175,9 +173,16 @@ class BasicHtmlEditor extends React.Component {
         if (nodeName === 'p' || nodeName === 'div') {
           console.log('p');
           console.log(node);
+          console.log(node.style.textAlign);
           if (node.style.textAlign === 'center') {
             return {
               type: 'center-align',
+              data: {}
+            };
+          } else if (node.style.textAlign === 'right') {
+            console.log('whaaa');
+            return {
+              type: 'right-align',
               data: {}
             };
           }
@@ -327,20 +332,6 @@ class BasicHtmlEditor extends React.Component {
     return 'not-handled';
   }
 
-  _handleImage(url) {
-    const {editorState} = this.state;
-    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = Entity.create('image', 'IMMUTABLE', {
-      src: url,
-      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
-      imageLink: '#'
-    });
-    this.props.saveImageEntityKey(url, entityKey);
-
-    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-    return newEditorState;
-  }
-
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -399,27 +390,51 @@ class BasicHtmlEditor extends React.Component {
     const {editorState} = this.state;
     let newState;
     let blockMap;
+    let contentState;
 
     if (html) {
-      console.log(html);
+      // console.log(html);
       const saneHtml = sanitizeHtml(html, {
         allowedAttributes: {
           p: ['style'],
+          div: ['style'],
           span: ['style'],
           a: ['href']
         }
       });
-      console.log(saneHtml);
-      blockMap = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml).blockMap;
+      // console.log(saneHtml);
+      contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
+      blockMap = contentState.getBlockMap();
+      const firstBlock = contentState.getFirstBlock();
+      // console.log(firstBlock.getType());
+      // console.log(firstBlock.getText());
+      // console.log(blockMap);
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
     } else {
-      blockMap = ContentState.createFromText(text.trim()).blockMap;
+      contentState = ContentState.createFromText(text.trim());
+      blockMap = contentState.blockMap;
     }
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    // console.log(newState.getFirstBlock().getType());
+    // console.log(newState.getFirstBlock().getText());
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
 
     return true;
+  }
+
+  _handleImage(url) {
+    const {editorState} = this.state;
+    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
+    const entityKey = Entity.create('image', 'IMMUTABLE', {
+      src: url,
+      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
+      imageLink: '#'
+    });
+    this.props.saveImageEntityKey(url, entityKey);
+
+    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+    return newEditorState;
   }
 
   _handleDroppedFiles(selection, files) {
@@ -520,7 +535,7 @@ class BasicHtmlEditor extends React.Component {
             <InlineStyleControls
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
-            inlineStyles={this.INLINE_STYLES}
+            inlineStyles={INLINE_STYLES}
             />
             <EntityControls
             editorState={editorState}
@@ -534,7 +549,7 @@ class BasicHtmlEditor extends React.Component {
             <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
             <BlockStyleControls
             editorState={editorState}
-            blockTypes={this.BLOCK_TYPES}
+            blockTypes={BLOCK_TYPES}
             onToggle={this.toggleBlockType}
             />
           </div>}
@@ -568,15 +583,42 @@ const styleMap = {
   },
 };
 
+
+function mediaBlockRenderer(block) {
+  if (block.getType() === 'atomic') {
+    return {
+      component: Media,
+      editable: false
+    };
+  }
+  return null;
+}
+
 function getBlockStyle(block) {
   switch (block.getType()) {
-    case 'blockquote': return 'RichEditor-blockquote';
-    case 'right-align': return 'RichEditor-right-align';
-    case 'left-align': return 'RichEditor-left-align';
-    case 'center-align': return 'RichEditor-center-align';
-    default: return null;
+    case 'blockquote':
+      return 'RichEditor-blockquote';
+    case 'right-align':
+      return 'RichEditor-right-align';
+    case 'left-align':
+      return 'RichEditor-left-align';
+    case 'center-align':
+      return 'RichEditor-center-align';
+    default:
+      return null;
   }
 }
+
+const blockRenderMap = Immutable.Map({
+  'right-align': {
+    element: 'div',
+  },
+  'center-align': {
+    element: 'div'
+  }
+});
+
+const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
 const mapStateToProps = (state, props) => {
   return {
@@ -586,20 +628,6 @@ const mapStateToProps = (state, props) => {
     current: state.emailImageReducer.current
   };
 };
-
-const blockRenderMap = Immutable.Map({
-  'center-align': {
-    element: 'div'
-  },
-  'right-align': {
-    element: 'div'
-  },
-  'left-align': {
-    element: 'div'
-  }
-});
-
-const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
