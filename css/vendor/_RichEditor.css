@@ -69,3 +69,16 @@
 .RichEditor-activeButton {
   color: #5890ff;
 }
+
+.RichEditor-right-align {
+  text-align: right;
+  background-color: red;
+}
+
+.RichEditor-left-align {
+  text-align: left;
+}
+
+.RichEditor-center-align {
+  text-align: center;
+}

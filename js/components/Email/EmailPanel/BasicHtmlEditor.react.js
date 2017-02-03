@@ -2,7 +2,7 @@ import React from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import {connect} from 'react-redux';
-import {
+import Draft, {
   Editor,
   EditorState,
   ContentState,
@@ -24,7 +24,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Popover from 'material-ui/Popover';
 import Dropzone from 'react-dropzone';
 import {blue100, blue200, grey300} from 'material-ui/styles/colors';
-import FontIcon from 'material-ui/FontIcon';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -37,6 +36,7 @@ import Image from './Image/Image.react';
 import FileWrapper from './FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
+import Immutable from 'immutable';
 
 import 'node_modules/draft-js/dist/Draft.css';
 
@@ -129,7 +129,10 @@ class BasicHtmlEditor extends React.Component {
       {label: 'Unordered List', style: 'unordered-list-item'},
       {label: 'Ordered List', style: 'ordered-list-item'},
       {label: 'Code Block', style: 'code-block'},
-      {label: 'Atomic', style: 'atomic'}
+      {label: 'Atomic', style: 'atomic'},
+      {label: 'Center', style: 'center-align'},
+      {label: 'Left', style: 'unstyled'},
+      {label: 'Right', style: 'right-align'},
     ];
     this.CONVERT_CONFIGS = {
       htmlToEntity: (nodeName, node) => {
@@ -166,6 +169,20 @@ class BasicHtmlEditor extends React.Component {
             type: 'atomic',
             data: {}
           };
+        }
+        if (nodeName === 'span') {
+          console.log('span');
+          console.log(node);
+        }
+        if (nodeName === 'p' || nodeName === 'div') {
+          console.log('p');
+          console.log(node);
+          if (node.style.textAlign === 'center') {
+            return {
+              type: 'center-align',
+              data: {}
+            };
+          }
         }
       },
     };
@@ -480,6 +497,7 @@ class BasicHtmlEditor extends React.Component {
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={mediaBlockRenderer}
+            blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
@@ -555,6 +573,9 @@ const styleMap = {
 function getBlockStyle(block) {
   switch (block.getType()) {
     case 'blockquote': return 'RichEditor-blockquote';
+    case 'right-align': return 'RichEditor-right-align';
+    case 'left-align': return 'RichEditor-left-align';
+    case 'center-align': return 'RichEditor-center-align';
     default: return null;
   }
 }
@@ -567,6 +588,20 @@ const mapStateToProps = (state, props) => {
     current: state.emailImageReducer.current
   };
 };
+
+const blockRenderMap = Immutable.Map({
+  'center-align': {
+    element: 'div'
+  },
+  'right-align': {
+    element: 'div'
+  },
+  'left-align': {
+    element: 'div'
+  }
+});
+
+const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
