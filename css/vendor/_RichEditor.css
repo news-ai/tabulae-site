@@ -79,3 +79,8 @@
   text-align: center;
   display: block;
 }
+
+.RichEditor-justify-align {
+  text-align: center;
+  display: justify;
+}
