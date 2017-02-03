@@ -72,13 +72,10 @@
 
 .RichEditor-right-align {
   text-align: right;
-  background-color: red;
-}
-
-.RichEditor-left-align {
-  text-align: left;
+  display: block;
 }
 
 .RichEditor-center-align {
   text-align: center;
+  display: block;
 }
