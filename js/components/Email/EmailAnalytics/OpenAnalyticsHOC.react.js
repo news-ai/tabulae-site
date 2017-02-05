@@ -8,8 +8,8 @@ import moment from 'moment-timezone';
 
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
-const OpenItem = ({Type, Created}) => {
-  let createdDate = moment(Created);
+const OpenItem = ({Type, CreatedAt}) => {
+  let createdDate = moment(CreatedAt);
   return (
   <div className='row vertical-center' style={{margin: '5px 0'}}>
     <span style={{margin: '0 5px', color: grey600, fontSize: '0.9em'}}>{createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>

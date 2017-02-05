@@ -1,13 +1,14 @@
 import React from 'react';
-import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import find from 'lodash/find';
 import DropDownMenu from 'material-ui/DropDownMenu';
+import Immutable from 'immutable';
 
 export default function FontSizeControls(props) {
   let {inlineStyles} = props;
   var currentStyle = props.editorState.getCurrentInlineStyle();
   const currentType = find(inlineStyles, type => currentStyle.has(type.style));
+  // console.log(currentType);
 
   return (
     <div className='RichEditor-controls' style={{display: 'flex'}}>
@@ -29,23 +30,6 @@ export default function FontSizeControls(props) {
           label={type.label}
           />)}
       </DropDownMenu>
-      {/*<SelectField
-      value={find(inlineStyles, type => currentStyle.has(type.style)).label || 'NONE'}
-      onChange={(e, index, value) => {
-        const currentSize = find(inlineStyles, type => currentStyle.has(type.style));
-        if (currentSize) {
-          // untoggle size first if it exist
-          props.onToggle(currentStyle.style);
-        }
-        props.onToggle(inlineStyles[index].style);
-      }}>
-        {inlineStyles.map((type, i) =>
-          <MenuItem
-          key={`fontsize-select-${i}`}
-          value={type.label}
-          primaryText={type.label}
-          />)}
-      </SelectField>*/}
     </div>
   );
 }
