@@ -7,6 +7,9 @@ import {
   EMAIL_SET_OFFSET,
   SET_SCHEDULE_TIME,
   CLEAR_SCHEDULE_TIME,
+  FETCH_EMAIL_LOGS,
+  FETCH_EMAIL_LOGS_FAIL,
+  RECEIVE_EMAIL_LOGS,
 } from './constants';
 
 import {initialState} from '../../reducers/initialState';
@@ -18,9 +21,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
   let obj;
   switch (action.type) {
     case SENDING_STAGED_EMAILS:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
+      return Object.assign({}, state, {isReceiving: true});
     case RECEIVE_STAGED_EMAILS:
       obj = assignToEmpty(state, action.emails);
       obj.previewEmails = action.previewEmails;
@@ -32,9 +33,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
       return obj;
     case REQUEST_MULTIPLE_EMAILS:
-      obj = assignToEmpty(state, action.emails);
-      obj.isReceiving = true;
-      return obj;
+      return Object.assign({}, state, {isReceiving: true});
     case RECEIVE_MULTIPLE_EMAILS:
       obj = assignToEmpty(state, action.emails);
       if (action.contactId) {
@@ -47,7 +46,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       }
       const unseen = action.ids.filter(id => !state[id]);
       const unsorted = state.received.concat(unseen);
-      unsorted.sort( function(aId, bId) {
+      unsorted.sort(function(aId, bId) {
         const aDate = new Date(obj[aId].created);
         const bDate = new Date(obj[bId].created);
         if (aDate > bDate) return -1;
@@ -62,13 +61,19 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.offset = action.offset;
       return obj;
     case SET_SCHEDULE_TIME:
-      obj = assignToEmpty(state, {});
-      obj.utctime = action.utctime;
-      return obj;
+      return assignToEmpty(state, {utctime: action.utctime});
     case CLEAR_SCHEDULE_TIME:
-      obj = assignToEmpty(state, {});
-      obj.utctime = null;
-      return obj;
+      return assignToEmpty(state, {utctime: null});
+    case FETCH_EMAIL_LOGS:
+      return Object.assign({}, state, {isReceiving: true});
+    case RECEIVE_EMAIL_LOGS:
+      return Object.assign({}, state, {
+        [action.emailId]: Object.assign({}, state[action.emailId], {
+          logs: action.logs,
+          links: action.links,
+        }),
+        isReceiving: false
+      });
     default:
       return state;
   }

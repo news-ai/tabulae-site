@@ -9,6 +9,10 @@ let blockTagMap = {
   'ordered-list-item':        ['<li>','</li>\n'],
   'unordered-list-item':      ['<li>','</li>\n'],
   'atomic':                   ['<figure>','</figure>\n'],
+  'center-align':             ['<div style="text-align:center">','</div>\n'],
+  'left-align':               ['<div>','</div>\n'],
+  'right-align':              ['<div style="text-align:right">','</div>\n'],
+  'justify-align':              ['<div style="text-align:justify">','</div>\n'],
   'default':                  ['<p>','</p>\n']
 };
 
@@ -18,11 +22,32 @@ let inlineTagMap = {
   'UNDERLINE': ['<u>','</u>'],
   'CODE': ['<code>','</code>'],
   'STRIKETHROUGH': ['<del>', '</del>'],
-  'default': ['<span>','</span>']
+  'default': ['<span>','</span>'],
+  'SIZE-5': ['<span style="font-size:5px">','</span>'],
+  'SIZE-5.5': ['<span style="font-size:5.5px">','</span>'],
+  'SIZE-6': ['<span style="font-size:6px">','</span>'],
+  'SIZE-7.5': ['<span style="font-size:7.5px">','</span>'],
+  'SIZE-8': ['<span style="font-size:8px">','</span>'],
+  'SIZE-9': ['<span style="font-size:9px">','</span>'],
+  'SIZE-10': ['<span style="font-size:10px">','</span>'],
+  'SIZE-10.5': ['<span style="font-size:10.5px">','</span>'],
+  'SIZE-11': ['<span style="font-size:11px">','</span>'],
+  'SIZE-12': ['<span style="font-size:12px">','</span>'],
+  'SIZE-14': ['<span style="font-size:14px">','</span>'],
+  'SIZE-16': ['<span style="font-size:16px">','</span>'],
+  'SIZE-18': ['<span style="font-size:18px">','</span>'],
+  'SIZE-20': ['<span style="font-size:20px">','</span>'],
+  'SIZE-22': ['<span style="font-size:202x">','</span>'],
+  'SIZE-24': ['<span style="font-size:24px">','</span>'],
+  'SIZE-26': ['<span style="font-size:26px">','</span>'],
+  'SIZE-28': ['<span style="font-size:28px">','</span>'],
+  'SIZE-36': ['<span style="font-size:36px">','</span>'],
+  'SIZE-48': ['<span style="font-size:48px">','</span>'],
+  'SIZE-72': ['<span style="font-size:72px">','</span>'],
 };
 
 let entityTagMap = {
-  'LINK': ['<a href="<%= url %>">', '</a>'],
+  'LINK': ['<a href="<%= url %>" target="_blank">', '</a>'],
   'image': ['<a href="<%= imageLink %>" target="_blank"><img src="<%= src %>" style="max-height:<%= size %>;max-width:<%= size %>;">', '</img></a>'],
 };
 

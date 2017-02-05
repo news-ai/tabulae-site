@@ -22,10 +22,14 @@ module.exports = function(options) {
       new webpack.optimize.UglifyJsPlugin({
         mangle: true,
         sourcemap: false,
-        compress: {
-          warnings: false
-        },
-        // compress: { warnings: false },
+        unused: true,
+        dead_code: true,
+        drop_debugger: true,
+        evaludate: true,
+        drop_console: true,
+        sequences: true,
+        booleans: true,
+        compress: { warnings: false },
         // comments: false,
         // sourceMap: true,
         // minimize: false,
@@ -127,9 +131,6 @@ module.exports = function(options) {
         'components': __dirname + '/js/components',
         'reducers': __dirname + '/js/reducers',
         'utils': __dirname + '/js/utils',
-        // temporary fix for missing require in `react-ga`
-        // cf. https://github.com/react-ga/react-ga/issues/53
-        'react/lib/Object.assign': 'object-assign'
       }
     },
     plugins: plugins,

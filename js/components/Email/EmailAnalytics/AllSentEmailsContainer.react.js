@@ -10,6 +10,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     emails,
+    isReceiving: state.stagingReducer.isReceiving
   };
 };
 

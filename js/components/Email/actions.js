@@ -4,10 +4,14 @@ import {
   RECEIVE_EMAIL,
   REQUEST_MULTIPLE_EMAILS,
   RECEIVE_MULTIPLE_EMAILS,
-  EMAIL_SET_OFFSET
+  EMAIL_SET_OFFSET,
+  FETCH_EMAIL_LOGS,
+  FETCH_EMAIL_LOGS_FAIL,
+  RECEIVE_EMAIL_LOGS,
 } from './constants';
 import {normalize, Schema, arrayOf} from 'normalizr';
-import * as api from '../../actions/api';
+import * as api from 'actions/api';
+import isEmpty from 'lodash/isEmpty';
 
 const emailSchema = new Schema('emails');
 
@@ -50,6 +54,30 @@ export function postBatchEmails(emails) {
       });
     })
     .catch( message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
+  };
+}
+
+export function fetchLogs(emailId) {
+  return (dispatch, getState) => {
+    if (!getState().stagingReducer[emailId]) return;
+    dispatch({type: FETCH_EMAIL_LOGS, emailId});
+    return api.get(`/emails/${emailId}/logs`)
+    .then(response => {
+      const logs = response.data;
+      const links = logs.reduce((a, b) => {
+        if (b.Type === 'click' && b.Link) {
+          a[b.Link] = a[b.Link] ? a[b.Link] + 1 : 1;
+        }
+        return a;
+      }, {});
+      return dispatch({
+        type: RECEIVE_EMAIL_LOGS,
+        logs,
+        emailId,
+        links: isEmpty(links) ? undefined : links,
+      });
+    })
+    .catch(err => dispatch({type: FETCH_EMAIL_LOGS_FAIL, err}));
   };
 }
 

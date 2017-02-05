@@ -2,7 +2,7 @@ import React from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import {connect} from 'react-redux';
-import {
+import Draft, {
   Editor,
   EditorState,
   ContentState,
@@ -31,13 +31,14 @@ import CurlySpan from './components/CurlySpan.react';
 import EntityControls from './components/EntityControls';
 import InlineStyleControls from './components/InlineStyleControls';
 import BlockStyleControls from './components/BlockStyleControls';
+import FontSizeControls from './components/FontSizeControls';
 import ExternalControls from './components/ExternalControls';
+import PositionStyleControls from './components/PositionStyleControls';
 import Image from './Image/Image.react';
 import FileWrapper from './FileWrapper.react';
-
 import alertify from 'alertifyjs';
-
-import 'node_modules/draft-js/dist/Draft.css';
+import sanitizeHtml from 'sanitize-html';
+import Immutable from 'immutable';
 
 import {curlyStrategy, findEntities} from './utils/strategies';
 
@@ -68,15 +69,59 @@ const Media = props => {
   return media;
 };
 
-function mediaBlockRenderer(block) {
-  if (block.getType() === 'atomic') {
-    return {
-      component: Media,
-      editable: false
-    };
-  }
-  return null;
-}
+const INLINE_STYLES = [
+  {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
+  {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
+  {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
+  // {label: 'Monospace', style: 'CODE'},
+  {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
+];
+
+const BLOCK_TYPES = [
+  {label: 'Normal', style: 'unstyled'},
+  {label: 'Heading - Large', style: 'header-one'},
+  {label: 'Heading - Medium', style: 'header-two'},
+  {label: 'Blockquote', style: 'blockquote'},
+  {label: 'Unordered List', style: 'unordered-list-item'},
+  {label: 'Ordered List', style: 'ordered-list-item'},
+  {label: 'Code Block', style: 'code-block'},
+  {label: 'Atomic', style: 'atomic'},
+  {label: 'Center', style: 'center-align'},
+  {label: 'Left', style: 'unstyled'},
+  {label: 'Right', style: 'right-align'},
+  {label: 'Right', style: 'justify-align'},
+];
+
+const POSITION_TYPES = [
+  {label: 'Center', style: 'center-align', icon: 'fa fa-align-center'},
+  {label: 'Left', style: 'unstyled', icon: 'fa fa-align-left'},
+  {label: 'Right', style: 'right-align', icon: 'fa fa-align-right'},
+  {label: 'Justify', style: 'justify-align', icon: 'fa fa-align-justify'},
+];
+
+/* const FONTSIZE_TYPES = [
+  {inlineType: 'size', label: 5, style: 'SIZE-5'},
+  {inlineType: 'size', label: 5.5, style: 'SIZE-5.5'},
+  {inlineType: 'size', label: 6, style: 'SIZE-6'},
+  {inlineType: 'size', label: 7.5, style: 'SIZE-7.5'},
+  {inlineType: 'size', label: 8, style: 'SIZE-8'},
+  {inlineType: 'size', label: 9, style: 'SIZE-9'},
+  {inlineType: 'size', label: 10, style: 'SIZE-10'},
+  {inlineType: 'size', label: 10.5, style: 'SIZE-10.5'},
+  {inlineType: 'size', label: 11, style: 'SIZE-11'},
+  {inlineType: 'size', label: 12, style: 'SIZE-12'},
+  {inlineType: 'size', label: 14, style: 'SIZE-14'},
+  {inlineType: 'size', label: 16, style: 'SIZE-16'},
+  {inlineType: 'size', label: 18, style: 'SIZE-18'},
+  {inlineType: 'size', label: 20, style: 'SIZE-20'},
+  {inlineType: 'size', label: 22, style: 'SIZE-22'},
+  {inlineType: 'size', label: 24, style: 'SIZE-24'},
+  {inlineType: 'size', label: 26, style: 'SIZE-26'},
+  {inlineType: 'size', label: 28, style: 'SIZE-28'},
+  {inlineType: 'size', label: 36, style: 'SIZE-36'},
+  {inlineType: 'size', label: 48, style: 'SIZE-48'},
+  {inlineType: 'size', label: 72, style: 'SIZE-72'},
+];*/
 
 
 class BasicHtmlEditor extends React.Component {
@@ -112,24 +157,6 @@ class BasicHtmlEditor extends React.Component {
       }
     ];
 
-    this.INLINE_STYLES = [
-      {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
-      {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
-      {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
-      // {label: 'Monospace', style: 'CODE'},
-      {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
-    ];
-
-    this.BLOCK_TYPES = [
-      {label: 'Normal', style: 'unstyled'},
-      {label: 'Heading - Large', style: 'header-one'},
-      {label: 'Heading - Medium', style: 'header-two'},
-      {label: 'Blockquote', style: 'blockquote'},
-      {label: 'Unordered List', style: 'unordered-list-item'},
-      {label: 'Ordered List', style: 'ordered-list-item'},
-      {label: 'Code Block', style: 'code-block'},
-      {label: 'Atomic', style: 'atomic'}
-    ];
     this.CONVERT_CONFIGS = {
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
@@ -166,6 +193,33 @@ class BasicHtmlEditor extends React.Component {
             data: {}
           };
         }
+        if (nodeName === 'span') {
+          // console.log('span');
+          // console.log(node);
+        }
+        if (nodeName === 'p' || nodeName === 'div') {
+          // console.log('p');
+          // console.log(node);
+          // console.log(node.style.textAlign);
+          if (node.style.textAlign === 'center') {
+            return {
+              type: 'center-align',
+              data: {}
+            };
+          } else if (node.style.textAlign === 'right') {
+            // console.log('whaaa');
+            return {
+              type: 'right-align',
+              data: {}
+            };
+          } else if (node.style.textAlign === 'justify') {
+            // console.log('whaaa');
+            return {
+              type: 'justify-align',
+              data: {}
+            };
+          }
+        }
       },
     };
 
@@ -193,6 +247,7 @@ class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
+      // console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -310,20 +365,6 @@ class BasicHtmlEditor extends React.Component {
     return 'not-handled';
   }
 
-  _handleImage(url) {
-    const {editorState} = this.state;
-    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = Entity.create('image', 'IMMUTABLE', {
-      src: url,
-      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
-      imageLink: '#'
-    });
-    this.props.saveImageEntityKey(url, entityKey);
-
-    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-    return newEditorState;
-  }
-
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -380,10 +421,53 @@ class BasicHtmlEditor extends React.Component {
 
   _handlePastedText(text, html) {
     const {editorState} = this.state;
-    const blockMap = ContentState.createFromText(text.trim()).blockMap;
-    const newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    let newState;
+    let blockMap;
+    let contentState;
+
+    if (html) {
+      // console.log(html);
+      const saneHtml = sanitizeHtml(html, {
+        allowedAttributes: {
+          p: ['style'],
+          div: ['style'],
+          span: ['style'],
+          a: ['href']
+        }
+      });
+      // console.log(saneHtml);
+      contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
+      blockMap = contentState.getBlockMap();
+      const firstBlock = contentState.getFirstBlock();
+      // console.log(firstBlock.getType());
+      // console.log(firstBlock.getText());
+      // console.log(blockMap);
+      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
+      // const content = convertFromHTML(nextProps.bodyHtml);
+    } else {
+      contentState = ContentState.createFromText(text.trim());
+      blockMap = contentState.blockMap;
+    }
+    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    // console.log(newState.getFirstBlock().getType());
+    // console.log(newState.getFirstBlock().getText());
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
+
     return true;
+  }
+
+  _handleImage(url) {
+    const {editorState} = this.state;
+    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
+    const entityKey = Entity.create('image', 'IMMUTABLE', {
+      src: url,
+      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
+      imageLink: '#'
+    });
+    this.props.saveImageEntityKey(url, entityKey);
+
+    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+    return newEditorState;
   }
 
   _handleDroppedFiles(selection, files) {
@@ -459,6 +543,7 @@ class BasicHtmlEditor extends React.Component {
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={mediaBlockRenderer}
+            blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
@@ -483,7 +568,7 @@ class BasicHtmlEditor extends React.Component {
             <InlineStyleControls
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
-            inlineStyles={this.INLINE_STYLES}
+            inlineStyles={INLINE_STYLES}
             />
             <EntityControls
             editorState={editorState}
@@ -495,9 +580,19 @@ class BasicHtmlEditor extends React.Component {
             active={props.files.length > 0}
             />
             <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+            <PositionStyleControls
+            editorState={editorState}
+            blockTypes={POSITION_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+            {/*<FontSizeControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={FONTSIZE_TYPES}
+            />*/}
             <BlockStyleControls
             editorState={editorState}
-            blockTypes={this.BLOCK_TYPES}
+            blockTypes={BLOCK_TYPES}
             onToggle={this.toggleBlockType}
             />
           </div>}
@@ -529,14 +624,69 @@ const styleMap = {
     fontSize: 16,
     padding: 2
   },
+  'SIZE-5': {fontSize: 5.5},
+  'SIZE-6': {fontSize: 6},
+  'SIZE-7.5': {fontSize: 7.5},
+  'SIZE-8': {fontSize: 8},
+  'SIZE-9': {fontSize: 9},
+  'SIZE-10': {fontSize: 10},
+  'SIZE-10.5': {fontSize: 10.5},
+  'SIZE-11': {fontSize: 11},
+  'SIZE-12': {fontSize: 12},
+  'SIZE-14': {fontSize: 14},
+  'SIZE-16': {fontSize: 16},
+  'SIZE-18': {fontSize: 18},
+  'SIZE-20': {fontSize: 20},
+  'SIZE-22': {fontSize: 22},
+  'SIZE-24': {fontSize: 24},
+  'SIZE-26': {fontSize: 26},
+  'SIZE-28': {fontSize: 28},
+  'SIZE-36': {fontSize: 36},
+  'SIZE-48': {fontSize: 48},
+  'SIZE-72': {fontSize: 72},
 };
+
+
+function mediaBlockRenderer(block) {
+  if (block.getType() === 'atomic') {
+    return {
+      component: Media,
+      editable: false
+    };
+  }
+  return null;
+}
 
 function getBlockStyle(block) {
   switch (block.getType()) {
-    case 'blockquote': return 'RichEditor-blockquote';
-    default: return null;
+    case 'blockquote':
+      return 'RichEditor-blockquote';
+    case 'right-align':
+      return 'RichEditor-right-align';
+    case 'left-align':
+      return 'RichEditor-left-align';
+    case 'center-align':
+      return 'RichEditor-center-align';
+    case 'justify-align':
+      return 'RichEditor-justify-align';
+    default:
+      return null;
   }
 }
+
+const blockRenderMap = Immutable.Map({
+  'right-align': {
+    element: 'div',
+  },
+  'center-align': {
+    element: 'div'
+  },
+  'justify-align': {
+    element: 'div'
+  }
+});
+
+const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
 const mapStateToProps = (state, props) => {
   return {
