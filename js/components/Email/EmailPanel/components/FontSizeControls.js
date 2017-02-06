@@ -12,11 +12,11 @@ export default function FontSizeControls(props) {
   let value = currentType && currentType.label || 14;
   if (!selection.isCollapsed() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
     // more than one fontSize selected
-    value = '';
+    value = null;
   }
 
   return (
-    <div className='RichEditor-controls' style={{display: 'flex'}}>
+    <div className='RichEditor-controls'>
       <DropDownMenu
       value={value}
       onChange={(e, index, value) => {
