@@ -99,7 +99,7 @@ const POSITION_TYPES = [
   {label: 'Justify', style: 'justify-align', icon: 'fa fa-align-justify'},
 ];
 
-/* const FONTSIZE_TYPES = [
+const FONTSIZE_TYPES = [
   {inlineType: 'size', label: 5, style: 'SIZE-5'},
   {inlineType: 'size', label: 5.5, style: 'SIZE-5.5'},
   {inlineType: 'size', label: 6, style: 'SIZE-6'},
@@ -121,7 +121,7 @@ const POSITION_TYPES = [
   {inlineType: 'size', label: 36, style: 'SIZE-36'},
   {inlineType: 'size', label: 48, style: 'SIZE-48'},
   {inlineType: 'size', label: 72, style: 'SIZE-72'},
-];*/
+];
 
 
 class BasicHtmlEditor extends React.Component {
@@ -585,11 +585,11 @@ class BasicHtmlEditor extends React.Component {
             blockTypes={POSITION_TYPES}
             onToggle={this.toggleBlockType}
             />
-            {/*<FontSizeControls
+            <FontSizeControls
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
             inlineStyles={FONTSIZE_TYPES}
-            />*/}
+            />
             <BlockStyleControls
             editorState={editorState}
             blockTypes={BLOCK_TYPES}
