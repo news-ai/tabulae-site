@@ -123,7 +123,6 @@ const FONTSIZE_TYPES = [
   {inlineType: 'size', label: 72, style: 'SIZE-72'},
 ];
 
-
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -439,9 +438,9 @@ class BasicHtmlEditor extends React.Component {
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
       const firstBlock = contentState.getFirstBlock();
-      // console.log(firstBlock.getType());
-      // console.log(firstBlock.getText());
-      // console.log(blockMap);
+      console.log(firstBlock.getType());
+      console.log(firstBlock.getText());
+      console.log(blockMap.toJS());
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
     } else {
@@ -449,8 +448,8 @@ class BasicHtmlEditor extends React.Component {
       blockMap = contentState.blockMap;
     }
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    // console.log(newState.getFirstBlock().getType());
-    // console.log(newState.getFirstBlock().getText());
+    console.log(newState.getFirstBlock().getType());
+    console.log(newState.getFirstBlock().getText());
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
 
     return true;
@@ -674,6 +673,8 @@ function getBlockStyle(block) {
   }
 }
 
+// const RightAlign = props => <div style={{backgroundColor: 'red'}}>{props.children}</div>;
+
 const blockRenderMap = Immutable.Map({
   'right-align': {
     element: 'div',
@@ -685,6 +686,7 @@ const blockRenderMap = Immutable.Map({
     element: 'div'
   }
 });
+
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
