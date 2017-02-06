@@ -13,11 +13,13 @@ export default function BlockStyleControls(props) {
     .getType();
 
   return (
-    <DropDownMenu
-    style={{width: 150, marginBottom: 13}}
-    value={find(blockTypes, type => type.style === blockType).label}
-    onChange={(e, index, value) => props.onToggle(blockTypes[index].style)}>
-      {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} style={{paddingLeft: 10}} primaryText={type.label} />)}
-    </DropDownMenu>
+    <div className='RichEditor-controls'>
+      <DropDownMenu
+      style={{width: 180}}
+      value={find(blockTypes, type => type.style === blockType).label}
+      onChange={(e, index, value) => props.onToggle(blockTypes[index].style)}>
+        {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} style={{paddingLeft: 10}} primaryText={type.label} />)}
+      </DropDownMenu>
+    </div>
   );
 }
