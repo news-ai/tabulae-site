@@ -7,11 +7,12 @@ import ConnectToGmail from './ConnectToGmail.react';
 import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
 import SMTPSettings from './SMTPSettings.react';
+import AddMultipleEmails from './AddMultipleEmails.react';
 
 import {actions as loginActions} from 'components/Login';
 
 const inputHeight = {
-  height: 40,
+  height: 45,
   margin: '5px 0'
 };
 
@@ -82,6 +83,14 @@ class EmailSettings extends Component {
                 {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
                     <Toggle toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/> :
                     <SMTPSettings/>}
+              </div>
+            </div>
+            <div className='row vertical-center' style={{height: 80, margin: '5px 0'}}>
+              <div className='large-4 medium-5 columns'>
+                <span style={spanStyle}>Add Multiple Emails</span>
+              </div>
+              <div className='large-8 medium-7 columns'>
+                <AddMultipleEmails/>
               </div>
             </div>
             <div className='row' style={{height: 210, margin: '15px 0'}}>

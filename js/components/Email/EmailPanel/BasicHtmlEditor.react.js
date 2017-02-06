@@ -157,6 +157,16 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.CONVERT_CONFIGS = {
+      htmlToStyle: (nodeName, node, currentStyle) => {
+        if (nodeName === 'span') {
+          console.log(node);
+          console.log(node.style);
+          console.log(currentStyle);
+          return currentStyle.add('BLUE');
+        } else {
+          return currentStyle;
+        }
+      },
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
           if (node.firstElementChild === null) {
@@ -192,13 +202,11 @@ class BasicHtmlEditor extends React.Component {
             data: {}
           };
         }
-        if (nodeName === 'span') {
-          // console.log('span');
-          // console.log(node);
-        }
         if (nodeName === 'p' || nodeName === 'div') {
           // console.log('p');
+          // console.log(node.style);
           // console.log(node);
+          // console.log(node.childNodes);
           // console.log(node.style.textAlign);
           if (node.style.textAlign === 'center') {
             return {
@@ -206,13 +214,11 @@ class BasicHtmlEditor extends React.Component {
               data: {}
             };
           } else if (node.style.textAlign === 'right') {
-            // console.log('whaaa');
             return {
               type: 'right-align',
               data: {}
             };
           } else if (node.style.textAlign === 'justify') {
-            // console.log('whaaa');
             return {
               type: 'justify-align',
               data: {}
@@ -422,11 +428,13 @@ class BasicHtmlEditor extends React.Component {
     const {editorState} = this.state;
     let newState;
     let blockMap;
+    // let blockArray;
     let contentState;
 
     if (html) {
       // console.log(html);
       const saneHtml = sanitizeHtml(html, {
+        // allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
           p: ['style'],
           div: ['style'],
@@ -437,10 +445,12 @@ class BasicHtmlEditor extends React.Component {
       // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
-      const firstBlock = contentState.getFirstBlock();
-      console.log(firstBlock.getType());
-      console.log(firstBlock.getText());
-      console.log(blockMap.toJS());
+      // blockArray = contentState.getBlocksAsArray();
+      // const firstBlock = contentState.getFirstBlock();
+      // console.log(blockArray);
+      // console.log(firstBlock.getType());
+      // console.log(firstBlock.getText());
+      // console.log(blockMap.toJS());
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
     } else {
@@ -448,8 +458,8 @@ class BasicHtmlEditor extends React.Component {
       blockMap = contentState.blockMap;
     }
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    console.log(newState.getFirstBlock().getType());
-    console.log(newState.getFirstBlock().getText());
+    // console.log(newState.getFirstBlock().getType());
+    // console.log(newState.getFirstBlock().getText());
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
 
     return true;
