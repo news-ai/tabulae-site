@@ -39,7 +39,6 @@ import FileWrapper from './FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Immutable from 'immutable';
-import Collapse from 'react-collapse';
 
 import {curlyStrategy, findEntities} from './utils/strategies';
 
@@ -54,6 +53,7 @@ const controlsStyle = {
   paddingRight: 10,
   bottom: 60,
   border: `solid 1px ${blue100}`,
+  borderRadius: '0.9em',
   backgroundColor: 'white',
 };
 
@@ -563,40 +563,39 @@ class BasicHtmlEditor extends React.Component {
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />
         </div>
-          <Collapse isOpened={state.isStyleBlockOpen}>
-            <div className='row vertical-center clearfix' style={controlsStyle}>
-              <InlineStyleControls
-              editorState={editorState}
-              onToggle={this.toggleInlineStyle}
-              inlineStyles={INLINE_STYLES}
-              />
-              <EntityControls
-              editorState={editorState}
-              entityControls={this.ENTITY_CONTROLS}
-              />
-              <ExternalControls
-              editorState={editorState}
-              externalControls={this.EXTERNAL_CONTROLS}
-              active={props.files.length > 0}
-              />
-              <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
-              <PositionStyleControls
-              editorState={editorState}
-              blockTypes={POSITION_TYPES}
-              onToggle={this.toggleBlockType}
-              />
-              <FontSizeControls
-              editorState={editorState}
-              onToggle={this.toggleInlineStyle}
-              inlineStyles={FONTSIZE_TYPES}
-              />
-              <BlockStyleControls
-              editorState={editorState}
-              blockTypes={BLOCK_TYPES}
-              onToggle={this.toggleBlockType}
-              />
-            </div>
-          </Collapse>
+        {state.isStyleBlockOpen &&
+          <div className='row vertical-center clearfix' style={controlsStyle}>
+            <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={INLINE_STYLES}
+            />
+            <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+            />
+            <ExternalControls
+            editorState={editorState}
+            externalControls={this.EXTERNAL_CONTROLS}
+            active={props.files.length > 0}
+            />
+            <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+            <PositionStyleControls
+            editorState={editorState}
+            blockTypes={POSITION_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+            <FontSizeControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={FONTSIZE_TYPES}
+            />
+            <BlockStyleControls
+            editorState={editorState}
+            blockTypes={BLOCK_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+          </div>}
           <div className='vertical-center' style={{
             position: 'absolute',
             bottom: 3,
