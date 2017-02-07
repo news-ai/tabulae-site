@@ -344,13 +344,14 @@ class BasicHtmlEditor extends React.Component {
   _addLink(/* e */) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
+    const contentState = editorState.getCurrentContent();
     if (selection.isCollapsed()) return;
     alertify.prompt(
       '',
       'Enter a URL',
       'https://',
       (e, url) => {
-        const entityKey = Entity.create('LINK', 'MUTABLE', {url});
+        const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
       },
       _ => {});
@@ -399,7 +400,7 @@ class BasicHtmlEditor extends React.Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = Entity.create('image', 'IMMUTABLE', {
+    const entityKey = editorState.getCurrentContent().createEntity('image', 'IMMUTABLE', {
       src: url,
       size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
       imageLink: '#'
