@@ -7,7 +7,7 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
   switch (action.type) {
     case 'INITIALIZE_EMAIL_DRAFT':
       obj = assignToEmpty(state, {});
-      obj[action.listId] = {};
+      obj[action.listId] = {from: action.email};
       return obj;
     case 'UPDATE_CC':
       obj = assignToEmpty(state, {});
@@ -16,6 +16,10 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
     case 'UPDATE_BCC':
       obj = assignToEmpty(state, {});
       obj[action.listId] = assignToEmpty(state[action.listId], {bcc: action.bcc});
+      return obj;
+    case 'SET_FROM_EMAIL':
+      obj = assignToEmpty(state, {});
+      obj[action.listId] = assignToEmpty(state[action.listId], {from: action.from});
       return obj;
     default:
       return state;

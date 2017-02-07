@@ -19,12 +19,14 @@ import PreviewEmails from '../PreviewEmails';
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
+import DropDownMenu from 'material-ui/DropDownMenu';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
 import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
 import AddCCPanelHOC from './AddCCPanelHOC.react';
+import SwitchEmailHOC from './SwitchEmailHOC.react';
 import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
@@ -224,21 +226,23 @@ class EmailPanel extends Component {
       zIndex: 200,
       display: state.minimized ? 'none' : 'block'
     };
+    console.log(props.from);
 
     return (
       <div style={styles.emailPanelOuterPosition}>
         <div style={styles.emailPanelPosition}>
           <div>
-          {state.minimized && <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
+          {state.minimized &&
+            <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
           </div>
           <Paper style={emailPanelWrapper} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
-                <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
-                <FontIcon style={{margin: '0 3px', fontSize: '0.9em', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
+                <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
+                <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
               </div>
-              <div>
-                <span>Emails are sent from: {props.person.email}</span>
+              <div className='vertical-center'>
+                <span>Emails are sent from: {props.from}</span>
               </div>
               <BasicHtmlEditor
               fieldsmap={state.fieldsmap}
@@ -294,8 +298,18 @@ class EmailPanel extends Component {
                     tooltipPosition='top-right'
                     />}
                   </AddCCPanelHOC>
+                  <SwitchEmailHOC listId={props.listId}>
+                  {({onRequestOpen}) =>
+                    <IconButton
+                    iconStyle={{color: grey800}}
+                    iconClassName='fa fa-users'
+                    onClick={onRequestOpen}
+                    tooltip='Switch Email'
+                    tooltipPosition='top-right'
+                    />}
+                  </SwitchEmailHOC>
                 </div>
-                <div style={{marginLeft: 100}}>
+                <div style={{marginLeft: 50}}>
                   <IconButton
                   iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
@@ -331,6 +345,7 @@ class EmailPanel extends Component {
 const mapStateToProps = (state, props) => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
   return {
+    person: state.personReducer.person,
     scheduledtime: state.stagingReducer.utctime,
     isReceiving: state.stagingReducer.isReceiving,
     stagedEmailIds: state.stagingReducer.previewEmails,
@@ -345,6 +360,7 @@ const mapStateToProps = (state, props) => {
     emailsignature: state.personReducer.person.emailsignature || null,
     cc: get(state, `emailDraftReducer[${props.listId}].cc`) || [],
     bcc: get(state, `emailDraftReducer[${props.listId}].bcc`) || [],
+    from: get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email,
   };
 };
 
@@ -358,7 +374,7 @@ const mapDispatchToProps = (dispatch, props) => {
     clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
     postBatchEmails: emails => dispatch(stagingActions.postBatchEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(stagingActions.postBatchEmailsWithAttachments(emails)),
-    initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId})
+    initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email: props.person.email}),
   };
 };
 

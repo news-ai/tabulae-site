@@ -159,9 +159,9 @@ class BasicHtmlEditor extends React.Component {
     this.CONVERT_CONFIGS = {
       htmlToStyle: (nodeName, node, currentStyle) => {
         if (nodeName === 'span') {
-          console.log(node);
-          console.log(node.style);
-          console.log(currentStyle);
+          // console.log(node);
+          // console.log(node.style);
+          // console.log(currentStyle);
           return currentStyle.add('BLUE');
         } else {
           return currentStyle;

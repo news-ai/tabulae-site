@@ -18,7 +18,7 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FeedbackPanel from './Feedback/FeedbackPanel.react';
-import {grey700, grey500, blue600, blue300} from 'material-ui/styles/colors';
+import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
 

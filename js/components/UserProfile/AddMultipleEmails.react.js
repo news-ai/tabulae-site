@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import isEmail from 'validator/lib/isEmail';
 import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
-import {blue800} from 'material-ui/styles/colors';
+import {grey500, cyan500} from 'material-ui/styles/colors';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
+import {actions as loginActions} from 'components/Login';
 
 class AddMultipleEmails extends Component {
   constructor(props) {
@@ -17,18 +18,17 @@ class AddMultipleEmails extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    const disabledInput = !isEmail(state.value);
+    const NoAccess = props.person.externalemail || props.person.gmail;
     return (
       <div>
         <ValidationHOC rules={[{validator: isEmail, errorMessage: 'Not a valid email.'}]}>
         {({onValueChange, errorMessage}) => (
           <TextField
-          hintStyle={{color: blue800}}
-          underlineStyle={{color: blue800}}
-          underlineFocusStyle={{color: blue800}}
-          floatingLabelFocusStyle={{color: blue800}}
+          disabled={NoAccess}
           errorText={errorMessage}
-          hintText='Email'
-          floatingLabelText='Email'
+          hintText={NoAccess ? 'Must disable Gmail or SMTP to activate' : 'Email'}
+          floatingLabelText={NoAccess ? 'Disable Gmail/SMTP to activate' : 'Email'}
           value={state.value}
           onChange={e => {
             // for validation
@@ -39,9 +39,12 @@ class AddMultipleEmails extends Component {
           />)}
         </ValidationHOC>
         <IconButton
-        disabled={!isEmail(state.value) || props.person.externalemail || props.person.gmais}
-        iconStyle={{color: blue800, fontSize: '16px'}}
+        tooltip='Add Email'
+        tooltipPosition='top-center'
+        disabled={NoAccess && disabledInput}
+        iconStyle={{color: disabledInput ? grey500 : cyan500, fontSize: '16px'}}
         iconClassName='fa fa-chevron-right'
+        onClick={_ => props.addExtraEmail(state.value).then(_ => this.setState({value: ''}))}
         />
       </div>);
   }
@@ -54,7 +57,9 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-  return {};
+  return {
+    addExtraEmail: email => dispatch(loginActions.addExtraEmail(email))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddMultipleEmails);
