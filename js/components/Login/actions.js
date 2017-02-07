@@ -8,16 +8,50 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 alertify.set('notifier', 'position', 'top-right');
 
+
+function requestLogin() {
+  return {
+    type: loginConstant.REQUEST
+  };
+}
+
+function receiveLogin(person) {
+  return {
+    type: loginConstant.RECEIVE,
+    person
+  };
+}
+
+function loginFail(message) {
+  return {
+    type: loginConstant.REQUEST_FAIL,
+    message
+  };
+}
+
 function notification(dispatch, args) {
   var notifications = JSON.parse(args.data);
   for (var i = notifications.length - 1; i >= 0; i--) {
     dispatch({type: 'EYY MESSAGE', message: notifications[i].message});
-    alertify.notify(notifications[i].message, 'custom', 5, function(){});
+    alertify.notify(notifications[i].message, 'custom', 5, function() {});
   }
 }
 
 function log(argument) {
   console.log(argument);
+}
+
+export function addExtraEmail(email) {
+  return dispatch => {
+    dispatch({type: 'ADD_EXTRA_EMAIL', email});
+    return api.post(`/users/me/add-email`, {email})
+    .then(response => {
+      alertify.notify(`Confirmation email has been sent to ${email}`, 'custom', 5, function() {});
+      dispatch({type: 'ADD_EXTRA_EMAIL_CONFIRMATION_SENT'});
+      return dispatch(receiveLogin(response.data));
+    })
+    .catch(err => console.log(err));
+  };
 }
 
 export function postFeedback(reason, feedback) {
@@ -45,25 +79,6 @@ export function fetchNotifications() {
   };
 }
 
-function requestLogin() {
-  return {
-    type: loginConstant.REQUEST
-  };
-}
-
-function receiveLogin(person) {
-  return {
-    type: loginConstant.RECEIVE,
-    person
-  };
-}
-
-function loginFail(message) {
-  return {
-    type: loginConstant.REQUEST_FAIL,
-    message
-  };
-}
 
 export function setFirstTimeUser() {
   return dispatch => dispatch({type: SET_FIRST_TIME_USER});
@@ -110,8 +125,8 @@ export function fetchPerson() {
     if (getState().personReducer.person) return;
     dispatch(requestLogin());
     return api.get('/users/me')
-    .then( response => dispatch(receiveLogin(response.data)))
-    .catch( message => {
+    .then(response => dispatch(receiveLogin(response.data)))
+    .catch(message => {
       if (window.isDev) console.log(message);
     });
   };

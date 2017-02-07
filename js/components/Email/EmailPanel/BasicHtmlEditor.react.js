@@ -1,6 +1,7 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
+import find from 'lodash/find';
 import {connect} from 'react-redux';
 import Draft, {
   Editor,
@@ -100,29 +101,28 @@ const POSITION_TYPES = [
 ];
 
 const FONTSIZE_TYPES = [
-  {inlineType: 'size', label: 5, style: 'SIZE-5'},
-  {inlineType: 'size', label: 5.5, style: 'SIZE-5.5'},
-  {inlineType: 'size', label: 6, style: 'SIZE-6'},
-  {inlineType: 'size', label: 7.5, style: 'SIZE-7.5'},
-  {inlineType: 'size', label: 8, style: 'SIZE-8'},
-  {inlineType: 'size', label: 9, style: 'SIZE-9'},
-  {inlineType: 'size', label: 10, style: 'SIZE-10'},
-  {inlineType: 'size', label: 10.5, style: 'SIZE-10.5'},
-  {inlineType: 'size', label: 11, style: 'SIZE-11'},
-  {inlineType: 'size', label: 12, style: 'SIZE-12'},
-  {inlineType: 'size', label: 14, style: 'SIZE-14'},
-  {inlineType: 'size', label: 16, style: 'SIZE-16'},
-  {inlineType: 'size', label: 18, style: 'SIZE-18'},
-  {inlineType: 'size', label: 20, style: 'SIZE-20'},
-  {inlineType: 'size', label: 22, style: 'SIZE-22'},
-  {inlineType: 'size', label: 24, style: 'SIZE-24'},
-  {inlineType: 'size', label: 26, style: 'SIZE-26'},
-  {inlineType: 'size', label: 28, style: 'SIZE-28'},
-  {inlineType: 'size', label: 36, style: 'SIZE-36'},
-  {inlineType: 'size', label: 48, style: 'SIZE-48'},
-  {inlineType: 'size', label: 72, style: 'SIZE-72'},
+  {inlineType: 'size', label: '5', style: 'SIZE-5'},
+  {inlineType: 'size', label: '5.5', style: 'SIZE-5.5'},
+  {inlineType: 'size', label: '6', style: 'SIZE-6'},
+  {inlineType: 'size', label: '7.5', style: 'SIZE-7.5'},
+  {inlineType: 'size', label: '8', style: 'SIZE-8'},
+  {inlineType: 'size', label: '9', style: 'SIZE-9'},
+  {inlineType: 'size', label: '10', style: 'SIZE-10'},
+  {inlineType: 'size', label: '10.5', style: 'SIZE-10.5'},
+  {inlineType: 'size', label: '11', style: 'SIZE-11'},
+  {inlineType: 'size', label: '12', style: 'SIZE-12'},
+  {inlineType: 'size', label: '14', style: 'SIZE-14'},
+  {inlineType: 'size', label: '16', style: 'SIZE-16'},
+  {inlineType: 'size', label: '18', style: 'SIZE-18'},
+  {inlineType: 'size', label: '20', style: 'SIZE-20'},
+  {inlineType: 'size', label: '22', style: 'SIZE-22'},
+  {inlineType: 'size', label: '24', style: 'SIZE-24'},
+  {inlineType: 'size', label: '26', style: 'SIZE-26'},
+  {inlineType: 'size', label: '28', style: 'SIZE-28'},
+  {inlineType: 'size', label: '36', style: 'SIZE-36'},
+  {inlineType: 'size', label: '48', style: 'SIZE-48'},
+  {inlineType: 'size', label: '72', style: 'SIZE-72'},
 ];
-
 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
@@ -158,6 +158,16 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.CONVERT_CONFIGS = {
+      htmlToStyle: (nodeName, node, currentStyle) => {
+        if (nodeName === 'span') {
+          const fontSize = node.style.fontSize.substring(0, node.style.fontSize.length - 2);
+          const foundType = find(FONTSIZE_TYPES, type => type.label === fontSize);
+          if (foundType) return currentStyle.add(foundType.style);
+          return currentStyle;
+        } else {
+          return currentStyle;
+        }
+      },
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
           if (node.firstElementChild === null) {
@@ -169,11 +179,7 @@ class BasicHtmlEditor extends React.Component {
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = node.href;
-            const entityKey = Entity.create('image', 'IMMUTABLE', {
-              src,
-              size,
-              imageLink
-            });
+            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size, imageLink});
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
@@ -193,13 +199,11 @@ class BasicHtmlEditor extends React.Component {
             data: {}
           };
         }
-        if (nodeName === 'span') {
-          // console.log('span');
-          // console.log(node);
-        }
         if (nodeName === 'p' || nodeName === 'div') {
           // console.log('p');
+          // console.log(node.style);
           // console.log(node);
+          // console.log(node.childNodes);
           // console.log(node.style.textAlign);
           if (node.style.textAlign === 'center') {
             return {
@@ -207,13 +211,11 @@ class BasicHtmlEditor extends React.Component {
               data: {}
             };
           } else if (node.style.textAlign === 'right') {
-            // console.log('whaaa');
             return {
               type: 'right-align',
               data: {}
             };
           } else if (node.style.textAlign === 'justify') {
-            // console.log('whaaa');
             return {
               type: 'justify-align',
               data: {}
@@ -423,11 +425,13 @@ class BasicHtmlEditor extends React.Component {
     const {editorState} = this.state;
     let newState;
     let blockMap;
+    // let blockArray;
     let contentState;
 
     if (html) {
       // console.log(html);
       const saneHtml = sanitizeHtml(html, {
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
           p: ['style'],
           div: ['style'],
@@ -438,10 +442,12 @@ class BasicHtmlEditor extends React.Component {
       // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
-      const firstBlock = contentState.getFirstBlock();
+      // blockArray = contentState.getBlocksAsArray();
+      // const firstBlock = contentState.getFirstBlock();
+      // console.log(blockArray);
       // console.log(firstBlock.getType());
       // console.log(firstBlock.getText());
-      // console.log(blockMap);
+      // console.log(blockMap.toJS());
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
     } else {
@@ -674,6 +680,8 @@ function getBlockStyle(block) {
   }
 }
 
+// const RightAlign = props => <div style={{backgroundColor: 'red'}}>{props.children}</div>;
+
 const blockRenderMap = Immutable.Map({
   'right-align': {
     element: 'div',
@@ -685,6 +693,7 @@ const blockRenderMap = Immutable.Map({
     element: 'div'
   }
 });
+
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 

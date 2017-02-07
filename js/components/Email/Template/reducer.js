@@ -38,6 +38,7 @@ function templateReducer(state = initialState.templateReducer, action) {
       obj = assignToEmpty(state, action.templates);
       const newReceived = state.received.concat(action.ids.filter(id => !state[id]));
       obj.received = newReceived;
+      obj.offset = action.offset;
       return obj;
     case templateConstant.REQUEST_MULTIPLE_FAIL:
       obj = assignToEmpty(state, {});
