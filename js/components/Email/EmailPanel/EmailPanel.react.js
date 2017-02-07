@@ -161,6 +161,7 @@ class EmailPanel extends Component {
           templateid: this.state.currentTemplateId,
           cc: this.props.cc.map(item => item.text),
           bcc: this.props.bcc.map(item => item.text),
+          fromemail: this.props.from
         };
         if (this.props.scheduledtime !== null) emailObj.sendat = this.props.scheduledtime;
         contactEmails.push(emailObj);
@@ -226,7 +227,6 @@ class EmailPanel extends Component {
       zIndex: 200,
       display: state.minimized ? 'none' : 'block'
     };
-    console.log(props.from);
 
     return (
       <div style={styles.emailPanelOuterPosition}>
