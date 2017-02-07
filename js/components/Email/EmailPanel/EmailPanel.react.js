@@ -299,7 +299,7 @@ class EmailPanel extends Component {
                     tooltipPosition='top-right'
                     />}
                   </AddCCPanelHOC>
-                  <SwitchEmailHOC listId={props.listId}>
+                  {/*<SwitchEmailHOC listId={props.listId}>
                   {({onRequestOpen}) =>
                     <IconButton
                     iconStyle={{color: grey800}}
@@ -308,9 +308,9 @@ class EmailPanel extends Component {
                     tooltip='Switch Email'
                     tooltipPosition='top-right'
                     />}
-                  </SwitchEmailHOC>
+                  </SwitchEmailHOC>*/}
                 </div>
-                <div style={{marginLeft: 50}}>
+                <div style={{marginLeft: 100}}>
                   <IconButton
                   iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
