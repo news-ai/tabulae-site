@@ -18,6 +18,7 @@ import draftRawToHtml from './utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
+import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from './utils/typeConstants';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -70,60 +71,6 @@ const Media = props => {
   }
   return media;
 };
-
-const INLINE_STYLES = [
-  {label: 'Bold', style: 'BOLD', icon: 'fa fa-bold'},
-  {label: 'Italic', style: 'ITALIC', icon: 'fa fa-italic'},
-  {label: 'Underline', style: 'UNDERLINE', icon: 'fa fa-underline'},
-  // {label: 'Monospace', style: 'CODE'},
-  {label: 'Strikethrough', style: 'STRIKETHROUGH', icon: 'fa fa-strikethrough'}
-];
-
-const BLOCK_TYPES = [
-  {label: 'Normal', style: 'unstyled'},
-  {label: 'Heading - Large', style: 'header-one'},
-  {label: 'Heading - Medium', style: 'header-two'},
-  {label: 'Blockquote', style: 'blockquote'},
-  {label: 'Unordered List', style: 'unordered-list-item'},
-  {label: 'Ordered List', style: 'ordered-list-item'},
-  {label: 'Code Block', style: 'code-block'},
-  {label: 'Atomic', style: 'atomic'},
-  {label: 'Center', style: 'center-align'},
-  {label: 'Left', style: 'unstyled'},
-  {label: 'Right', style: 'right-align'},
-  {label: 'Justify', style: 'justify-align'},
-];
-
-const POSITION_TYPES = [
-  {label: 'Center', style: 'center-align', icon: 'fa fa-align-center'},
-  {label: 'Left', style: 'unstyled', icon: 'fa fa-align-left'},
-  {label: 'Right', style: 'right-align', icon: 'fa fa-align-right'},
-  {label: 'Justify', style: 'justify-align', icon: 'fa fa-align-justify'},
-];
-
-const FONTSIZE_TYPES = [
-  {inlineType: 'size', label: '5', style: 'SIZE-5'},
-  {inlineType: 'size', label: '5.5', style: 'SIZE-5.5'},
-  {inlineType: 'size', label: '6', style: 'SIZE-6'},
-  {inlineType: 'size', label: '7.5', style: 'SIZE-7.5'},
-  {inlineType: 'size', label: '8', style: 'SIZE-8'},
-  {inlineType: 'size', label: '9', style: 'SIZE-9'},
-  {inlineType: 'size', label: '10', style: 'SIZE-10'},
-  {inlineType: 'size', label: '10.5', style: 'SIZE-10.5'},
-  {inlineType: 'size', label: '11', style: 'SIZE-11'},
-  {inlineType: 'size', label: '12', style: 'SIZE-12'},
-  {inlineType: 'size', label: '14', style: 'SIZE-14'},
-  {inlineType: 'size', label: '16', style: 'SIZE-16'},
-  {inlineType: 'size', label: '18', style: 'SIZE-18'},
-  {inlineType: 'size', label: '20', style: 'SIZE-20'},
-  {inlineType: 'size', label: '22', style: 'SIZE-22'},
-  {inlineType: 'size', label: '24', style: 'SIZE-24'},
-  {inlineType: 'size', label: '26', style: 'SIZE-26'},
-  {inlineType: 'size', label: '28', style: 'SIZE-28'},
-  {inlineType: 'size', label: '36', style: 'SIZE-36'},
-  {inlineType: 'size', label: '48', style: 'SIZE-48'},
-  {inlineType: 'size', label: '72', style: 'SIZE-72'},
-];
 
 class BasicHtmlEditor extends React.Component {
   constructor(props) {
@@ -201,11 +148,6 @@ class BasicHtmlEditor extends React.Component {
           };
         }
         if (nodeName === 'p' || nodeName === 'div') {
-          // console.log('p');
-          // console.log(node.style);
-          // console.log(node);
-          // console.log(node.childNodes);
-          // console.log(node.style.textAlign);
           if (node.style.textAlign === 'center') {
             return {
               type: 'center-align',
@@ -371,18 +313,19 @@ class BasicHtmlEditor extends React.Component {
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
+    const contentState = editorState.getCurrentContent();
     if (selection.isCollapsed()) return;
     const startKey = selection.getStartKey();
     const startOffset = selection.getStartOffset();
     const endOffset = selection.getEndOffset();
-    const blockAtLinkBeginning = editorState.getCurrentContent().getBlockForKey(startKey);
+    const blockAtLinkBeginning = contentState.getBlockForKey(startKey);
     let i;
     let linkKey;
     let hasEntityType = false;
     for (i = startOffset; i < endOffset; i++) {
       linkKey = blockAtLinkBeginning.getEntityAt(i);
       if (linkKey !== null) {
-        const type = Entity.get(linkKey).getType();
+        const type = contentState.getEntity(linkKey).getType();
         if (type === 'LINK') {
           hasEntityType = true;
           break;
@@ -443,21 +386,11 @@ class BasicHtmlEditor extends React.Component {
       // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
-      // blockArray = contentState.getBlocksAsArray();
-      // const firstBlock = contentState.getFirstBlock();
-      // console.log(blockArray);
-      // console.log(firstBlock.getType());
-      // console.log(firstBlock.getText());
-      // console.log(blockMap.toJS());
-      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
-      // const content = convertFromHTML(nextProps.bodyHtml);
     } else {
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    // console.log(newState.getFirstBlock().getType());
-    // console.log(newState.getFirstBlock().getText());
     this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
 
     return true;

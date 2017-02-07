@@ -4,7 +4,6 @@ import {
   EditorState,
   CompositeDecorator,
   ContentState,
-  convertFromHTML
 } from 'draft-js';
 
 import Link from './components/Link';
@@ -19,7 +18,7 @@ class Subject extends Component {
     super(props);
     const decorator = new CompositeDecorator([
       {
-        strategy: findEntities.bind(null, 'link'),
+        strategy: findEntities.bind(null, 'LINK'),
         component: Link
       },
       {

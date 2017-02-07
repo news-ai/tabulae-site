@@ -1,5 +1,4 @@
 import React from 'react';
-import { Entity } from 'draft-js';
 
 export default function Link(props) {
   const {href} = props.contentState.getEntity(props.entityKey).getData();
