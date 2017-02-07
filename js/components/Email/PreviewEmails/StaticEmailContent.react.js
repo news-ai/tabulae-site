@@ -31,13 +31,14 @@ const AttachmentLineItem = props => {
     </div>);
 };
 
-function StaticEmailContent({to, subject, body, sendat, attachments, files, cc, bcc}) {
+function StaticEmailContent({to, subject, body, sendat, attachments, files, cc, bcc, fromemail}) {
   let date;
   if (sendat !== null && sendat !== '0001-01-01T00:00:00Z') date = moment(sendat);
   return (
     <div className='u-full-width' style={styles.content}>
+      {fromemail && fromemail !== null && <div className='vertical-center' style={styles.span}><strong style={styles.strong}>From</strong>{fromemail}</div>}
       <div className='vertical-center' style={styles.span}><strong style={styles.strong}>To</strong>{to}</div>
-      <div className='vertical-center' style={styles.span}><strong style={styles.strong}>Subject</strong>{subject}</div>
+      <div className='vertical-center' style={styles.span}><strong style={styles.strong}>Subject</strong>{subject.length === 0 ? '(No Subject)' : subject}</div>
       {cc !== null && <div className='vertical-center' style={styles.span}><strong style={styles.strong}>CC</strong>{cc.join(', ')}</div>}
       {bcc !== null && <div className='vertical-center' style={styles.span}><strong style={styles.strong}>BCC</strong>{bcc.join(', ')}</div>}
       {attachments !== null &&
@@ -52,7 +53,7 @@ function StaticEmailContent({to, subject, body, sendat, attachments, files, cc, 
 
 const mapStateToProps = (state, props) => {
   return {
-    files: props.attachments !== null && props.attachments.filter(fileId => state.emailAttachmentReducer[fileId]).map(fileId => state.emailAttachmentReducer[fileId])
+    files: props.attachments !== null && props.attachments.filter(fileId => state.emailAttachmentReducer[fileId]).map(fileId => state.emailAttachmentReducer[fileId]),
   };
 };
 
