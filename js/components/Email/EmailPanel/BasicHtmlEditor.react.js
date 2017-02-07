@@ -59,7 +59,8 @@ const controlsStyle = {
 };
 
 const Media = props => {
-  const entity = Entity.get(props.block.getEntityAt(0));
+  const {block, contentState} = props;
+  const entity = contentState.getEntity(block.getEntityAt(0));
   const {src} = entity.getData();
   const type = entity.getType();
 

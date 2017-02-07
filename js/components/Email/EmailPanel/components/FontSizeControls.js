@@ -12,7 +12,7 @@ export default function FontSizeControls(props) {
   let value = currentType && currentType.label || 14;
   if (!selection.isCollapsed() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
     // more than one fontSize selected
-    value = null;
+    value = '--';
   }
 
   return (

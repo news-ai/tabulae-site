@@ -21,7 +21,7 @@ class SwitchEmailHOC extends Component {
       <div>
         <Dialog title='Switch From Email' autoScrollBodyContent open={state.open} onRequestClose={_ => this.setState({open: false})}>
           <div style={{margin: 10, padding: 10, backgroundColor: yellow50, fontSize: '0.9em'}}>
-          You can add a different email to send from in <Link to='settings'>Setting</Link>.
+          You can add a different email to send from in <Link to='/settings'>Setting</Link>.
           </div>
           <DropDownMenu value={props.from} onChange={(e, i, value) => props.setFromEmail(value)}>
             {emails}
