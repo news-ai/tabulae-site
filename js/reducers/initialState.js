@@ -57,7 +57,8 @@ export const initialState = {
   templateReducer: {
     isReceiving: false,
     didInvalidate: false,
-    received: []
+    received: [],
+    offset: 0
   },
   searchReducer: {
     isReceiving: false,

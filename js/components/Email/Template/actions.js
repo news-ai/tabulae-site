@@ -58,17 +58,22 @@ export function toggleArchiveTemplate(templateId) {
 }
 
 export function getTemplates() {
-  return dispatch => {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().templateReducer.offset;
+    if (OFFSET === null || getState().templateReducer.isReceiving) return;
     dispatch({type: templateConstant.REQUEST_MULTIPLE});
-    return api.get(`/templates`)
+    return api.get(`/templates?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
       const res = normalize(response, {
         data: arrayOf(templateSchema),
       });
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
       return dispatch({
         type: templateConstant.RECEIVE_MULTIPLE,
         templates: res.entities.templates,
-        ids: res.result.data
+        ids: res.result.data,
+        offset: newOffset
       });
     })
     .catch(message => dispatch({type: templateConstant.REQUEST_MULTIPLE_FAIL, message}));

@@ -259,6 +259,7 @@ class EmailPanel extends Component {
                   style={{overflowX: 'hidden'}}
                   value={state.currentTemplateId}
                   onChange={this.handleTemplateValueChange}
+                  maxHeight={200}
                   >
                   {templateMenuItems}
                   </SelectField>

@@ -202,8 +202,8 @@ class BasicHtmlEditor extends React.Component {
         if (nodeName === 'p' || nodeName === 'div') {
           // console.log('p');
           // console.log(node.style);
-          console.log(node);
-          console.log(node.childNodes);
+          // console.log(node);
+          // console.log(node.childNodes);
           // console.log(node.style.textAlign);
           if (node.style.textAlign === 'center') {
             return {
