@@ -351,7 +351,7 @@ class BasicHtmlEditor extends React.Component {
       'Enter a URL',
       'https://',
       (e, url) => {
-        const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url});
+        const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
       },
       _ => {});
@@ -404,7 +404,7 @@ class BasicHtmlEditor extends React.Component {
       src: url,
       size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
       imageLink: '#'
-    });
+    }).getLastCreatedEntityKey();
     this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
