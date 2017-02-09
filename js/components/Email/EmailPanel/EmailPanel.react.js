@@ -312,7 +312,7 @@ class EmailPanel extends Component {
                   </SwitchEmailHOC>
                 */}
                 </div>
-                <div style={{position: 'absolute', right: 20}}>
+                <div style={{position: 'absolute', right: 20, bottom: 3}}>
                   <IconButton
                   iconClassName='fa fa-envelope'
                   onClick={this._onPreviewEmailsClick}
