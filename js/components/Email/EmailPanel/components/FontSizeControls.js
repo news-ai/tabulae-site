@@ -9,8 +9,11 @@ export default function FontSizeControls(props) {
   var currentStyle = props.editorState.getCurrentInlineStyle();
   const currentType = find(inlineStyles, type => currentStyle.has(type.style));
   const selection = props.editorState.getSelection();
-  let value = currentType && currentType.label || 14;
-  if (!selection.isCollapsed() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
+  let value = '14';
+  if (currentType) {
+    value = currentType.label;
+  }
+  if (!selection.isCollapsed() && selection.getHasFocus() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
     // more than one fontSize selected
     value = '--';
   }
