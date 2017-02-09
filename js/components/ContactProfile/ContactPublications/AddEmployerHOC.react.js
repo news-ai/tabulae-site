@@ -116,9 +116,7 @@ class AddEmployerHOC extends Component {
           onHide={_ => this.setState({publicationFormOpen: false})}
           />}
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>
       );
   }

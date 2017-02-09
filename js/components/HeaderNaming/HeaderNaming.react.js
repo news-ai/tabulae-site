@@ -178,7 +178,7 @@ class HeaderNaming extends Component {
             <h5>Name Your Columns</h5>
             <span style={{fontSize: '0.9em'}}>
             Look through each column we pulled from your file and map it to Tabulae properties we have.
-            Tabulae will start to aggregate feeds from each contact's social fields once its connected.
+            Tabulae will start to aggregate feeds from each contact's social fields once its connected. <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>
             </span>
           </div>
           <div>
@@ -223,6 +223,8 @@ class HeaderNaming extends Component {
               className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />}
             label='Submit'
             onClick={this.onSubmit} />
+            {props.isProcessWaiting &&
+            <span>Please be patient. This may take 20 seconds to a few minutes.</span>}
           </div>
         </div>}
       </div>);

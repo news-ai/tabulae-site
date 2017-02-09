@@ -2,11 +2,10 @@ import React from 'react';
 
 import StyleButton from './StyleButton';
 
-import {Entity} from 'draft-js';
-
 function isEntityActiveInSelection(editorState, entityType) {
   let hasEntityType = false;
   const selection = editorState.getSelection();
+  const contentState = editorState.getCurrentContent();
   if (selection.isCollapsed()) return hasEntityType;
   const startKey = selection.getStartKey();
   const startOffset = selection.getStartOffset();
@@ -17,7 +16,7 @@ function isEntityActiveInSelection(editorState, entityType) {
   for (i = startOffset; i < endOffset; i++) {
     linkKey = blockAtLinkBeginning.getEntityAt(i);
     if (linkKey !== null) {
-      const type = Entity.get(linkKey).getType();
+      const type = contentState.getEntity(linkKey).getType();
       if (type === entityType) {
         hasEntityType = true;
         break;

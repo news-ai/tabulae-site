@@ -7,8 +7,10 @@ import {actions as listActions} from 'components/Lists';
 import {actions as fileActions} from 'components/ImportFile';
 import Dropzone from 'react-dropzone';
 import Radium from 'radium';
+import FontIcon from 'material-ui/FontIcon';
 
 import Waiting from '../Waiting';
+import {grey500, grey800} from 'material-ui/styles/colors';
 
 const styles = {
   dropzone: {
@@ -30,14 +32,6 @@ const styles = {
       borderColor: '#DD3A0A'
     }
   },
-  icon: {
-    color: 'lightgray',
-    marginLeft: '7px',
-    ':hover': {
-      color: 'gray',
-      cursor: 'pointer'
-    }
-  }
 };
 
 class DropFileWrapper extends Component {
@@ -99,11 +93,11 @@ class DropFileWrapper extends Component {
             onKeyDown={e => e.keyCode === 13 ? this.onSetNameClick() : null}
             onChange={e => this.setState({value: e.target.value})} />
           </div>
-          <div style={{height: 200}}>
+          <div style={{height: 180}}>
           {state.isFileDropped ?
-            <div className='row vertical-center' style={{marginBottom: 20}}>
+            <div className='row vertical-center' style={{margin: '20px 0'}}>
               <span style={{marginRight: 20}}>{state.file.name} -- {state.file.size} bytes</span>
-              <i style={[styles.icon]} onClick={ _ => this.setState({file: null, isFileDropped: false})} className='fa fa-close' aria-hidden='true'></i>
+              <FontIcon color={grey800} hoverColor={grey500} style={{fontSize: '16px'}} onClick={ _ => this.setState({file: null, isFileDropped: false})} className='fa fa-close pointer'/>
             </div>
             : <Dropzone
               accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
@@ -113,14 +107,22 @@ class DropFileWrapper extends Component {
               onDrop={this.onDrop}
               multiple={false}
               >
-            <div>Try dropping an Excel (xlsx) file here, or click to select file to upload.</div>
-          </Dropzone>}
+              <div>Try dropping an Excel (xlsx) file here, or click to select file to upload.</div>
+            </Dropzone>}
           </div>
-          <RaisedButton primary disabled={state.clicked || state.file === null} style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
+          <div className='vertical-center horizontal-center'>
+            <RaisedButton primary disabled={state.clicked || state.file === null} style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
+          </div>
+          <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
+            <span>For more details, you may refer to <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>.</span>
+          </div>
         </div>
         );
     } else {
-      renderNode = <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: 10}} text='Waiting for Columns to be processed...' />;
+      renderNode = (
+        <div>
+          <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: 20}} text='Waiting for Columns to be processed...' />
+        </div>);
     }
     return (
       <div className='horizontal-center'>

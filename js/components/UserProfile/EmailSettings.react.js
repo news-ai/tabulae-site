@@ -85,14 +85,16 @@ class EmailSettings extends Component {
                     <SMTPSettings/>}
               </div>
             </div>
-            {/*<div className='row vertical-center' style={{height: 80, margin: '5px 0'}}>
+            {/*
+            <div className='row vertical-center' style={{height: 80, margin: '5px 0'}}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Add Multiple Emails</span>
               </div>
               <div className='large-8 medium-7 columns'>
                 <AddMultipleEmails/>
               </div>
-            </div>*/}
+            </div>
+          */}
             <div className='row' style={{height: 210, margin: '15px 0'}}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Email Signature</span>

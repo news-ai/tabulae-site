@@ -19,14 +19,11 @@ import {convertFromHTML} from 'draft-convert';
 import {actions as loginActions} from 'components/Login';
 import alertify from 'alertifyjs';
 
-export function findEntities(entityType, contentBlock, callback) {
+export function findEntities(entityType, contentBlock, callback, contentState) {
   contentBlock.findEntityRanges(
     (character) => {
       const entityKey = character.getEntity();
-      return (
-        entityKey !== null &&
-        Entity.get(entityKey).getType() === entityType
-      );
+      return (entityKey !== null && contentState.getEntity(entityKey).getType() === entityType);
     },
     callback
   );
@@ -34,7 +31,7 @@ export function findEntities(entityType, contentBlock, callback) {
 
 const CURLY_REGEX = /{([^}]+)}/g;
 
-function findWithRegex(regex, contentBlock, callback) {
+function findWithRegex(regex, contentBlock, callback, contentState) {
   const text = contentBlock.getText();
   let matchArr, start;
   while ((matchArr = regex.exec(text)) !== null) {
@@ -43,7 +40,7 @@ function findWithRegex(regex, contentBlock, callback) {
   }
 }
 
-export function curlyStrategy(contentBlock, callback) {
+export function curlyStrategy(contentBlock, callback, contentState) {
   findWithRegex(CURLY_REGEX, contentBlock, callback);
 }
 
@@ -177,18 +174,19 @@ class EmailSignatureEditor extends Component {
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
+    const contentState = editorState.getCurrentContent();
     if (selection.isCollapsed()) return;
     const startKey = selection.getStartKey();
     const startOffset = selection.getStartOffset();
     const endOffset = selection.getEndOffset();
-    const blockAtLinkBeginning = editorState.getCurrentContent().getBlockForKey(startKey);
+    const blockAtLinkBeginning = contentState.getBlockForKey(startKey);
     let i;
     let linkKey;
     let hasEntityType = false;
     for (i = startOffset; i < endOffset; i++) {
       linkKey = blockAtLinkBeginning.getEntityAt(i);
       if (linkKey !== null) {
-        const type = Entity.get(linkKey).getType();
+        const type = contentState.getEntity(linkKey).getType();
         if (type === 'LINK') {
           hasEntityType = true;
           break;

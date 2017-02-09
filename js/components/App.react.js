@@ -149,13 +149,13 @@ class App extends Component {
         docked={false}
         open={state.isDrawerOpen}
         onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/')} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/clients')} rightIcon={<i className='fa fa-folder' aria-hidden='true' />}>Client Directory</MenuItem>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/search')} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/emailstats')} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Sent & Scheduled Emails</MenuItem>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/settings')} rightIcon={<i className='fa fa-cogs' aria-hidden='true' />}>Settings</MenuItem>
+          <Link to={'/'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<i className='fa fa-home' aria-hidden='true' />}>Home</MenuItem></Link>
+          <Link to={'/clients'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<i className='fa fa-folder' aria-hidden='true' />}>Client Directory</MenuItem></Link>
+          <Link to={'/search'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<i className='fa fa-search' aria-hidden='true' />}>Search</MenuItem></Link>
+          <Link to={'/emailstats'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<i className='fa fa-envelope' aria-hidden='true' />}>Sent & Scheduled Emails</MenuItem></Link>
+          <Link to={'/settings'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<i className='fa fa-cogs' aria-hidden='true' />}>Settings</MenuItem></Link>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<i className='fa fa-credit-card' aria-hidden='true' />}>Billing</MenuItem>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => props.router.push('/public')} rightIcon={<i className='fa fa-table' aria-hidden='true' />}>Public Lists</MenuItem>
+          <Link to={'/public'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<i className='fa fa-table' aria-hidden='true' />}>Public Lists</MenuItem></Link>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
