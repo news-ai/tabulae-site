@@ -299,6 +299,7 @@ class EmailPanel extends Component {
                     tooltipPosition='top-right'
                     />}
                   </AddCCPanelHOC>
+                  {/*
                   <SwitchEmailHOC listId={props.listId}>
                   {({onRequestOpen}) =>
                     <IconButton
@@ -309,6 +310,7 @@ class EmailPanel extends Component {
                     tooltipPosition='top-right'
                     />}
                   </SwitchEmailHOC>
+                */}
                 </div>
                 <div style={{position: 'absolute', right: 20}}>
                   <IconButton
