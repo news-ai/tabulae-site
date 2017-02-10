@@ -332,6 +332,7 @@ class EmailPanel extends Component {
           ref='preview'
           title='Preview'>
             <PreviewEmails
+            listId={props.listId}
             sendLater={props.scheduledtime !== null}
             isReceiving={props.isReceiving}
             previewEmails={props.previewEmails}
