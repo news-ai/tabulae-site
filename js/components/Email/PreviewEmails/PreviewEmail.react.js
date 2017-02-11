@@ -49,7 +49,7 @@ class PreviewEmail extends Component {
       bcc: props.bcc,
       fromemail: props.fromemail
     };
-    props.patchEmail(emailObj).then(_ => this.setState({onEditMode: false}));
+    props.patchEmail(emailObj);
   }
 
   render() {
@@ -72,9 +72,9 @@ class PreviewEmail extends Component {
           person={props.person}
           /> :
           <StaticEmailContent {...props} />}
-        <div style={{margin: '10px 0'}}>
+        {!state.onEditMode && <div style={{margin: '10px 0'}}>
           <RaisedButton onClick={props.onSendEmailClick} labelStyle={{textTransform: 'none'}} label={props.sendLater ? 'Schedule' : 'Send'} />
-        </div>
+        </div>}
       </div>
       );
   }

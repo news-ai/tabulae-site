@@ -245,6 +245,7 @@ class EmailPanel extends Component {
                 <span>Emails are sent from: {props.from}</span>
               </div>
               <BasicHtmlEditor
+              listId={props.listId}
               fieldsmap={state.fieldsmap}
               width={styles.emailPanel.width}
               bodyHtml={state.bodyHtml}

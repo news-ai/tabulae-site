@@ -20,9 +20,8 @@ import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 
-import RaisedButton from 'material-ui/RaisedButton';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, grey300} from 'material-ui/styles/colors';
+import {blue100} from 'material-ui/styles/colors';
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
 import Link from 'components/Email/EmailPanel/components/Link';
@@ -44,13 +43,11 @@ import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/str
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
 const controlsStyle = {
-  position: 'fixed',
   height: 40,
   zIndex: 200,
   overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
-  bottom: 60,
   border: `solid 1px ${blue100}`,
   borderRadius: '0.9em',
   backgroundColor: 'white',
