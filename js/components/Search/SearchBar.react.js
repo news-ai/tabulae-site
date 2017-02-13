@@ -73,7 +73,7 @@ class SearchBar extends Component {
           <div
           className='row horizontal-center'
           style={{margin: '20px 0'}}>
-            <div>
+            <div className='vertical-center'>
              <TextField
               hintText='Search query here...'
               onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
