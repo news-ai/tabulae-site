@@ -132,6 +132,17 @@ export function sendEmail(id) {
   };
 }
 
+export function patchEmail(id, emailBody) {
+  return dispatch => {
+    dispatch({type: 'PATCH_EMAIL', id, emailBody});
+    return api.patch(`/emails/${id}`, emailBody)
+    .then(response => {
+      const res = normalize(response.data, emailSchema);
+      return dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result});
+    });
+  };
+}
+
 export function getStagedEmails() {
   return dispatch => {
     return api.get(`/emails`)

@@ -1,42 +1,33 @@
-import {initialState} from '../../../reducers/initialState';
-import {assignToEmpty} from '../../../utils/assign';
+import {initialState} from 'reducers/initialState';
+import {assignToEmpty} from 'utils/assign';
 
 function emailAttachmentReducer(state = initialState.emailAttachmentReducer, action) {
   if (window.isDev) Object.freeze(state);
-
-  let obj;
   switch (action.type) {
     case 'SET_ATTACHMENTS':
-      obj = assignToEmpty(state, {});
-      obj.attached = action.files;
-      return obj;
-    case 'CLEAR_ATTACHMENTS':
-      obj = assignToEmpty(state, {});
-      obj.attached = [];
-      return obj;
-    case 'ALL_EMAIL_ATTACHMENTS_START':
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
-    case 'ALL_EMAIL_ATTACHMENTS_FINISHED':
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      return obj;
-    case 'EMAIL_ATTACHMENT_REQUEST':
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
-    case 'EMAIL_ATTACHMENT_RECEIVE':
-      obj = assignToEmpty(state, {
-        [action.fileId]: action.attachment
+      return assignToEmpty(state, {
+        attached: action.files
       });
-      obj.isReceiving = false;
-      return obj;
+    case 'CLEAR_ATTACHMENTS':
+      return assignToEmpty(state, {
+        attached: []
+      });
+    case 'ALL_EMAIL_ATTACHMENTS_START':
+      return assignToEmpty(state, {isReceiving: true});
+    case 'ALL_EMAIL_ATTACHMENTS_FINISHED':
+      return assignToEmpty(state, {isReceiving: false});
+    case 'EMAIL_ATTACHMENT_REQUEST':
+      return assignToEmpty(state, {isReceiving: true});
+    case 'EMAIL_ATTACHMENT_RECEIVE':
+      return assignToEmpty(state, {
+        [action.fileId]: action.attachment,
+        isReceiving: false
+      });
     case 'EMAIL_ATTACHMENT_REQUEST_FAIL':
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj.didInvalidate = true;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: false,
+        didInvalidate: true
+      });
     default:
       return state;
   }

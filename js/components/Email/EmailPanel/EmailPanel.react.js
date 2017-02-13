@@ -245,6 +245,7 @@ class EmailPanel extends Component {
                 <span>Emails are sent from: {props.from}</span>
               </div>
               <BasicHtmlEditor
+              listId={props.listId}
               fieldsmap={state.fieldsmap}
               width={styles.emailPanel.width}
               bodyHtml={state.bodyHtml}
@@ -332,6 +333,7 @@ class EmailPanel extends Component {
           ref='preview'
           title='Preview'>
             <PreviewEmails
+            listId={props.listId}
             sendLater={props.scheduledtime !== null}
             isReceiving={props.isReceiving}
             previewEmails={props.previewEmails}
@@ -352,7 +354,7 @@ const mapStateToProps = (state, props) => {
     scheduledtime: state.stagingReducer.utctime,
     isReceiving: state.stagingReducer.isReceiving,
     stagedEmailIds: state.stagingReducer.previewEmails,
-    previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails
+    previewEmails: state.stagingReducer.previewEmails
     .map(pEmail => state.stagingReducer[pEmail.id])
     .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,

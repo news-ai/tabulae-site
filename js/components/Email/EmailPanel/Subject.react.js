@@ -98,7 +98,7 @@ class Subject extends Component {
         <div
         className='subject-draft-container'
         style={{
-          width: 500,
+          width: this.props.width,
           height: 32,
           overflowX: 'scroll',
           marginRight: 5,

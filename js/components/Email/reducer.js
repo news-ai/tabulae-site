@@ -31,6 +31,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
     case RECEIVE_EMAIL:
       obj = assignToEmpty(state, action.email);
       if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
+      obj.isReceiving = false;
       return obj;
     case REQUEST_MULTIPLE_EMAILS:
       return Object.assign({}, state, {isReceiving: true});
@@ -74,6 +75,8 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         }),
         isReceiving: false
       });
+    case 'PATCH_EMAIL':
+      return Object.assign({}, state, {isReceiving: true});
     default:
       return state;
   }

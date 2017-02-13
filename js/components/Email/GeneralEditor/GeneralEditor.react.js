@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
@@ -14,30 +14,26 @@ import Draft, {
   CompositeDecorator,
   Modifier,
 } from 'draft-js';
-import draftRawToHtml from './utils/draftRawToHtml';
+import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from './utils/typeConstants';
+import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 
-import Menu from 'material-ui/Menu';
-import MenuItem from 'material-ui/MenuItem';
-import RaisedButton from 'material-ui/RaisedButton';
-import Popover from 'material-ui/Popover';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, grey300} from 'material-ui/styles/colors';
+import {blue100} from 'material-ui/styles/colors';
 
-import Subject from './Subject.react';
-import Link from './components/Link';
-import CurlySpan from './components/CurlySpan.react';
-import EntityControls from './components/EntityControls';
-import InlineStyleControls from './components/InlineStyleControls';
-import BlockStyleControls from './components/BlockStyleControls';
-import FontSizeControls from './components/FontSizeControls';
-import ExternalControls from './components/ExternalControls';
-import PositionStyleControls from './components/PositionStyleControls';
-import Image from './Image/Image.react';
-import FileWrapper from './FileWrapper.react';
+import Subject from 'components/Email/EmailPanel/Subject.react';
+import Link from 'components/Email/EmailPanel/components/Link';
+import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.react';
+import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
+import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
+import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyleControls';
+import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
+import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
+import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
+import Image from 'components/Email/EmailPanel/Image/Image.react';
+import FileWrapper from 'components/Email/EmailPanel/FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Immutable from 'immutable';
@@ -45,19 +41,18 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
+import RaisedButton from 'material-ui/RaisedButton';
 
-import {curlyStrategy, findEntities} from './utils/strategies';
+import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
 const controlsStyle = {
-  position: 'fixed',
   height: 40,
   zIndex: 200,
   overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
-  bottom: 60,
   border: `solid 1px ${blue100}`,
   borderRadius: '0.9em',
   backgroundColor: 'white',
@@ -76,7 +71,7 @@ const Media = props => {
   return media;
 };
 
-class BasicHtmlEditor extends React.Component {
+class GeneralEditor extends Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -95,12 +90,12 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.EXTERNAL_CONTROLS = [
-      {
-        label: 'File Upload',
-        onToggle: _ => this.setState({filePanelOpen: true}),
-        icon: 'fa fa-paperclip',
-        isActive: _ => this.props.files.length > 0
-      },
+      // {
+      //   label: 'File Upload',
+      //   onToggle: _ => this.setState({filePanelOpen: true}),
+      //   icon: 'fa fa-paperclip',
+      //   isActive: _ => this.props.files.length > 0,
+      // },
       {
         label: 'Image Upload',
         onToggle: _ => this.setState({imagePanelOpen: true}),
@@ -177,10 +172,6 @@ class BasicHtmlEditor extends React.Component {
         EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), decorator) :
         EditorState.createEmpty(decorator),
       bodyHtml: this.props.bodyHtml || null,
-      variableMenuOpen: false,
-      variableMenuAnchorEl: null,
-      isStyleBlockOpen: true,
-      styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
       imageLink: ''
@@ -188,13 +179,6 @@ class BasicHtmlEditor extends React.Component {
 
     this.focus = () => this.refs.editor.focus();
     this.onChange = this._onChange.bind(this);
-    this.handleTouchTap = (event) => {
-      event.preventDefault();
-      this.setState({
-        variableMenuOpen: true,
-        variableMenuAnchorEl: event.currentTarget,
-      });
-    };
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
@@ -456,7 +440,6 @@ class BasicHtmlEditor extends React.Component {
       }, 50);
     }
   }
-
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -502,27 +485,10 @@ class BasicHtmlEditor extends React.Component {
           </div>
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
-        <Popover
-        open={state.variableMenuOpen}
-        anchorEl={state.variableMenuAnchorEl}
-        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        onRequestClose={_ => this.setState({variableMenuOpen: false})}
-        >
-          <Menu desktop>
-          {props.fieldsmap
-            .filter(field => !field.hidden)
-            .map((field, i) =>
-            <MenuItem key={i} primaryText={field.name} onClick={_ => {
-              this.insertText(field.name);
-              this.setState({variableMenuOpen: false});
-            }} />)}
-          </Menu>
-        </Popover>
         <Subject
-        width={props.width}
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
+        width={props.width}
         />
         <div style={{
           height: 480,
@@ -545,59 +511,38 @@ class BasicHtmlEditor extends React.Component {
             spellCheck
             />
           </div>
-          <RaisedButton
-          style={{margin: 10}}
-          label='Insert Property'
-          labelStyle={{textTransform: 'none'}}
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+        </div>
+        <div className='row vertical-center clearfix' style={controlsStyle}>
+          <InlineStyleControls
+          editorState={editorState}
+          onToggle={this.toggleInlineStyle}
+          inlineStyles={INLINE_STYLES}
+          />
+          <EntityControls
+          editorState={editorState}
+          entityControls={this.ENTITY_CONTROLS}
+          />
+          <ExternalControls
+          editorState={editorState}
+          externalControls={this.EXTERNAL_CONTROLS}
+          active={props.files.length > 0}
+          />
+          <PositionStyleControls
+          editorState={editorState}
+          blockTypes={POSITION_TYPES}
+          onToggle={this.toggleBlockType}
+          />
+          <FontSizeControls
+          editorState={editorState}
+          onToggle={this.toggleInlineStyle}
+          inlineStyles={FONTSIZE_TYPES}
+          />
+          <BlockStyleControls
+          editorState={editorState}
+          blockTypes={BLOCK_TYPES}
+          onToggle={this.toggleBlockType}
           />
         </div>
-        {state.isStyleBlockOpen &&
-          <div className='row vertical-center clearfix' style={controlsStyle}>
-            <InlineStyleControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-            inlineStyles={INLINE_STYLES}
-            />
-            <EntityControls
-            editorState={editorState}
-            entityControls={this.ENTITY_CONTROLS}
-            />
-            <ExternalControls
-            editorState={editorState}
-            externalControls={this.EXTERNAL_CONTROLS}
-            active={props.files.length > 0}
-            />
-            <PositionStyleControls
-            editorState={editorState}
-            blockTypes={POSITION_TYPES}
-            onToggle={this.toggleBlockType}
-            />
-            <FontSizeControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-            inlineStyles={FONTSIZE_TYPES}
-            />
-            <BlockStyleControls
-            editorState={editorState}
-            blockTypes={BLOCK_TYPES}
-            onToggle={this.toggleBlockType}
-            />
-          </div>}
-          <div className='vertical-center' style={{
-            position: 'absolute',
-            bottom: 3,
-            width: props.width,
-          }}>
-          <div style={{padding: 3, marginRight: 10}}>
-            <i
-            className='fa fa-circle pointer'
-            style={{color: state.isStyleBlockOpen ? blue200 : grey300}}
-            onClick={this.onCheck}
-            />
-          </div>
-           {props.children}
-         </div>
       </div>
     );
   }
@@ -683,7 +628,8 @@ const mapStateToProps = (state, props) => {
     files: state.emailAttachmentReducer.attached,
     emailImageReducer: state.emailImageReducer,
     updated: state.emailImageReducer.updated,
-    current: state.emailImageReducer.current
+    current: state.emailImageReducer.current,
+    person: state.personReducer.person
   };
 };
 
@@ -700,4 +646,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(BasicHtmlEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(GeneralEditor);
