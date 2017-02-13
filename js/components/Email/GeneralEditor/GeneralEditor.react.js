@@ -37,6 +37,11 @@ import FileWrapper from 'components/Email/EmailPanel/FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Immutable from 'immutable';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
+import isURL from 'validator/lib/isURL';
+import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
@@ -66,7 +71,7 @@ const Media = props => {
   return media;
 };
 
-class PreviewEditor extends Component {
+class GeneralEditor extends Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -89,11 +94,12 @@ class PreviewEditor extends Component {
         label: 'File Upload',
         onToggle: _ => this.setState({filePanelOpen: true}),
         icon: 'fa fa-paperclip',
-        isActive: _ => this.props.files.length > 0
+        isActive: _ => this.props.files.length > 0,
+        disabled: true
       },
       {
         label: 'Image Upload',
-        onToggle: _ => this.imgDropzone.open(),
+        onToggle: _ => this.setState({imagePanelOpen: true}),
         icon: 'fa fa-camera',
         isActive: _ => false
       }
@@ -168,6 +174,8 @@ class PreviewEditor extends Component {
         EditorState.createEmpty(decorator),
       bodyHtml: this.props.bodyHtml || null,
       filePanelOpen: false,
+      imagePanelOpen: false,
+      imageLink: ''
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -192,6 +200,7 @@ class PreviewEditor extends Component {
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
     this.handleImage = this._handleImage.bind(this);
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
+    this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -420,6 +429,18 @@ class PreviewEditor extends Component {
     this.handleDroppedFiles(selection, acceptedFiles);
   }
 
+  _onOnlineImageUpload() {
+    const props = this.props;
+    const state = this.state;
+    if (isURL(state.imageLink)) {
+      props.saveImageData(state.imageLink);
+      setTimeout(_ => {
+        const newEditorState = this.handleImage(state.imageLink);
+        this.onChange(newEditorState);
+        this.setState({imageLink: ''});
+      }, 50);
+    }
+  }
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -438,9 +459,37 @@ class PreviewEditor extends Component {
     return (
       <div>
         <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
+        <Dialog autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
+          <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
+            <div>
+              <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
+              {({onValueChange, errorMessage}) => (
+                <TextField
+                errorText={errorMessage}
+                hintText='Image link here'
+                floatingLabelText='Image link here'
+                value={state.imageLink}
+                onChange={e => {
+                  // for validation
+                  onValueChange(e.target.value);
+                  // for updating value
+                  this.setState({imageLink: e.target.value});
+                }}
+                />)}
+              </ValidationHOC>
+              <RaisedButton style={{margin: 5}} label='Submit' onClick={this.onOnlineImageUpload}/>
+            </div>
+          </div>
+          <div className='horizontal-center'>OR</div>
+          <div className='vertical-center horizontal-center' style={{margin: '10px 0'}}>
+            <RaisedButton label='Upload from File' onClick={_ => this.imgDropzone.open()}/>
+          </div>
+        </Dialog>
+        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
         <Subject
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
+        width={props.width}
         />
         <div style={{
           height: 480,
@@ -479,7 +528,6 @@ class PreviewEditor extends Component {
           externalControls={this.EXTERNAL_CONTROLS}
           active={props.files.length > 0}
           />
-          <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
           <PositionStyleControls
           editorState={editorState}
           blockTypes={POSITION_TYPES}
@@ -582,6 +630,7 @@ const mapStateToProps = (state, props) => {
     emailImageReducer: state.emailImageReducer,
     updated: state.emailImageReducer.updated,
     current: state.emailImageReducer.current,
+    person: state.personReducer.person
   };
 };
 
@@ -598,4 +647,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PreviewEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(GeneralEditor);

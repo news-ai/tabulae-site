@@ -16,18 +16,28 @@ export default class StyleButton extends React.Component {
   render() {
     const props = this.props;
     let renderNode;
+    let color = props.active ? blueA400 : grey800;
+    let hoverColor = props.active ? blue200 : grey400;
+    let onClick = this.onToggle;
+    let pointerClassName = 'pointer';
+    if (props.disabled) {
+      color = grey400;
+      onClick = undefined;
+      pointerClassName = 'not-allowed';
+    }
+
     if (props.icon) {
       renderNode = (
         <FontIcon
         style={{marginRight: 10, fontSize: '14px'}}
-        className={`${props.icon} pointer`}
-        color={props.active ? blueA400 : grey800}
-        hoverColor={props.active ? blue200 : grey400}
-        onClick={this.onToggle}
+        className={`${props.icon} ${pointerClassName}`}
+        color={color}
+        hoverColor={hoverColor}
+        onClick={onClick}
         />);
     } else {
       renderNode = (
-        <span style={buttonStyle} onMouseDown={this.onToggle}>
+        <span className={pointerClassName} style={buttonStyle} onMouseDown={onClick}>
           {props.label}
         </span>);
     }

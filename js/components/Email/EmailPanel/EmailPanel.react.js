@@ -354,7 +354,7 @@ const mapStateToProps = (state, props) => {
     scheduledtime: state.stagingReducer.utctime,
     isReceiving: state.stagingReducer.isReceiving,
     stagedEmailIds: state.stagingReducer.previewEmails,
-    previewEmails: state.stagingReducer.isReceiving ? [] : state.stagingReducer.previewEmails
+    previewEmails: state.stagingReducer.previewEmails
     .map(pEmail => state.stagingReducer[pEmail.id])
     .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,

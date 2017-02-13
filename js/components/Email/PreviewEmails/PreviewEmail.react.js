@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import StaticEmailContent from './StaticEmailContent.react';
 import RaisedButton from 'material-ui/RaisedButton';
-import PreviewEditor from './PreviewEditor.react';
+import GeneralEditor from '../GeneralEditor/GeneralEditor.react';
 import {connect} from 'react-redux';
 import * as stagingActions from '../actions';
 
@@ -10,6 +10,7 @@ const styles = {
     border: '1px dotted lightgray',
     margin: '10px',
     padding: '5px',
+    position: 'relative'
   },
   bounced: {
     color: 'red'
@@ -35,6 +36,12 @@ class PreviewEmail extends Component {
     this.onCancel = _ => this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false})
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.body !== nextProps.body) {
+      this.setState({bodyHtml: nextProps.body, subjectHtml: nextProps.subject});
+    }
+  }
+
   _onSave() {
     const props = this.props;
     const state = this.state;
@@ -49,7 +56,8 @@ class PreviewEmail extends Component {
       bcc: props.bcc,
       fromemail: props.fromemail
     };
-    props.patchEmail(emailObj);
+    props.patchEmail(emailObj)
+    .then(_ => this.setState({onEditMode: false}));
   }
 
   render() {
@@ -57,19 +65,25 @@ class PreviewEmail extends Component {
     const state = this.state;
     return (
       <div style={styles.contentBox}>
-        <div>
-          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={state.onEditMode ? this.onSave : this.toggleEditMode}/>
-          {state.onEditMode && <RaisedButton label='Cancel' onClick={this.onCancel}/>}
+        <div style={{position: 'absolute', right: 10, top: 10}}>
+          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={_ => {
+            if (state.onEditMode) {
+              this.onSave();
+            } else {
+              this.toggleEditMode();
+            }
+          }}/>
+        {state.onEditMode &&
+          <RaisedButton label='Cancel' onClick={this.onCancel}/>}
         </div>
         {state.onEditMode ?
-          <PreviewEditor
-          width={700}
+          <GeneralEditor
+          width={600}
           bodyHtml={state.bodyHtml}
           subjectHtml={state.subjectHtml}
           onBodyChange={html => this.updateBodyHtml(html) }
           onSubjectChange={this.onSubjectChange}
           debounce={500}
-          person={props.person}
           /> :
           <StaticEmailContent {...props} />}
         {!state.onEditMode && <div style={{margin: '10px 0'}}>

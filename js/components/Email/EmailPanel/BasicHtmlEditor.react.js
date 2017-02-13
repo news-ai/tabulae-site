@@ -520,6 +520,7 @@ class BasicHtmlEditor extends React.Component {
           </Menu>
         </Popover>
         <Subject
+        width={props.width}
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
         />
@@ -591,7 +592,6 @@ class BasicHtmlEditor extends React.Component {
           <div style={{padding: 3, marginRight: 10}}>
             <i
             className='fa fa-circle pointer'
-            accept='image/*'
             style={{color: state.isStyleBlockOpen ? blue200 : grey300}}
             onClick={this.onCheck}
             />
