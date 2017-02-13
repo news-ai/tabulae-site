@@ -69,6 +69,7 @@
   border-right: 3px solid #e0e0e0;
   height: 100%;
   right: 0;
+  bottom: 0;
   cursor: pointer;
   z-index: 400;
 }
