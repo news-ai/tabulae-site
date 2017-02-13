@@ -68,13 +68,18 @@ class PreviewEmail extends Component {
         <div style={{position: 'absolute', right: 10, top: 10}}>
           <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={_ => {
             if (state.onEditMode) {
+              props.turnOffDraft();
               this.onSave();
             } else {
+              props.turnOnDraft();
               this.toggleEditMode();
             }
           }}/>
         {state.onEditMode &&
-          <RaisedButton label='Cancel' onClick={this.onCancel}/>}
+          <RaisedButton label='Cancel' onClick={_ => {
+            props.turnOffDraft();
+            this.onCancel();
+          }}/>}
         </div>
         {state.onEditMode ?
           <GeneralEditor
