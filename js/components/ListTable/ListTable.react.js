@@ -592,7 +592,6 @@ class ListTable extends Component {
           }
         }
       }
-
       this.setState({
         isSearchOn: true,
         currentSearchIndex: 0,
@@ -628,7 +627,6 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-
     return (
       <div style={{marginTop: 10}}>
         {

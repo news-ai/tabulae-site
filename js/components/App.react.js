@@ -125,11 +125,13 @@ class App extends Component {
               <RaisedButton primary label='Go to Billing' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} />
             </div>
             <div className='horizontal-center' style={{margin: 10}}>
-             <RaisedButton
+              <Link to='/settings'>
+              <RaisedButton
               label='Invite friends, get 1 month'
               labelColor='white'
               backgroundColor={blue300}
-              onClick={_ => props.router.push('/settings')}/>
+              />
+              </Link>
             </div>
             <div className='horizontal-center' style={{margin: 10}}>
               <RaisedButton label='Logout' onClick={props.logoutClick}/>
@@ -161,7 +163,7 @@ class App extends Component {
           <div className='small-6 medium-1 large-1 columns vertical-center'>
             <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
-          <div className='hide-for-small-only medium-4 large-6 columns vertical-center'>
+          <div className='hide-for-small-only medium-4 large-8 columns vertical-center'>
             <div>
               <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
@@ -173,12 +175,9 @@ class App extends Component {
               />
             </div>
           </div>
-          <div className='hide-for-small-only medium-4 large-3 columns vertical-center horizontal-center clearfix'>
-            <Link
-            to='/settings'
-            >
+          <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
+            <Link to='/settings'>
               <RaisedButton
-              className='right'
               label='Invite friends'
               labelColor='white'
               backgroundColor={blue300}
@@ -187,7 +186,7 @@ class App extends Component {
             </Link>
           </div>
           <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
-            <RaisedButton className='right' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
+            <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
           </div>
         </div>
         <div style={{height: 60}}></div>
