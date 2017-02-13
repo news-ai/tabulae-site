@@ -90,13 +90,12 @@ class GeneralEditor extends Component {
     ];
 
     this.EXTERNAL_CONTROLS = [
-      {
-        label: 'File Upload',
-        onToggle: _ => this.setState({filePanelOpen: true}),
-        icon: 'fa fa-paperclip',
-        isActive: _ => this.props.files.length > 0,
-        disabled: true
-      },
+      // {
+      //   label: 'File Upload',
+      //   onToggle: _ => this.setState({filePanelOpen: true}),
+      //   icon: 'fa fa-paperclip',
+      //   isActive: _ => this.props.files.length > 0,
+      // },
       {
         label: 'Image Upload',
         onToggle: _ => this.setState({imagePanelOpen: true}),
