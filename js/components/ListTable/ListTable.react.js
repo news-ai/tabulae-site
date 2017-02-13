@@ -580,12 +580,10 @@ class ListTable extends Component {
     if (searchValue !== this.state.searchValue) {
       this.setState({searchValue});
     }
-    console.log('before search');
     props.searchListContacts(props.listId, searchValue)
     .then(({searchContactMap, ids}) => {
       // find where first search result is in the list
       let scrollToFirstPosition;
-      console.log(props.listData.contacts.length);
       if (ids.length > 0) {
         for (let i = 0; props.listData.contacts.length; i++) {
           if (props.listData.contacts[i] === ids[0]) {
