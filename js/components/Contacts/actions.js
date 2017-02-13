@@ -247,7 +247,7 @@ export function searchListContacts(listId, query) {
       const publicationReducer = getState().publicationReducer;
       const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
       dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, contactsWithEmployers, listId});
-      dispatch(receiveContacts(res.entities.contacts, res.result.data));
+      // dispatch(receiveContacts(res.entities.contacts, res.result.data));
       return {searchContactMap: contactsWithEmployers, ids};
     })
     .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
