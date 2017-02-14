@@ -50,6 +50,7 @@ class DropFileWrapper extends Component {
   }
 
   _onUploadClick() {
+    window.Intercom('trackEvent', 'uploaded_sheet');
     const props = this.props;
     this.setState({clicked: true});
     props.createEmptyList(this.state.value)
