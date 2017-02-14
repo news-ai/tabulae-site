@@ -62,8 +62,9 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
+      const appId = window.isDev ? 'eh8247hf' : 'ur8dbk9e';
       intercomSetup({
-        app_id: 'ur8dbk9e',
+        app_id: appId,
         email: nextProps.person.email,
         name: `${nextProps.person.firstname} ${nextProps.person.lastname}`,
         custom_launcher_selector: '#custom_intercom_launcher',
