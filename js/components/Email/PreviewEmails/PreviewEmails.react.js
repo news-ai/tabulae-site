@@ -26,12 +26,18 @@ class PreviewEmails extends Component {
         <RaisedButton disabled={state.numberDraftEmails > 0} label={sendAllButtonLabel} primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
         {previewEmails.map((email, i) =>
           <PreviewEmail
-          turnOnDraft={_ => this.setState({numberDraftEmails: state.numberDraftEmails + 1})}
+          turnOnDraft={_ => {
+            window.Intercom('trackEvent', 'use_preview_draft');
+            this.setState({numberDraftEmails: state.numberDraftEmails + 1});
+          }}
           turnOffDraft={_ => this.setState({numberDraftEmails: state.numberDraftEmails - 1})}
           sendLater={sendLater}
           key={`preview-email-${i}`}
           {...email}
-          onSendEmailClick={_ => onSendEmailClick(email.id)}
+          onSendEmailClick={_ => {
+            window.Intercom('trackEvent', 'sent_email', {numSentEmails: previewEmails.length, scheduled: sendLater});
+            onSendEmailClick(email.id);
+          }}
           />)}
       </div>
       );

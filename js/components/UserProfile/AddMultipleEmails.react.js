@@ -21,7 +21,7 @@ class AddMultipleEmails extends Component {
     const disabledInput = !isEmail(state.value);
     const NoAccess = props.person.externalemail || props.person.gmail;
     return (
-      <div>
+      <div className='vertical-center'>
         <ValidationHOC rules={[{validator: isEmail, errorMessage: 'Not a valid email.'}]}>
         {({onValueChange, errorMessage}) => (
           <TextField

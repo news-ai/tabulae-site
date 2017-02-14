@@ -149,6 +149,7 @@ class HeaderNaming extends Component {
   }
 
   _onSubmit() {
+    window.Intercom('trackEvent', 'processed_sheet');
     const order = this.state.order.map(name => name || 'ignore_column');
     this.props.onAddHeaders(order).then(_ => setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}`), 5000));
   }

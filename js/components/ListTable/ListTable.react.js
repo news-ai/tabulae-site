@@ -122,6 +122,7 @@ class ListTable extends Component {
     this.onTooltipPanel = false;
 
     if (this.props.listData) {
+      window.Intercom('trackEvent', 'opened_sheet', {listId: this.props.listData.id});
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
     }
 
