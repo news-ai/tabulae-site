@@ -761,14 +761,17 @@ class ListTable extends Component {
               tooltipPosition='top-center'
               style={{marginLeft: 5}}
               onClick={e => {
-                 const searchValue = this.refs.searchValue.input.value;
-                if (state.isSearchOn && props.listData.searchResults.length > 0) {
+                const searchValue = this.refs.searchValue.input.value;
+                if (searchValue.length === 0) {
+                  props.router.push(`/tables/${props.listId}`);
+                  this.onSearchClearClick();
+                } else if (state.isSearchOn && searchValue === state.searchValue && props.listData.searchResults.length > 0) {
                   this.getNextSearchResult();
                 } else {
                   // doing a search
                   props.router.push(`/tables/${props.listId}?search=${searchValue}`);
+                  this.setState({searchValue});
                 }
-                this.setState({searchValue});
               }}
               />
             </div>
