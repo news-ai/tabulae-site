@@ -122,7 +122,6 @@ class ListTable extends Component {
     this.onTooltipPanel = false;
 
     if (this.props.listData) {
-      window.Intercom('trackEvent', 'opened_sheet', {listId: this.props.listData.id});
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
     }
 
@@ -502,6 +501,7 @@ class ListTable extends Component {
       props.listData.contacts !== null &&
       props.received.length < props.listData.contacts.length
       ) {
+      window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
       return props.loadAllContacts(props.listId);
     }
     return undefined;
