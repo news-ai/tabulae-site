@@ -107,7 +107,7 @@ export function fetchLists() {
         data: arrayOf(listSchema),
       });
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch(receiveLists(res.entities.lists, res.result.data, newOffset));
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset));
     })
     .catch(message => dispatch(requestListsFail(message)));
   };
@@ -125,11 +125,33 @@ export function fetchPublicLists() {
         data: arrayOf(listSchema),
       });
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch({
+      return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
         lists: res.entities.lists,
         ids: res.result.data,
         publicOffset: newOffset
+      });
+    })
+    .catch(message => dispatch(requestListsFail(message)));
+  };
+}
+
+export function fetchTeamLists() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.teamOffset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    dispatch(requestLists());
+    return api.get(`/lists/team?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(listSchema)});
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      return dispatch({
+        type: listConstant.RECEIVE_MULTIPLE,
+        lists: res.entities.lists,
+        ids: res.result.data,
+        teamOffset: newOffset,
+        teamId: getState().personReducer.person.teamid
       });
     })
     .catch(message => dispatch(requestListsFail(message)));

@@ -17,6 +17,7 @@ function listReducer(state = initialState.listReducer, action) {
   let archivedLists = [];
   let publicLists = [];
   let tagLists = [];
+  let teamLists = [];
   let obj;
   switch (action.type) {
     case 'CLEAR_LIST_REDUCER':
@@ -49,7 +50,6 @@ function listReducer(state = initialState.listReducer, action) {
       obj.isReceiving = true;
       return obj;
     case CLIENT_LISTS_RECEIVED:
-      obj = assignToEmpty(state, {});
       obj = assignToEmpty(state, action.lists);
       obj.received = state.received.concat(action.ids.filter(id => !state.received.some(listId => listId === id)));
       obj.isReceiving = false;
@@ -69,15 +69,18 @@ function listReducer(state = initialState.listReducer, action) {
         if (!list.archived && !list.publiclist) unarchivedLists.push(list.id);
         if (list.archived) archivedLists.push(list.id);
         if (list.publiclist) publicLists.push(list.id);
+        if (action.teamId === list.teamid) teamLists.push(list.id);
       });
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
       obj.publicLists = publicLists;
+      obj.teamLists = teamLists;
       obj.isReceiving = false;
       obj.didInvalidate = false;
       if (action.offset !== undefined) obj.offset = action.offset;
       if (action.archivedOffset !== undefined) obj.archivedOffset = action.archivedOffset;
       if (action.publicOffset !== undefined) obj.publicOffset = action.publicOffset;
+      if (action.teamOffset !== undefined) obj.teamOffset = action.teamOffset;
       if (action.tagOffset !== undefined) obj.tagOffset = action.tagOffset;
       if (action.tagQuery !== undefined) {
         obj.tagLists = action.tagQuery === state.tagQuery ? [...state.tagLists, ...action.ids] : [...action.ids];

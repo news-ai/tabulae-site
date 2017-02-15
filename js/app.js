@@ -40,6 +40,7 @@ import ListManagerContainer from './components/Lists/ListManagerContainer.react'
 import TagListsContainer from './components/Lists/TagListsContainer.react';
 import ArchiveContainer from './components/Lists/ArchiveContainer.react';
 import PublicListsContainer from './components/Lists/PublicListsContainer.react';
+import TeamListsContainer from './components/Lists/TeamListsContainer.react';
 import SearchBar from './components/Search';
 
 import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsContainer.react';
@@ -104,6 +105,7 @@ ReactDOM.render(
             <Route path='headersnaming/:listId' staticName name='Header Naming' component={HeaderNaming} />
             <Route path='archive' name='Archive' component={ArchiveContainer} />
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
+            <Route path='team' name='Team Lists' component={TeamListsContainer} />
             <Route path='settings' name='Settings' component={UserProfile} />
             <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
               <IndexRoute component={AllSentEmailsContainer}/>
