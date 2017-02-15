@@ -49,6 +49,7 @@ import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
 import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
 import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from '../Tags/Tags.react';
+import debounce from 'lodash/debounce';
 
 import {
   generateTableFieldsmap,
@@ -746,27 +747,11 @@ class ListTable extends Component {
             <div className='large-4 columns vertical-center'>
               <TextField
               id='search-input'
+              ref='searchValue'
               hintText='Search...'
-              value={state.searchValue}
               floatingLabelText={state.isSearchOn ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
               floatingLabelFixed={state.isSearchOn}
-              onChange={e => {
-                const searchValue = e.target.value;
-                if (this.state.searchValue.length > 0 && searchValue.length === 0) this.onSearchClearClick();
-                if (searchValue !== this.state.searchValue) this.onSearchClearClick();
-                this.setState({searchValue});
-              }}
-              onKeyDown={e => {
-                if (e.keyCode === 13 ) {
-                  if (state.isSearchOn && props.listData.searchResults.length > 0) {
-                    this.getNextSearchResult();
-                  } else {
-                    // doing a search
-                    props.router.push(`/tables/${props.listId}?search=${state.searchValue}`);
-                  }
-                }
-                else return null;
-              }}
+              defaultValue={props.searchQuery || ''}
               errorText={state.errorText}
               />
               <IconButton
@@ -775,7 +760,16 @@ class ListTable extends Component {
               tooltip='Search'
               tooltipPosition='top-center'
               style={{marginLeft: 5}}
-              onClick={_=> props.router.push(`/tables/${props.listId}?search=${state.searchValue}`)}
+              onClick={e => {
+                 const searchValue = this.refs.searchValue.input.value;
+                if (state.isSearchOn && props.listData.searchResults.length > 0) {
+                  this.getNextSearchResult();
+                } else {
+                  // doing a search
+                  props.router.push(`/tables/${props.listId}?search=${searchValue}`);
+                }
+                this.setState({searchValue});
+              }}
               />
             </div>
           {
@@ -898,19 +892,6 @@ const mapStateToProps = (state, props) => {
   // if one contact is loaded before others, but also indexes lastFetchedIndex for lazy-loading
   let received = [];
   let contacts = [];
-  // if (searchQuery && listData.searchResults && listData.searchResults.every(id => state.contactReducer[id])) {
-  //   console.log(listData);
-  //   received = listData.searchResults;
-  //   contacts = received.map(id => state.contactReducer[id]);
-  // } else if (!isEmpty(listData.contacts)) {
-  //   listData.contacts.map((contactId, i) => {
-  //     if (state.contactReducer[contactId]) {
-  //       let contact = state.contactReducer[contactId];
-  //       received.push(contactId);
-  //       contacts.push(contact);
-  //     }
-  //   });
-  // }
 
   if (!isEmpty(listData.contacts)) {
     listData.contacts.map((contactId, i) => {
