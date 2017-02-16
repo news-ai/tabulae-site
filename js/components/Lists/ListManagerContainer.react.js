@@ -73,7 +73,7 @@ class ListManagerContainer extends Component {
 
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
-  let lists = listReducer.lists.map(id => listReducer[id]);
+  let lists = listReducer.lists.map(id => listReducer[id]).filter(list => list.createdby === state.personReducer.person.id);
   let untitledNum = 0;
   lists.map(list => {
     if (list.name.substring(0, 9) === 'untitled-') {
