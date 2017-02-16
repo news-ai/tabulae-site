@@ -2,9 +2,10 @@ import React, {PropTypes} from 'react';
 import Link from 'react-router/lib/Link';
 import withRouter from 'react-router/lib/withRouter';
 import {listPropTypes} from 'constants/CommonPropTypes';
-import {grey50, grey700, grey500} from 'material-ui/styles/colors';
+import {teal50, teal200, grey700, grey500} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import Tags from '../../Tags/Tags.react';
+import Tag from '../../Tags/Tag.react';
 import {connect} from 'react-redux';
 
 const styles = {
@@ -37,6 +38,15 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
       className={listClassName}>
         <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
           <div style={{float: 'right'}}>
+          {list.publiclist &&
+            <Tag
+            hideDelete
+            color={teal50}
+            borderColor={teal200}
+            key='public-tag'
+            text='Public'
+            link='/public'
+            />}
             <Tags hideDelete listId={list.id}/>
           </div>
       </div>

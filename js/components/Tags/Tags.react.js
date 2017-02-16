@@ -1,18 +1,23 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {actions as listActions} from 'components/Lists';
+import {blue50, blue200, grey800, grey500} from 'material-ui/styles/colors';
 import Tag from './Tag.react';
 
 const Tags = props => {
   return (
     <div className='vertical-center'>
-      <div className='vertical-center'>
-        {props.list && props.list.tags !== null &&
-          props.list.tags
-          .map((name, i) =>
-            <Tag hideDelete={props.hideDelete} key={`tag-${i}`} text={name} onDeleteTag={_ => props.onDeleteTag(name)}/>
-            )}
-      </div>
+  {props.list && props.list.tags !== null && props.list.tags
+    .map((name, i) =>
+      <Tag
+      color={blue50}
+      borderColor={blue200}
+      hideDelete={props.hideDelete}
+      key={`tag-${i}`}
+      text={name}
+      link={`/tags/${name}`}
+      onDeleteTag={_ => props.onDeleteTag(name)}
+      />)}
     </div>);
 };
 
