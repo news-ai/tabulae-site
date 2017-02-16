@@ -11,7 +11,7 @@ class TeamListsContainer extends Component {
     super(props);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.props.fetchLists()
     .then(_ => this.props.fetchUsers());
   }

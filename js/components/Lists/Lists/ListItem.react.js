@@ -30,7 +30,7 @@ const styles = {
 
 function ListItem({list, onToggle, iconName, tooltip, router, nameString, person}) {
   const updatedDate = new Date(list.updated);
-  const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-6 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
+  const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
     <div key='parent' className='row align-middle hovergray' style={styles.parent}>
       <div
@@ -50,8 +50,8 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
             <Tags hideDelete listId={list.id}/>
           </div>
       </div>
-      <div className='hide-for-small-only medium-2 large-2 columns'>
-        <span style={{fontSize: '0.8em', fontColor: grey500}}>{updatedDate.toDateString()}</span>
+      <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
+        <span style={{fontSize: '0.8em', fontColor: grey500}}>{updatedDate.toLocaleDateString()}</span>
       </div>
     {person.teamid &&
       <div className='small-4 medium-2 large-2 columns horizontal-center'>
