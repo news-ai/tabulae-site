@@ -140,7 +140,7 @@ export function fetchTeamLists() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().listReducer.teamOffset;
-    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    if (OFFSET === null || getState().listReducer.isReceiving) return Promise.resolve(true);
     dispatch(requestLists());
     return api.get(`/lists/team?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
