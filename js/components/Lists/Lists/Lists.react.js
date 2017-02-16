@@ -21,10 +21,7 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
         iconName='fa fa-angle-right fa-fw'
         backRouteTitle={backRouteTitle}
         />
-      <div style={{
-        marginBottom: '50px',
-        marginTop: '50px'
-      }}>
+      <div style={{marginBottom: 50, marginTop: 50}}>
        {lists.length === 0 && <span>{statementIfEmpty}</span>}
         {
           lists.map( (list, i) =>

@@ -171,7 +171,7 @@ export function fetchTagLists(tagQuery) {
         data: arrayOf(listSchema),
       });
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch({
+      return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
         lists: res.entities.lists,
         ids: res.result.data,
@@ -196,7 +196,7 @@ export function fetchArchivedLists() {
         data: arrayOf(listSchema),
       });
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch({
+      return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
         lists: res.entities.lists,
         ids: res.result.data,

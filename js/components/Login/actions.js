@@ -8,7 +8,6 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 alertify.set('notifier', 'position', 'top-right');
 
-
 function requestLogin() {
   return {
     type: loginConstant.REQUEST
@@ -126,6 +125,18 @@ export function fetchPerson() {
     dispatch(requestLogin());
     return api.get('/users/me')
     .then(response => dispatch(receiveLogin(response.data)))
+    .catch(message => {
+      if (window.isDev) console.log(message);
+    });
+  };
+}
+
+export function fetchUser(userId) {
+  return (dispatch, getState) => {
+    if (getState().personReducer[userId]) return;
+    dispatch({type: 'FETCH_USER', userId});
+    return api.get(`/users/${userId}`)
+    .then(response => dispatch({type: 'RECEIVE_USER', user: response.data}))
     .catch(message => {
       if (window.isDev) console.log(message);
     });

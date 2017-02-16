@@ -6,9 +6,8 @@ import {
 import {initialState} from '../../reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
-function personReducer(state = initialState.personReducer, action) {
+function personReducer(state=initialState.personReducer, action) {
   if (window.isDev) Object.freeze(state);
-  let obj;
   switch (action.type) {
     case loginConstant.REQUEST:
       return assignToEmpty(state, {
@@ -42,6 +41,10 @@ function personReducer(state = initialState.personReducer, action) {
         feedback: false,
         feedbackIsReceiving: false,
         feedbackDidInvalidate: true
+      });
+    case 'RECEIVE_USER':
+      return assignToEmpty(state, {
+        [action.user.id]: action.user
       });
     default:
       return state;
