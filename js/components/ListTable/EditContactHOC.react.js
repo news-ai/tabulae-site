@@ -168,8 +168,9 @@ class EditContact extends Component {
     ];
     return (
       <div className={props.className}>
-        {state.open && <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
-          {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
+        {state.open &&
+          <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
+          {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'}/>}
           <div className='row' style={{marginTop: 20}}>
             <div className={columnClassname}>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
@@ -250,32 +251,6 @@ class EditContact extends Component {
                 />
               </Collapse>
             </div>
-            {
-              /* <div className='panel' style={{
-              backgroundColor: yellow50,
-              margin: 10,
-              padding: 10
-            }}>
-              <span style={{fontSize: '0.8em'}}>
-              Many websites can be followed with RSS if they are powered by WordPress or Tumblr. You can discover their feed link by simply adding <strong>/feed</strong> or <strong>/rss</strong>.
-              For example:
-                https://vogue.com/feed,
-                https://nypost.com/author/firstname-lastname/feed,
-                https://nycstreetfile.tumblr.com/rss
-              </span>
-            </div>*/
-          }
-          {/*
-            <div className='large-12 medium-12 small-12 columns'>
-              <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
-              <span style={{whiteSpace: 'nowrap', fontSize: '0.8em'}}> * Separate feeds with a new line</span>
-              <Textarea
-              value={state.rssfeedsTextarea}
-              maxRows={10}
-              onChange={e => this.setState({rssfeedsTextarea: e.target.value})}
-              />
-            </div>*/
-          }
           </div>
         </Dialog>}
         {props.children({
