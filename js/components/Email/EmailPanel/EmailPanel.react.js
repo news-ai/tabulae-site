@@ -32,7 +32,7 @@ import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
 
-import {grey800, blue400, lightBlue500} from 'material-ui/styles/colors';
+import {grey800, blue400, lightBlue500, yellow50} from 'material-ui/styles/colors';
 
 const styles = {
   emailPanelOuterPosition: {
@@ -242,7 +242,7 @@ class EmailPanel extends Component {
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
               </div>
               <div className='vertical-center'>
-                <span>Emails are sent from: {props.from}</span>
+                Emails are sent from: <span style={{backgroundColor: props.from !== props.person.email && yellow50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
               </div>
               <BasicHtmlEditor
               listId={props.listId}
