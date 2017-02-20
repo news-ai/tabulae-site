@@ -891,7 +891,7 @@ class ListTable extends Component {
               }
               return wid + 10;
             }}
-            overscanRowCount={10}
+            overscanRowCount={30}
             height={state.leftoverHeight || 500}
             width={state.screenWidth}
             rowCount={props.received.length}
