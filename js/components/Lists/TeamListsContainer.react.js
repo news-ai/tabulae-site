@@ -36,7 +36,7 @@ const mapStateToProps = state => {
     isReceiving: lists === undefined ? true : false,
     statementIfEmpty: 'There are no team lists available.',
     listItemIcon: 'fa fa-arrow-left',
-    title: 'Team Lists',
+    title: 'Team Member Lists',
     tooltip: 'put back',
     person: state.personReducer.person,
     personReducer: state.personReducer
