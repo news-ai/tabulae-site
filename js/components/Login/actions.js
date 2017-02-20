@@ -95,6 +95,16 @@ export function loginWithGoogle() {
   };
 }
 
+export function getEmailMaxAllowance() {
+  return (dispatch, getState) => {
+    if (getState().personReducer.allowance) return Promise.resolve(true);
+    dispatch({type: 'REQUEST_EMAIL_MAX_ALLOWANCE'});
+    return api.get(`/users/me/plan-details`)
+    .then(response => dispatch({type: 'RECEIVE_EMAIL_MAX_ALLOWANCE', allowance: response.data.emailaccounts}))
+    .catch(err => console.log(err));
+  };
+}
+
 export function onLogin() {
   return dispatch => {
     const base = `${window.TABULAE_API_BASE}/auth?next=${window.location}`;
