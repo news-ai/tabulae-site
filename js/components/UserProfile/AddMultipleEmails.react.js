@@ -56,10 +56,14 @@ class AddMultipleEmails extends Component {
 const mapStateToProps = (state, props) => {
   const person = state.personReducer.person;
   const allowance = state.personReducer.allowance;
+  let leftover = allowance;
+  if (allowance && person.sendgridemails !== null) {
+    leftover = allowance - person.sendgridemails;
+  }
   return {
     person,
     allowance,
-    leftover: allowance ? allowance - person.sendgridemails.length : null
+    leftover
   };
 };
 
