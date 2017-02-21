@@ -156,12 +156,11 @@ class App extends Component {
           <Link to={'/clients'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-folder'/>}>Client Directory</MenuItem></Link>
           <Link to={'/search'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-search'/>}>Search</MenuItem></Link>
           <Link to={'/emailstats'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-envelope'/>}>Sent & Scheduled Emails</MenuItem></Link>
-          <Link to={'/settings'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
           <Link to={'/public'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
         {props.person.teamid > 0 &&
-          <Link to={'/team'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>
-        }
+          <Link to={'/team'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
+          <Link to={'/settings'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
