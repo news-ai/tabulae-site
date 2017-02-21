@@ -4,7 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import get from 'lodash/get';
-import {yellow50} from 'material-ui/styles/colors';
+import {yellow50, grey500} from 'material-ui/styles/colors';
 import Link from 'react-router/lib/Link';
 
 class SwitchEmailHOC extends Component {
@@ -23,9 +23,17 @@ class SwitchEmailHOC extends Component {
           <div style={{margin: 10, padding: 10, backgroundColor: yellow50, fontSize: '0.9em'}}>
           You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>.
           </div>
-          <DropDownMenu value={props.from} onChange={(e, i, value) => props.setFromEmail(value)}>
+          <DropDownMenu
+          disabled={props.person.gmail || props.person.externalemail}
+          value={props.from}
+          onChange={(e, i, value) => props.setFromEmail(value)}
+          >
             {emails}
           </DropDownMenu>
+        {(props.person.gmail || props.person.externalemail) &&
+          <div className='vertical-center' style={{margin: 10}}>
+            <span style={{color: grey500, fontSize: '0.9em'}}>*You must disable Gmail/SMTP integrations to use Email Switching.</span>
+          </div>}
         </Dialog>
         {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>
