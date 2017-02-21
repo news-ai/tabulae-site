@@ -20,6 +20,9 @@ class AddMultipleEmails extends Component {
     const state = this.state;
     const disabledInput = !isEmail(state.value);
     const NoAccess = props.person.externalemail || props.person.gmail;
+    let hintText = NoAccess ? 'Disable Gmail/SMTP Connect to activate' : `${props.leftover} emails left`;
+    let floatingLabelText = NoAccess ? 'Disable Gmail/SMTP Connect to activate' : 'Email';
+    if (props.ontrial) floatingLabelText = 'Upgrade to Pro plan to add emails';
     return (
       <div className='vertical-center'>
       {props.leftover > 0 &&
@@ -28,8 +31,8 @@ class AddMultipleEmails extends Component {
           <TextField
           disabled={NoAccess}
           errorText={errorMessage}
-          hintText={NoAccess ? 'Must disable Gmail or SMTP to activate' : 'Email'}
-          floatingLabelText={NoAccess ? 'Disable Gmail/SMTP to activate' : 'Email'}
+          hintText={hintText}
+          floatingLabelText={floatingLabelText}
           value={state.value}
           onChange={e => {
             // for validation
@@ -40,14 +43,16 @@ class AddMultipleEmails extends Component {
           />)}
         </ValidationHOC>}
         {props.leftover === 0 &&
-          <span style={{color: grey500}}>Max'd out the number of external emails. Please upgrade or delete emails to add another.</span>}
+          <span style={{color: grey500}}>Max'd out the number of external emails. Please upgrade or remove emails to add another.</span>}
         <IconButton
         tooltip='Add Email'
         tooltipPosition='top-center'
-        disabled={NoAccess && disabledInput}
+        disabled={NoAccess && disabledInput && props.ontrial}
         iconStyle={{color: disabledInput ? grey500 : cyan500, fontSize: '16px'}}
         iconClassName='fa fa-chevron-right'
-        onClick={_ => props.addExtraEmail(state.value).then(_ => this.setState({value: ''}))}
+        onClick={_ => {
+          if (state.value.length > 2) props.addExtraEmail(state.value).then(_ => this.setState({value: ''}));
+        }}
         />
       </div>);
   }
@@ -58,12 +63,13 @@ const mapStateToProps = (state, props) => {
   const allowance = state.personReducer.allowance;
   let leftover = allowance;
   if (allowance && person.sendgridemails !== null) {
-    leftover = allowance - person.sendgridemails;
+    leftover = allowance - person.sendgridemails.length;
   }
   return {
     person,
     allowance,
-    leftover
+    leftover,
+    ontrial: state.personReducer.ontrial
   };
 };
 

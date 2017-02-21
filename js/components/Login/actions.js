@@ -100,7 +100,7 @@ export function getEmailMaxAllowance() {
     if (getState().personReducer.allowance) return Promise.resolve(true);
     dispatch({type: 'REQUEST_EMAIL_MAX_ALLOWANCE'});
     return api.get(`/users/me/plan-details`)
-    .then(response => dispatch({type: 'RECEIVE_EMAIL_MAX_ALLOWANCE', allowance: response.data.emailaccounts}))
+    .then(response => dispatch({type: 'RECEIVE_EMAIL_MAX_ALLOWANCE', allowance: response.data.emailaccounts, ontrial: response.data.ontrial}))
     .catch(err => console.log(err));
   };
 }

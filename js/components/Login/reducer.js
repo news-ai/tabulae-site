@@ -43,7 +43,7 @@ function personReducer(state=initialState.personReducer, action) {
     case 'RECEIVE_USER':
       return assignToEmpty(state, {[action.user.id]: action.user});
     case 'RECEIVE_EMAIL_MAX_ALLOWANCE':
-      return assignToEmpty(state, {allowance: action.allowance});
+      return assignToEmpty(state, {allowance: action.allowance, ontrial: action.ontrial});
     default:
       return state;
   }

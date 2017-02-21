@@ -161,6 +161,7 @@ class App extends Component {
           <Link to={'/team'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
           <Link to={'/settings'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
+          <a href='https://help.newsai.co' target='_blank'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
