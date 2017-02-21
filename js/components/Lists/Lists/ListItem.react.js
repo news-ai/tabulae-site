@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react';
+import React, {PropTypes} from 'react';
 import Link from 'react-router/lib/Link';
 import withRouter from 'react-router/lib/withRouter';
-import Radium from 'radium';
 import {listPropTypes} from 'constants/CommonPropTypes';
-import {grey50, grey700} from 'material-ui/styles/colors';
+import {teal50, teal200, grey700, grey500} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import Tags from '../../Tags/Tags.react';
+import Tag from '../../Tags/Tag.react';
+import {connect} from 'react-redux';
 
 const styles = {
   parent: {
@@ -15,9 +16,6 @@ const styles = {
     paddingRight: 15,
     paddingTop: 5,
     paddingBottom: 5,
-    ':hover': {
-      backgroundColor: grey50
-    }
   },
   smallIcon: {
     fontSize: 16,
@@ -30,21 +28,35 @@ const styles = {
   },
 };
 
-function ListItem({list, onToggle, iconName, tooltip, router}) {
+function ListItem({list, onToggle, iconName, tooltip, router, nameString, person}) {
   const updatedDate = new Date(list.updated);
+  const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
-    <div key='parent' className='row align-middle' style={[styles.parent]}>
+    <div key='parent' className='row align-middle hovergray' style={styles.parent}>
       <div
       id={list.name === 'My first list!' && 'listitem_table_hop'}
-      className='small-8 medium-7 large-7 columns pointer'>
+      className={listClassName}>
         <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
           <div style={{float: 'right'}}>
+          {list.publiclist &&
+            <Tag
+            hideDelete
+            color={teal50}
+            borderColor={teal200}
+            key='public-tag'
+            text='Public'
+            link='/public'
+            />}
             <Tags hideDelete listId={list.id}/>
           </div>
       </div>
-      <div className='small-4 medium-2 large-3 columns'>
-        <span style={{fontSize: '0.8em', fontColor: 'gray'}}>{updatedDate.toDateString()}</span>
+      <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
+        <span style={{fontSize: '0.8em', fontColor: grey500}}>{updatedDate.toLocaleDateString()}</span>
       </div>
+    {person.teamid &&
+      <div className='small-4 medium-2 large-2 columns horizontal-center'>
+        <span style={{fontSize: '0.8em', fontColor: grey500}}>{nameString}</span>
+      </div>}
       <div className='hide-for-small-only medium-3 large-2 columns'>
         <Link to={`/listfeeds/${list.id}`}>
           <IconButton
@@ -69,6 +81,24 @@ function ListItem({list, onToggle, iconName, tooltip, router}) {
     </div>
     );
 }
+const mapStateToProps = (state, props) => {
+  let nameString = '';
+  if (state.personReducer.person.id === props.list.createdby) nameString = 'Me';
+  else {
+    const user = state.personReducer[props.list.createdby];
+    if (user) {
+      nameString = `${user.firstname} ${user.lastname}`;
+    }
+  }
+  return {
+    nameString,
+    person: state.personReducer.person
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {};
+};
 
 ListItem.PropTypes = {
   list: listPropTypes.isRequired,
@@ -78,4 +108,4 @@ ListItem.PropTypes = {
   tooltip: PropTypes.string
 };
 
-export default withRouter(Radium(ListItem));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ListItem));

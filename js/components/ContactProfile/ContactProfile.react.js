@@ -68,6 +68,7 @@ class ContactProfile extends Component {
     };
     this.onTabChange = activeKey => this.setState({activeKey});
     this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
+    window.Intercom('trackEvent', {contactId: this.props.contactId});
   }
 
   componentWillMount() {

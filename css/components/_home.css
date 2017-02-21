@@ -134,3 +134,7 @@ input {
 .not-allowed {
   cursor: not-allowed;
 }
+
+.hovergray:hover {
+  background-color: #FAFAFA;
+}

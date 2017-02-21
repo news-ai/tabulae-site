@@ -22,6 +22,7 @@ class AddMultipleEmails extends Component {
     const NoAccess = props.person.externalemail || props.person.gmail;
     return (
       <div className='vertical-center'>
+      {props.leftover > 0 &&
         <ValidationHOC rules={[{validator: isEmail, errorMessage: 'Not a valid email.'}]}>
         {({onValueChange, errorMessage}) => (
           <TextField
@@ -37,7 +38,9 @@ class AddMultipleEmails extends Component {
             this.setState({value: e.target.value});
           }}
           />)}
-        </ValidationHOC>
+        </ValidationHOC>}
+        {props.leftover === 0 &&
+          <span style={{color: grey500}}>Max'd out the number of external emails. Please upgrade or delete emails to add another.</span>}
         <IconButton
         tooltip='Add Email'
         tooltipPosition='top-center'
@@ -51,8 +54,16 @@ class AddMultipleEmails extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const person = state.personReducer.person;
+  const allowance = state.personReducer.allowance;
+  let leftover = allowance;
+  if (allowance && person.sendgridemails !== null) {
+    leftover = allowance - person.sendgridemails;
+  }
   return {
-    person: state.personReducer.person
+    person,
+    allowance,
+    leftover
   };
 };
 

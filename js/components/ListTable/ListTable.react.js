@@ -43,6 +43,7 @@ import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
 import EditContactHOC from './EditContactHOC.react';
+import EditMultipleContactsHOC from './EditMultipleContactsHOC.react';
 import PanelOverlayHOC from './PanelOverlayHOC.react';
 import EmptyListStatement from './EmptyListStatement.react';
 import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
@@ -741,8 +742,27 @@ class ListTable extends Component {
               />
               <AddTagDialogHOC listId={props.listId}>
                 {({onRequestOpen}) =>
-                <IconButton iconStyle={{color: grey500}} iconClassName='fa fa-tags' onClick={onRequestOpen} tooltip='Add Tag & Client' tooltipPosition='top-right'/>}
+                <IconButton
+                iconStyle={{color: grey500}}
+                iconClassName='fa fa-tags'
+                onClick={onRequestOpen}
+                tooltip='Add Tag & Client'
+                tooltipPosition='top-right'
+                disabled={props.listData.readonly}
+                />}
               </AddTagDialogHOC>
+            {state.selected.length > 1 &&
+              <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
+              {({onRequestOpen}) =>
+                <IconButton
+                iconStyle={{color: grey500}}
+                iconClassName='fa fa-edit'
+                tooltip='Edit Multiple'
+                tooltipPosition='top-right'
+                disabled={props.listData.readonly}
+                onClick={onRequestOpen}
+                />}
+              </EditMultipleContactsHOC>}
             </div>
             <div className='large-4 columns vertical-center'>
               <TextField
@@ -871,7 +891,7 @@ class ListTable extends Component {
               }
               return wid + 10;
             }}
-            overscanRowCount={10}
+            overscanRowCount={30}
             height={state.leftoverHeight || 500}
             width={state.screenWidth}
             rowCount={props.received.length}

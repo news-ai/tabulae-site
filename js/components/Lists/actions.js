@@ -140,7 +140,7 @@ export function fetchTeamLists() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().listReducer.teamOffset;
-    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    if (OFFSET === null || getState().listReducer.isReceiving) return Promise.resolve(true);
     dispatch(requestLists());
     return api.get(`/lists/team?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
@@ -171,7 +171,7 @@ export function fetchTagLists(tagQuery) {
         data: arrayOf(listSchema),
       });
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch({
+      return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
         lists: res.entities.lists,
         ids: res.result.data,
@@ -196,7 +196,7 @@ export function fetchArchivedLists() {
         data: arrayOf(listSchema),
       });
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      dispatch({
+      return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
         lists: res.entities.lists,
         ids: res.result.data,

@@ -73,8 +73,8 @@ function listReducer(state = initialState.listReducer, action) {
       });
       obj.lists = unarchivedLists;
       obj.archivedLists = archivedLists;
-      obj.publicLists = publicLists;
-      obj.teamLists = teamLists;
+      obj.publicLists = publicLists.length > state.publicLists ? publicLists : state.publicLists;
+      obj.teamLists = teamLists.length > state.teamLists ? teamLists : state.teamLists;
       obj.isReceiving = false;
       obj.didInvalidate = false;
       if (action.offset !== undefined) obj.offset = action.offset;

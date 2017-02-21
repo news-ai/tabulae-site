@@ -69,6 +69,7 @@ class EmailsList extends Component {
 
   componentWillMount() {
     this.props.fetchEmails();
+    window.Intercom('trackEvent', 'checking_sent_emails', {route: window.location.href});
   }
 
   render() {

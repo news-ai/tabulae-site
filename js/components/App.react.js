@@ -159,10 +159,9 @@ class App extends Component {
           <Link to={'/settings'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
           <Link to={'/public'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
-        {/*
-        props.person.teamid > 0 &&
+        {props.person.teamid > 0 &&
           <Link to={'/team'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>
-        */}
+        }
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
