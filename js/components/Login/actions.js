@@ -45,7 +45,7 @@ export function addExtraEmail(email) {
     dispatch({type: 'ADD_EXTRA_EMAIL', email});
     return api.post(`/users/me/add-email`, {email})
     .then(response => {
-      alertify.notify(`Confirmation email has been sent to ${email}`, 'custom', 5, function() {});
+      alertify.notify(`Confirmation email has been sent to ${email}`, 'custom', 8, function() {});
       dispatch({type: 'ADD_EXTRA_EMAIL_CONFIRMATION_SENT'});
       return dispatch(receiveLogin(response.data));
     })
@@ -153,12 +153,21 @@ export function fetchUser(userId) {
   };
 }
 
+export function removeExternalEmail(email) {
+  return dispatch => {
+    dispatch({type: 'START_REMOVE_EXTERNAL_EMAIL'});
+    return api.post(`/users/me/remove-email`, {email})
+    .then(response => dispatch(receiveLogin(response.data)))
+    .catch(err => console.log(err));
+  };
+}
+
 export function patchPerson(personBody) {
   return dispatch => {
     dispatch({type: 'PATCH_PERSON', personBody});
     return api.patch(`/users/me`, personBody)
-    .then( response => dispatch(receiveLogin(response.data)))
-    .catch( message => {
+    .then(response => dispatch(receiveLogin(response.data)))
+    .catch(message => {
       if (window.isDev) console.log(message);
     });
   };
