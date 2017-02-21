@@ -81,9 +81,10 @@ class SearchBar extends Component {
               value={state.query}
               />
               <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
-              {state.isSearchReceived ? <p>We found {expectedResultsString} for "{state.prevQuery}"</p> : null}
             </div>
           </div>
+        {state.isSearchReceived ?
+          <div className='horizontal-center'>We found {expectedResultsString} for "{state.prevQuery}"</div> : null}
           <div className='row'>
             <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
             <div className='large-12 columns' style={{marginBottom: 30}}>
