@@ -8,6 +8,7 @@ import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
 import SMTPSettings from './SMTPSettings.react';
 import AddMultipleEmails from './AddMultipleEmails.react';
+import EmailItem from './EmailItem.react';
 
 import {actions as loginActions} from 'components/Login';
 
@@ -94,6 +95,16 @@ class EmailSettings extends Component {
                 <AddMultipleEmails/>
               </div>
             </div>
+          {props.person.sendgridemails !== null &&
+            <div className='row vertical-center'>
+              <div className='large-4 medium-5 columns'>
+                <span style={spanStyle}>Currently Connected</span>
+              </div>
+              <div className='large-8 medium-7 columns'>
+              {props.person.sendgridemails.map(email =>
+                <EmailItem key={email} email={email}/>)}
+              </div>
+            </div>}
             <div className='row' style={{height: 210, margin: '15px 0'}}>
               <div className='large-4 medium-5 columns'>
                 <span style={spanStyle}>Email Signature</span>
