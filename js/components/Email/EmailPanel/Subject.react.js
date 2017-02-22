@@ -150,7 +150,8 @@ class Subject extends Component {
         style={{width: 40, height: 32}}>
           <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
           <FontIcon
-          style={{fontSize: '0.9em'}}
+          className='pointer'
+          style={{fontSize: '0.9em', margin: '0 2px'}}
           color={grey500}
           hoverColor={grey700}
           className='fa fa-chevron-down'
