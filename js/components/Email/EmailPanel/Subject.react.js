@@ -12,6 +12,7 @@ import CurlySpan from './components/CurlySpan.react';
 import {curlyStrategy, findEntities} from './utils/strategies';
 import {grey500, grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -149,12 +150,12 @@ class Subject extends Component {
         <div
         style={{width: 40, height: 32}}>
           <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
-          <FontIcon
-          className='pointer'
-          style={{fontSize: '0.9em', margin: '0 2px'}}
-          color={grey500}
-          hoverColor={grey700}
-          className='fa fa-chevron-down'
+          <IconButton
+          iconStyle={{width: 12, height: 12, fontSize: '12px', color: grey500}}
+          style={{width: 24, height: 24, padding: 6, marginLeft: 4}}
+          iconClassName='fa fa-chevron-down'
+          tooltip='Insert Property to Subject'
+          tooltipPosition='bottom-center'
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />
         </div>
