@@ -10,7 +10,7 @@ import {
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
 import {curlyStrategy, findEntities} from './utils/strategies';
-import {grey500, grey700} from 'material-ui/styles/colors';
+import {grey400, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Popover from 'material-ui/Popover';
@@ -151,7 +151,7 @@ class Subject extends Component {
         style={{width: 40, height: 32}}>
           <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
           <IconButton
-          iconStyle={{width: 12, height: 12, fontSize: '12px', color: grey500}}
+          iconStyle={{width: 12, height: 12, fontSize: '12px', color: grey400}}
           style={{width: 24, height: 24, padding: 6, marginLeft: 4}}
           iconClassName='fa fa-chevron-down'
           tooltip='Insert Property to Subject'
