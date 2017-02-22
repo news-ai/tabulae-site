@@ -123,6 +123,7 @@ class Subject extends Component {
           overflowX: 'scroll',
           marginRight: 5,
         }}>
+      {props.fieldsmap &&
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
@@ -139,7 +140,7 @@ class Subject extends Component {
               this.setState({variableMenuOpen: false});
             }} />)}
           </Menu>
-        </Popover>
+        </Popover>}
           <Editor
           editorState={editorState}
           onChange={this.onChange}
@@ -147,9 +148,9 @@ class Subject extends Component {
           placeholder='Subject...'
           />
         </div>
-        <div
-        style={{width: 40, height: 32}}>
+        <div className='vertical-center'>
           <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
+        {props.fieldsmap &&
           <IconButton
           iconStyle={{width: 12, height: 12, fontSize: '12px', color: grey400}}
           style={{width: 24, height: 24, padding: 6, marginLeft: 4}}
@@ -157,7 +158,7 @@ class Subject extends Component {
           tooltip='Insert Property to Subject'
           tooltipPosition='bottom-center'
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
-          />
+          />}
         </div>
       </div>
     );
