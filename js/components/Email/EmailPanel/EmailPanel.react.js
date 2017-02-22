@@ -243,6 +243,7 @@ class EmailPanel extends Component {
               </div>
               <div className='vertical-center'>
                 Emails are sent from: <span style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
+                {props.isImageReceiving && <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
               </div>
               <BasicHtmlEditor
               listId={props.listId}
@@ -364,6 +365,7 @@ const mapStateToProps = (state, props) => {
     cc: get(state, `emailDraftReducer[${props.listId}].cc`) || [],
     bcc: get(state, `emailDraftReducer[${props.listId}].bcc`) || [],
     from: get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email,
+    isImageReceiving: state.emailImageReducer.isReceiving,
   };
 };
 
