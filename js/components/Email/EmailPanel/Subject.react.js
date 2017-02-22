@@ -4,12 +4,17 @@ import {
   EditorState,
   CompositeDecorator,
   ContentState,
+  Modifier
 } from 'draft-js';
 
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
 import {curlyStrategy, findEntities} from './utils/strategies';
-import {grey500} from 'material-ui/styles/colors';
+import {grey500, grey700} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
 
 const MAX_LENGTH = 255;
 
@@ -30,9 +35,12 @@ class Subject extends Component {
     this.state = {
       editorState: EditorState.createEmpty(decorator),
       subjectHtml: null,
-      subjectLength: 0
+      subjectLength: 0,
+      variableMenuOpen: false,
+      variableMenuAnchorEl: null
     };
     this.truncateText = this._truncateText.bind(this);
+    this.insertText = this._insertText.bind(this);
 
     this.onChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -88,8 +96,19 @@ class Subject extends Component {
     return editorState;
   }
 
+  _insertText(replaceText) {
+    const {editorState} = this.state;
+    const content = editorState.getCurrentContent();
+    const selection = editorState.getSelection();
+    const newContent = Modifier.insertText(content, selection, '{' + replaceText + '}');
+    const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
+    this.onChange(newEditorState);
+  }
+
   render() {
     const {editorState, subjectLength} = this.state;
+    const state = this.state;
+    const props = this.props;
     return (
       <div
       style={{marginTop: 12}}
@@ -103,6 +122,23 @@ class Subject extends Component {
           overflowX: 'scroll',
           marginRight: 5,
         }}>
+        <Popover
+        open={state.variableMenuOpen}
+        anchorEl={state.variableMenuAnchorEl}
+        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        >
+          <Menu desktop>
+          {props.fieldsmap
+            .filter(field => !field.hidden)
+            .map((field, i) =>
+            <MenuItem key={i} primaryText={field.name} onClick={_ => {
+              this.insertText(field.name);
+              this.setState({variableMenuOpen: false});
+            }} />)}
+          </Menu>
+        </Popover>
           <Editor
           editorState={editorState}
           onChange={this.onChange}
@@ -111,11 +147,15 @@ class Subject extends Component {
           />
         </div>
         <div
-        style={{
-          width: 20,
-          height: 32,
-        }}>
+        style={{width: 40, height: 32}}>
           <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
+          <FontIcon
+          style={{fontSize: '0.9em'}}
+          color={grey500}
+          hoverColor={grey700}
+          className='fa fa-chevron-down'
+          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          />
         </div>
       </div>
     );

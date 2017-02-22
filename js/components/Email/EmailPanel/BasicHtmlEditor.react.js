@@ -523,6 +523,7 @@ class BasicHtmlEditor extends React.Component {
         width={props.width}
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
+        fieldsmap={props.fieldsmap}
         />
         <div style={{
           height: 480,
