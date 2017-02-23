@@ -40,7 +40,8 @@ const mergeProps = ({list}, {patchList}, ownProps) => {
     onDeleteTag: name => patchList({
       listId: list.id,
       name: list.name,
-      tags: list.tags.filter(tagName => tagName !== name)
+      tags: list.tags.filter(tagName => tagName !== name),
+      client: list.client
     }),
     ...ownProps
   };

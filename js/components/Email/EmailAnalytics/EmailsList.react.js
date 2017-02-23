@@ -90,7 +90,7 @@ class EmailsList extends Component {
           <span>No emails scheduled for delivery.</span>}
         </div>
       {this.props.isReceiving &&
-        <div className='horizontal-center'>
+        <div className='horizontal-center' style={{margin: '10px 0'}}>
           <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
         </div>}
       </InfiniteScroll>
