@@ -183,7 +183,6 @@ const mapDispatchToProps = (dispatch, props) => {
     addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
     patchContacts: (contactList) => dispatch(contactActions.patchContacts(contactList)),
-    patchList: listBody => dispatch(listActions.patchList(listBody)),
   };
 };
 

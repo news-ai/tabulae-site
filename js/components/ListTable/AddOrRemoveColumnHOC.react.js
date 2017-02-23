@@ -10,6 +10,7 @@ import TextField from 'material-ui/TextField';
 import {grey400, grey700, yellow50} from 'material-ui/styles/colors';
 import {SortableContainer, SortableHandle, SortableElement, arrayMove} from 'react-sortable-hoc';
 import find from 'lodash/find';
+import {reformatFieldsmap} from './helpers';
 
 import './react_sortable_hoc.css';
 
@@ -24,7 +25,7 @@ const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal
   return (
     <div className='row item'>
       <div className='large-1 medium-1 small-6 columns'>
-        <DragHandle />
+        <DragHandle/>
       </div>
       <div className='large-1 medium-1 small-6 columns'>
         <Checkbox disabled={internal || hideCheckbox} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
@@ -121,9 +122,7 @@ class AddOrHideColumns extends Component {
   }
 
   _onSubmit() {
-    const fieldsmap = this.state.items
-    .filter(fieldObj => !fieldObj.tableOnly)
-    .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}));
+    const fieldsmap = reformatFieldsmap(this.state.items);
     const listBody = {
       listId: this.props.listId,
       name: this.props.list.name,
@@ -139,9 +138,7 @@ class AddOrHideColumns extends Component {
       this.setState({errorText: 'duplicate'});
       return;
     }
-    const prevFieldsmap = this.state.items
-    .filter(fieldObj => !fieldObj.tableOnly)
-    .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}));
+    const prevFieldsmap = reformatFieldsmap(this.state.items);
     const fieldsmap = [...prevFieldsmap, {
       name: value,
       value: value.toLowerCase().split(' ').join('_'),
@@ -158,9 +155,7 @@ class AddOrHideColumns extends Component {
   }
 
   _onRemove(deleteValue) {
-    const fieldsmap = this.state.items
-    .filter(fieldObj => !fieldObj.tableOnly)
-    .map(({name, value, hidden, customfield}) => ({name, value, hidden, customfield}))
+    const fieldsmap = reformatFieldsmap(this.state.items)
     .filter(fieldObj => fieldObj.value !== deleteValue);
     const listBody = {
       listId: this.props.listId,

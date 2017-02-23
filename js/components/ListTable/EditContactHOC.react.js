@@ -10,7 +10,6 @@ import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
-import Textarea from 'react-textarea-autosize';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.react';
 
@@ -274,7 +273,6 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     addContacts: contacts => dispatch(contactActions.addContacts(contacts)),
     patchContact: (contactId, body) => dispatch(contactActions.patchContact(contactId, body)),
-    patchList: listBody => dispatch(listActions.patchList(listBody)),
     searchPublications: query => dispatch(publicationActions.searchPublications(query)),
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),

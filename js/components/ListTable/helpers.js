@@ -10,6 +10,7 @@ export function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+// returns contact value for certain fieldObj
 export function _getter(contact, fieldObj) {
   try {
     if (fieldObj.customfield) {
@@ -148,7 +149,55 @@ function publicationColumn(listData) {
   };
 }
 
+export function reformatFieldsmap(fieldsmap) {
+  const formattedMap = fieldsmap
+  .filter(fieldObj => !fieldObj.tableOnly)
+  .map(fieldObj => {
+    switch (fieldObj.value) {
+      case 'publication_name_1':
+        return {
+          name: 'Employers',
+          value: 'employers',
+          hidden: fieldObj.hidden,
+          customfield: fieldObj.customfield
+        };
+      default:
+        return {
+          name: fieldObj.name,
+          value: fieldObj.value,
+          hidden: fieldObj.hidden,
+          customfield: fieldObj.customfield
+        };
+    }
+  });
+  return formattedMap;
+}
+
+export function transformFieldsmap(fieldsmap) {
+  return fieldsmap.map(fieldObj => {
+    switch (fieldObj.value) {
+      case 'employers':
+        return {
+          customfield: false,
+          name: 'Publication',
+          value: 'publication_name_1',
+          hidden: find(fieldsmap, fObj => fObj.value === 'employers').hidden,
+          sortEnabled: true,
+          hideCheckbox: false,
+          checkboxStrategy: (fMap, checked) => fMap.map(fObj => {
+            if (fObj.value === 'publication_name_1' || fObj.value === 'employers') return Object.assign({}, fObj, {hidden: checked});
+            return fObj;
+          }),
+          strategy: contact => contact.publication_name_1
+        };
+      default:
+        return fieldObj;
+    }
+  });
+}
+
 export function generateTableFieldsmap(listData) {
+  const replacedNameMap = transformFieldsmap(listData.fieldsmap);
   const fieldsmap = [
     {
       name: '#',
@@ -174,14 +223,12 @@ export function generateTableFieldsmap(listData) {
       tableOnly: true,
       hideCheckbox: true,
     },
-    ...listData.fieldsmap
-    .map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
+    ...replacedNameMap.map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     instagramLikesToComments(listData),
     instagramLikesToPosts(listData),
     instagramCommentsToPosts(listData),
     instagramLikesToFollowers(listData),
     instagramCommentsToFollowers(listData),
-    publicationColumn(listData)
   ];
   return fieldsmap.filter(fieldObj => fieldObj);
 }
