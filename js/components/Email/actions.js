@@ -43,9 +43,7 @@ export function postBatchEmails(emails) {
     dispatch({type: SENDING_STAGED_EMAILS, emails});
     return api.post(`/emails`, emails)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(emailSchema)
-      });
+      const res = normalize(response, {data: arrayOf(emailSchema)});
       return dispatch({
         type: RECEIVE_STAGED_EMAILS,
         emails: res.entities.emails,
@@ -162,13 +160,10 @@ export function fetchSentEmails() {
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then( response => {
-      const res = normalize(response, {
-        data: arrayOf(emailSchema)
-      });
+      const res = normalize(response, {data: arrayOf(emailSchema)});
       let newOffset = OFFSET + PAGE_LIMIT;
       if (response.data.length < PAGE_LIMIT) newOffset = null;
       dispatch({type: EMAIL_SET_OFFSET, offset: newOffset});
-
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
         emails: res.entities.emails,
@@ -189,9 +184,7 @@ export function fetchListEmails(listId) {
     dispatch({type: REQUEST_MULTIPLE_EMAILS, listId});
     return api.get(`/lists/${listId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then( response => {
-      const res = normalize(response, {
-        data: arrayOf(emailSchema)
-      });
+      const res = normalize(response, {data: arrayOf(emailSchema)});
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
         emails: res.entities.emails,
@@ -214,9 +207,7 @@ export function fetchContactEmails(contactId) {
     dispatch({type: REQUEST_MULTIPLE_EMAILS}, contactId);
     return api.get(`/contacts/${contactId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(emailSchema)
-      });
+      const res = normalize(response, {data: arrayOf(emailSchema)});
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
         emails: res.entities.emails,
