@@ -59,7 +59,8 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return obj;
     case EMAIL_SET_OFFSET:
       obj = assignToEmpty(state, {});
-      obj.offset = action.offset;
+      if (action.scheduledOffset) obj.scheduledOffset = action.scheduledOffset;
+      if (action.offset) obj.offset = action.offset;
       return obj;
     case SET_SCHEDULE_TIME:
       return assignToEmpty(state, {utctime: action.utctime});

@@ -35,7 +35,8 @@ export const initialState = {
     offset: 0,
     contactOffsets: {},
     listOffsets: {},
-    utctime: null
+    utctime: null,
+    scheduledOffset: 0,
   },
   emailAttachmentReducer: {
     attached: [],
