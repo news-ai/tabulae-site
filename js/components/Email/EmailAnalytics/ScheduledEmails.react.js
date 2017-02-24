@@ -43,7 +43,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(stagingActions.fetchSentEmails()),
+    fetchEmails: _ => dispatch(stagingActions.fetchScheduledEmails()),
   };
 };
 
