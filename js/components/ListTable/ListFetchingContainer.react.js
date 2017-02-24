@@ -20,7 +20,7 @@ class ListFetchingContainer extends Component {
         <i className='fa fa-cog fa-spin'/>
       </div>);
     if (this.props.didInvalidate) {
-      renderNode = <div>LIST NOT FOUND. Go back to Home and hit Refresh.</div>;
+      renderNode = <div style={{margin: 20}}>LIST NOT FOUND AT THIS TIME. Check to see if you are logged into the right account then hit Refresh. If refreshing the page didn't help, reach out to Support.</div>;
     }
     return renderNode;
   }
