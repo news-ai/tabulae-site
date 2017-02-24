@@ -13,12 +13,16 @@ class ListFetchingContainer extends Component {
   }
 
   render() {
-    return this.props.list ?
+    let renderNode = this.props.list ?
     <ListTable {...this.props}/> : (
       <div style={{margin: 20}}>
         <span style={{margin: '0 10px'}}>LIST LOADING...</span>
         <i className='fa fa-cog fa-spin'/>
       </div>);
+    if (this.props.didInvalidate) {
+      renderNode = <div>LIST NOT FOUND. Go back to Home and hit Refresh.</div>;
+    }
+    return renderNode;
   }
 }
 
@@ -26,7 +30,8 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
   return {
     listId,
-    list: state.listReducer[listId]
+    list: state.listReducer[listId],
+    didInvalidate: state.listReducer.didInvalidate
   };
 };
 
