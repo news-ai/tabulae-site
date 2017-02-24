@@ -10,6 +10,7 @@
     "draft-js": "^0.10.0",
     "es6-promise": "^4.0.5",
     "fontfaceobserver": "^1.5.1",
+    "fuse.js": "^2.6.2",
     "fuzzy": "^0.1.1",
     "hopscotch": "^0.2.6",
     "immutable": "^3.8.1",
