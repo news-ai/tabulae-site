@@ -68,13 +68,20 @@ class PreviewEmails extends Component {
       <div>
         <div className='vertical-center' style={{margin: '10px 0'}}>
           <div>
-            <RaisedButton disabled={state.numberDraftEmails > 0} label={sendAllButtonLabel} primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
+            <RaisedButton
+            disabled={state.numberDraftEmails > 0}
+            label={sendAllButtonLabel}
+            primary
+            labelStyle={{textTransform: 'none'}}
+            onClick={onSendAllEmailsClick}
+            />
           </div>
           <div className='right'>
             <TextField
             id='preview_searchValue'
+            disabled={state.numberDraftEmails > 0}
             hintText='Search Filter'
-            floatingLabelText='Search Filter'
+            floatingLabelText={state.numberDraftEmails > 0 ? 'Draft in Progress' : 'Search Filter'}
             value={state.searchValue}
             onChange={this.onChange}
             />
