@@ -4,6 +4,7 @@ import PreviewEmail from './PreviewEmail.react';
 import Waiting from 'components/Waiting';
 import Fuse from 'fuse.js';
 import TextField from 'material-ui/TextField';
+import {grey700} from 'material-ui/styles/colors';
 
 const fuseOptions = {
   threshold: 0.6,
@@ -53,8 +54,9 @@ class PreviewEmails extends Component {
   render() {
     const state = this.state;
     const {sendLater, isReceiving, onSendEmailClick} = this.props;
-    const previewEmails = state.searchOn ? state.results : this.props.previewEmails;
     const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));
+
+    const previewEmails = state.searchOn ? state.results : this.props.previewEmails;
 
     let sendAllButtonLabel = sendLater ? 'Schedule All Emails' : 'Send All';
     if (state.numberDraftEmails > 0) sendAllButtonLabel = 'Draft in Progess';
@@ -64,7 +66,23 @@ class PreviewEmails extends Component {
     else {
       renderNode = (
       <div>
-        <RaisedButton disabled={state.numberDraftEmails > 0} label={sendAllButtonLabel} primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
+        <div className='vertical-center' style={{margin: '10px 0'}}>
+          <div>
+            <RaisedButton disabled={state.numberDraftEmails > 0} label={sendAllButtonLabel} primary labelStyle={{textTransform: 'none'}} onClick={onSendAllEmailsClick} />
+          </div>
+          <div className='right'>
+            <TextField
+            id='preview_searchValue'
+            hintText='Search Filter'
+            floatingLabelText='Search Filter'
+            value={state.searchValue}
+            onChange={this.onChange}
+            />
+          </div>
+        </div>
+        <div>
+          <span style={{color: grey700, fontSize: '0.8em'}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
+        </div>
         {previewEmails.map((email, i) =>
           <PreviewEmail
           turnOnDraft={_ => {
@@ -85,10 +103,7 @@ class PreviewEmails extends Component {
     }
     return (
       <div style={{padding: 10}}>
-        <Waiting style={{position: 'absolute', right: 15, top: 15}} isReceiving={isReceiving} text='Generating emails...' textStyle={{marginTop: '20px'}}/>
-        <div>
-          <TextField id='preview_searchValue' value={state.searchValue} onChange={this.onChange}/>
-        </div>
+        <Waiting style={{position: 'absolute', right: 15, top: 15}} isReceiving={isReceiving} text='Generating emails' textStyle={{marginTop: '20px'}}/>
         {renderNode}
       </div>);
   }
