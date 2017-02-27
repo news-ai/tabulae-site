@@ -35,6 +35,7 @@ export function addExtraEmail(email) {
     .then(response => {
       alertify.notify(`Confirmation email has been sent to ${email}`, 'custom', 8, function() {});
       dispatch({type: 'ADD_EXTRA_EMAIL_CONFIRMATION_SENT'});
+      dispatch({type: 'RECEIVE_NOTIFICATION', message: `Confirmation email has been sent to ${email}`});
       return dispatch(receiveLogin(response.data));
     })
     .catch(err => console.log(err));
@@ -45,9 +46,7 @@ export function postFeedback(reason, feedback) {
   return (dispatch) => {
     dispatch({type: 'POSTING_FEEDBACK', reason, feedback});
     return api.post(`/users/me/feedback`, {reason, feedback})
-    .then(response => {
-      return dispatch({type: 'POSTED_FEEDBACK'});
-    })
+    .then(response => dispatch({type: 'POSTED_FEEDBACK'}))
     .catch(err => dispatch({type: 'POSTED_FEEDBACK_FAIL'}));
   };
 }
