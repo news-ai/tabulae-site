@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import intercomSetup from '../chat';
 
 import {actions as loginActions} from 'components/Login';
+import {actions as notificationActions} from 'components/Notifications';
 import * as joyrideActions from './Joyride/actions';
 
 import Login from './Login';
@@ -16,8 +17,10 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
+import Popover from 'material-ui/Popover/Popover';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FeedbackPanel from './Feedback/FeedbackPanel.react';
+import NotificationPanel from 'components/Notifications/NotificationPanel.react';
 import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
@@ -47,7 +50,9 @@ class App extends Component {
       showNavBar: true,
       firstTimeUser: false,
       didScroll: false,
-      feedbackPanelOpen: false
+      feedbackPanelOpen: false,
+      notificationPanelOpen: false,
+      notificationAnchorEl: null
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
@@ -180,14 +185,30 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
-            <Link to='/settings'>
+            <IconButton
+            iconClassName='fa fa-bell'
+            onClick={e => {
+              e.preventDefault();
+              this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+            }}
+            />
+            <Popover
+            open={state.notificationPanelOpen}
+            anchorEl={state.notificationAnchorEl}
+            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+            onRequestClose={_ => this.setState({notificationPanelOpen: false})}
+            >
+              <NotificationPanel/>
+            </Popover>
+            {/*<Link to='/settings'>
               <RaisedButton
               label='Invite friends'
               labelColor='white'
               backgroundColor={blue300}
               labelStyle={{textTransform: 'none'}}
               />
-            </Link>
+            </Link>*/}
           </div>
           <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
             <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
@@ -228,7 +249,8 @@ const mapStateToProps = (state, props) => {
     isLogin: state.personReducer.person ? true : false,
     loginDidInvalidate: state.personReducer.didInvalidate,
     person: state.personReducer.person,
-    firstTimeUser: props.location.query.firstTimeUser || state.personReducer.firstTimeUser
+    firstTimeUser: props.location.query.firstTimeUser || state.personReducer.firstTimeUser,
+    notifications: state.notificationReducer.messages
   };
 };
 
@@ -237,7 +259,7 @@ const mapDispatchToProps = dispatch => {
     getAuth: _ => dispatch(loginActions.fetchPerson()),
     logoutClick: _ => dispatch(loginActions.logout()),
     setFirstTimeUser: _ => dispatch(loginActions.setFirstTimeUser()),
-    fetchNotifications: _ => dispatch(loginActions.fetchNotifications()),
+    fetchNotifications: _ => dispatch(notificationActions.fetchNotifications()),
     turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
   };

@@ -28,18 +28,6 @@ function loginFail(message) {
   };
 }
 
-function notification(dispatch, args) {
-  var notifications = JSON.parse(args.data);
-  for (var i = notifications.length - 1; i >= 0; i--) {
-    dispatch({type: 'EYY MESSAGE', message: notifications[i].message});
-    alertify.notify(notifications[i].message, 'custom', 5, function() {});
-  }
-}
-
-function log(argument) {
-  console.log(argument);
-}
-
 export function addExtraEmail(email) {
   return dispatch => {
     dispatch({type: 'ADD_EXTRA_EMAIL', email});
@@ -63,21 +51,6 @@ export function postFeedback(reason, feedback) {
     .catch(err => dispatch({type: 'POSTED_FEEDBACK_FAIL'}));
   };
 }
-
-export function fetchNotifications() {
-  return dispatch => {
-    return api.get('/users/me/token')
-    .then(response => {
-      const channel = new goog.appengine.Channel(response.token);
-      const socket = channel.open();
-      socket.onopen = log;
-      socket.onmessage = args => notification(dispatch, args);
-      socket.onerror = log;
-      socket.onclose = log;
-    });
-  };
-}
-
 
 export function setFirstTimeUser() {
   return dispatch => dispatch({type: SET_FIRST_TIME_USER});
