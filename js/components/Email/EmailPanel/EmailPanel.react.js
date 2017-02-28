@@ -180,11 +180,11 @@ class EmailPanel extends Component {
     const {subject, body} = this.state;
     const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
     if (selectedContacts.length === 0) {
-      alertify.alert(`You didn't select any contact to send this email to.`);
+      alertify.alert(`Contact Selection Error`, `You didn't select any contact to send this email to.`, function() {});
       return;
     }
     if (selectedContacts.some(contact => contact.email.length === 0 || contact.email === null)) {
-      alertify.alert(`You selected contacts without email field filled. We can't send emails to contacts with empty email field.`);
+      alertify.alert(`Contact Selection Error`, `You selected contacts without email field filled. We can't send emails to contacts with empty email field.`, function() {});
       return;
     }
     if (subject.length === 0 || body.length === 0) {

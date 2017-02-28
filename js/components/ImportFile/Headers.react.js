@@ -72,7 +72,7 @@ class Headers extends Component {
         _ => {}
         );
     } else if (untitledCount === headers.length) {
-      alertify.alert(`Importing empty list is not allowed. You must at least name one column.`);
+      alertify.alert(`Import List Error`, `Importing empty list is not allowed. You must at least name one column.`, function() {});
     } else {
       onProcessHeaders(newOrder);
     }

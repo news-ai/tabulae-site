@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import Link from 'react-router/lib/Link';
 import IconButton from 'material-ui/IconButton';
 import {contactPropTypes} from '../../constants/CommonPropTypes';
-import {grey50} from 'material-ui/styles/colors';
+import {grey50, grey700} from 'material-ui/styles/colors';
 import withRouter from 'react-router/lib/withRouter';
 
 const smallSpan = {
@@ -12,7 +12,7 @@ const smallSpan = {
   marginRight: 5
 };
 
-const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, query, id, router, publications}) => {
+const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, router, publications, list}) => {
   return (
     <div className='row horizontal-center'>
       <div className='large-10 columns' style={{
@@ -33,21 +33,26 @@ const ContactItem = ({email, firstname, lastname, listname, listid, rowNum, quer
             </div>
           }
           <span style={smallSpan}>belongs in</span>
-          <Link to={`/tables/${listid}`}><span>{listname}</span></Link>
+          <Link to={`/tables/${listid}`}><span>{list ? list.name : listid}</span></Link>
+          <span style={{marginLeft: 5, fontSize: '0.9em', color: grey700}}>{list && list.archived && '(Archived)'}</span>
         </div>
         <div className='large-2 medium-2 columns vertical-center'>
-          {listid ? <IconButton
-            tooltip='Go to Profile'
-            tooltipPosition='top-right'
-            iconClassName='fa fa-user'
-            onClick={_ => router.push(`/tables/${listid}/${id}`)}
-            /> : null}
-          {rowNum ? <IconButton
-            tooltip='Go to Search Results in List'
-            tooltipPosition='top-right'
-            iconClassName='fa fa-list-alt'
-            onClick={_ => router.push(`/tables/${listid}?search=${query}`)}
-            /> : null}
+          {listid &&
+            <Link to={`/tables/${listid}/${id}`}>
+              <IconButton
+              tooltip='Go to Profile'
+              tooltipPosition='top-right'
+              iconClassName='fa fa-user'
+              />
+            </Link>}
+          {rowNum &&
+            <Link to={`/tables/${listid}?search=${query}`}>
+              <IconButton
+              tooltip='Go to Search Results in List'
+              tooltipPosition='top-right'
+              iconClassName='fa fa-list-alt'
+              />
+            </Link>}
         </div>
         </div>
       </div>
@@ -59,7 +64,7 @@ ContactItem.PropTypes = contactPropTypes;
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
   return {
-    listname: listReducer[props.listid] ? listReducer[props.listid].name : props.listid,
+    list: listReducer[props.listid],
     publications: props.employers !== null && props.employers.map(pubid => state.publicationReducer[pubid])
   };
 };

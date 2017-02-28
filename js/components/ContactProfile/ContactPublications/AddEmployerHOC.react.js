@@ -60,7 +60,7 @@ class AddEmployerHOC extends Component {
         props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
         this.onRequestClose();
       } else {
-        alertify.alert('All fields must be filled to continue.');
+        alertify.alert('Form Completion', 'All fields must be filled to continue.', function() {});
       }
     } else {
       props.createPublicationThenPatchContact(props.contact.id, state.publicationObj, props.type);
