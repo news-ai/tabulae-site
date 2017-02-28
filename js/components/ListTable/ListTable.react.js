@@ -685,7 +685,7 @@ class ListTable extends Component {
               iconStyle={{color: grey500}}
               onClick={_ => props.person.emailconfirmed ?
                 this.setState({isEmailPanelOpen: true}) :
-                alertify.alert('You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.')}
+                alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {})}
               disabled={state.isEmailPanelOpen || props.listData.readonly}
               />
               <IconButton
