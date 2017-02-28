@@ -185,7 +185,7 @@ class App extends Component {
             </div>
           </div>
           <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
-            <IconButton
+            {/*<IconButton
             iconClassName='fa fa-bell'
             onClick={e => {
               e.preventDefault();
@@ -200,15 +200,15 @@ class App extends Component {
             onRequestClose={_ => this.setState({notificationPanelOpen: false})}
             >
               <NotificationPanel/>
-            </Popover>
-            {/*<Link to='/settings'>
+            </Popover>*/}
+            <Link to='/settings'>
               <RaisedButton
               label='Invite friends'
               labelColor='white'
               backgroundColor={blue300}
               labelStyle={{textTransform: 'none'}}
               />
-            </Link>*/}
+            </Link>
           </div>
           <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
             <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />

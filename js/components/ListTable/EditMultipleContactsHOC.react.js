@@ -116,10 +116,12 @@ class EditMultipleContacts extends Component {
     const actions = [
       <FlatButton
       label='Cancel'
+      disabled={props.isReceiving}
       onClick={_ => this.setState({open: false, contactBody: {}, customfields: []})}
       />,
       <FlatButton
-      label='Submit'
+      label={props.isReceiving ? 'Updating...' : 'Submit'}
+      disabled={props.isReceiving}
       onClick={this.onSubmit}
       />,
     ];
@@ -127,7 +129,7 @@ class EditMultipleContacts extends Component {
       <div className={props.className}>
         {state.open &&
           <Dialog actions={actions} autoScrollBodyContent modal open={state.open} title='Edit Multiple Contacts' onRequestClose={_ => this.setState({open: false})}>
-          <div style={{margin: 10,padding: 10, fontSize: '0.8em', backgroundColor: yellow50}}>
+          <div style={{margin: 10, padding: 10, fontSize: '0.8em', backgroundColor: yellow50}}>
             Warning: content added here will be applied to all selected contacts.
           </div>
           <div className='row' style={{marginTop: 20}}>
@@ -175,6 +177,7 @@ const mapStateToProps = (state, props) => {
   return {
     list: state.listReducer[props.listId],
     selectContacts: props.selected.map(id => state.contactReducer[id]),
+    isReceiving: state.contactReducer.isReceiving
   };
 };
 
