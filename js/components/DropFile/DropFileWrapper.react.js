@@ -68,7 +68,7 @@ class DropFileWrapper extends Component {
   }
 
   _onDrop(files) {
-    this.setState({file: files[files.length - 1], isFileDropped: true});
+    if (files.length > 0) this.setState({file: files[files.length - 1], isFileDropped: true});
   }
 
   _onProcessHeaders(order) {
