@@ -76,6 +76,8 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         }),
         isReceiving: false
       });
+    case 'SEND_EMAIL':
+      return Object.assign({}, state, {isReceiving: true});
     case 'PATCH_EMAIL':
       return Object.assign({}, state, {isReceiving: true});
     default:

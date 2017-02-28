@@ -5,6 +5,7 @@ import Waiting from 'components/Waiting';
 import Fuse from 'fuse.js';
 import TextField from 'material-ui/TextField';
 import {grey700} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
 
 const fuseOptions = {
   threshold: 0.6,
@@ -53,6 +54,7 @@ class PreviewEmails extends Component {
 
   render() {
     const state = this.state;
+    const props = this.props;
     const {sendLater, isReceiving, onSendEmailClick} = this.props;
     const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));
 
@@ -69,9 +71,10 @@ class PreviewEmails extends Component {
         <div className='vertical-center' style={{margin: '10px 0'}}>
           <div>
             <RaisedButton
-            disabled={state.numberDraftEmails > 0}
+            disabled={state.numberDraftEmails > 0 || props.isReceiving}
             label={sendAllButtonLabel}
             primary
+            icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
             labelStyle={{textTransform: 'none'}}
             onClick={onSendAllEmailsClick}
             />
