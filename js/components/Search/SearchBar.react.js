@@ -55,7 +55,8 @@ class SearchBar extends Component {
 
   _onSearchClick() {
     if (this.props.isReceiving) return;
-    this.props.router.push(`/search?query=${this.state.query}`);
+    const query = this.refs.searchQuery.input.value;
+    this.props.router.push(`/search?query=${query}`);
   }
 
   render() {
@@ -76,9 +77,8 @@ class SearchBar extends Component {
             <div className='vertical-center'>
              <TextField
               hintText='Search query here...'
+              ref='searchQuery'
               onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
-              onChange={e => this.setState({query: e.target.value})}
-              value={state.query}
               />
               <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
             </div>
