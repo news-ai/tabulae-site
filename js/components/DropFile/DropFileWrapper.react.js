@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import TextField from 'material-ui/TextField';
 import withRouter from 'react-router/lib/withRouter';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -11,6 +11,7 @@ import FontIcon from 'material-ui/FontIcon';
 
 import Waiting from '../Waiting';
 import {grey500, grey800} from 'material-ui/styles/colors';
+import alertify from 'alertifyjs';
 
 const styles = {
   dropzone: {
@@ -68,7 +69,18 @@ class DropFileWrapper extends Component {
   }
 
   _onDrop(files) {
-    if (files.length > 0) this.setState({file: files[files.length - 1], isFileDropped: true});
+    if (files.length > 0) {
+      const file = files[files.length - 1];
+      const fileExtensionArray = file.name.split('.');
+      const fileExtension = fileExtensionArray[fileExtensionArray.length - 1];
+      if (fileExtension === 'xlsx') {
+        this.setState({file, isFileDropped: true});
+      } else {
+        alertify.alert('File Dropped', `File dropped but not of accepted file types. We only accept .xlsx file format. You dropped a .${fileExtension} file.`, function() {});
+      }
+    } else {
+      alertify.alert('File Dropped', 'File dropped but not of accepted file types. We only accept .xlsx file format.', function() {});
+    }
   }
 
   _onProcessHeaders(order) {
