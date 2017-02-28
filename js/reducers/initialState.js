@@ -142,4 +142,7 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false
   },
+  notificationReducer: {
+    messages: []
+  }
 };

@@ -314,7 +314,7 @@ class EmailPanel extends Component {
                 </div>
                 <div style={{position: 'absolute', right: 20, bottom: 3}}>
                   <IconButton
-                  iconClassName='fa fa-envelope'
+                  iconClassName={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}
                   onClick={this._onPreviewEmailsClick}
                   tooltip='Preview then Send'
                   tooltipPosition='top-left'

@@ -28,18 +28,6 @@ function loginFail(message) {
   };
 }
 
-function notification(dispatch, args) {
-  var notifications = JSON.parse(args.data);
-  for (var i = notifications.length - 1; i >= 0; i--) {
-    dispatch({type: 'EYY MESSAGE', message: notifications[i].message});
-    alertify.notify(notifications[i].message, 'custom', 5, function() {});
-  }
-}
-
-function log(argument) {
-  console.log(argument);
-}
-
 export function addExtraEmail(email) {
   return dispatch => {
     dispatch({type: 'ADD_EXTRA_EMAIL', email});
@@ -47,6 +35,7 @@ export function addExtraEmail(email) {
     .then(response => {
       alertify.notify(`Confirmation email has been sent to ${email}`, 'custom', 8, function() {});
       dispatch({type: 'ADD_EXTRA_EMAIL_CONFIRMATION_SENT'});
+      dispatch({type: 'RECEIVE_NOTIFICATION', message: `Confirmation email has been sent to ${email}`});
       return dispatch(receiveLogin(response.data));
     })
     .catch(err => console.log(err));
@@ -57,27 +46,10 @@ export function postFeedback(reason, feedback) {
   return (dispatch) => {
     dispatch({type: 'POSTING_FEEDBACK', reason, feedback});
     return api.post(`/users/me/feedback`, {reason, feedback})
-    .then(response => {
-      return dispatch({type: 'POSTED_FEEDBACK'});
-    })
+    .then(response => dispatch({type: 'POSTED_FEEDBACK'}))
     .catch(err => dispatch({type: 'POSTED_FEEDBACK_FAIL'}));
   };
 }
-
-export function fetchNotifications() {
-  return dispatch => {
-    return api.get('/users/me/token')
-    .then(response => {
-      const channel = new goog.appengine.Channel(response.token);
-      const socket = channel.open();
-      socket.onopen = log;
-      socket.onmessage = args => notification(dispatch, args);
-      socket.onerror = log;
-      socket.onclose = log;
-    });
-  };
-}
-
 
 export function setFirstTimeUser() {
   return dispatch => dispatch({type: SET_FIRST_TIME_USER});
