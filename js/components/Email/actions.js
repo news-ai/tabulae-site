@@ -97,9 +97,7 @@ export function postBatchEmailsWithAttachments(emails) {
     dispatch({type: SENDING_STAGED_EMAILS, emails});
     return api.post(`/emails`, emails)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(emailSchema)
-      });
+      const res = normalize(response, {data: arrayOf(emailSchema)});
       const ids = res.result.data;
       const postFilePromises = ids.map(id => dispatch(postAttachments(id)));
       dispatch({type: 'ALL_EMAIL_ATTACHMENTS_START'});
@@ -137,7 +135,7 @@ export function sendLimitedEmails(emailids) {
     .then(response => {
       const res = normalize(response, {data: arrayOf(emailSchema)});
       return dispatch({
-        type: RECEIVE_MULTIPLE_EMAILS,
+        type: 'RECEIVE_MULTIPLE_EMAILS_MANUAL',
         emails: res.entities.emails,
         ids: res.result.data
       });
@@ -149,6 +147,7 @@ export function sendLimitedEmails(emailids) {
 export function bulkSendEmails(emailids) {
   return dispatch => {
     dispatch({type: 'START_BULK_SEND_EMAILS', emailids});
+    dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_ON'});
     const LIMIT = 70;
     let promises = [];
     if (emailids.length > LIMIT) {
@@ -163,7 +162,10 @@ export function bulkSendEmails(emailids) {
     } else {
       promises.push(dispatch(sendLimitedEmails(emailids)));
     }
-    return Promise.all(promises).then(_ => dispatch({type: 'FINISHED_BULK_SEND_EMAILS'}));
+    return Promise.all(promises).then(_ => {
+      dispatch({type: 'FINISHED_BULK_SEND_EMAILS'});
+      dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
+    });
   };
 }
 
