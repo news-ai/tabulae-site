@@ -339,7 +339,7 @@ class EmailPanel extends Component {
             sendLater={props.scheduledtime !== null}
             isReceiving={props.isReceiving}
             previewEmails={props.previewEmails}
-            onSendAllEmailsClick={props.onBulkSendEmails}
+            onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
             onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
             />
           </SkyLight>

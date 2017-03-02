@@ -130,7 +130,7 @@ export function sendEmail(id) {
   };
 }
 
-export function send250Emails(emailids) {
+export function sendLimitedEmails(emailids) {
   return dispatch => {
     dispatch({type: 'SEND_EMAIL', emailids});
     return api.post(`/emails/bulksend`, {emailids})
@@ -142,26 +142,28 @@ export function send250Emails(emailids) {
         ids: res.result.data
       });
     })
-    .catch( message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
+    .catch(message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
   };
 }
 
 export function bulkSendEmails(emailids) {
   return dispatch => {
     dispatch({type: 'START_BULK_SEND_EMAILS', emailids});
-    const LIMIT = 250;
+    const LIMIT = 70;
+    let promises = [];
     if (emailids.length > LIMIT) {
       let r = LIMIT;
       let l = 0;
       while (r < emailids.length) {
-        dispatch(send250Emails(emailids.slice(l, r)));
+        promises.push(dispatch(sendLimitedEmails(emailids.slice(l, r))));
         l += LIMIT;
         r += LIMIT;
       }
-      dispatch(send250Emails(emailids.slice(l, emailids.length)));
+      promises.push(dispatch(sendLimitedEmails(emailids.slice(l, emailids.length))));
     } else {
-      dispatch(send250Emails(emailids));
+      promises.push(dispatch(sendLimitedEmails(emailids)));
     }
+    return Promise.all(promises).then(_ => dispatch({type: 'FINISHED_BULK_SEND_EMAILS'}));
   };
 }
 
