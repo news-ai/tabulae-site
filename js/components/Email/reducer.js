@@ -19,6 +19,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
   if (window.isDev) Object.freeze(state);
 
   let obj;
+  let unsorted, unseen;
   switch (action.type) {
     case SENDING_STAGED_EMAILS:
       return Object.assign({}, state, {isReceiving: true});
@@ -45,8 +46,8 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         obj.listOffsets = assignToEmpty(state.listOffsets, {});
         obj.listOffsets[action.listId] = action.offset;
       }
-      const unseen = action.ids.filter(id => !state[id]);
-      const unsorted = state.received.concat(unseen);
+      unseen = action.ids.filter(id => !state[id]);
+      unsorted = state.received.concat(unseen);
       unsorted.sort(function(aId, bId) {
         const aDate = new Date(obj[aId].created);
         const bDate = new Date(obj[bId].created);
@@ -56,6 +57,27 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       });
       obj.received = unsorted;
       obj.isReceiving = false;
+      return obj;
+    case 'RECEIVE_MULTIPLE_EMAILS_MANUAL':
+      obj = assignToEmpty(state, action.emails);
+      if (action.contactId) {
+        obj.contactOffsets = assignToEmpty(state.contactOffsets, {});
+        obj.contactOffsets[action.contactId] = action.offset;
+      }
+      if (action.listId) {
+        obj.listOffsets = assignToEmpty(state.listOffsets, {});
+        obj.listOffsets[action.listId] = action.offset;
+      }
+      unseen = action.ids.filter(id => !state[id]);
+      unsorted = state.received.concat(unseen);
+      unsorted.sort(function(aId, bId) {
+        const aDate = new Date(obj[aId].created);
+        const bDate = new Date(obj[bId].created);
+        if (aDate > bDate) return -1;
+        if (aDate < bDate) return 1;
+        return 0;
+      });
+      obj.received = unsorted;
       return obj;
     case EMAIL_SET_OFFSET:
       obj = assignToEmpty(state, {});
@@ -80,6 +102,10 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return Object.assign({}, state, {isReceiving: true});
     case 'PATCH_EMAIL':
       return Object.assign({}, state, {isReceiving: true});
+    case 'STAGING_MANUALLY_SET_ISRECEIVING_ON':
+      return Object.assign({}, state, {isReceiving: true});
+    case 'STAGING_MANUALLY_SET_ISRECEIVING_OFF':
+      return Object.assign({}, state, {isReceiving: false});
     default:
       return state;
   }
