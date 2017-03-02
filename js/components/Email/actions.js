@@ -130,6 +130,41 @@ export function sendEmail(id) {
   };
 }
 
+export function send250Emails(emailids) {
+  return dispatch => {
+    dispatch({type: 'SEND_EMAIL', emailids});
+    return api.post(`/emails/bulksend`, {emailids})
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(emailSchema)});
+      return dispatch({
+        type: RECEIVE_MULTIPLE_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data
+      });
+    })
+    .catch( message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
+  };
+}
+
+export function bulkSendEmails(emailids) {
+  return dispatch => {
+    dispatch({type: 'START_BULK_SEND_EMAILS', emailids});
+    const LIMIT = 250;
+    if (emailids.length > LIMIT) {
+      let r = LIMIT;
+      let l = 0;
+      while (r < emailids.length) {
+        dispatch(send250Emails(emailids.slice(l, r)));
+        l += LIMIT;
+        r += LIMIT;
+      }
+      dispatch(send250Emails(emailids.slice(l, emailids.length)));
+    } else {
+      dispatch(send250Emails(emailids));
+    }
+  };
+}
+
 export function patchEmail(id, emailBody) {
   return dispatch => {
     dispatch({type: 'PATCH_EMAIL', id, emailBody});
