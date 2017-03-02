@@ -56,7 +56,6 @@ class PreviewEmails extends Component {
     const state = this.state;
     const props = this.props;
     const {sendLater, isReceiving, onSendEmailClick} = this.props;
-    const onSendAllEmailsClick = _ => previewEmails.map(email => onSendEmailClick(email.id));
 
     const previewEmails = state.searchOn ? state.results : this.props.previewEmails;
 
@@ -76,7 +75,7 @@ class PreviewEmails extends Component {
             primary
             icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
             labelStyle={{textTransform: 'none'}}
-            onClick={onSendAllEmailsClick}
+            onClick={_ => props.onSendAllEmailsClick(previewEmails.map(email => email.id))}
             />
           </div>
           <div className='right'>

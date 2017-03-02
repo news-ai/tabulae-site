@@ -196,6 +196,9 @@ class EmailPanel extends Component {
         _ => { } // on Cancel
       );
     } else {
+      if (selectedContacts.length > 400) {
+        alertify.alert('Processing', `Sending >400 emails might take a minute to process. Please be patient while we generate Preview of those emails.`, function() {});
+      }
       this._sendGeneratedEmails(contactEmails);
     }
   }
@@ -336,7 +339,7 @@ class EmailPanel extends Component {
             sendLater={props.scheduledtime !== null}
             isReceiving={props.isReceiving}
             previewEmails={props.previewEmails}
-            onSendAllEmailsClick={this._onSendAllEmailsClick}
+            onSendAllEmailsClick={props.onBulkSendEmails}
             onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
             />
           </SkyLight>
@@ -372,6 +375,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     onSendEmailClick: id => dispatch(stagingActions.sendEmail(id)),
+    onBulkSendEmails: ids => dispatch(stagingActions.bulkSendEmails(ids)),
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
