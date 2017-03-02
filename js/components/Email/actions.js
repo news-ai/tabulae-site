@@ -130,7 +130,7 @@ export function sendEmail(id) {
   };
 }
 
-export function send250Emails(emailids) {
+export function sendLimitedEmails(emailids) {
   return dispatch => {
     dispatch({type: 'SEND_EMAIL', emailids});
     return api.post(`/emails/bulksend`, {emailids})
@@ -149,18 +149,18 @@ export function send250Emails(emailids) {
 export function bulkSendEmails(emailids) {
   return dispatch => {
     dispatch({type: 'START_BULK_SEND_EMAILS', emailids});
-    const LIMIT = 250;
+    const LIMIT = 70;
     if (emailids.length > LIMIT) {
       let r = LIMIT;
       let l = 0;
       while (r < emailids.length) {
-        dispatch(send250Emails(emailids.slice(l, r)));
+        dispatch(sendLimitedEmails(emailids.slice(l, r)));
         l += LIMIT;
         r += LIMIT;
       }
-      dispatch(send250Emails(emailids.slice(l, emailids.length)));
+      dispatch(sendLimitedEmails(emailids.slice(l, emailids.length)));
     } else {
-      dispatch(send250Emails(emailids));
+      dispatch(sendLimitedEmails(emailids));
     }
   };
 }
