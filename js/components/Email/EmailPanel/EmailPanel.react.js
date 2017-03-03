@@ -217,7 +217,7 @@ class EmailPanel extends Component {
     if (state.body || state.subject) {
       alertify.confirm(
         'Are you sure?',
-        'Closing the editor will cause your subject/body to be discarded. Save them as template using the bottom utility button if you\'d like to reuse them.',
+        'Closing the editor will cause your subject/body to be discarded.',
         this.props.onClose,
         () => {}
         );

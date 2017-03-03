@@ -62,6 +62,7 @@ class PreviewEmails extends Component {
     let sendAllButtonLabel = sendLater ? 'Schedule All Emails' : 'Send All';
     if (state.numberDraftEmails > 0) sendAllButtonLabel = 'Draft in Progess';
 
+
     let renderNode;
     if (previewEmails.length === 0) renderNode = <span>All done.</span>;
     else {
@@ -94,8 +95,8 @@ class PreviewEmails extends Component {
         </div>
         <div style={{margin: '8px 0'}}>
           <span style={{fontSize: '0.9em'}}>Attachments:</span>
-      {props.attachments.map(file =>
-          <span key={file.name} style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>{file.name}</span>)}
+      {props.attachments.length > 0 ? props.attachments.map(file =>
+          <span key={file.name} style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>{file.name}</span>) : <span style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>None</span>}
           <div className='vertical-center'>
             {props.attachmentIsReceiving && <span style={{color: grey700, fontSize: '0.8em'}}>Attaching files...</span>}
             {props.finishedAttaching && <span style={{color: grey700, fontSize: '0.8em'}}>Succesfully attached.</span>}
