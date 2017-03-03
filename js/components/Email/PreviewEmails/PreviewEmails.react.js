@@ -6,6 +6,7 @@ import Fuse from 'fuse.js';
 import TextField from 'material-ui/TextField';
 import {grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
+import {connect} from 'react-redux';
 
 const fuseOptions = {
   threshold: 0.6,
@@ -88,8 +89,17 @@ class PreviewEmails extends Component {
             />
           </div>
         </div>
-        <div>
+        <div className='vertical-center'>
           <span style={{color: grey700, fontSize: '0.8em'}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
+        </div>
+        <div style={{margin: '8px 0'}}>
+          <span style={{fontSize: '0.9em'}}>Attachments:</span>
+      {props.attachments.map(file =>
+          <span key={file.name} style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>{file.name}</span>)}
+          <div className='vertical-center'>
+            {props.attachmentIsReceiving && <span style={{color: grey700, fontSize: '0.8em'}}>Attaching files...</span>}
+            {props.finishedAttaching && <span style={{color: grey700, fontSize: '0.8em'}}>Succesfully attached.</span>}
+          </div>
         </div>
         {previewEmails.map((email, i) =>
           <PreviewEmail
@@ -123,4 +133,12 @@ PreviewEmails.PropTypes = {
   onSendEmailClick: PropTypes.func.isRequired,
 };
 
-export default PreviewEmails;
+const mapStateToProps = (state, props) => {
+  return {
+    attachmentIsReceiving: state.emailAttachmentReducer.isReceiving,
+    attachments: state.emailAttachmentReducer.attached,
+    finishedAttaching: state.emailAttachmentReducer.finished
+  };
+};
+
+export default connect(mapStateToProps)(PreviewEmails);

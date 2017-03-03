@@ -7,7 +7,7 @@ import Paper from 'material-ui/Paper';
 import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import {actions as attachmentActions} from 'components/Email/EmailAttachment';
-import {deepOrange100, deepOrange600, grey400, grey600, grey800} from 'material-ui/styles/colors';
+import {deepOrange600, grey400, grey600, grey800} from 'material-ui/styles/colors';
 import moment from 'moment-timezone';
 import alertify from 'alertifyjs';
 import FontIcon from 'material-ui/FontIcon';
