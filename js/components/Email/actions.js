@@ -87,7 +87,9 @@ export function postAttachments(emailid) {
     files.map(file => data.append('file', file, file.name));
     dispatch({type: 'ATTACHING_EMAIL_FILES', files});
     return api.postFile(`/emails/${emailid}/attach`, data)
-    .then(response => dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data}))
+    .then(response => {
+      return dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data});
+    })
     .catch(err => dispatch({type: 'ATTACHED_EMAIL_FILES_FAIL', err}));
   };
 }
