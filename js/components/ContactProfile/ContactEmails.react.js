@@ -13,7 +13,7 @@ class ContactEmails extends Component {
   }
 
   render() {
-    return <EmailsList {...this.props}/>;
+    return (<EmailsList {...this.props}/>);
   }
 }
 
@@ -33,7 +33,11 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(stagingActions.fetchContactEmails(props.contactId))
+    fetchEmails: _ => dispatch(stagingActions.fetchContactEmails(props.contactId)),
+    refreshEmails: _ => {
+      dispatch({type: 'RESET_STAGING_CONTACT_OFFSET', contactId: props.contactId});
+      dispatch(stagingActions.fetchContactEmails(props.contactId));
+    }
   };
 };
 

@@ -106,6 +106,14 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return Object.assign({}, state, {isReceiving: true});
     case 'STAGING_MANUALLY_SET_ISRECEIVING_OFF':
       return Object.assign({}, state, {isReceiving: false});
+    case 'RESET_STAGING_CONTACT_OFFSET':
+      obj = assignToEmpty(state, {});
+      obj.contactOffsets = assignToEmpty(state.contactOffsets, {});
+      obj.contactOffsets[action.contactId] = 0;
+      return obj;
+    case 'RESET_STAGING_OFFSET':
+      obj = assignToEmpty(state, {offset: 0});
+      return obj;
     default:
       return state;
   }

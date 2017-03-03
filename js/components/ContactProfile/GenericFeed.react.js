@@ -3,6 +3,7 @@ import React, {PropTypes, Component} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
+import {grey700} from 'material-ui/styles/colors';
 
 const styleEmptyRow = {
   padding: 10,
@@ -62,7 +63,7 @@ class GenericFeed extends Component {
           && props.feed.length === 0
           && (
             <div className='row' style={styleEmptyRow}>
-              <p>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p>
+              <p style={{color: grey700, fontSize: '0.9em'}}>No {props.title} attached. Try clicking on 'Settings' to start seeing some headlines.</p>
             </div>
             )}
         {props.didInvalidate
