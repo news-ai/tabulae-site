@@ -17,6 +17,10 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchEmails: _ => dispatch(stagingActions.fetchSentEmails()),
+    refreshEmails: _ => {
+      dispatch({type: 'RESET_STAGING_OFFSET'});
+      dispatch(stagingActions.fetchSentEmails());
+    }
   };
 };
 
