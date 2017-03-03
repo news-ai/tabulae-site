@@ -13,6 +13,7 @@ import alertify from 'alertifyjs';
 import FontIcon from 'material-ui/FontIcon';
 
 const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
+const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
 const styles = {
   analytics: {
@@ -81,7 +82,7 @@ class ScheduledEmailItem extends Component {
     const wrapperStyle = styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let sendAtDate = moment(sendat);
-    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(DEFAULT_DATESTRING);
+    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
     return (
       <Paper zDepth={1} className='clearfix' style={wrapperStyle}>
@@ -107,7 +108,7 @@ class ScheduledEmailItem extends Component {
             </div>}
           </div>
           <div className='small-12 medium-6 large-6 columns'>
-            <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(DEFAULT_DATESTRING)}</span>
+            <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
           </div>
           <div className='small-12 medium-12 large-12 columns'>
             <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Send at:</strong> {sendAtDatestring}</span>
