@@ -99,6 +99,7 @@ class EmailPanel extends Component {
     this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
+    this.onClose = this._onClose.bind(this);
   }
 
   componentWillMount() {
@@ -211,6 +212,20 @@ class EmailPanel extends Component {
       _ => console.log('template saving cancelled'));
   }
 
+  _onClose() {
+    const state = this.state;
+    if (state.body || state.subject) {
+      alertify.confirm(
+        'Are you sure?',
+        'Closing the editor will cause your subject/body to be discarded. Save them as template using the bottom utility button if you\'d like to reuse them.',
+        this.props.onClose,
+        () => {}
+        );
+    } else {
+      this.props.onClose();
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -241,7 +256,7 @@ class EmailPanel extends Component {
           <Paper style={emailPanelWrapper} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
-                <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={props.onClose} className='fa fa-times pointer'/>
+                <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
               </div>
               <div className='vertical-center'>

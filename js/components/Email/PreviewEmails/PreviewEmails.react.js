@@ -35,7 +35,6 @@ class PreviewEmails extends Component {
       numberDraftEmails: 0,
       searchValue: '',
       searchOn: false,
-
     };
     this.onChange = this._onChange.bind(this);
     this.fuse = new Fuse(this.props.previewEmails, fuseOptions);
