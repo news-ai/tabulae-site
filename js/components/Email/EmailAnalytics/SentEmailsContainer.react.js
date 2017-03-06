@@ -76,7 +76,7 @@ class SentEmailsPaginationContainer extends Component {
                       {selectable}
                       </DropDownMenu>
                     </div>
-                    <div className='vertical-center'>
+                    {/*<div className='vertical-center'>
                       <TextField
                       ref='emailSearch'
                       floatingLabelText='Search Filter'
@@ -86,7 +86,7 @@ class SentEmailsPaginationContainer extends Component {
                       iconClassName='fa fa-search'
                       onClick={e => props.router.push(`/emailstats/search/${this.refs.emailSearch.input.value}`)}
                       />
-                    </div>
+                    </div>*/}
                   </div>}
                   {props.children}
                 </div>
