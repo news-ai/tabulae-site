@@ -246,7 +246,7 @@ export function fetchListEmails(listId) {
     if (!OFFSET) OFFSET = 0;
     dispatch({type: REQUEST_MULTIPLE_EMAILS, listId});
     return api.get(`/lists/${listId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
-    .then( response => {
+    .then(response => {
       const res = normalize(response, {data: arrayOf(emailSchema)});
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,

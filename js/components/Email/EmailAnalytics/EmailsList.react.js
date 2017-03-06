@@ -73,6 +73,10 @@ class EmailsList extends Component {
     // window.Intercom('trackEvent', 'checking_sent_emails', {route: window.location.pathname});
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
+  }
+
   render() {
     let style = {};
     if (this.props.containerHeight) style.height = this.props.containerHeight;

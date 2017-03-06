@@ -43,8 +43,9 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         obj.contactOffsets[action.contactId] = action.offset;
       }
       if (action.listId) {
-        obj.listOffsets = assignToEmpty(state.listOffsets, {});
-        obj.listOffsets[action.listId] = action.offset;
+        obj.listOffsets = assignToEmpty(state.listOffsets, {
+          [action.listId]: action.offset
+        });
       }
       unseen = action.ids.filter(id => !state[id]);
       unsorted = state.received.concat(unseen);

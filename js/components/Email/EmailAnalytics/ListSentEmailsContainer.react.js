@@ -12,14 +12,23 @@ const mapStateToProps = (state, props) => {
   .filter(email => email.listid === listId);
   return {
     emails,
-    isReceiving: state.stagingReducer.isReceiving
+    isReceiving: state.stagingReducer.isReceiving,
+    listId
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(stagingActions.fetchListEmails(props.params.listId))
+    fetchListEmails: id => dispatch(stagingActions.fetchListEmails(id))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EmailsList);
+const mergeProps = (sProps, dProps) => {
+  return {
+    ...sProps,
+    ...dProps,
+    fetchEmails: _ => dProps.fetchListEmails(sProps.listId),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(EmailsList);
