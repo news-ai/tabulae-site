@@ -55,8 +55,22 @@ class SentEmailsPaginationContainer extends Component {
 
     return (
         <div className='large-10 large-offset-1 columns'>
-          <div style={{margin: '20px 0'}}>
+          <div className='vertical-center' style={{margin: '20px 0'}}>
             <span style={{fontSize: '1.3em', marginRight: 10}}>Emails You Sent</span>
+            {/*<div className='right'>
+              <TextField
+              ref='emailSearch'
+              floatingLabelText='Search Filter'
+              />
+              <IconButton
+              iconStyle={{color: grey600}}
+              iconClassName='fa fa-search'
+              onClick={e => {
+                this.onTabChange('/emailstats/search');
+                props.router.push(`/emailstats/search/${this.refs.emailSearch.input.value}`);
+              }}
+              />
+            </div>*/}
           </div>
           <div className='row'>
             <Tabs
@@ -76,17 +90,6 @@ class SentEmailsPaginationContainer extends Component {
                       {selectable}
                       </DropDownMenu>
                     </div>
-                    {/*<div className='vertical-center'>
-                      <TextField
-                      ref='emailSearch'
-                      floatingLabelText='Search Filter'
-                      />
-                      <IconButton
-                      iconStyle={{color: grey600}}
-                      iconClassName='fa fa-search'
-                      onClick={e => props.router.push(`/emailstats/search/${this.refs.emailSearch.input.value}`)}
-                      />
-                    </div>*/}
                   </div>}
                   {props.children}
                 </div>
@@ -101,6 +104,11 @@ class SentEmailsPaginationContainer extends Component {
                 {props.children}
                 </div>
               </TabPane>
+              {/*<TabPane placeholder={<span>Placeholder</span>} tab='Search' key='/emailstats/search'>
+                <div style={{margin: 5}}>
+                {props.children}
+                </div>
+              </TabPane>*/}
             </Tabs>
           </div>
         </div>

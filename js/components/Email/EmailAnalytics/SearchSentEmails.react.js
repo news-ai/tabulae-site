@@ -6,13 +6,10 @@ import {actions as stagingActions} from 'components/Email';
 class SearchSentEmails extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      emails: []
-    };
   }
 
   componentWillMount() {
-    this.props.fetchEmails();
+    // this.props.fetchSearchSentEmails()).then(t => console.log(t));
   }
 
   render() {
@@ -21,8 +18,8 @@ class SearchSentEmails extends Component {
     return (
       <EmailsList
       isReceiving={props.isReceiving}
-      emails={state.emails}
-      fetchEmails={e => props.fetchEmails()}
+      emails={props.emails}
+      fetchEmails={e => props.fetchSearchSentEmails(props.searchQuery)}
       />
       );
   }
@@ -30,6 +27,7 @@ class SearchSentEmails extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
+    emails: state.stagingReducer.searchReceivedEmails || [],
     isReceiving: state.stagingReducer.isReceiving,
     searchQuery: props.params.searchQuery
   };
