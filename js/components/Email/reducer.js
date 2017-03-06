@@ -115,6 +115,11 @@ function stagingReducer(state = initialState.stagingReducer, action) {
     case 'RESET_STAGING_OFFSET':
       obj = assignToEmpty(state, {offset: 0});
       return obj;
+    case 'RECEIVE_SEARCH_SENT_EMAILS':
+      return assignToEmpty(state, {
+        searchReceivedEmails: action.emails,
+        searchQuery: action.query
+      });
     default:
       return state;
   }

@@ -70,8 +70,8 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
       let iterateArray = clone(tags);
       let tagsToReopen = [];
 
-      iterateArray.forEach( tag => {
-        let isCloser = tag.substr(0,2) === '</';
+      iterateArray.forEach(tag => {
+        let isCloser = tag.substr(0, 2) === '</';
         let stackTag = tagStack[0];
         let closeMatch = isTagCloseMatch(stackTag, tag);
 
@@ -112,8 +112,13 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
     return '</' + t.substr(1);
   }
 
+  function isString (str) {
+    if (typeof str === 'string') return true;
+    else return false;
+  }
+
   function isTagCloseMatch(opener, closer) {
-    if (!opener || !closer) { return false; }
+    if (!opener || !closer || !isString(opener) || !isString(close)) { return false; }
     return opener.substr(1) === closer.substr(2);
   }
 
