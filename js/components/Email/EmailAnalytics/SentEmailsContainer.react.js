@@ -5,6 +5,9 @@ import {actions as stagingActions} from 'components/Email';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
+import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
+import {grey600} from 'material-ui/styles/colors';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
@@ -72,6 +75,17 @@ class SentEmailsPaginationContainer extends Component {
                       <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
                       {selectable}
                       </DropDownMenu>
+                    </div>
+                    <div className='vertical-center'>
+                      <TextField
+                      ref='emailSearch'
+                      floatingLabelText='Search Filter'
+                      />
+                      <IconButton
+                      iconStyle={{color: grey600}}
+                      iconClassName='fa fa-search'
+                      onClick={e => props.router.push(`/emailstats/search/${this.refs.emailSearch.input.value}`)}
+                      />
                     </div>
                   </div>}
                   {props.children}
