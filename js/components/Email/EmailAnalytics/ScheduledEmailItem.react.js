@@ -87,11 +87,6 @@ class ScheduledEmailItem extends Component {
     return (
       <Paper zDepth={1} className='clearfix' style={wrapperStyle}>
         <div className='row'>
-        {cancel && <div className='row'>
-          <div className='small-12 large-6 columns left'>
-          <span style={{color: deepOrange600}}>Canceled Delivery</span>
-          </div>
-        </div>}
           <div className='small-12 medium-6 large-6 columns'>
           {listid !== 0 &&
             <div>
@@ -142,6 +137,12 @@ class ScheduledEmailItem extends Component {
               _ => ({}))}
               label='Cancel Delivery' secondary/>}
           </div>
+        {cancel &&
+          <div className='row'>
+            <div className='small-12 large-6 columns left'>
+              <span style={{color: deepOrange600}}>Canceled Delivery</span>
+            </div>
+          </div>}
         </div>
       </Paper>
       );
