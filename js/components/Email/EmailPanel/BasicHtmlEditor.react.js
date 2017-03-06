@@ -356,7 +356,7 @@ class BasicHtmlEditor extends React.Component {
     alertify.prompt(
       '',
       'Enter a URL',
-      'https://',
+      'http://',
       (e, url) => {
         const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));

@@ -141,7 +141,7 @@ class EmailSignatureEditor extends Component {
     alertify.prompt(
       '',
       'Enter a URL',
-      'https://',
+      'http://',
       (e, url) => {
         const entityKey = Entity.create('LINK', 'MUTABLE', {url});
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
