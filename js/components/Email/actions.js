@@ -12,6 +12,7 @@ import {
 import {normalize, Schema, arrayOf} from 'normalizr';
 import * as api from 'actions/api';
 import isEmpty from 'lodash/isEmpty';
+import transform from 'lodash/transform';
 
 const emailSchema = new Schema('emails');
 
@@ -259,6 +260,33 @@ export function fetchListEmails(listId) {
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
   };
 }
+
+// export function fetchSearchSentEmails(query) {
+//   const PAGE_LIMIT = 20;
+//   return (dispatch, getState) => {
+//     let OFFSET = 0;
+//     const isReceiving = getState().stagingReducer.isReceiving;
+//     if (OFFSET === null || isReceiving) return;
+//     if (!OFFSET) OFFSET = 0;
+//     dispatch({type: REQUEST_MULTIPLE_EMAILS, query});
+//     return api.get(`/emails/search?q="${query}"?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
+//     .then(response => {
+//       let t = response.data.map(obj => transform(obj, function (result, val, key) {
+//         result[key.toLowerCase()] = val;
+//       }));
+//       console.log(t);
+//       return Promise.resolve(t);
+//       // const res = normalize(response, {data: arrayOf(emailSchema)});
+//       // return dispatch({
+//       //   type: RECEIVE_MULTIPLE_EMAILS,
+//       //   emails: res.entities.emails,
+//       //   ids: res.result.data,
+//       //   offset: res.result.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT
+//       // });
+//     })
+//     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
+//   };
+// }
 
 export function fetchContactEmails(contactId) {
   const PAGE_LIMIT = 50;

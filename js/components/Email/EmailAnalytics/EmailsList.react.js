@@ -87,7 +87,7 @@ class EmailsList extends Component {
       {this.props.refreshEmails &&
         <div className='vertical-center'>
           <div className='right'>
-            <IconButton onClick={this.props.refreshEmails} iconStyle={{color: grey500}} className='right' iconClassName='fa fa-refresh'/>
+            <IconButton onClick={this.props.refreshEmails} iconStyle={{color: grey500}} className='right' iconClassName={`fa fa-refresh ${this.props.isReceiving ? 'fa-spin' : ''}`}/>
           </div>
         </div>}
         <div style={style}>

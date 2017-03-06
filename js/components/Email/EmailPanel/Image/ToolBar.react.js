@@ -19,7 +19,7 @@ const ToolBar = props => {
   const setLink = _ => alertify.prompt(
     '',
     'Enter a URL',
-    'https://',
+    'http://',
     (e, url) => props.setLink(url),
     _ => {}
     );

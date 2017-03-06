@@ -47,6 +47,7 @@ import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsCon
 import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
 import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSentEmailsContainer.react';
 import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
+import SearchSentEmails from './components/Email/EmailAnalytics/SearchSentEmails.react';
 import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
 
 import ContactProfile from './components/ContactProfile';
@@ -84,6 +85,7 @@ if (module.hot) {
 }
 
 // wrap components that we want onboarding to, pass down props like routes
+              //<Route path='search/:searchQuery' staticName name='Search' component={SearchSentEmails}/>
 
 ReactDOM.render(
   <MultiThemeProvider>

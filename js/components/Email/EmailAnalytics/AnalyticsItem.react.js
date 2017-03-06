@@ -100,7 +100,7 @@ class AnalyticsItem extends Component {
           {listid !== 0 &&
             <div>
               <span style={styles.sentFrom}>Sent from List</span>
-              <span style={{margin: '0 5px', fontSize: '0.9em'}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
+              <span style={{margin: '0 5px', fontSize: '0.9em'}}><Link to={`/tables/${listid}`}>{listname || `(Archived) ${listid}`}</Link></span>
               {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
               {!archived && <FontIcon
               className='pointer fa fa-trash'
