@@ -31,6 +31,7 @@ import MinimizedView from './MinimizedView.react';
 import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
+import isEmail from 'validator/lib/isEmail';
 
 import {grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 
@@ -179,14 +180,27 @@ class EmailPanel extends Component {
   _onPreviewEmailsClick() {
     const {selectedContacts} = this.props;
     const {subject, body} = this.state;
-    const contactEmails = this._getGeneratedHtmlEmails(selectedContacts, subject, body);
+    const contactEmails = this._getGeneratedHtmlEmails(selectedContacts.filter(contact => contact.email !== null && contact.email.length > 0 && isEmail(contact.email)), subject, body);
     if (selectedContacts.length === 0) {
       alertify.alert(`Contact Selection Error`, `You didn't select any contact to send this email to.`, function() {});
       return;
     }
     if (selectedContacts.some(contact => contact.email.length === 0 || contact.email === null)) {
-      alertify.alert(`Contact Selection Error`, `You selected contacts without email field filled. We can't send emails to contacts with empty email field.`, function() {});
-      return;
+      alertify.alert(
+        `Contact Selection Warning`,
+        `You selected contacts without email field filled. We will skip emailing the following contacts:\n${
+          selectedContacts
+          .filter(contact => contact.email.length === 0 || contact.email === null)
+          .map(contact => `${contact.firstname} ${contact.lastname}`)
+          .join(', ')
+        }`, function() {});
+      if (contactEmails.length === 0) {
+        alertify.alert(
+          `Contact Selection Warning`,
+          `All contacts selected had no email fields.`
+          , function() {});
+        return;
+      }
     }
     if (subject.length === 0 || body.length === 0) {
       const warningType = subject.length === 0 ? `subject` : `body`;
