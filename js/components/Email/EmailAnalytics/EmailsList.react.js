@@ -7,7 +7,7 @@ import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
 
 const bucketEmailsByDate = (emails) => {
-  if (emails.length === 0) return {dateOrder: [], emailMap: {}};
+  if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}};
   const firstDateString = new Date(emails[0].created).toLocaleDateString();
   let emailMap = {[firstDateString]: [emails[0]]};
   let dateOrder = [firstDateString];
@@ -63,6 +63,8 @@ class EmailDateContainer extends Component {
   }
 }
 
+const placeholder = 'No emails scheduled for delivery.';
+
 class EmailsList extends Component {
   constructor(props) {
     super(props);
@@ -97,8 +99,8 @@ class EmailsList extends Component {
           datestring={datestring}
           emailBucket={emailMap[datestring]}
           />))}
-        {this.props.emails.length === 0 &&
-          <span style={{color: grey700, fontSize: '0.9em'}}>No emails scheduled for delivery.</span>}
+        {this.props.emails && this.props.emails.length === 0 &&
+          <span style={{color: grey700, fontSize: '0.9em'}}>{this.props.placeholder || placeholder}</span>}
         </div>
       {this.props.isReceiving &&
         <div className='horizontal-center' style={{margin: '10px 0'}}>

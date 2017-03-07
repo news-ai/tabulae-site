@@ -10,7 +10,8 @@ const mapStateToProps = (state, props) => {
 
   return {
     emails,
-    isReceiving: state.stagingReducer.isReceiving
+    isReceiving: state.stagingReducer.isReceiving,
+    placeholder: 'No emails found.'
   };
 };
 

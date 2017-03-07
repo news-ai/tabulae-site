@@ -35,15 +35,25 @@ class SentEmailsPaginationContainer extends Component {
       this.setState({activeKey});
     };
     this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
+    this.onSearchClick = this._onSearchClick.bind(this);
   }
 
   componentWillMount() {
-    const {listReducer, fetchLists} = this.props;
+    const {listReducer, fetchLists, searchQuery} = this.props;
     if (listReducer.received.length === 0) fetchLists();
+    if (searchQuery) this.onSearchClick(searchQuery);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listId !== this.props.listId) this.setState({filterValue: nextProps.listId});
+    if (nextProps.searchQuery !== this.props.searchQuery) {
+      this.onSearchClick(nextProps.searchQuery);
+    }
+  }
+
+  _onSearchClick(query) {
+    this.onTabChange('/emailstats/search');
+    this.props.router.push(`/emailstats/search/${query}`);
   }
 
   render() {
@@ -57,7 +67,7 @@ class SentEmailsPaginationContainer extends Component {
         <div className='large-10 large-offset-1 columns'>
           <div className='vertical-center' style={{margin: '20px 0'}}>
             <span style={{fontSize: '1.3em', marginRight: 10}}>Emails You Sent</span>
-            {/*<div className='right'>
+            <div className='right'>
               <TextField
               ref='emailSearch'
               floatingLabelText='Search Filter'
@@ -65,12 +75,9 @@ class SentEmailsPaginationContainer extends Component {
               <IconButton
               iconStyle={{color: grey600}}
               iconClassName='fa fa-search'
-              onClick={e => {
-                this.onTabChange('/emailstats/search');
-                props.router.push(`/emailstats/search/${this.refs.emailSearch.input.value}`);
-              }}
+              onClick={e => this.onSearchClick(this.props.searchQuery)}
               />
-            </div>*/}
+            </div>
           </div>
           <div className='row'>
             <Tabs
@@ -104,11 +111,11 @@ class SentEmailsPaginationContainer extends Component {
                 {props.children}
                 </div>
               </TabPane>
-              {/*<TabPane placeholder={<span>Placeholder</span>} tab='Search' key='/emailstats/search'>
+              <TabPane placeholder={<span>Placeholder</span>} tab='Search' key='/emailstats/search'>
                 <div style={{margin: 5}}>
                 {props.children}
                 </div>
-              </TabPane>*/}
+              </TabPane>
             </Tabs>
           </div>
         </div>
@@ -122,6 +129,7 @@ const mapStateToProps = (state, props) => {
     listReducer: state.listReducer,
     canLoadMore: state.stagingReducer.offset !== null,
     lists: state.listReducer.lists && state.listReducer.lists.map(listId => state.listReducer[listId]),
+    searchQuery: props.params.searchQuery
   };
 };
 
