@@ -113,7 +113,7 @@ ReactDOM.render(
               <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
               <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
               <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
-              <Route path='search/:searchQuery' staticName name='Search' component={SearchSentEmails}/>
+              <Route path='search(/:searchQuery)' staticName name='Search' component={SearchSentEmails}/>
             </Route>
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='*' staticName name='Not Found' component={NotFound} />

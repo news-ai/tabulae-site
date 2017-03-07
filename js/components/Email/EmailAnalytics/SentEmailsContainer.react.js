@@ -46,12 +46,13 @@ class SentEmailsPaginationContainer extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listId !== this.props.listId) this.setState({filterValue: nextProps.listId});
-    if (nextProps.searchQuery !== this.props.searchQuery) {
+    if (nextProps.searchQuery && nextProps.searchQuery !== this.props.searchQuery) {
       this.onSearchClick(nextProps.searchQuery);
     }
   }
 
   _onSearchClick(query) {
+    if (!query) return;
     this.onTabChange('/emailstats/search');
     this.props.router.push(`/emailstats/search/${query}`);
   }
@@ -75,7 +76,7 @@ class SentEmailsPaginationContainer extends Component {
               <IconButton
               iconStyle={{color: grey600}}
               iconClassName='fa fa-search'
-              onClick={e => this.onSearchClick(this.props.searchQuery)}
+              onClick={e => this.onSearchClick(this.refs.emailSearch.input.value)}
               />
             </div>
           </div>

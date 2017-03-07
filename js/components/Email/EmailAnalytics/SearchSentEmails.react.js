@@ -9,11 +9,11 @@ class SearchSentEmails extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchSearchSentEmails(this.props.searchQuery);
+    if (this.props.searchQuery) this.props.fetchSearchSentEmails(this.props.searchQuery);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.searchQuery !== nextProps.searchQuery) this.props.fetchSearchSentEmails(nextProps.searchQuery);
+    if (nextProps.searchQuery && this.props.searchQuery !== nextProps.searchQuery) this.props.fetchSearchSentEmails(nextProps.searchQuery);
   }
 
   render() {
