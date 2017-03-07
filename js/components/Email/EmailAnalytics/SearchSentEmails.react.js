@@ -31,11 +31,13 @@ class SearchSentEmails extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const rightNow = new Date();
   const ids = state.stagingReducer.searchReceivedEmails || [];
   let email;
   const emails = ids ? ids.reduce((acc, id) => {
     email = state.stagingReducer[id];
     if (email && email.issent) acc.push(email);
+    else if (email && new Date(email.sendat) > rightNow) acc.push(email);
     return acc;
   }, []) : [];
   return {

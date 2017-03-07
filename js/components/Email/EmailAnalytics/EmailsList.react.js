@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
+import ScheduledEmailItem from './ScheduledEmailItem.react';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
@@ -39,6 +40,7 @@ class EmailDateContainer extends Component {
 
   render() {
     const {datestring, emailBucket} = this.props;
+    const rightNow = new Date();
     return (
       <div style={{marginTop: 25}}>
         <div
@@ -54,10 +56,9 @@ class EmailDateContainer extends Component {
         </div>
         <Collapse isOpened={this.state.open}>
         {emailBucket && emailBucket.map((email, i) =>
-          <AnalyticsItem
-          key={`email-analytics-${i}`}
-          {...email}
-          />)}
+          new Date(email.sendat) > rightNow ?
+          <ScheduledEmailItem key={`email-analytics-${i}`} {...email}/> :
+          <AnalyticsItem key={`email-analytics-${i}`} {...email}/>)}
         </Collapse>
       </div>);
   }

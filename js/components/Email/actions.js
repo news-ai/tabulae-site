@@ -270,7 +270,6 @@ export function fetchSearchSentEmails(query) {
     dispatch({type: REQUEST_MULTIPLE_EMAILS, query});
     return api.get(`/emails/search?q="${query}"`)
     .then(response => {
-      console.log(response);
       const res = normalize(response, {data: arrayOf(emailSchema)});
       dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
