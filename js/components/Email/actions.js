@@ -12,7 +12,6 @@ import {
 import {normalize, Schema, arrayOf} from 'normalizr';
 import * as api from 'actions/api';
 import isEmpty from 'lodash/isEmpty';
-import transform from 'lodash/transform';
 
 const emailSchema = new Schema('emails');
 
@@ -269,23 +268,15 @@ export function fetchSearchSentEmails(query) {
     if (OFFSET === null || isReceiving) return;
     if (!OFFSET) OFFSET = 0;
     dispatch({type: REQUEST_MULTIPLE_EMAILS, query});
-    return api.get(`/emails/search?q="${query}"?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
+    return api.get(`/emails/search?q="${query}"`)
     .then(response => {
-      let t = response.data.map(obj => transform(obj, function (result, val, key) {
-        result[key.toLowerCase()] = val;
-      }));
-      return dispatch({
-        type: 'RECEIVE_SEARCH_SENT_EMAILS',
-        emails: t,
-        query
+      const res = normalize(response, {data: arrayOf(emailSchema)});
+      dispatch({
+        type: RECEIVE_MULTIPLE_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data,
       });
-      // const res = normalize(response, {data: arrayOf(emailSchema)});
-      // return dispatch({
-      //   type: RECEIVE_MULTIPLE_EMAILS,
-      //   emails: res.entities.emails,
-      //   ids: res.result.data,
-      //   offset: res.result.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT
-      // });
+      return dispatch({type: 'RECEIVE_SEARCH_SENT_EMAILS', ids: res.result.data, query});
     })
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
   };

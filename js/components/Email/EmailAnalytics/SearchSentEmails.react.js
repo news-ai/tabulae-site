@@ -9,7 +9,11 @@ class SearchSentEmails extends Component {
   }
 
   componentWillMount() {
-    // this.props.fetchSearchSentEmails()).then(t => console.log(t));
+    if (this.props.searchQuery) this.props.fetchSearchSentEmails(this.props.searchQuery);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.searchQuery && this.props.searchQuery !== nextProps.searchQuery) this.props.fetchSearchSentEmails(nextProps.searchQuery);
   }
 
   render() {
@@ -19,15 +23,25 @@ class SearchSentEmails extends Component {
       <EmailsList
       isReceiving={props.isReceiving}
       emails={props.emails}
-      fetchEmails={e => props.fetchSearchSentEmails(props.searchQuery)}
+      fetchEmails={_ => {}}
+      placeholder='Search results will be shown here.'
       />
       );
   }
 }
 
 const mapStateToProps = (state, props) => {
+  const rightNow = new Date();
+  const ids = state.stagingReducer.searchReceivedEmails || [];
+  let email;
+  const emails = ids ? ids.reduce((acc, id) => {
+    email = state.stagingReducer[id];
+    if (email && email.issent) acc.push(email);
+    else if (email && new Date(email.sendat) > rightNow) acc.push(email);
+    return acc;
+  }, []) : [];
   return {
-    emails: state.stagingReducer.searchReceivedEmails || [],
+    emails,
     isReceiving: state.stagingReducer.isReceiving,
     searchQuery: props.params.searchQuery
   };

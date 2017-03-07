@@ -117,7 +117,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return obj;
     case 'RECEIVE_SEARCH_SENT_EMAILS':
       return assignToEmpty(state, {
-        searchReceivedEmails: action.emails,
+        searchReceivedEmails: action.ids,
         searchQuery: action.query
       });
     default:

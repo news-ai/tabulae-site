@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
+import ScheduledEmailItem from './ScheduledEmailItem.react';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
 
 const bucketEmailsByDate = (emails) => {
-  if (emails.length === 0) return {dateOrder: [], emailMap: {}};
+  if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}};
   const firstDateString = new Date(emails[0].created).toLocaleDateString();
   let emailMap = {[firstDateString]: [emails[0]]};
   let dateOrder = [firstDateString];
@@ -39,6 +40,7 @@ class EmailDateContainer extends Component {
 
   render() {
     const {datestring, emailBucket} = this.props;
+    const rightNow = new Date();
     return (
       <div style={{marginTop: 25}}>
         <div
@@ -54,14 +56,15 @@ class EmailDateContainer extends Component {
         </div>
         <Collapse isOpened={this.state.open}>
         {emailBucket && emailBucket.map((email, i) =>
-          <AnalyticsItem
-          key={`email-analytics-${i}`}
-          {...email}
-          />)}
+          new Date(email.sendat) > rightNow ?
+          <ScheduledEmailItem key={`email-analytics-${i}`} {...email}/> :
+          <AnalyticsItem key={`email-analytics-${i}`} {...email}/>)}
         </Collapse>
       </div>);
   }
 }
+
+const placeholder = 'No emails scheduled for delivery.';
 
 class EmailsList extends Component {
   constructor(props) {
@@ -97,8 +100,8 @@ class EmailsList extends Component {
           datestring={datestring}
           emailBucket={emailMap[datestring]}
           />))}
-        {this.props.emails.length === 0 &&
-          <span style={{color: grey700, fontSize: '0.9em'}}>No emails scheduled for delivery.</span>}
+        {this.props.emails && this.props.emails.length === 0 &&
+          <span style={{color: grey700, fontSize: '0.9em'}}>{this.props.placeholder || placeholder}</span>}
         </div>
       {this.props.isReceiving &&
         <div className='horizontal-center' style={{margin: '10px 0'}}>

@@ -6,11 +6,13 @@ const mapStateToProps = (state, props) => {
   const emails = state.stagingReducer.received
   .filter(id => state.stagingReducer[id].delivered)
   .filter(id => !state.stagingReducer[id].archived)
+  .filter(id => state.stagingReducer[id].issent)
   .map(id => state.stagingReducer[id]);
 
   return {
     emails,
-    isReceiving: state.stagingReducer.isReceiving
+    isReceiving: state.stagingReducer.isReceiving,
+    placeholder: 'No emails found.'
   };
 };
 
