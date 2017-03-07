@@ -22,6 +22,7 @@ import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'compon
 
 import Dropzone from 'react-dropzone';
 import {blue100} from 'material-ui/styles/colors';
+import Paper from 'material-ui/Paper';
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
 import Link from 'components/Email/EmailPanel/components/Link';
@@ -53,8 +54,6 @@ const controlsStyle = {
   overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
-  border: `solid 1px ${blue100}`,
-  borderRadius: '0.9em',
   backgroundColor: 'white',
 };
 
@@ -512,7 +511,7 @@ class GeneralEditor extends Component {
             />
           </div>
         </div>
-        <div className='row vertical-center clearfix' style={controlsStyle}>
+        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle}>
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -542,7 +541,7 @@ class GeneralEditor extends Component {
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
           />
-        </div>
+        </Paper>
       </div>
     );
   }
