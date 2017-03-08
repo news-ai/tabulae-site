@@ -18,7 +18,8 @@ const AttachmentPreview = ({name, size, preview, onRemoveClick, maxLength}) => {
       <div>
         <span style={{fontSize: '0.8em'}}>{size} bytes</span>
       </div>
-      <img width={100} height={100} src={preview}/>
+      {preview &&
+      <img width={100} height={100} src={preview}/>}
     </div>
     );
 };
