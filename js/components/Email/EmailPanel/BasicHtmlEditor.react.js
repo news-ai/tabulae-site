@@ -23,9 +23,11 @@ import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from './util
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
+import FontIcon from 'material-ui/FontIcon';
 import Popover from 'material-ui/Popover';
+import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, grey300} from 'material-ui/styles/colors';
+import {blue100, blue200, blue700, grey700, grey300, grey500, grey800} from 'material-ui/styles/colors';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -58,8 +60,8 @@ const controlsStyle = {
   paddingLeft: 10,
   paddingRight: 10,
   bottom: 60,
-  border: `solid 1px ${blue100}`,
-  borderRadius: '0.9em',
+  // border: `solid 1px ${blue100}`,
+  // borderRadius: '0.9em',
   backgroundColor: 'white',
 };
 
@@ -553,53 +555,60 @@ class BasicHtmlEditor extends React.Component {
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />
         </div>
-        {state.isStyleBlockOpen &&
-          <div className='row vertical-center clearfix' style={controlsStyle}>
-            <InlineStyleControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-            inlineStyles={INLINE_STYLES}
-            />
-            <EntityControls
-            editorState={editorState}
-            entityControls={this.ENTITY_CONTROLS}
-            />
-            <ExternalControls
-            editorState={editorState}
-            externalControls={this.EXTERNAL_CONTROLS}
-            active={props.files.length > 0}
-            />
-            <PositionStyleControls
-            editorState={editorState}
-            blockTypes={POSITION_TYPES}
-            onToggle={this.toggleBlockType}
-            />
-            <FontSizeControls
-            editorState={editorState}
-            onToggle={this.toggleInlineStyle}
-            inlineStyles={FONTSIZE_TYPES}
-            />
-            <BlockStyleControls
-            editorState={editorState}
-            blockTypes={BLOCK_TYPES}
-            onToggle={this.toggleBlockType}
-            />
-          </div>}
-          <div className='vertical-center' style={{
-            position: 'absolute',
-            bottom: 3,
-            width: props.width,
-          }}>
-          <div style={{padding: 3, marginRight: 10}}>
-            <i
-            className='fa fa-circle pointer'
-            style={{color: state.isStyleBlockOpen ? blue200 : grey300}}
-            onClick={this.onCheck}
-            />
-          </div>
-           {props.children}
-         </div>
+      {state.isStyleBlockOpen &&
+        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle}>
+          <InlineStyleControls
+          editorState={editorState}
+          onToggle={this.toggleInlineStyle}
+          inlineStyles={INLINE_STYLES}
+          />
+          <EntityControls
+          editorState={editorState}
+          entityControls={this.ENTITY_CONTROLS}
+          />
+          <ExternalControls
+          editorState={editorState}
+          externalControls={this.EXTERNAL_CONTROLS}
+          active={props.files.length > 0}
+          />
+          <PositionStyleControls
+          editorState={editorState}
+          blockTypes={POSITION_TYPES}
+          onToggle={this.toggleBlockType}
+          />
+          <FontSizeControls
+          editorState={editorState}
+          onToggle={this.toggleInlineStyle}
+          inlineStyles={FONTSIZE_TYPES}
+          />
+          <BlockStyleControls
+          editorState={editorState}
+          blockTypes={BLOCK_TYPES}
+          onToggle={this.toggleBlockType}
+          />
+          <FontIcon
+          style={{fontSize: '14px'}}
+          hoverColor={grey500}
+          color={grey800}
+          className='fa fa-chevron-down pointer'
+          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          />
+        </Paper>}
+        <div className='vertical-center' style={{
+          position: 'absolute',
+          bottom: 3,
+          width: props.width,
+        }}>
+        <div style={{padding: 3, marginRight: 10}}>
+          <FontIcon
+          className={`fa fa-angle-double-${state.isStyleBlockOpen ? 'up' : 'down'} pointer`}
+          style={{color: state.isStyleBlockOpen ? blue700 : grey700}}
+          onClick={this.onCheck}
+          />
+        </div>
+        {props.children}
       </div>
+    </div>
     );
   }
 }
