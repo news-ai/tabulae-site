@@ -590,7 +590,7 @@ class BasicHtmlEditor extends React.Component {
           style={{fontSize: '14px'}}
           hoverColor={grey500}
           color={grey800}
-          className='fa fa-chevron-down pointer'
+          className='fa fa-plus pointer'
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
           />
         </Paper>}

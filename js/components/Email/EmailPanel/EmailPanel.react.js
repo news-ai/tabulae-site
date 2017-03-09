@@ -79,11 +79,11 @@ class EmailPanel extends Component {
   toggleMinimize: (event: Event) => void;
   updateBodyHtml: (html: string) => void;
   handleTemplateValueChange: (event: Event) => void;
-  replaceAll: (html: string, contact: Object) => string;
+  replaceAll: (html: ?string, contact: Object) => ?string;
   onPreviewEmailsClick: (event: Event) => void;
   getGeneratedHtmlEmails: (selectedContacts: Array<Object>, subject: string, body: ?string) => Array<Object>;
   sendGeneratedEmails: (contactEmails: Array<Object>) => void;
-  onSubjectChange: (editorState: editorState) => void;
+  onSubjectChange: (editorState: EditorState) => void;
   onSaveNewTemplateClick: (event: Event) => void;
   onDeleteTemplate: () => void;
   onClose: (event: Event) => void;
@@ -95,7 +95,7 @@ class EmailPanel extends Component {
     bodyHtml: ?string,
     body: ?string,
     subjectHtml: ?string,
-    minimized: Boolean
+    minimized: bool
   };
 
   constructor(props) {
@@ -161,7 +161,8 @@ class EmailPanel extends Component {
 
   _replaceAll(html, contact) {
     const {fieldsmap} = this.state;
-    let newHtml = html;
+    if (html === null) return;
+    let newHtml: ?string = html;
     fieldsmap.map(fieldObj => {
       let value = '';
       const replaceValue = _getter(contact, fieldObj);
