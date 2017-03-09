@@ -58,6 +58,23 @@ const styles = {
   }
 };
 
+const emailPanelWrapper = {
+  height: styles.emailPanel.height,
+  width: styles.emailPanel.width,
+  zIndex: 200,
+};
+
+const emailPanelPauseOverlay = {
+  backgroundColor: grey800,
+  zIndex: 300,
+  position: 'absolute',
+  opacity: 0.7,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+
 export function _getter(contact: Object, fieldObj: Object): ?string {
   try {
     if (fieldObj.customfield) {
@@ -73,6 +90,12 @@ export function _getter(contact: Object, fieldObj: Object): ?string {
     return undefined;
   }
 }
+
+const PauseOverlay = ({message}: {message: string}) => (
+  <div style={Object.assign({}, emailPanelWrapper, emailPanelPauseOverlay)}>
+    <div style={{margin: 0}}>
+    <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
+  </div>);
 
 
 class EmailPanel extends Component {
@@ -277,21 +300,14 @@ class EmailPanel extends Component {
       primaryText={template.name.length > 0 ? template.name : template.subject}
       />)) : null;
 
-    const emailPanelWrapper = {
-      height: styles.emailPanel.height,
-      width: styles.emailPanel.width,
-      zIndex: 200,
-      display: state.minimized ? 'none' : 'block',
-    };
-
     return (
       <div style={styles.emailPanelOuterPosition}>
         <div style={styles.emailPanelPosition}>
-          <div>
-          {state.minimized &&
-            <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
-          </div>
-          <Paper style={emailPanelWrapper} zDepth={2}>
+        {props.isImageReceiving &&
+          <PauseOverlay message='Image is loading.'/>}
+        {state.minimized &&
+          <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
+          <Paper style={Object.assign({}, emailPanelWrapper, {display: state.minimized ? 'none' : 'block'})} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
