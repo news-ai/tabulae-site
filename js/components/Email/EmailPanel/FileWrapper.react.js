@@ -1,3 +1,4 @@
+// @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Dialog from 'material-ui/Dialog';
@@ -5,12 +6,13 @@ import Dropzone from 'react-dropzone';
 import AttachmentPreview from '../EmailAttachment/AttachmentPreview.react';
 
 class FileWrapper extends Component {
+  onDrop: (acceptedFiles: Array<Object>, rejectedFiles: Array<Object>) => void;
   constructor(props) {
     super(props);
     this.onDrop = this._onDrop.bind(this);
   }
 
-  _onDrop(acceptedFiles, rejectedFiles) {
+  _onDrop(acceptedFiles: Array<Object>, rejectedFiles: Array<Object>):void {
     const files = [...this.props.files, ...acceptedFiles];
     this.props.setAttachments(files);
   }

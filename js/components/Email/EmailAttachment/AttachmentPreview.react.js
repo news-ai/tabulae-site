@@ -1,8 +1,17 @@
+// @flow
 import React from 'react';
 import {grey400, grey600} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 
-const AttachmentPreview = ({name, size, preview, onRemoveClick, maxLength}) => {
+type Types = {
+  name: string,
+  size: number,
+  preview: string,
+  onRemoveClick: (event: Event) => void,
+  maxLength: number
+};
+
+const AttachmentPreview = ({name, size, preview, onRemoveClick, maxLength}: Types) => {
   return (
     <div style={{margin: 5}}>
       <div>

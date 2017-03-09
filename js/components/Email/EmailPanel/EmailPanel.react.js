@@ -1,3 +1,4 @@
+// @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Radium from 'radium';
@@ -57,7 +58,7 @@ const styles = {
   }
 };
 
-export function _getter(contact, fieldObj) {
+export function _getter(contact: Object, fieldObj: Object): ?string {
   try {
     if (fieldObj.customfield) {
       if (fieldObj.readonly) return contact[fieldObj.value];
@@ -75,6 +76,28 @@ export function _getter(contact, fieldObj) {
 
 
 class EmailPanel extends Component {
+  toggleMinimize: (event: Event) => void;
+  updateBodyHtml: (html: string) => void;
+  handleTemplateValueChange: (event: Event) => void;
+  replaceAll: (html: string, contact: Object) => string;
+  onPreviewEmailsClick: (event: Event) => void;
+  getGeneratedHtmlEmails: (selectedContacts: Array<Object>, subject: string, body: ?string) => Array<Object>;
+  sendGeneratedEmails: (contactEmails: Array<Object>) => void;
+  onSubjectChange: (editorState: editorState) => void;
+  onSaveNewTemplateClick: (event: Event) => void;
+  onDeleteTemplate: () => void;
+  onClose: (event: Event) => void;
+  state: {
+    subject: string,
+    bodyEditorState: ?Object,
+    fieldsmap: Array<Object>,
+    currentTemplateId: number,
+    bodyHtml: ?string,
+    body: ?string,
+    subjectHtml: ?string,
+    minimized: Boolean
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -91,13 +114,13 @@ class EmailPanel extends Component {
     this.updateBodyHtml = html => this.setState({body: html});
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this.replaceAll = this._replaceAll.bind(this);
-    this._onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
+    this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({subject});
     };
-    this._getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
-    this._sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
+    this.getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
+    this.sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
     this.onClose = this._onClose.bind(this);
@@ -180,7 +203,7 @@ class EmailPanel extends Component {
   _onPreviewEmailsClick() {
     const {selectedContacts} = this.props;
     const {subject, body} = this.state;
-    const contactEmails = this._getGeneratedHtmlEmails(selectedContacts.filter(contact => contact.email !== null && contact.email.length > 0 && isEmail(contact.email)), subject, body);
+    const contactEmails = this.getGeneratedHtmlEmails(selectedContacts.filter(contact => contact.email !== null && contact.email.length > 0 && isEmail(contact.email)), subject, body);
     if (selectedContacts.length === 0) {
       alertify.alert(`Contact Selection Error`, `You didn't select any contact to send this email to.`, function() {});
       return;
@@ -207,19 +230,19 @@ class EmailPanel extends Component {
       alertify
       .confirm(
         `Your ${warningType} is empty. Are you sure you want to send this email?`,
-        _ => this._sendGeneratedEmails(contactEmails), // on OK
+        _ => this.sendGeneratedEmails(contactEmails), // on OK
         _ => { } // on Cancel
       );
     } else {
       if (selectedContacts.length > 400) {
         alertify.alert('Processing', `Sending >400 emails might take a minute to process. Please be patient while we generate Preview of those emails.`, function() {});
       }
-      this._sendGeneratedEmails(contactEmails);
+      this.sendGeneratedEmails(contactEmails);
     }
   }
 
   _onSaveNewTemplateClick() {
-    const state = this.state;
+    const state:any = this.state;
     alertify.prompt('', 'Name of new Email Template', '',
       (e, name) => this.props.createTemplate(name, state.subject, state.body)
         .then(currentTemplateId => this.setState({currentTemplateId})),
@@ -227,7 +250,7 @@ class EmailPanel extends Component {
   }
 
   _onClose() {
-    const state = this.state;
+    const state:any = this.state;
     if (state.body || state.subject) {
       alertify.confirm(
         'Are you sure?',
@@ -241,8 +264,8 @@ class EmailPanel extends Component {
   }
 
   render() {
-    const props = this.props;
-    const state = this.state;
+    const state:any = this.state;
+    const props:any = this.props;
     // add this button to fetch all staged emails for debugging purposes
     const templateMenuItems = props.templates.length > 0 ?
     [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>]
@@ -347,7 +370,7 @@ class EmailPanel extends Component {
                 <div style={{position: 'absolute', right: 20, bottom: 3}}>
                   <IconButton
                   iconClassName={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}
-                  onClick={this._onPreviewEmailsClick}
+                  onClick={this.onPreviewEmailsClick}
                   tooltip='Preview then Send'
                   tooltipPosition='top-left'
                   iconStyle={{color: 'white'}}
