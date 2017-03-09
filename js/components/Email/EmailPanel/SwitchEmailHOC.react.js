@@ -6,6 +6,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import get from 'lodash/get';
 import {yellow50, grey500} from 'material-ui/styles/colors';
 import Link from 'react-router/lib/Link';
+import FlatButton from 'material-ui/FlatButton';
 
 class SwitchEmailHOC extends Component {
   constructor(props) {
@@ -19,7 +20,8 @@ class SwitchEmailHOC extends Component {
     const emails = props.emails.map((email, i) => <MenuItem key={`switch-email-${i}`} value={email} primaryText={email}/>);
     return (
       <div>
-        <Dialog title='Switch From Email' autoScrollBodyContent open={state.open} onRequestClose={_ => this.setState({open: false})}>
+        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
+        title='Switch From Email' autoScrollBodyContent open={state.open} onRequestClose={_ => this.setState({open: false})}>
           <div style={{margin: 10, padding: 10, backgroundColor: yellow50, fontSize: '0.9em'}}>
           You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>.
           </div>

@@ -4,6 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import {WithContext as ReactTags} from 'react-tag-input';
 import isEmail from 'validator/lib/isEmail';
 import {yellow50} from 'material-ui/styles/colors';
+import FlatButton from 'material-ui/FlatButton'
 
 class AddCCPanelHOC extends Component {
   constructor(props) {
@@ -18,7 +19,8 @@ class AddCCPanelHOC extends Component {
     const state = this.state;
     return (
       <div>
-        <Dialog open={state.open} onRequestClose={_ => this.setState({open: false})}>
+        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
+        open={state.open} onRequestClose={_ => this.setState({open: false})}>
           <div className='panel' style={{
             backgroundColor: yellow50,
             margin: 10,

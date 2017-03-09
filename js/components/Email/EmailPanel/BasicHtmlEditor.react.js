@@ -30,6 +30,7 @@ import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
 import {blue700, grey700, grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -523,7 +524,8 @@ class BasicHtmlEditor extends React.Component {
     return (
       <div>
         <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
-        <Dialog autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
+        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
+        autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
           <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
           <div className='horizontal-center'>OR</div>
           <div className='vertical-center horizontal-center' style={{margin: '15px 0'}}>
