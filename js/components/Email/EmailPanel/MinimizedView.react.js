@@ -4,7 +4,7 @@ import Paper from 'material-ui/Paper';
 import FontIcon from 'material-ui/FontIcon';
 import {grey50} from 'material-ui/styles/colors';
 
-function MinimizedView(props: {name: string, toggleMinimize: (event: Event) => void}) {
+function MinimizedView({toggleMinimize}: {toggleMinimize: (event: Event) => void}) {
   return (
       <Paper zDepth={2} style={{
         width: 300,
@@ -18,9 +18,9 @@ function MinimizedView(props: {name: string, toggleMinimize: (event: Event) => v
         color='lightgray'
         hoverColor='gray'
         style={{fontSize: '3em'}}
-        key={props.name}
+        key='minimized-view'
         className='fa fa-chevron-up pointer'
-        onClick={props.toggleMinimize}
+        onClick={toggleMinimize}
         />
       </Paper>);
 }

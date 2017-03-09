@@ -306,12 +306,19 @@ class EmailPanel extends Component {
         {props.isImageReceiving &&
           <PauseOverlay message='Image is loading.'/>}
         {state.minimized &&
-          <MinimizedView color='red' toggleMinimize={this.toggleMinimize} name={1}/>}
+          <MinimizedView toggleMinimize={this.toggleMinimize}/>}
           <Paper style={Object.assign({}, emailPanelWrapper, {display: state.minimized ? 'none' : 'block'})} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
+                {/*<div className='pointer' style={{
+                  zIndex: 500,
+                  float: 'right',
+                  margin: '0 5px'
+                }}>
+                  <span style={{fontSize: '0.7em', color: 'darkgray'}}>Files Attached</span>
+                </div>*/}
               </div>
               <div className='vertical-center'>
                 Emails are sent from: <span style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
