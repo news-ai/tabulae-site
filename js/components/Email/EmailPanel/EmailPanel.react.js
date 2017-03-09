@@ -49,7 +49,7 @@ const styles = {
   },
   emailPanel: {
     height: 600,
-    width: 600,
+    width: 620,
   },
   sendButtonPosition: {
     position: 'absolute',

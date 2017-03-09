@@ -27,7 +27,8 @@ import FontIcon from 'material-ui/FontIcon';
 import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, blue700, grey700, grey300, grey500, grey800} from 'material-ui/styles/colors';
+import {blue700, grey700, grey800} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -56,9 +57,6 @@ const controlsStyle = {
   position: 'fixed',
   height: 40,
   zIndex: 200,
-  overflow: 'hidden',
-  paddingLeft: 10,
-  paddingRight: 10,
   bottom: 60,
   // border: `solid 1px ${blue100}`,
   // borderRadius: '0.9em',
@@ -93,21 +91,22 @@ class BasicHtmlEditor extends React.Component {
     ]);
 
     this.ENTITY_CONTROLS = [
-      {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
+      {label: 'Hyperlink', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
     ];
 
     this.EXTERNAL_CONTROLS = [
       {
-        label: 'File Upload',
+        label: 'Attachments',
         onToggle: _ => this.setState({filePanelOpen: true}),
         icon: 'fa fa-paperclip',
-        isActive: _ => this.props.files.length > 0
+        isActive: _ => this.props.files.length > 0,
+        tooltip: 'Attach File'
       },
       {
         label: 'Image Upload',
         onToggle: _ => this.setState({imagePanelOpen: true}),
         icon: 'fa fa-camera',
-        isActive: _ => false
+        isActive: _ => false,
       }
     ];
 
@@ -586,12 +585,13 @@ class BasicHtmlEditor extends React.Component {
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
           />
-          <FontIcon
-          style={{fontSize: '14px'}}
-          hoverColor={grey500}
-          color={grey800}
-          className='fa fa-plus pointer'
+          <IconButton
+          iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
+          style={{width: 28, height: 28, padding: 6}}
+          iconClassName='fa fa-plus pointer'
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          tooltip='Insert Property'
+          tooltipPosition='top-right'
           />
         </Paper>}
         <div className='vertical-center' style={{
