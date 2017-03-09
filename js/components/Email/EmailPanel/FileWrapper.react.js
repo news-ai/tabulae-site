@@ -1,16 +1,19 @@
+// @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Dialog from 'material-ui/Dialog';
 import Dropzone from 'react-dropzone';
 import AttachmentPreview from '../EmailAttachment/AttachmentPreview.react';
+import FlatButton from 'material-ui/FlatButton';
 
 class FileWrapper extends Component {
+  onDrop: (acceptedFiles: Array<Object>, rejectedFiles: Array<Object>) => void;
   constructor(props) {
     super(props);
     this.onDrop = this._onDrop.bind(this);
   }
 
-  _onDrop(acceptedFiles, rejectedFiles) {
+  _onDrop(acceptedFiles: Array<Object>, rejectedFiles: Array<Object>):void {
     const files = [...this.props.files, ...acceptedFiles];
     this.props.setAttachments(files);
   }
@@ -18,7 +21,9 @@ class FileWrapper extends Component {
   render() {
     const props = this.props;
     return (
-    <Dialog title='File Upload' autoScrollBodyContent open={props.open} onRequestClose={props.onRequestClose}>
+    <Dialog actions={[<FlatButton label='Close' onClick={props.onRequestClose}/>]}
+    title='File Upload' autoScrollBodyContent
+    open={props.open} onRequestClose={props.onRequestClose}>
       <div style={{margin: 10}} className='horizontal-center'>
         <Dropzone maxSize={5000000} onDrop={this.onDrop}>
           <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>

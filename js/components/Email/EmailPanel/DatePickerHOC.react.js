@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
+import FlatButton from 'material-ui/FlatButton';
 
 import moment from 'moment-timezone';
 import 'node_modules/react-datepicker/dist/react-datepicker.css';
@@ -132,7 +133,8 @@ class DatePickerHOC extends Component {
 
     return (
       <div>
-        <Dialog title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
+        <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
+        title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
           <div className='horizontal-center' style={{margin: '20px 0'}}>
             <DatePicker
             inline

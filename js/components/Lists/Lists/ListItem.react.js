@@ -53,7 +53,7 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
       <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
         <span style={{fontSize: '0.8em', fontColor: grey500}}>{updatedDate.toLocaleDateString()}</span>
       </div>
-    {person.teamid &&
+    {person.teamid > 0 &&
       <div className='small-4 medium-2 large-2 columns horizontal-center'>
         <span style={{fontSize: '0.8em', fontColor: grey500}}>{nameString}</span>
       </div>}

@@ -11,7 +11,6 @@ import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
 import {curlyStrategy, findEntities} from './utils/strategies';
 import {grey400, grey500} from 'material-ui/styles/colors';
-import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
@@ -154,7 +153,7 @@ class Subject extends Component {
           <IconButton
           iconStyle={{width: 12, height: 12, fontSize: '12px', color: grey400}}
           style={{width: 24, height: 24, padding: 6, marginLeft: 4}}
-          iconClassName='fa fa-chevron-down'
+          iconClassName='fa fa-plus'
           tooltip='Insert Property to Subject'
           tooltipPosition='bottom-center'
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}

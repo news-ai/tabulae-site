@@ -15,7 +15,7 @@ export default function BlockStyleControls(props) {
   return (
     <div className='RichEditor-controls'>
       <DropDownMenu
-      style={{width: 180}}
+      style={{width: 160}}
       value={find(blockTypes, type => type.style === blockType).label}
       onChange={(e, index, value) => props.onToggle(blockTypes[index].style)}>
         {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} style={{paddingLeft: 10}} primaryText={type.label} />)}

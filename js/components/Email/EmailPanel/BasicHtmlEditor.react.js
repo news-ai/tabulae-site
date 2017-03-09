@@ -7,6 +7,7 @@ import Draft, {
   Editor,
   EditorState,
   ContentState,
+  SelectionState,
   Entity,
   RichUtils,
   AtomicBlockUtils,
@@ -27,7 +28,9 @@ import FontIcon from 'material-ui/FontIcon';
 import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
-import {blue100, blue200, blue700, grey700, grey300, grey500, grey800} from 'material-ui/styles/colors';
+import {blue700, grey700, grey800} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
 
 import Subject from './Subject.react';
 import Link from './components/Link';
@@ -52,13 +55,16 @@ import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
+import linkifyIt from 'linkify-it';
+import tlds from 'tlds';
+
+const linkify = linkifyIt();
+linkify.tlds(tlds);
+
 const controlsStyle = {
   position: 'fixed',
   height: 40,
   zIndex: 200,
-  overflow: 'hidden',
-  paddingLeft: 10,
-  paddingRight: 10,
   bottom: 60,
   // border: `solid 1px ${blue100}`,
   // borderRadius: '0.9em',
@@ -93,21 +99,22 @@ class BasicHtmlEditor extends React.Component {
     ]);
 
     this.ENTITY_CONTROLS = [
-      {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
+      {label: 'Hyperlink', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
     ];
 
     this.EXTERNAL_CONTROLS = [
       {
-        label: 'File Upload',
+        label: 'Attachments',
         onToggle: _ => this.setState({filePanelOpen: true}),
         icon: 'fa fa-paperclip',
-        isActive: _ => this.props.files.length > 0
+        isActive: _ => this.props.files.length > 0,
+        tooltip: 'Attach File'
       },
       {
         label: 'Image Upload',
         onToggle: _ => this.setState({imagePanelOpen: true}),
         icon: 'fa fa-camera',
-        isActive: _ => false
+        isActive: _ => false,
       }
     ];
 
@@ -247,8 +254,48 @@ class BasicHtmlEditor extends React.Component {
   componentWillUnmount() {
     this.props.clearAttachments();
   }
-
+  /*const startKey = selection.getStartKey();
+    const startOffset = selection.getStartOffset();
+    const endOffset = selection.getEndOffset();
+    const blockAtLinkBeginning = contentState.getBlockForKey(startKey);
+    let i;
+    let linkKey;
+    let hasEntityType = false;
+    for (i = startOffset; i < endOffset; i++) {
+      linkKey = blockAtLinkBeginning.getEntityAt(i);
+      if (linkKey !== null) {
+        const type = contentState.getEntity(linkKey).getType();
+        if (type === 'LINK') {
+          hasEntityType = true;
+          break;
+        }
+      }
+    }
+    if (hasEntityType) {
+      // REMOVE LINK
+      this.removeLink();
+    } else {
+      // ADD LINK
+      this.addLink();
+    }*/
   _onChange(editorState) {
+    // console.log('----');
+    // const selection = editorState.getSelection();
+    // if (selection.getHasFocus()) console.log(selection.getFocusOffset());
+    // editorState.getCurrentContent().getBlockMap().forEach(block => {
+    //   const links = linkify.match(block.get('text'));
+    //   if (typeof links !== 'undefined' && links !== null) {
+    //     let startOffset, endOffset;
+    //     for (let i = 0; i < links.length; i++) {
+    //       console.log(block);
+    //       startOffset = links[i].index;
+    //       endOffset = links[i].lastIndex;
+    //       console.log(links[i]);
+    //       console.log(links[i].url);
+    //     }
+    //   }
+    // });
+
     let previousContent = this.state.editorState.getCurrentContent();
     this.setState({editorState});
 
@@ -477,8 +524,11 @@ class BasicHtmlEditor extends React.Component {
     return (
       <div>
         <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
-        <Dialog autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
-          <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
+        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
+        autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
+          <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
+          <div className='horizontal-center'>OR</div>
+          <div className='vertical-center horizontal-center' style={{margin: '15px 0'}}>
             <div>
               <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
               {({onValueChange, errorMessage}) => (
@@ -586,12 +636,13 @@ class BasicHtmlEditor extends React.Component {
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
           />
-          <FontIcon
-          style={{fontSize: '14px'}}
-          hoverColor={grey500}
-          color={grey800}
-          className='fa fa-chevron-down pointer'
+          <IconButton
+          iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
+          style={{width: 28, height: 28, padding: 6}}
+          iconClassName='fa fa-plus pointer'
           onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          tooltip='Insert Property'
+          tooltipPosition='top-right'
           />
         </Paper>}
         <div className='vertical-center' style={{

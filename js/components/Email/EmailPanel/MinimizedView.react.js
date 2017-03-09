@@ -1,16 +1,10 @@
+// @flow
 import React from 'react';
 import Paper from 'material-ui/Paper';
-import Radium from 'radium';
+import FontIcon from 'material-ui/FontIcon';
 import {grey50} from 'material-ui/styles/colors';
 
-const iconStyle = {
-  color: 'lightgray',
-  ':hover': {
-    color: 'gray',
-  }
-};
-
-function MinimizedView(props) {
+function MinimizedView({toggleMinimize}: {toggleMinimize: (event: Event) => void}) {
   return (
       <Paper zDepth={2} style={{
         width: 300,
@@ -20,14 +14,15 @@ function MinimizedView(props) {
         display: 'inline-block',
         textAlign: 'center'
       }}>
-        <i
-        style={[iconStyle]}
-        key={props.name}
-        className='fa fa-chevron-up fa-3x pointer'
-        aria-hidden='true'
-        onClick={props.toggleMinimize}
+        <FontIcon
+        color='lightgray'
+        hoverColor='gray'
+        style={{fontSize: '3em'}}
+        key='minimized-view'
+        className='fa fa-chevron-up pointer'
+        onClick={toggleMinimize}
         />
       </Paper>);
 }
 
-export default Radium(MinimizedView);
+export default MinimizedView;

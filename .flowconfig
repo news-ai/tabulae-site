@@ -1,4 +1,10 @@
 [ignore]
-/node_modules/.*
-/test/.*
-.*
+.*/node_modules/fbjs/.*
+.*/node_modules/draft-js/.*
+.*/node_modules/radium/.*
+.*/node_modules/npm/.*
+.*/build/manifest.json
+[include]
+[libs]
+[options]
+module.name_mapper='^components$' -> '<PROJECT_ROOT>/components$'

@@ -1,6 +1,7 @@
 import React from 'react';
 import {blueA400, blue200, grey500, grey800} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton';
 
 const buttonStyle = {marginRight: 10};
 
@@ -28,12 +29,14 @@ export default class StyleButton extends React.Component {
 
     if (props.icon) {
       renderNode = (
-        <FontIcon
-        style={{marginRight: 10, fontSize: '14px'}}
-        className={`${props.icon} ${pointerClassName}`}
-        color={color}
-        hoverColor={hoverColor}
+        <IconButton
+        iconStyle={{width: 14, height: 14, fontSize: '14px', color: color}}
+        hoveredStyle={{color: hoverColor}}
+        style={{width: 28, height: 28, padding: 6}}
+        iconClassName={props.icon}
         onClick={onClick}
+        tooltip={props.label}
+        tooltipPosition='top-right'
         />);
     } else {
       renderNode = (
