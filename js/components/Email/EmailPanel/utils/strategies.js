@@ -9,7 +9,6 @@ export function findEntities(entityType, contentBlock, callback, contentState) {
 }
 
 const CURLY_REGEX = /{([^}]+)}/g;
-
 function findWithRegex(regex, contentBlock, callback, contentState) {
   const text = contentBlock.getText();
   let matchArr, start;

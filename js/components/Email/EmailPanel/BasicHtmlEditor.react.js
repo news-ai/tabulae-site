@@ -7,6 +7,7 @@ import Draft, {
   Editor,
   EditorState,
   ContentState,
+  SelectionState,
   Entity,
   RichUtils,
   AtomicBlockUtils,
@@ -52,6 +53,12 @@ import ValidationHOC from 'components/ContactProfile/ContactPublications/Validat
 import {curlyStrategy, findEntities} from './utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
+
+import linkifyIt from 'linkify-it';
+import tlds from 'tlds';
+
+const linkify = linkifyIt();
+linkify.tlds(tlds);
 
 const controlsStyle = {
   position: 'fixed',
@@ -246,8 +253,48 @@ class BasicHtmlEditor extends React.Component {
   componentWillUnmount() {
     this.props.clearAttachments();
   }
-
+  /*const startKey = selection.getStartKey();
+    const startOffset = selection.getStartOffset();
+    const endOffset = selection.getEndOffset();
+    const blockAtLinkBeginning = contentState.getBlockForKey(startKey);
+    let i;
+    let linkKey;
+    let hasEntityType = false;
+    for (i = startOffset; i < endOffset; i++) {
+      linkKey = blockAtLinkBeginning.getEntityAt(i);
+      if (linkKey !== null) {
+        const type = contentState.getEntity(linkKey).getType();
+        if (type === 'LINK') {
+          hasEntityType = true;
+          break;
+        }
+      }
+    }
+    if (hasEntityType) {
+      // REMOVE LINK
+      this.removeLink();
+    } else {
+      // ADD LINK
+      this.addLink();
+    }*/
   _onChange(editorState) {
+    // console.log('----');
+    // const selection = editorState.getSelection();
+    // if (selection.getHasFocus()) console.log(selection.getFocusOffset());
+    // editorState.getCurrentContent().getBlockMap().forEach(block => {
+    //   const links = linkify.match(block.get('text'));
+    //   if (typeof links !== 'undefined' && links !== null) {
+    //     let startOffset, endOffset;
+    //     for (let i = 0; i < links.length; i++) {
+    //       console.log(block);
+    //       startOffset = links[i].index;
+    //       endOffset = links[i].lastIndex;
+    //       console.log(links[i]);
+    //       console.log(links[i].url);
+    //     }
+    //   }
+    // });
+
     let previousContent = this.state.editorState.getCurrentContent();
     this.setState({editorState});
 
