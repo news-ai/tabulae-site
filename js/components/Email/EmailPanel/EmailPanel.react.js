@@ -34,7 +34,7 @@ import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
 
-import {grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 
 const styles = {
   emailPanelOuterPosition: {
@@ -281,7 +281,7 @@ class EmailPanel extends Component {
       height: styles.emailPanel.height,
       width: styles.emailPanel.width,
       zIndex: 200,
-      display: state.minimized ? 'none' : 'block'
+      display: state.minimized ? 'none' : 'block',
     };
 
     return (
@@ -299,7 +299,8 @@ class EmailPanel extends Component {
               </div>
               <div className='vertical-center'>
                 Emails are sent from: <span style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
-                {props.isImageReceiving && <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
+              {props.isImageReceiving &&
+                <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
               </div>
               <BasicHtmlEditor
               listId={props.listId}
@@ -312,7 +313,7 @@ class EmailPanel extends Component {
               debounce={500}
               person={props.person}
               >
-                <div className='vertical-center'>
+                <div style={{backgroundColor: 'white'}} className='vertical-center'>
                   <SelectField
                   style={{overflowX: 'hidden'}}
                   value={state.currentTemplateId}

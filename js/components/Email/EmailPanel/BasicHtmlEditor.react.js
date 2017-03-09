@@ -477,7 +477,9 @@ class BasicHtmlEditor extends React.Component {
       <div>
         <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
         <Dialog autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
-          <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
+          <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
+          <div className='horizontal-center'>OR</div>
+          <div className='vertical-center horizontal-center' style={{margin: '15px 0'}}>
             <div>
               <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
               {({onValueChange, errorMessage}) => (
