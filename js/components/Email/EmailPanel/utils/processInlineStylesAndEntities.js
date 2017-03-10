@@ -1,3 +1,4 @@
+// @flow
 import template from 'lodash/template';
 import sortBy from 'lodash/sortBy';
 import last from 'lodash/last';
@@ -5,6 +6,9 @@ import clone from 'lodash/clone';
 import indexOf from 'lodash/indexOf';
 
 export default function processInlineStylesAndEntities(inlineTagMap, entityTagMap, entityMap, block) {
+  if (!block) {
+    return '';
+  }
   if (!block.inlineStyleRanges && !block.entityRanges) {
     // TODO: optimisation, exit early if length === 0 as well
     return block.text;
@@ -20,7 +24,7 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
   let escapeReplacements = [ ['<', '&lt;'], ['&', '&amp;']];
 
   escapeReplacements.forEach((arr) =>{
-    for(var i=0; i<html.length;i++) {
+    for (var i = 0; i < html.length; i++) {
       if (html[i] === arr[0]) {
         if (!tagInsertMap[i]) {
           tagInsertMap[i] = [];
@@ -41,11 +45,15 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
   sortedInlineStyleRanges.forEach(function(range) {
     let tag = inlineTagMap[range.style];
 
-    if (!tagInsertMap[range.offset]) { tagInsertMap[range.offset] = []; }
+    if (!tagInsertMap[range.offset]) {
+      tagInsertMap[range.offset] = [];
+    }
 
     tagInsertMap[range.offset].push(tag[0]);
     if (tag[1]) {
-      if (!tagInsertMap[range.offset+range.length] ) { tagInsertMap[range.offset+range.length] = []; }
+      if (!tagInsertMap[range.offset+range.length] ) {
+        tagInsertMap[range.offset+range.length] = [];
+      }
       // add closing tags to start of array, otherwise tag nesting will be invalid
       tagInsertMap[ range.offset+range.length].unshift(tag[1]);
     }

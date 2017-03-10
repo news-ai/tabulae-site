@@ -6,9 +6,15 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
   let obj;
   switch (action.type) {
     case 'INITIALIZE_EMAIL_DRAFT':
-      obj = assignToEmpty(state, {});
+      obj = assignToEmpty(state, {
+        isAttachmentPanelOpen: false
+      });
       obj[action.listId] = {from: action.email};
       return obj;
+    case 'TURN_ON_ATTACHMENT_PANEL':
+      return assignToEmpty(state, {isAttachmentPanelOpen: true});
+    case 'TURN_OFF_ATTACHMENT_PANEL':
+      return assignToEmpty(state, {isAttachmentPanelOpen: false});
     case 'UPDATE_CC':
       obj = assignToEmpty(state, {});
       obj[action.listId] = assignToEmpty(state[action.listId], {cc: action.cc});

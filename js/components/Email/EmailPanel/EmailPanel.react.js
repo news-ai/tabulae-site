@@ -16,11 +16,13 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
 
+import ReactTooltip from 'react-tooltip'
 import PreviewEmails from '../PreviewEmails';
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
+import FileWrapper from './FileWrapper.react';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
@@ -184,8 +186,10 @@ class EmailPanel extends Component {
 
   _replaceAll(html, contact) {
     const {fieldsmap} = this.state;
-    if (html === null) return;
-    let newHtml: ?string = html;
+    if (html === null) {
+      return;
+    }
+    let newHtml: string = html;
     fieldsmap.map(fieldObj => {
       let value = '';
       const replaceValue = _getter(contact, fieldObj);
@@ -302,23 +306,28 @@ class EmailPanel extends Component {
 
     return (
       <div style={styles.emailPanelOuterPosition}>
+        <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
+          <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
+        </ReactTooltip>
         <div style={styles.emailPanelPosition}>
         {props.isImageReceiving &&
           <PauseOverlay message='Image is loading.'/>}
         {state.minimized &&
           <MinimizedView toggleMinimize={this.toggleMinimize}/>}
+          <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
           <Paper style={Object.assign({}, emailPanelWrapper, {display: state.minimized ? 'none' : 'block'})} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
-                {/*<div className='pointer' style={{
+                <div onClick={props.onAttachmentPanelOpen} className='pointer' style={{
                   zIndex: 500,
                   float: 'right',
-                  margin: '0 5px'
+                  margin: '0 8px',
+                  display: (props.files && props.files.length > 0) ? 'block' : 'none'
                 }}>
-                  <span style={{fontSize: '0.7em', color: 'darkgray'}}>Files Attached</span>
-                </div>*/}
+                  <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: 'darkgray'}}>File{props.files.length > 1 && 's'} Attached</a>
+                </div>
               </div>
               <div className='vertical-center'>
                 Emails are sent from: <span style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
@@ -392,7 +401,7 @@ class EmailPanel extends Component {
                     />}
                   </SwitchEmailHOC>
                 </div>
-                <div style={{position: 'absolute', right: 20, bottom: 3}}>
+                <div style={{position: 'absolute', right: 20, bottom: 3, zIndex: 300}}>
                   <IconButton
                   iconClassName={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}
                   onClick={this.onPreviewEmailsClick}
@@ -446,6 +455,8 @@ const mapStateToProps = (state, props) => {
     bcc: get(state, `emailDraftReducer[${props.listId}].bcc`) || [],
     from: get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email,
     isImageReceiving: state.emailImageReducer.isReceiving,
+    files: state.emailAttachmentReducer.attached,
+    isAttachmentPanelOpen: state.emailDraftReducer.isAttachmentPanelOpen,
   };
 };
 
@@ -461,6 +472,8 @@ const mapDispatchToProps = (dispatch, props) => {
     postBatchEmails: emails => dispatch(stagingActions.postBatchEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(stagingActions.postBatchEmailsWithAttachments(emails)),
     initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email: props.person.email}),
+    onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
+    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
   };
 };
 

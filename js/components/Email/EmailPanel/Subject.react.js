@@ -10,7 +10,7 @@ import {
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.react';
 import {curlyStrategy, findEntities} from './utils/strategies';
-import {grey400, grey500} from 'material-ui/styles/colors';
+import {grey300, grey400, grey500} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
@@ -111,7 +111,7 @@ class Subject extends Component {
     const props = this.props;
     return (
       <div
-      style={{marginTop: 12}}
+      style={{marginTop: 12, borderBottom: `1px solid ${grey300}`}}
       className='vertical-center'
       >
         <div

@@ -1,3 +1,4 @@
+// @flow
 import processInlineStylesAndEntities from './processInlineStylesAndEntities';
 
 let blockTagMap = {
