@@ -186,8 +186,10 @@ class EmailPanel extends Component {
 
   _replaceAll(html, contact) {
     const {fieldsmap} = this.state;
-    if (html === null) return;
-    let newHtml: ?string = html;
+    if (html === null) {
+      return;
+    }
+    let newHtml: string = html;
     fieldsmap.map(fieldObj => {
       let value = '';
       const replaceValue = _getter(contact, fieldObj);

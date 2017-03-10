@@ -111,7 +111,7 @@ class Subject extends Component {
     const props = this.props;
     return (
       <div
-      style={{marginTop: 12}}
+      style={{marginTop: 12, borderBottom: `1px solid ${grey400}`}}
       className='vertical-center'
       >
         <div

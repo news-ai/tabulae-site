@@ -1,3 +1,4 @@
+// @flow
 import template from 'lodash/template';
 import sortBy from 'lodash/sortBy';
 import last from 'lodash/last';
