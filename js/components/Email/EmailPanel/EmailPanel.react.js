@@ -324,7 +324,7 @@ class EmailPanel extends Component {
                   margin: '0 8px',
                   display: (props.files && props.files.length > 0) ? 'block' : 'none'
                 }}>
-                  <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: 'darkgray'}}>Files Attached</a>
+                  <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: 'darkgray'}}>File{props.files.length > 1 && 's'} Attached</a>
                 </div>
               </div>
               <div className='vertical-center'>
