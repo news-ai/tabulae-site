@@ -23,7 +23,7 @@ class FileWrapper extends Component {
     return (
     <Dialog actions={[<FlatButton label='Close' onClick={props.onRequestClose}/>]}
     title='File Upload' autoScrollBodyContent
-    open={props.open} onRequestClose={props.onRequestClose}>
+    open={props.open || false} onRequestClose={props.onRequestClose}>
       <div style={{margin: 10}} className='horizontal-center'>
         <Dropzone maxSize={5000000} onDrop={this.onDrop}>
           <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>

@@ -42,7 +42,6 @@ import FontSizeControls from './components/FontSizeControls';
 import ExternalControls from './components/ExternalControls';
 import PositionStyleControls from './components/PositionStyleControls';
 import Image from './Image/Image.react';
-import FileWrapper from './FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Immutable from 'immutable';
@@ -105,7 +104,7 @@ class BasicHtmlEditor extends React.Component {
     this.EXTERNAL_CONTROLS = [
       {
         label: 'Attachments',
-        onToggle: _ => this.setState({filePanelOpen: true}),
+        onToggle: this.props.onAttachmentPanelOpen,
         icon: 'fa fa-paperclip',
         isActive: _ => this.props.files.length > 0,
         tooltip: 'Attach File'
@@ -523,7 +522,6 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
         autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
           <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
@@ -757,7 +755,8 @@ const mapDispatchToProps = (dispatch, props) => {
     saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
     setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
     setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
-    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'})
+    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'}),
+    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'})
   };
 };
 

@@ -40,7 +40,8 @@ export const initialState = {
   },
   emailAttachmentReducer: {
     attached: [],
-    isReceiving: false
+    isReceiving: false,
+    isAttachmentPanelOpen: false
   },
   publicationReducer: {
     isReceiving: false,

@@ -22,6 +22,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
+import FileWrapper from './FileWrapper.react';
 import IconMenu from 'material-ui/IconMenu';
 import SelectField from 'material-ui/SelectField';
 import Paper from 'material-ui/Paper';
@@ -311,12 +312,13 @@ class EmailPanel extends Component {
           <PauseOverlay message='Image is loading.'/>}
         {state.minimized &&
           <MinimizedView toggleMinimize={this.toggleMinimize}/>}
+          <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
           <Paper style={Object.assign({}, emailPanelWrapper, {display: state.minimized ? 'none' : 'block'})} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
                 <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
-                <div className='pointer' style={{
+                <div onClick={props.onAttachmentPanelOpen} className='pointer' style={{
                   zIndex: 500,
                   float: 'right',
                   margin: '0 8px',
@@ -452,6 +454,7 @@ const mapStateToProps = (state, props) => {
     from: get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email,
     isImageReceiving: state.emailImageReducer.isReceiving,
     files: state.emailAttachmentReducer.attached,
+    isAttachmentPanelOpen: state.emailDraftReducer.isAttachmentPanelOpen,
   };
 };
 
@@ -467,6 +470,8 @@ const mapDispatchToProps = (dispatch, props) => {
     postBatchEmails: emails => dispatch(stagingActions.postBatchEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(stagingActions.postBatchEmailsWithAttachments(emails)),
     initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email: props.person.email}),
+    onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
+    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
   };
 };
 
