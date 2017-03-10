@@ -429,7 +429,6 @@ class BasicHtmlEditor extends React.Component {
     let contentState;
 
     if (html) {
-      // console.log(html);
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -439,7 +438,6 @@ class BasicHtmlEditor extends React.Component {
           a: ['href']
         }
       });
-      // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
