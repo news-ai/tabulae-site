@@ -2,6 +2,11 @@
   white-space: nowrap;
 }
 
+.subject-draft-container {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  -ms-overflow-style: none;
+}
+
 .subject-draft-container::-webkit-scrollbar {
   display: none;
 }
