@@ -253,50 +253,11 @@ class BasicHtmlEditor extends React.Component {
   componentWillUnmount() {
     this.props.clearAttachments();
   }
-  /*const startKey = selection.getStartKey();
-    const startOffset = selection.getStartOffset();
-    const endOffset = selection.getEndOffset();
-    const blockAtLinkBeginning = contentState.getBlockForKey(startKey);
-    let i;
-    let linkKey;
-    let hasEntityType = false;
-    for (i = startOffset; i < endOffset; i++) {
-      linkKey = blockAtLinkBeginning.getEntityAt(i);
-      if (linkKey !== null) {
-        const type = contentState.getEntity(linkKey).getType();
-        if (type === 'LINK') {
-          hasEntityType = true;
-          break;
-        }
-      }
-    }
-    if (hasEntityType) {
-      // REMOVE LINK
-      this.removeLink();
-    } else {
-      // ADD LINK
-      this.addLink();
-    }*/
+ 
   _onChange(editorState) {
-    // console.log('----');
-    // const selection = editorState.getSelection();
-    // if (selection.getHasFocus()) console.log(selection.getFocusOffset());
-    // editorState.getCurrentContent().getBlockMap().forEach(block => {
-    //   const links = linkify.match(block.get('text'));
-    //   if (typeof links !== 'undefined' && links !== null) {
-    //     let startOffset, endOffset;
-    //     for (let i = 0; i < links.length; i++) {
-    //       console.log(block);
-    //       startOffset = links[i].index;
-    //       endOffset = links[i].lastIndex;
-    //       console.log(links[i]);
-    //       console.log(links[i].url);
-    //     }
-    //   }
-    // });
-
+    let newEditorState = editorState;
     let previousContent = this.state.editorState.getCurrentContent();
-    this.setState({editorState});
+    this.setState({editorState: newEditorState});
 
     // only emit html when content changes
     if (previousContent !== editorState.getCurrentContent()) {
@@ -444,9 +405,54 @@ class BasicHtmlEditor extends React.Component {
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
 
+    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+
+    let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
+
+    // MOVE ALL THIS TO ON PASTE
+    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
+      console.log(block.getText());
+      const links = linkify.match(block.get('text'));
+      if (typeof links !== 'undefined' && links !== null) {
+        for (let i = 0; i < links.length; i++) {
+          let selectionState = SelectionState.createEmpty(block.getKey());
+          const focusOffset = selectionState.getFocusOffset() + links[i].raw.length;
+          selectionState = newEditorState.getSelection().merge({
+            anchorOffset: selectionState.getAnchorOffset(),
+            focusKey: block.getKey(),
+            focusOffset
+          });
+          newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
+
+          // check if entity exists already
+          const startOffset = selectionState.getStartOffset();
+          const endOffset = selectionState.getEndOffset();
+
+          let linkKey;
+          let hasEntityType = false;
+          for (let j = startOffset; j < endOffset; j++) {
+            linkKey = block.getEntityAt(j);
+            if (linkKey !== null) {
+              const type = newEditorState.getCurrentContent().getEntity(linkKey).getType();
+              if (type === 'LINK') {
+                hasEntityType = true;
+                break;
+              }
+            }
+          }
+          if (!hasEntityType) {
+            console.log('INSERT ENTITY');
+            // insert entity if no entity exist
+            const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+            newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
+          }
+          console.log(links[i].url);
+        }
+      }
+    });
+
+    this.onChange(newEditorState);
     return true;
   }
 
