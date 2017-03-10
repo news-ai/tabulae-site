@@ -1,8 +1,10 @@
-
 .subject-draft-container span {
   white-space: nowrap;
 }
 
+.subject-draft-container::-webkit-scrollbar {
+  display: none;
+}
 
 .RichEditor-root {
   background: #fff;
@@ -17,6 +19,10 @@
   cursor: text;
   font-size: 14px;
   margin-top: 5px;
+}
+
+.public-DraftStyleDefault-block .public-DraftStyleDefault-ltr::-webkit-scrollbar {
+  display: none;
 }
 
 .RichEditor-editor .public-DraftEditorPlaceholder-root,
