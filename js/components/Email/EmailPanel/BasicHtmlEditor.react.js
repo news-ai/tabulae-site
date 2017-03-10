@@ -574,7 +574,7 @@ class BasicHtmlEditor extends React.Component {
         fieldsmap={props.fieldsmap}
         />
         <div style={{
-          height: 480,
+          height: 460,
           overflowY: 'scroll',
         }}>
           <div className={className} onClick={this.focus}>
