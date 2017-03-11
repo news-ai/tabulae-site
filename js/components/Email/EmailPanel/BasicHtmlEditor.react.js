@@ -224,6 +224,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleImage = this._handleImage.bind(this);
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
+    this.handleBeforeInput = this._handleBeforeInput.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -250,12 +251,14 @@ class BasicHtmlEditor extends React.Component {
       this.emitHTML(this.state.editorState);
     }
   }
+
   componentWillUnmount() {
     this.props.clearAttachments();
   }
- 
+
   _onChange(editorState) {
     let newEditorState = editorState;
+
     let previousContent = this.state.editorState.getCurrentContent();
     this.setState({editorState: newEditorState});
 
@@ -263,6 +266,77 @@ class BasicHtmlEditor extends React.Component {
     if (previousContent !== editorState.getCurrentContent()) {
       this.emitHTML(editorState);
     }
+  }
+
+  _handleBeforeInput(lastInsertedChar) {
+    let handled = false;
+    if (lastInsertedChar === ' ') {
+      let editorState = this.state.editorState;
+      if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
+        const selection = editorState.getSelection();
+        const focusKey = selection.getFocusKey();
+        const focusOffset = selection.getFocusOffset();
+        // console.log(focusOffset);
+        const block = editorState.getCurrentContent().getBlockForKey(focusKey);
+        const links = linkify.match(block.get('text'));
+        if (typeof links !== 'undefined' && links !== null) {
+          for (let i = 0; i < links.length; i++) {
+            // console.log(links[i]);
+            if (links[i].lastIndex === focusOffset) {
+              // last right before space inserted
+              let selectionState = SelectionState.createEmpty(block.getKey());
+              selectionState = selection.merge({
+                anchorKey: block.getKey(),
+                anchorOffset: focusOffset - links[i].raw.length,
+                focusKey: block.getKey(),
+                focusOffset
+              });
+              editorState = EditorState.acceptSelection(editorState, selectionState);
+
+              // check if entity exists already
+              const startOffset = selectionState.getStartOffset();
+              const endOffset = selectionState.getEndOffset();
+
+              let linkKey;
+              let hasEntityType = false;
+              for (let j = startOffset; j < endOffset; j++) {
+                linkKey = block.getEntityAt(j);
+                if (linkKey !== null) {
+                  const type = editorState.getCurrentContent().getEntity(linkKey).getType();
+                  if (type === 'LINK') {
+                    hasEntityType = true;
+                    break;
+                  }
+                }
+              }
+              if (!hasEntityType) {
+                const content = editorState.getCurrentContent();
+                const newContent = Modifier.insertText(content, selection, ' ');
+                editorState = EditorState.push(editorState, newContent, 'insert-fragment');
+
+                handled = 'handled';
+                // insert entity if no entity exist
+                const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+                editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
+
+                // move selection focus back to original spot
+                selectionState = selectionState.merge({
+                  anchorKey: block.getKey(),
+                  anchorOffset: focusOffset + 1, // add 1 for space in front of link
+                  focusKey: block.getKey(),
+                  focusOffset: focusOffset + 1
+                });
+                editorState = EditorState.acceptSelection(editorState, selectionState);
+
+                this.onChange(editorState);
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+    return handled;
   }
 
   _insertText(replaceText) {
@@ -410,9 +484,7 @@ class BasicHtmlEditor extends React.Component {
 
     let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
 
-    // MOVE ALL THIS TO ON PASTE
     newEditorState.getCurrentContent().getBlockMap().forEach(block => {
-      console.log(block.getText());
       const links = linkify.match(block.get('text'));
       if (typeof links !== 'undefined' && links !== null) {
         for (let i = 0; i < links.length; i++) {
@@ -442,12 +514,11 @@ class BasicHtmlEditor extends React.Component {
             }
           }
           if (!hasEntityType) {
-            console.log('INSERT ENTITY');
             // insert entity if no entity exist
             const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
             newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
           }
-          console.log(links[i].url);
+          // console.log(links[i].url);
         }
       }
     });
@@ -594,6 +665,7 @@ class BasicHtmlEditor extends React.Component {
             handleReturn={this.handleReturn}
             handlePastedText={this.handlePastedText}
             handleDroppedFiles={this.handleDroppedFiles}
+            handleBeforeInput={this.handleBeforeInput}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'
