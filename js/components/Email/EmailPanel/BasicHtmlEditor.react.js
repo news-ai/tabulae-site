@@ -344,7 +344,6 @@ class BasicHtmlEditor extends React.Component {
   }
 
   _handleBeforeInput(lastInsertedChar) {
-    console.log('handleBeforeInput');
     let handled = 'not-handled';
     if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
     return handled;
@@ -452,7 +451,6 @@ class BasicHtmlEditor extends React.Component {
   }
 
   _handlePastedText(text, html) {
-    console.log('handlePastedText');
     const {editorState} = this.state;
     let newState;
     let blockMap;
@@ -527,7 +525,7 @@ class BasicHtmlEditor extends React.Component {
         }
       }
     });
-    
+
     newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
 
     this.onChange(newEditorState);
