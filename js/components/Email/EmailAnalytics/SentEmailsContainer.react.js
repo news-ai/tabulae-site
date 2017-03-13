@@ -72,6 +72,7 @@ class SentEmailsPaginationContainer extends Component {
               <TextField
               ref='emailSearch'
               floatingLabelText='Search Filter'
+              onKeyDown={e => e.key === 'Enter' ? this.onSearchClick(this.refs.emailSearch.input.value) : null}
               />
               <IconButton
               iconStyle={{color: grey600}}
