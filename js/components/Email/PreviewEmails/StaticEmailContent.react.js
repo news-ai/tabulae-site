@@ -17,7 +17,7 @@ const styles = {
   },
 };
 
-const FORMAT = 'dddd, MMMM HH:mm';
+const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
 function createMarkUp(html) {
   return { __html: html };
