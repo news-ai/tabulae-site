@@ -273,6 +273,7 @@ class BasicHtmlEditor extends React.Component {
 
   _linkifyLastWord(insertChar = ' ') {
     // check last words in a block and linkify if detect link
+    // insert special char after handling linkify case
     let editorState = this.state.editorState;
     let handled = 'not-handled';
     if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
@@ -475,46 +476,51 @@ class BasicHtmlEditor extends React.Component {
       blockMap = contentState.blockMap;
     }
 
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    const prePasteSelection = editorState.getSelection();
+    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
 
+    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
     let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
 
-    newEditorState.getCurrentContent().getBlockMap().forEach((block, index) => {
-      const links = linkify.match(block.get('text'));
-      if (typeof links !== 'undefined' && links !== null) {
-        for (let i = 0; i < links.length; i++) {
-          console.log(links[i]);
-          let selectionState = SelectionState.createEmpty(block.getKey());
-          const focusOffset = selectionState.getFocusOffset() + links[i].raw.length;
-          selectionState = newEditorState.getSelection().merge({
-            anchorOffset: selectionState.getAnchorOffset(),
-            focusKey: block.getKey(),
-            focusOffset
-          });
-          newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
+    let inPasteRange = false;
+    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) return false; // hit next block pre-paste, stop linkify
+      if (key === prePasteSelection.getStartKey() || inPasteRange) {
+        inPasteRange = true;
+        const links = linkify.match(block.get('text'));
+        if (typeof links !== 'undefined' && links !== null) {
+          for (let i = 0; i < links.length; i++) {
+            let selectionState = SelectionState.createEmpty(block.getKey());
+            selectionState = newEditorState.getSelection().merge({
+              anchorKey: block.getKey(),
+              anchorOffset: links[i].index,
+              focusKey: block.getKey(),
+              focusOffset: links[i].lastIndex
+            });
+            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
 
-          // check if entity exists already
-          const startOffset = selectionState.getStartOffset();
-          const endOffset = selectionState.getEndOffset();
+            // check if entity exists already
+            const startOffset = selectionState.getStartOffset();
+            const endOffset = selectionState.getEndOffset();
 
-          let linkKey;
-          let hasEntityType = false;
-          for (let j = startOffset; j < endOffset; j++) {
-            linkKey = block.getEntityAt(j);
-            if (linkKey !== null) {
-              const type = newEditorState.getCurrentContent().getEntity(linkKey).getType();
-              if (type === 'LINK') {
-                hasEntityType = true;
-                break;
+            let linkKey;
+            let hasEntityType = false;
+            for (let j = startOffset; j < endOffset; j++) {
+              linkKey = block.getEntityAt(j);
+              if (linkKey !== null) {
+                const type = contentState.getEntity(linkKey).getType();
+                if (type === 'LINK') {
+                  hasEntityType = true;
+                  break;
+                }
               }
             }
+            if (!hasEntityType) {
+              // insert entity if no entity exist
+              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
+            }
           }
-          if (!hasEntityType) {
-            // insert entity if no entity exist
-            const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-            newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
-          }
-          // console.log(links[i].url);
         }
       }
     });
