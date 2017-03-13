@@ -8,7 +8,7 @@ export default function Link(props) {
     href = props.decoratedText;
   }
   return (
-    <a href={href} className='drafjs-bhe_link'>
+    <a href={href} target='_blank'>
       {props.children}
     </a>
   );
