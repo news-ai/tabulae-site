@@ -1,5 +1,9 @@
 // helper function to add extra tableOnly columns like index, selected, etc.
 import find from 'lodash/find';
+import moment from 'moment-timezone';
+const FORMAT = 'ddd, MMM Do Y, hh:mm A';
+const ONE_HOUR = 60 * 60 * 1000;
+const ONE_DAY = 24 * 60 * 60 * 1000;
 
 function divide(numerator, denomenator, fixedTo) {
   const res = Math.round(numerator * (1 / fixedTo) / denomenator) / (1 / fixedTo);
@@ -10,14 +14,29 @@ export function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+const TIMEZONE = moment.tz.guess(TIMEZONE);
+
+export function transformTypeValue(type, value) {
+  if (!value || value === null) return value;
+  switch (type) {
+    case 'Date':
+      const m = moment(value);
+      if (!m.isValid()) return value;
+      const date = m.tz(TIMEZONE).fromNow();
+      return date;
+    default:
+      return value;
+  }
+}
+
 // returns contact value for certain fieldObj
 export function _getter(contact, fieldObj) {
   try {
     if (fieldObj.customfield) {
-      if (fieldObj.readonly) return contact[fieldObj.value];
+      if (fieldObj.readonly) return transformTypeValue(fieldObj.type, contact[fieldObj.value]);
       if (contact.customfields === null) return undefined;
       else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-      else return find(contact.customfields, obj => obj.name === fieldObj.value).value;
+      else return transformTypeValue(find(contact.customfields, obj => obj.name === fieldObj.value).value);
     } else {
       if (fieldObj.strategy) return fieldObj.strategy(contact);
       else return contact[fieldObj.value];
@@ -132,23 +151,6 @@ function instagramCommentsToPosts(listData) {
   }
 }
 
-function publicationColumn(listData) {
-  return {
-    customfield: false,
-    name: 'Publication',
-    value: 'publication_name_1',
-    hidden: find(listData.fieldsmap, fieldObj => fieldObj.value === 'employers').hidden,
-    sortEnabled: true,
-    tableOnly: true,
-    hideCheckbox: false,
-    checkboxStrategy: (fieldsmap, checked) => fieldsmap.map(fieldObj => {
-      if (fieldObj.value === 'publication_name_1' || fieldObj.value === 'employers') return Object.assign({}, fieldObj, {hidden: checked});
-      return fieldObj;
-    }),
-    strategy: contact => contact.publication_name_1
-  };
-}
-
 export function reformatFieldsmap(fieldsmap) {
   const formattedMap = fieldsmap
   .filter(fieldObj => !fieldObj.tableOnly)
@@ -240,7 +242,7 @@ export function measureSpanSize(txt, font) {
   context.font = font;
   var tsize = {
     width: context.measureText(txt).width + 23,
-    height: parseInt(context.font)
+    height: parseInt(context.font, 10)
   };
   return tsize;
 }

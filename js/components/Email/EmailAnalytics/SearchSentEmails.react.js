@@ -24,7 +24,7 @@ class SearchSentEmails extends Component {
       isReceiving={props.isReceiving}
       emails={props.emails}
       fetchEmails={_ => {}}
-      placeholder='Search results will be shown here.'
+      placeholder='Search results will be shown here. None found.'
       />
       );
   }

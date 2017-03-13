@@ -66,7 +66,7 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
 
   var tagStack = [];
 
-  Object.keys(tagInsertMap).forEach( key => {
+  Object.keys(tagInsertMap).forEach(key => {
     let newInsertMap = [];
     let tags = tagInsertMap[key];
 
@@ -79,6 +79,8 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
       let tagsToReopen = [];
 
       iterateArray.forEach(tag => {
+        if (tag.constructor === Array) return;
+
         let isCloser = tag.substr(0, 2) === '</';
         let stackTag = tagStack[0];
         let closeMatch = isTagCloseMatch(stackTag, tag);

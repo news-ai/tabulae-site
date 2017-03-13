@@ -58,7 +58,9 @@ import linkifyIt from 'linkify-it';
 import tlds from 'tlds';
 
 const linkify = linkifyIt();
-linkify.tlds(tlds);
+linkify
+.tlds(tlds)
+.set({fuzzyLink: false});
 
 const controlsStyle = {
   position: 'fixed',
@@ -224,6 +226,8 @@ class BasicHtmlEditor extends React.Component {
     this.handleImage = this._handleImage.bind(this);
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
+    this.handleBeforeInput = this._handleBeforeInput.bind(this);
+    this.linkifyLastWord = this._linkifyLastWord.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -250,12 +254,14 @@ class BasicHtmlEditor extends React.Component {
       this.emitHTML(this.state.editorState);
     }
   }
+
   componentWillUnmount() {
     this.props.clearAttachments();
   }
- 
+
   _onChange(editorState) {
     let newEditorState = editorState;
+
     let previousContent = this.state.editorState.getCurrentContent();
     this.setState({editorState: newEditorState});
 
@@ -263,6 +269,84 @@ class BasicHtmlEditor extends React.Component {
     if (previousContent !== editorState.getCurrentContent()) {
       this.emitHTML(editorState);
     }
+  }
+
+  _linkifyLastWord(insertChar = ' ') {
+    // check last words in a block and linkify if detect link
+    // insert special char after handling linkify case
+    let editorState = this.state.editorState;
+    let handled = 'not-handled';
+    if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
+      const selection = editorState.getSelection();
+      const focusKey = selection.getFocusKey();
+      const focusOffset = selection.getFocusOffset();
+      // console.log(focusOffset);
+      const block = editorState.getCurrentContent().getBlockForKey(focusKey);
+      const links = linkify.match(block.get('text'));
+      if (typeof links !== 'undefined' && links !== null) {
+        for (let i = 0; i < links.length; i++) {
+          if (links[i].lastIndex === focusOffset) {
+            // console.log(links[i]);
+            // last right before space inserted
+            let selectionState = SelectionState.createEmpty(block.getKey());
+            selectionState = selection.merge({
+              anchorKey: block.getKey(),
+              anchorOffset: focusOffset - links[i].raw.length,
+              focusKey: block.getKey(),
+              focusOffset
+            });
+            editorState = EditorState.acceptSelection(editorState, selectionState);
+
+            // check if entity exists already
+            const startOffset = selectionState.getStartOffset();
+            const endOffset = selectionState.getEndOffset();
+
+            let linkKey;
+            let hasEntityType = false;
+            for (let j = startOffset; j < endOffset; j++) {
+              linkKey = block.getEntityAt(j);
+              if (linkKey !== null) {
+                const type = editorState.getCurrentContent().getEntity(linkKey).getType();
+                if (type === 'LINK') {
+                  hasEntityType = true;
+                  break;
+                }
+              }
+            }
+
+            if (!hasEntityType) {
+              // insert space
+              const content = editorState.getCurrentContent();
+              const newContent = Modifier.insertText(content, selection, insertChar);
+              editorState = EditorState.push(editorState, newContent, 'insert-fragment');
+
+              handled = 'handled';
+              // insert entity if no entity exist
+              const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+              editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
+
+              // move selection focus back to original spot
+              selectionState = selectionState.merge({
+                anchorKey: block.getKey(),
+                anchorOffset: focusOffset + 1, // add 1 for space in front of link
+                focusKey: block.getKey(),
+                focusOffset: focusOffset + 1
+              });
+              editorState = EditorState.acceptSelection(editorState, selectionState);
+              this.onChange(editorState);
+            }
+            break;
+          }
+        }
+      }
+    }
+    return handled;
+  }
+
+  _handleBeforeInput(lastInsertedChar) {
+    let handled = 'not-handled';
+    if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
+    return handled;
   }
 
   _insertText(replaceText) {
@@ -274,6 +358,14 @@ class BasicHtmlEditor extends React.Component {
     this.onChange(newEditorState);
   }
 
+  _handleReturn(e) {
+    if (e.key === 'Enter') {
+      console.log('ENTER PRESSED');
+      return this.linkifyLastWord('\n');
+    }
+    return 'not-handled';
+  }
+
   _handleKeyCommand(command) {
     const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -282,14 +374,6 @@ class BasicHtmlEditor extends React.Component {
       return true;
     }
     return false;
-  }
-
-  _handleReturn(e) {
-    if (e.metaKey === true) {
-      return this._addLineBreak();
-    } else {
-      return 'not-handled';
-    }
   }
 
   _toggleBlockType(blockType) {
@@ -308,22 +392,6 @@ class BasicHtmlEditor extends React.Component {
         inlineStyle
       )
     );
-  }
-
-  _addLineBreak(/* e */) {
-    let newContent, newEditorState;
-    const {editorState} = this.state;
-    const content = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const block = content.getBlockForKey(selection.getStartKey());
-    // console.log(content.toJS(), selection.toJS(), block.toJS());
-    if (block.type === 'code-block') {
-      newContent = Modifier.insertText(content, selection, '\n');
-      newEditorState = EditorState.push(editorState, newContent, 'add-new-line');
-      this.onChange(newEditorState);
-      return 'handled';
-    }
-    return 'not-handled';
   }
 
   _manageLink() {
@@ -406,51 +474,59 @@ class BasicHtmlEditor extends React.Component {
       blockMap = contentState.blockMap;
     }
 
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
+    const prePasteSelection = editorState.getSelection();
+    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
 
+    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
     let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
 
-    // MOVE ALL THIS TO ON PASTE
-    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
-      console.log(block.getText());
-      const links = linkify.match(block.get('text'));
-      if (typeof links !== 'undefined' && links !== null) {
-        for (let i = 0; i < links.length; i++) {
-          let selectionState = SelectionState.createEmpty(block.getKey());
-          const focusOffset = selectionState.getFocusOffset() + links[i].raw.length;
-          selectionState = newEditorState.getSelection().merge({
-            anchorOffset: selectionState.getAnchorOffset(),
-            focusKey: block.getKey(),
-            focusOffset
-          });
-          newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
+    let inPasteRange = false;
+    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
+        // hit next block pre-paste, stop linkify
+        return false;
+      }
+      if (key === prePasteSelection.getStartKey() || inPasteRange) {
+        inPasteRange = true;
+        const links = linkify.match(block.get('text'));
+        if (typeof links !== 'undefined' && links !== null) {
+          for (let i = 0; i < links.length; i++) {
+            let selectionState = SelectionState.createEmpty(block.getKey());
+            selectionState = newEditorState.getSelection().merge({
+              anchorKey: block.getKey(),
+              anchorOffset: links[i].index,
+              focusKey: block.getKey(),
+              focusOffset: links[i].lastIndex
+            });
+            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
 
-          // check if entity exists already
-          const startOffset = selectionState.getStartOffset();
-          const endOffset = selectionState.getEndOffset();
+            // check if entity exists already
+            const startOffset = selectionState.getStartOffset();
+            const endOffset = selectionState.getEndOffset();
 
-          let linkKey;
-          let hasEntityType = false;
-          for (let j = startOffset; j < endOffset; j++) {
-            linkKey = block.getEntityAt(j);
-            if (linkKey !== null) {
-              const type = newEditorState.getCurrentContent().getEntity(linkKey).getType();
-              if (type === 'LINK') {
-                hasEntityType = true;
-                break;
+            let linkKey;
+            let hasEntityType = false;
+            for (let j = startOffset; j < endOffset; j++) {
+              linkKey = block.getEntityAt(j);
+              if (linkKey !== null) {
+                const type = contentState.getEntity(linkKey).getType();
+                if (type === 'LINK') {
+                  hasEntityType = true;
+                  break;
+                }
               }
             }
+            if (!hasEntityType) {
+              // insert entity if no entity exist
+              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
+            }
           }
-          if (!hasEntityType) {
-            console.log('INSERT ENTITY');
-            // insert entity if no entity exist
-            const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-            newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
-          }
-          console.log(links[i].url);
         }
       }
     });
+
+    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
 
     this.onChange(newEditorState);
     return true;
@@ -594,6 +670,7 @@ class BasicHtmlEditor extends React.Component {
             handleReturn={this.handleReturn}
             handlePastedText={this.handlePastedText}
             handleDroppedFiles={this.handleDroppedFiles}
+            handleBeforeInput={this.handleBeforeInput}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'

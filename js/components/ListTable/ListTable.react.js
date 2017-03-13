@@ -294,7 +294,6 @@ class ListTable extends Component {
       if (nextProps.searchQuery) {
         this.onSearchClick(nextProps.searchQuery);
       }
-
     }
   }
 
@@ -769,6 +768,13 @@ class ListTable extends Component {
               id='search-input'
               ref='searchValue'
               hintText='Search...'
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  const searchValue = this.refs.searchValue.input.value;
+                  props.router.push(`/tables/${props.listId}?search=${searchValue}`);
+                  this.setState({searchValue});
+                }
+              }}
               floatingLabelText={state.isSearchOn ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
               floatingLabelFixed={state.isSearchOn}
               defaultValue={props.searchQuery || ''}
@@ -788,7 +794,6 @@ class ListTable extends Component {
                 } else if (state.isSearchOn && searchValue === state.searchValue && props.listData.searchResults.length > 0) {
                   this.getNextSearchResult();
                 } else {
-                  // doing a search
                   props.router.push(`/tables/${props.listId}?search=${searchValue}`);
                   this.setState({searchValue});
                 }
