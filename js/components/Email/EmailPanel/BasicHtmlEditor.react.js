@@ -484,7 +484,10 @@ class BasicHtmlEditor extends React.Component {
 
     let inPasteRange = false;
     newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) return false; // hit next block pre-paste, stop linkify
+      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
+        // hit next block pre-paste, stop linkify
+        return false;
+      }
       if (key === prePasteSelection.getStartKey() || inPasteRange) {
         inPasteRange = true;
         const links = linkify.match(block.get('text'));
@@ -524,6 +527,8 @@ class BasicHtmlEditor extends React.Component {
         }
       }
     });
+    
+    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
 
     this.onChange(newEditorState);
     return true;
