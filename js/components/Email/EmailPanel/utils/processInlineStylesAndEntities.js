@@ -5,7 +5,12 @@ import last from 'lodash/last';
 import clone from 'lodash/clone';
 import indexOf from 'lodash/indexOf';
 
-export default function processInlineStylesAndEntities(inlineTagMap, entityTagMap, entityMap, block) {
+export default function processInlineStylesAndEntities(
+  inlineTagMap: Object,
+  entityTagMap: Object,
+  entityMap?: Object,
+  block?: Object
+  ): string {
   if (!block) {
     return '';
   }
@@ -139,6 +144,7 @@ export default function processInlineStylesAndEntities(inlineTagMap, entityTagMa
   let sortedEntityRanges = sortBy(block.entityRanges, 'offset');
 
   sortedEntityRanges.forEach(function(range) {
+    if (!range) return;
     let entity = entityMap[range.key];
     let tag = entityTagMap[entity.type];
 

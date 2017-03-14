@@ -1,3 +1,4 @@
+//@flow
 import React from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
@@ -271,7 +272,7 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
-  _linkifyLastWord(insertChar = ' ') {
+  _linkifyLastWord(insertChar = '') {
     // check last words in a block and linkify if detect link
     // insert special char after handling linkify case
     let editorState = this.state.editorState;
@@ -280,13 +281,11 @@ class BasicHtmlEditor extends React.Component {
       const selection = editorState.getSelection();
       const focusKey = selection.getFocusKey();
       const focusOffset = selection.getFocusOffset();
-      // console.log(focusOffset);
       const block = editorState.getCurrentContent().getBlockForKey(focusKey);
       const links = linkify.match(block.get('text'));
       if (typeof links !== 'undefined' && links !== null) {
         for (let i = 0; i < links.length; i++) {
           if (links[i].lastIndex === focusOffset) {
-            // console.log(links[i]);
             // last right before space inserted
             let selectionState = SelectionState.createEmpty(block.getKey());
             selectionState = selection.merge({
