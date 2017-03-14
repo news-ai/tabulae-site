@@ -36,7 +36,7 @@ export function _getter(contact, fieldObj) {
       if (fieldObj.readonly) return transformTypeValue(fieldObj.type, contact[fieldObj.value]);
       if (contact.customfields === null) return undefined;
       else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-      else return transformTypeValue(find(contact.customfields, obj => obj.name === fieldObj.value).value);
+      else return transformTypeValue(fieldObj.type, find(contact.customfields, obj => obj.name === fieldObj.value).value);
     } else {
       if (fieldObj.strategy) return fieldObj.strategy(contact);
       else return contact[fieldObj.value];
