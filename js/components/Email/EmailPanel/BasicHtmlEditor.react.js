@@ -86,10 +86,9 @@ const Media = props => {
   return media;
 };
 
-type EditorState = Object;
 class BasicHtmlEditor extends React.Component {
   state : {
-    editorState: EditorState,
+    editorState: Object,
     bodyHtml: ?string,
     variableMenuOpen: bool,
     variableMenuAnchorEl: Object,
@@ -119,7 +118,7 @@ class BasicHtmlEditor extends React.Component {
   onCheck: () => void;
   handlePastedText: (text: string, html: string) => bool;
   handleDroppedFiles: (selection: Object, files: Array<Object>) => void;
-  handleImage: (url: string) => EditorState;
+  handleImage: (url: string) => Object;
   onImageUploadClicked: (acceptSelection: Array<Object>, rejectedFiles: Array<Object>) => void;
   onOnlineImageUpload: () => void;
   handleBeforeInput: (lastInsertedChar: string) => string;
