@@ -1,7 +1,6 @@
 // @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import Radium from 'radium';
 import SkyLight from 'react-skylight';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as contactActions} from 'components/Contacts';
@@ -104,11 +103,11 @@ class EmailPanel extends Component {
   toggleMinimize: (event: Event) => void;
   updateBodyHtml: (html: string) => void;
   handleTemplateValueChange: (event: Event) => void;
-  replaceAll: (html: ?string, contact: Object) => ?string;
+  replaceAll: (html: string, contact: Object) => ?string;
   onPreviewEmailsClick: (event: Event) => void;
-  getGeneratedHtmlEmails: (selectedContacts: Array<Object>, subject: string, body: ?string) => Array<Object>;
+  getGeneratedHtmlEmails: (selectedContacts: Array<Object>, subject: string, body: string) => Array<Object>;
   sendGeneratedEmails: (contactEmails: Array<Object>) => void;
-  onSubjectChange: (editorState: EditorState) => void;
+  onSubjectChange: (editorState: Object) => void;
   onSaveNewTemplateClick: (event: Event) => void;
   onDeleteTemplate: () => void;
   onClose: (event: Event) => void;
@@ -117,8 +116,8 @@ class EmailPanel extends Component {
     bodyEditorState: ?Object,
     fieldsmap: Array<Object>,
     currentTemplateId: number,
-    bodyHtml: ?string,
-    body: ?string,
+    bodyHtml: string,
+    body: string,
     subjectHtml: ?string,
     minimized: bool
   };
@@ -130,8 +129,8 @@ class EmailPanel extends Component {
       bodyEditorState: null,
       fieldsmap: [],
       currentTemplateId: 0,
-      bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : null,
-      body: this.props.emailsignature !== null ? this.props.emailsignature : null,
+      bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : '',
+      body: this.props.emailsignature !== null ? this.props.emailsignature : '',
       subjectHtml: null,
       minimized: false,
     };
@@ -186,10 +185,8 @@ class EmailPanel extends Component {
 
   _replaceAll(html, contact) {
     const {fieldsmap} = this.state;
-    if (html === null) {
-      return;
-    }
-    let newHtml: string = html;
+    if (html === null || html.length === 0) return;
+    let newHtml = html;
     fieldsmap.map(fieldObj => {
       let value = '';
       const replaceValue = _getter(contact, fieldObj);
@@ -216,7 +213,9 @@ class EmailPanel extends Component {
           bcc: this.props.bcc.map(item => item.text),
           fromemail: this.props.from
         };
-        if (this.props.scheduledtime !== null) emailObj.sendat = this.props.scheduledtime;
+        if (this.props.scheduledtime !== null) {
+          emailObj.sendat = this.props.scheduledtime;
+        }
         contactEmails.push(emailObj);
       }
     });
@@ -490,4 +489,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
-)(Radium(EmailPanel));
+)(EmailPanel);

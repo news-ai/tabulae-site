@@ -1,3 +1,4 @@
+// @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {actions as listActions} from 'components/Lists';
@@ -17,6 +18,15 @@ import 'rc-tabs/assets/index.css';
 import './SentEmails.css';
 
 class SentEmailsPaginationContainer extends Component {
+  handleFilterChange: (event: Event, index: number, filterValue: number) => void;
+  onTabChange: (activeKey: string) => void;
+  onSearchClick: (query: string) => void;
+  state: {
+    filterValue: number,
+    isShowingArchived: bool,
+    activeKey: string,
+    start: number,
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -34,7 +44,6 @@ class SentEmailsPaginationContainer extends Component {
       this.props.router.push(activeKey);
       this.setState({activeKey});
     };
-    this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
     this.onSearchClick = this._onSearchClick.bind(this);
   }
 

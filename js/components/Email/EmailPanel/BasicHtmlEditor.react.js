@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
@@ -85,7 +86,44 @@ const Media = props => {
   return media;
 };
 
+type EditorState = Object;
 class BasicHtmlEditor extends React.Component {
+  state : {
+    editorState: EditorState,
+    bodyHtml: ?string,
+    variableMenuOpen: bool,
+    variableMenuAnchorEl: Object,
+    isStyleBlockOpen: bool,
+    styleBlockAnchorEl: Object,
+    filePanelOpen: bool,
+    imagePanelOpen: bool,
+    imageLink: string
+  };
+  CONVERT_CONFIGS: Object;
+  EXTERNAL_CONTROLS: Array<Object>;
+  ENTITY_CONTROLS: Array<Object>;
+
+  toggleMinimize: (event: Event) => void;
+  focus: () => void;
+  onChange: (editorState: Object) => void;
+  handleTouchTap: (event: Event) => void;
+  emitHTML: (editorState: Object) => void;
+  insertText: (replaceText: string) => void;
+  handleKeyCommand: (command: string) => bool;
+  toggleBlockType: (blockType: string) => void;
+  toggleInlineStyle: (inlineStyle: string) => void;
+  handleReturn: (e: Event) => string;
+  addLink: () => void;
+  removeLink: () => void;
+  manageLink: () => void;
+  onCheck: () => void;
+  handlePastedText: (text: string, html: string) => bool;
+  handleDroppedFiles: (selection: Object, files: Array<Object>) => void;
+  handleImage: (url: string) => EditorState;
+  onImageUploadClicked: (acceptSelection: Array<Object>, rejectedFiles: Array<Object>) => void;
+  onOnlineImageUpload: () => void;
+  handleBeforeInput: (lastInsertedChar: string) => string;
+  linkifyLastWord: (insertChar: string) => string;
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -271,7 +309,7 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
-  _linkifyLastWord(insertChar = ' ') {
+  _linkifyLastWord(insertChar = '') {
     // check last words in a block and linkify if detect link
     // insert special char after handling linkify case
     let editorState = this.state.editorState;
@@ -280,13 +318,11 @@ class BasicHtmlEditor extends React.Component {
       const selection = editorState.getSelection();
       const focusKey = selection.getFocusKey();
       const focusOffset = selection.getFocusOffset();
-      // console.log(focusOffset);
       const block = editorState.getCurrentContent().getBlockForKey(focusKey);
       const links = linkify.match(block.get('text'));
       if (typeof links !== 'undefined' && links !== null) {
         for (let i = 0; i < links.length; i++) {
           if (links[i].lastIndex === focusOffset) {
-            // console.log(links[i]);
             // last right before space inserted
             let selectionState = SelectionState.createEmpty(block.getKey());
             selectionState = selection.merge({
@@ -360,7 +396,6 @@ class BasicHtmlEditor extends React.Component {
 
   _handleReturn(e) {
     if (e.key === 'Enter') {
-      console.log('ENTER PRESSED');
       return this.linkifyLastWord('\n');
     }
     return 'not-handled';

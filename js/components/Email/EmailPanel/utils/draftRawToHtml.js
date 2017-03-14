@@ -57,7 +57,7 @@ let nestedTagMap = {
   'unordered-list-item': ['<ul>', '</ul>']
 };
 
-export default function(raw) {
+export default function(raw: Object): string {
   let html = '';
   let nestLevel = [];
   let lastIndex = raw.blocks.length - 1;
