@@ -68,13 +68,13 @@ class ContactProfile extends Component {
     };
     this.onTabChange = activeKey => this.setState({activeKey});
     this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
-    window.Intercom('trackEvent', {contactId: this.props.contactId});
   }
 
   componentWillMount() {
     this.props.fetchContact(this.props.contactId)
     .then(_ => {
       const {contact} = this.props;
+      window.Intercom('trackEvent', 'checking_contact_profile', {contactId: contact.id});
       this.setState({notes: contact.notes});
     });
     this.props.fetchContactFeeds(this.props.contactId);
