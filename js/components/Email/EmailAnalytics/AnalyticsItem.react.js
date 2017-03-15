@@ -35,10 +35,6 @@ const styles = {
     alignSelf: 'flex-start',
     marginRight: 5
   },
-  errorText: {
-    color: deepOrange700,
-    float: 'right'
-  },
   subjectText: {
     fontWeight: 500,
     color: grey800
@@ -139,8 +135,6 @@ class AnalyticsItem extends Component {
               <span>Something went wrong on our end. Let us know!</span>
               <p>Email ID: {id}</p>
             </div>}
-          {bounced &&
-            <span style={styles.errorText}>email bounced</span>}
           {bouncedreason &&
             <p style={{color: deepOrange900}}>{bouncedreason}</p>}
           </div>
@@ -158,6 +152,10 @@ class AnalyticsItem extends Component {
               <CountViewItem onTouchTap={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o'/>)}
             </LinkAnalyticsHOC>}
           </div>
+        {bounced &&
+          <div className='small-12 large-6 columns left'>
+            <span style={{color: deepOrange700, fontSize: '0.8em'}}>email bounced</span>
+          </div>}
         </div>
       </Paper>
       );

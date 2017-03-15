@@ -505,7 +505,7 @@ class ListTable extends Component {
       window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
       return props.loadAllContacts(props.listId);
     }
-    return undefined;
+    return Promise.resolve(true);
   }
 
   _onSort(columnIndex) {

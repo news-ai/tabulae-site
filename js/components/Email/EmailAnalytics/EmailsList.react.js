@@ -41,6 +41,7 @@ class EmailDateContainer extends Component {
   render() {
     const {datestring, emailBucket} = this.props;
     const rightNow = new Date();
+    emailBucket.sort((a, b) => b.opened - a.opened);
     return (
       <div style={{marginTop: 25}}>
         <div
