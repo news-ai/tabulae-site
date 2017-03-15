@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import Link from 'react-router/lib/Link';
 import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
@@ -138,11 +138,9 @@ class ScheduledEmailItem extends Component {
               label='Cancel Delivery' secondary/>}
           </div>
         {cancel &&
-          <div className='row'>
             <div className='small-12 large-6 columns left'>
-              <span style={{color: deepOrange600}}>Canceled Delivery</span>
-            </div>
-          </div>}
+              <span style={{color: deepOrange600, fontSize: '0.8em'}}>Canceled Delivery</span>
+            </div>}
         </div>
       </Paper>
       );
