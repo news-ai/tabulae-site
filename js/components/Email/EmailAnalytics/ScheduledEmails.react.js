@@ -1,6 +1,23 @@
+import React from 'react';
 import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import EmailsList from './EmailsList.react';
+import RaisedButton from 'material-ui/RaisedButton';
+import alertify from 'alertifyjs';
+
+const ScheduledEmails = props => {
+  return (
+    <div>
+    {props.emails.length > 0 && props.emails.some(email => !email.cancel) &&
+      <div className='vertical-center'>
+        <div className='right'>
+          <RaisedButton onClick={props.onCancelAllScheduledEmailsClick} label='Cancel All'/>
+        </div>
+      </div>}
+      <EmailsList {...props}/>
+    </div>
+    );
+};
 
 const mapStateToProps = (state, props) => {
   const rightNow = new Date();
@@ -17,7 +34,25 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchEmails: _ => dispatch(stagingActions.fetchScheduledEmails()),
+    onCancelClick: id => dispatch(stagingActions.cancelScheduledEmail(id)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EmailsList);
+const mergeProps = (sProps, dProps, props) => {
+  return {
+    onCancelAllScheduledEmailsClick: () => {
+      alertify.confirm(
+        'Are you sure?',
+        'Canceling all scheduled emails is not reversible. This action might take a short while. Are you sure?',
+        () => {
+          sProps.emails.map(email => dProps.onCancelClick(email.id));
+        },
+        () => {}
+        );
+    },
+    ...sProps,
+    ...dProps
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(ScheduledEmails);
