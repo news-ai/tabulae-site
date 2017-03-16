@@ -92,6 +92,25 @@ export function _getter(contact: Object, fieldObj: Object): ?string {
   }
 }
 
+function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
+  if (html === null || html.length === 0) return;
+  let newHtml = html;
+  let matchCount = {};
+  fieldsmap.map(fieldObj => {
+    let value = '';
+    const replaceValue = _getter(contact, fieldObj);
+    if (replaceValue) value = replaceValue;
+    const regexValue = new RegExp('\{' + fieldObj.name + '\}', 'g');
+    // count num custom vars used
+    const matches = newHtml.match(regexValue);
+    if (matches !== null) matchCount[fieldObj.name] = matches.length;
+
+    newHtml = newHtml.replace(regexValue, value);
+  });
+  window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
+  return newHtml;
+}
+
 const PauseOverlay = ({message}: {message: string}) => (
   <div style={Object.assign({}, emailPanelWrapper, emailPanelPauseOverlay)}>
     <div style={{margin: 0}}>
@@ -103,7 +122,6 @@ class EmailPanel extends Component {
   toggleMinimize: (event: Event) => void;
   updateBodyHtml: (html: string) => void;
   handleTemplateValueChange: (event: Event) => void;
-  replaceAll: (html: string, contact: Object) => ?string;
   onPreviewEmailsClick: (event: Event) => void;
   getGeneratedHtmlEmails: (selectedContacts: Array<Object>, subject: string, body: string) => Array<Object>;
   sendGeneratedEmails: (contactEmails: Array<Object>) => void;
@@ -137,7 +155,6 @@ class EmailPanel extends Component {
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = html => this.setState({body: html});
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
-    this.replaceAll = this._replaceAll.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -183,25 +200,13 @@ class EmailPanel extends Component {
     this.setState({currentTemplateId: value});
   }
 
-  _replaceAll(html, contact) {
-    const {fieldsmap} = this.state;
-    if (html === null || html.length === 0) return;
-    let newHtml = html;
-    fieldsmap.map(fieldObj => {
-      let value = '';
-      const replaceValue = _getter(contact, fieldObj);
-      if (replaceValue) value = replaceValue;
-      newHtml = newHtml.replace(new RegExp('\{' + fieldObj.name + '\}', 'g'), value);
-    });
-    return newHtml;
-  }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
     let contactEmails = [];
     selectedContacts.map((contact, i) => {
       if (contact && contact !== null) {
-        const replacedBody = this.replaceAll(body, selectedContacts[i]);
-        const replacedSubject = this.replaceAll(subject, selectedContacts[i]);
+        const replacedBody = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
+        const replacedSubject = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
         let emailObj = {
           listid: this.props.listId,
           to: contact.email,
@@ -230,9 +235,23 @@ class EmailPanel extends Component {
   _onPreviewEmailsClick() {
     const {selectedContacts} = this.props;
     const {subject, body} = this.state;
-    const contactEmails = this.getGeneratedHtmlEmails(selectedContacts.filter(contact => contact.email !== null && contact.email.length > 0 && isEmail(contact.email)), subject, body);
+    let validEmailContacts = [];
+    let invalidEmailContacts = [];
+    selectedContacts.map(contact => {
+      if (contact.email !== null && contact.email.length > 0 && isEmail(contact.email)) validEmailContacts.push(contact);
+      else invalidEmailContacts.push(contact);
+    });
+    const contactEmails = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
     if (selectedContacts.length === 0) {
       alertify.alert(`Contact Selection Error`, `You didn't select any contact to send this email to.`, function() {});
+      return;
+    }
+    if (invalidEmailContacts.length > 0) {
+      alertify.confirm(
+        `Found ${invalidEmailContacts.length} email(s) with invalid format: ${invalidEmailContacts.map(contact => contact.email).join(',')}. Would you like to ignore these and continue with valid emails?`,
+        () => this.sendGeneratedEmails(contactEmails),
+        () => {}
+        );
       return;
     }
     if (selectedContacts.some(contact => contact.email.length === 0 || contact.email === null)) {

@@ -1,3 +1,4 @@
+// @flow
 import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
@@ -41,6 +42,7 @@ class EmailDateContainer extends Component {
   render() {
     const {datestring, emailBucket} = this.props;
     const rightNow = new Date();
+    emailBucket.sort((a, b) => b.opened - a.opened);
     return (
       <div style={{marginTop: 25}}>
         <div
@@ -90,7 +92,12 @@ class EmailsList extends Component {
       {this.props.refreshEmails &&
         <div className='vertical-center'>
           <div className='right'>
-            <IconButton onClick={this.props.refreshEmails} iconStyle={{color: grey500}} className='right' iconClassName={`fa fa-refresh ${this.props.isReceiving ? 'fa-spin' : ''}`}/>
+            <IconButton
+            onClick={this.props.refreshEmails}
+            iconStyle={{color: grey500}}
+            className='right'
+            iconClassName={`fa fa-refresh ${this.props.isReceiving ? 'fa-spin' : ''}`}
+            />
           </div>
         </div>}
         <div style={style}>
