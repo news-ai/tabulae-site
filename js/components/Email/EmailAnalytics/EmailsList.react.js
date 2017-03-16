@@ -1,3 +1,4 @@
+// @flow
 import React, {Component} from 'react';
 import AnalyticsItem from './AnalyticsItem.react';
 import InfiniteScroll from '../../InfiniteScroll';
@@ -84,6 +85,7 @@ class EmailsList extends Component {
   render() {
     let style = {};
     if (this.props.containerHeight) style.height = this.props.containerHeight;
+    console.log(this.props.containerHeight);
 
     const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
     return (

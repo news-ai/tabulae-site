@@ -290,10 +290,9 @@ class ContactProfile extends Component {
                 placeholder={<span>Placeholder</span>}
                 tab='Sent Emails'
                 key='emails'>
-                  <div style={{padding: 5}}>
+                  <div style={{height: 850}}>
                     <ContactEmails
                     refName='emails'
-                    containerHeight={680}
                     containerWidth={state.containerWidth}
                     contactId={props.contactId}
                     listId={props.listId}
