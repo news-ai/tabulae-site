@@ -584,8 +584,6 @@ class BasicHtmlEditor extends React.Component {
     files.map(file => {
       if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
         if (file.size <= 5000000) {
-          // const newEditorState = this.handleImage();
-          // this.onChange(newEditorState);
           this.props.uploadImage(file)
           .then(url => {
             const newEditorState = this.handleImage(url);
@@ -633,7 +631,6 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}

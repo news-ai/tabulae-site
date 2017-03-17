@@ -65,7 +65,7 @@ const Media = props => {
 
   let media;
   if (type === 'image') {
-    media = <Image src={src}/>;
+    media = <Image diableToolbar src={src}/>;
   }
   return media;
 };
