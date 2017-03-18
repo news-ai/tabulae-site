@@ -13,6 +13,7 @@ import Draft, {
   RichUtils,
   AtomicBlockUtils,
   convertToRaw,
+  convertFromRaw,
   CompositeDecorator,
   Modifier,
 } from 'draft-js';
@@ -85,6 +86,18 @@ const Media = props => {
   }
   return media;
 };
+
+// draft-convert has a bug that uses 'a' as anchor textNode for atomic block
+function stripATextNodeFromContent(content) {
+  const {entityMap, blocks} = convertToRaw(content);
+  const newRaw = {entityMap, blocks: blocks.map(block => {
+    if (block.type === 'atomic') {
+      return Object.assign({}, block, {text: '  '});
+    }
+    return block;
+  })}
+  return convertFromRaw(newRaw);
+}
 
 class BasicHtmlEditor extends React.Component {
   state : {
@@ -177,8 +190,10 @@ class BasicHtmlEditor extends React.Component {
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
+            console.log(size);
+            console.log(imgNode.style['max-height']);
             const imageLink = node.href;
-            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size, imageLink});
+            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size: imgNode.style['max-height'], imageLink});
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
@@ -245,7 +260,7 @@ class BasicHtmlEditor extends React.Component {
     function emitHTML(editorState) {
       const raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
-      // console.log(html);
+      console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -271,10 +286,15 @@ class BasicHtmlEditor extends React.Component {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
       // console.log(nextProps.bodyHtml);
+      // const configuredContent = stripATextNodeFromContent(convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml));
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
+      console.log(nextProps.bodyHtml);
+      console.log(convertToRaw(configuredContent));
+      const newContent = stripATextNodeFromContent(configuredContent);
+      console.log(convertToRaw(newContent));
       // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
       // const content = convertFromHTML(nextProps.bodyHtml);
-      const editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
@@ -282,13 +302,23 @@ class BasicHtmlEditor extends React.Component {
     if (!this.props.updated && nextProps.updated) {
       const emailImageObject = nextProps.emailImageReducer[nextProps.current];
       const entityKey = emailImageObject.entityKey;
-      Entity.replaceData(entityKey, {
+      console.log('------');
+      console.log(~~(emailImageObject.size * 100));
+      const newContentState = this.state.editorState.getCurrentContent()
+      .replaceEntityData(entityKey, {
         src: nextProps.current,
         size: `${~~(emailImageObject.size * 100)}%`,
         imageLink: emailImageObject.imageLink || '#'
       });
+      // hack!! get selection to force a rerender of editorState
+      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'activate-entity-data');
+      const selection = newEditorState.getSelection();
+
       this.props.onImageUpdated();
-      this.emitHTML(this.state.editorState);
+      this.setState({editorState: EditorState.forceSelection(newEditorState, selection)}, _ => {
+        console.log('updated');
+        this.emitHTML(this.state.editorState);
+      });
     }
   }
 
