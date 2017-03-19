@@ -254,7 +254,6 @@ class BasicHtmlEditor extends React.Component {
     };
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
-      console.log(raw);
       // cleanup mismatching raw entityMap and entity values
       // hack!! until convertToRaw actually converts current entity data in editorState
       let entityMap = raw.entityMap;
@@ -272,7 +271,7 @@ class BasicHtmlEditor extends React.Component {
       raw.entityMap = entityMap;
       // end hack
       let html = draftRawToHtml(raw);
-      console.log(html);
+      // console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -297,15 +296,8 @@ class BasicHtmlEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
-      // console.log(nextProps.bodyHtml);
-      // const configuredContent = stripATextNodeFromContent(convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml));
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      console.log(nextProps.bodyHtml);
-      console.log(convertToRaw(configuredContent));
       const newContent = stripATextNodeFromContent(configuredContent);
-      console.log(convertToRaw(newContent));
-      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
-      // const content = convertFromHTML(nextProps.bodyHtml);
       const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
@@ -314,8 +306,6 @@ class BasicHtmlEditor extends React.Component {
     if (!this.props.updated && nextProps.updated) {
       const emailImageObject = nextProps.emailImageReducer[nextProps.current];
       const entityKey = emailImageObject.entityKey;
-      console.log('------');
-      console.log(~~(emailImageObject.size * 100));
       const newContentState = this.state.editorState.getCurrentContent()
       .mergeEntityData(entityKey, {
         src: nextProps.current,
@@ -323,12 +313,9 @@ class BasicHtmlEditor extends React.Component {
         imageLink: emailImageObject.imageLink || '#'
       });
       const newEditorState = EditorState.push(this.state.editorState, newContentState, 'apply-entity');
-      const selection = newEditorState.getSelection();
       this.props.onImageUpdated();
-      console.log(newEditorState.getCurrentContent().getEntity(entityKey).getData());
       this.onChange(newEditorState, _ => {
-        console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
-
+        // force emitHTML because immutable doesn't detect entity data updates
         setTimeout(_ => this.emitHTML(this.state.editorState), 50);
       });
     }
