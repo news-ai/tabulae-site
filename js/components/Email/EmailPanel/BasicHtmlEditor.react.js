@@ -92,7 +92,7 @@ function stripATextNodeFromContent(content) {
   const {entityMap, blocks} = convertToRaw(content);
   const newRaw = {entityMap, blocks: blocks.map(block => {
     if (block.type === 'atomic') {
-      return Object.assign({}, block, {text: '  '});
+      return Object.assign({}, block, {text: ' '});
     }
     return block;
   })}
@@ -190,10 +190,8 @@ class BasicHtmlEditor extends React.Component {
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
-            console.log(size);
-            console.log(imgNode.style['max-height']);
             const imageLink = node.href;
-            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size: imgNode.style['max-height'], imageLink});
+            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size: imgNode.style['max-height'], imageLink: imageLink || '#'});
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
@@ -208,10 +206,7 @@ class BasicHtmlEditor extends React.Component {
       },
       htmlToBlock: (nodeName, node) => {
         if (nodeName === 'figure') {
-          return {
-            type: 'atomic',
-            data: {}
-          };
+          return 'atomic';
         }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
@@ -258,7 +253,24 @@ class BasicHtmlEditor extends React.Component {
       });
     };
     function emitHTML(editorState) {
-      const raw = convertToRaw(editorState.getCurrentContent());
+      let raw = convertToRaw(editorState.getCurrentContent());
+      console.log(raw);
+      // cleanup mismatching raw entityMap and entity values
+      // hack!! until convertToRaw actually converts current entity data in editorState
+      let entityMap = raw.entityMap;
+      const keys = Object.keys(entityMap);
+      keys.map(key => {
+        const entity = entityMap[key];
+        if (entity.type === 'image') {
+          const imgReducerObj = this.props.emailImageReducer[entity.data.src];
+          entityMap[key].data = Object.assign({}, entityMap[key].data, {
+            size: `${~~(imgReducerObj.size * 100)}%`,
+            imageLink: imgReducerObj.imageLink || '#'
+          });
+        }
+      });
+      raw.entityMap = entityMap;
+      // end hack
       let html = draftRawToHtml(raw);
       console.log(html);
       this.props.onBodyChange(html);
@@ -305,19 +317,19 @@ class BasicHtmlEditor extends React.Component {
       console.log('------');
       console.log(~~(emailImageObject.size * 100));
       const newContentState = this.state.editorState.getCurrentContent()
-      .replaceEntityData(entityKey, {
+      .mergeEntityData(entityKey, {
         src: nextProps.current,
         size: `${~~(emailImageObject.size * 100)}%`,
         imageLink: emailImageObject.imageLink || '#'
       });
-      // hack!! get selection to force a rerender of editorState
-      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'activate-entity-data');
+      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'apply-entity');
       const selection = newEditorState.getSelection();
-
       this.props.onImageUpdated();
-      this.setState({editorState: EditorState.forceSelection(newEditorState, selection)}, _ => {
-        console.log('updated');
-        this.emitHTML(this.state.editorState);
+      console.log(newEditorState.getCurrentContent().getEntity(entityKey).getData());
+      this.onChange(newEditorState, _ => {
+        console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
+
+        setTimeout(_ => this.emitHTML(this.state.editorState), 50);
       });
     }
   }
@@ -326,16 +338,17 @@ class BasicHtmlEditor extends React.Component {
     this.props.clearAttachments();
   }
 
-  _onChange(editorState) {
+  _onChange(editorState, callback) {
     let newEditorState = editorState;
 
     let previousContent = this.state.editorState.getCurrentContent();
-    this.setState({editorState: newEditorState});
 
     // only emit html when content changes
-    if (previousContent !== editorState.getCurrentContent()) {
+    if (previousContent !== newEditorState.getCurrentContent()) {
       this.emitHTML(editorState);
     }
+
+    this.setState({editorState: newEditorState}, callback);
   }
 
   _linkifyLastWord(insertChar = '') {
