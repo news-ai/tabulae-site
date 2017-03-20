@@ -31,9 +31,9 @@ class ToolBar extends Component {
       className='vertical-center'
       style={{
         backgroundColor: 'white',
-        position: 'absolute',
-        top: 3,
-        left: 3,
+        position: 'fixed',
+        top: props.top || 3,
+        left: props.left || 3,
         padding: '2px 3px',
         border: `solid 1px ${grey400}`,
         borderRadius: '5px',
@@ -58,7 +58,7 @@ class ToolBar extends Component {
           className='fa fa-link span-button pointer'
           />
         </div>}
-        {/*<FontIcon
+        <FontIcon
         color={props.align === 'left' ? blue400 : grey800}
         hoverColor={props.align === 'left' ? blue200 : grey400}
         onClick={_ => props.setImageAlignment('left')}
@@ -78,7 +78,7 @@ class ToolBar extends Component {
         onClick={_ => props.setImageAlignment('right')}
         style={{fontSize: '14px'}}
         className='fa fa-align-right span-button pointer'
-        />*/}
+        />
       </div>
       );
   }

@@ -4,16 +4,6 @@ import ToolBar from './ToolBar.react';
 
 import './Image.css';
 
-const Image = ({size, src, imageLink, align}) => {
-  const pSize = ~~(size * 100);
-  let style = {maxWidth: `${pSize}%`, maxHeight: `${pSize}%`};
-  // if (align === 'right' || align === 'center') {
-  //   style = Object.assign({}, style, {float: align});
-  // }
-  const img = <img src={src} style={style}/>;
-  return imageLink ? <a href={imageLink} target='_blank'>{img}</a> : img;
-};
-
 class ImageContainer extends Component {
   constructor(props) {
     super(props);
@@ -31,17 +21,25 @@ class ImageContainer extends Component {
     //   style.border = '1px solid red';
     //   style.padding = 5;
     // }
-    // if (props.align === 'center') {
-    //   style = Object.assign({}, style, {textAlign: props.align});
-    // }
+    if (props.align) {
+      style = Object.assign({}, style, {textAlign: props.align});
+    }
+    const imgNode = this.refs[props.src];
+    const pSize = ~~(props.size * 100);
+    const img = <img ref={props.src} src={props.src} style={{maxWidth: `${pSize}%`, maxHeight: `${pSize}%`}}/>;
     return (
       <div
       onMouseEnter={_ => this.setState({open: true})}
       onMouseLeave={_ => this.setState({open: false})}
       style={style}
       >
-        {state.open && <ToolBar {...props}/>}
-        <Image src={props.src} size={props.size} imageLink={props.imageLink} align={props.align}/>
+        {state.open &&
+          <ToolBar
+          left={imgNode && imgNode.getBoundingClientRect().left}
+          top={imgNode && imgNode.getBoundingClientRect().top}
+          {...props}
+          />}
+        {props.imageLink ? <a href={props.imageLink} target='_blank'>{img}</a> : img}
       </div>);
   }
 }

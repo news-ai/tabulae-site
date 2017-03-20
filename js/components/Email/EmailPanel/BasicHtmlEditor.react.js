@@ -161,12 +161,17 @@ class BasicHtmlEditor extends React.Component {
             // LINK ENTITY
             return Entity.create('LINK', 'MUTABLE', {url: node.href});
           } else if (node.firstElementChild.nodeName === 'IMG') {
+            console.log(node);
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = node.href;
-            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src, size: imgNode.style['max-height'], imageLink: imageLink || '#'});
+            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src,
+              size: imgNode.style['max-height'],
+              imageLink: imageLink || '#',
+              align: 'left'
+            });
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
@@ -239,14 +244,15 @@ class BasicHtmlEditor extends React.Component {
           const imgReducerObj = this.props.emailImageReducer[entity.data.src];
           entityMap[key].data = Object.assign({}, entityMap[key].data, {
             size: `${~~(imgReducerObj.size * 100)}%`,
-            imageLink: imgReducerObj.imageLink || '#'
+            imageLink: imgReducerObj.imageLink || '#',
+            align: imgReducerObj.align || 'left',
           });
         }
       });
       raw.entityMap = entityMap;
       // end hack
       let html = draftRawToHtml(raw);
-      // console.log(html);
+      console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -285,7 +291,8 @@ class BasicHtmlEditor extends React.Component {
       .mergeEntityData(entityKey, {
         src: nextProps.current,
         size: `${~~(emailImageObject.size * 100)}%`,
-        imageLink: emailImageObject.imageLink || '#'
+        imageLink: emailImageObject.imageLink || '#',
+        align: emailImageObject.align || 'left'
       });
       const newEditorState = EditorState.push(this.state.editorState, newContentState, 'apply-entity');
       this.props.onImageUpdated();
@@ -577,7 +584,8 @@ class BasicHtmlEditor extends React.Component {
     const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'IMMUTABLE', {
       src: url,
       size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
-      imageLink: '#'
+      imageLink: '#',
+      align: this.props.emailImageReducer[url].align
     }).getLastCreatedEntityKey();
     this.props.saveImageEntityKey(url, entityKey);
 
