@@ -168,18 +168,18 @@ class ListTable extends Component {
         onSort: false,
         sortedIds: [],
       });
+    this.checkEmailDupes = this._checkEmailDupes.bind(this);
   }
 
   componentWillMount() {
     // get locally stored columnWidths
     let columnWidths = this.getColumnStorage();
     if (columnWidths) this.setState({columnWidths});
-
     if (this.props.searchQuery) {
-      this.fetchOperations(this.props)
-      .then(_ => this.onSearchClick(this.props.searchQuery));
-    } else {
-      this.fetchOperations(this.props);
+      this.fetchOperations(this.props).then(_ => this.onSearchClick(this.props.searchQuery));
+    }
+    if (this.props.location.query.justCreated == 'true') {
+      this.fetchOperations(this.props).then(_ => this.checkEmailDupes());
     }
   }
 
@@ -301,6 +301,22 @@ class ListTable extends Component {
     window.document.title = DEFAULT_WINDOW_TITLE;
   }
 
+  _checkEmailDupes() {
+    let seen = {};
+    let dupMap = {};
+    let dupes = [];
+    this.props.contacts.map(contact => {
+      if (isEmpty(contact.email)) return;
+      if (seen[contact.email]) {
+        dupes.push(contact.id);
+        dupMap[contact.email] = true;
+      }
+      else seen[contact.email] = true;
+    });
+    alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them.`);
+    this.setState({selected: dupes});
+  }
+
   _setGridHeight() {
     const headerContainer = document.getElementById('HeaderGridContainerId');
     if (headerContainer) {
@@ -389,7 +405,8 @@ class ListTable extends Component {
       <div
       className='headercell'
       key={key}
-      style={style}>
+      style={style}
+      >
         {customSpan || <span style={{whiteSpace: 'nowrap'}}>{content}</span>}
         {sortDirection !== 2 &&
           <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
