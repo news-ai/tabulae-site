@@ -39,7 +39,9 @@ class ToolBar extends Component {
         borderRadius: '5px',
       }}
       >
-        <div className='vertical-center'>
+        {props.diableToolbar ?
+          <span style={{fontSize: '0.8em', color: grey800}}>Image Toolbar disabled at Preview.</span> :
+          <div className='vertical-center'>
           <span style={{fontSize: '0.8em', width: 30}}>{`${(state.sliderValue * 100).toFixed()}%`}</span>
           <Slider
           min={0} max={1} step={0.01}
@@ -48,20 +50,14 @@ class ToolBar extends Component {
           onAfterChange={_ => props.setImageSize(state.sliderValue)}
           value={state.sliderValue}
           />
-        </div>
-        {/*
-        <SpanButton onClick={_ => props.setImageSize(0.25)} size={props.size} scale={0.25} text='25%'/>
-        <SpanButton onClick={_ => props.setImageSize(0.5)} size={props.size} scale={0.5} text='50%'/>
-        <SpanButton onClick={_ => props.setImageSize(0.75)} size={props.size} scale={0.75} text='75%'/>
-        <SpanButton onClick={_ => props.setImageSize(1)} size={props.size} scale={1} text='100%'/>
-        */}
-        <FontIcon
-        color={props.imageLink ? blue400 : grey800}
-        hoverColor={props.imageLink ? blue200 : grey400}
-        onClick={props.imageLink ? props.unsetLink : props.setLink}
-        style={{fontSize: '14px', margin: '0 2px'}}
-        className='fa fa-link span-button pointer'
-        />
+          <FontIcon
+          color={props.imageLink ? blue400 : grey800}
+          hoverColor={props.imageLink ? blue200 : grey400}
+          onClick={props.imageLink ? props.unsetLink : props.setLink}
+          style={{fontSize: '14px', margin: '0 2px'}}
+          className='fa fa-link span-button pointer'
+          />
+        </div>}
         {/*<FontIcon
         color={props.align === 'left' ? blue400 : grey800}
         hoverColor={props.align === 'left' ? blue200 : grey400}

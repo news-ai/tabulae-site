@@ -147,6 +147,7 @@ export default function processInlineStylesAndEntities(
     if (!range) return;
     let entity = entityMap[range.key];
     let tag = entityTagMap[entity.type];
+    if (!tag) return;
 
     let compiledTag0 = template(tag[0])(entity.data);
     let compiledTag1 = template(tag[1])(entity.data);

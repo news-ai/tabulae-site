@@ -40,7 +40,7 @@ class ImageContainer extends Component {
       onMouseLeave={_ => this.setState({open: false})}
       style={style}
       >
-        {!props.disableToolbar && state.open && <ToolBar {...props}/>}
+        {state.open && <ToolBar {...props}/>}
         <Image src={props.src} size={props.size} imageLink={props.imageLink} align={props.align}/>
       </div>);
   }

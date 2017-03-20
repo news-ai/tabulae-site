@@ -19,9 +19,9 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
 
 import Dropzone from 'react-dropzone';
-import {blue100} from 'material-ui/styles/colors';
 import Paper from 'material-ui/Paper';
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
@@ -64,7 +64,7 @@ const Media = props => {
   const type = entity.getType();
 
   let media;
-  if (type === 'image') {
+  if (type === 'IMAGE') {
     media = <Image diableToolbar src={src}/>;
   }
   return media;
@@ -95,12 +95,12 @@ class GeneralEditor extends Component {
       //   icon: 'fa fa-paperclip',
       //   isActive: _ => this.props.files.length > 0,
       // },
-      {
-        label: 'Image Upload',
-        onToggle: _ => this.setState({imagePanelOpen: true}),
-        icon: 'fa fa-camera',
-        isActive: _ => false
-      }
+      // {
+      //   label: 'Image Upload',
+      //   onToggle: _ => this.setState({imagePanelOpen: true}),
+      //   icon: 'fa fa-camera',
+      //   isActive: _ => false
+      // }
     ];
 
     this.CONVERT_CONFIGS = {
@@ -125,7 +125,7 @@ class GeneralEditor extends Component {
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = node.href;
-            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size, imageLink});
+            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src, size, imageLink});
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
@@ -390,7 +390,7 @@ class GeneralEditor extends Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = editorState.getCurrentContent().createEntity('image', 'IMMUTABLE', {
+    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'IMMUTABLE', {
       src: url,
       size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
       imageLink: '#'
@@ -402,23 +402,7 @@ class GeneralEditor extends Component {
   }
 
   _handleDroppedFiles(selection, files) {
-    files.map(file => {
-      if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
-        if (file.size <= 5000000) {
-          // const newEditorState = this.handleImage();
-          // this.onChange(newEditorState);
-          this.props.uploadImage(file)
-          .then(url => {
-            const newEditorState = this.handleImage(url);
-            this.onChange(newEditorState);
-          });
-        } else {
-          alertify.warning(`Image size cannot exceed 5MB. The image dropped was ${(file.size / 1000000).toFixed(2)}MB`);
-        }
-      } else {
-        alertify.warning(`Image type must be PNG or JPEG. The file dropped was ${file.type}.`);
-      }
-    });
+    alertify.warning('Image operations not available at this point.');
   }
 
   _onImageUploadClicked(acceptedFiles, rejectedFiles) {
@@ -546,79 +530,6 @@ class GeneralEditor extends Component {
     );
   }
 }
-
-// Custom overrides for "code" style.
-const styleMap = {
-  CODE: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
-    fontSize: 16,
-    padding: 2
-  },
-  'SIZE-5': {fontSize: 5.5},
-  'SIZE-6': {fontSize: 6},
-  'SIZE-7.5': {fontSize: 7.5},
-  'SIZE-8': {fontSize: 8},
-  'SIZE-9': {fontSize: 9},
-  'SIZE-10': {fontSize: 10},
-  'SIZE-10.5': {fontSize: 10.5},
-  'SIZE-11': {fontSize: 11},
-  'SIZE-12': {fontSize: 12},
-  'SIZE-14': {fontSize: 14},
-  'SIZE-16': {fontSize: 16},
-  'SIZE-18': {fontSize: 18},
-  'SIZE-20': {fontSize: 20},
-  'SIZE-22': {fontSize: 22},
-  'SIZE-24': {fontSize: 24},
-  'SIZE-26': {fontSize: 26},
-  'SIZE-28': {fontSize: 28},
-  'SIZE-36': {fontSize: 36},
-  'SIZE-48': {fontSize: 48},
-  'SIZE-72': {fontSize: 72},
-};
-
-
-function mediaBlockRenderer(block) {
-  if (block.getType() === 'atomic') {
-    return {
-      component: Media,
-      editable: false
-    };
-  }
-  return null;
-}
-
-function getBlockStyle(block) {
-  switch (block.getType()) {
-    case 'blockquote':
-      return 'RichEditor-blockquote';
-    case 'right-align':
-      return 'RichEditor-right-align';
-    case 'left-align':
-      return 'RichEditor-left-align';
-    case 'center-align':
-      return 'RichEditor-center-align';
-    case 'justify-align':
-      return 'RichEditor-justify-align';
-    default:
-      return null;
-  }
-}
-
-// const RightAlign = props => <div style={{backgroundColor: 'red'}}>{props.children}</div>;
-
-const blockRenderMap = Immutable.Map({
-  'right-align': {
-    element: 'div',
-  },
-  'center-align': {
-    element: 'div'
-  },
-  'justify-align': {
-    element: 'div'
-  }
-});
-
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 

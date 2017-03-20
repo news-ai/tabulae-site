@@ -200,7 +200,6 @@ class EmailPanel extends Component {
     this.setState({currentTemplateId: value});
   }
 
-
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
     let contactEmails = [];
     selectedContacts.map((contact, i) => {
