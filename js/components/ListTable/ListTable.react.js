@@ -314,7 +314,7 @@ class ListTable extends Component {
       }
       else seen[contact.email] = true;
     });
-    alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them.`);
+   if (Object.keys(dupMap).length > 0) alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them.`);
     this.setState({selected: dupes});
   }
 
