@@ -20,7 +20,7 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
+import {stripATextNodeFromContent, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
 
 import Dropzone from 'react-dropzone';
 import Paper from 'material-ui/Paper';
@@ -86,19 +86,6 @@ function mediaBlockRenderer(block) {
     };
   }
   return null;
-}
-
-
-// draft-convert has a bug that uses 'a' as anchor textNode for atomic block
-function stripATextNodeFromContent(content) {
-  const {entityMap, blocks} = convertToRaw(content);
-  const newRaw = {entityMap, blocks: blocks.map(block => {
-    if (block.type === 'atomic') {
-      return Object.assign({}, block, {text: ' '});
-    }
-    return block;
-  })}
-  return convertFromRaw(newRaw);
 }
 
 class GeneralEditor extends Component {

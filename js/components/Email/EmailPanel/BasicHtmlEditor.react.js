@@ -22,7 +22,7 @@ import draftRawToHtml from './utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from './utils/typeConstants';
-import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
+import {stripATextNodeFromContent, mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -73,18 +73,6 @@ const controlsStyle = {
   // borderRadius: '0.9em',
   backgroundColor: 'white',
 };
-
-// draft-convert has a bug that uses 'a' as anchor textNode for atomic block
-function stripATextNodeFromContent(content) {
-  const {entityMap, blocks} = convertToRaw(content);
-  const newRaw = {entityMap, blocks: blocks.map(block => {
-    if (block.type === 'atomic') {
-      return Object.assign({}, block, {text: ' '});
-    }
-    return block;
-  })}
-  return convertFromRaw(newRaw);
-}
 
 class BasicHtmlEditor extends React.Component {
   state : {

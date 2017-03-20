@@ -1,7 +1,22 @@
 import React from 'react';
 import Image from 'components/Email/EmailPanel/Image/Image.react';
 import Immutable from 'immutable';
+import {
+  convertToRaw,
+  convertFromRaw,
+} from 'draft-js';
 
+// draft-convert has a bug that uses 'a' as anchor textNode for atomic block
+export function stripATextNodeFromContent(content) {
+  const {entityMap, blocks} = convertToRaw(content);
+  const newRaw = {entityMap, blocks: blocks.map(block => {
+    if (block.type === 'atomic') {
+      return Object.assign({}, block, {text: ' '});
+    }
+    return block;
+  })};
+  return convertFromRaw(newRaw);
+}
 
 const Media = props => {
   const {block, contentState} = props;
