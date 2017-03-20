@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'components/Email/EmailPanel/Image/Image.react';
 import Immutable from 'immutable';
 
+
 const Media = props => {
   const {block, contentState} = props;
   const entity = contentState.getEntity(block.getEntityAt(0));

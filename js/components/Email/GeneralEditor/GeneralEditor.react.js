@@ -9,8 +9,9 @@ import Draft, {
   ContentState,
   Entity,
   RichUtils,
-  AtomicBlockUtils,
+  SelectionState,
   convertToRaw,
+  convertFromRaw,
   CompositeDecorator,
   Modifier,
 } from 'draft-js';
@@ -37,7 +38,6 @@ import Image from 'components/Email/EmailPanel/Image/Image.react';
 import FileWrapper from 'components/Email/EmailPanel/FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
-import Immutable from 'immutable';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
@@ -47,6 +47,14 @@ import RaisedButton from 'material-ui/RaisedButton';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
+
+import linkifyIt from 'linkify-it';
+import tlds from 'tlds';
+
+const linkify = linkifyIt();
+linkify
+.tlds(tlds)
+.set({fuzzyLink: false});
 
 const controlsStyle = {
   height: 40,
@@ -78,6 +86,19 @@ function mediaBlockRenderer(block) {
     };
   }
   return null;
+}
+
+
+// draft-convert has a bug that uses 'a' as anchor textNode for atomic block
+function stripATextNodeFromContent(content) {
+  const {entityMap, blocks} = convertToRaw(content);
+  const newRaw = {entityMap, blocks: blocks.map(block => {
+    if (block.type === 'atomic') {
+      return Object.assign({}, block, {text: ' '});
+    }
+    return block;
+  })}
+  return convertFromRaw(newRaw);
 }
 
 class GeneralEditor extends Component {
@@ -136,9 +157,9 @@ class GeneralEditor extends Component {
             const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = node.href;
             const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src, size, imageLink});
-            this.props.saveImageData(src);
-            this.props.saveImageEntityKey(src, entityKey);
-            this.props.setImageSize(src, size);
+            // this.props.saveImageData(src);
+            // this.props.saveImageEntityKey(src, entityKey);
+            // this.props.setImageSize(src, size);
             if (imageLink.length > 0) {
               this.props.setImageLink(src, imageLink);
             } else {
@@ -177,9 +198,7 @@ class GeneralEditor extends Component {
     };
 
     this.state = {
-      editorState: !isEmpty(this.props.bodyHtml) ?
-        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), decorator) :
-        EditorState.createEmpty(decorator),
+      editorState: EditorState.createEmpty(decorator),
       bodyHtml: this.props.bodyHtml || null,
       filePanelOpen: false,
       imagePanelOpen: false,
@@ -189,7 +208,23 @@ class GeneralEditor extends Component {
     this.focus = () => this.refs.editor.focus();
     this.onChange = this._onChange.bind(this);
     function emitHTML(editorState) {
-      const raw = convertToRaw(editorState.getCurrentContent());
+      let raw = convertToRaw(editorState.getCurrentContent());
+      // cleanup mismatching raw entityMap and entity values
+      // hack!! until convertToRaw actually converts current entity data in editorState
+      let entityMap = raw.entityMap;
+      const keys = Object.keys(entityMap);
+      keys.map(key => {
+        const entity = entityMap[key];
+        if (entity.type === 'IMAGE') {
+          const imgReducerObj = this.props.emailImageReducer[entity.data.src];
+          entityMap[key].data = Object.assign({}, entityMap[key].data, {
+            size: `${~~(imgReducerObj.size * 100)}%`,
+            imageLink: imgReducerObj.imageLink || '#'
+          });
+        }
+      });
+      raw.entityMap = entityMap;
+      // end hack
       let html = draftRawToHtml(raw);
       // console.log(html);
       this.props.onBodyChange(html);
@@ -206,9 +241,17 @@ class GeneralEditor extends Component {
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
-    this.handleImage = this._handleImage.bind(this);
-    this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
-    this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
+    this.handleBeforeInput = this._handleBeforeInput.bind(this);
+    this.linkifyLastWord = this._linkifyLastWord.bind(this);
+  }
+
+  componentDidMount() {
+    if (!isEmpty(this.props.bodyHtml)) {
+      const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml);
+      const newContent = stripATextNodeFromContent(configuredContent);
+      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+      this.onChange(editorState);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -247,6 +290,82 @@ class GeneralEditor extends Component {
     if (previousContent !== editorState.getCurrentContent()) {
       this.emitHTML(editorState);
     }
+  }
+
+  _linkifyLastWord(insertChar = '') {
+    // check last words in a block and linkify if detect link
+    // insert special char after handling linkify case
+    let editorState = this.state.editorState;
+    let handled = 'not-handled';
+    if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
+      const selection = editorState.getSelection();
+      const focusKey = selection.getFocusKey();
+      const focusOffset = selection.getFocusOffset();
+      const block = editorState.getCurrentContent().getBlockForKey(focusKey);
+      const links = linkify.match(block.get('text'));
+      if (typeof links !== 'undefined' && links !== null) {
+        for (let i = 0; i < links.length; i++) {
+          if (links[i].lastIndex === focusOffset) {
+            // last right before space inserted
+            let selectionState = SelectionState.createEmpty(block.getKey());
+            selectionState = selection.merge({
+              anchorKey: block.getKey(),
+              anchorOffset: focusOffset - links[i].raw.length,
+              focusKey: block.getKey(),
+              focusOffset
+            });
+            editorState = EditorState.acceptSelection(editorState, selectionState);
+
+            // check if entity exists already
+            const startOffset = selectionState.getStartOffset();
+            const endOffset = selectionState.getEndOffset();
+
+            let linkKey;
+            let hasEntityType = false;
+            for (let j = startOffset; j < endOffset; j++) {
+              linkKey = block.getEntityAt(j);
+              if (linkKey !== null) {
+                const type = editorState.getCurrentContent().getEntity(linkKey).getType();
+                if (type === 'LINK') {
+                  hasEntityType = true;
+                  break;
+                }
+              }
+            }
+
+            if (!hasEntityType) {
+              // insert space
+              const content = editorState.getCurrentContent();
+              const newContent = Modifier.insertText(content, selection, insertChar);
+              editorState = EditorState.push(editorState, newContent, 'insert-fragment');
+
+              handled = 'handled';
+              // insert entity if no entity exist
+              const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+              editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
+
+              // move selection focus back to original spot
+              selectionState = selectionState.merge({
+                anchorKey: block.getKey(),
+                anchorOffset: focusOffset + 1, // add 1 for space in front of link
+                focusKey: block.getKey(),
+                focusOffset: focusOffset + 1
+              });
+              editorState = EditorState.acceptSelection(editorState, selectionState);
+              this.onChange(editorState);
+            }
+            break;
+          }
+        }
+      }
+    }
+    return handled;
+  }
+
+  _handleBeforeInput(lastInsertedChar) {
+    let handled = 'not-handled';
+    if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
+    return handled;
   }
 
   _insertText(replaceText) {
@@ -374,7 +493,6 @@ class GeneralEditor extends Component {
     let contentState;
 
     if (html) {
-      // console.log(html);
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -384,55 +502,75 @@ class GeneralEditor extends Component {
           a: ['href']
         }
       });
-      // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
+
+    const prePasteSelection = editorState.getSelection();
+    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
+
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    this.onChange(EditorState.push(editorState, newState, 'insert-fragment'));
+    let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
 
+    let inPasteRange = false;
+    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
+        // hit next block pre-paste, stop linkify
+        return false;
+      }
+      if (key === prePasteSelection.getStartKey() || inPasteRange) {
+        inPasteRange = true;
+        const links = linkify.match(block.get('text'));
+        if (typeof links !== 'undefined' && links !== null) {
+          for (let i = 0; i < links.length; i++) {
+            let selectionState = SelectionState.createEmpty(block.getKey());
+            selectionState = newEditorState.getSelection().merge({
+              anchorKey: block.getKey(),
+              anchorOffset: links[i].index,
+              focusKey: block.getKey(),
+              focusOffset: links[i].lastIndex
+            });
+            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
+
+            // check if entity exists already
+            const startOffset = selectionState.getStartOffset();
+            const endOffset = selectionState.getEndOffset();
+
+            let linkKey;
+            let hasEntityType = false;
+            for (let j = startOffset; j < endOffset; j++) {
+              linkKey = block.getEntityAt(j);
+              if (linkKey !== null) {
+                const type = contentState.getEntity(linkKey).getType();
+                if (type === 'LINK') {
+                  hasEntityType = true;
+                  break;
+                }
+              }
+            }
+            if (!hasEntityType) {
+              // insert entity if no entity exist
+              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
+            }
+          }
+        }
+      }
+    });
+
+    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
+
+    this.onChange(newEditorState);
     return true;
-  }
-
-  _handleImage(url) {
-    const {editorState} = this.state;
-    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'IMMUTABLE', {
-      src: url,
-      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
-      imageLink: '#'
-    }).getLastCreatedEntityKey();
-    this.props.saveImageEntityKey(url, entityKey);
-
-    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-    return newEditorState;
   }
 
   _handleDroppedFiles(selection, files) {
     alertify.warning('Image operations not available at this point.');
   }
 
-  _onImageUploadClicked(acceptedFiles, rejectedFiles) {
-    const {editorState} = this.state;
-    const selection = editorState.getSelection();
-    this.handleDroppedFiles(selection, acceptedFiles);
-  }
-
-  _onOnlineImageUpload() {
-    const props = this.props;
-    const state = this.state;
-    if (isURL(state.imageLink)) {
-      props.saveImageData(state.imageLink);
-      setTimeout(_ => {
-        const newEditorState = this.handleImage(state.imageLink);
-        this.onChange(newEditorState);
-        this.setState({imageLink: ''});
-      }, 50);
-    }
-  }
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -498,6 +636,7 @@ class GeneralEditor extends Component {
             handleReturn={this.handleReturn}
             handlePastedText={this.handlePastedText}
             handleDroppedFiles={this.handleDroppedFiles}
+            handleBeforeInput={this.handleBeforeInput}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'
