@@ -178,9 +178,10 @@ class ListTable extends Component {
     if (this.props.searchQuery) {
       this.fetchOperations(this.props).then(_ => this.onSearchClick(this.props.searchQuery));
     }
-    if (this.props.location.query.justCreated == 'true') {
+    else if (this.props.location.query.justCreated == 'true') {
       this.fetchOperations(this.props).then(_ => this.checkEmailDupes());
     }
+    else this.fetchOperations(this.props);
   }
 
   componentDidMount() {
