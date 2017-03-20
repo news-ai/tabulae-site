@@ -14,7 +14,7 @@ function emailImageReducer(state = initialState.emailImageReducer, action) {
     case imgConstant.RECEIVE:
       obj = assignToEmpty(state, {});
       obj.isReceiving = false;
-      obj[action.src] = {size: 1};
+      obj[action.src] = {size: 1, align: 'left'};
       return obj;
     case imgConstant.REQUEST_FAIL:
       obj = assignToEmpty(state, {});
@@ -24,6 +24,12 @@ function emailImageReducer(state = initialState.emailImageReducer, action) {
     case 'SET_IMAGE_SIZE':
       obj = assignToEmpty(state, {});
       obj[action.src] = Object.assign({}, state[action.src], {size: action.size});
+      obj.updated = true;
+      obj.current = action.src;
+      return obj;
+    case 'SET_IMAGE_ALIGN':
+      obj = assignToEmpty(state, {});
+      obj[action.src] = Object.assign({}, state[action.src], {align: action.align});
       obj.updated = true;
       obj.current = action.src;
       return obj;

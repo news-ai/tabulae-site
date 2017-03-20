@@ -21,7 +21,6 @@ module.exports = function(options) {
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new webpack.optimize.UglifyJsPlugin({
         mangle: true,
-        sourcemap: false,
         unused: true,
         dead_code: true,
         drop_debugger: true,
@@ -30,6 +29,7 @@ module.exports = function(options) {
         sequences: true,
         booleans: true,
         compress: { warnings: false },
+        sourcemap: false,
         // comments: false,
         // sourceMap: true,
         // minimize: false,
@@ -94,7 +94,8 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: 'cheap-source-map',
+    devtool: 'cheap-module-source-map',
+    // devtool: 'source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),

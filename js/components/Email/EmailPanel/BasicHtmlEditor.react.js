@@ -13,6 +13,7 @@ import Draft, {
   RichUtils,
   AtomicBlockUtils,
   convertToRaw,
+  convertFromRaw,
   CompositeDecorator,
   Modifier,
 } from 'draft-js';
@@ -21,6 +22,7 @@ import draftRawToHtml from './utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from './utils/typeConstants';
+import {stripATextNodeFromContent, mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -42,7 +44,6 @@ import BlockStyleControls from './components/BlockStyleControls';
 import FontSizeControls from './components/FontSizeControls';
 import ExternalControls from './components/ExternalControls';
 import PositionStyleControls from './components/PositionStyleControls';
-import Image from './Image/Image.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Immutable from 'immutable';
@@ -71,19 +72,6 @@ const controlsStyle = {
   // border: `solid 1px ${blue100}`,
   // borderRadius: '0.9em',
   backgroundColor: 'white',
-};
-
-const Media = props => {
-  const {block, contentState} = props;
-  const entity = contentState.getEntity(block.getEntityAt(0));
-  const {src} = entity.getData();
-  const type = entity.getType();
-
-  let media;
-  if (type === 'image') {
-    media = <Image src={src}/>;
-  }
-  return media;
 };
 
 class BasicHtmlEditor extends React.Component {
@@ -178,7 +166,7 @@ class BasicHtmlEditor extends React.Component {
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = node.href;
-            const entityKey = Entity.create('image', 'IMMUTABLE', {src, size, imageLink});
+            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src, size: imgNode.style['max-height'], imageLink: imageLink || '#'});
             this.props.saveImageData(src);
             this.props.saveImageEntityKey(src, entityKey);
             this.props.setImageSize(src, size);
@@ -193,10 +181,7 @@ class BasicHtmlEditor extends React.Component {
       },
       htmlToBlock: (nodeName, node) => {
         if (nodeName === 'figure') {
-          return {
-            type: 'atomic',
-            data: {}
-          };
+          return 'atomic';
         }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
@@ -243,7 +228,23 @@ class BasicHtmlEditor extends React.Component {
       });
     };
     function emitHTML(editorState) {
-      const raw = convertToRaw(editorState.getCurrentContent());
+      let raw = convertToRaw(editorState.getCurrentContent());
+      // cleanup mismatching raw entityMap and entity values
+      // hack!! until convertToRaw actually converts current entity data in editorState
+      let entityMap = raw.entityMap;
+      const keys = Object.keys(entityMap);
+      keys.map(key => {
+        const entity = entityMap[key];
+        if (entity.type === 'IMAGE') {
+          const imgReducerObj = this.props.emailImageReducer[entity.data.src];
+          entityMap[key].data = Object.assign({}, entityMap[key].data, {
+            size: `${~~(imgReducerObj.size * 100)}%`,
+            imageLink: imgReducerObj.imageLink || '#'
+          });
+        }
+      });
+      raw.entityMap = entityMap;
+      // end hack
       let html = draftRawToHtml(raw);
       // console.log(html);
       this.props.onBodyChange(html);
@@ -270,11 +271,9 @@ class BasicHtmlEditor extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
-      // console.log(nextProps.bodyHtml);
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
-      // const content = convertFromHTML(nextProps.bodyHtml);
-      const editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+      const newContent = stripATextNodeFromContent(configuredContent);
+      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
@@ -282,13 +281,18 @@ class BasicHtmlEditor extends React.Component {
     if (!this.props.updated && nextProps.updated) {
       const emailImageObject = nextProps.emailImageReducer[nextProps.current];
       const entityKey = emailImageObject.entityKey;
-      Entity.replaceData(entityKey, {
+      const newContentState = this.state.editorState.getCurrentContent()
+      .mergeEntityData(entityKey, {
         src: nextProps.current,
         size: `${~~(emailImageObject.size * 100)}%`,
         imageLink: emailImageObject.imageLink || '#'
       });
+      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'apply-entity');
       this.props.onImageUpdated();
-      this.emitHTML(this.state.editorState);
+      this.onChange(newEditorState, _ => {
+        // force emitHTML because immutable doesn't detect entity data updates
+        setTimeout(_ => this.emitHTML(this.state.editorState), 50);
+      });
     }
   }
 
@@ -296,16 +300,17 @@ class BasicHtmlEditor extends React.Component {
     this.props.clearAttachments();
   }
 
-  _onChange(editorState) {
+  _onChange(editorState, callback) {
     let newEditorState = editorState;
 
     let previousContent = this.state.editorState.getCurrentContent();
-    this.setState({editorState: newEditorState});
 
     // only emit html when content changes
-    if (previousContent !== editorState.getCurrentContent()) {
+    if (previousContent !== newEditorState.getCurrentContent()) {
       this.emitHTML(editorState);
     }
+
+    this.setState({editorState: newEditorState}, callback);
   }
 
   _linkifyLastWord(insertChar = '') {
@@ -569,7 +574,7 @@ class BasicHtmlEditor extends React.Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = editorState.getCurrentContent().createEntity('image', 'IMMUTABLE', {
+    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'IMMUTABLE', {
       src: url,
       size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
       imageLink: '#'
@@ -584,8 +589,6 @@ class BasicHtmlEditor extends React.Component {
     files.map(file => {
       if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
         if (file.size <= 5000000) {
-          // const newEditorState = this.handleImage();
-          // this.onChange(newEditorState);
           this.props.uploadImage(file)
           .then(url => {
             const newEditorState = this.handleImage(url);
@@ -633,7 +636,6 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -776,78 +778,6 @@ class BasicHtmlEditor extends React.Component {
     );
   }
 }
-
-// Custom overrides for "code" style.
-const styleMap = {
-  CODE: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
-    fontSize: 16,
-    padding: 2
-  },
-  'SIZE-5': {fontSize: 5.5},
-  'SIZE-6': {fontSize: 6},
-  'SIZE-7.5': {fontSize: 7.5},
-  'SIZE-8': {fontSize: 8},
-  'SIZE-9': {fontSize: 9},
-  'SIZE-10': {fontSize: 10},
-  'SIZE-10.5': {fontSize: 10.5},
-  'SIZE-11': {fontSize: 11},
-  'SIZE-12': {fontSize: 12},
-  'SIZE-14': {fontSize: 14},
-  'SIZE-16': {fontSize: 16},
-  'SIZE-18': {fontSize: 18},
-  'SIZE-20': {fontSize: 20},
-  'SIZE-22': {fontSize: 22},
-  'SIZE-24': {fontSize: 24},
-  'SIZE-26': {fontSize: 26},
-  'SIZE-28': {fontSize: 28},
-  'SIZE-36': {fontSize: 36},
-  'SIZE-48': {fontSize: 48},
-  'SIZE-72': {fontSize: 72},
-};
-
-
-function mediaBlockRenderer(block) {
-  if (block.getType() === 'atomic') {
-    return {
-      component: Media,
-      editable: false
-    };
-  }
-  return null;
-}
-
-function getBlockStyle(block) {
-  switch (block.getType()) {
-    case 'blockquote':
-      return 'RichEditor-blockquote';
-    case 'right-align':
-      return 'RichEditor-right-align';
-    case 'left-align':
-      return 'RichEditor-left-align';
-    case 'center-align':
-      return 'RichEditor-center-align';
-    case 'justify-align':
-      return 'RichEditor-justify-align';
-    default:
-      return null;
-  }
-}
-
-// const RightAlign = props => <div style={{backgroundColor: 'red'}}>{props.children}</div>;
-
-const blockRenderMap = Immutable.Map({
-  'right-align': {
-    element: 'div',
-  },
-  'center-align': {
-    element: 'div'
-  },
-  'justify-align': {
-    element: 'div'
-  }
-});
 
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
