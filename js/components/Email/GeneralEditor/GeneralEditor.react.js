@@ -19,7 +19,7 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
+import {getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
 
 import Dropzone from 'react-dropzone';
 import Paper from 'material-ui/Paper';
@@ -69,6 +69,16 @@ const Media = props => {
   }
   return media;
 };
+
+function mediaBlockRenderer(block) {
+  if (block.getType() === 'atomic') {
+    return {
+      component: Media,
+      editable: false
+    };
+  }
+  return null;
+}
 
 class GeneralEditor extends Component {
   constructor(props) {
