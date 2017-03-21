@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import EmailsList from './EmailsList.react';
 import RaisedButton from 'material-ui/RaisedButton';
+import FontIcon from 'material-ui/FontIcon';
 import alertify from 'alertifyjs';
 
 const ScheduledEmails = props => {
@@ -11,7 +12,13 @@ const ScheduledEmails = props => {
     {props.emails.length > 0 && props.emails.some(email => !email.cancel) &&
       <div className='vertical-center'>
         <div className='right'>
-          <RaisedButton onClick={props.onCancelAllScheduledEmailsClick} label='Cancel All'/>
+          <RaisedButton
+          onClick={props.onCancelAllScheduledEmailsClick}
+          label='Cancel All'
+          primary
+          icon={<FontIcon className={`${props.isReceiving ? 'fa fa-spin fa-spinner' : 'fa fa-times'}`}
+          />}
+          />
         </div>
       </div>}
       <EmailsList {...props}/>
@@ -35,6 +42,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchEmails: _ => dispatch(stagingActions.fetchScheduledEmails()),
     onCancelClick: id => dispatch(stagingActions.cancelScheduledEmail(id)),
+    onCancelAll: _ => dispatch(stagingActions.cancelAllScheduledEmails())
   };
 };
 
@@ -45,7 +53,8 @@ const mergeProps = (sProps, dProps, props) => {
         'Are you sure?',
         'Canceling all scheduled emails is not reversible. This action might take a short while. Are you sure?',
         () => {
-          sProps.emails.map(email => dProps.onCancelClick(email.id));
+          window.Intercom('trackEvent', 'cancel_all_emails');
+          dProps.onCancelAll();
         },
         () => {}
         );
