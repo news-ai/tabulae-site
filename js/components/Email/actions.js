@@ -55,27 +55,46 @@ export function postBatchEmails(emails) {
   };
 }
 
-export function fetchLogs(emailId) {
-  return (dispatch, getState) => {
-    if (!getState().stagingReducer[emailId]) return;
-    dispatch({type: FETCH_EMAIL_LOGS, emailId});
-    return api.get(`/emails/${emailId}/logs`)
-    .then(response => {
-      const logs = response.data;
-      const links = logs.reduce((a, b) => {
-        if (b.Type === 'click' && b.Link) {
-          a[b.Link] = a[b.Link] ? a[b.Link] + 1 : 1;
-        }
-        return a;
-      }, {});
+function chunkPostPromises(values, func, limit) {
+  const LIMIT = limit || 70;
+  let promises = [];
+  if (values.length > limit) {
+    let r = LIMIT;
+    let l = 0;
+    while (r < values.length) {
+      promises.push(func(values.slice(l, r)));
+      l += LIMIT;
+      r += LIMIT;
+    }
+    promises.push(func(values.slice(l, values.length)));
+  } else {
+    promises.push(func(values));
+  }
+  return promises;
+}
+
+export function bulkSendStagingEmails(emails) {
+  return dispatch => {
+    dispatch({type: SENDING_STAGED_EMAILS, emails});
+    const sendStagingPostRequest = s => {
+      dispatch({type: 'SENDING_LIMITED_STAGING_EMAILS', emails: s});
+      return api.post(`/emails`, s);
+    };
+    const promises = chunkPostPromises(emails, sendStagingPostRequest, 70);
+    return Promise.all(promises)
+    .then(responses => {
+      // flatten responses into one response
+      let data = [];
+      responses.map(response => response.data.map(email => data.push(email)));
+      const response = {data};
+      const res = normalize(response, {data: arrayOf(emailSchema)});
       return dispatch({
-        type: RECEIVE_EMAIL_LOGS,
-        logs,
-        emailId,
-        links: isEmpty(links) ? undefined : links,
+        type: RECEIVE_STAGED_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data,
+        previewEmails: response.data
       });
-    })
-    .catch(err => dispatch({type: FETCH_EMAIL_LOGS_FAIL, err}));
+    });
   };
 }
 
@@ -97,8 +116,19 @@ export function postAttachments(emailid) {
 export function postBatchEmailsWithAttachments(emails) {
   return dispatch => {
     dispatch({type: SENDING_STAGED_EMAILS, emails});
-    return api.post(`/emails`, emails)
-    .then(response => {
+
+    dispatch({type: SENDING_STAGED_EMAILS, emails});
+    const sendStagingPostRequest = s => {
+      dispatch({type: 'SENDING_LIMITED_STAGING_EMAILS', emails: s});
+      return api.post(`/emails`, s);
+    };
+    const promises = chunkPostPromises(emails, sendStagingPostRequest, 70);
+    return Promise.all(promises)
+    .then(responses => {
+      // flatten responses into one response
+      let data = [];
+      responses.map(response => response.data.map(email => data.push(email)));
+      const response = {data};
       const res = normalize(response, {data: arrayOf(emailSchema)});
       const ids = res.result.data;
       const postFilePromises = ids.map(id => dispatch(postAttachments(id)));
@@ -150,20 +180,8 @@ export function bulkSendEmails(emailids) {
   return dispatch => {
     dispatch({type: 'START_BULK_SEND_EMAILS', emailids});
     dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_ON'});
-    const LIMIT = 70;
-    let promises = [];
-    if (emailids.length > LIMIT) {
-      let r = LIMIT;
-      let l = 0;
-      while (r < emailids.length) {
-        promises.push(dispatch(sendLimitedEmails(emailids.slice(l, r))));
-        l += LIMIT;
-        r += LIMIT;
-      }
-      promises.push(dispatch(sendLimitedEmails(emailids.slice(l, emailids.length))));
-    } else {
-      promises.push(dispatch(sendLimitedEmails(emailids)));
-    }
+    const generatePostRequests = ids => dispatch(sendLimitedEmails(ids));
+    const promises = chunkPostPromises(emailids, generatePostRequests, 70);
     return Promise.all(promises).then(_ => {
       dispatch({type: 'FINISHED_BULK_SEND_EMAILS'});
       dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
@@ -190,6 +208,30 @@ export function getStagedEmails() {
       return dispatch({type: RECEIVE_STAGED_EMAILS, json});
     })
     .catch(message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
+  };
+}
+
+export function fetchLogs(emailId) {
+  return (dispatch, getState) => {
+    if (!getState().stagingReducer[emailId]) return;
+    dispatch({type: FETCH_EMAIL_LOGS, emailId});
+    return api.get(`/emails/${emailId}/logs`)
+    .then(response => {
+      const logs = response.data;
+      const links = logs.reduce((a, b) => {
+        if (b.Type === 'click' && b.Link) {
+          a[b.Link] = a[b.Link] ? a[b.Link] + 1 : 1;
+        }
+        return a;
+      }, {});
+      return dispatch({
+        type: RECEIVE_EMAIL_LOGS,
+        logs,
+        emailId,
+        links: isEmpty(links) ? undefined : links,
+      });
+    })
+    .catch(err => dispatch({type: FETCH_EMAIL_LOGS_FAIL, err}));
   };
 }
 
