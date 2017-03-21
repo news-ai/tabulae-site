@@ -41,6 +41,7 @@ class Subject extends Component {
     };
     this.truncateText = this._truncateText.bind(this);
     this.insertText = this._insertText.bind(this);
+    this.handlePastedText = this._handlePastedText.bind(this);
 
     this.onChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -105,6 +106,14 @@ class Subject extends Component {
     this.onChange(newEditorState);
   }
 
+  _handlePastedText(text, html) {
+    const newText = text.replace(/(\r\n|\n|\r)/gm, '').substring(0, 255);
+    const editorState = this.state.editorState;
+    const contentState = Modifier.insertText(editorState.getCurrentContent(), editorState.getSelection(), newText);
+    this.onChange(EditorState.push(this.state.editorState, contentState, 'insert-fragment'));
+    return 'handled';
+  }
+
   render() {
     const {editorState, subjectLength} = this.state;
     const state = this.state;
@@ -145,6 +154,7 @@ class Subject extends Component {
           onChange={this.onChange}
           handleReturn={e => 'handled'}
           placeholder='Subject...'
+          handlePastedText={this.handlePastedText}
           />
         </div>
         <div className='vertical-center'>
