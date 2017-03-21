@@ -486,7 +486,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
     toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
     clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
-    postBatchEmails: emails => dispatch(stagingActions.postBatchEmails(emails)),
+    postBatchEmails: emails => dispatch(stagingActions.bulkSendStagingEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(stagingActions.postBatchEmailsWithAttachments(emails)),
     initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email: props.person.email}),
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),

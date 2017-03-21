@@ -116,8 +116,6 @@ export function postAttachments(emailid) {
 export function postBatchEmailsWithAttachments(emails) {
   return dispatch => {
     dispatch({type: SENDING_STAGED_EMAILS, emails});
-
-    dispatch({type: SENDING_STAGED_EMAILS, emails});
     const sendStagingPostRequest = s => {
       dispatch({type: 'SENDING_LIMITED_STAGING_EMAILS', emails: s});
       return api.post(`/emails`, s);
