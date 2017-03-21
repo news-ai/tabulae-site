@@ -161,7 +161,6 @@ class BasicHtmlEditor extends React.Component {
             // LINK ENTITY
             return Entity.create('LINK', 'MUTABLE', {url: node.href});
           } else if (node.firstElementChild.nodeName === 'IMG') {
-            console.log(node);
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;

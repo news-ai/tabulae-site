@@ -67,7 +67,9 @@ const controlsStyle = {
 
 const Media = props => {
   const {block, contentState} = props;
-  const entity = contentState.getEntity(block.getEntityAt(0));
+  const entityKey = block.getEntityAt(0);
+  if (entityKey === null) return null;
+  const entity = contentState.getEntity(entityKey);
   const {src} = entity.getData();
   const type = entity.getType();
 
@@ -143,10 +145,15 @@ class GeneralEditor extends Component {
             const src = imgNode.src;
             const size = parseFloat(imgNode.style['max-height']) / 100;
             const imageLink = node.href;
-            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src, size, imageLink});
-            // this.props.saveImageData(src);
-            // this.props.saveImageEntityKey(src, entityKey);
-            // this.props.setImageSize(src, size);
+            const imgReducerObj = this.props.emailImageReducer[src];
+            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src,
+              size: imgNode.style['max-height'],
+              imageLink: imageLink || '#',
+              align: imgReducerObj.align
+            });
+            this.props.saveImageData(src);
+            this.props.saveImageEntityKey(src, entityKey);
+            this.props.setImageSize(src, size);
             if (imageLink.length > 0) {
               this.props.setImageLink(src, imageLink);
             } else {
@@ -158,10 +165,7 @@ class GeneralEditor extends Component {
       },
       htmlToBlock: (nodeName, node) => {
         if (nodeName === 'figure') {
-          return {
-            type: 'atomic',
-            data: {}
-          };
+          return 'atomic';
         }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
@@ -187,8 +191,6 @@ class GeneralEditor extends Component {
     this.state = {
       editorState: EditorState.createEmpty(decorator),
       bodyHtml: this.props.bodyHtml || null,
-      filePanelOpen: false,
-      imagePanelOpen: false,
       imageLink: ''
     };
 
@@ -206,14 +208,14 @@ class GeneralEditor extends Component {
           const imgReducerObj = this.props.emailImageReducer[entity.data.src];
           entityMap[key].data = Object.assign({}, entityMap[key].data, {
             size: `${~~(imgReducerObj.size * 100)}%`,
-            imageLink: imgReducerObj.imageLink || '#'
+            imageLink: imgReducerObj.imageLink || '#',
+            align: imgReducerObj.align || 'left',
           });
         }
       });
       raw.entityMap = entityMap;
       // end hack
       let html = draftRawToHtml(raw);
-      // console.log(html);
       this.props.onBodyChange(html);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -244,11 +246,9 @@ class GeneralEditor extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.bodyHtml !== this.state.bodyHtml) {
       console.log('change template');
-      // console.log(nextProps.bodyHtml);
       const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      // const content = ContentState.createFromBlockArray(htmlToContent(nextProps.bodyHtml));
-      // const content = convertFromHTML(nextProps.bodyHtml);
-      const editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+      const newContent = stripATextNodeFromContent(configuredContent);
+      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
       this.setState({bodyHtml: nextProps.bodyHtml});
     }
@@ -575,34 +575,6 @@ class GeneralEditor extends Component {
 
     return (
       <div>
-        <FileWrapper open={state.filePanelOpen} onRequestClose={_ => this.setState({filePanelOpen: false})}/>
-        <Dialog autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
-          <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
-            <div>
-              <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
-              {({onValueChange, errorMessage}) => (
-                <TextField
-                errorText={errorMessage}
-                hintText='Image link here'
-                floatingLabelText='Image link here'
-                value={state.imageLink}
-                onChange={e => {
-                  // for validation
-                  onValueChange(e.target.value);
-                  // for updating value
-                  this.setState({imageLink: e.target.value});
-                }}
-                />)}
-              </ValidationHOC>
-              <RaisedButton style={{margin: 5}} label='Submit' onClick={this.onOnlineImageUpload}/>
-            </div>
-          </div>
-          <div className='horizontal-center'>OR</div>
-          <div className='vertical-center horizontal-center' style={{margin: '10px 0'}}>
-            <RaisedButton label='Upload from File' onClick={_ => this.imgDropzone.open()}/>
-          </div>
-        </Dialog>
-        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
         <Subject
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
@@ -688,6 +660,7 @@ const mapDispatchToProps = (dispatch, props) => {
     saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
     setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
     setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
+    setImageAlignment: (src, align) => dispatch({type: 'SET_IMAGE_ALIGN', align, src: src}),
     onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'})
   };
 };

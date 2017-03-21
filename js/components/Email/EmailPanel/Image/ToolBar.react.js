@@ -57,28 +57,28 @@ class ToolBar extends Component {
           style={{fontSize: '14px', margin: '0 2px'}}
           className='fa fa-link span-button pointer'
           />
+          <FontIcon
+          color={props.align === 'left' ? blue400 : grey800}
+          hoverColor={props.align === 'left' ? blue200 : grey400}
+          onClick={_ => props.setImageAlignment('left')}
+          style={{fontSize: '14px'}}
+          className='fa fa-align-left span-button pointer'
+          />
+          <FontIcon
+          color={props.align === 'center' ? blue400 : grey800}
+          hoverColor={props.align === 'center' ? blue200 : grey400}
+          onClick={_ => props.setImageAlignment('center')}
+          style={{fontSize: '14px'}}
+          className='fa fa-align-center span-button pointer'
+          />
+          <FontIcon
+          color={props.align === 'right' ? blue400 : grey800}
+          hoverColor={props.align === 'right' ? blue200 : grey400}
+          onClick={_ => props.setImageAlignment('right')}
+          style={{fontSize: '14px'}}
+          className='fa fa-align-right span-button pointer'
+          />
         </div>}
-        <FontIcon
-        color={props.align === 'left' ? blue400 : grey800}
-        hoverColor={props.align === 'left' ? blue200 : grey400}
-        onClick={_ => props.setImageAlignment('left')}
-        style={{fontSize: '14px'}}
-        className='fa fa-align-left span-button pointer'
-        />
-        <FontIcon
-        color={props.align === 'center' ? blue400 : grey800}
-        hoverColor={props.align === 'center' ? blue200 : grey400}
-        onClick={_ => props.setImageAlignment('center')}
-        style={{fontSize: '14px'}}
-        className='fa fa-align-center span-button pointer'
-        />
-        <FontIcon
-        color={props.align === 'right' ? blue400 : grey800}
-        hoverColor={props.align === 'right' ? blue200 : grey400}
-        onClick={_ => props.setImageAlignment('right')}
-        style={{fontSize: '14px'}}
-        className='fa fa-align-right span-button pointer'
-        />
       </div>
       );
   }

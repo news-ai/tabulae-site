@@ -26,7 +26,10 @@ class PreviewEmail extends Component {
       subjectHtml: props.subject,
       onEditMode: false
     };
-    this.updateBodyHtml = html => this.setState({body: html});
+    this.updateBodyHtml = html => {
+      console.log(html);
+      this.setState({body: html});
+    };
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({subject});
