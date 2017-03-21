@@ -38,6 +38,23 @@ export function cancelScheduledEmail(id) {
   };
 }
 
+export function cancelAllScheduledEmails() {
+  return (dispatch, getState) => {
+    dispatch({type: 'CANCEL_SCHEDULED_EMAILS'});
+    return api.get(`/emails/cancelscheduled`)
+    .then(response => {
+      dispatch({type: 'CANCEL_SCHEDULED_EMAILS_FINISHED'});
+      const res = normalize(response, {data: arrayOf(emailSchema)});
+      return dispatch({
+        type: RECEIVE_MULTIPLE_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data,
+      });
+    })
+    .catch(err => dispatch({type: 'CANCEL_SCHEDULED_EMAIL_FAIL', err}));
+  };
+}
+
 export function postBatchEmails(emails) {
   return dispatch => {
     dispatch({type: SENDING_STAGED_EMAILS, emails});

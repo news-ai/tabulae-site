@@ -120,6 +120,14 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         searchReceivedEmails: action.ids,
         searchQuery: action.query
       });
+    case 'CANCEL_SCHEDULED_EMAILS':
+      return assignToEmpty(state, {
+        isReceiving: true
+      });
+    case 'CANCEL_SCHEDULED_EMAILS_FINISHED':
+      return assignToEmpty(state, {
+        isReceiving: false
+      });
     default:
       return state;
   }
