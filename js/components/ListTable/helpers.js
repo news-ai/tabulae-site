@@ -252,12 +252,13 @@ export function escapeHtml(unsafe) {
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&quot;')
   .replace(/'/g, '&#039;');
 }
 
 export function convertToCsvString(contacts, fieldsmap) {
-  let base = 'data:text/csv;charset=utf-8,';
+  // let base = 'data:text/csv;charset=utf-8,';
+  let base = '';
   const filteredfieldsmap = fieldsmap
   .filter(fieldObj => !fieldObj.hidden && !fieldObj.tableOnly);
   base += filteredfieldsmap.map(fieldObj => fieldObj.name).toString() + '\n';
@@ -272,7 +273,7 @@ export function convertToCsvString(contacts, fieldsmap) {
         el = contact[fieldObj.value];
       }
       if (typeof el === 'string') {
-        if (el.split(',').length > 1) rowStringArray.push('\"' + escapeHtml(el) + '\"');
+        if (el.split(',').length > 1) rowStringArray.push('\'' + escapeHtml(el) + '\'');
         else rowStringArray.push(escapeHtml(el));
       } else {
         rowStringArray.push('');
@@ -283,11 +284,22 @@ export function convertToCsvString(contacts, fieldsmap) {
   return base;
 }
 
-export function exportOperations(contacts, fieldsmap, name) {
+export function exportOperations(contacts, fieldsmap, filename) {
   const csvString = convertToCsvString(contacts, fieldsmap);
-  const csvFile = encodeURI(csvString);
-  const link = document.createElement('a');
-  link.setAttribute('href', csvFile);
-  link.setAttribute('download', name);
-  link.click();
+  var blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  if (navigator.msSaveBlob) { // IE 10+
+    navigator.msSaveBlob(blob, filename);
+  } else {
+    var link = document.createElement('a');
+    if (link.download !== undefined) { // feature detection
+      // Browsers that support HTML5 download attribute
+      var url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${filename}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
 }
