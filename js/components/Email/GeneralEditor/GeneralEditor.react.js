@@ -143,11 +143,11 @@ class GeneralEditor extends Component {
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
-            const size = parseFloat(imgNode.style['max-height']) / 100;
+            const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
             const imageLink = node.href;
             const imgReducerObj = this.props.emailImageReducer[src];
             const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src,
-              size: imgNode.style['max-height'],
+              size: `${size}%`,
               imageLink: imageLink || '#',
               align: imgReducerObj.align
             });
@@ -207,7 +207,7 @@ class GeneralEditor extends Component {
         if (entity.type === 'IMAGE') {
           const imgReducerObj = this.props.emailImageReducer[entity.data.src];
           entityMap[key].data = Object.assign({}, entityMap[key].data, {
-            size: `${~~(imgReducerObj.size * 100)}%`,
+            size: `${imgReducerObj.size}%`,
             imageLink: imgReducerObj.imageLink || '#',
             align: imgReducerObj.align || 'left',
           });
@@ -258,7 +258,7 @@ class GeneralEditor extends Component {
       const entityKey = emailImageObject.entityKey;
       Entity.replaceData(entityKey, {
         src: nextProps.current,
-        size: `${~~(emailImageObject.size * 100)}%`,
+        size: `${emailImageObject.size}%`,
         imageLink: emailImageObject.imageLink || '#'
       });
       this.props.onImageUpdated();

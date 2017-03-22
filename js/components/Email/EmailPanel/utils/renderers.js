@@ -9,6 +9,7 @@ import {
 // draft-convert has a bug that uses 'a' as anchor textNode for atomic block
 export function stripATextNodeFromContent(content) {
   const {entityMap, blocks} = convertToRaw(content);
+  console.log(entityMap);
   const newRaw = {entityMap, blocks: blocks.map(block => {
     if (block.type === 'atomic') {
       return Object.assign({}, block, {text: ' '});
@@ -21,12 +22,13 @@ export function stripATextNodeFromContent(content) {
 const Media = props => {
   const {block, contentState} = props;
   const entity = contentState.getEntity(block.getEntityAt(0));
-  const {src} = entity.getData();
+  const {src, align, imageLink, size} = entity.getData();
+  console.log(entity.getData());
   const type = entity.getType();
 
   let media;
   if (type === 'IMAGE') {
-    media = <Image src={src}/>;
+    media = <Image align={align} imageLink={imageLink} size={size} src={src}/>;
   }
   return media;
 };

@@ -20,12 +20,13 @@ const SpanButton = props => {
 class ToolBar extends Component {
   constructor(props) {
     super(props);
-    this.state = {sliderValue: props.size || 1};
+    this.state = {sliderValue: parseInt(props.size.slice(0, -1), 10) || 1};
   }
 
   render() {
     const props = this.props;
     const state = this.state;
+    console.log(state.sliderValue);
     return (
       <div
       className='vertical-center'
@@ -42,17 +43,17 @@ class ToolBar extends Component {
         {props.diableToolbar ?
           <span style={{fontSize: '0.8em', color: grey800}}>Image Toolbar disabled at Preview.</span> :
           <div className='vertical-center'>
-          <span style={{fontSize: '0.8em', width: 30}}>{`${(state.sliderValue * 100).toFixed()}%`}</span>
+          <span style={{fontSize: '0.8em', width: 30}}>{`${state.sliderValue}%`}</span>
           <Slider
-          min={0} max={1} step={0.01}
+          min={0} max={100} step={1}
           style={{width: 70, margin: '0 5px'}}
           onChange={sliderValue => this.setState({sliderValue})}
           onAfterChange={_ => props.setImageSize(state.sliderValue)}
           value={state.sliderValue}
           />
           <FontIcon
-          color={props.imageLink ? blue400 : grey800}
-          hoverColor={props.imageLink ? blue200 : grey400}
+          color={props.imageLink.length > 1 ? blue400 : grey800}
+          hoverColor={props.imageLink.length > 1 ? blue200 : grey400}
           onClick={props.imageLink ? props.unsetLink : props.setLink}
           style={{fontSize: '14px', margin: '0 2px'}}
           className='fa fa-link span-button pointer'
@@ -86,11 +87,11 @@ class ToolBar extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    image: state.emailImageReducer[props.src],
-    size: state.emailImageReducer[props.src].size,
-    entityKey: state.emailImageReducer[props.src].entityKey,
-    imageLink: state.emailImageReducer[props.src].imageLink,
-    align: state.emailImageReducer[props.src].align
+    // image: state.emailImageReducer[props.src],
+    // size: state.emailImageReducer[props.src].size,
+    // entityKey: state.emailImageReducer[props.src].entityKey,
+    // imageLink: state.emailImageReducer[props.src].imageLink,
+    // align: state.emailImageReducer[props.src].align
   };
 };
 

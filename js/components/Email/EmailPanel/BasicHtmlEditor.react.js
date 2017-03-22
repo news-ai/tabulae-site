@@ -164,10 +164,10 @@ class BasicHtmlEditor extends React.Component {
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
-            const size = parseFloat(imgNode.style['max-height']) / 100;
+            const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
             const imageLink = node.href;
-            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src,
-              size: imgNode.style['max-height'],
+            const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
+              size: `${size}%`,
               imageLink: imageLink || '#',
               align: 'left'
             });
@@ -242,7 +242,7 @@ class BasicHtmlEditor extends React.Component {
         if (entity.type === 'IMAGE') {
           const imgReducerObj = this.props.emailImageReducer[entity.data.src];
           entityMap[key].data = Object.assign({}, entityMap[key].data, {
-            size: `${~~(imgReducerObj.size * 100)}%`,
+            size: `${imgReducerObj.size}%`,
             imageLink: imgReducerObj.imageLink || '#',
             align: imgReducerObj.align || 'left',
           });
@@ -286,19 +286,23 @@ class BasicHtmlEditor extends React.Component {
     if (!this.props.updated && nextProps.updated) {
       const emailImageObject = nextProps.emailImageReducer[nextProps.current];
       const entityKey = emailImageObject.entityKey;
+      console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
       const newContentState = this.state.editorState.getCurrentContent()
       .mergeEntityData(entityKey, {
         src: nextProps.current,
-        size: `${~~(emailImageObject.size * 100)}%`,
+        size: `${emailImageObject.size}%`,
         imageLink: emailImageObject.imageLink || '#',
         align: emailImageObject.align || 'left'
       });
-      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'apply-entity');
+      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'activate-entity-data');
+      console.log(newEditorState.getCurrentContent().getEntity(entityKey).getData());
+      const selection = newEditorState.getSelection();
       this.props.onImageUpdated();
-      this.onChange(newEditorState, _ => {
-        // force emitHTML because immutable doesn't detect entity data updates
-        setTimeout(_ => this.emitHTML(this.state.editorState), 50);
-      });
+      // use setState because immutable cannot detect that entity data changed
+      this.setState({editorState: EditorState.forceSelection(newEditorState, newEditorState.getSelection())},
+        _ => {
+          this.emitHTML(this.state.editorState)
+        });
     }
   }
 
@@ -580,9 +584,9 @@ class BasicHtmlEditor extends React.Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'IMMUTABLE', {
+    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
       src: url,
-      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
+      size: `${this.props.emailImageReducer[url].size}%`,
       imageLink: '#',
       align: this.props.emailImageReducer[url].align
     }).getLastCreatedEntityKey();
@@ -643,6 +647,7 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}

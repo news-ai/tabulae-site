@@ -25,8 +25,7 @@ class ImageContainer extends Component {
       style = Object.assign({}, style, {textAlign: props.align});
     }
     const imgNode = this.refs[props.src];
-    const pSize = ~~(props.size * 100);
-    const img = <img ref={props.src} src={props.src} style={{maxWidth: `${pSize}%`, maxHeight: `${pSize}%`}}/>;
+    const img = <img ref={props.src} src={props.src} style={{maxWidth: props.size, maxHeight: props.size}}/>;
     return (
       <div
       onMouseEnter={_ => this.setState({open: true})}
@@ -44,14 +43,15 @@ class ImageContainer extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  return {
-    image: state.emailImageReducer[props.src],
-    size: state.emailImageReducer[props.src].size,
-    entityKey: state.emailImageReducer[props.src].entityKey,
-    imageLink: state.emailImageReducer[props.src].imageLink,
-    align: state.emailImageReducer[props.src].align
-  };
-};
+// const mapStateToProps = (state, props) => {
+//   return {
+//     // image: state.emailImageReducer[props.src],
+//     // size: state.emailImageReducer[props.src].size,
+//     // entityKey: state.emailImageReducer[props.src].entityKey,
+//     // imageLink: state.emailImageReducer[props.src].imageLink,
+//     // align: state.emailImageReducer[props.src].align
+//   };
+// };
 
-export default connect(mapStateToProps)(ImageContainer);
+// export default connect(mapStateToProps)(ImageContainer);
+export default ImageContainer;
