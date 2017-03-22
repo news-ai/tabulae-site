@@ -271,6 +271,7 @@ class BasicHtmlEditor extends React.Component {
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
+    this.getEditorState = () => this.state.editorState;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -288,19 +289,20 @@ class BasicHtmlEditor extends React.Component {
       const entityKey = emailImageObject.entityKey;
       console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
       const newContentState = this.state.editorState.getCurrentContent()
-      .mergeEntityData(entityKey, {
+      .replaceEntityData(entityKey, {
         src: nextProps.current,
         size: `${emailImageObject.size}%`,
         imageLink: emailImageObject.imageLink || '#',
         align: emailImageObject.align || 'left'
       });
       const newEditorState = EditorState.push(this.state.editorState, newContentState, 'activate-entity-data');
-      console.log(newEditorState.getCurrentContent().getEntity(entityKey).getData());
       const selection = newEditorState.getSelection();
       this.props.onImageUpdated();
       // use setState because immutable cannot detect that entity data changed
       this.setState({editorState: EditorState.forceSelection(newEditorState, newEditorState.getSelection())},
         _ => {
+          console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
+          console.log(convertToRaw(this.state.editorState.getCurrentContent()));
           this.emitHTML(this.state.editorState)
         });
     }
@@ -710,7 +712,7 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer}
+            blockRendererFn={mediaBlockRenderer(this.getEditorState)}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
