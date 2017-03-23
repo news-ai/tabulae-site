@@ -1,5 +1,5 @@
-import { generateConstants } from '../../constants/generateConstants';
-import { commonTypes } from '../../constants/AppConstants';
+import {generateConstants} from 'constants/generateConstants';
+import {commonTypes} from 'constants/AppConstants';
 
 export const fileConstant = generateConstants(commonTypes, 'UPLOAD_FILE');
 export const headerConstant = generateConstants(commonTypes, 'HEADERS');

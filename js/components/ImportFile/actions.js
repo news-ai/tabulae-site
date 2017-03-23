@@ -6,20 +6,22 @@ import {
 } from './constants';
 import * as api from 'actions/api';
 
-function receiveFile(file, listId) {
-  return {
-    type: fileConstant.RECEIVE,
-    file,
-    listId
-  };
-}
+const mockApi = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(_ => {
+      return reject('boom!');
+    }, 50);
+  });
+};
 
 export function uploadFile(listId, file) {
   return dispatch => {
     dispatch({type: fileConstant.REQUEST, listId, file});
     return api.postFile(`/lists/${listId}/upload`, file)
-    .then( response => dispatch(receiveFile(response.data, listId)))
-    .catch( message => dispatch({ type: fileConstant.REQUEST_FAIL, message }));
+    .then(
+      response => dispatch({type: fileConstant.RECEIVE, file: response.data, listId}),
+      error => dispatch({type: fileConstant.REQUEST_FAIL, error})
+      );
   };
 }
 
@@ -28,25 +30,25 @@ export function fetchHeaders(listId) {
     const fileId = getState().fileReducer[listId].id;
     dispatch({type: headerConstant.REQUEST, listId});
     return api.get(`/files/${fileId}/headers`)
-    .then(response => dispatch({type: headerConstant.RECEIVE, headers: response.data, listId}))
-    .catch(message => dispatch({type: headerConstant.REQUEST_FAIL, message, listId}));
-  };
-}
-
-export function waitForServerProcess(listId) {
-  return dispatch => {
-    dispatch({type: TURN_ON_PROCESS_WAIT});
+    .then(
+      response => dispatch({type: headerConstant.RECEIVE, headers: response.data, listId}),
+      error => dispatch({type: headerConstant.REQUEST_FAIL, error, listId})
+      );
   };
 }
 
 export function addHeaders(listId, order) {
   return (dispatch, getState) => {
     dispatch({type: headerConstant.CREATE_REQUEST, order});
-    dispatch(waitForServerProcess(listId));
+    dispatch({type: TURN_ON_PROCESS_WAIT, listId});
     const fileId = getState().fileReducer[listId].id;
-
     return api.post(`/files/${fileId}/headers`, {order})
-    .then(response => dispatch({type: headerConstant.CREATE_RECEIVED, response}))
-    .catch( message => dispatch({type: headerConstant.REQUEST_FAIL, message}));
+    .then(
+      response => {
+        dispatch({type: headerConstant.CREATE_RECEIVED, response});
+        dispatch({type: TURN_OFF_PROCESS_WAIT, listId});
+      },
+      error => dispatch({type: headerConstant.REQUEST_FAIL, error})
+    );
   };
 }
