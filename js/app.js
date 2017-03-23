@@ -70,6 +70,7 @@ import '../css/main.css';
 const store = configureStore();
 
 window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.com/api` : `https://tabulae.newsai.org/api`;
+window.TABULAE_HOME = window.isDev ? `https://tabulae-dev.newsai.co` : `https://tabulae.newsai.co`;
 
 
 // third-party services setups

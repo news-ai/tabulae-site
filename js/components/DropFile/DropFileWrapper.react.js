@@ -6,7 +6,6 @@ import {connect} from 'react-redux';
 import {actions as listActions} from 'components/Lists';
 import {actions as fileActions} from 'components/ImportFile';
 import Dropzone from 'react-dropzone';
-import Radium from 'radium';
 import FontIcon from 'material-ui/FontIcon';
 
 import Waiting from '../Waiting';
@@ -35,6 +34,41 @@ const styles = {
   },
 };
 
+const FileDroppedIndicator = ({file, onClose}) => {
+  return (
+      <div className='row vertical-center' style={{margin: '20px 0'}}>
+        <span style={{marginRight: 20}}>{file.name} -- {file.size} bytes</span>
+        <FontIcon
+        color={grey800}
+        hoverColor={grey500}
+        style={{fontSize: '16px'}}
+        onClick={onClose}
+        className='fa fa-close pointer'
+        />
+      </div>
+    );
+};
+
+const FileDroppedError = ({error}) => {
+  return (
+    <div>
+      <p>Oops. An error occurred in processing the file.</p>
+      <ol>
+        <li>The file was corrupt</li>
+        <li>The file had hidden fields that we couldn't handle</li>
+        <li>Our processing servers are experiencing downtime</li>
+      </ol>
+      <p>Here are a couple strategies that could potentially solve the problem.</p>
+      <ol>
+        <li>Refresh the page and try again</li>
+        <li>Make sure that you are saving your Excel file with <code>.xlsx</code> format</li>
+        <li>Open the Excel file you are uploading and copy the columns you need into a new Excel file to get rid of potentially hidden columns/formulas/etc</li>
+        <li>Contact Support</li>
+      </ol>
+    </div>
+    );
+};
+
 class DropFileWrapper extends Component {
   constructor(props) {
     super(props);
@@ -50,11 +84,18 @@ class DropFileWrapper extends Component {
     this.onUploadClick = this._onUploadClick.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+  }
+
+  componentWillUnmount() {
+    this.props.resetError();
+  }
+
   _onUploadClick() {
     window.Intercom('trackEvent', 'uploaded_sheet');
-    const props = this.props;
+    // create empty list first then upload file to populare the list
     this.setState({clicked: true});
-    props.createEmptyList(this.state.value)
+    this.props.createEmptyList(this.state.value)
     .then(response => {
       this.setState({listId: response.data.id});
       return response.data.id;
@@ -63,8 +104,10 @@ class DropFileWrapper extends Component {
       let data = new FormData();
       data.append('file', this.state.file);
       this.setState({isFileSubmitted: true});
-      props.uploadFile(listId, data)
-      .then(_ => props.router.push(`/headersnaming/${listId}`));
+      this.props.uploadFile(listId, data)
+      .then(_ => {
+        if (!this.props.didInvalidate) this.props.router.push(`/headersnaming/${listId}`);
+      });
     });
   }
 
@@ -83,18 +126,13 @@ class DropFileWrapper extends Component {
     }
   }
 
-  _onProcessHeaders(order) {
-    this.props.addHeaders(this.state.listId, order)
-    .then(_ => console.log('COMPLETED!'));
-  }
-
   render() {
     const state = this.state;
     const props = this.props;
     let renderNode;
     if (!state.isFileSubmitted) {
       renderNode = (
-        <div style={{marginTop: 40}}>
+        <div>
           <div className='row'>
             <span>Give the uploaded list a name.</span>
           </div>
@@ -103,20 +141,20 @@ class DropFileWrapper extends Component {
             id='filedrop-textfield'
             fullWidth
             value={state.value}
-            onKeyDown={e => e.keyCode === 13 ? this.onSetNameClick() : null}
-            onChange={e => this.setState({value: e.target.value})} />
+            onChange={e => this.setState({value: e.target.value})}
+            />
           </div>
           <div style={{height: 180}}>
           {state.isFileDropped ?
             <div className='row vertical-center' style={{margin: '20px 0'}}>
-              <span style={{marginRight: 20}}>{state.file.name} -- {state.file.size} bytes</span>
-              <FontIcon color={grey800} hoverColor={grey500} style={{fontSize: '16px'}} onClick={ _ => this.setState({file: null, isFileDropped: false})} className='fa fa-close pointer'/>
+              <FileDroppedIndicator
+              file={state.file}
+              onClose={_ => this.setState({file: null, isFileDropped: false})}
+              />
             </div>
             : <Dropzone
               accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
-              style={styles.dropzone.default}
-              activeStyle={styles.dropzone.active}
-              rejectStyle={styles.dropzone.reject}
+              style={styles.dropzone.default} activeStyle={styles.dropzone.active} rejectStyle={styles.dropzone.reject}
               onDrop={this.onDrop}
               multiple={false}
               >
@@ -124,7 +162,12 @@ class DropFileWrapper extends Component {
             </Dropzone>}
           </div>
           <div className='vertical-center horizontal-center'>
-            <RaisedButton primary disabled={state.clicked || state.file === null} style={{float: 'right'}} label='Upload' onClick={this.onUploadClick} />
+            <RaisedButton
+            primary
+            disabled={state.clicked || state.file === null}
+            label='Upload'
+            onClick={this.onUploadClick}
+            />
           </div>
           <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
             <span>For more details, you may refer to <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>.</span>
@@ -134,11 +177,18 @@ class DropFileWrapper extends Component {
     } else {
       renderNode = (
         <div>
-          <Waiting isReceiving={props.isReceiving || props.headerIsReceiving} textStyle={{marginTop: 20}} text='Waiting for Columns to be processed...' />
+          <Waiting
+          isReceiving={props.isReceiving || props.headerIsReceiving}
+          textStyle={{marginTop: 20}}
+          text='Waiting for Columns to be processed...'
+          />
         </div>);
     }
+    if (props.didInvalidate) {
+      return <FileDroppedError error={props.error}/>;
+    }
     return (
-      <div className='horizontal-center'>
+      <div className='horizontal-center' style={{marginTop: 40}}>
         {renderNode}
       </div>);
   }
@@ -150,6 +200,8 @@ const mapStateToProps = (state, props) => {
     isReceiving: state.fileReducer.isReceiving,
     headerIsReceiving: state.headerReducer.isReceiving,
     headerReducer: state.headerReducer,
+    didInvalidate: state.fileReducer.didInvalidate,
+    errorMessage: state.fileReducer.error,
   };
 };
 
@@ -158,10 +210,11 @@ const mapDispatchToProps = (dispatch, props) => {
     createEmptyList: listname => dispatch(listActions.createEmptyList(listname)),
     uploadFile: (listId, file) => dispatch(fileActions.uploadFile(listId, file)),
     fetchHeaders: listId => dispatch(fileActions.fetchHeaders(listId)),
+    resetError: _ => dispatch({type: 'RESET_FILE_REDUCER_ERROR'})
   };
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-  )(Radium(withRouter(DropFileWrapper)));
+  )(withRouter(DropFileWrapper));

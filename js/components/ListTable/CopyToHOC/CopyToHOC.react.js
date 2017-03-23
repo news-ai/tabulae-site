@@ -171,12 +171,21 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchLists: _ => dispatch(listActions.fetchLists()),
     addContactsThenPatchList: (rawContacts, list) => dispatch(copyActions.addContactsThenPatchList(rawContacts, list, props.listId))
-    .then(_ => alertify.notify('Copy completed!', 'custom', 2, function(){})),
+    .then(_ => {
+      window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
+      alertify.notify('Copy completed!', 'custom', 2, function(){});
+    }),
     copyToNewList: (rawContacts, name) => dispatch(listActions.createEmptyList(name))
     .then(response => dispatch(copyActions.addContactsThenPatchList(rawContacts, response.data, props.listId)))
-    .then(_ => alertify.notify('Copy completed!', 'custom', 2, function(){})),
+    .then(_ => {
+      window.Intercom('trackEvent', 'copy_some_contacts_to_new');
+      alertify.notify('Copy completed!', 'custom', 2, function(){});
+    }),
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
-    .then(_ => alertify.notify('Copy completed!', 'custom', 2, function(){})),
+    .then(_ => {
+      window.Intercom('trackEvent', 'copy_all_contacts_to_new');
+      alertify.notify('Copy completed!', 'custom', 2, function(){});
+    }),
   };
 };
 

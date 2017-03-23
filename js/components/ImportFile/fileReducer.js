@@ -21,9 +21,12 @@ function fileReducer(state = initialState.fileReducer, action) {
       obj.isReceiving = true;
       return obj;
     case fileConstant.REQUEST_FAIL:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj.didInvalidate = true;
+      obj = assignToEmpty(state, {
+        isReceiving: false,
+        didInvalidate: true,
+        error: action.error
+      });
+      if (!window.isDev) window.Intercom('trackEvent', 'file_upload_error', {error: action.error});
       return obj;
     case fileConstant.RECEIVE:
       obj = assignToEmpty(state, {});
@@ -31,20 +34,12 @@ function fileReducer(state = initialState.fileReducer, action) {
       // file belongs to list
       obj[action.listId] = action.file;
       return obj;
+    case 'RESET_FILE_REDUCER_ERROR':
+      return assignToEmpty(state, {didInvalidate: false, error: undefined});
     case headerConstant.REQUEST:
       obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       obj[action.listId] = assignToEmpty(state[action.listId], {didInvalidate: false});
-      return obj;
-    case headerConstant.RECEIVE:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj[action.listId].headers = action.headers;
-      return obj;
-    case headerConstant.REQUEST_FAIL:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj[action.listId] = assignToEmpty(state[action.listId], {didInvalidate: true});
       return obj;
     case TURN_ON_PROCESS_WAIT:
       obj = assignToEmpty(state, {});
