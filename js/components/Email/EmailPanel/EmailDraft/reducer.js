@@ -7,7 +7,8 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
   switch (action.type) {
     case 'INITIALIZE_EMAIL_DRAFT':
       obj = assignToEmpty(state, {
-        isAttachmentPanelOpen: false
+        isAttachmentPanelOpen: false,
+        editorState: null
       });
       obj[action.listId] = {from: action.email};
       return obj;
@@ -27,6 +28,8 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
       obj = assignToEmpty(state, {});
       obj[action.listId] = assignToEmpty(state[action.listId], {from: action.from});
       return obj;
+    case 'SET_EDITORSTATE':
+      return assignToEmpty(state, {editorState: action.editorState});
     default:
       return state;
   }

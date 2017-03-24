@@ -252,7 +252,7 @@ class BasicHtmlEditor extends React.Component {
       // end hack
       let html = draftRawToHtml(raw);
       console.log(html);
-      this.props.onBodyChange(html);
+      this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
     this.insertText = this._insertText.bind(this);
@@ -314,6 +314,7 @@ class BasicHtmlEditor extends React.Component {
 
   _onChange(editorState, callback) {
     let newEditorState = editorState;
+    this.setState({editorState: newEditorState}, callback);
 
     let previousContent = this.state.editorState.getCurrentContent();
 
@@ -322,7 +323,6 @@ class BasicHtmlEditor extends React.Component {
       this.emitHTML(editorState);
     }
 
-    this.setState({editorState: newEditorState}, callback);
   }
 
   _linkifyLastWord(insertChar = '') {
