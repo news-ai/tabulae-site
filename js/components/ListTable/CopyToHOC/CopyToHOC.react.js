@@ -10,6 +10,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
 import {yellow50} from 'material-ui/styles/colors';
+import alertify from 'alertifyjs';
 
 class CopyToHOC extends Component {
   constructor(props) {
@@ -38,15 +39,18 @@ class CopyToHOC extends Component {
   _onNewSheetSubmit() {
     const props = this.props;
     const val = this.refs.copyToHOC_newSheetName.input.value;
-    props.copyToNewList(props.selectedContacts, val);
+    let name;
+    if (val.length > 0) name = val;
+    else name = `${this.props.list.name} (Copy)`;
+    props.copyToNewList(props.selectedContacts, name);
   }
 
   _onWholeSheetCopy() {
     const val = this.refs.copyToHOC_whole_list.input.value;
     let name;
     if (val.length > 0) name = val;
-    this.props.copyEntireList(this.props.list.id, name)
-    .then(newListId => this.props.router.push(`/tables/${newListId}`));
+    else name = `${this.props.list.name} (Copy)`;
+    this.props.copyEntireList(this.props.list.id, name);
   }
 
   render() {
@@ -55,7 +59,7 @@ class CopyToHOC extends Component {
     return (
       <div>
         <Dialog
-        title='Copy to Another Table'
+        title='Copy to Another Table -- select contacts to copy'
         open={state.open}
         modal={false}
         autoScrollBodyContent
@@ -73,12 +77,13 @@ class CopyToHOC extends Component {
               The bigger the migration, the slower it is! Don't navigate from the page during migration.
               </span>
             </div>
+            <strong>Method 1: Copy a Couple Contacts to an Existing/New List</strong>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
               <span style={{fontWeight: 'bold', marginRight: 8}}>Selected Contacts</span>
               {props.selected.length === 0 && <span>none selected</span>}
               {props.selectedContacts &&
                 <span>{props.selectedContacts
-                .map(contact => contact.firstname)
+                .map(contact => contact.firstname || contact.lastname || contact.email)
                 .join(', ')}</span>}
             </div>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
@@ -97,7 +102,7 @@ class CopyToHOC extends Component {
               label='Submit'
               primary
               disabled={!props.selectedContacts || state.value.length === 0}
-              icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
+              icon={props.selectedContacts && state.value.length > 0 && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
               onClick={this.onSubmit}
               />
             </div>
@@ -106,11 +111,11 @@ class CopyToHOC extends Component {
             </div>
             <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 30}}>
               <div className='vertical-center'>
-                <span style={{marginRight: 10, fontSize: '0.9em'}}>New Sheet Name</span>
+                <span style={{marginRight: 10, fontSize: '0.9em'}}>New List Name</span>
                 <TextField
                 id='copyToHOC_newSheetName'
                 ref='copyToHOC_newSheetName'
-                defaultValue={`${props.list.name} (Copy)`}
+                placeholder={`${props.list.name} (Copy) (default name)`}
                 />
                 <RaisedButton
                 primary
@@ -118,23 +123,24 @@ class CopyToHOC extends Component {
                 disabled={state.value.length > 0 || !props.selectedContacts}
                 label='Copy to New List'
                 onClick={this.onNewSheetSubmit}
-                icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
+                icon={state.value.length === 0 && props.selectedContacts && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
                 />
               </div>
             </div>
-            <div className='large-12 medium-12 small-12 columns'>
-              <span>Or, copy the WHOLE list (every contact in this list) to a new list:</span>
-            </div>
+            <strong>Method 2: Copy the Whole List</strong>
             <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 30}}>
               <div className='vertical-center'>
+                <span style={{marginRight: 10, fontSize: '0.9em'}}>New List Name</span>
                 <TextField
                 id='copyToHOC_whole_list'
                 ref='copyToHOC_whole_list'
-                placeholder={`Copy of ${props.list.name} (default)`}
+                placeholder={`${props.list.name} (Copy) (default name)`}
                 />
                 <RaisedButton
                 label='Copy Whole List'
                 onClick={this.onWholeSheetCopy}
+                disabled={props.isListReceiving || props.isReceiving}
+                primary
                 icon={<FontIcon className={props.isListReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
                 />
               </div>
@@ -164,10 +170,22 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchLists: _ => dispatch(listActions.fetchLists()),
-    addContactsThenPatchList: (rawContacts, list) => dispatch(copyActions.addContactsThenPatchList(rawContacts, list, props.listId)),
+    addContactsThenPatchList: (rawContacts, list) => dispatch(copyActions.addContactsThenPatchList(rawContacts, list, props.listId))
+    .then(_ => {
+      window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
+      alertify.notify('Copy completed!', 'custom', 2, function(){});
+    }),
     copyToNewList: (rawContacts, name) => dispatch(listActions.createEmptyList(name))
-    .then(response => dispatch(copyActions.addContactsThenPatchList(rawContacts, response.data, props.listId))),
+    .then(response => dispatch(copyActions.addContactsThenPatchList(rawContacts, response.data, props.listId)))
+    .then(_ => {
+      window.Intercom('trackEvent', 'copy_some_contacts_to_new');
+      alertify.notify('Copy completed!', 'custom', 2, function(){});
+    }),
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
+    .then(_ => {
+      window.Intercom('trackEvent', 'copy_all_contacts_to_new');
+      alertify.notify('Copy completed!', 'custom', 2, function(){});
+    }),
   };
 };
 

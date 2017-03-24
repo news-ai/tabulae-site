@@ -10,7 +10,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 
-import {grey500, lightBlue50, lightBlue300} from 'material-ui/styles/colors';
+import {grey500, lightBlue50, lightBlue300, red800} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
@@ -47,12 +47,14 @@ class HeaderNaming extends Component {
   }
 
   componentDidMount() {
-
   }
 
   componentWillReceiveProps(nextProps) {
     if (!this.props.headers && nextProps.headers) {
       this.setState({order: Array(nextProps.headers.length).fill(undefined)});
+    }
+
+    if (this.props.error !== nextProps.error && nextProps.didInvalidate) {
     }
   }
 
@@ -151,7 +153,8 @@ class HeaderNaming extends Component {
   _onSubmit() {
     window.Intercom('trackEvent', 'processed_sheet');
     const order = this.state.order.map(name => name || 'ignore_column');
-    this.props.onAddHeaders(order).then(_ => setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}?justCreated=true`), 5000));
+    this.props.onAddHeaders(order)
+    .then(_ => setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}?justCreated=true`), 5000));
   }
 
   _onAddCustom() {
@@ -161,6 +164,10 @@ class HeaderNaming extends Component {
       '',
       (e, name) => {
         const value = name.toLowerCase().split(' ').join('_');
+        if (this.state.options.some(option => option.value === value)) {
+          alertify.alert('Dupliate Name', `The name: [${name}] you inputed already exist as an option. Please pick another.`, function(){});
+          return;
+        }
         const options = [...this.state.options, {value, label: name, selected: false}];
         this.setState({options}, _ => this._headernames.recomputeGridSize());
       },
@@ -221,11 +228,16 @@ class HeaderNaming extends Component {
             backgroundColor={lightBlue300}
             icon={
               <FontIcon color='white'
-              className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'} />}
+              className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'}
+              />}
             label='Submit'
             onClick={this.onSubmit} />
-            {props.isProcessWaiting &&
+          {props.isProcessWaiting &&
             <span>Please be patient. This may take 20 seconds to a few minutes.</span>}
+          {props.didInvalidate &&
+            <div>
+              <span style={{color: red800}}>Something went wrong while processing property headers. Please hit <a href={window.TABULAE_HOME}>Refresh</a> and try again or contact Support.</span>
+            </div>}
           </div>
         </div>}
       </div>);
@@ -239,6 +251,8 @@ const mapStateToProps = (state, props) => {
     isProcessWaiting: state.fileReducer.isProcessWaiting,
     isReceiving: state.headerReducer.isReceiving,
     headers: state.headerReducer[listId],
+    didInvalidate: state.headerReducer.didInvalidate,
+    error: state.headerReducer.error
   };
 };
 

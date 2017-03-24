@@ -572,6 +572,7 @@ class ListTable extends Component {
 
 
   _onExportClick() {
+    window.Intercom('trackEvent', 'on_export_click');
     exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name);
   }
 
