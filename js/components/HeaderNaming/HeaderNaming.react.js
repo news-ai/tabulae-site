@@ -46,9 +46,6 @@ class HeaderNaming extends Component {
     this.props.fetchHeaders();
   }
 
-  componentDidMount() {
-  }
-
   componentWillReceiveProps(nextProps) {
     if (!this.props.headers && nextProps.headers) {
       this.setState({order: Array(nextProps.headers.length).fill(undefined)});
@@ -56,6 +53,10 @@ class HeaderNaming extends Component {
 
     if (this.props.error !== nextProps.error && nextProps.didInvalidate) {
     }
+  }
+
+  componentWillUnmount() {
+    this.props.onReducerReset();
   }
 
   _headerRenderer({columnIndex, rowIndex, key, style}) {
@@ -154,7 +155,9 @@ class HeaderNaming extends Component {
     window.Intercom('trackEvent', 'processed_sheet');
     const order = this.state.order.map(name => name || 'ignore_column');
     this.props.onAddHeaders(order)
-    .then(_ => setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}?justCreated=true`), 5000));
+    .then(_ => {
+      if (!this.props.didInvalidate) setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}?justCreated=true`), 5000);
+    });
   }
 
   _onAddCustom() {
@@ -225,18 +228,22 @@ class HeaderNaming extends Component {
             <RaisedButton
             style={{float: 'right'}}
             labelStyle={{color: 'white', textTransform: 'none'}}
+            disabled={props.didInvalidate}
             backgroundColor={lightBlue300}
             icon={
               <FontIcon color='white'
-              className={props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'}
+              className={!props.didInvalidate && props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'}
               />}
             label='Submit'
             onClick={this.onSubmit} />
           {props.isProcessWaiting &&
-            <span>Please be patient. This may take 20 seconds to a few minutes.</span>}
+            <span>Please be patient. This may take from a few seconds to a few minutes depending on file size.</span>}
           {props.didInvalidate &&
             <div>
-              <span style={{color: red800}}>Something went wrong while processing property headers. Please hit <a href={window.TABULAE_HOME}>Refresh</a> and try again or contact Support.</span>
+              <span style={{color: red800}}>Something went wrong while processing property headers.
+              One common case is hidden columns/formulas on the Excel file which we can't parse. It can be solved by copy-paste the rows you want into a new Excel file.
+              Please <a href={window.TABULAE_HOME}>Refresh</a> and try again or contact Support.
+              </span>
             </div>}
           </div>
         </div>}
@@ -261,6 +268,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchHeaders: _ => dispatch(fileActions.fetchHeaders(listId)),
     onAddHeaders: order => dispatch(fileActions.addHeaders(listId, order)),
+    onReducerReset: () => dispatch({type: 'HEADERS_REDUCER_RESET'})
   };
 };
 

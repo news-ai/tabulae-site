@@ -18,11 +18,13 @@ function headerReducer(state = initialState.headerReducer, action) {
       obj[action.listId] = action.headers;
       return obj;
     case headerConstant.REQUEST_FAIL:
-      if (!window.isDev) window.Intercom('trackEvent', 'headers_upload_error', {error: action.error});
+      if (!window.isDev) window.Intercom('trackEvent', 'headers_upload_error', {error: JSON.stringify(action.error)});
       return assignToEmpty(state, {
         didInvalidate: true,
         isReceiving: false
       });
+    case headerConstant.REDUCER_RESET:
+      return assignToEmpty(state, initialState.headerReducer);
     default:
       return state;
   }
