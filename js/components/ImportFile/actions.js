@@ -40,11 +40,13 @@ export function fetchHeaders(listId) {
 export function addHeaders(listId, order) {
   return (dispatch, getState) => {
     dispatch({type: headerConstant.CREATE_REQUEST, order});
+    dispatch({type: TURN_ON_PROCESS_WAIT, listId});
     const fileId = getState().fileReducer[listId].id;
     return api.post(`/files/${fileId}/headers`, {order})
     .then(
       response => {
         dispatch({type: headerConstant.CREATE_RECEIVED, response});
+        dispatch({type: TURN_OFF_PROCESS_WAIT, listId});
       },
       error => dispatch({type: headerConstant.REQUEST_FAIL, error})
     );
