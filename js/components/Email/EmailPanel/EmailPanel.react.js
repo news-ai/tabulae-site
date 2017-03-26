@@ -34,6 +34,7 @@ import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
+import isJSON from 'validator/lib/isJSON';
 
 import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 
@@ -192,16 +193,45 @@ class EmailPanel extends Component {
     .then(_ => this._handleTemplateValueChange(null, null, 0));
   }
 
+  _onSaveNewTemplateClick() {
+    const state:any = this.state;
+    alertify.prompt('', 'Name of new Email Template', '',
+      (e, name) => {
+        this.props.createTemplate(
+          name,
+          state.subject,
+          JSON.stringify({type: 'DraftEditorState' , data: state.bodyEditorState})
+          ).then(currentTemplateId => this.setState({currentTemplateId}));
+      },
+      _ => console.log('template saving cancelled'));
+  }
+
+  _onSaveCurrentTemplateClick() {
+    this.props.onSaveCurrentTemplateClick(
+      state.currentTemplateId,
+      state.subject,
+      JSON.stringify({type: 'DraftEditorState' , data: state.bodyEditorState})
+      );
+  }
+
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
       const template = find(this.props.templates, tmp => value === tmp.id);
-      const bodyHtml = template.body;
       const subjectHtml = template.subject;
-      this.setState({bodyHtml, subjectHtml});
+      const bodyHtml = template.body;
+      if (isJSON(template.body)) {
+        const templateJSON = JSON.parse(template.body);
+        this.setState({bodyEditorState: templateJSON.data});
+        this.props.saveEditorState(templateJSON.data);
+        this.setState({subjectHtml});
+      } else {
+        this.setState({bodyHtml, subjectHtml});
+      }
     } else {
       this.setState({bodyHtml: '', subjectHtml: ''});
     }
     this.setState({currentTemplateId: value});
+    this.props.turnOnTemplateChange();
   }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
@@ -288,18 +318,6 @@ class EmailPanel extends Component {
       }
       this.sendGeneratedEmails(contactEmails);
     }
-  }
-
-  _onSaveNewTemplateClick() {
-    const state:any = this.state;
-    alertify.prompt('', 'Name of new Email Template', '',
-      (e, name) => this.props.createTemplate(name, state.subject, {type: 'DraftEditorState' , data: state.bodyEditorState})
-        .then(currentTemplateId => this.setState({currentTemplateId})),
-      _ => console.log('template saving cancelled'));
-  }
-
-  _onSaveCurrentTemplateClick() {
-    this.props.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, {type: 'DraftEditorState' , data: state.bodyEditorState})
   }
 
   _onClose() {
@@ -500,6 +518,7 @@ const mapDispatchToProps = (dispatch, props) => {
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
+    turnOnTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_ON'})
   };
 };
 

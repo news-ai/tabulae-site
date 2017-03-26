@@ -12,17 +12,17 @@ export function createTemplate(name, subject, body) {
   else templateBody.name = 'untitled template name';
   if (subject.length > 0) templateBody.subject = subject;
   else templateBody.subject = 'untitled subject line';
-  if (body.length > 0) templateBody.body = body;
+  if (body) templateBody.body = body;
   else templateBody.body = '';
   return dispatch => {
-    dispatch({type: templateConstant.CREATE_REQUEST});
+    dispatch({type: templateConstant.CREATE_REQUEST, templateBody});
     return api.post(`/templates`, templateBody)
     .then(response => {
       const res = normalize(response.data, templateSchema);
       dispatch({type: templateConstant.CREATE_RECEIVED, template: res.entities.templates, id: res.result});
       return res.result;
     })
-    .catch(message => dispatch({type: templateConstant.REQUEST_FAIL, message}));
+    .catch(error => dispatch({type: templateConstant.REQUEST_FAIL, error: error.message}));
   };
 }
 

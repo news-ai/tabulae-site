@@ -275,15 +275,6 @@ class BasicHtmlEditor extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.bodyHtml !== this.state.bodyHtml) {
-      console.log('change template');
-      const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      const newContent = stripATextNodeFromContent(configuredContent);
-      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-      this.onChange(editorState);
-      this.setState({bodyHtml: nextProps.bodyHtml});
-    }
-
     if (!this.props.updated && nextProps.updated) {
       const emailImageObject = nextProps.emailImageReducer[nextProps.current];
       const entityKey = emailImageObject.entityKey;
@@ -306,6 +297,22 @@ class BasicHtmlEditor extends React.Component {
           this.emitHTML(this.state.editorState)
         });
     }
+
+    if (!this.props.templateChanged && nextProps.templateChanged) {
+      console.log('change template');
+      this.props.turnOffTemplateChange();
+      let newContent;
+      if (nextProps.savedEditorState) {
+        newContent = convertFromRaw(nextProps.savedEditorState);
+      } else {
+        const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
+        newContent = stripATextNodeFromContent(configuredContent);
+        this.setState({bodyHtml: nextProps.bodyHtml});
+      }
+      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+      this.onChange(editorState);
+    }
+
   }
 
   componentWillUnmount() {
@@ -801,7 +808,9 @@ const mapStateToProps = (state, props) => {
     files: state.emailAttachmentReducer.attached,
     emailImageReducer: state.emailImageReducer,
     updated: state.emailImageReducer.updated,
-    current: state.emailImageReducer.current
+    current: state.emailImageReducer.current,
+    templateChanged: state.emailDraftReducer.templateChanged,
+    savedEditorState: state.emailDraftReducer.editorState
   };
 };
 
@@ -815,7 +824,8 @@ const mapDispatchToProps = (dispatch, props) => {
     setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
     setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
     onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'}),
-    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'})
+    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
+    turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'})
   };
 };
 

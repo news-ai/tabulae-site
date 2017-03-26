@@ -30,6 +30,10 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
       return obj;
     case 'SET_EDITORSTATE':
       return assignToEmpty(state, {editorState: action.editorState});
+    case 'TEMPLATE_CHANGE_ON':
+      return assignToEmpty(state, {templateChanged: true});
+    case 'TEMPLATE_CHANGE_OFF':
+      return assignToEmpty(state, {templateChanged: false});
     default:
       return state;
   }
