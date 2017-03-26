@@ -235,20 +235,20 @@ class BasicHtmlEditor extends React.Component {
       let raw = convertToRaw(editorState.getCurrentContent());
       // cleanup mismatching raw entityMap and entity values
       // hack!! until convertToRaw actually converts current entity data in editorState
-      let entityMap = raw.entityMap;
-      const keys = Object.keys(entityMap);
-      keys.map(key => {
-        const entity = entityMap[key];
-        if (entity.type === 'IMAGE') {
-          const imgReducerObj = this.props.emailImageReducer[entity.data.src];
-          entityMap[key].data = Object.assign({}, entityMap[key].data, {
-            size: `${imgReducerObj.size}%`,
-            imageLink: imgReducerObj.imageLink || '#',
-            align: imgReducerObj.align || 'left',
-          });
-        }
-      });
-      raw.entityMap = entityMap;
+      // let entityMap = raw.entityMap;
+      // const keys = Object.keys(entityMap);
+      // keys.map(key => {
+      //   const entity = entityMap[key];
+      //   if (entity.type === 'IMAGE') {
+      //     const imgReducerObj = this.props.emailImageReducer[entity.data.src];
+      //     entityMap[key].data = Object.assign({}, entityMap[key].data, {
+      //       size: `${imgReducerObj.size}%`,
+      //       imageLink: imgReducerObj.imageLink || '#',
+      //       align: imgReducerObj.align || 'left',
+      //     });
+      //   }
+      // });
+      // raw.entityMap = entityMap;
       // end hack
       let html = draftRawToHtml(raw);
       console.log(html);
@@ -302,12 +302,13 @@ class BasicHtmlEditor extends React.Component {
       console.log('change template');
       this.props.turnOffTemplateChange();
       let newContent;
-      if (nextProps.savedEditorState) {
-        newContent = convertFromRaw(nextProps.savedEditorState);
-      } else {
+      if (nextProps.savedBodyHtml) {
         const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
         newContent = stripATextNodeFromContent(configuredContent);
         this.setState({bodyHtml: nextProps.bodyHtml});
+        this.props.clearCacheBodyHtml();
+      } else {
+        newContent = convertFromRaw(nextProps.savedEditorState);
       }
       const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
@@ -719,7 +720,7 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer(this.getEditorState)}
+            blockRendererFn={mediaBlockRenderer({getEditorState: this.getEditorState, onChange: this.onChange})}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
@@ -810,7 +811,8 @@ const mapStateToProps = (state, props) => {
     updated: state.emailImageReducer.updated,
     current: state.emailImageReducer.current,
     templateChanged: state.emailDraftReducer.templateChanged,
-    savedEditorState: state.emailDraftReducer.editorState
+    savedEditorState: state.emailDraftReducer.editorState,
+    savedBodyHtml: state.emailDraftReducer.bodyHtml
   };
 };
 
@@ -825,7 +827,8 @@ const mapDispatchToProps = (dispatch, props) => {
     setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
     onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
-    turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'})
+    turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'}),
+    clearCacheBodyHtml: _ => dispatch({type: 'CLEAR_CACHE_BODYHTML'})
   };
 };
 

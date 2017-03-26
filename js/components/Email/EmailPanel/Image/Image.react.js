@@ -43,15 +43,4 @@ class ImageContainer extends Component {
   }
 }
 
-// const mapStateToProps = (state, props) => {
-//   return {
-//     // image: state.emailImageReducer[props.src],
-//     // size: state.emailImageReducer[props.src].size,
-//     // entityKey: state.emailImageReducer[props.src].entityKey,
-//     // imageLink: state.emailImageReducer[props.src].imageLink,
-//     // align: state.emailImageReducer[props.src].align
-//   };
-// };
-
-// export default connect(mapStateToProps)(ImageContainer);
 export default ImageContainer;

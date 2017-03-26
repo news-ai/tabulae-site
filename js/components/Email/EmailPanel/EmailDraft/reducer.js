@@ -8,7 +8,8 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
     case 'INITIALIZE_EMAIL_DRAFT':
       obj = assignToEmpty(state, {
         isAttachmentPanelOpen: false,
-        editorState: null
+        editorState: null,
+        bodyHtml: null
       });
       obj[action.listId] = {from: action.email};
       return obj;
@@ -30,6 +31,10 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
       return obj;
     case 'SET_EDITORSTATE':
       return assignToEmpty(state, {editorState: action.editorState});
+    case 'SET_BODYHTML':
+      return assignToEmpty(state, {bodyHtml: action.bodyHtml});
+    case 'CLEAR_CACHE_BODYHTML':
+      return assignToEmpty(state, {bodyHtml: null});
     case 'TEMPLATE_CHANGE_ON':
       return assignToEmpty(state, {templateChanged: true});
     case 'TEMPLATE_CHANGE_OFF':

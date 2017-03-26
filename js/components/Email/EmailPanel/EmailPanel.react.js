@@ -167,7 +167,7 @@ class EmailPanel extends Component {
     this.getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this.sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
-    this.onSaveCurrentTemplateClick = this._onSaveNewTemplateClick.bind(this);
+    this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
     this.onClose = this._onClose.bind(this);
   }
@@ -194,13 +194,12 @@ class EmailPanel extends Component {
   }
 
   _onSaveNewTemplateClick() {
-    const state:any = this.state;
     alertify.prompt('', 'Name of new Email Template', '',
       (e, name) => {
         this.props.createTemplate(
           name,
-          state.subject,
-          JSON.stringify({type: 'DraftEditorState' , data: state.bodyEditorState})
+          this.state.subject,
+          JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
           ).then(currentTemplateId => this.setState({currentTemplateId}));
       },
       _ => console.log('template saving cancelled'));
@@ -208,9 +207,9 @@ class EmailPanel extends Component {
 
   _onSaveCurrentTemplateClick() {
     this.props.onSaveCurrentTemplateClick(
-      state.currentTemplateId,
-      state.subject,
-      JSON.stringify({type: 'DraftEditorState' , data: state.bodyEditorState})
+      this.state.currentTemplateId,
+      this.state.subject,
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
       );
   }
 
@@ -225,6 +224,7 @@ class EmailPanel extends Component {
         this.props.saveEditorState(templateJSON.data);
         this.setState({subjectHtml});
       } else {
+        this.props.setBodyHtml(bodyHtml);
         this.setState({bodyHtml, subjectHtml});
       }
     } else {
@@ -518,7 +518,8 @@ const mapDispatchToProps = (dispatch, props) => {
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
-    turnOnTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_ON'})
+    turnOnTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_ON'}),
+    setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml})
   };
 };
 

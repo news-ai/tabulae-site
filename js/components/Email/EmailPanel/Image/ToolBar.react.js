@@ -1,21 +1,10 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import {grey100, grey400, grey800, blue200, blue400} from 'material-ui/styles/colors';
 import Slider from 'rc-slider';
 
 import alertify from 'alertifyjs';
 import 'rc-slider/assets/index.css';
-
-const SpanButton = props => {
-  return (
-    <span
-    onClick={props.onClick}
-    style={{backgroundColor: props.size === props.scale ? grey100 : 'white'}}
-    className='span-button pointer'>
-    {props.text}
-    </span>);
-};
 
 class ToolBar extends Component {
   constructor(props) {
@@ -26,7 +15,16 @@ class ToolBar extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(state.sliderValue);
+    const setLink = _ => {
+      alertify.prompt(
+      '',
+      'Enter a URL',
+      'http://',
+      (e, url) => props.onImageLinkChange(url),
+      _ => {}
+      );
+    };
+    const unsetLink = _ => props.onImageLinkChange('#');
     return (
       <div
       className='vertical-center'
@@ -48,34 +46,34 @@ class ToolBar extends Component {
           min={0} max={100} step={1}
           style={{width: 70, margin: '0 5px'}}
           onChange={sliderValue => this.setState({sliderValue})}
-          onAfterChange={_ => props.setImageSize(state.sliderValue)}
+          onAfterChange={_ => props.onSizeChange(state.sliderValue)}
           value={state.sliderValue}
           />
           <FontIcon
           color={props.imageLink.length > 1 ? blue400 : grey800}
           hoverColor={props.imageLink.length > 1 ? blue200 : grey400}
-          onClick={props.imageLink ? props.unsetLink : props.setLink}
+          onClick={props.imageLink.length > 1 ? unsetLink : setLink}
           style={{fontSize: '14px', margin: '0 2px'}}
           className='fa fa-link span-button pointer'
           />
           <FontIcon
           color={props.align === 'left' ? blue400 : grey800}
           hoverColor={props.align === 'left' ? blue200 : grey400}
-          onClick={_ => props.setImageAlignment('left')}
+          onClick={_ => props.onImageAlignChange('left')}
           style={{fontSize: '14px'}}
           className='fa fa-align-left span-button pointer'
           />
           <FontIcon
           color={props.align === 'center' ? blue400 : grey800}
           hoverColor={props.align === 'center' ? blue200 : grey400}
-          onClick={_ => props.setImageAlignment('center')}
+          onClick={_ => props.onImageAlignChange('center')}
           style={{fontSize: '14px'}}
           className='fa fa-align-center span-button pointer'
           />
           <FontIcon
           color={props.align === 'right' ? blue400 : grey800}
           hoverColor={props.align === 'right' ? blue200 : grey400}
-          onClick={_ => props.setImageAlignment('right')}
+          onClick={_ => props.onImageAlignChange('right')}
           style={{fontSize: '14px'}}
           className='fa fa-align-right span-button pointer'
           />
@@ -85,31 +83,4 @@ class ToolBar extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  return {
-    // image: state.emailImageReducer[props.src],
-    // size: state.emailImageReducer[props.src].size,
-    // entityKey: state.emailImageReducer[props.src].entityKey,
-    // imageLink: state.emailImageReducer[props.src].imageLink,
-    // align: state.emailImageReducer[props.src].align
-  };
-};
-
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    setImageSize: (size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: props.src}),
-    setLink: _ => {
-      alertify.prompt(
-      '',
-      'Enter a URL',
-      'http://',
-      (e, url) => dispatch({type: 'SET_IMAGE_LINK', imageLink: url, src: props.src}),
-      _ => {}
-      );
-    },
-    unsetLink: _ => dispatch({type: 'UNSET_IMAGE_LINK', src: props.src}),
-    setImageAlignment: align => dispatch({type: 'SET_IMAGE_ALIGN', align, src: props.src}),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ToolBar);
+export default ToolBar
