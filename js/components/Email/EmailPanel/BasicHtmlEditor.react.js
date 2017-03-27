@@ -172,13 +172,6 @@ class BasicHtmlEditor extends React.Component {
               align: 'left'
             });
             this.props.saveImageData(src);
-            // this.props.saveImageEntityKey(src, entityKey);
-            // this.props.setImageSize(src, size);
-            // if (imageLink.length > 0) {
-            //   this.props.setImageLink(src, imageLink);
-            // } else {
-            //   this.props.setImageLink(src, undefined);
-            // }
             return entityKey;
           }
         }
@@ -189,10 +182,6 @@ class BasicHtmlEditor extends React.Component {
         }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
-            if (node.firstChild !== null && node.firstChild.firstChild !== null) {
-              console.log('HEYYY');
-              console.log(node.firstChild.firstChild.nodeName);
-            }
             return {
               type: 'center-align',
               data: {}
@@ -237,26 +226,9 @@ class BasicHtmlEditor extends React.Component {
     };
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
-      // cleanup mismatching raw entityMap and entity values
-      // hack!! until convertToRaw actually converts current entity data in editorState
-      // let entityMap = raw.entityMap;
-      // const keys = Object.keys(entityMap);
-      // keys.map(key => {
-      //   const entity = entityMap[key];
-      //   if (entity.type === 'IMAGE') {
-      //     const imgReducerObj = this.props.emailImageReducer[entity.data.src];
-      //     entityMap[key].data = Object.assign({}, entityMap[key].data, {
-      //       size: `${imgReducerObj.size}%`,
-      //       imageLink: imgReducerObj.imageLink || '#',
-      //       align: imgReducerObj.align || 'left',
-      //     });
-      //   }
-      // });
-      // raw.entityMap = entityMap;
-      // end hack
       let html = draftRawToHtml(raw);
-      console.log(raw);
-      console.log(html);
+      // console.log(raw);
+      // console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -286,7 +258,7 @@ class BasicHtmlEditor extends React.Component {
       let newContent;
       let editorState;
       if (nextProps.savedBodyHtml) {
-        console.log(nextProps.savedBodyHtml);
+        // console.log(nextProps.savedBodyHtml);
         const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
         // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
         editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
@@ -297,10 +269,9 @@ class BasicHtmlEditor extends React.Component {
               const entityKey = character.getEntity();
               if (entityKey === null) return false;
               if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-
-                console.log(convertToRaw(editorState.getCurrentContent()));
+                // console.log(convertToRaw(editorState.getCurrentContent()));
                 editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-                console.log(convertToRaw(editorState.getCurrentContent()));
+                // console.log(convertToRaw(editorState.getCurrentContent()));
               }
               return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
             },
@@ -308,6 +279,7 @@ class BasicHtmlEditor extends React.Component {
         });
 
         // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
+        // rebuild contentState with valid blocks
         let truncatedBlocks = [];
         let okayBlock = true; // check if a block is atomic and has image
         let ignoreRest = false;
@@ -834,8 +806,6 @@ const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRende
 const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
-    emailImageReducer: state.emailImageReducer,
-    current: state.emailImageReducer.current,
     templateChanged: state.emailDraftReducer.templateChanged,
     savedEditorState: state.emailDraftReducer.editorState,
     savedBodyHtml: state.emailDraftReducer.bodyHtml
