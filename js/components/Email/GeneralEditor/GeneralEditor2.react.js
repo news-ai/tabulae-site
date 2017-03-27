@@ -1,15 +1,16 @@
-import React, {Component} from 'react';
+// @flow
+import React from 'react';
 import debounce from 'lodash/debounce';
-import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
 import {connect} from 'react-redux';
 import Draft, {
   Editor,
   EditorState,
   ContentState,
+  SelectionState,
   Entity,
   RichUtils,
-  SelectionState,
+  AtomicBlockUtils,
   convertToRaw,
   convertFromRaw,
   CompositeDecorator,
@@ -20,10 +21,13 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {stripATextNodeFromContent, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
+import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
 
-import Dropzone from 'react-dropzone';
+import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
+import Dropzone from 'react-dropzone';
+import {grey800} from 'material-ui/styles/colors';
+import FlatButton from 'material-ui/FlatButton';
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
 import Link from 'components/Email/EmailPanel/components/Link';
@@ -34,15 +38,13 @@ import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyl
 import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
-import Image from 'components/Email/EmailPanel/Image/Image.react';
-import FileWrapper from 'components/Email/EmailPanel/FileWrapper.react';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
+import Immutable from 'immutable';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
-import RaisedButton from 'material-ui/RaisedButton';
 
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
@@ -59,38 +61,14 @@ linkify
 const controlsStyle = {
   height: 40,
   zIndex: 200,
-  overflow: 'hidden',
+  // overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
   backgroundColor: 'white',
 };
 
-const Media = props => {
-  const {block, contentState} = props;
-  const entityKey = block.getEntityAt(0);
-  if (entityKey === null) return null;
-  const entity = contentState.getEntity(entityKey);
-  const {src} = entity.getData();
-  const type = entity.getType();
 
-  let media;
-  if (type === 'IMAGE') {
-    media = <Image diableToolbar src={src}/>;
-  }
-  return media;
-};
-
-function mediaBlockRenderer(block) {
-  if (block.getType() === 'atomic') {
-    return {
-      component: Media,
-      editable: false
-    };
-  }
-  return null;
-}
-
-class GeneralEditor extends Component {
+class GeneralEditor extends React.Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -105,22 +83,23 @@ class GeneralEditor extends Component {
     ]);
 
     this.ENTITY_CONTROLS = [
-      {label: 'Manage Link', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
+      {label: 'Hyperlink', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
     ];
 
     this.EXTERNAL_CONTROLS = [
       // {
-      //   label: 'File Upload',
-      //   onToggle: _ => this.setState({filePanelOpen: true}),
+      //   label: 'Attachments',
+      //   onToggle: this.props.onAttachmentPanelOpen,
       //   icon: 'fa fa-paperclip',
       //   isActive: _ => this.props.files.length > 0,
+      //   tooltip: 'Attach File'
       // },
-      // {
-      //   label: 'Image Upload',
-      //   onToggle: _ => this.setState({imagePanelOpen: true}),
-      //   icon: 'fa fa-camera',
-      //   isActive: _ => false
-      // }
+      {
+        label: 'Image Upload',
+        onToggle: _ => this.setState({imagePanelOpen: true}),
+        icon: 'fa fa-camera',
+        isActive: _ => false,
+      }
     ];
 
     this.CONVERT_CONFIGS = {
@@ -145,27 +124,19 @@ class GeneralEditor extends Component {
             const src = imgNode.src;
             const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
             const imageLink = node.href;
-            const imgReducerObj = this.props.emailImageReducer[src];
-            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src,
+            const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
               size: `${size}%`,
               imageLink: imageLink || '#',
-              align: imgReducerObj.align
+              align: 'left'
             });
             this.props.saveImageData(src);
-            this.props.saveImageEntityKey(src, entityKey);
-            this.props.setImageSize(src, size);
-            if (imageLink.length > 0) {
-              this.props.setImageLink(src, imageLink);
-            } else {
-              this.props.setImageLink(src, undefined);
-            }
             return entityKey;
           }
         }
       },
       htmlToBlock: (nodeName, node) => {
         if (nodeName === 'figure') {
-          return 'atomic';
+          return;
         }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
@@ -189,34 +160,33 @@ class GeneralEditor extends Component {
     };
 
     this.state = {
-      editorState: EditorState.createEmpty(decorator),
-      bodyHtml: this.props.bodyHtml || null,
+      editorState: this.props.rawBodyContentState ?
+      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), decorator) :
+      EditorState.createEmpty(decorator),
+      variableMenuOpen: false,
+      variableMenuAnchorEl: null,
+      isStyleBlockOpen: true,
+      styleBlockAnchorEl: null,
+      filePanelOpen: false,
+      imagePanelOpen: false,
       imageLink: ''
     };
 
     this.focus = () => this.refs.editor.focus();
     this.onChange = this._onChange.bind(this);
+    this.handleTouchTap = (event) => {
+      event.preventDefault();
+      this.setState({
+        variableMenuOpen: true,
+        variableMenuAnchorEl: event.currentTarget,
+      });
+    };
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
-      // cleanup mismatching raw entityMap and entity values
-      // hack!! until convertToRaw actually converts current entity data in editorState
-      let entityMap = raw.entityMap;
-      const keys = Object.keys(entityMap);
-      keys.map(key => {
-        const entity = entityMap[key];
-        if (entity.type === 'IMAGE') {
-          const imgReducerObj = this.props.emailImageReducer[entity.data.src];
-          entityMap[key].data = Object.assign({}, entityMap[key].data, {
-            size: `${imgReducerObj.size}%`,
-            imageLink: imgReducerObj.imageLink || '#',
-            align: imgReducerObj.align || 'left',
-          });
-        }
-      });
-      raw.entityMap = entityMap;
-      // end hack
       let html = draftRawToHtml(raw);
-      this.props.onBodyChange(html);
+      // console.log(raw);
+      // console.log(html);
+      this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
     this.insertText = this._insertText.bind(this);
@@ -230,51 +200,22 @@ class GeneralEditor extends Component {
     this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
+    this.handleImage = this._handleImage.bind(this);
+    this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
+    this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
+    this.getEditorState = () => this.state.editorState;
   }
 
-  componentDidMount() {
-    if (!isEmpty(this.props.bodyHtml)) {
-      const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml);
-      const newContent = stripATextNodeFromContent(configuredContent);
-      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-      this.onChange(editorState);
-    }
-  }
+  _onChange(editorState, onChangeType) {
+    let newEditorState = editorState;
+    this.setState({editorState: newEditorState});
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.bodyHtml !== this.state.bodyHtml) {
-      console.log('change template');
-      const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      const newContent = stripATextNodeFromContent(configuredContent);
-      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-      this.onChange(editorState);
-      this.setState({bodyHtml: nextProps.bodyHtml});
-    }
-
-    if (!this.props.updated && nextProps.updated) {
-      const emailImageObject = nextProps.emailImageReducer[nextProps.current];
-      const entityKey = emailImageObject.entityKey;
-      Entity.replaceData(entityKey, {
-        src: nextProps.current,
-        size: `${emailImageObject.size}%`,
-        imageLink: emailImageObject.imageLink || '#'
-      });
-      this.props.onImageUpdated();
-      this.emitHTML(this.state.editorState);
-    }
-  }
-  componentWillUnmount() {
-    this.props.clearAttachments();
-  }
-
-  _onChange(editorState) {
     let previousContent = this.state.editorState.getCurrentContent();
-    this.setState({editorState});
 
     // only emit html when content changes
-    if (previousContent !== editorState.getCurrentContent()) {
+    if (previousContent !== newEditorState.getCurrentContent() || onChangeType === 'force-emit-html') {
       this.emitHTML(editorState);
     }
   }
@@ -364,6 +305,13 @@ class GeneralEditor extends Component {
     this.onChange(newEditorState);
   }
 
+  _handleReturn(e) {
+    if (e.key === 'Enter') {
+      return this.linkifyLastWord('\n');
+    }
+    return 'not-handled';
+  }
+
   _handleKeyCommand(command) {
     const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -372,14 +320,6 @@ class GeneralEditor extends Component {
       return true;
     }
     return false;
-  }
-
-  _handleReturn(e) {
-    if (e.metaKey === true) {
-      return this._addLineBreak();
-    } else {
-      return 'not-handled';
-    }
   }
 
   _toggleBlockType(blockType) {
@@ -398,22 +338,6 @@ class GeneralEditor extends Component {
         inlineStyle
       )
     );
-  }
-
-  _addLineBreak(/* e */) {
-    let newContent, newEditorState;
-    const {editorState} = this.state;
-    const content = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const block = content.getBlockForKey(selection.getStartKey());
-    // console.log(content.toJS(), selection.toJS(), block.toJS());
-    if (block.type === 'code-block') {
-      newContent = Modifier.insertText(content, selection, '\n');
-      newEditorState = EditorState.push(editorState, newContent, 'add-new-line');
-      this.onChange(newEditorState);
-      return 'handled';
-    }
-    return 'not-handled';
   }
 
   _manageLink() {
@@ -554,8 +478,56 @@ class GeneralEditor extends Component {
     return true;
   }
 
+  _handleImage(url) {
+    const {editorState} = this.state;
+    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
+    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
+      src: url,
+      size: '100%',
+      imageLink: '#',
+      align: 'left'
+    }).getLastCreatedEntityKey();
+    // this.props.saveImageEntityKey(url, entityKey);
+
+    const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+    return newEditorState;
+  }
+
   _handleDroppedFiles(selection, files) {
-    alertify.warning('Image operations not available at this point.');
+    files.map(file => {
+      if (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg') {
+        if (file.size <= 5000000) {
+          this.props.uploadImage(file)
+          .then(url => {
+            const newEditorState = this.handleImage(url);
+            this.onChange(newEditorState, 'force-emit-html');
+          });
+        } else {
+          alertify.warning(`Image size cannot exceed 5MB. The image dropped was ${(file.size / 1000000).toFixed(2)}MB`);
+        }
+      } else {
+        alertify.warning(`Image type must be PNG or JPEG. The file dropped was ${file.type}.`);
+      }
+    });
+  }
+
+  _onImageUploadClicked(acceptedFiles, rejectedFiles) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    this.handleDroppedFiles(selection, acceptedFiles);
+  }
+
+  _onOnlineImageUpload() {
+    const props = this.props;
+    const state = this.state;
+    if (isURL(state.imageLink)) {
+      props.saveImageData(state.imageLink);
+      setTimeout(_ => {
+        const newEditorState = this.handleImage(state.imageLink);
+        this.onChange(newEditorState);
+        this.setState({imageLink: ''});
+      }, 50);
+    }
   }
 
   render() {
@@ -572,22 +544,52 @@ class GeneralEditor extends Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-
     return (
       <div>
+        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
+        autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
+          <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
+          <div className='horizontal-center'>OR</div>
+          <div className='vertical-center horizontal-center' style={{margin: '15px 0'}}>
+            <div>
+              <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
+              {({onValueChange, errorMessage}) => (
+                <TextField
+                errorText={errorMessage}
+                hintText='Image link here'
+                floatingLabelText='Image link here'
+                value={state.imageLink}
+                onChange={e => {
+                  // for validation
+                  onValueChange(e.target.value);
+                  // for updating value
+                  this.setState({imageLink: e.target.value});
+                }}
+                />)}
+              </ValidationHOC>
+              <RaisedButton style={{margin: 5}} label='Submit' onClick={this.onOnlineImageUpload}/>
+            </div>
+          </div>
+          <div className='horizontal-center'>OR</div>
+          <div className='vertical-center horizontal-center' style={{margin: '10px 0'}}>
+            <RaisedButton label='Upload from File' onClick={_ => this.imgDropzone.open()}/>
+          </div>
+        </Dialog>
+        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
         <Subject
+        width={props.width}
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
-        width={props.width}
+        fieldsmap={props.fieldsmap}
         />
         <div style={{
-          height: 480,
+          height: 460,
           overflowY: 'scroll',
         }}>
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer}
+            blockRendererFn={mediaBlockRenderer({getEditorState: this.getEditorState, onChange: this.onChange})}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
@@ -634,20 +636,18 @@ class GeneralEditor extends Component {
           onToggle={this.toggleBlockType}
           />
         </Paper>
-      </div>
+    </div>
     );
   }
 }
+
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
 const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
-    emailImageReducer: state.emailImageReducer,
-    updated: state.emailImageReducer.updated,
-    current: state.emailImageReducer.current,
-    person: state.personReducer.person
+    templateChanged: state.emailDraftReducer.templateChanged,
   };
 };
 
@@ -657,11 +657,9 @@ const mapDispatchToProps = (dispatch, props) => {
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
     uploadImage: file => dispatch(imgActions.uploadImage(file)),
     saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
-    saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
-    setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
-    setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
-    setImageAlignment: (src, align) => dispatch({type: 'SET_IMAGE_ALIGN', align, src: src}),
-    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'})
+    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
+    turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'}),
+    clearCacheBodyHtml: _ => dispatch({type: 'CLEAR_CACHE_BODYHTML'})
   };
 };
 

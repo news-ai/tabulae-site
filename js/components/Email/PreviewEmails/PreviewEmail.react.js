@@ -1,39 +1,61 @@
 import React, {Component, PropTypes} from 'react';
 import StaticEmailContent from './StaticEmailContent.react';
 import RaisedButton from 'material-ui/RaisedButton';
-import GeneralEditor from '../GeneralEditor/GeneralEditor.react';
+import GeneralEditor from '../GeneralEditor/GeneralEditor2.react';
 import {connect} from 'react-redux';
+import {grey800} from 'material-ui/styles/colors';
 import * as stagingActions from '../actions';
+import FontIcon from 'material-ui/FontIcon';
 
 const styles = {
   contentBox: {
     border: '1px dotted lightgray',
     margin: '10px',
     padding: '5px',
-    position: 'relative'
+    position: 'relative',
+    overflowWrap: 'break-word'
   },
   bounced: {
     color: 'red'
   }
 };
 
+const emailPanelPauseOverlay = {
+  backgroundColor: grey800,
+  zIndex: 300,
+  position: 'absolute',
+  opacity: 0.7,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const PauseOverlay = ({message}: {message: string}) => (
+  <div style={Object.assign({}, styles.contentBox, emailPanelPauseOverlay)}>
+    <div style={{margin: 0}}>
+    <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
+  </div>);
 
 class PreviewEmail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       bodyHtml: props.body,
+      rawBodyContentState: undefined,
       subjectHtml: props.subject,
       onEditMode: false
     };
-    this.updateBodyHtml = html => this.setState({body: html});
+    this.updateBodyHtml = (html, raw) => {
+      // console.log(html);
+      this.setState({body: html, rawBodyContentState: raw});
+    };
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({subject});
     };
     this.toggleEditMode = _ => this.setState({onEditMode: true});
     this.onSave = this._onSave.bind(this);
-    this.onCancel = _ => this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false})
+    this.onCancel = _ => this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false, rawBodyContentState: props.savedContentState});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -66,13 +88,22 @@ class PreviewEmail extends Component {
     return (
       <div style={styles.contentBox}>
         <div style={{position: 'absolute', right: 10, top: 10}}>
-          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={_ => {
+          <RaisedButton
+          label={state.onEditMode ? 'Save' : 'Edit'}
+          onClick={_ => {
             if (state.onEditMode) {
               props.turnOffDraft();
               this.onSave();
             } else {
-              props.turnOnDraft();
-              this.toggleEditMode();
+              if (!state.rawBodyContentState) {
+                this.setState({rawBodyContentState: props.savedContentState}, _ => {
+                  props.turnOnDraft();
+                  this.toggleEditMode();
+                });
+              } else {
+                props.turnOnDraft();
+                this.toggleEditMode();
+              }
             }
           }}/>
         {state.onEditMode &&
@@ -82,14 +113,18 @@ class PreviewEmail extends Component {
           }}/>}
         </div>
         {state.onEditMode ?
-          <GeneralEditor
-          width={600}
-          bodyHtml={state.bodyHtml}
-          subjectHtml={state.subjectHtml}
-          onBodyChange={html => this.updateBodyHtml(html) }
-          onSubjectChange={this.onSubjectChange}
-          debounce={500}
-          /> :
+          <div>
+            {props.isImageReceiving && <PauseOverlay message='Image is Loading...'/>}
+            <GeneralEditor
+            width={600}
+            onEditMode={state.onEditMode}
+            rawBodyContentState={state.rawBodyContentState}
+            subjectHtml={state.subjectHtml}
+            onBodyChange={this.updateBodyHtml}
+            onSubjectChange={this.onSubjectChange}
+            debounce={500}
+            />
+          </div> :
           <StaticEmailContent {...props} />}
         {!state.onEditMode && <div style={{margin: '10px 0'}}>
           <RaisedButton onClick={props.onSendEmailClick} labelStyle={{textTransform: 'none'}} label={props.sendLater ? 'Schedule' : 'Send'} />
@@ -117,12 +152,15 @@ const mapStateToProps = (state, props) => {
   return {
     email: state.stagingReducer[props.emailId],
     person: state.personReducer.person,
+    savedContentState: state.emailDraftReducer.editorState,
+    isImageReceiving: state.emailImageReducer.isReceiving,
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchEmail: emailBody => dispatch(stagingActions.patchEmail(props.id, emailBody))
+    patchEmail: emailBody => dispatch(stagingActions.patchEmail(props.id, emailBody)),
+
   };
 };
 

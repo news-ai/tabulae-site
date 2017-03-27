@@ -17,11 +17,11 @@ import Draft, {
   CompositeDecorator,
   Modifier,
 } from 'draft-js';
-import draftRawToHtml from './utils/draftRawToHtml';
+import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from './utils/typeConstants';
+import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {stripATextNodeFromContent, mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
 
 import Menu from 'material-ui/Menu';
@@ -35,15 +35,16 @@ import {blue700, grey700, grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 
-import Subject from './Subject.react';
-import Link from './components/Link';
-import CurlySpan from './components/CurlySpan.react';
-import EntityControls from './components/EntityControls';
-import InlineStyleControls from './components/InlineStyleControls';
-import BlockStyleControls from './components/BlockStyleControls';
-import FontSizeControls from './components/FontSizeControls';
-import ExternalControls from './components/ExternalControls';
-import PositionStyleControls from './components/PositionStyleControls';
+
+import Subject from 'components/Email/EmailPanel/Subject.react';
+import Link from 'components/Email/EmailPanel/components/Link';
+import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.react';
+import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
+import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
+import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyleControls';
+import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
+import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
+import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Immutable from 'immutable';
@@ -52,7 +53,7 @@ import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
 
-import {curlyStrategy, findEntities} from './utils/strategies';
+import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
@@ -164,24 +165,21 @@ class BasicHtmlEditor extends React.Component {
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
-            const size = parseFloat(imgNode.style['max-height']) / 100;
+            const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
             const imageLink = node.href;
-            const entityKey = Entity.create('IMAGE', 'IMMUTABLE', {src, size: imgNode.style['max-height'], imageLink: imageLink || '#'});
+            const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
+              size: `${size}%`,
+              imageLink: imageLink || '#',
+              align: 'left'
+            });
             this.props.saveImageData(src);
-            this.props.saveImageEntityKey(src, entityKey);
-            this.props.setImageSize(src, size);
-            if (imageLink.length > 0) {
-              this.props.setImageLink(src, imageLink);
-            } else {
-              this.props.setImageLink(src, undefined);
-            }
             return entityKey;
           }
         }
       },
       htmlToBlock: (nodeName, node) => {
         if (nodeName === 'figure') {
-          return 'atomic';
+          return;
         }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
@@ -229,25 +227,10 @@ class BasicHtmlEditor extends React.Component {
     };
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
-      // cleanup mismatching raw entityMap and entity values
-      // hack!! until convertToRaw actually converts current entity data in editorState
-      let entityMap = raw.entityMap;
-      const keys = Object.keys(entityMap);
-      keys.map(key => {
-        const entity = entityMap[key];
-        if (entity.type === 'IMAGE') {
-          const imgReducerObj = this.props.emailImageReducer[entity.data.src];
-          entityMap[key].data = Object.assign({}, entityMap[key].data, {
-            size: `${~~(imgReducerObj.size * 100)}%`,
-            imageLink: imgReducerObj.imageLink || '#'
-          });
-        }
-      });
-      raw.entityMap = entityMap;
-      // end hack
       let html = draftRawToHtml(raw);
+      // console.log(raw);
       // console.log(html);
-      this.props.onBodyChange(html);
+      this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
     this.insertText = this._insertText.bind(this);
@@ -266,51 +249,88 @@ class BasicHtmlEditor extends React.Component {
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
+    this.getEditorState = () => this.state.editorState;
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.bodyHtml !== this.state.bodyHtml) {
+    if (!this.props.templateChanged && nextProps.templateChanged) {
       console.log('change template');
-      const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-      const newContent = stripATextNodeFromContent(configuredContent);
-      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+      this.props.turnOffTemplateChange();
+      let newContent;
+      let editorState;
+      if (nextProps.savedBodyHtml) {
+        // console.log(nextProps.savedBodyHtml);
+        const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
+        // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
+        editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+        // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
+        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+          block.findEntityRanges(
+            (character) => {
+              const entityKey = character.getEntity();
+              if (entityKey === null) return false;
+              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+                // console.log(convertToRaw(editorState.getCurrentContent()));
+                editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+                // console.log(convertToRaw(editorState.getCurrentContent()));
+              }
+              return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
+            },
+            (start, end) => {});
+        });
+
+        // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
+        // rebuild contentState with valid blocks
+        let truncatedBlocks = [];
+        let okayBlock = true; // check if a block is atomic and has image
+        let ignoreRest = false;
+        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+          ignoreRest = false;
+          block.findEntityRanges(
+            (character) => {
+              const entityKey = character.getEntity();
+              if (ignoreRest || entityKey === null) {
+                return false;
+              }
+              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+                if (block.getType() !== 'atomic') {
+                  okayBlock = false;
+                  ignoreRest = true;
+                }
+              }
+            },
+            (state, end) => {});
+          if (okayBlock) truncatedBlocks.push(block);
+        });
+        const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+        editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
+
+        this.setState({bodyHtml: nextProps.bodyHtml});
+
+        this.props.clearCacheBodyHtml();
+      } else {
+        newContent = convertFromRaw(nextProps.savedEditorState);
+        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+      }
       this.onChange(editorState);
-      this.setState({bodyHtml: nextProps.bodyHtml});
     }
 
-    if (!this.props.updated && nextProps.updated) {
-      const emailImageObject = nextProps.emailImageReducer[nextProps.current];
-      const entityKey = emailImageObject.entityKey;
-      const newContentState = this.state.editorState.getCurrentContent()
-      .mergeEntityData(entityKey, {
-        src: nextProps.current,
-        size: `${~~(emailImageObject.size * 100)}%`,
-        imageLink: emailImageObject.imageLink || '#'
-      });
-      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'apply-entity');
-      this.props.onImageUpdated();
-      this.onChange(newEditorState, _ => {
-        // force emitHTML because immutable doesn't detect entity data updates
-        setTimeout(_ => this.emitHTML(this.state.editorState), 50);
-      });
-    }
   }
 
   componentWillUnmount() {
     this.props.clearAttachments();
   }
 
-  _onChange(editorState, callback) {
+  _onChange(editorState, onChangeType) {
     let newEditorState = editorState;
+    this.setState({editorState: newEditorState});
 
     let previousContent = this.state.editorState.getCurrentContent();
 
     // only emit html when content changes
-    if (previousContent !== newEditorState.getCurrentContent()) {
+    if (previousContent !== newEditorState.getCurrentContent() || onChangeType === 'force-emit-html') {
       this.emitHTML(editorState);
     }
-
-    this.setState({editorState: newEditorState}, callback);
   }
 
   _linkifyLastWord(insertChar = '') {
@@ -574,12 +594,13 @@ class BasicHtmlEditor extends React.Component {
   _handleImage(url) {
     const {editorState} = this.state;
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
-    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'IMMUTABLE', {
+    const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
       src: url,
-      size: `${~~(this.props.emailImageReducer[url].size * 100)}%`,
-      imageLink: '#'
+      size: '100%',
+      imageLink: '#',
+      align: 'left'
     }).getLastCreatedEntityKey();
-    this.props.saveImageEntityKey(url, entityKey);
+    // this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -636,6 +657,7 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -698,7 +720,7 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer}
+            blockRendererFn={mediaBlockRenderer({getEditorState: this.getEditorState, onChange: this.onChange})}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
@@ -785,9 +807,9 @@ const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRende
 const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
-    emailImageReducer: state.emailImageReducer,
-    updated: state.emailImageReducer.updated,
-    current: state.emailImageReducer.current
+    templateChanged: state.emailDraftReducer.templateChanged,
+    savedEditorState: state.emailDraftReducer.editorState,
+    savedBodyHtml: state.emailDraftReducer.bodyHtml
   };
 };
 
@@ -797,11 +819,9 @@ const mapDispatchToProps = (dispatch, props) => {
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
     uploadImage: file => dispatch(imgActions.uploadImage(file)),
     saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
-    saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
-    setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
-    setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
-    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'}),
-    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'})
+    onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
+    turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'}),
+    clearCacheBodyHtml: _ => dispatch({type: 'CLEAR_CACHE_BODYHTML'})
   };
 };
 

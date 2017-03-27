@@ -4,6 +4,7 @@ import Immutable from 'immutable';
 import {
   convertToRaw,
   convertFromRaw,
+  EditorState
 } from 'draft-js';
 
 // draft-convert has a bug that uses 'a' as anchor textNode for atomic block
@@ -20,26 +21,69 @@ export function stripATextNodeFromContent(content) {
 
 const Media = props => {
   const {block, contentState} = props;
+  // console.log(convertToRaw(contentState));
+  // console.log(block.getEntityAt(0));
   const entity = contentState.getEntity(block.getEntityAt(0));
-  const {src} = entity.getData();
+  // console.log(entity.getData());
   const type = entity.getType();
 
   let media;
   if (type === 'IMAGE') {
-    media = <Image src={src}/>;
+    // const realEntity = props.blockProps.getEditorState().getCurrentContent().getEntity(block.getEntityAt(0));
+    const {src, align, imageLink, size} = entity.getData();
+    media = (
+      <Image
+      align={align}
+      imageLink={imageLink}
+      size={size}
+      src={src}
+      onSizeChange={newSize => {
+        const editorState = props.blockProps.getEditorState();
+        const newContent = editorState.getCurrentContent()
+        .mergeEntityData(block.getEntityAt(0), {size: `${newSize}%`});
+
+        const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
+        const selection = newEditorState.getSelection();
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
+      }}
+      onImageLinkChange={imageLink => {
+        const editorState = props.blockProps.getEditorState();
+        const newContent = editorState.getCurrentContent()
+        .mergeEntityData(block.getEntityAt(0), {imageLink});
+
+        const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
+        const selection = newEditorState.getSelection();
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
+      }}
+      onImageAlignChange={align => {
+        const editorState = props.blockProps.getEditorState();
+        const newContent = editorState.getCurrentContent()
+        .mergeEntityData(block.getEntityAt(0), {align});
+
+        const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
+        const selection = newEditorState.getSelection();
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
+      }}
+      />);
   }
   return media;
 };
 
-export function mediaBlockRenderer(block) {
+export const mediaBlockRenderer = ({getEditorState, onChange}) => (block) => {
+  // const editorState = getEditorState();
+  // console.log(editorState);
   if (block.getType() === 'atomic') {
     return {
       component: Media,
-      editable: false
+      editable: false,
+      props: {
+        getEditorState,
+        onChange
+      }
     };
   }
   return null;
-}
+};
 
 export function getBlockStyle(block) {
   switch (block.getType()) {

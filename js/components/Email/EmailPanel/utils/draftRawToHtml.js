@@ -10,10 +10,11 @@ let blockTagMap = {
   'ordered-list-item':        ['<li>','</li>\n'],
   'unordered-list-item':      ['<li>','</li>\n'],
   'atomic':                   ['<figure>','</figure>\n'],
+  // 'atomic':              ['<figure style="text-align:center">','</figure>\n'],
   'center-align':             ['<div style="text-align:center">','</div>\n'],
   'left-align':               ['<div>','</div>\n'],
   'right-align':              ['<div style="text-align:right">','</div>\n'],
-  'justify-align':              ['<div style="text-align:justify">','</div>\n'],
+  'justify-align':            ['<div style="text-align:justify">','</div>\n'],
   'default':                  ['<p>','</p>\n']
 };
 
@@ -49,7 +50,13 @@ let inlineTagMap = {
 
 let entityTagMap = {
   'LINK': ['<a href="<%= url %>" target="_blank">', '</a>'],
-  'IMAGE': ['<a href="<%= imageLink %>" target="_blank"><img src="<%= src %>" style="max-height:<%= size %>;max-width:<%= size %>;">', '</img></a>'],
+  'IMAGE': [
+    `<div style="text-align:<%= align %>">
+      <a href="<%= imageLink %>" target="_blank">
+        <img src="<%= src %>" style="max-height:<%= size %>;max-width:<%= size %>;">`,
+        `</img>
+      </a>
+    </div>`],
 };
 
 let nestedTagMap = {

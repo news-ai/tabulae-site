@@ -34,6 +34,7 @@ import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
+import isJSON from 'validator/lib/isJSON';
 
 import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 
@@ -144,16 +145,20 @@ class EmailPanel extends Component {
     super(props);
     this.state = {
       subject: '',
-      bodyEditorState: null,
       fieldsmap: [],
       currentTemplateId: 0,
+      bodyEditorState: null,
       bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : '',
       body: this.props.emailsignature !== null ? this.props.emailsignature : '',
       subjectHtml: null,
       minimized: false,
+      isPreveiwOpen: false
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
-    this.updateBodyHtml = html => this.setState({body: html});
+    this.updateBodyHtml = (html, editorState) => {
+      this.setState({body: html, bodyEditorState: editorState});
+      this.props.saveEditorState(editorState);
+    };
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this.onSubjectChange = (editorState) => {
@@ -163,6 +168,7 @@ class EmailPanel extends Component {
     this.getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this.sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
+    this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
     this.onClose = this._onClose.bind(this);
   }
@@ -188,16 +194,45 @@ class EmailPanel extends Component {
     .then(_ => this._handleTemplateValueChange(null, null, 0));
   }
 
+  _onSaveNewTemplateClick() {
+    alertify.prompt('', 'Name of new Email Template', '',
+      (e, name) => {
+        this.props.createTemplate(
+          name,
+          this.state.subject,
+          JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
+          ).then(currentTemplateId => this.setState({currentTemplateId}));
+      },
+      _ => console.log('template saving cancelled'));
+  }
+
+  _onSaveCurrentTemplateClick() {
+    this.props.onSaveCurrentTemplateClick(
+      this.state.currentTemplateId,
+      this.state.subject,
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
+      );
+  }
+
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
       const template = find(this.props.templates, tmp => value === tmp.id);
-      const bodyHtml = template.body;
       const subjectHtml = template.subject;
-      this.setState({bodyHtml, subjectHtml});
+      const bodyHtml = template.body;
+      if (isJSON(template.body)) {
+        const templateJSON = JSON.parse(template.body);
+        this.setState({bodyEditorState: templateJSON.data});
+        this.props.saveEditorState(templateJSON.data);
+        this.setState({subjectHtml});
+      } else {
+        this.props.setBodyHtml(bodyHtml);
+        this.setState({bodyHtml, subjectHtml});
+      }
     } else {
       this.setState({bodyHtml: '', subjectHtml: ''});
     }
     this.setState({currentTemplateId: value});
+    this.props.turnOnTemplateChange();
   }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
@@ -286,14 +321,6 @@ class EmailPanel extends Component {
     }
   }
 
-  _onSaveNewTemplateClick() {
-    const state:any = this.state;
-    alertify.prompt('', 'Name of new Email Template', '',
-      (e, name) => this.props.createTemplate(name, state.subject, state.body)
-        .then(currentTemplateId => this.setState({currentTemplateId})),
-      _ => console.log('template saving cancelled'));
-  }
-
   _onClose() {
     const state:any = this.state;
     if (state.body || state.subject) {
@@ -327,7 +354,7 @@ class EmailPanel extends Component {
           <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
         </ReactTooltip>
         <div style={styles.emailPanelPosition}>
-        {props.isImageReceiving &&
+        {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.'/>}
         {state.minimized &&
           <MinimizedView toggleMinimize={this.toggleMinimize}/>}
@@ -357,7 +384,7 @@ class EmailPanel extends Component {
               width={styles.emailPanel.width}
               bodyHtml={state.bodyHtml}
               subjectHtml={state.subjectHtml}
-              onBodyChange={html => this.updateBodyHtml(html) }
+              onBodyChange={this.updateBodyHtml}
               onSubjectChange={this.onSubjectChange}
               debounce={500}
               person={props.person}
@@ -378,7 +405,7 @@ class EmailPanel extends Component {
                   >
                     <MenuItem
                     disabled={state.currentTemplateId ? false : true}
-                    onClick={_ => props.onSaveCurrentTemplateClick(state.currentTemplateId, state.subject, state.body)}
+                    onClick={this.onSaveCurrentTemplateClick}
                     primaryText='Save Text to Existing Template'
                     />
                     <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
@@ -435,6 +462,8 @@ class EmailPanel extends Component {
           overlayStyles={skylightStyles.overlay}
           dialogStyles={skylightStyles.dialog}
           hideOnOverlayClicked
+          afterOpen={_ => this.setState({isPreveiwOpen: true})}
+          afterClose={_ => this.setState({isPreveiwOpen: false})}
           ref='preview'
           title='Preview'>
             <PreviewEmails
@@ -491,6 +520,9 @@ const mapDispatchToProps = (dispatch, props) => {
     initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email: props.person.email}),
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
+    saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
+    turnOnTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_ON'}),
+    setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml})
   };
 };
 
