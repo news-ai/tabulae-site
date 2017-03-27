@@ -159,7 +159,6 @@ class GeneralEditor extends React.Component {
         }
       },
     };
-    console.log(this.props);
 
     this.state = {
       editorState: this.props.rawBodyContentState ?
@@ -209,19 +208,6 @@ class GeneralEditor extends React.Component {
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
   }
-
-  // componentWillReceiveProps(nextProps) {
-  //   console.log(nextProps);
-  //   console.log(this.props);
-  //   if (!this.props.onEditMode && nextProps.onEditMode) {
-  //     let newContent;
-  //     let editorState;
-  //     console.log(nextProps.rawBodyContentState);
-  //     newContent = convertFromRaw(nextProps.rawBodyContentState);
-  //     editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-  //     this.onChange(editorState, 'force-emit-html');
-  //   }
-  // }
 
   _onChange(editorState, onChangeType) {
     let newEditorState = editorState;
