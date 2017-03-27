@@ -184,11 +184,15 @@ class BasicHtmlEditor extends React.Component {
         }
       },
       htmlToBlock: (nodeName, node) => {
-        // if (nodeName === 'figure') {
-        //   return 'atomic';
-        // }
+        if (nodeName === 'figure') {
+          return;
+        }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
+            if (node.firstChild !== null && node.firstChild.firstChild !== null) {
+              console.log('HEYYY');
+              console.log(node.firstChild.firstChild.nodeName);
+            }
             return {
               type: 'center-align',
               data: {}
@@ -251,6 +255,7 @@ class BasicHtmlEditor extends React.Component {
       // raw.entityMap = entityMap;
       // end hack
       let html = draftRawToHtml(raw);
+      console.log(raw);
       console.log(html);
       this.props.onBodyChange(html, raw);
     }
@@ -281,31 +286,58 @@ class BasicHtmlEditor extends React.Component {
       let newContent;
       let editorState;
       if (nextProps.savedBodyHtml) {
+        console.log(nextProps.savedBodyHtml);
         const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
-        console.log(convertToRaw(configuredContent));
-        // newContent = stripATextNodeFromContent(configuredContent);
         // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
         editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
-        console.log(convertToRaw(editorState.getCurrentContent()));
+        // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
         editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
           block.findEntityRanges(
             (character) => {
-              console.log(character.getEntity());
               const entityKey = character.getEntity();
               if (entityKey === null) return false;
               if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+
+                console.log(convertToRaw(editorState.getCurrentContent()));
                 editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+                console.log(convertToRaw(editorState.getCurrentContent()));
               }
               return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
             },
             (start, end) => {
-              console.log('--');
-              console.log(start);
-              console.log(end);
+              // callback stuff here
             });
         });
-        console.log(convertToRaw(editorState.getCurrentContent()));
+
+        // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
+        let truncatedBlocks = [];
+        let okayBlock = true; // check if a block is atomic and has image
+        let ignoreRest = false;
+        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+          ignoreRest = false;
+          block.findEntityRanges(
+            (character) => {
+              const entityKey = character.getEntity();
+              if (ignoreRest || entityKey === null) {
+                return false;
+              }
+              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+                if (block.getType() !== 'atomic') {
+                  okayBlock = false;
+                  ignoreRest = true;
+                }
+              }
+            },
+            (state, end) => {
+
+            });
+          if (okayBlock) truncatedBlocks.push(block);
+        });
+        const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+        editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
+
         this.setState({bodyHtml: nextProps.bodyHtml});
+
         this.props.clearCacheBodyHtml();
       } else {
         newContent = convertFromRaw(nextProps.savedEditorState);
