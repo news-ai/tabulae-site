@@ -61,7 +61,7 @@ linkify
 const controlsStyle = {
   height: 40,
   zIndex: 200,
-  overflow: 'hidden',
+  // overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
   backgroundColor: 'white',
