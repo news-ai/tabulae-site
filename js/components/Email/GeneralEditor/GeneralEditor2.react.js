@@ -159,12 +159,12 @@ class GeneralEditor extends React.Component {
         }
       },
     };
+    console.log(this.props);
 
     this.state = {
-      editorState: !isEmpty(this.props.bodyHtml) ?
-        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), decorator) :
-        EditorState.createEmpty(decorator),
-      bodyHtml: this.props.bodyHtml || null,
+      editorState: this.props.rawBodyContentState ?
+      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), decorator) :
+      EditorState.createEmpty(decorator),
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
@@ -186,7 +186,7 @@ class GeneralEditor extends React.Component {
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
-      // console.log(raw);
+      console.log(raw);
       // console.log(html);
       this.props.onBodyChange(html, raw);
     }
@@ -210,15 +210,18 @@ class GeneralEditor extends React.Component {
     this.getEditorState = () => this.state.editorState;
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.onEditMode && nextProps.onEditMode) {
-      let newContent;
-      let editorState;
-      newContent = convertFromRaw(nextProps.rawBodyContentState);
-      editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-      this.onChange(editorState);
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   console.log(nextProps);
+  //   console.log(this.props);
+  //   if (!this.props.onEditMode && nextProps.onEditMode) {
+  //     let newContent;
+  //     let editorState;
+  //     console.log(nextProps.rawBodyContentState);
+  //     newContent = convertFromRaw(nextProps.rawBodyContentState);
+  //     editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+  //     this.onChange(editorState, 'force-emit-html');
+  //   }
+  // }
 
   _onChange(editorState, onChangeType) {
     let newEditorState = editorState;
@@ -556,6 +559,7 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    console.log(props);
     // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
     return (
       <div>
@@ -661,8 +665,6 @@ const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
     templateChanged: state.emailDraftReducer.templateChanged,
-    savedEditorState: state.emailDraftReducer.editorState,
-    savedBodyHtml: state.emailDraftReducer.bodyHtml
   };
 };
 

@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import StaticEmailContent from './StaticEmailContent.react';
 import RaisedButton from 'material-ui/RaisedButton';
-import GeneralEditor2 from '../GeneralEditor/GeneralEditor2.react';
+import GeneralEditor from '../GeneralEditor/GeneralEditor2.react';
 import {connect} from 'react-redux';
 import * as stagingActions from '../actions';
 
@@ -23,13 +23,13 @@ class PreviewEmail extends Component {
     super(props);
     this.state = {
       bodyHtml: props.body,
-      rawBodyContentState: null,
+      rawBodyContentState: undefined,
       subjectHtml: props.subject,
       onEditMode: false
     };
     this.updateBodyHtml = (html, raw) => {
-      console.log(html);
-      this.setState({body: html, bodyEditorState: raw});
+      // console.log(html);
+      this.setState({body: html, rawBodyContentState: raw});
     };
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -37,7 +37,7 @@ class PreviewEmail extends Component {
     };
     this.toggleEditMode = _ => this.setState({onEditMode: true});
     this.onSave = this._onSave.bind(this);
-    this.onCancel = _ => this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false})
+    this.onCancel = _ => this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false, rawBodyContentState: props.savedContentState});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,9 +77,15 @@ class PreviewEmail extends Component {
               props.turnOffDraft();
               this.onSave();
             } else {
-              if (state.bodyEditorState === null) this.setState({rawBodyContentState: props.savedContentState});
-              props.turnOnDraft();
-              this.toggleEditMode();
+              if (!state.rawBodyContentState) {
+                this.setState({rawBodyContentState: props.savedContentState}, _ => {
+                  props.turnOnDraft();
+                  this.toggleEditMode();
+                });
+              } else {
+                props.turnOnDraft();
+                this.toggleEditMode();
+              }
             }
           }}/>
         {state.onEditMode &&
@@ -89,11 +95,10 @@ class PreviewEmail extends Component {
           }}/>}
         </div>
         {state.onEditMode ?
-          <GeneralEditor2
+          <GeneralEditor
           width={600}
-          editMode={state.onEditMode}
+          onEditMode={state.onEditMode}
           rawBodyContentState={state.rawBodyContentState}
-          bodyHtml={state.bodyHtml}
           subjectHtml={state.subjectHtml}
           onBodyChange={this.updateBodyHtml}
           onSubjectChange={this.onSubjectChange}
@@ -126,7 +131,7 @@ const mapStateToProps = (state, props) => {
   return {
     email: state.stagingReducer[props.emailId],
     person: state.personReducer.person,
-    savedContentState: state.emailDraftReducer.savedEditorState
+    savedContentState: state.emailDraftReducer.editorState
   };
 };
 
