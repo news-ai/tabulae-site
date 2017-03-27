@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import debounce from 'lodash/debounce';
-import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
 import {connect} from 'react-redux';
 import Draft, {
@@ -28,7 +27,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
 import {grey800} from 'material-ui/styles/colors';
-import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
@@ -68,6 +66,7 @@ const controlsStyle = {
   paddingRight: 10,
   backgroundColor: 'white',
 };
+
 
 class GeneralEditor extends React.Component {
   constructor(props) {
