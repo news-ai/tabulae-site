@@ -12,6 +12,7 @@ import isEmpty from 'lodash/isEmpty';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as contactActions} from 'components/Contacts';
+import {actions as loginActions} from 'components/Login';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -314,7 +315,7 @@ class ListTable extends Component {
       }
       else seen[contact.email] = true;
     });
-   if (Object.keys(dupMap).length > 0) alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them. If not, you can deselect them all by clicking on "Selected" label twice.`);
+    if (Object.keys(dupMap).length > 0) alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them. If not, you can deselect them all by clicking on "Selected" label twice.`);
     this.setState({selected: dupes});
   }
 
