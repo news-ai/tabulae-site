@@ -34,6 +34,7 @@ import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
+import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
 import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
@@ -269,6 +270,30 @@ class EmailPanel extends Component {
   _onPreviewEmailsClick() {
     const {selectedContacts} = this.props;
     const {subject, body} = this.state;
+
+    // check dupes
+    let seen = {};
+    let dupMap = {};
+    let dupes = [];
+    selectedContacts.map(contact => {
+      if (isEmpty(contact.email)) return;
+      if (seen[contact.email]) {
+        dupes.push(contact.id);
+        dupMap[contact.email] = true;
+      }
+      else seen[contact.email] = true;
+    });
+    
+    if (Object.keys(dupMap).length > 0) {
+      let cancelDelivery = false;
+      alertify.confirm('Duplicate Email Warning',
+        `We found email duplicates selected: ${Object.keys(dupMap).join(', ')}. Are you sure you want to continue?`,
+        () => {},
+        () => (cancelDelivery = true)
+        );
+      if (cancelDelivery) return;
+    }
+    
     let validEmailContacts = [];
     let invalidEmailContacts = [];
     selectedContacts.map(contact => {

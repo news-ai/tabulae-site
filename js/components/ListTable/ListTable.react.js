@@ -12,6 +12,7 @@ import isEmpty from 'lodash/isEmpty';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as contactActions} from 'components/Contacts';
+import {actions as loginActions} from 'components/Login';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -314,7 +315,7 @@ class ListTable extends Component {
       }
       else seen[contact.email] = true;
     });
-   if (Object.keys(dupMap).length > 0) alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them. If not, you can deselect them all by clicking on "Selected" label twice.`);
+    if (Object.keys(dupMap).length > 0) alertify.alert('Duplicate Email Warning', `We found email duplicates for ${Object.keys(dupMap).join(', ')}. Every duplicate email is selected if you wish to delete them. If not, you can deselect them all by clicking on "Selected" label twice.`);
     this.setState({selected: dupes});
   }
 
@@ -655,10 +656,18 @@ class ListTable extends Component {
             <p><span style={{fontWeight: 'bold'}}>Table</span> powers <span style={{fontWeight: 'bold'}}>List Feed</span>.</p>
             <p>It comes with default columns that connect social profiles to power different feeds and dynamic graphs.</p>
             <div className='horizontal-center' style={{margin: '10px 0'}}>
-              <RaisedButton primary label='OK' onClick={_ => {
-                this.setState({firsttime: false});
-                hopscotch.startTour(tour);
-              }}/>
+              <div style={{margin: '0 3px'}}>
+                <RaisedButton label='Skip Tour' onClick={_ => {
+                  this.setState({firsttime: false});
+                  props.removeFirstTimeUser();
+                }}/>
+              </div>
+              <div style={{margin: '0 3px'}}>
+                <RaisedButton primary label='Start Tour' onClick={_ => {
+                  this.setState({firsttime: false});
+                  hopscotch.startTour(tour);
+                }}/>
+              </div>
             </div>
           </Dialog>
         }
@@ -989,6 +998,7 @@ const mapDispatchToProps = (dispatch, props) => {
     clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId}),
     deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
     loadAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
+    removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser()),
   };
 };
 
