@@ -115,6 +115,11 @@ class App extends Component {
                   this.setState({firstTimeUser: false});
                 }} />
               </div>
+              <div className='horizontal-center'>
+                <RaisedButton style={{margin: 10}} label='Skip Tour' onClick={_ => {
+                  this.setState({firstTimeUser: false});
+                }} />
+              </div>
             </div>
           </Dialog>
         }

@@ -655,10 +655,18 @@ class ListTable extends Component {
             <p><span style={{fontWeight: 'bold'}}>Table</span> powers <span style={{fontWeight: 'bold'}}>List Feed</span>.</p>
             <p>It comes with default columns that connect social profiles to power different feeds and dynamic graphs.</p>
             <div className='horizontal-center' style={{margin: '10px 0'}}>
-              <RaisedButton primary label='OK' onClick={_ => {
-                this.setState({firsttime: false});
-                hopscotch.startTour(tour);
-              }}/>
+              <div style={{margin: '0 3px'}}>
+                <RaisedButton label='Skip Tour' onClick={_ => {
+                  this.setState({firsttime: false});
+                  props.removeFirstTimeUser();
+                }}/>
+              </div>
+              <div style={{margin: '0 3px'}}>
+                <RaisedButton primary label='Start Tour' onClick={_ => {
+                  this.setState({firsttime: false});
+                  hopscotch.startTour(tour);
+                }}/>
+              </div>
             </div>
           </Dialog>
         }
@@ -989,6 +997,7 @@ const mapDispatchToProps = (dispatch, props) => {
     clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId}),
     deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
     loadAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
+    removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser()),
   };
 };
 
