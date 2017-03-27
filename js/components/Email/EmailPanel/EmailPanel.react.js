@@ -172,6 +172,7 @@ class EmailPanel extends Component {
     this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
     this.onClose = this._onClose.bind(this);
+    this.checkEmailDupes = this._checkEmailDupes.bind(this);
   }
 
   componentWillMount() {
@@ -267,31 +268,41 @@ class EmailPanel extends Component {
     .then(_ => this.refs.preview.show());
   }
 
+  _checkEmailDupes() {
+    return new Promise((resolve, reject) => {
+      const {selectedContacts} = this.props;
+      // check dupes
+      let seen = {};
+      let dupMap = {};
+      let dupes = [];
+      selectedContacts.map(contact => {
+        if (isEmpty(contact.email)) return;
+        if (seen[contact.email]) {
+          dupes.push(contact.id);
+          dupMap[contact.email] = true;
+        }
+        else seen[contact.email] = true;
+      });
+
+      if (Object.keys(dupMap).length > 0) {
+        let cancelDelivery = false;
+        alertify.confirm('Duplicate Email Warning',
+          `We found email duplicates selected: ${Object.keys(dupMap).join(', ')}. Are you sure you want to continue?`,
+          () => resolve(true),
+          () => reject(dupMap));
+      } else {
+        resolve(true);
+      }
+    })
+  }
+
   _onPreviewEmailsClick() {
     const {selectedContacts} = this.props;
     const {subject, body} = this.state;
 
-    // check dupes
-    let seen = {};
-    let dupMap = {};
-    let dupes = [];
-    selectedContacts.map(contact => {
-      if (isEmpty(contact.email)) return;
-      if (seen[contact.email]) {
-        dupes.push(contact.id);
-        dupMap[contact.email] = true;
-      }
-      else seen[contact.email] = true;
-    });
-    
-    if (Object.keys(dupMap).length > 0) {
-      let cancelDelivery = false;
-      alertify.confirm('Duplicate Email Warning',
-        `We found email duplicates selected: ${Object.keys(dupMap).join(', ')}. Are you sure you want to continue?`,
-        () => {},
-        () => (cancelDelivery = true)
-        );
-      if (cancelDelivery) return;
+    if (selectedContacts.length === 0) {
+      alertify.alert(`Contact Selection Error`, `You didn't select any contact to send this email to.`, function() {});
+      return;
     }
     
     let validEmailContacts = [];
@@ -301,12 +312,9 @@ class EmailPanel extends Component {
       else invalidEmailContacts.push(contact);
     });
     const contactEmails = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
-    if (selectedContacts.length === 0) {
-      alertify.alert(`Contact Selection Error`, `You didn't select any contact to send this email to.`, function() {});
-      return;
-    }
     if (invalidEmailContacts.length > 0) {
       alertify.confirm(
+        `Invalid Email Addresses Found`,
         `Found ${invalidEmailContacts.length} email(s) with invalid format: ${invalidEmailContacts.map(contact => contact.email).join(',')}. Would you like to ignore these and continue with valid emails?`,
         () => this.sendGeneratedEmails(contactEmails),
         () => {}
@@ -473,7 +481,13 @@ class EmailPanel extends Component {
                 <div style={{position: 'absolute', right: 20, bottom: 3, zIndex: 300}}>
                   <IconButton
                   iconClassName={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}
-                  onClick={this.onPreviewEmailsClick}
+                  onClick={
+                    _ => this.checkEmailDupes()
+                    .then(
+                      this.onPreviewEmailsClick,
+                      _ => {/* do nothing*/}
+                      )
+                  }
                   tooltip='Preview then Send'
                   tooltipPosition='top-left'
                   iconStyle={{color: 'white'}}
