@@ -152,6 +152,7 @@ class EmailPanel extends Component {
       body: this.props.emailsignature !== null ? this.props.emailsignature : '',
       subjectHtml: null,
       minimized: false,
+      isPreveiwOpen: false
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = (html, editorState) => {
@@ -353,7 +354,7 @@ class EmailPanel extends Component {
           <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
         </ReactTooltip>
         <div style={styles.emailPanelPosition}>
-        {props.isImageReceiving &&
+        {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.'/>}
         {state.minimized &&
           <MinimizedView toggleMinimize={this.toggleMinimize}/>}
@@ -461,6 +462,8 @@ class EmailPanel extends Component {
           overlayStyles={skylightStyles.overlay}
           dialogStyles={skylightStyles.dialog}
           hideOnOverlayClicked
+          afterOpen={_ => this.setState({isPreveiwOpen: true})}
+          afterClose={_ => this.setState({isPreveiwOpen: false})}
           ref='preview'
           title='Preview'>
             <PreviewEmails

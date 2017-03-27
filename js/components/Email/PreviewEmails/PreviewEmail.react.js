@@ -10,13 +10,19 @@ const styles = {
     border: '1px dotted lightgray',
     margin: '10px',
     padding: '5px',
-    position: 'relative'
+    position: 'relative',
+    overflowWrap: 'break-word'
   },
   bounced: {
     color: 'red'
   }
 };
 
+const PauseOverlay = ({message}: {message: string}) => (
+  <div style={Object.assign({}, emailPanelWrapper, emailPanelPauseOverlay)}>
+    <div style={{margin: 0}}>
+    <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
+  </div>);
 
 class PreviewEmail extends Component {
   constructor(props) {
