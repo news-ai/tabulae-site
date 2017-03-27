@@ -138,6 +138,8 @@ export const initialState = {
     isAttachmentPanelOpen: false,
     templateChanged: false
   },
+  emailPreviewDraftReducer: {
+  },
   smtpReducer: {
     isReceiving: false,
     didInvalidate: false

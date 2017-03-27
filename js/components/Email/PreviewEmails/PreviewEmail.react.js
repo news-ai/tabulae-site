@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import StaticEmailContent from './StaticEmailContent.react';
 import RaisedButton from 'material-ui/RaisedButton';
-import GeneralEditor from '../GeneralEditor/GeneralEditor.react';
+import GeneralEditor2 from '../GeneralEditor/GeneralEditor2.react';
 import {connect} from 'react-redux';
 import * as stagingActions from '../actions';
 
@@ -23,12 +23,13 @@ class PreviewEmail extends Component {
     super(props);
     this.state = {
       bodyHtml: props.body,
+      rawBodyContentState: null,
       subjectHtml: props.subject,
       onEditMode: false
     };
-    this.updateBodyHtml = html => {
+    this.updateBodyHtml = (html, raw) => {
       console.log(html);
-      this.setState({body: html});
+      this.setState({body: html, bodyEditorState: raw});
     };
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -69,11 +70,14 @@ class PreviewEmail extends Component {
     return (
       <div style={styles.contentBox}>
         <div style={{position: 'absolute', right: 10, top: 10}}>
-          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={_ => {
+          <RaisedButton
+          label={state.onEditMode ? 'Save' : 'Edit'}
+          onClick={_ => {
             if (state.onEditMode) {
               props.turnOffDraft();
               this.onSave();
             } else {
+              if (state.bodyEditorState === null) this.setState({rawBodyContentState: props.savedContentState});
               props.turnOnDraft();
               this.toggleEditMode();
             }
@@ -85,11 +89,13 @@ class PreviewEmail extends Component {
           }}/>}
         </div>
         {state.onEditMode ?
-          <GeneralEditor
+          <GeneralEditor2
           width={600}
+          editMode={state.onEditMode}
+          rawBodyContentState={state.rawBodyContentState}
           bodyHtml={state.bodyHtml}
           subjectHtml={state.subjectHtml}
-          onBodyChange={html => this.updateBodyHtml(html) }
+          onBodyChange={this.updateBodyHtml}
           onSubjectChange={this.onSubjectChange}
           debounce={500}
           /> :
@@ -120,12 +126,14 @@ const mapStateToProps = (state, props) => {
   return {
     email: state.stagingReducer[props.emailId],
     person: state.personReducer.person,
+    savedContentState: state.emailDraftReducer.savedEditorState
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    patchEmail: emailBody => dispatch(stagingActions.patchEmail(props.id, emailBody))
+    patchEmail: emailBody => dispatch(stagingActions.patchEmail(props.id, emailBody)),
+
   };
 };
 

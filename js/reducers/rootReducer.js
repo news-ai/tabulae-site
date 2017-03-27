@@ -24,6 +24,7 @@ import joyrideReducer from 'components/Joyride/reducer';
 import clientReducer from 'components/ClientDirectories/reducer';
 import emailImageReducer from 'components/Email/EmailPanel/Image/reducer';
 import emailDraftReducer from 'components/Email/EmailPanel/EmailDraft/reducer';
+// import emailPreviewDraftReducer from 'components/Email/EmailPanel/GeneralEditor/reducer';
 import smtpReducer from 'components/UserProfile/reducer';
 import publicationProfileReducer from 'components/Publications/DatabaseProfile/reducer';
 import notificationReducer from 'components/Notifications/reducer';
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
   smtpReducer,
   publicationProfileReducer,
   notificationReducer,
+  // emailPreviewDraftReducer
 });
 
 export default rootReducer;

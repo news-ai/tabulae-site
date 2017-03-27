@@ -22,19 +22,14 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {stripATextNodeFromContent, mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
+import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
 
-import Menu from 'material-ui/Menu';
-import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import FontIcon from 'material-ui/FontIcon';
-import Popover from 'material-ui/Popover';
 import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
-import {blue700, grey700, grey800} from 'material-ui/styles/colors';
+import {grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
-
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
 import Link from 'components/Email/EmailPanel/components/Link';
@@ -66,52 +61,15 @@ linkify
 .set({fuzzyLink: false});
 
 const controlsStyle = {
-  position: 'fixed',
   height: 40,
   zIndex: 200,
-  bottom: 60,
-  // border: `solid 1px ${blue100}`,
-  // borderRadius: '0.9em',
+  overflow: 'hidden',
+  paddingLeft: 10,
+  paddingRight: 10,
   backgroundColor: 'white',
 };
 
-class BasicHtmlEditor extends React.Component {
-  state : {
-    editorState: Object,
-    bodyHtml: ?string,
-    variableMenuOpen: bool,
-    variableMenuAnchorEl: Object,
-    isStyleBlockOpen: bool,
-    styleBlockAnchorEl: Object,
-    filePanelOpen: bool,
-    imagePanelOpen: bool,
-    imageLink: string
-  };
-  CONVERT_CONFIGS: Object;
-  EXTERNAL_CONTROLS: Array<Object>;
-  ENTITY_CONTROLS: Array<Object>;
-
-  toggleMinimize: (event: Event) => void;
-  focus: () => void;
-  onChange: (editorState: Object) => void;
-  handleTouchTap: (event: Event) => void;
-  emitHTML: (editorState: Object) => void;
-  insertText: (replaceText: string) => void;
-  handleKeyCommand: (command: string) => bool;
-  toggleBlockType: (blockType: string) => void;
-  toggleInlineStyle: (inlineStyle: string) => void;
-  handleReturn: (e: Event) => string;
-  addLink: () => void;
-  removeLink: () => void;
-  manageLink: () => void;
-  onCheck: () => void;
-  handlePastedText: (text: string, html: string) => bool;
-  handleDroppedFiles: (selection: Object, files: Array<Object>) => void;
-  handleImage: (url: string) => Object;
-  onImageUploadClicked: (acceptSelection: Array<Object>, rejectedFiles: Array<Object>) => void;
-  onOnlineImageUpload: () => void;
-  handleBeforeInput: (lastInsertedChar: string) => string;
-  linkifyLastWord: (insertChar: string) => string;
+class GeneralEditor extends React.Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -130,13 +88,13 @@ class BasicHtmlEditor extends React.Component {
     ];
 
     this.EXTERNAL_CONTROLS = [
-      {
-        label: 'Attachments',
-        onToggle: this.props.onAttachmentPanelOpen,
-        icon: 'fa fa-paperclip',
-        isActive: _ => this.props.files.length > 0,
-        tooltip: 'Attach File'
-      },
+      // {
+      //   label: 'Attachments',
+      //   onToggle: this.props.onAttachmentPanelOpen,
+      //   icon: 'fa fa-paperclip',
+      //   isActive: _ => this.props.files.length > 0,
+      //   tooltip: 'Attach File'
+      // },
       {
         label: 'Image Upload',
         onToggle: _ => this.setState({imagePanelOpen: true}),
@@ -253,72 +211,13 @@ class BasicHtmlEditor extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.templateChanged && nextProps.templateChanged) {
-      console.log('change template');
-      this.props.turnOffTemplateChange();
+    if (!this.props.onEditMode && nextProps.onEditMode) {
       let newContent;
       let editorState;
-      if (nextProps.savedBodyHtml) {
-        // console.log(nextProps.savedBodyHtml);
-        const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
-        // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
-        editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
-        // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
-        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-          block.findEntityRanges(
-            (character) => {
-              const entityKey = character.getEntity();
-              if (entityKey === null) return false;
-              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-                // console.log(convertToRaw(editorState.getCurrentContent()));
-                editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-                // console.log(convertToRaw(editorState.getCurrentContent()));
-              }
-              return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
-            },
-            (start, end) => {});
-        });
-
-        // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
-        // rebuild contentState with valid blocks
-        let truncatedBlocks = [];
-        let okayBlock = true; // check if a block is atomic and has image
-        let ignoreRest = false;
-        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-          ignoreRest = false;
-          block.findEntityRanges(
-            (character) => {
-              const entityKey = character.getEntity();
-              if (ignoreRest || entityKey === null) {
-                return false;
-              }
-              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-                if (block.getType() !== 'atomic') {
-                  okayBlock = false;
-                  ignoreRest = true;
-                }
-              }
-            },
-            (state, end) => {});
-          if (okayBlock) truncatedBlocks.push(block);
-        });
-        const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
-        editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
-
-        this.setState({bodyHtml: nextProps.bodyHtml});
-
-        this.props.clearCacheBodyHtml();
-      } else {
-        newContent = convertFromRaw(nextProps.savedEditorState);
-        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-      }
+      newContent = convertFromRaw(nextProps.rawBodyContentState);
+      editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
     }
-
-  }
-
-  componentWillUnmount() {
-    this.props.clearAttachments();
   }
 
   _onChange(editorState, onChangeType) {
@@ -690,23 +589,6 @@ class BasicHtmlEditor extends React.Component {
           </div>
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
-        <Popover
-        open={state.variableMenuOpen}
-        anchorEl={state.variableMenuAnchorEl}
-        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        onRequestClose={_ => this.setState({variableMenuOpen: false})}
-        >
-          <Menu desktop>
-          {props.fieldsmap
-            .filter(field => !field.hidden)
-            .map((field, i) =>
-            <MenuItem key={i} primaryText={field.name} onClick={_ => {
-              this.insertText(field.name);
-              this.setState({variableMenuOpen: false});
-            }} />)}
-          </Menu>
-        </Popover>
         <Subject
         width={props.width}
         onSubjectChange={props.onSubjectChange}
@@ -735,14 +617,7 @@ class BasicHtmlEditor extends React.Component {
             spellCheck
             />
           </div>
-          <RaisedButton
-          style={{margin: 10}}
-          label='Insert Property'
-          labelStyle={{textTransform: 'none'}}
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
-          />
         </div>
-      {state.isStyleBlockOpen &&
         <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle}>
           <InlineStyleControls
           editorState={editorState}
@@ -773,29 +648,7 @@ class BasicHtmlEditor extends React.Component {
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
           />
-          <IconButton
-          iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
-          style={{width: 28, height: 28, padding: 6}}
-          iconClassName='fa fa-plus pointer'
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
-          tooltip='Insert Property'
-          tooltipPosition='top-right'
-          />
-        </Paper>}
-        <div className='vertical-center' style={{
-          position: 'absolute',
-          bottom: 3,
-          width: props.width,
-        }}>
-        <div style={{padding: 3, marginRight: 10}}>
-          <FontIcon
-          className={`fa fa-angle-double-${state.isStyleBlockOpen ? 'up' : 'down'} pointer`}
-          style={{color: state.isStyleBlockOpen ? blue700 : grey700}}
-          onClick={this.onCheck}
-          />
-        </div>
-        {props.children}
-      </div>
+        </Paper>
     </div>
     );
   }
@@ -825,4 +678,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(BasicHtmlEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(GeneralEditor);
