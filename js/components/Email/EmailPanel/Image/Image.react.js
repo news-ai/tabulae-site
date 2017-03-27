@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ToolBar from './ToolBar.react';
 
-import './Image.css';
+// import './Image.css';
 
 class ImageContainer extends Component {
   constructor(props) {
@@ -15,7 +15,7 @@ class ImageContainer extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    let style = {position: 'relative'};
+    let style = {position: 'relative', display: 'block'};
     // if (state.open) {
     //   style.border = '1px solid red';
     //   style.padding = 5;
@@ -25,6 +25,7 @@ class ImageContainer extends Component {
     }
     const imgNode = this.refs[props.src];
     const img = <img ref={props.src} src={props.src} style={{maxWidth: props.size, maxHeight: props.size}}/>;
+    // style.border = '1px solid red';
     return (
       <div
       onMouseEnter={_ => this.setState({open: true})}

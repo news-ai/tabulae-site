@@ -185,7 +185,7 @@ class GeneralEditor extends React.Component {
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
-      console.log(raw);
+      // console.log(raw);
       // console.log(html);
       this.props.onBodyChange(html, raw);
     }
@@ -501,7 +501,7 @@ class GeneralEditor extends React.Component {
           this.props.uploadImage(file)
           .then(url => {
             const newEditorState = this.handleImage(url);
-            this.onChange(newEditorState);
+            this.onChange(newEditorState, 'force-emit-html');
           });
         } else {
           alertify.warning(`Image size cannot exceed 5MB. The image dropped was ${(file.size / 1000000).toFixed(2)}MB`);
@@ -545,8 +545,6 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    console.log(props);
-    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
