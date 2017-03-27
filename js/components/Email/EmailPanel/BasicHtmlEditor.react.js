@@ -304,9 +304,7 @@ class BasicHtmlEditor extends React.Component {
               }
               return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
             },
-            (start, end) => {
-              // callback stuff here
-            });
+            (start, end) => {});
         });
 
         // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
@@ -328,9 +326,7 @@ class BasicHtmlEditor extends React.Component {
                 }
               }
             },
-            (state, end) => {
-
-            });
+            (state, end) => {});
           if (okayBlock) truncatedBlocks.push(block);
         });
         const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
@@ -352,17 +348,16 @@ class BasicHtmlEditor extends React.Component {
     this.props.clearAttachments();
   }
 
-  _onChange(editorState, callback) {
+  _onChange(editorState, onChangeType) {
     let newEditorState = editorState;
-    this.setState({editorState: newEditorState}, callback);
+    this.setState({editorState: newEditorState});
 
     let previousContent = this.state.editorState.getCurrentContent();
 
     // only emit html when content changes
-    if (previousContent !== newEditorState.getCurrentContent()) {
+    if (previousContent !== newEditorState.getCurrentContent() || onChangeType === 'force-emit-html') {
       this.emitHTML(editorState);
     }
-
   }
 
   _linkifyLastWord(insertChar = '') {

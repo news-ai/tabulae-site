@@ -44,7 +44,7 @@ const Media = props => {
 
         const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
         const selection = newEditorState.getSelection();
-        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection));
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
       }}
       onImageLinkChange={imageLink => {
         const editorState = props.blockProps.getEditorState();
@@ -53,7 +53,7 @@ const Media = props => {
 
         const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
         const selection = newEditorState.getSelection();
-        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection));
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
       }}
       onImageAlignChange={align => {
         const editorState = props.blockProps.getEditorState();
@@ -62,7 +62,7 @@ const Media = props => {
 
         const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
         const selection = newEditorState.getSelection();
-        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection));
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
       }}
       />);
   }
