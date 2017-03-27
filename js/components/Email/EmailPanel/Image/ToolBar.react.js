@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import FontIcon from 'material-ui/FontIcon';
-import {grey100, grey400, grey800, blue200, blue400} from 'material-ui/styles/colors';
+import {grey400, grey800, blue200, blue400} from 'material-ui/styles/colors';
 import Slider from 'rc-slider';
 
 import alertify from 'alertifyjs';

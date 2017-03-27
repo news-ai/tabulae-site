@@ -172,21 +172,21 @@ class BasicHtmlEditor extends React.Component {
               align: 'left'
             });
             this.props.saveImageData(src);
-            this.props.saveImageEntityKey(src, entityKey);
-            this.props.setImageSize(src, size);
-            if (imageLink.length > 0) {
-              this.props.setImageLink(src, imageLink);
-            } else {
-              this.props.setImageLink(src, undefined);
-            }
+            // this.props.saveImageEntityKey(src, entityKey);
+            // this.props.setImageSize(src, size);
+            // if (imageLink.length > 0) {
+            //   this.props.setImageLink(src, imageLink);
+            // } else {
+            //   this.props.setImageLink(src, undefined);
+            // }
             return entityKey;
           }
         }
       },
       htmlToBlock: (nodeName, node) => {
-        if (nodeName === 'figure') {
-          return 'atomic';
-        }
+        // if (nodeName === 'figure') {
+        //   return 'atomic';
+        // }
         if (nodeName === 'p' || nodeName === 'div') {
           if (node.style.textAlign === 'center') {
             return {
@@ -275,42 +275,42 @@ class BasicHtmlEditor extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.updated && nextProps.updated) {
-      const emailImageObject = nextProps.emailImageReducer[nextProps.current];
-      const entityKey = emailImageObject.entityKey;
-      console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
-      const newContentState = this.state.editorState.getCurrentContent()
-      .replaceEntityData(entityKey, {
-        src: nextProps.current,
-        size: `${emailImageObject.size}%`,
-        imageLink: emailImageObject.imageLink || '#',
-        align: emailImageObject.align || 'left'
-      });
-      const newEditorState = EditorState.push(this.state.editorState, newContentState, 'activate-entity-data');
-      const selection = newEditorState.getSelection();
-      this.props.onImageUpdated();
-      // use setState because immutable cannot detect that entity data changed
-      this.setState({editorState: EditorState.forceSelection(newEditorState, newEditorState.getSelection())},
-        _ => {
-          console.log(this.state.editorState.getCurrentContent().getEntity(entityKey).getData());
-          console.log(convertToRaw(this.state.editorState.getCurrentContent()));
-          this.emitHTML(this.state.editorState)
-        });
-    }
-
     if (!this.props.templateChanged && nextProps.templateChanged) {
       console.log('change template');
       this.props.turnOffTemplateChange();
       let newContent;
+      let editorState;
       if (nextProps.savedBodyHtml) {
-        const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.bodyHtml);
-        newContent = stripATextNodeFromContent(configuredContent);
+        const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
+        console.log(convertToRaw(configuredContent));
+        // newContent = stripATextNodeFromContent(configuredContent);
+        // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
+        editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+        console.log(convertToRaw(editorState.getCurrentContent()));
+        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+          block.findEntityRanges(
+            (character) => {
+              console.log(character.getEntity());
+              const entityKey = character.getEntity();
+              if (entityKey === null) return false;
+              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+                editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+              }
+              return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
+            },
+            (start, end) => {
+              console.log('--');
+              console.log(start);
+              console.log(end);
+            });
+        });
+        console.log(convertToRaw(editorState.getCurrentContent()));
         this.setState({bodyHtml: nextProps.bodyHtml});
         this.props.clearCacheBodyHtml();
       } else {
         newContent = convertFromRaw(nextProps.savedEditorState);
+        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       }
-      const editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
     }
 
@@ -596,11 +596,11 @@ class BasicHtmlEditor extends React.Component {
     // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
     const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
       src: url,
-      size: `${this.props.emailImageReducer[url].size}%`,
+      size: '100%',
       imageLink: '#',
-      align: this.props.emailImageReducer[url].align
+      align: 'left'
     }).getLastCreatedEntityKey();
-    this.props.saveImageEntityKey(url, entityKey);
+    // this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -808,7 +808,6 @@ const mapStateToProps = (state, props) => {
   return {
     files: state.emailAttachmentReducer.attached,
     emailImageReducer: state.emailImageReducer,
-    updated: state.emailImageReducer.updated,
     current: state.emailImageReducer.current,
     templateChanged: state.emailDraftReducer.templateChanged,
     savedEditorState: state.emailDraftReducer.editorState,
@@ -822,10 +821,6 @@ const mapDispatchToProps = (dispatch, props) => {
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
     uploadImage: file => dispatch(imgActions.uploadImage(file)),
     saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
-    saveImageEntityKey: (src, key) => dispatch({type: 'SAVE_IMAGE_ENTITY_KEY', entityKey: key, src}),
-    setImageSize: (src, size) => dispatch({type: 'SET_IMAGE_SIZE', size, src: src}),
-    setImageLink: (src, imageLink) => dispatch({type: 'SET_IMAGE_LINK', imageLink, src: src}),
-    onImageUpdated: _ => dispatch({type: 'ON_IMAGE_UPDATED'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'}),
     clearCacheBodyHtml: _ => dispatch({type: 'CLEAR_CACHE_BODYHTML'})
