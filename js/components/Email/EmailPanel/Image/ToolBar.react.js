@@ -31,12 +31,17 @@ class ToolBar extends Component {
       style={{
         backgroundColor: 'white',
         position: 'fixed',
+        marginLeft: 0,
+        marginTop: 0,
         // top: props.top || 3,
         // left: props.left || 3,
+        // position: 'absolute',
+        // top: 0,
+        // left: 0,
         padding: '2px 3px',
         border: `solid 1px ${grey400}`,
-        borderRadius: '5px',
-        // zIndex: 300
+        borderRadius: 5,
+        zIndex: 500
       }}
       >
         {props.diableToolbar ?
