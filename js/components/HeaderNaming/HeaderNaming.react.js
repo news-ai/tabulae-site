@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import {actions as fileActions} from 'components/ImportFile';
@@ -15,7 +15,7 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const defaultSelectableOptions = [
-  {value: 'firstname', label: 'First Name', selected: false},
+  {value: 'firstname', label: 'First Name/Full Name', selected: false},
   {value: 'lastname', label: 'Last Name', selected: false},
   {value: 'email', label: 'Email', selected: false},
   {value: 'employers', label: 'Employer/Publication'},
