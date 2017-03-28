@@ -89,8 +89,6 @@ const styles = {
   },
 };
 
-
-
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
 

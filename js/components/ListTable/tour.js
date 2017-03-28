@@ -1,6 +1,5 @@
 export const tour = {
   id: 'listable-hopscotch',
-  onEnd: _ => console.log('TOUR ENDED'),
   steps: [
     {
       title: 'Add Contact',

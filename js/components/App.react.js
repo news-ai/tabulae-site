@@ -17,10 +17,10 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
-import Popover from 'material-ui/Popover/Popover';
+// import Popover from 'material-ui/Popover/Popover';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FeedbackPanel from './Feedback/FeedbackPanel.react';
-import NotificationPanel from 'components/Notifications/NotificationPanel.react';
+// import NotificationPanel from 'components/Notifications/NotificationPanel.react';
 import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
 import {StyleRoot} from 'radium';
