@@ -613,7 +613,7 @@ class BasicHtmlEditor extends React.Component {
           this.props.uploadImage(file)
           .then(url => {
             const newEditorState = this.handleImage(url);
-            this.onChange(newEditorState);
+            this.onChange(newEditorState, 'force-emit-html');
           });
         } else {
           alertify.warning(`Image size cannot exceed 5MB. The image dropped was ${(file.size / 1000000).toFixed(2)}MB`);
@@ -637,7 +637,7 @@ class BasicHtmlEditor extends React.Component {
       props.saveImageData(state.imageLink);
       setTimeout(_ => {
         const newEditorState = this.handleImage(state.imageLink);
-        this.onChange(newEditorState);
+        this.onChange(newEditorState, 'force-emit-html');
         this.setState({imageLink: ''});
       }, 50);
     }
