@@ -43,7 +43,9 @@ export default function FontSizeControls(props) {
         if (currentType) {
           // untoggle size first if it exist
           props.onToggle(currentType.style);
-          setTimeout(_ => props.onToggle(inlineStyles[index - 1].style), 100);
+          setTimeout(_ => {
+            props.onToggle(inlineStyles[index - 1].style);
+          }, 100);
         } else {
           props.onToggle(inlineStyles[index - 1].style);
         }
