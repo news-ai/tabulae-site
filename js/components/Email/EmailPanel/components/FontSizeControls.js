@@ -20,7 +20,12 @@ export default function FontSizeControls(props) {
     value = PLACEHOLDER;
   }
   const menuItems = [
-    <MenuItem key={`fontsize-select-default`} value={PLACEHOLDER} primaryText={PLACEHOLDER} label={PLACEHOLDER}/>,
+    <MenuItem
+    key={`fontsize-select-default`}
+    value={PLACEHOLDER}
+    primaryText={PLACEHOLDER}
+    label={PLACEHOLDER}
+    />,
     ...inlineStyles.map(type =>
       <MenuItem
       key={`fontsize-select-${type.label}`}
@@ -34,13 +39,13 @@ export default function FontSizeControls(props) {
     <div className='RichEditor-controls'>
       <DropDownMenu
       value={value}
-      onChange={(e, index, value) => {
+      onChange={(e, index, newValue) => {
         if (currentType) {
           // untoggle size first if it exist
           props.onToggle(currentType.style);
-          setTimeout(_ => props.onToggle(inlineStyles[index].style), 100);
+          setTimeout(_ => props.onToggle(inlineStyles[index - 1].style), 100);
         } else {
-          props.onToggle(inlineStyles[index].style);
+          props.onToggle(inlineStyles[index - 1].style);
         }
       }}
       >
