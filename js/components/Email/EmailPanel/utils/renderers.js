@@ -20,7 +20,7 @@ export function stripATextNodeFromContent(content) {
 }
 
 const Media = props => {
-  const {block, contentState} = props;
+  const {block, contentState, } = props;
   // console.log(convertToRaw(contentState));
   // console.log(block.getEntityAt(0));
   const entity = contentState.getEntity(block.getEntityAt(0));
@@ -37,6 +37,11 @@ const Media = props => {
       imageLink={imageLink}
       size={size}
       src={src}
+      onDragStart={e => {
+        e.dataTransfer.dropEffect = 'move';
+        e.dataTransfer.setData('text', props.block.getKey());
+      }}
+      onDragDrop={props.blockProps.onImageDragDrop}
       onSizeChange={newSize => {
         const editorState = props.blockProps.getEditorState();
         const newContent = editorState.getCurrentContent()
@@ -69,7 +74,7 @@ const Media = props => {
   return media;
 };
 
-export const mediaBlockRenderer = ({getEditorState, onChange}) => (block) => {
+export const mediaBlockRenderer = ({getEditorState, onChange, onImageDragDrop}) => (block) => {
   // const editorState = getEditorState();
   // console.log(editorState);
   if (block.getType() === 'atomic') {
@@ -78,7 +83,8 @@ export const mediaBlockRenderer = ({getEditorState, onChange}) => (block) => {
       editable: false,
       props: {
         getEditorState,
-        onChange
+        onChange,
+        onImageDragDrop
       }
     };
   }

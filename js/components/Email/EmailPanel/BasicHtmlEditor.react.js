@@ -250,6 +250,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
+    this.handleDrop = this._handleDrop.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -600,7 +601,6 @@ class BasicHtmlEditor extends React.Component {
       imageLink: '#',
       align: 'left'
     }).getLastCreatedEntityKey();
-    // this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -643,6 +643,13 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
+  _handleDrop(e, dropSelection) {
+    const blockKey = e.dataTransfer.getData('text');
+    console.log(dropSelection);
+    console.log(blockKey);
+    console.log(e);
+  }
+
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -657,7 +664,7 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
+
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -720,7 +727,12 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer({getEditorState: this.getEditorState, onChange: this.onChange})}
+            blockRendererFn={
+              mediaBlockRenderer({
+                getEditorState: this.getEditorState,
+                onChange: this.onChange,
+                onImageDragDrop: this.handleDrop
+              })}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}

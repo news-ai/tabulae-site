@@ -83,10 +83,17 @@ class ToolBar extends Component {
           style={{fontSize: '14px', margin: '0 4px'}}
           className='fa fa-align-right span-button pointer'
           />
+          <FontIcon
+          color={props.isDragging ? blue400 : grey800}
+          hoverColor={props.isDragging ? blue200 : grey400}
+          onClick={props.isDragging ? props.endDrag : props.startDrag}
+          style={{fontSize: '14px', margin: '0 4px'}}
+          className='fa fa-arrows span-button pointer'
+          />
         </div>}
       </div>
       );
   }
 }
 
-export default ToolBar
+export default ToolBar;

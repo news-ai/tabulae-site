@@ -10,6 +10,13 @@ class ImageContainer extends Component {
     this.state = {
       open: false,
       hover: false,
+      isDragging: false
+    };
+    this.startDrag = _ => {
+      this.setState({isDragging: true});
+    };
+    this.endDrag = _ => {
+      this.setState({isDragging: false});
     };
   }
 
@@ -20,10 +27,11 @@ class ImageContainer extends Component {
       position: 'relative',
       textAlign: props.align,
     };
-    // if (state.open) {
-    //   style.border = '1px solid red';
-    //   style.padding = 5;
-    // }
+    if (state.isDragging) {
+      style.border = '1px solid red';
+      style.padding = 5;
+      style.cursor = 'move';
+    }
     const imgNode = this.refs[props.src];
     const img = (
       <img
@@ -35,20 +43,29 @@ class ImageContainer extends Component {
         maxHeight: props.size
       }}
       />);
-    // style.border = '1px solid red';
     return (
       <div
+      contentEditable={false}
       onMouseEnter={_ => this.setState({open: true})}
-      onMouseLeave={_ => this.setState({open: false})}
+      onMouseLeave={_ => !state.isDragging && this.setState({open: false})}
+      onDragStart={props.onDragStart}
+      onDragOver={e => e.preventDefault()}
+      onDrop={props.onDragDrop}
+      onDragEnd={props.onDragDrop}
+      draggable={state.isDragging}
       style={style}
       >
       {state.open &&
         <ToolBar
         left={imgNode && imgNode.getBoundingClientRect().left}
         top={imgNode && imgNode.getBoundingClientRect().top}
+        isDragging={state.isDragging}
+        startDrag={this.startDrag}
+        endDrag={this.endDrag}
         {...props}
         />}
-      {props.imageLink ? <a href={props.imageLink} target='_blank'>{img}</a> : img}
+      {/*props.imageLink !== '#' ? <a href={props.imageLink} target='_blank'>{img}</a> : img*/}
+      {img}
       </div>);
   }
 }
