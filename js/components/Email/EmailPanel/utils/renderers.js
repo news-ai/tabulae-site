@@ -51,19 +51,19 @@ const Media = props => {
         const selection = newEditorState.getSelection();
         props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
       }}
-      onImageLinkChange={imageLink => {
+      onImageLinkChange={newImageLink => {
         const editorState = props.blockProps.getEditorState();
         const newContent = editorState.getCurrentContent()
-        .mergeEntityData(block.getEntityAt(0), {imageLink});
+        .mergeEntityData(block.getEntityAt(0), {imageLink: newImageLink});
 
         const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
         const selection = newEditorState.getSelection();
         props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
       }}
-      onImageAlignChange={align => {
+      onImageAlignChange={newAlign => {
         const editorState = props.blockProps.getEditorState();
         const newContent = editorState.getCurrentContent()
-        .mergeEntityData(block.getEntityAt(0), {align});
+        .mergeEntityData(block.getEntityAt(0), {align: newAlign});
 
         const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
         const selection = newEditorState.getSelection();
