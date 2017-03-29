@@ -22,7 +22,14 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {stripATextNodeFromContent, mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
+import {
+  stripATextNodeFromContent,
+  mediaBlockRenderer,
+  getBlockStyle,
+  blockRenderMap,
+  styleMap
+} from 'components/Email/EmailPanel/utils/renderers';
+import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -213,7 +220,8 @@ class BasicHtmlEditor extends React.Component {
       styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
-      imageLink: ''
+      imageLink: '',
+      currentDragTarget: undefined
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -251,6 +259,7 @@ class BasicHtmlEditor extends React.Component {
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
+    this.selectWholeBlock = this._selectWholeBlock.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -644,11 +653,32 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
-  _handleDrop(e, dropSelection) {
-    const blockKey = e.dataTransfer.getData('text');
-    console.log(dropSelection);
-    console.log(blockKey);
-    console.log(e);
+  _selectWholeBlock(blockKey) {
+    const blockLength = this.state.editorState.getCurrentContent().getBlockForKey(blockKey).getLength();
+    const newSelection = SelectionState.createEmpty(blockKey);
+    const updatedSelection = this.state.editorState.getSelection().merge({
+      focusKey: blockKey,
+      anchorKey: blockKey,
+      focusOffset: 0,
+      anchorOffset: blockLength
+    });
+    console.log(updatedSelection.serialize());
+    const newEditorState = EditorState.acceptSelection(this.state.editorState, updatedSelection);
+    this.onChange(newEditorState);
+  }
+
+  _handleDrop(dropSelection, e) {
+    console.log('DROP SELECTION');
+    console.log(dropSelection.serialize());
+    console.log(this.state.currentDragTarget);
+    if (this.state.currentDragTarget) {
+      const blockKey = this.state.currentDragTarget;
+      const atomicBlock = this.state.editorState.getCurrentContent().getBlockForKey(this.state.currentDragTarget);
+      const newEditorState = moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
+      this.onChange(newEditorState);
+      return true;
+    }
+    return false;
   }
 
   render() {
@@ -664,6 +694,11 @@ class BasicHtmlEditor extends React.Component {
       if (contentState.getBlockMap().first().getType() !== 'unstyled') {
         className += ' RichEditor-hidePlaceholder';
       }
+    }
+
+    if (!editorState.getSelection().isCollapsed()) {
+      console.log(editorState.getSelection().serialize());
+
     }
 
     return (
@@ -732,7 +767,7 @@ class BasicHtmlEditor extends React.Component {
               mediaBlockRenderer({
                 getEditorState: this.getEditorState,
                 onChange: this.onChange,
-                onImageDragDrop: this.handleDrop
+                propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
               })}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
@@ -742,6 +777,7 @@ class BasicHtmlEditor extends React.Component {
             handlePastedText={this.handlePastedText}
             handleDroppedFiles={this.handleDroppedFiles}
             handleBeforeInput={this.handleBeforeInput}
+            handleDrop={this.handleDrop}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'

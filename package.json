@@ -38,6 +38,7 @@
     "react-breadcrumbs": "^1.3.16",
     "react-collapse": "^2.3.3",
     "react-datepicker": "^0.34.0",
+    "react-dnd": "^2.3.0",
     "react-dom": "^15.4.2",
     "react-draggable": "^2.2.2",
     "react-dropzone": "^3.5.3",

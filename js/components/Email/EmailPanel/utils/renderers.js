@@ -20,12 +20,15 @@ export function stripATextNodeFromContent(content) {
 }
 
 const Media = props => {
-  const {block, contentState, } = props;
-  // console.log(convertToRaw(contentState));
+  const {block, contentState} = props;
+  console.log(convertToRaw(contentState));
+  const entityKey = block.getEntityAt(0);
+  if (entityKey === null) return;
   // console.log(block.getEntityAt(0));
-  const entity = contentState.getEntity(block.getEntityAt(0));
+  const entity = contentState.getEntity(entityKey);
   // console.log(entity.getData());
   const type = entity.getType();
+  const blockKey = block.getKey();
 
   let media;
   if (type === 'IMAGE') {
@@ -37,11 +40,9 @@ const Media = props => {
       imageLink={imageLink}
       size={size}
       src={src}
-      onDragStart={e => {
-        e.dataTransfer.dropEffect = 'move';
-        e.dataTransfer.setData('text', props.block.getKey());
+      onDragStart={_ => {
+        props.blockProps.propagateDragTarget(blockKey);
       }}
-      onDragDrop={props.blockProps.onImageDragDrop}
       onSizeChange={newSize => {
         const editorState = props.blockProps.getEditorState();
         const newContent = editorState.getCurrentContent()
@@ -74,7 +75,11 @@ const Media = props => {
   return media;
 };
 
-export const mediaBlockRenderer = ({getEditorState, onChange, onImageDragDrop}) => (block) => {
+export const mediaBlockRenderer = ({
+  getEditorState,
+  onChange,
+  propagateDragTarget
+}) => (block) => {
   // const editorState = getEditorState();
   // console.log(editorState);
   if (block.getType() === 'atomic') {
@@ -84,7 +89,7 @@ export const mediaBlockRenderer = ({getEditorState, onChange, onImageDragDrop}) 
       props: {
         getEditorState,
         onChange,
-        onImageDragDrop
+        propagateDragTarget
       }
     };
   }
