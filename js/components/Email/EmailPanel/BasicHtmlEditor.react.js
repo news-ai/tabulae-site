@@ -22,7 +22,14 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {stripATextNodeFromContent, mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from './utils/renderers';
+import {
+  stripATextNodeFromContent,
+  mediaBlockRenderer,
+  getBlockStyle,
+  blockRenderMap,
+  styleMap
+} from 'components/Email/EmailPanel/utils/renderers';
+import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -34,7 +41,6 @@ import Dropzone from 'react-dropzone';
 import {blue700, grey700, grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
-
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
 import Link from 'components/Email/EmailPanel/components/Link';
@@ -213,7 +219,8 @@ class BasicHtmlEditor extends React.Component {
       styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
-      imageLink: ''
+      imageLink: '',
+      currentDragTarget: undefined
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -250,6 +257,7 @@ class BasicHtmlEditor extends React.Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
+    this.handleDrop = this._handleDrop.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -601,7 +609,6 @@ class BasicHtmlEditor extends React.Component {
       imageLink: '#',
       align: 'left'
     }).getLastCreatedEntityKey();
-    // this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -644,6 +651,17 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
+  _handleDrop(dropSelection, e) {
+    if (this.state.currentDragTarget) {
+      const blockKey = this.state.currentDragTarget;
+      const atomicBlock = this.state.editorState.getCurrentContent().getBlockForKey(this.state.currentDragTarget);
+      const newEditorState = moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
+      this.onChange(newEditorState);
+      return true;
+    }
+    return false;
+  }
+
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -658,7 +676,12 @@ class BasicHtmlEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
+
+    if (!editorState.getSelection().isCollapsed()) {
+      console.log(editorState.getSelection().serialize());
+
+    }
+
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -721,7 +744,12 @@ class BasicHtmlEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer({getEditorState: this.getEditorState, onChange: this.onChange})}
+            blockRendererFn={
+              mediaBlockRenderer({
+                getEditorState: this.getEditorState,
+                onChange: this.onChange,
+                propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
+              })}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
@@ -730,6 +758,7 @@ class BasicHtmlEditor extends React.Component {
             handlePastedText={this.handlePastedText}
             handleDroppedFiles={this.handleDroppedFiles}
             handleBeforeInput={this.handleBeforeInput}
+            handleDrop={this.handleDrop}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'
