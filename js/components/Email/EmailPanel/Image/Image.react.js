@@ -20,11 +20,6 @@ class ImageContainer extends Component {
       position: 'relative',
       textAlign: props.align,
     };
-    if (state.isDraggable) {
-      style.border = '1px solid red';
-      style.padding = 5;
-      style.cursor = 'move';
-    }
     const imgNode = this.refs[props.src];
     const img = (
       <img
@@ -33,7 +28,8 @@ class ImageContainer extends Component {
       style={{
         // transform: `scale(${parseFloat(props.size) / 100.0})`,
         maxWidth: props.size,
-        maxHeight: props.size
+        maxHeight: props.size,
+        cursor: 'move',
       }}
       />);
     return (
