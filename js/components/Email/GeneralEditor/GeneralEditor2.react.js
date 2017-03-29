@@ -22,6 +22,7 @@ import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
+import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -40,7 +41,6 @@ import ExternalControls from 'components/Email/EmailPanel/components/ExternalCon
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
-import Immutable from 'immutable';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
@@ -206,6 +206,7 @@ class GeneralEditor extends React.Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
+    this.handleDrop = this._handleDrop.bind(this);
   }
 
   _onChange(editorState, onChangeType) {
@@ -530,6 +531,17 @@ class GeneralEditor extends React.Component {
     }
   }
 
+  _handleDrop(dropSelection, e) {
+    if (this.state.currentDragTarget) {
+      const blockKey = this.state.currentDragTarget;
+      const atomicBlock = this.state.editorState.getCurrentContent().getBlockForKey(this.state.currentDragTarget);
+      const newEditorState = moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
+      this.onChange(newEditorState);
+      return true;
+    }
+    return false;
+  }
+
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -589,7 +601,12 @@ class GeneralEditor extends React.Component {
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
-            blockRendererFn={mediaBlockRenderer({getEditorState: this.getEditorState, onChange: this.onChange})}
+            blockRendererFn={
+              mediaBlockRenderer({
+                getEditorState: this.getEditorState,
+                onChange: this.onChange,
+                propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
+              })}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={styleMap}
             editorState={editorState}
@@ -598,6 +615,7 @@ class GeneralEditor extends React.Component {
             handlePastedText={this.handlePastedText}
             handleDroppedFiles={this.handleDroppedFiles}
             handleBeforeInput={this.handleBeforeInput}
+            handleDrop={this.handleDrop}
             onChange={this.onChange}
             placeholder={placeholder}
             ref='editor'

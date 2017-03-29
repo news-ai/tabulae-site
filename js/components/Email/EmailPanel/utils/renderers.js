@@ -21,7 +21,6 @@ export function stripATextNodeFromContent(content) {
 
 const Media = props => {
   const {block, contentState} = props;
-  console.log(convertToRaw(contentState));
   const entityKey = block.getEntityAt(0);
   if (entityKey === null) return;
   // console.log(block.getEntityAt(0));

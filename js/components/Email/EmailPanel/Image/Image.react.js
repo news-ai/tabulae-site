@@ -10,14 +10,6 @@ class ImageContainer extends Component {
     this.state = {
       open: false,
       hover: false,
-      isDraggable: false
-    };
-    this.startDrag = _ => {
-      props.onDragStart();
-      this.setState({isDraggable: true});
-    };
-    this.endDrag = _ => {
-      this.setState({isDraggable: false});
     };
   }
 
@@ -48,23 +40,15 @@ class ImageContainer extends Component {
       <div
       contentEditable={false}
       onMouseEnter={_ => this.setState({open: true})}
-      onMouseLeave={_ => !state.isDraggable && this.setState({open: false})}
-      onDragStart={_ => {
-        console.log('DRAGSTART');
-      }}
-      onDragEnd={_ => {
-        console.log('DRAGEND');
-      }}
-      draggable={state.isDraggable}
+      onMouseLeave={_ => this.setState({open: false})}
+      onDragStart={props.onDragStart}
+      draggable
       style={style}
       >
       {state.open &&
         <ToolBar
         left={imgNode && imgNode.getBoundingClientRect().left}
         top={imgNode && imgNode.getBoundingClientRect().top}
-        isDraggable={state.isDraggable}
-        startDrag={this.startDrag}
-        endDrag={this.endDrag}
         {...props}
         />}
       {/*props.imageLink !== '#' ? <a href={props.imageLink} target='_blank'>{img}</a> : img*/}

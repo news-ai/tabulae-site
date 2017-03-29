@@ -42,7 +42,6 @@ import {blue700, grey700, grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 
-
 import Subject from 'components/Email/EmailPanel/Subject.react';
 import Link from 'components/Email/EmailPanel/components/Link';
 import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.react';
@@ -259,7 +258,6 @@ class BasicHtmlEditor extends React.Component {
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.selectWholeBlock = this._selectWholeBlock.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -653,24 +651,7 @@ class BasicHtmlEditor extends React.Component {
     }
   }
 
-  _selectWholeBlock(blockKey) {
-    const blockLength = this.state.editorState.getCurrentContent().getBlockForKey(blockKey).getLength();
-    const newSelection = SelectionState.createEmpty(blockKey);
-    const updatedSelection = this.state.editorState.getSelection().merge({
-      focusKey: blockKey,
-      anchorKey: blockKey,
-      focusOffset: 0,
-      anchorOffset: blockLength
-    });
-    console.log(updatedSelection.serialize());
-    const newEditorState = EditorState.acceptSelection(this.state.editorState, updatedSelection);
-    this.onChange(newEditorState);
-  }
-
   _handleDrop(dropSelection, e) {
-    console.log('DROP SELECTION');
-    console.log(dropSelection.serialize());
-    console.log(this.state.currentDragTarget);
     if (this.state.currentDragTarget) {
       const blockKey = this.state.currentDragTarget;
       const atomicBlock = this.state.editorState.getCurrentContent().getBlockForKey(this.state.currentDragTarget);
