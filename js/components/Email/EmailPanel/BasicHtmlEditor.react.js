@@ -450,7 +450,8 @@ class BasicHtmlEditor extends React.Component {
       RichUtils.toggleInlineStyle(
         this.state.editorState,
         inlineStyle
-      )
+      ),
+    'force-emit-html'
     );
   }
 
