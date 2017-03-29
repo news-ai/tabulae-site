@@ -11,14 +11,22 @@ export default function BlockStyleControls(props) {
     .getCurrentContent()
     .getBlockForKey(selection.getStartKey())
     .getType();
+  const filteredBlockTypes = blockTypes.filter(type => type.style !== 'atomic');
 
   return (
     <div className='RichEditor-controls'>
       <DropDownMenu
       style={{width: 160}}
       value={find(blockTypes, type => type.style === blockType).label}
-      onChange={(e, index, value) => props.onToggle(blockTypes[index].style)}>
-        {blockTypes.map((type, i) => <MenuItem key={i} value={type.label} style={{paddingLeft: 10}} primaryText={type.label} />)}
+      onChange={(e, index, value) => props.onToggle(filteredBlockTypes[index].style)}
+      >
+        {filteredBlockTypes.map((type, i) => (
+          <MenuItem
+          key={i}
+          value={type.label}
+          style={{paddingLeft: 10}}
+          primaryText={type.label}
+          />))}
       </DropDownMenu>
     </div>
   );
