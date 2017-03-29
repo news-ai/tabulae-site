@@ -26,6 +26,10 @@ export const POSITION_TYPES = [
   {label: 'Left', style: 'unstyled', icon: 'fa fa-align-left'},
   {label: 'Right', style: 'right-align', icon: 'fa fa-align-right'},
   {label: 'Justify', style: 'justify-align', icon: 'fa fa-align-justify'},
+  {label: 'Ordered List', style: 'ordered-list-item', icon: 'fa fa-list-ol'},
+  {label: 'Unordered List', style: 'unordered-list-item', icon: 'fa fa-list-ul'},
+  {label: 'Quote Block', style: 'blockquote', icon: 'fa fa-quote-right'},
+  {label: 'Code Block', style: 'code-block', icon: 'fa fa-code'},
 ];
 
 export const FONTSIZE_TYPES = [
