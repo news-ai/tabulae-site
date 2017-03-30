@@ -77,6 +77,9 @@ const emailPanelPauseOverlay = {
   justifyContent: 'center',
 };
 
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
 
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
     alertify.prompt(
@@ -315,10 +318,12 @@ class EmailPanel extends Component {
 
       if (Object.keys(dupMap).length > 0) {
         let cancelDelivery = false;
-        alertify.confirm('Duplicate Email Warning',
+        alertify.confirm(
+          'Duplicate Email Warning',
           `We found email duplicates selected: ${Object.keys(dupMap).join(', ')}. Are you sure you want to continue?`,
           () => resolve(true),
-          () => reject(dupMap));
+          () => reject(dupMap)
+          );
       } else {
         resolve(true);
       }
@@ -386,12 +391,12 @@ class EmailPanel extends Component {
   _onClose() {
     const state:any = this.state;
     if (state.dirty) {
-      alertify.confirm(
+      alertify.promisifyConfirm(
         'Are you sure?',
         'Closing the editor will cause your subject/body to be discarded.',
-        this.props.onClose,
-        () => {}
-        );
+        )
+      .then(this.props.onClose)
+      .catch(err => {});
     } else {
       this.props.onClose();
     }
