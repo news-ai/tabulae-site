@@ -58,7 +58,7 @@ const styles = {
     position: 'absolute',
     bottom: 10,
     right: 10
-  }
+  },
 };
 
 const emailPanelWrapper = {

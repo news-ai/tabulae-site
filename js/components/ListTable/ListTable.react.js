@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
-import Radium from 'radium';
 import classNames from 'classnames';
 
 import find from 'lodash/find';
@@ -699,7 +698,12 @@ class ListTable extends Component {
             <div className='large-3 medium-4 columns vertical-center'>
               <div>
                 <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
-                <ControlledInput async disabled={props.listData.readonly} name={props.listData.name} onBlur={value => props.patchList({listId: props.listId, name: value})}/>
+                <ControlledInput
+                async
+                disabled={props.listData.readonly}
+                name={props.listData.name}
+                onBlur={value => props.patchList({listId: props.listId, name: value})}
+                />
               </div>
             </div>
             <div className='large-4 medium-4 columns vertical-center'>
@@ -1004,4 +1008,4 @@ const mapDispatchToProps = (dispatch, props) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withRouter(Radium(ListTable)));
+)(withRouter(ListTable));
