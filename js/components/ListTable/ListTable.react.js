@@ -599,6 +599,7 @@ class ListTable extends Component {
     if (searchValue !== this.state.searchValue) {
       this.setState({searchValue});
     }
+    window.Intercom('trackEvent', 'listtable_search');
     props.searchListContacts(props.listId, searchValue)
     .then(({searchContactMap, ids}) => {
       // find where first search result is in the list
