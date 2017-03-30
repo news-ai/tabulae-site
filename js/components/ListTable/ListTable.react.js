@@ -115,7 +115,7 @@ class ListTable extends Component {
       firsttime: this.props.firstTimeUser,
       leftoverHeight: undefined,
       scrollToRow: undefined,
-      currentSearchIndex: 0
+      currentSearchIndex: 0,
     };
 
     // store outside of state to update synchronously for PanelOverlay

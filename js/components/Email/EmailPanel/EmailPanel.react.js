@@ -78,6 +78,16 @@ const emailPanelPauseOverlay = {
 };
 
 
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+    alertify.prompt(
+      title,
+      description,
+      defaultValue,
+      (e, value) => resolve(value),
+      reject
+      );
+  });
+
 export function _getter(contact: Object, fieldObj: Object): ?string {
   try {
     if (fieldObj.customfield) {
@@ -153,11 +163,12 @@ class EmailPanel extends Component {
       body: this.props.emailsignature !== null ? this.props.emailsignature : '',
       subjectHtml: null,
       minimized: false,
-      isPreveiwOpen: false
+      isPreveiwOpen: false,
+      dirty: false,
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = (html, editorState) => {
-      this.setState({body: html, bodyEditorState: editorState});
+      this.setState({body: html, bodyEditorState: editorState, dirty: true});
       this.props.saveEditorState(editorState);
     };
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
@@ -194,18 +205,31 @@ class EmailPanel extends Component {
   _onArchiveTemplate() {
     this.props.toggleArchiveTemplate(this.state.currentTemplateId)
     .then(_ => this._handleTemplateValueChange(null, null, 0));
+    setTimeout(_ => this.setState({dirty: false}), 10);
   }
 
   _onSaveNewTemplateClick() {
-    alertify.prompt('', 'Name of new Email Template', '',
-      (e, name) => {
+    alertify.promisifyPrompt(
+      '',
+      'Name of new Email Template',
+      '',
+      ).then(
+      name => {
         this.props.createTemplate(
           name,
           this.state.subject,
           JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
-          ).then(currentTemplateId => this.setState({currentTemplateId}));
+          )
+        .then(currentTemplateId => {
+          this.setState({currentTemplateId}, _ => {
+            setTimeout(_ => {
+              this.setState({dirty: false});
+            }, 10);
+          });
+        });
       },
-      _ => console.log('template saving cancelled'));
+      _ => console.log('template saving cancelled')
+      );
   }
 
   _onSaveCurrentTemplateClick() {
@@ -214,27 +238,32 @@ class EmailPanel extends Component {
       this.state.subject,
       JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
       );
+    setTimeout(_ => this.setState({dirty: false}), 10);
   }
 
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
       const template = find(this.props.templates, tmp => value === tmp.id);
-      const subjectHtml = template.subject;
-      const bodyHtml = template.body;
+      let subjectHtml = template.subject;
+      let bodyHtml = template.body;
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
         this.setState({bodyEditorState: templateJSON.data});
         this.props.saveEditorState(templateJSON.data);
-        this.setState({subjectHtml});
       } else {
         this.props.setBodyHtml(bodyHtml);
-        this.setState({bodyHtml, subjectHtml});
       }
     } else {
-      this.setState({bodyHtml: '', subjectHtml: ''});
+      bodyHtml = '';
+      subjectHtml = '';
     }
-    this.setState({currentTemplateId: value});
+    this.setState({
+      currentTemplateId: value,
+      bodyHtml,
+      subjectHtml,
+    });
     this.props.turnOnTemplateChange();
+    setTimeout(_ => this.setState({dirty: false}), 10);
   }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
@@ -356,7 +385,7 @@ class EmailPanel extends Component {
 
   _onClose() {
     const state:any = this.state;
-    if (state.body || state.subject) {
+    if (state.dirty) {
       alertify.confirm(
         'Are you sure?',
         'Closing the editor will cause your subject/body to be discarded.',
