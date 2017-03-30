@@ -109,7 +109,7 @@ function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): st
 
     newHtml = newHtml.replace(regexValue, value);
   });
-  window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
+  if (Object.keys(matchCount).length > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
   return newHtml;
 }
 
