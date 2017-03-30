@@ -235,6 +235,7 @@ class EmailSignatureEditor extends Component {
     };
     this.setState({editing: false});
     this.props.patchPerson(person).then(_ => this.setState({dirty: false}));
+    window.Intercom('trackEvent', 'write_email_signature');
   }
 
   render() {
@@ -264,7 +265,8 @@ class EmailSignatureEditor extends Component {
             />
           </div>
           }
-        {state.dirty && <button className='button tiny' onClick={this.onSave}>Save</button>}
+      {state.dirty &&
+        <button className='button tiny' onClick={this.onSave}>Save</button>}
       </div>
       );
   }
