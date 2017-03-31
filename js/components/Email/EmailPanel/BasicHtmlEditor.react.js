@@ -177,7 +177,7 @@ class BasicHtmlEditor extends React.Component {
             const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
               size: `${size}%`,
               imageLink: imageLink || '#',
-              align
+              align: align || 'left'
             });
             this.props.saveImageData(src);
             return entityKey;
