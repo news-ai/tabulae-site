@@ -173,10 +173,11 @@ class BasicHtmlEditor extends React.Component {
             const src = imgNode.src;
             const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
             const imageLink = node.href;
+            const align = node.parentNode.style['text-align'];
             const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
               size: `${size}%`,
               imageLink: imageLink || '#',
-              align: 'left'
+              align
             });
             this.props.saveImageData(src);
             return entityKey;
