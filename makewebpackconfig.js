@@ -51,7 +51,6 @@ module.exports = function(options) {
         },
         inject: true,
         favicon: 'favicon.ico',
-        hash: true
       }),
       new ExtractTextPlugin('css/main.css'),
       new webpack.DefinePlugin({
@@ -85,7 +84,6 @@ module.exports = function(options) {
         template: 'index.html',
         inject: true,
         favicon: 'favicon.ico',
-        hash: true
       })
     ];
   }
@@ -101,7 +99,7 @@ module.exports = function(options) {
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
-      filename: 'js/bundle.js',
+      filename: 'js/bundle.[hash].js',
       publicPath: '/',
     },
     module: {
