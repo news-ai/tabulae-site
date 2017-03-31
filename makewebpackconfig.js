@@ -50,7 +50,8 @@ module.exports = function(options) {
           minifyURLs: true
         },
         inject: true,
-        favicon: 'favicon.ico'
+        favicon: 'favicon.ico',
+        hash: true
       }),
       new ExtractTextPlugin('css/main.css'),
       new webpack.DefinePlugin({
