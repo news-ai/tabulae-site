@@ -174,11 +174,13 @@ class BasicHtmlEditor extends React.Component {
             const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
             const imageLink = node.href;
             const align = node.parentNode.style['text-align'];
-            const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
+            const entityKey = Entity.create('IMAGE', 'MUTABLE', {
+              src,
               size: `${size}%`,
               imageLink: imageLink || '#',
               align: align || 'left'
             });
+
             this.props.saveImageData(src);
             return entityKey;
           }
@@ -270,6 +272,11 @@ class BasicHtmlEditor extends React.Component {
       if (nextProps.savedBodyHtml) {
         // console.log(nextProps.savedBodyHtml);
         const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
+
+        // let raw = convertToRaw(configuredContent);
+        // let html = draftRawToHtml(raw);
+        // console.log(raw);
+        // console.log(html);
         // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
         editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
         // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
@@ -312,6 +319,10 @@ class BasicHtmlEditor extends React.Component {
           if (okayBlock) truncatedBlocks.push(block);
         });
         const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+        // raw = convertToRaw(cleanedContentState);
+        // html = draftRawToHtml(raw);
+        // console.log(raw);
+        // console.log(html);
         editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
 
         this.setState({bodyHtml: nextProps.bodyHtml});

@@ -50,7 +50,7 @@ module.exports = function(options) {
           minifyURLs: true
         },
         inject: true,
-        favicon: 'favicon.ico'
+        favicon: 'favicon.ico',
       }),
       new ExtractTextPlugin('css/main.css'),
       new webpack.DefinePlugin({
@@ -83,7 +83,7 @@ module.exports = function(options) {
       new HtmlWebpackPlugin({
         template: 'index.html',
         inject: true,
-        favicon: 'favicon.ico'
+        favicon: 'favicon.ico',
       })
     ];
   }
@@ -99,7 +99,7 @@ module.exports = function(options) {
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
-      filename: 'js/bundle.js',
+      filename: 'js/bundle.[hash].js',
       publicPath: '/',
     },
     module: {
