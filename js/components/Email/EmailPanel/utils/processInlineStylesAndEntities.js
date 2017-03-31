@@ -10,7 +10,7 @@ export default function processInlineStylesAndEntities(
   entityTagMap: Object,
   entityMap?: Object,
   block?: Object
-  ): string {
+): string {
   if (!block) {
     return '';
   }
@@ -26,15 +26,15 @@ export default function processInlineStylesAndEntities(
    * ESCAPE CHARS
   */
 
-  let escapeReplacements = [ ['<', '&lt;'], ['&', '&amp;']];
+  let escapeReplacements = [['<', '&lt;'], ['&', '&amp;']];
 
-  escapeReplacements.forEach((arr) =>{
+  escapeReplacements.forEach((arr) => {
     for (var i = 0; i < html.length; i++) {
       if (html[i] === arr[0]) {
         if (!tagInsertMap[i]) {
           tagInsertMap[i] = [];
         }
-        tagInsertMap[i].push([ arr[0].length, arr[1] ]);
+        tagInsertMap[i].push([arr[0].length, arr[1]]);
       }
     }
   });
@@ -56,11 +56,11 @@ export default function processInlineStylesAndEntities(
 
     tagInsertMap[range.offset].push(tag[0]);
     if (tag[1]) {
-      if (!tagInsertMap[range.offset+range.length] ) {
-        tagInsertMap[range.offset+range.length] = [];
+      if (!tagInsertMap[range.offset + range.length]) {
+        tagInsertMap[range.offset + range.length] = [];
       }
       // add closing tags to start of array, otherwise tag nesting will be invalid
-      tagInsertMap[ range.offset+range.length].unshift(tag[1]);
+      tagInsertMap[range.offset + range.length].unshift(tag[1]);
     }
   });
 
@@ -76,7 +76,7 @@ export default function processInlineStylesAndEntities(
     let tags = tagInsertMap[key];
 
     if (tagStack.length === 0) {
-      tags.forEach( tag => {
+      tags.forEach(tag => {
         tagStack.unshift(tag);
       });
     } else {
@@ -96,13 +96,13 @@ export default function processInlineStylesAndEntities(
           newInsertMap.push(tag);
         } else if (isCloser) {
           let i = tagStack.indexOf(toOpeningTag(tag));
-          let earlyClosers = tagStack.splice(0, i+1);
+          let earlyClosers = tagStack.splice(0, i + 1);
 
           //get rid of actual tag
           earlyClosers.pop();
 
           // close tag, add tag to reopen stack
-          earlyClosers.forEach( t => {
+          earlyClosers.forEach(t => {
             newInsertMap.push(toClosingTag(t));
             tagsToReopen.push(t);
           });
@@ -123,17 +123,21 @@ export default function processInlineStylesAndEntities(
     return t.replace('/', '');
   }
   function toClosingTag(t) {
-    if (!t) { return ''; }
+    if (!t) {
+      return '';
+    }
     return '</' + t.substr(1);
   }
 
-  function isString (str) {
+  function isString(str) {
     if (typeof str === 'string') return true;
     else return false;
   }
 
   function isTagCloseMatch(opener, closer) {
-    if (!opener || !closer || !isString(opener) || !isString(close)) { return false; }
+    if (!opener || !closer || !isString(opener) || !isString(close)) {
+      return false;
+    }
     return opener.substr(1) === closer.substr(2);
   }
 
@@ -152,14 +156,17 @@ export default function processInlineStylesAndEntities(
     let compiledTag0 = template(tag[0])(entity.data);
     let compiledTag1 = template(tag[1])(entity.data);
 
-    if (!tagInsertMap[range.offset]) { tagInsertMap[range.offset] = []; }
+    if (!tagInsertMap[range.offset]) {
+      tagInsertMap[range.offset] = [];
+    }
     tagInsertMap[range.offset].push(compiledTag0);
 
     if (tag[1]) {
-
-      if (!tagInsertMap[range.offset+range.length] ) { tagInsertMap[range.offset+range.length] = []; }
+      if (!tagInsertMap[range.offset + range.length]) {
+        tagInsertMap[range.offset + range.length] = [];
+      }
       // add closing tags to start of array, otherwise tag nesting will be invalid
-      tagInsertMap[ range.offset+range.length].unshift(compiledTag1);
+      tagInsertMap[range.offset + range.length].unshift(compiledTag1);
     }
   });
 
@@ -171,8 +178,12 @@ export default function processInlineStylesAndEntities(
   let orderedKeys = Object.keys(tagInsertMap).sort(function(a, b) {
     a = Number(a);
     b = Number(b);
-    if (a > b) { return 1; }
-    if (a < b) { return -1; }
+    if (a > b) {
+      return 1;
+    }
+    if (a < b) {
+      return -1;
+    }
     return 0;
   });
 
@@ -184,16 +195,16 @@ export default function processInlineStylesAndEntities(
     tagInsertMap[pos].forEach(function(tag) {
 
       if (typeof tag === 'string') {
-        html = html.substr(0, offset+index) +
-          tag +
-          html.substr(offset+index);
+        html = html.substr(0, offset + index) +
+        tag +
+        html.substr(offset + index);
         offset += tag.length;
       } else {
-        let [ length, replacement] = tag;
-        html = html.substr(0, offset+index) +
-          replacement +
-          html.substr(offset+index+length);
-        offset += (replacement.length - length );
+        let [length, replacement] = tag;
+        html = html.substr(0, offset + index) +
+        replacement +
+        html.substr(offset + index + length);
+        offset += (replacement.length - length);
       }
 
     });
