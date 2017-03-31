@@ -83,7 +83,8 @@ module.exports = function(options) {
       new HtmlWebpackPlugin({
         template: 'index.html',
         inject: true,
-        favicon: 'favicon.ico'
+        favicon: 'favicon.ico',
+        hash: true
       })
     ];
   }
