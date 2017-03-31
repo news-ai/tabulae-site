@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React from 'react';
 import ToggleableEditInput from './ToggleableEditInput.react';
 import ToggleableEditInputHOC from './ToggleableEditInputHOC.react';
 
@@ -16,6 +16,7 @@ function ControlledInput(props) {
         nameStyle={props.nameStyle}
         hideIcon={props.hideIcon}
         maxTextLength={props.maxTextLength}
+        onKeyDown={props.onKeyDown}
         />}
     </ToggleableEditInputHOC>);
 }

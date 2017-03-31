@@ -34,6 +34,7 @@ class CopyToHOC extends Component {
     if (state.value.length === 0 || props.selectedContacts.length === 0) return;
     const selectedLists = state.value.map(obj => props.listReducer[obj.value]);
     selectedLists.map(list => props.addContactsThenPatchList(props.selectedContacts, list));
+    window.Intercom('trackEvent', 'copy_to_existing_sheet');
   }
 
   _onNewSheetSubmit() {
@@ -43,6 +44,7 @@ class CopyToHOC extends Component {
     if (val.length > 0) name = val;
     else name = `${this.props.list.name} (Copy)`;
     props.copyToNewList(props.selectedContacts, name);
+    window.Intercom('trackEvent', 'copy_to_new_sheet');
   }
 
   _onWholeSheetCopy() {
@@ -51,6 +53,7 @@ class CopyToHOC extends Component {
     if (val.length > 0) name = val;
     else name = `${this.props.list.name} (Copy)`;
     this.props.copyEntireList(this.props.list.id, name);
+    window.Intercom('trackEvent', 'copy_whole_sheet');
   }
 
   render() {

@@ -677,11 +677,6 @@ class BasicHtmlEditor extends React.Component {
       }
     }
 
-    if (!editorState.getSelection().isCollapsed()) {
-      console.log(editorState.getSelection().serialize());
-
-    }
-
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -798,11 +793,11 @@ class BasicHtmlEditor extends React.Component {
           onToggle={this.toggleInlineStyle}
           inlineStyles={FONTSIZE_TYPES}
           />
-          <BlockStyleControls
+          {/*<BlockStyleControls
           editorState={editorState}
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
-          />
+          />*/}
           <IconButton
           iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
           style={{width: 28, height: 28, padding: 6}}

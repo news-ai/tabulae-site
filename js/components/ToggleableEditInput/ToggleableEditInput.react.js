@@ -30,7 +30,8 @@ function ToggleableEditInput({
   placeholder,
   hideIcon,
   disabled,
-  maxTextLength
+  maxTextLength,
+  onKeyDown,
 }) {
   const spanStyle = nameStyle ? Object.assign({}, styles.nameBlock.title, nameStyle) : styles.nameBlock.title;
   const content = placeholder && (!name || name.length === 0) ? placeholder : name;
@@ -42,6 +43,7 @@ function ToggleableEditInput({
     type='text'
     name={name}
     onBlur={onToggleTitleEdit}
+    onKeyDown={onKeyDown}
     value={name}
     onChange={onUpdateName}
     autoFocus

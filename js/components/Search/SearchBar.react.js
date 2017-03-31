@@ -56,6 +56,7 @@ class SearchBar extends Component {
   _onSearchClick() {
     if (this.props.isReceiving) return;
     const query = this.refs.searchQuery.input.value;
+    window.Intercom('trackEvent', 'on_search_click');
     this.props.router.push(`/search?query=${query}`);
   }
 

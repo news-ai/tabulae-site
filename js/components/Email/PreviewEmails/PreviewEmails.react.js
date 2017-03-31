@@ -76,7 +76,10 @@ class PreviewEmails extends Component {
             primary
             icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
             labelStyle={{textTransform: 'none'}}
-            onClick={_ => props.onSendAllEmailsClick(previewEmails.map(email => email.id))}
+            onClick={_ => {
+              window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: sendLater});
+              props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+            }}
             />
           </div>
           <div className='right'>
@@ -113,7 +116,7 @@ class PreviewEmails extends Component {
           key={`preview-email-${i}`}
           {...email}
           onSendEmailClick={_ => {
-            window.Intercom('trackEvent', 'sent_email', {numSentEmails: previewEmails.length, scheduled: sendLater});
+            window.Intercom('trackEvent', 'sent_email', {numSentEmails: 1, scheduled: sendLater});
             onSendEmailClick(email.id);
           }}
           />)}

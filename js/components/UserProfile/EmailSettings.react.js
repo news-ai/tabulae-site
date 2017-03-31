@@ -60,7 +60,10 @@ class EmailSettings extends Component {
                 <span style={spanStyle}>Subscribe to Emails</span>
               </div>
               <div className='large-8 medium-7 columns'>
-                <Toggle toggled={state.newPerson.get('getdailyemails')} onToggle={_ => this.setNewPerson('getdailyemails', !state.newPerson.get('getdailyemails'))}/>
+                <Toggle
+                toggled={state.newPerson.get('getdailyemails')}
+                onToggle={_ => this.setNewPerson('getdailyemails', !state.newPerson.get('getdailyemails'))}
+                />
               </div>
             </div>
             {person.googleid && <div className='row vertical-center' style={inputHeight}>
@@ -83,7 +86,10 @@ class EmailSettings extends Component {
               </div>
               <div className='large-8 medium-7 columns'>
             {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
-                <Toggle toggled={state.newPerson.get('externalemail')} onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}/> :
+                <Toggle
+                toggled={state.newPerson.get('externalemail')}
+                onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
+                /> :
                 <SMTPSettings/>}
               </div>
             </div>
