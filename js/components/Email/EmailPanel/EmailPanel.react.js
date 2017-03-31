@@ -247,24 +247,21 @@ class EmailPanel extends Component {
   _handleTemplateValueChange(event, index, value) {
     if (value !== 0) {
       const template = find(this.props.templates, tmp => value === tmp.id);
-      let subjectHtml = template.subject;
-      let bodyHtml = template.body;
+      const subjectHtml = template.subject;
+      const bodyHtml = template.body;
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
         this.setState({bodyEditorState: templateJSON.data});
         this.props.saveEditorState(templateJSON.data);
+        this.setState({subjectHtml});
       } else {
         this.props.setBodyHtml(bodyHtml);
+        this.setState({bodyHtml, subjectHtml});
       }
     } else {
-      bodyHtml = '';
-      subjectHtml = '';
+      this.setState({bodyHtml: '', subjectHtml: ''});
     }
-    this.setState({
-      currentTemplateId: value,
-      bodyHtml,
-      subjectHtml,
-    });
+    this.setState({currentTemplateId: value});
     this.props.turnOnTemplateChange();
     setTimeout(_ => this.setState({dirty: false}), 10);
   }

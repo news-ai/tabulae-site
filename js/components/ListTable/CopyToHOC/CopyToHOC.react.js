@@ -104,7 +104,7 @@ class CopyToHOC extends Component {
               <RaisedButton
               label='Submit'
               primary
-              disabled={!props.selectedContacts || state.value.length === 0}
+              disabled={!props.selectedContacts || state.value.length === 0 || props.isReceiving}
               icon={props.selectedContacts && state.value.length > 0 && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
               onClick={this.onSubmit}
               />

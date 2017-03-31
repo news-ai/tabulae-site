@@ -169,7 +169,8 @@ class EditContact extends Component {
       <div className={props.className}>
         {state.open &&
           <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Edit Contact' onRequestClose={_ => this.setState({open: false})}>
-          {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'}/>}
+        {props.isReceiving &&
+          <FontIcon className={'fa fa-spinner fa-spin'}/>}
           <div className='row' style={{marginTop: 20}}>
             <div className={columnClassname}>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
