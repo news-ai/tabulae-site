@@ -44,22 +44,22 @@ class EmailDateContainer extends Component {
   }
 
   render() {
-    let {datestring, emailBucket} = this.props;
+    let {datestring, emailBucket, isClosed, onOpenClick} = this.props;
     const rightNow = new Date();
     return (
       <div style={{marginTop: 25}}>
         <div
-        onClick={_ => this.setState({open: !this.state.open}, this.props.recomputeSelfHeight)}
-        style={{margin: '10px 0', color: this.state.open ? grey600 : grey700}} className='vertical-center pointer'>
+        onClick={onOpenClick}
+        style={{margin: '10px 0', color: !isClosed ? grey600 : grey700}} className='vertical-center pointer'>
           <span
           style={{fontSize: '1.2em'}}
           >{datestring}</span>
           <FontIcon
           color={grey600}
           style={{fontSize: '0.8em', margin: '0 5px'}}
-          className={this.state.open ? 'fa fa-chevron-down' : 'fa fa-chevron-up'}/>
+          className={!isClosed ? 'fa fa-chevron-down' : 'fa fa-chevron-up'}/>
         </div>
-        <Collapse isOpened={this.state.open}>
+        <Collapse isOpened={!isClosed}>
           {emailBucket.map((email, index) =>
             new Date(email.sendat) > rightNow ?
             <ScheduledEmailItem key={`email-analytics-${index}`} {...email}/> :
@@ -76,7 +76,11 @@ class EmailsList extends Component {
   constructor(props) {
     super(props);
     const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
-    this.state = {dateOrder, emailMap};
+    this.state = {
+      dateOrder,
+      emailMap,
+      isClosedMap: {}
+    };
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
@@ -113,10 +117,16 @@ class EmailsList extends Component {
     return (
       <div style={style} key={key}>
         <EmailDateContainer
-        recomputeSelfHeight={_ => this._list.recomputeRowHeights(index)}
         key={`email-date-${datestring}`}
         datestring={datestring}
         emailBucket={this.state.emailMap[datestring]}
+        isClosed={this.state.isClosedMap[index]}
+        onOpenClick={_ => this.setState({isClosedMap: Object.assign({}, this.state.isClosedMap, {[index]: !this.state.isClosedMap[index]})},
+          _ => {
+            console.log('RECOMPUTE');
+            this._listCellMeasurer.resetMeasurements();
+            this._list.recomputeRowHeights();
+          })}
         />
       </div>);
   }
