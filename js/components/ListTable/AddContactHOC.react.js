@@ -303,7 +303,6 @@ class AddContactHOC extends Component {
 const mapStateToProps = (state, props) => {
   return {
     list: state.listReducer[props.listId],
-    contacts: state.listReducer[props.listId].contacts.map(contactId => state.contactReducer[contactId]),
     publicationReducer: state.publicationReducer,
     publicationIsReceiving: state.publicationReducer.isReceiving,
   };
