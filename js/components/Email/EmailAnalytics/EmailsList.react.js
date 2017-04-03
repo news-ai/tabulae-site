@@ -49,7 +49,7 @@ class EmailDateContainer extends Component {
     return (
       <div style={{marginTop: 25}}>
         <div
-        onClick={_ => this.setState({open: !this.state.open})}
+        onClick={_ => this.setState({open: !this.state.open}, this.props.recomputeSelfHeight)}
         style={{margin: '10px 0', color: this.state.open ? grey600 : grey700}} className='vertical-center pointer'>
           <span
           style={{fontSize: '1.2em'}}
@@ -78,6 +78,16 @@ class EmailsList extends Component {
     const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
     this.state = {dateOrder, emailMap};
     this.rowRenderer = this._rowRenderer.bind(this);
+    this._listRef = this._listRef.bind(this);
+    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
+  }
+
+  _listRef(ref) {
+    this._list = ref;
+  }
+
+  _listCellMeasurerRef(ref) {
+    this._listCellMeasurer = ref;
   }
 
   componentWillMount() {
@@ -89,16 +99,21 @@ class EmailsList extends Component {
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
     if (this.props.emails.length !== nextProps.emails.length) {
       const {dateOrder, emailMap} = bucketEmailsByDate(nextProps.emails);
-      this.setState({dateOrder, emailMap});
+      this.setState({dateOrder, emailMap}, _ => {
+        if (this._list) setTimeout(_ => {
+          this._listCellMeasurer.resetMeasurements();
+          this._list.recomputeRowHeights();
+        }, 1000);
+      });
     }
   }
 
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const datestring = this.state.dateOrder[index];
-    if (index === this.state.dateOrder.length - 1) this.props.fetchEmails();
     return (
       <div style={style} key={key}>
         <EmailDateContainer
+        recomputeSelfHeight={_ => this._list.recomputeRowHeights(index)}
         key={`email-date-${datestring}`}
         datestring={datestring}
         emailBucket={this.state.emailMap[datestring]}
@@ -132,6 +147,7 @@ class EmailsList extends Component {
             <AutoSizer disableHeight>
               {({width}) =>
                 <CellMeasurer
+                ref={this._listCellMeasurerRef}
                 cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
                 columnCount={1}
                 rowCount={state.dateOrder.length}
@@ -139,6 +155,7 @@ class EmailsList extends Component {
                 >
                 {({getRowHeight}) =>
                   <List
+                  ref={this._listRef}
                   autoHeight
                   width={width}
                   height={height}
@@ -162,6 +179,13 @@ class EmailsList extends Component {
         <div className='horizontal-center' style={{margin: '10px 0'}}>
           <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
         </div>}
+        <div className='horizontal-center'>
+          <IconButton
+          tooltip='Load More'
+          tooltipPosition='top-center'
+          onClick={props.fetchEmails}
+          iconClassName='fa fa-chevron-down'/>
+        </div>
       </div>
       );
   }
