@@ -44,7 +44,7 @@ import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
-import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
+import ValidationHOC from 'components/ValidationHOC';
 
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 

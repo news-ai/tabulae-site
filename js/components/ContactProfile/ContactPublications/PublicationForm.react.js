@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import TextField from 'material-ui/TextField';
 import {blue50, blue800, grey700} from 'material-ui/styles/colors';
 import isURL from 'validator/lib/isURL';
-import ValidationHOC from './ValidationHOC.react';
+import ValidationHOC from 'components/ValidationHOC';
 
 class PublicationForm extends Component {
   constructor(props) {
