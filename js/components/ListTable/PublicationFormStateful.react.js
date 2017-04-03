@@ -4,7 +4,7 @@ import {actions as publicationActions} from 'components/Publications';
 import TextField from 'material-ui/TextField';
 import {blue50, blue800, grey700} from 'material-ui/styles/colors';
 import isURL from 'validator/lib/isURL';
-import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
+import ValidationHOC from 'components/ValidationHOC';
 import IconButton from 'material-ui/IconButton';
 
 class PublicationFormStateful extends Component {

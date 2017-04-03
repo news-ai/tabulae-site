@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as contactActions} from 'components/Contacts';
-import {actions as listActions} from 'components/Lists';
+// import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 
 import Dialog from 'material-ui/Dialog';
@@ -174,43 +174,95 @@ class EditContact extends Component {
           <div className='row' style={{marginTop: 20}}>
             <div className={columnClassname}>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
-              <TextField style={textfieldStyle} value={state.contactBody.firstname || ''} name='firstname' onChange={e => this.onChange('firstname', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.firstname || ''}
+              name='firstname'
+              onChange={e => this.onChange('firstname', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span style={{whiteSpace: 'nowrap'}}>Last Name</span>
-              <TextField style={textfieldStyle} value={state.contactBody.lastname || ''} name='lastname' onChange={e => this.onChange('lastname', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.lastname || ''}
+              name='lastname'
+              onChange={e => this.onChange('lastname', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Email</span>
-              <TextField style={textfieldStyle} value={state.contactBody.email || ''} name='email' onChange={e => this.onChange('email', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.email || ''}
+              name='email'
+              onChange={e => this.onChange('email', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Twitter</span>
-              <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.twitter || ''} name='twitter' onChange={e => this.onChange('twitter', e.target.value)}/>
+              <TextField
+              hintText='adding will populate the feed'
+              style={textfieldStyle}
+              value={state.contactBody.twitter || ''}
+              name='twitter'
+              onChange={e => this.onChange('twitter', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Instagram</span>
-              <TextField hintText='adding will populate the feed' style={textfieldStyle} value={state.contactBody.instagram || ''} name='instagram' onChange={e => this.onChange('instagram', e.target.value)}/>
+              <TextField
+              hintText='adding will populate the feed'
+              style={textfieldStyle}
+              value={state.contactBody.instagram || ''}
+              name='instagram'
+              onChange={e => this.onChange('instagram', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>LinkedIn</span>
-              <TextField style={textfieldStyle} value={state.contactBody.linkedin || ''} name='linkedin' onChange={e => this.onChange('linkedin', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.linkedin || ''}
+              name='linkedin'
+              onChange={e => this.onChange('linkedin', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Phone #</span>
-              <TextField style={textfieldStyle} value={state.contactBody.phonenumber || ''} name='phonenumber' onChange={e => this.onChange('phonenumber', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.phonenumber || ''}
+              name='phonenumber'
+              onChange={e => this.onChange('phonenumber', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Blog</span>
-              <TextField style={textfieldStyle} value={state.contactBody.blog || ''} name='blog' onChange={e => this.onChange('blog', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.blog || ''}
+              name='blog'
+              onChange={e => this.onChange('blog', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Website</span>
-              <TextField style={textfieldStyle} value={state.contactBody.website || ''} name='website' onChange={e => this.onChange('website', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.website || ''}
+              name='website'
+              onChange={e => this.onChange('website', e.target.value)}
+              />
             </div>
             <div className={columnClassname}>
               <span>Notes</span>
-              <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.notes || ''}
+              name='notes'
+              onChange={e => this.onChange('notes', e.target.value)}
+              />
             </div>
         {props.list && props.list.fieldsmap !== null &&
           props.list.fieldsmap

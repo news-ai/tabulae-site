@@ -13,6 +13,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.react';
+import ValidationHOC from 'components/ValidationHOC';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -54,12 +55,6 @@ class AddContactHOC extends Component {
     this.onChange = this._onChange.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.open === false && this.state.open === true) {
-      // onRequestOpen hit
-    }
   }
 
   _onSubmit() {
@@ -144,15 +139,40 @@ class AddContactHOC extends Component {
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
-              <TextField style={textfieldStyle} value={state.contactBody.firstname || ''} name='firstname' onChange={e => this.onChange('firstname', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.firstname || ''}
+              name='firstname'
+              onChange={e => this.onChange('firstname', e.target.value)}
+              />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span style={{whiteSpace: 'nowrap'}}>Last Name</span>
-              <TextField style={textfieldStyle} value={state.contactBody.lastname || ''} name='lastname' onChange={e => this.onChange('lastname', e.target.value)}/>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.lastname || ''}
+              name='lastname'
+              onChange={e => this.onChange('lastname', e.target.value)}
+              />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Email</span>
-              <TextField style={textfieldStyle} value={state.contactBody.email || ''} name='email' onChange={e => this.onChange('email', e.target.value)}/>
+              <ValidationHOC rules={[{
+                validator: val => !props.contacts.some(({email}) => email === val),
+                errorMessage: 'Email already exists on this List.'
+              }]}>
+              {({onValueChange, errorMessage}) =>
+                <TextField
+                style={textfieldStyle}
+                value={state.contactBody.email || ''}
+                name='email'
+                floatingLabelText={errorMessage}
+                onChange={e => {
+                  onValueChange(e.target.value);
+                  this.onChange('email', e.target.value);
+                }}
+                />}
+              </ValidationHOC>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Twitter</span>
@@ -170,13 +190,10 @@ class AddContactHOC extends Component {
                     if (parser.hostname === 'twitter.com') {
                       const path = parser.pathname.split('/');
                       return path[path.length - 1];
-                    } else {
-                      return value;
                     }
                   }
                   return value;
-                }
-                )}
+                })}
               />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
@@ -195,8 +212,6 @@ class AddContactHOC extends Component {
                     if (parser.hostname === 'instagram.com' || parser.hostname === 'www.instagram.com') {
                       const path = parser.pathname.split('/').filter(val => val.length > 0);
                       return path[path.length - 1];
-                    } else {
-                      return value;
                     }
                   }
                   return value;
@@ -288,6 +303,7 @@ class AddContactHOC extends Component {
 const mapStateToProps = (state, props) => {
   return {
     list: state.listReducer[props.listId],
+    contacts: state.listReducer[props.listId].contacts.map(contactId => state.contactReducer[contactId]),
     publicationReducer: state.publicationReducer,
     publicationIsReceiving: state.publicationReducer.isReceiving,
   };
