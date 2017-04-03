@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import isEmail from 'validator/lib/isEmail';
-import ValidationHOC from 'components/ContactProfile/ContactPublications/ValidationHOC.react';
+import ValidationHOC from 'components/ValidationHOC';
 import {grey500, cyan500} from 'material-ui/styles/colors';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';

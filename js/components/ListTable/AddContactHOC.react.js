@@ -13,6 +13,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Textarea from 'react-textarea-autosize';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.react';
+import ValidationHOC from 'components/ValidationHOC';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -156,12 +157,22 @@ class AddContactHOC extends Component {
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Email</span>
-              <TextField
-              style={textfieldStyle}
-              value={state.contactBody.email || ''}
-              name='email'
-              onChange={e => this.onChange('email', e.target.value)}
-              />
+              <ValidationHOC rules={[{
+                validator: val => !props.contacts.some(({email}) => email === val),
+                errorMessage: 'Email already exists on this List.'
+              }]}>
+              {({onValueChange, errorMessage}) =>
+                <TextField
+                style={textfieldStyle}
+                value={state.contactBody.email || ''}
+                name='email'
+                floatingLabelText={errorMessage}
+                onChange={e => {
+                  onValueChange(e.target.value);
+                  this.onChange('email', e.target.value);
+                }}
+                />}
+              </ValidationHOC>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Twitter</span>
@@ -179,13 +190,10 @@ class AddContactHOC extends Component {
                     if (parser.hostname === 'twitter.com') {
                       const path = parser.pathname.split('/');
                       return path[path.length - 1];
-                    } else {
-                      return value;
                     }
                   }
                   return value;
-                }
-                )}
+                })}
               />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
@@ -204,8 +212,6 @@ class AddContactHOC extends Component {
                     if (parser.hostname === 'instagram.com' || parser.hostname === 'www.instagram.com') {
                       const path = parser.pathname.split('/').filter(val => val.length > 0);
                       return path[path.length - 1];
-                    } else {
-                      return value;
                     }
                   }
                   return value;

@@ -33,6 +33,7 @@ import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
+import ValidationHOC from 'components/ValidationHOC';
 
 import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
