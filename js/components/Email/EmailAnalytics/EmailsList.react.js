@@ -7,6 +7,7 @@ import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 
 const bucketEmailsByDate = (emails) => {
   if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}};
@@ -30,6 +31,9 @@ const bucketEmailsByDate = (emails) => {
       });
     }
   });
+  dateOrder.map(datestring => {
+    emailMap[datestring] = emailMap[datestring].sort((a, b) => b.opened - a.opened);
+  });
   return {dateOrder, emailMap};
 };
 
@@ -40,9 +44,8 @@ class EmailDateContainer extends Component {
   }
 
   render() {
-    const {datestring, emailBucket} = this.props;
+    let {datestring, emailBucket} = this.props;
     const rightNow = new Date();
-    emailBucket.sort((a, b) => b.opened - a.opened);
     return (
       <div style={{marginTop: 25}}>
         <div
@@ -57,10 +60,11 @@ class EmailDateContainer extends Component {
           className={this.state.open ? 'fa fa-chevron-down' : 'fa fa-chevron-up'}/>
         </div>
         <Collapse isOpened={this.state.open}>
-        {emailBucket && emailBucket.map((email, i) =>
-          new Date(email.sendat) > rightNow ?
-          <ScheduledEmailItem key={`email-analytics-${i}`} {...email}/> :
-          <AnalyticsItem key={`email-analytics-${i}`} {...email}/>)}
+          {emailBucket.map((email, index) =>
+            new Date(email.sendat) > rightNow ?
+            <ScheduledEmailItem key={`email-analytics-${index}`} {...email}/> :
+            <AnalyticsItem key={`email-analytics-${index}`} {...email}/>
+            )}
         </Collapse>
       </div>);
   }
@@ -71,6 +75,9 @@ const placeholder = 'No emails scheduled for delivery.';
 class EmailsList extends Component {
   constructor(props) {
     super(props);
+    const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
+    this.state = {dateOrder, emailMap};
+    this.rowRenderer = this._rowRenderer.bind(this);
   }
 
   componentWillMount() {
@@ -80,41 +87,82 @@ class EmailsList extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
+    if (this.props.emails.length !== nextProps.emails.length) {
+      const {dateOrder, emailMap} = bucketEmailsByDate(nextProps.emails);
+      this.setState({dateOrder, emailMap});
+    }
+  }
+
+  _rowRenderer({key, index, isScrolling, isVisible, style}) {
+    const datestring = this.state.dateOrder[index];
+    if (index === this.state.dateOrder.length - 1) this.props.fetchEmails();
+    return (
+      <div style={style} key={key}>
+        <EmailDateContainer
+        key={`email-date-${datestring}`}
+        datestring={datestring}
+        emailBucket={this.state.emailMap[datestring]}
+        />
+      </div>);
   }
 
   render() {
     let style = {};
-    if (this.props.containerHeight) style.height = this.props.containerHeight;
+    const state = this.state;
+    const props = this.props;
+    if (this.props.containerHeight) style.height = props.containerHeight;
 
-    const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
     return (
-      <InfiniteScroll onScrollBottom={this.props.fetchEmails}>
-      {this.props.refreshEmails &&
+      <div>
+      {props.refreshEmails &&
         <div className='vertical-center'>
           <div className='right'>
             <IconButton
-            onClick={this.props.refreshEmails}
+            onClick={props.refreshEmails}
             iconStyle={{color: grey500}}
             className='right'
-            iconClassName={`fa fa-refresh ${this.props.isReceiving ? 'fa-spin' : ''}`}
+            iconClassName={`fa fa-refresh ${props.isReceiving ? 'fa-spin' : ''}`}
             />
           </div>
         </div>}
         <div style={style}>
-        {dateOrder.map((datestring) => (
-          <EmailDateContainer
-          key={`email-date-${datestring}`}
-          datestring={datestring}
-          emailBucket={emailMap[datestring]}
-          />))}
-        {this.props.emails && this.props.emails.length === 0 &&
-          <span style={{color: grey700, fontSize: '0.9em'}}>{this.props.placeholder || placeholder}</span>}
+        {this.state.dateOrder && this.state.dateOrder.length > 0 &&
+          <WindowScroller>
+          {({height, isScrolling, scrollTop}) =>
+            <AutoSizer disableHeight>
+              {({width}) =>
+                <CellMeasurer
+                cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
+                columnCount={1}
+                rowCount={state.dateOrder.length}
+                width={width}
+                >
+                {({getRowHeight}) =>
+                  <List
+                  autoHeight
+                  width={width}
+                  height={height}
+                  rowHeight={getRowHeight}
+                  rowCount={state.dateOrder.length}
+                  rowRenderer={this.rowRenderer}
+                  scrollTop={scrollTop}
+                  isScrolling={isScrolling}
+                  />
+                }
+                </CellMeasurer>
+              }
+              </AutoSizer>
+            }
+          </WindowScroller>
+        }
+        {props.emails && props.emails.length === 0 &&
+          <span style={{color: grey700, fontSize: '0.9em'}}>{props.placeholder || placeholder}</span>}
         </div>
-      {this.props.isReceiving &&
+      {props.isReceiving &&
         <div className='horizontal-center' style={{margin: '10px 0'}}>
           <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
         </div>}
-      </InfiniteScroll>
+      </div>
       );
   }
 }
