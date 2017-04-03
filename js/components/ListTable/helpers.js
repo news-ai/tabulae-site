@@ -194,22 +194,22 @@ export function transformFieldsmap(fieldsmap) {
           }),
           strategy: contact => contact.publication_name_1
         };
-      case 'pastemployers':
-        return {
-          customfield: false,
-          name: 'Past Publication',
-          value: 'past_publication_name_1',
-          hidden: find(fieldsmap, fObj => fObj.value === 'pastemployers').hidden,
-          sortEnabled: true,
-          hideCheckbox: false,
-          checkboxStrategy: (fMap, checked) => fMap.map(fObj => {
-            if (fObj.value === 'past_publication_name_1' || fObj.value === 'pastemployers') {
-              return Object.assign({}, fObj, {hidden: checked});
-            }
-            return fObj;
-          }),
-          strategy: contact => contact.past_publication_name_1
-        };
+      // case 'pastemployers':
+      //   return {
+      //     customfield: false,
+      //     name: 'Past Publication',
+      //     value: 'past_publication_name_1',
+      //     hidden: find(fieldsmap, fObj => fObj.value === 'pastemployers').hidden,
+      //     sortEnabled: true,
+      //     hideCheckbox: false,
+      //     checkboxStrategy: (fMap, checked) => fMap.map(fObj => {
+      //       if (fObj.value === 'past_publication_name_1' || fObj.value === 'pastemployers') {
+      //         return Object.assign({}, fObj, {hidden: checked});
+      //       }
+      //       return fObj;
+      //     }),
+      //     strategy: contact => contact.past_publication_name_1
+      //   };
       default:
         return fieldObj;
     }
