@@ -123,7 +123,6 @@ class EmailsList extends Component {
         isClosed={this.state.isClosedMap[index]}
         onOpenClick={_ => this.setState({isClosedMap: Object.assign({}, this.state.isClosedMap, {[index]: !this.state.isClosedMap[index]})},
           _ => {
-            console.log('RECOMPUTE');
             this._listCellMeasurer.resetMeasurements();
             this._list.recomputeRowHeights();
           })}
