@@ -95,7 +95,7 @@ class EmailsList extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchEmails();
+    if (this.props.emails.length === 0) this.props.fetchEmails();
     // window.Intercom('trackEvent', 'checking_sent_emails', {route: window.location.pathname});
   }
 
@@ -104,10 +104,10 @@ class EmailsList extends Component {
     if (this.props.emails.length !== nextProps.emails.length) {
       const {dateOrder, emailMap} = bucketEmailsByDate(nextProps.emails);
       this.setState({dateOrder, emailMap}, _ => {
-        if (this._list) setTimeout(_ => {
+        if (this._list) {
           this._listCellMeasurer.resetMeasurements();
           this._list.recomputeRowHeights();
-        }, 1000);
+        }
       });
     }
   }
@@ -189,13 +189,15 @@ class EmailsList extends Component {
         <div className='horizontal-center' style={{margin: '10px 0'}}>
           <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
         </div>}
+      {!props.isReceiving &&
         <div className='horizontal-center'>
           <IconButton
           tooltip='Load More'
           tooltipPosition='top-center'
           onClick={props.fetchEmails}
-          iconClassName='fa fa-chevron-down'/>
-        </div>
+          iconClassName='fa fa-chevron-down'
+          />
+        </div>}
       </div>
       );
   }
