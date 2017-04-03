@@ -750,7 +750,7 @@ class ListTable extends Component {
                 onClick={onRequestOpen}
                 />)}
               </AddOrRemoveColumnHOC>
-              <AddContactHOC listId={props.listId}>
+              <AddContactHOC contacts={props.contacts} listId={props.listId}>
               {({onRequestOpen}) => (
                 <IconButton
                 tooltip='Add New Contact'
