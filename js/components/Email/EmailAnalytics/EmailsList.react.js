@@ -146,9 +146,12 @@ class EmailsList extends Component {
             iconStyle={{color: grey500}}
             className='right'
             iconClassName={`fa fa-refresh ${props.isReceiving ? 'fa-spin' : ''}`}
+            tooltip='Refresh'
+            tooltipPosition='top-left'
             />
           </div>
-        </div>}
+        </div>
+      }
         <div style={style}>
         {this.state.dateOrder && this.state.dateOrder.length > 0 &&
           <WindowScroller>
@@ -188,13 +191,14 @@ class EmailsList extends Component {
         <div className='horizontal-center' style={{margin: '10px 0'}}>
           <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
         </div>}
-      {!props.isReceiving &&
+      {props.hasNext && !props.isReceiving &&
         <div className='horizontal-center'>
           <IconButton
           tooltip='Load More'
           tooltipPosition='top-center'
           onClick={props.fetchEmails}
           iconClassName='fa fa-chevron-down'
+          iconStyle={{color: grey600}}
           />
         </div>}
       </div>

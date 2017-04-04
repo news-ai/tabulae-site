@@ -3,14 +3,17 @@ import EmailsList from './EmailsList.react';
 import {actions as stagingActions} from 'components/Email';
 
 const mapStateToProps = (state, props) => {
-  const emails = state.stagingReducer.received
-  .filter(id => state.stagingReducer[id].delivered)
-  .filter(id => state.stagingReducer[id].archived)
-  .map(id => state.stagingReducer[id]);
+  const emails = state.stagingReducer.received.reduce((acc, id, i) => {
+    if (state.stagingReducer[id].delivered && state.stagingReducer[id].archived) {
+      acc.push(state.stagingReducer[id]);
+    }
+    return acc;
+  }, []);
   return {
     emails,
     isReceiving: state.stagingReducer.isReceiving,
-    placeholder: 'No emails trashed.'
+    placeholder: 'No emails trashed.',
+    hasNext: true
   };
 };
 

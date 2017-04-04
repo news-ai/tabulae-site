@@ -99,7 +99,7 @@ module.exports = function(options) {
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
-      filename: 'js/bundle.[hash].js',
+      filename: options.prod ? 'js/bundle.[hash].js' : 'js/bundle.js',
       publicPath: '/',
     },
     module: {

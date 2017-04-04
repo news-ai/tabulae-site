@@ -34,7 +34,8 @@ const mapStateToProps = (state, props) => {
   .filter(email => new Date(email.sendat) > rightNow);
   return {
     emails,
-    isReceiving: state.stagingReducer.isReceiving
+    isReceiving: state.stagingReducer.isReceiving,
+    hasNext: emails.length > 0
   };
 };
 
