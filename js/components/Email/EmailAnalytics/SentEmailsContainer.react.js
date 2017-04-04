@@ -6,6 +6,7 @@ import {actions as stagingActions} from 'components/Email';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
+import Link from 'react-router/lib/Link';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import {grey600} from 'material-ui/styles/colors';
@@ -17,50 +18,17 @@ import 'rc-tabs/assets/index.css';
 
 import './SentEmails.css';
 
-function partialMatch(activeKey, matchKey) {
-  // only support colon, no parentheses/maybe routing yet
-  let ret = true;
-  let activeParts = activeKey.split('/');
-  let matchParts = matchKey.split('/');
-  if (activeParts.length !== matchParts.length) return false;
-  matchParts.forEach((segment, i) => {
-    if (segment.charAt(0) !== ':') {
-      if (segment !== activeParts[i]) {
-        ret = false;
-        return false
-      }
-    } 
-  });
-  return ret;
-}
 
-const TabHandler = ({pathKey, label, activeKey, children, router, alsoMatch}) => {
+const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => {
   // clean up activeKey if last char is /
-  if (activeKey.charAt(activeKey.length - 1) === '/') {
-    activeKey = activeKey.substring(0, activeKey.length - 1);
-  }
-
-  let isActive = false;
-  if (pathKey === activeKey) isActive = true;
-  else if (alsoMatch) {
-    alsoMatch.forEach(matchKey => {
-      isActive = partialMatch(activeKey, matchKey);
-      if (isActive) return false;
-    })
-  }
-
   return (
-    <div style={{
-      margin: '0 10px',
-      color: isActive && 'red',
-      cursor: 'pointer'
-    }}
-    onClick={_ => router.push(pathKey)}
-    >{children}</div>
+    <div style={{margin: '0 5px'}}>
+      <Link onlyActiveOnIndex activeStyle={{color: 'red', borderBottom: '1px solid red'}} to={pathKey}>
+      {children}
+      </Link>
+    </div>
     );
 };
-
-const TabHandle = withRouter(TabHandler);
 
 class SentEmailsPaginationContainer extends Component {
   handleFilterChange: (event: Event, index: number, filterValue: number) => void;
@@ -117,7 +85,6 @@ class SentEmailsPaginationContainer extends Component {
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
     const selectable = [<MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
     .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
-    console.log(props.router.location.pathname);
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
 
