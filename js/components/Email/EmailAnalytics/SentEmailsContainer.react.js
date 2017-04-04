@@ -23,7 +23,12 @@ const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => 
   // clean up activeKey if last char is /
   return (
     <div style={{margin: '0 5px'}}>
-      <Link onlyActiveOnIndex activeStyle={{color: 'red', borderBottom: '1px solid red'}} to={pathKey}>
+      <Link
+      onlyActiveOnIndex
+      style={{color: 'black'}}
+      activeStyle={{color: 'red', borderBottom: '1px solid red'}}
+      to={pathKey}
+      >
       {children}
       </Link>
     </div>
