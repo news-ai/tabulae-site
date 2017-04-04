@@ -150,5 +150,11 @@ export const initialState = {
   },
   notificationReducer: {
     messages: []
+  },
+  emailStatsReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    offset: 0,
+    received: [],
   }
 };

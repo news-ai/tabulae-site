@@ -9,7 +9,7 @@ import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import {grey600} from 'material-ui/styles/colors';
+import {grey600, grey800, blue500} from 'material-ui/styles/colors';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
@@ -25,8 +25,8 @@ const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => 
     <div style={{margin: '0 5px'}}>
       <Link
       onlyActiveOnIndex
-      style={{color: 'black'}}
-      activeStyle={{color: 'red', borderBottom: '1px solid red'}}
+      style={{color: grey800}}
+      activeStyle={{color: blue500, borderBottom: `1px solid ${blue500}`}}
       to={pathKey}
       >
       {children}
@@ -117,45 +117,6 @@ class SentEmailsPaginationContainer extends Component {
               <TabHandle pathKey='/emailstats/trash' activeKey={routeKey}>Trash</TabHandle>
               <TabHandle pathKey='/emailstats/search' alsoMatch={['/emailstats/search/:searchQuery']} activeKey={routeKey}>Search</TabHandle>
             </div>
-            {/*
-            <Tabs
-            defaultActiveKey='/emailstats'
-            activeKey={state.activeKey}
-            onChange={this.onTabChange}
-            renderTabBar={() => <ScrollableInkTabBar/>}
-            renderTabContent={() => <TabContent/>}
-            >
-              <TabPane placeholder={<span>Placeholder</span>} tab='All Sent Emails' key='/emailstats'>
-                <div style={{margin: 5}}>
-                {props.lists &&
-                  <div className='left'>
-                    <div className='vertical-center'>
-                      <span>Filter by List: </span>
-                      <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
-                      {selectable}
-                      </DropDownMenu>
-                    </div>
-                  </div>}
-                  {props.children}
-                </div>
-              </TabPane>
-              <TabPane placeholder={<span>Placeholder</span>} tab='Scheduled Emails' key='/emailstats/scheduled'>
-                <div style={{margin: 5}}>
-                {props.children}
-                </div>
-              </TabPane>
-              <TabPane placeholder={<span>Placeholder</span>} tab='Trash' key='/emailstats/trash'>
-                <div style={{margin: 5}}>
-                {props.children}
-                </div>
-              </TabPane>
-              <TabPane placeholder={<span>Placeholder</span>} tab='Search' key='/emailstats/search'>
-                <div style={{margin: 5}}>
-                {props.children}
-                </div>
-              </TabPane>
-            </Tabs>
-          */}
           </div>
         {props.lists &&
           <div className='vertical-center'>

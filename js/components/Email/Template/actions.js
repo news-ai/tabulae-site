@@ -1,7 +1,7 @@
 import {
   templateConstant
 } from './constants';
-import * as api from '../../../actions/api';
+import * as api from 'actions/api';
 
 import { normalize, Schema, arrayOf } from 'normalizr';
 const templateSchema = new Schema('templates');

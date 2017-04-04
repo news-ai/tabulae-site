@@ -1,7 +1,6 @@
 import {connect} from 'react-redux';
 import EmailsList from './EmailsList.react';
 import {actions as stagingActions} from 'components/Email';
-import React, {Component} from 'react';
 
 const mapStateToProps = (state, props) => {
   const emails = state.stagingReducer.received.reduce((acc, id, i) => {
