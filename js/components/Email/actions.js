@@ -385,7 +385,7 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator) {
 }
 
 export function fetchSpecificDayEmails(day) {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS', day});
     let limit = 5;
     let offset = 0;
@@ -394,7 +394,8 @@ export function fetchSpecificDayEmails(day) {
     .then(
       response => {
         console.log(response);
-        return Promise.resolve(response);
+        dispatch({type: 'RECEIVE_SPECIFIC_DAY_EMAILS', ids: response, day});
+        return Promise.resolve(response.map(id => getState().stagingReducer[id]));
       },
       error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
     );

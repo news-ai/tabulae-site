@@ -19,10 +19,16 @@ function emailStatsReducer(state = initialState.emailStatsReducer, action) {
       obj.isReceiving = false;
       return obj;
     case emailStatsConstant.REQUEST_FAIL:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj.didInvalidate = true;
-      return obj;
+      return assignToEmpty(state, {
+        isReceiving: false,
+        didInvalidate: true
+      });
+    case 'RECEIVE_SPECIFIC_DAY_EMAILS':
+      return assignToEmpty(state, {
+        [action.day]: assignToEmpty(state[action.day], {
+          received: action.ids
+        })
+      });
     default:
       return state;
   }

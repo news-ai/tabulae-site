@@ -154,7 +154,6 @@ class EmailStats extends Component {
           iconClassName='fa fa-angle-right'
           />
         </div>
-        <IconButton iconClassName='fa fa-envelope' onClick={_ => props.fetchSpecificDayEmails('2017-04-04')}/>
       </div>
       );
   }
