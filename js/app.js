@@ -49,6 +49,7 @@ import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSen
 import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
 import SearchSentEmails from './components/Email/EmailAnalytics/SearchSentEmails.react';
 import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
+import EmailStatsContainer from './components/Email/EmailAnalytics/EmailStats/EmailStatsContainer.react';
 
 import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable';
@@ -115,6 +116,7 @@ ReactDOM.render(
               <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
               <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
               <Route path='search(/:searchQuery)' staticName name='Search' component={SearchSentEmails}/>
+              <Route path='charts' staticName name='Charts' component={EmailStatsContainer}/>
             </Route>
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='*' staticName name='Not Found' component={NotFound} />

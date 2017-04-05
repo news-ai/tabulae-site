@@ -10,7 +10,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Brush
 } from 'recharts';
 import IconButton from 'material-ui/IconButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -109,7 +108,7 @@ class EmailStats extends Component {
     // console.log(this.state.currentLimit);
     return (
       <div>
-        <div className='vertical-center'>
+        <div className='vertical-center horizontal-center'>
           <AreaChart
           width={700}
           height={300}

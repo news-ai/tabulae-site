@@ -102,7 +102,6 @@ class SentEmailsPaginationContainer extends Component {
       ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
-    console.log(routeKey);
 
     return (
         <div className='large-10 large-offset-1 columns'>
@@ -127,10 +126,8 @@ class SentEmailsPaginationContainer extends Component {
               <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
               <TabHandle pathKey='/emailstats/trash' activeKey={routeKey}>Trash</TabHandle>
               <TabHandle pathKey='/emailstats/search' alsoMatch={['/emailstats/search/:searchQuery']} activeKey={routeKey}>Search</TabHandle>
+              <TabHandle pathKey='/emailstats/charts' activeKey={routeKey}>Charts</TabHandle>
             </div>
-          </div>
-          <div style={{marginTop: 20}} className='horizontal-center'>
-            <EmailStats/>
           </div>
         {props.lists && (routeKey === '/emailstats' || props.listId > 0) &&
           <div className='vertical-center'>
