@@ -134,22 +134,23 @@ class EmailStats extends Component {
             />
             <Area
             type='monotone'
-            dataKey='Clicks'
-            stackId='1'
-            stroke='#8884d8'
-            fill='#8884d8'
-            />
-            <Area
-            type='monotone'
             dataKey='Opens'
             stackId='1'
             stroke='#82ca9d'
             fill='#82ca9d'
             />
+            <Area
+            type='monotone'
+            dataKey='Clicks'
+            stackId='1'
+            stroke='#8884d8'
+            fill='#8884d8'
+            />
           </AreaChart>
         </div>
         <div className='vertical-center horizontal-center'>
           <IconButton
+          tooltip='Back'
           disabled={props.doneLoading && left === 0}
           onClick={this.onLeftClick}
           iconClassName='fa fa-angle-left'
@@ -161,6 +162,7 @@ class EmailStats extends Component {
             <MenuItem key={90} value={90} primaryText='Past 90 Days' />
           </DropDownMenu>
           <IconButton
+          tooltip='Forward'
           disabled={state.currentOffset - state.currentLimit < 0}
           onClick={this.onRightClick}
           iconClassName='fa fa-angle-right'

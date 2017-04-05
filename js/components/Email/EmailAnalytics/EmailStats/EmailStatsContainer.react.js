@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import EmailStats from './EmailStats.react';
-import IconButton from 'material-ui/IconButton';
 import EmailsList from '../EmailsList.react';
 import {actions as stagingActions} from 'components/Email';
 import {grey200} from 'material-ui/styles/colors';
@@ -11,15 +10,27 @@ class EmailStatsContainer extends Component {
     super(props);
     this.state = {
       selectedDay: undefined,
-      emails: []
+      emails: [],
+      isEmailLoading: false,
+      noEmailSentDay: false
     };
     this.onDateSelected = this._onDateSelected.bind(this);
   }
 
   _onDateSelected(day) {
+    // simple receiver
+    const receiveEmails = emails => this.setState({emails, isEmailLoading: false, noEmailSentDay: emails.length === 0});
+
     this.setState({selectedDay: day, isEmailLoading: true});
-    this.props.fetchSpecificDayEmails(day)
-    .then(emails => this.setState({emails, isEmailLoading: false}));
+    const dayStats = this.props.emailStatsReducer[day];
+    if (dayStats && dayStats.received) {
+      // hits cache if already fetched
+      const emails = dayStats.received.map(id => this.props.stagingReducer[id]);
+      receiveEmails(emails);
+    } else {
+      this.props.fetchSpecificDayEmails(day)
+      .then(receiveEmails);
+    }
   }
 
   render() {
@@ -34,16 +45,18 @@ class EmailStatsContainer extends Component {
       {props.didInvalidate &&
         <div>An error occurred. Email stats cannot be fetched at this time.</div>}
       {props.isReceiving &&
-        <div style={{width: 700, height: 300, backgroundColor: grey200}}></div>}
+        <div className='row horizontal-center'>
+          <div style={{width: 700, height: 300, backgroundColor: grey200}}></div>
+        </div>}
         <EmailStats onDateSelected={this.onDateSelected}/>
       </div>
-    {state.emails.length === 0 &&
+    {!state.isEmailLoading && state.emails.length === 0 &&
       <div style={{margin: '10px 0'}}>
-        <span>Click on a point in the chart to show emails sent on that day.</span>
+        <span>{state.noEmailSentDay ? `No email sent on day selected.` : `Click on a point in the chart to show emails sent on that day.`}</span>
       </div>}
     {state.isEmailLoading &&
       <div>Loading emails... <i className='fa fa-spinner fa-spin'/></div>}
-    {state.emails.length > 0 &&
+    {!state.isEmailLoading && state.emails.length > 0 &&
       <EmailsList
       emails={state.emails}
       hasNext={false}
@@ -58,6 +71,8 @@ const mapStateToProps = (state, props) => {
     didInvalidate: state.emailStatsReducer.didInvalidate,
     emailDidInvalidate: state.stagingReducer.didInvalidate,
     isReceiving: state.emailStatsReducer.isReceiving,
+    emailStatsReducer: state.emailStatsReducer,
+    stagingReducer: state.stagingReducer,
   };
 };
 
