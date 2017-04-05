@@ -9,7 +9,7 @@ import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import {grey300, grey600, grey800, lightBlue300, lightBlue500} from 'material-ui/styles/colors';
+import {grey100, grey600, grey800, lightBlue200, lightBlue500} from 'material-ui/styles/colors';
 import EmailStats from './EmailStats/EmailStats.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
@@ -23,18 +23,22 @@ import './SentEmails.css';
 const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => {
   // clean up activeKey if last char is /
   return (
-    <div>
-      <Link
-      onlyActiveOnIndex
-      style={{color: grey800, padding: '0 10px'}}
-      activeStyle={{color: lightBlue500, borderBottom: `2px solid ${lightBlue300}`}}
-      to={pathKey}
-      >
-        <span style={{fontSize: '0.9em'}}>
-        {children}
-        </span>
-      </Link>
-    </div>
+    <Link
+    onlyActiveOnIndex
+    style={{
+      color: grey800,
+      padding: '3px 13px',
+      display: 'inline-block',
+      fontSize: '0.9em'
+    }}
+    activeStyle={{
+      color: lightBlue500,
+      borderBottom: `2px solid ${lightBlue200}`,
+    }}
+    to={pathKey}
+    >
+      {children}
+    </Link>
     );
 };
 
@@ -116,7 +120,7 @@ class SentEmailsPaginationContainer extends Component {
               />
             </div>
           </div>
-          <div className='row' style={{borderBottom: `1px solid ${grey300}`, marginBottom: 15}}>
+          <div className='row' style={{borderBottom: `2px solid ${grey100}`, marginBottom: 15}}>
             <div className='vertical-center'>
               <TabHandle pathKey='/emailstats' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
               <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
