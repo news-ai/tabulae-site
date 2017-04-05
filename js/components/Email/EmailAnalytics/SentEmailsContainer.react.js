@@ -9,7 +9,7 @@ import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import {grey600, grey800, blue500} from 'material-ui/styles/colors';
+import {grey300, grey600, grey800, lightBlue300, lightBlue500} from 'material-ui/styles/colors';
 import EmailStats from './EmailStats/EmailStats.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
@@ -23,14 +23,16 @@ import './SentEmails.css';
 const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => {
   // clean up activeKey if last char is /
   return (
-    <div style={{margin: '0 5px'}}>
+    <div>
       <Link
       onlyActiveOnIndex
-      style={{color: grey800}}
-      activeStyle={{color: blue500, borderBottom: `1px solid ${blue500}`}}
+      style={{color: grey800, padding: '0 10px'}}
+      activeStyle={{color: lightBlue500, borderBottom: `2px solid ${lightBlue300}`}}
       to={pathKey}
       >
-      {children}
+        <span style={{fontSize: '0.9em'}}>
+        {children}
+        </span>
       </Link>
     </div>
     );
@@ -89,8 +91,11 @@ class SentEmailsPaginationContainer extends Component {
     const state = this.state;
     const props = this.props;
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
-    const selectable = [<MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
-    .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
+    const selectable = [
+    <MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
+    .concat(filterLists.map((list, i) =>
+      <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
+      ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
 
@@ -111,7 +116,7 @@ class SentEmailsPaginationContainer extends Component {
               />
             </div>
           </div>
-          <div className='row'>
+          <div className='row' style={{borderBottom: `1px solid ${grey300}`, marginBottom: 15}}>
             <div className='vertical-center'>
               <TabHandle pathKey='/emailstats' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
               <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
@@ -119,16 +124,16 @@ class SentEmailsPaginationContainer extends Component {
               <TabHandle pathKey='/emailstats/search' alsoMatch={['/emailstats/search/:searchQuery']} activeKey={routeKey}>Search</TabHandle>
             </div>
           </div>
+          <div style={{marginTop: 20}} className='horizontal-center'>
+            <EmailStats/>
+          </div>
         {props.lists &&
           <div className='vertical-center'>
-            <span>Filter by List: </span>
+            <span style={{fontSize: '0.9em', color: grey800}}>Filter by List: </span>
             <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
             {selectable}
             </DropDownMenu>
           </div>}
-          <div className='horizontal-center'>
-            <EmailStats/>
-          </div>
           <div style={{margin: 5}}>
           {props.children}
           </div>

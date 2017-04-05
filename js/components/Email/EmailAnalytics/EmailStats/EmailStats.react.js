@@ -3,7 +3,15 @@ import {connect} from 'react-redux';
 
 import * as actions from './actions';
 
-import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Brush
+} from 'recharts';
 import IconButton from 'material-ui/IconButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -18,7 +26,7 @@ class EmailStats extends Component {
     super(props);
     this.state = {
       currentOffset: 0,
-      currentLimit: 7,
+      currentLimit: 30,
       data: []
     };
     this.onLeftClick = this._onLeftClick.bind(this);
@@ -46,14 +54,14 @@ class EmailStats extends Component {
           return acc;
         } else {
           for (let j = 1; j <= diff - 1; j++) {
-            acc.push({Date: prevDay.add('days', 1).format('YYYY-MM-DD')});
+            acc.push({Date: prevDay.add(1, 'days').format('YYYY-MM-DD')});
           }
           acc.push(curr);
           return acc;
         }
       }, []);
-      console.log(data);
-      console.log(filledData);
+      // console.log(data);
+      // console.log(filledData);
       this.setState({data: filledData});
     }
   }
@@ -96,15 +104,15 @@ class EmailStats extends Component {
     // if (data.length % state.currentLimit > 0) {
     //   data = [...data, new Array(data.length % state.currentLimit).fill({})];
     // }
-    console.log(left);
-    console.log(right);
-    console.log(this.state.currentLimit);
+    // console.log(left);
+    // console.log(right);
+    // console.log(this.state.currentLimit);
     return (
       <div>
         <div className='vertical-center'>
           <AreaChart
           width={700}
-          height={400}
+          height={300}
           data={data}
           margin={{top: 10, right: 30, left: 0, bottom: 0}}
           >
@@ -112,17 +120,29 @@ class EmailStats extends Component {
             <YAxis/>
             <CartesianGrid strokeDasharray='3 3'/>
             <Tooltip/>
-            <Area type='monotone' dataKey='Clicks' stackId='1' stroke='#8884d8' fill='#8884d8' />
-            <Area type='monotone' dataKey='Opens' stackId='1' stroke='#82ca9d' fill='#82ca9d' />
+            <Area
+            type='monotone'
+            dataKey='Clicks'
+            stackId='1'
+            stroke='#8884d8'
+            fill='#8884d8'
+            />
+            <Area
+            type='monotone'
+            dataKey='Opens'
+            stackId='1'
+            stroke='#82ca9d'
+            fill='#82ca9d'
+            />
           </AreaChart>
         </div>
-        <div className='vertical-center'>
+        <div className='vertical-center horizontal-center'>
           <IconButton
           disabled={props.doneLoading && left === 0}
           onClick={this.onLeftClick}
-          iconClassName='fa fa-arrow-left'
+          iconClassName='fa fa-angle-left'
           />
-          <DropDownMenu value={state.currentLimit} onChange={(event, index, newLimit) => this.setState({currentLimit: newLimit})}>
+          <DropDownMenu value={state.currentLimit} onChange={this.onLimitChange}>
             <MenuItem key={7} value={7} primaryText='Past 7 Days' />
             <MenuItem key={14} value={14} primaryText='Past Two Weeks' />
             <MenuItem key={30} value={30} primaryText='Past 30 Days' />
@@ -131,7 +151,7 @@ class EmailStats extends Component {
           <IconButton
           disabled={state.currentOffset - state.currentLimit < 0}
           onClick={this.onRightClick}
-          iconClassName='fa fa-arrow-right'
+          iconClassName='fa fa-angle-right'
           />
         </div>
       </div>
@@ -142,7 +162,8 @@ class EmailStats extends Component {
 const mapStateToProps = (state, props) => {
   return {
     data: state.emailStatsReducer.received.map(datestring => state.emailStatsReducer[datestring]),
-    doneLoading: state.emailStatsReducer.offset === null
+    doneLoading: state.emailStatsReducer.offset === null,
+    isReceiving: state.emailStatsReducer.isReceiving,
   };
 };
 

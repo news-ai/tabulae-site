@@ -8,13 +8,12 @@ export function fetchEmailStats(limit = 7) {
   return (dispatch, getState) => {
     const OFFSET = getState().emailStatsReducer.offset;
     if (OFFSET === null || getState().emailStatsReducer.isReceiving) return;
-    dispatch({type: emailStatsConstant.REQUEST});
+    dispatch({type: emailStatsConstant.REQUEST, limit: PAGE_LIMIT});
     return api.get(`/emails/stats?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(
       response => {
         const res = normalize(response, {data: arrayOf(emailStatsSchema)});
         const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-        console.log(res);
         return dispatch({
           type: emailStatsConstant.RECEIVE,
           stats: res.entities.emailStats,
