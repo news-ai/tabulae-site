@@ -10,6 +10,7 @@ import Link from 'react-router/lib/Link';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import {grey600, grey800, blue500} from 'material-ui/styles/colors';
+import EmailStats from './EmailStats/EmailStats.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
@@ -125,6 +126,9 @@ class SentEmailsPaginationContainer extends Component {
             {selectable}
             </DropDownMenu>
           </div>}
+          <div className='horizontal-center'>
+            <EmailStats/>
+          </div>
           <div style={{margin: 5}}>
           {props.children}
           </div>

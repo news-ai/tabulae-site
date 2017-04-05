@@ -11,32 +11,14 @@ function emailStatsReducer(state = initialState.emailStatsReducer, action) {
       obj = assignToEmpty(state, {});
       obj.isReceiving = true;
       return obj;
-    case emailStatsConstant.CREATE_REQUEST:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = true;
-      return obj;
     case emailStatsConstant.RECEIVE:
-      obj = assignToEmpty(state, action.emailStats);
-      if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
-      obj.isReceiving = false;
-      return obj;
-    case emailStatsConstant.CREATE_RECEIVED:
-      obj = assignToEmpty(state, action.emailStats);
-      if (!state.received.some(id => id === action.id)) obj.received = [...state.received, action.id];
+      obj = assignToEmpty(state, action.stats);
+      const newReceived = [...action.ids.filter(id => !state[id]), ...state.received];
+      obj.received = newReceived;
+      obj.offset = action.offset;
       obj.isReceiving = false;
       return obj;
     case emailStatsConstant.REQUEST_FAIL:
-      obj = assignToEmpty(state, {});
-      obj.isReceiving = false;
-      obj.didInvalidate = true;
-      return obj;
-    case emailStatsConstant.RECEIVE_MULTIPLE:
-      obj = assignToEmpty(state, action.emailStatss);
-      const newReceived = state.received.concat(action.ids.filter(id => !state[id]));
-      obj.received = newReceived;
-      obj.offset = action.offset;
-      return obj;
-    case emailStatsConstant.REQUEST_MULTIPLE_FAIL:
       obj = assignToEmpty(state, {});
       obj.isReceiving = false;
       obj.didInvalidate = true;

@@ -65,9 +65,7 @@ export function getTemplates() {
     dispatch({type: templateConstant.REQUEST_MULTIPLE});
     return api.get(`/templates?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(templateSchema),
-      });
+      const res = normalize(response, {data: arrayOf(templateSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
       return dispatch({
         type: templateConstant.RECEIVE_MULTIPLE,
