@@ -361,3 +361,43 @@ export function fetchContactEmails(contactId) {
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
   };
 }
+
+export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator) {
+  // day format: YYYY-MM-DD
+  return dispatch => {
+    dispatch({type: 'REQUEST_LIMITED_SPECIFIC_DAY_SENT_EMAILS', day, offset, limit});
+    return api.get(`/emails/search?q=date:${day}&limit=${limit}&offset=${offset}`)
+    .then(
+      response => {
+        const res = normalize(response, {data: arrayOf(emailSchema)});
+        dispatch({
+          type: RECEIVE_MULTIPLE_EMAILS,
+          emails: res.entities.emails,
+          ids: res.result.data,
+        });
+        const newAccumulator = [...accumulator, ...res.result.data];
+        if (response.data.length === limit) return dispatch(fetchLimitedSpecificDayEmails(day, offset + limit, limit, newAccumulator));
+        else return Promise.resolve(newAccumulator);
+      },
+      error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
+      );
+  };
+}
+
+export function fetchSpecificDayEmails(day) {
+  return dispatch => {
+    dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS', day});
+    let limit = 5;
+    let offset = 0;
+    let acc = [];
+    return dispatch(fetchLimitedSpecificDayEmails(day, offset, limit, acc))
+    .then(
+      response => {
+        console.log(response);
+        return Promise.resolve(response);
+      },
+      error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
+    );
+  };
+}
+

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import * as actions from './actions';
+import {actions as stagingActions} from 'components/Email';
 
 import {
   AreaChart,
@@ -153,6 +154,7 @@ class EmailStats extends Component {
           iconClassName='fa fa-angle-right'
           />
         </div>
+        <IconButton iconClassName='fa fa-envelope' onClick={_ => props.fetchSpecificDayEmails('2017-04-04')}/>
       </div>
       );
   }
@@ -169,6 +171,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchEmailStats: limit => dispatch(actions.fetchEmailStats(limit)),
+    fetchSpecificDayEmails: day => dispatch(stagingActions.fetchSpecificDayEmails(day)),
   };
 };
 
