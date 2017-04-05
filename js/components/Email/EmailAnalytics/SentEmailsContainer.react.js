@@ -102,6 +102,7 @@ class SentEmailsPaginationContainer extends Component {
       ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
+    console.log(routeKey);
 
     return (
         <div className='large-10 large-offset-1 columns'>
@@ -131,7 +132,7 @@ class SentEmailsPaginationContainer extends Component {
           <div style={{marginTop: 20}} className='horizontal-center'>
             <EmailStats/>
           </div>
-        {props.lists &&
+        {props.lists && (routeKey === '/emailstats' || props.listId > 0) &&
           <div className='vertical-center'>
             <span style={{fontSize: '0.9em', color: grey800}}>Filter by List: </span>
             <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
