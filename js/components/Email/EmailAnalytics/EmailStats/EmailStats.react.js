@@ -11,6 +11,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
 } from 'recharts';
 import IconButton from 'material-ui/IconButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -33,6 +34,7 @@ class EmailStats extends Component {
     this.onRightClick = this._onRightClick.bind(this);
     this.fetchEmailStats = this._fetchEmailStats.bind(this);
     this.onLimitChange = this._onLimitChange.bind(this);
+    this.handleAreaChartOnClick = this._handleAreaChartOnClick.bind(this);
   }
 
   componentWillMount() {
@@ -94,6 +96,11 @@ class EmailStats extends Component {
     });
   }
 
+  _handleAreaChartOnClick(args) {
+    const datestring = args.activeLabel;
+    this.props.onDateSelected(datestring);
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -114,12 +121,17 @@ class EmailStats extends Component {
           width={700}
           height={300}
           data={data}
+          onClick={this.handleAreaChartOnClick}
           margin={{top: 10, right: 30, left: 0, bottom: 0}}
           >
             <XAxis dataKey='Date' tickFormatter={dateFormat}/>
             <YAxis/>
             <CartesianGrid strokeDasharray='3 3'/>
             <Tooltip/>
+            <Legend
+            verticalAlign='top'
+            height={36}
+            />
             <Area
             type='monotone'
             dataKey='Clicks'

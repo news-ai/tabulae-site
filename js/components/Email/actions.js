@@ -387,13 +387,13 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator) {
 export function fetchSpecificDayEmails(day) {
   return (dispatch, getState) => {
     dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS', day});
-    let limit = 5;
+    let limit = 50;
     let offset = 0;
     let acc = [];
     return dispatch(fetchLimitedSpecificDayEmails(day, offset, limit, acc))
     .then(
       response => {
-        console.log(response);
+        // console.log(response);
         dispatch({type: 'RECEIVE_SPECIFIC_DAY_EMAILS', ids: response, day});
         return Promise.resolve(response.map(id => getState().stagingReducer[id]));
       },
