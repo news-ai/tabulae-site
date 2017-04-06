@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-
 import {connect} from 'react-redux';
+
+import withRouter from 'react-router/lib/withRouter';
 import EmailStats from './EmailStats.react';
-// import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import PlainEmailsList from './PlainEmailsList.react';
 import {actions as stagingActions} from 'components/Email';
-import {grey200, grey700} from 'material-ui/styles/colors';
+import {grey700} from 'material-ui/styles/colors';
 
 class EmailStatsContainer extends Component {
   constructor(props) {
@@ -18,6 +18,18 @@ class EmailStatsContainer extends Component {
       hasNext: false
     };
     this.onDateSelected = this._onDateSelected.bind(this);
+  }
+
+  componentWillMount() {
+    if (this.props.queryDate) {
+      this.onDateSelected(this.props.queryDate);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.queryDate !== nextProps.queryDate) {
+      this.onDateSelected(nextProps.queryDate);
+    }
   }
 
   _onDateSelected(day) {
@@ -49,7 +61,7 @@ class EmailStatsContainer extends Component {
       <div style={{marginTop: 20}}>
       {props.didInvalidate &&
         <div>An error occurred. Email stats cannot be fetched at this time.</div>}
-        <EmailStats onDateSelected={this.onDateSelected}/>
+        <EmailStats onDateSelected={day => this.props.router.push(`/emailstats/charts?date=${day}`)}/>
       </div>
       <div style={{height: 20, margin: 10, marginBottom: 20, display: 'inline-block'}}>
         <span style={{fontSize: '1.2em', color: grey700}}>{state.selectedDay}</span>
@@ -76,6 +88,7 @@ const mapStateToProps = (state, props) => {
     isReceiving: state.emailStatsReducer.isReceiving,
     emailStatsReducer: state.emailStatsReducer,
     stagingReducer: state.stagingReducer,
+    queryDate: props.router.location.query.date,
   };
 };
 
@@ -85,4 +98,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EmailStatsContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(EmailStatsContainer));

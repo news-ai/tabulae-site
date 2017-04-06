@@ -108,12 +108,7 @@ class EmailStats extends Component {
     if (left < 0) left = 0;
     const right = state.data.length - state.currentOffset;
     const data = state.data.slice(left, right);
-    // if (data.length % state.currentLimit > 0) {
-    //   data = [...data, new Array(data.length % state.currentLimit).fill({})];
-    // }
-    // console.log(left);
-    // console.log(right);
-    // console.log(this.state.currentLimit);
+
     return (
       <div>
         <div className='vertical-center horizontal-center'>

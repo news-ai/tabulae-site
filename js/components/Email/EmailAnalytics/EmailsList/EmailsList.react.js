@@ -54,6 +54,10 @@ class EmailsList extends Component {
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
   }
 
+  componentWillMount() {
+    if (this.props.fetchEmails) this.props.fetchEmails();
+  }
+
   _listRef(ref) {
     this._list = ref;
   }
