@@ -26,7 +26,8 @@ function emailStatsReducer(state = initialState.emailStatsReducer, action) {
     case 'RECEIVE_SPECIFIC_DAY_EMAILS':
       return assignToEmpty(state, {
         [action.day]: assignToEmpty(state[action.day], {
-          received: action.ids
+          received: action.ids,
+          hitThreshold: action.hitThreshold,
         })
       });
     default:

@@ -12,7 +12,8 @@ class EmailStatsContainer extends Component {
       selectedDay: undefined,
       emails: [],
       isEmailLoading: false,
-      noEmailSentDay: false
+      noEmailSentDay: false,
+      hasNext: false
     };
     this.onDateSelected = this._onDateSelected.bind(this);
   }
@@ -23,7 +24,7 @@ class EmailStatsContainer extends Component {
 
     this.setState({selectedDay: day, isEmailLoading: true});
     const dayStats = this.props.emailStatsReducer[day];
-    if (dayStats && dayStats.received) {
+    if (dayStats && dayStats.received && !dayStats.hitThreshold) {
       // hits cache if already fetched
       const emails = dayStats.received.map(id => this.props.stagingReducer[id]);
       receiveEmails(emails);
@@ -36,6 +37,8 @@ class EmailStatsContainer extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    const emailStats = props.emailStatsReducer[state.selectedDay];
+    const hasNext = emailStats && emailStats.hitThreshold;
     return (
     <div>
       <div className='row'>
@@ -59,7 +62,8 @@ class EmailStatsContainer extends Component {
     {!state.isEmailLoading && state.emails.length > 0 &&
       <EmailsList
       emails={state.emails}
-      hasNext={false}
+      fetchEmails={_ => this.onDateSelected(state.selectedDay)}
+      hasNext={hasNext}
       />}
     </div>
     );
