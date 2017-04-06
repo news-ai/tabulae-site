@@ -43,8 +43,8 @@ class EmailStats extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.data.length !== this.props.data.length) {
-      // ['1/1', '1/2']
       const data = nextProps.data;
+      // fill in empty days with empty object with right date to fill out the graph
       const filledData = data.reduce((acc, curr, i) => {
         if (i === 0) return [curr];
         const prev = data[i - 1];

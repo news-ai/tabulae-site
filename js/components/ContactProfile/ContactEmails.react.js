@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import * as stagingActions from '../Email/actions';
-import EmailsList from '../Email/EmailAnalytics/EmailsList.react';
+import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 
 class ContactEmails extends Component {
   constructor(props) {

@@ -1,5 +1,5 @@
 import {connect} from 'react-redux';
-import EmailsList from './EmailsList.react';
+import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import {actions as stagingActions} from 'components/Email';
 
 const mapStateToProps = (state, props) => {

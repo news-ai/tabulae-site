@@ -375,6 +375,7 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator, t
           emails: res.entities.emails,
           ids: res.result.data,
         });
+
         const newAccumulator = [...accumulator, ...res.result.data];
         if (response.data.length === limit && offset + limit < threshold) {
           return dispatch(fetchLimitedSpecificDayEmails(day, offset + limit, limit, newAccumulator, threshold));

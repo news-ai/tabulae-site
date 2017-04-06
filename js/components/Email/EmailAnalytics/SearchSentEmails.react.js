@@ -1,8 +1,8 @@
 // @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import EmailsList from './EmailsList.react';
 import {actions as stagingActions} from 'components/Email';
+import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 
 class SearchSentEmails extends Component {
   constructor(props) {

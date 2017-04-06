@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
+
 import {connect} from 'react-redux';
 import EmailStats from './EmailStats.react';
-import EmailsList from '../EmailsList.react';
+// import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
+import PlainEmailsList from './PlainEmailsList.react';
 import {actions as stagingActions} from 'components/Email';
-import {grey200} from 'material-ui/styles/colors';
+import {grey200, grey700} from 'material-ui/styles/colors';
 
 class EmailStatsContainer extends Component {
   constructor(props) {
@@ -53,14 +55,17 @@ class EmailStatsContainer extends Component {
         </div>}
         <EmailStats onDateSelected={this.onDateSelected}/>
       </div>
-    {!state.isEmailLoading && state.emails.length === 0 &&
-      <div style={{margin: '10px 0'}}>
-        <span>{state.noEmailSentDay ? `No email sent on day selected.` : `Click on a point in the chart to show emails sent on that day.`}</span>
-      </div>}
+    <div style={{height: 20}}>
     {state.isEmailLoading &&
       <div>Loading emails... <i className='fa fa-spinner fa-spin'/></div>}
-    {!state.isEmailLoading && state.emails.length > 0 &&
-      <EmailsList
+    {!state.isEmailLoading && state.emails.length === 0 &&
+        <span>{state.noEmailSentDay ? `No email sent on day selected.` : `Click on a point in the chart to show emails sent on that day.`}</span>}
+    </div>
+    <div style={{height: 20, margin: 10}}>
+      <span style={{fontSize: '1.2em', color: grey700}}>{state.selectedDay}</span>
+    </div>
+    {state.emails.length > 0 &&
+      <PlainEmailsList
       emails={state.emails}
       fetchEmails={_ => this.onDateSelected(state.selectedDay)}
       hasNext={hasNext}
