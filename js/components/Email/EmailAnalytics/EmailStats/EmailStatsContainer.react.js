@@ -49,21 +49,15 @@ class EmailStatsContainer extends Component {
       <div style={{marginTop: 20}}>
       {props.didInvalidate &&
         <div>An error occurred. Email stats cannot be fetched at this time.</div>}
-      {props.isReceiving &&
-        <div className='row horizontal-center'>
-          <div style={{width: 700, height: 300, backgroundColor: grey200}}></div>
-        </div>}
         <EmailStats onDateSelected={this.onDateSelected}/>
       </div>
-    <div style={{height: 20}}>
-    {state.isEmailLoading &&
-      <div>Loading emails... <i className='fa fa-spinner fa-spin'/></div>}
+      <div style={{height: 20, margin: 10, marginBottom: 20, display: 'inline-block'}}>
+        <span style={{fontSize: '1.2em', color: grey700}}>{state.selectedDay}</span>
+      {state.isEmailLoading &&
+        <span style={{margin: '0 5px'}}>Loading emails... <i className='fa fa-spinner fa-spin'/></span>}
+      </div>
     {!state.isEmailLoading && state.emails.length === 0 &&
-        <span>{state.noEmailSentDay ? `No email sent on day selected.` : `Click on a point in the chart to show emails sent on that day.`}</span>}
-    </div>
-    <div style={{height: 20, margin: 10}}>
-      <span style={{fontSize: '1.2em', color: grey700}}>{state.selectedDay}</span>
-    </div>
+      <span>{state.noEmailSentDay ? `No email sent on day selected.` : `Click on a point in the chart to show emails sent on that day.`}</span>}
     {state.emails.length > 0 &&
       <PlainEmailsList
       emails={state.emails}

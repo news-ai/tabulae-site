@@ -118,7 +118,7 @@ class EmailStats extends Component {
       <div>
         <div className='vertical-center horizontal-center'>
           <AreaChart
-          width={700}
+          width={800}
           height={300}
           data={data}
           onClick={this.handleAreaChartOnClick}
