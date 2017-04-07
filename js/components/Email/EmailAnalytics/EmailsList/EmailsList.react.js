@@ -10,6 +10,8 @@ import Collapse from 'react-collapse';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import EmailDateContainer from './EmailDateContainer.react';
 
+const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
+
 const bucketEmailsByDate = (emails) => {
   if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}};
   const firstDateString = new Date(emails[0].created).toLocaleDateString();
@@ -17,9 +19,11 @@ const bucketEmailsByDate = (emails) => {
   let dateOrder = [firstDateString];
   let dateMap = {[firstDateString]: true};
   let datestring;
+  let sendat;
   emails.map((email, i) => {
     if (i === 0) return null;
-    datestring = new Date(email.created).toLocaleDateString();
+    sendat = email.sendat === DEFAULT_SENDAT ? email.created : email.sendat;
+    datestring = new Date(sendat).toLocaleDateString();
     if (dateMap[datestring]) {
       emailMap = Object.assign({}, emailMap, {
         [datestring]: [...emailMap[datestring], email]
