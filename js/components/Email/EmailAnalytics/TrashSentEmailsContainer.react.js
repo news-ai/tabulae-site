@@ -13,7 +13,7 @@ const mapStateToProps = (state, props) => {
     emails,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails trashed.',
-    hasNext: true
+    hasNext: state.stagingReducer.archivedOffset !== null,
   };
 };
 

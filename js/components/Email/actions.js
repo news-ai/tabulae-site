@@ -277,6 +277,7 @@ export function fetchArchivedEmails() {
   return (dispatch, getState) => {
     const OFFSET = getState().stagingReducer.archivedOffset;
     if (OFFSET === null || getState().stagingReducer.isReceiving) return;
+    dispatch({type: 'FETCH_ARCHIVED_EMAILS'});
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails/archived?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then(response => {
