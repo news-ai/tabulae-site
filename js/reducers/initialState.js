@@ -35,6 +35,7 @@ export const initialState = {
     offset: 0,
     contactOffsets: {},
     listOffsets: {},
+    archivedOffsets: {},
     utctime: null,
     scheduledOffset: 0,
   },

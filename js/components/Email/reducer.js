@@ -84,6 +84,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj = assignToEmpty(state, {});
       if (action.scheduledOffset || action.scheduledOffset === null) obj.scheduledOffset = action.scheduledOffset;
       if (action.offset || action.offset === null) obj.offset = action.offset;
+      if (action.archivedOffset || action.archivedOffset === null) obj.archivedOffset = action.archivedOffset;
       return obj;
     case SET_SCHEDULE_TIME:
       return assignToEmpty(state, {utctime: action.utctime});
