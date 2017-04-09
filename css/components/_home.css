@@ -25,6 +25,16 @@
 	
 }
 
+.hoverGray {
+/*  grey600 */
+  color: #757575;
+}
+
+.hoverGray:hover {
+/*  grey500 */
+  color: #9E9E9E;
+}
+
 .wrapper {
 	background-color: #FEFEFE;
 	color: #222222;

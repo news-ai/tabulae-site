@@ -1,6 +1,5 @@
-
-// Best used with material-ui Textfield to generate errorText without overcrowding state
 import React, {Component} from 'react';
+// Best used with material-ui Textfield to generate errorText without overcrowding state
 
 class ValidationHOC extends Component {
   constructor(props) {
@@ -18,7 +17,7 @@ class ValidationHOC extends Component {
       this.setState({showErrorMessage: false, errorMessage: ''});
       return;
     }
-    for (var i = 0; i < rules.length; i++) {
+    for (let i = 0; i < rules.length; i++) {
       const {validator, errorMessage} = rules[i];
       if (!validator(value)) {
         this.setState({showErrorMessage: true, errorMessage});

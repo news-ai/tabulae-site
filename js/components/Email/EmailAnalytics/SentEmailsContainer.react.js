@@ -6,9 +6,11 @@ import {actions as stagingActions} from 'components/Email';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import withRouter from 'react-router/lib/withRouter';
+import Link from 'react-router/lib/Link';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import {grey600} from 'material-ui/styles/colors';
+import {grey100, grey600, grey800, lightBlue200, lightBlue500} from 'material-ui/styles/colors';
+import EmailStats from './EmailStats/EmailStats.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
@@ -16,6 +18,29 @@ import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
 import 'rc-tabs/assets/index.css';
 
 import './SentEmails.css';
+
+
+const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => {
+  // clean up activeKey if last char is /
+  return (
+    <Link
+    onlyActiveOnIndex
+    style={{
+      color: grey800,
+      padding: '3px 13px',
+      display: 'inline-block',
+      fontSize: '0.9em'
+    }}
+    activeStyle={{
+      color: lightBlue500,
+      borderBottom: `2px solid ${lightBlue200}`,
+    }}
+    to={pathKey}
+    >
+      {children}
+    </Link>
+    );
+};
 
 class SentEmailsPaginationContainer extends Component {
   handleFilterChange: (event: Event, index: number, filterValue: number) => void;
@@ -70,8 +95,13 @@ class SentEmailsPaginationContainer extends Component {
     const state = this.state;
     const props = this.props;
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
-    const selectable = [<MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
-    .concat(filterLists.map((list, i) => <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>));
+    const selectable = [
+    <MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
+    .concat(filterLists.map((list, i) =>
+      <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
+      ));
+    // console.log(props.router.location);
+    const routeKey = props.router.location.pathname;
 
     return (
         <div className='large-10 large-offset-1 columns'>
@@ -90,44 +120,24 @@ class SentEmailsPaginationContainer extends Component {
               />
             </div>
           </div>
-          <div className='row'>
-            <Tabs
-            defaultActiveKey='/emailstats'
-            activeKey={state.activeKey}
-            onChange={this.onTabChange}
-            renderTabBar={() => <ScrollableInkTabBar/>}
-            renderTabContent={() => <TabContent/>}
-            >
-              <TabPane placeholder={<span>Placeholder</span>} tab='All Sent Emails' key='/emailstats'>
-                <div style={{margin: 5}}>
-                {props.lists &&
-                  <div className='left'>
-                    <div className='vertical-center'>
-                      <span>Filter by List: </span>
-                      <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
-                      {selectable}
-                      </DropDownMenu>
-                    </div>
-                  </div>}
-                  {props.children}
-                </div>
-              </TabPane>
-              <TabPane placeholder={<span>Placeholder</span>} tab='Scheduled Emails' key='/emailstats/scheduled'>
-                <div style={{margin: 5}}>
-                {props.children}
-                </div>
-              </TabPane>
-              <TabPane placeholder={<span>Placeholder</span>} tab='Trash' key='/emailstats/trash'>
-                <div style={{margin: 5}}>
-                {props.children}
-                </div>
-              </TabPane>
-              <TabPane placeholder={<span>Placeholder</span>} tab='Search' key='/emailstats/search'>
-                <div style={{margin: 5}}>
-                {props.children}
-                </div>
-              </TabPane>
-            </Tabs>
+          <div className='row' style={{borderBottom: `2px solid ${grey100}`, marginBottom: 15}}>
+            <div className='vertical-center'>
+              <TabHandle pathKey='/emailstats' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
+              <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
+              <TabHandle pathKey='/emailstats/trash' activeKey={routeKey}>Trash</TabHandle>
+              <TabHandle pathKey='/emailstats/search' alsoMatch={['/emailstats/search/:searchQuery']} activeKey={routeKey}>Search</TabHandle>
+              <TabHandle pathKey='/emailstats/charts' activeKey={routeKey}>Charts</TabHandle>
+            </div>
+          </div>
+        {props.lists && (routeKey === '/emailstats' || props.listId > 0) &&
+          <div className='vertical-center'>
+            <span style={{fontSize: '0.9em', color: grey800}}>Filter by List: </span>
+            <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
+            {selectable}
+            </DropDownMenu>
+          </div>}
+          <div style={{margin: 5}}>
+          {props.children}
           </div>
         </div>
     );
@@ -140,7 +150,7 @@ const mapStateToProps = (state, props) => {
     listReducer: state.listReducer,
     canLoadMore: state.stagingReducer.offset !== null,
     lists: state.listReducer.lists && state.listReducer.lists.map(listId => state.listReducer[listId]),
-    searchQuery: props.params.searchQuery
+    searchQuery: props.params.searchQuery,
   };
 };
 

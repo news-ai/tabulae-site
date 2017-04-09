@@ -361,3 +361,56 @@ export function fetchContactEmails(contactId) {
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
   };
 }
+
+export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator, threshold) {
+  // day format: YYYY-MM-DD
+  return dispatch => {
+    dispatch({type: 'REQUEST_LIMITED_SPECIFIC_DAY_SENT_EMAILS', day, offset, limit});
+    return api.get(`/emails/search?q=date:${day}&limit=${limit}&offset=${offset}`)
+    .then(
+      response => {
+        const res = normalize(response, {data: arrayOf(emailSchema)});
+        dispatch({
+          type: RECEIVE_MULTIPLE_EMAILS,
+          emails: res.entities.emails,
+          ids: res.result.data,
+        });
+
+        const newAccumulator = [...accumulator, ...res.result.data];
+        if (response.data.length === limit && offset + limit < threshold) {
+          return dispatch(fetchLimitedSpecificDayEmails(day, offset + limit, limit, newAccumulator, threshold));
+        } else {
+          return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold});
+        }
+      },
+      error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
+      );
+  };
+}
+
+// threshold must always be larger than limit
+// threshold is the number of emails that can be recursely fetched at a time
+// to prevent fetching 1000s of emails at once and slow down UI
+const THRESHOLD_SIZE = 300;
+const LIMIT_SIZE = 50;
+
+export function fetchSpecificDayEmails(day) {
+  return (dispatch, getState) => {
+    dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS', day});
+    const limit = LIMIT_SIZE;
+    const emailStats = getState().emailStatsReducer[day];
+    const offset = emailStats && emailStats.received ? emailStats.received.length : 0;
+    const threshold = offset + THRESHOLD_SIZE;
+    const acc = [];
+    return dispatch(fetchLimitedSpecificDayEmails(day, offset, limit, acc, threshold))
+    .then(
+      ({data, hitThreshold}) => {
+        const ids = emailStats && emailStats.received ? [...emailStats.received, ...data] : data;
+        dispatch({type: 'RECEIVE_SPECIFIC_DAY_EMAILS', ids, day, hitThreshold});
+        return Promise.resolve(ids.map(id => getState().stagingReducer[id]));
+      },
+      error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
+    );
+  };
+}
+

@@ -1,18 +1,22 @@
 import React, {Component} from 'react';
+import CountViewItem from './CountViewItem.react';
 import Link from 'react-router/lib/Link';
 import Dialog from 'material-ui/Dialog';
-import StaticEmailContent from '../PreviewEmails/StaticEmailContent.react';
-import FlatButton from 'material-ui/FlatButton';
-import Paper from 'material-ui/Paper';
+import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.react';
+import LinkAnalyticsHOC from './LinkAnalyticsHOC.react';
+import OpenAnalyticsHOC from './OpenAnalyticsHOC.react';
+import {
+  deepOrange100, deepOrange700, deepOrange900,
+  grey400, grey600, grey800
+} from 'material-ui/styles/colors';
+import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import {actions as attachmentActions} from 'components/Email/EmailAttachment';
-import {deepOrange600, grey400, grey600, grey800} from 'material-ui/styles/colors';
-import moment from 'moment-timezone';
-import alertify from 'alertifyjs';
-import FontIcon from 'material-ui/FontIcon';
+import Paper from 'material-ui/Paper';
 
-const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
+import moment from 'moment-timezone';
+
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
 const styles = {
@@ -41,7 +45,10 @@ const styles = {
   }
 };
 
-class ScheduledEmailItem extends Component {
+const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
+
+
+class AnalyticsItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -74,12 +81,10 @@ class ScheduledEmailItem extends Component {
       cc,
       bcc,
       archiveEmail,
-      archived,
-      cancel,
-      onCancelClick
+      archived
     } = this.props;
     const state = this.state;
-    const wrapperStyle = styles.wrapper;
+    const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let sendAtDate = moment(sendat);
     const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
@@ -91,7 +96,7 @@ class ScheduledEmailItem extends Component {
           {listid !== 0 &&
             <div>
               <span style={styles.sentFrom}>Sent from List</span>
-              <span style={{margin: '0 5px', fontSize: '0.9em'}}><Link to={`/tables/${listid}`}>{listname || listid}</Link></span>
+              <span style={{margin: '0 5px', fontSize: '0.9em'}}><Link to={`/tables/${listid}`}>{listname || `(Archived) ${listid}`}</Link></span>
               {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
               {!archived && <FontIcon
               className='pointer fa fa-trash'
@@ -119,28 +124,38 @@ class ScheduledEmailItem extends Component {
         <div className='email-analytics row' style={styles.analytics}>
           <div className='small-12 medium-3 large-3 columns'>
             <span style={styles.to}>To</span>
-            <span style={{fontSize: '0.9em', color: grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
+            <span style={{fontSize: '0.9em', color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
           <div className='small-12 medium-5 large-5 columns' style={{margin: '15px 0'}}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
           {subject.length === 0 &&
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>(No Subject)</span>}
-          </div>
-          <div className='small-12 medium-4 large-4 columns horizontal-center'>
-            {!cancel &&
-              <FlatButton
-              onClick={_ =>
-              alertify.confirm(
-              'Cancel Email Delivery',
-              'Canceling email delivery cannot be undone. You would have to resend the email. Are you sure?',
-              onCancelClick,
-              _ => ({}))}
-              label='Cancel Delivery' secondary/>}
-          </div>
-        {cancel &&
-            <div className='small-12 large-6 columns left'>
-              <span style={{color: deepOrange600, fontSize: '0.8em'}}>Canceled Delivery</span>
+          {!delivered &&
+            <div style={styles.errorText}>
+              <span>Something went wrong on our end. Let us know!</span>
+              <p>Email ID: {id}</p>
             </div>}
+          {bouncedreason &&
+            <p style={{color: deepOrange900}}>{bouncedreason}</p>}
+          </div>
+          <div className='small-12 medium-2 large-2 columns horizontal-center' style={{padding: 3}}>
+          {(!bounced && delivered) &&
+            <OpenAnalyticsHOC emailId={id} count={opened}>
+            {({onRequestOpen}) => (
+              <CountViewItem onTouchTap={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o'/>)}
+            </OpenAnalyticsHOC>}
+          </div>
+          <div className='small-12 medium-2 large-2 columns horizontal-center' style={{padding: 3}}>
+          {(!bounced && delivered) &&
+            <LinkAnalyticsHOC emailId={id} count={clicked}>
+            {({onRequestOpen}) => (
+              <CountViewItem onTouchTap={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o'/>)}
+            </LinkAnalyticsHOC>}
+          </div>
+        {bounced &&
+          <div className='small-12 large-6 columns left'>
+            <span style={{color: deepOrange700, fontSize: '0.8em'}}>email bounced</span>
+          </div>}
         </div>
       </Paper>
       );
@@ -155,9 +170,9 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onCancelClick: _ => dispatch(stagingActions.cancelScheduledEmail(props.id)),
     fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(attachmentActions.fetchAttachment(id))),
+    archiveEmail: _ => dispatch(stagingActions.archiveEmail(props.id))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ScheduledEmailItem);
+export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsItem);

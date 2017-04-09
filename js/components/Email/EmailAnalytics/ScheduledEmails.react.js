@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
-import EmailsList from './EmailsList.react';
+import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import alertify from 'alertifyjs';
@@ -34,7 +34,8 @@ const mapStateToProps = (state, props) => {
   .filter(email => new Date(email.sendat) > rightNow);
   return {
     emails,
-    isReceiving: state.stagingReducer.isReceiving
+    isReceiving: state.stagingReducer.isReceiving,
+    hasNext: emails.length > 0
   };
 };
 
