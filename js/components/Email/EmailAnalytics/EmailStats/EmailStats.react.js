@@ -112,6 +112,7 @@ class EmailStats extends Component {
     return (
       <div>
         <div className='vertical-center horizontal-center'>
+          {state.data.length === 0 && <div style={{margin: '20px 0'}}>No sent email history. Check back here after sending some emails.</div>}
           <AreaChart
           width={800}
           height={300}
@@ -146,7 +147,7 @@ class EmailStats extends Component {
         <div className='vertical-center horizontal-center'>
           <IconButton
           tooltip='Back'
-          disabled={props.doneLoading && left === 0}
+          disabled={state.data.length === 0 || (props.doneLoading && left === 0)}
           onClick={this.onLeftClick}
           iconClassName='fa fa-angle-left'
           />
@@ -158,7 +159,7 @@ class EmailStats extends Component {
           </DropDownMenu>
           <IconButton
           tooltip='Forward'
-          disabled={state.currentOffset - state.currentLimit < 0}
+          disabled={state.data.length === 0 || state.currentOffset - state.currentLimit < 0}
           onClick={this.onRightClick}
           iconClassName='fa fa-angle-right'
           />
