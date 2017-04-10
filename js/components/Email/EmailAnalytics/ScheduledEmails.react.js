@@ -35,7 +35,7 @@ const mapStateToProps = (state, props) => {
   return {
     emails,
     isReceiving: state.stagingReducer.isReceiving,
-    hasNext: emails.length > 0
+    hasNext: state.stagingReducer.scheduledOffset !== null,
   };
 };
 

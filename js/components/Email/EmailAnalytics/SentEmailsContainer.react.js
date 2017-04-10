@@ -19,22 +19,32 @@ import 'rc-tabs/assets/index.css';
 
 import './SentEmails.css';
 
+const styles = {
+  tabHandle: {
+    color: grey800,
+    padding: '3px 13px',
+    display: 'inline-block',
+    fontSize: '0.9em'
+  },
+  tabHandleActive: {
+    color: lightBlue500,
+    borderBottom: `2px solid ${lightBlue200}`,
+  },
+  searchIcon: {color: grey600},
+  filterLabel: {fontSize: '0.9em', color: grey800},
+  childrenMargin: {margin: 5},
+  tabContainer: {borderBottom: `2px solid ${grey100}`, marginBottom: 15},
+  label: {fontSize: '1.3em', marginRight: 10},
+  labelContainer: {margin: '20px 0'},
+};
 
 const TabHandle = ({pathKey, label, activeKey, children, router, alsoMatch}) => {
   // clean up activeKey if last char is /
   return (
     <Link
     onlyActiveOnIndex
-    style={{
-      color: grey800,
-      padding: '3px 13px',
-      display: 'inline-block',
-      fontSize: '0.9em'
-    }}
-    activeStyle={{
-      color: lightBlue500,
-      borderBottom: `2px solid ${lightBlue200}`,
-    }}
+    style={styles.tabHandle}
+    activeStyle={styles.tabHandleActive}
     to={pathKey}
     >
       {children}
@@ -70,6 +80,7 @@ class SentEmailsPaginationContainer extends Component {
       this.setState({activeKey});
     };
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.onSearchKeyDown = e => e.key === 'Enter' ? this.onSearchClick(this.refs.emailSearch.input.value) : null;
   }
 
   componentWillMount() {
@@ -105,22 +116,22 @@ class SentEmailsPaginationContainer extends Component {
 
     return (
         <div className='large-10 large-offset-1 columns'>
-          <div className='vertical-center' style={{margin: '20px 0'}}>
-            <span style={{fontSize: '1.3em', marginRight: 10}}>Emails You Sent</span>
+          <div className='vertical-center' style={styles.labelContainer}>
+            <span style={styles.label}>Emails You Sent</span>
             <div className='right'>
               <TextField
               ref='emailSearch'
               floatingLabelText='Search Filter'
-              onKeyDown={e => e.key === 'Enter' ? this.onSearchClick(this.refs.emailSearch.input.value) : null}
+              onKeyDown={this.onSearchKeyDown}
               />
               <IconButton
-              iconStyle={{color: grey600}}
+              iconStyle={styles.searchIcon}
               iconClassName='fa fa-search'
               onClick={e => this.onSearchClick(this.refs.emailSearch.input.value)}
               />
             </div>
           </div>
-          <div className='row' style={{borderBottom: `2px solid ${grey100}`, marginBottom: 15}}>
+          <div className='row' style={styles.tabContainer}>
             <div className='vertical-center'>
               <TabHandle pathKey='/emailstats' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
               <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
@@ -131,12 +142,12 @@ class SentEmailsPaginationContainer extends Component {
           </div>
         {props.lists && (routeKey === '/emailstats' || props.listId > 0) &&
           <div className='vertical-center'>
-            <span style={{fontSize: '0.9em', color: grey800}}>Filter by List: </span>
+            <span style={styles.filterLists}>Filter by List: </span>
             <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
             {selectable}
             </DropDownMenu>
           </div>}
-          <div style={{margin: 5}}>
+          <div style={styles.childrenMargin}>
           {props.children}
           </div>
         </div>

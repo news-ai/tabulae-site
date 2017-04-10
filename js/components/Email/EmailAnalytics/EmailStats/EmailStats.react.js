@@ -22,6 +22,10 @@ const dateFormat = (time) => {
   return moment(time).format('MM/DD');
 };
 
+const areaChartMargins = {top: 10, right: 30, left: 0, bottom: 0};
+
+const emptyDivStyle = {margin: '20px 0'};
+
 class EmailStats extends Component {
   constructor(props) {
     super(props);
@@ -38,6 +42,7 @@ class EmailStats extends Component {
   }
 
   componentWillMount() {
+    window.Intercom('trackEvent', 'load_stats');
     this.fetchEmailStats();
   }
 
@@ -73,8 +78,10 @@ class EmailStats extends Component {
   }
 
   _onLeftClick() {
+
     new Promise((resolve, reject) => {
-      if (this.props.doneLoading) resolve(true);
+      window.Intercom('trackEvent', 'get_older_stats', {limit: this.state.currentLimit});
+      if (this.props.doneLoading) resolve(true); // no more stats available for loading
       else this.fetchEmailStats().then(resolve, reject);
     })
     .then(_ => {
@@ -114,13 +121,14 @@ class EmailStats extends Component {
     return (
       <div>
         <div className='vertical-center horizontal-center'>
-          {state.data.length === 0 && <div style={{margin: '20px 0'}}>No sent email history. Check back here after sending some emails.</div>}
+        {state.data.length === 0 &&
+          <div style={emptyDivStyle}>No sent email history. Check back here after sending some emails.</div>}
           <AreaChart
           width={800}
           height={300}
           data={data}
           onClick={this.handleAreaChartOnClick}
-          margin={{top: 10, right: 30, left: 0, bottom: 0}}
+          margin={areaChartMargins}
           >
             <XAxis dataKey='Date' tickFormatter={dateFormat}/>
             <YAxis/>
