@@ -7,6 +7,12 @@ import PlainEmailsList from './PlainEmailsList.react';
 import {actions as stagingActions} from 'components/Email';
 import {grey700} from 'material-ui/styles/colors';
 
+const pageTitleSpan = {fontSize: '1.5em'};
+const marginTop = {marginTop: 20};
+const emailContainerStyle = {height: 20, margin: 10, marginBottom: 20, display: 'inline-block'};
+const emailContainerLabelStyle = {fontSize: '1.2em', color: grey700};
+const smallSpanStyle = {margin: '0 5px'};
+
 class EmailStatsContainer extends Component {
   constructor(props) {
     super(props);
@@ -18,6 +24,8 @@ class EmailStatsContainer extends Component {
       hasNext: false
     };
     this.onDateSelected = this._onDateSelected.bind(this);
+    this.fetchEmails = _ => this.onDateSelected(this.state.selectedDay);
+    this.onChartClick = day => this.props.router.push(`/emailstats/charts?date=${day}`);
   }
 
   componentWillMount() {
@@ -57,24 +65,24 @@ class EmailStatsContainer extends Component {
     return (
     <div>
       <div className='row'>
-        <span style={{fontSize: '1.5em'}}>Opens/Clicks History</span>
+        <span style={pageTitleSpan}>Opens/Clicks History</span>
       </div>
-      <div style={{marginTop: 20}}>
+      <div style={marginTop}>
       {props.didInvalidate &&
         <div>An error occurred. Email stats cannot be fetched at this time.</div>}
-        <EmailStats onDateSelected={day => this.props.router.push(`/emailstats/charts?date=${day}`)}/>
+        <EmailStats onDateSelected={this.onChartClick}/>
       </div>
-      <div style={{height: 20, margin: 10, marginBottom: 20, display: 'inline-block'}}>
-        <span style={{fontSize: '1.2em', color: grey700}}>{state.selectedDay}</span>
+      <div style={emailContainerStyle}>
+        <span style={emailContainerLabelStyle}>{state.selectedDay}</span>
       {state.isEmailLoading &&
-        <span style={{margin: '0 5px'}}>Loading emails... <i className='fa fa-spinner fa-spin'/></span>}
+        <span style={smallSpanStyle}>Loading emails... <i className='fa fa-spinner fa-spin'/></span>}
       </div>
     {!state.isEmailLoading && state.emails.length === 0 &&
       <span>{state.noEmailSentDay ? `No email sent on day selected.` : `Click on a point in the chart to show emails sent on that day.`}</span>}
     {state.emails.length > 0 &&
       <PlainEmailsList
       emails={state.emails}
-      fetchEmails={_ => this.onDateSelected(state.selectedDay)}
+      fetchEmails={this.fetchEmails}
       hasNext={hasNext}
       />}
     </div>
