@@ -28,6 +28,7 @@ class EmailStatsContainer extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.queryDate !== nextProps.queryDate) {
+      window.Intercom('trackEvent', 'get_specific_day_emails');
       this.onDateSelected(nextProps.queryDate);
     }
   }
