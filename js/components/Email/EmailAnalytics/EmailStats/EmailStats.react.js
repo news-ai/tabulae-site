@@ -38,6 +38,7 @@ class EmailStats extends Component {
   }
 
   componentWillMount() {
+    window.Intercom('trackEvent', 'load_stats');
     this.fetchEmailStats();
   }
 
@@ -73,8 +74,10 @@ class EmailStats extends Component {
   }
 
   _onLeftClick() {
+
     new Promise((resolve, reject) => {
-      if (this.props.doneLoading) resolve(true);
+      window.Intercom('trackEvent', 'get_older_stats', {limit: this.state.currentLimit});
+      if (this.props.doneLoading) resolve(true); // no more stats available for loading
       else this.fetchEmailStats().then(resolve, reject);
     })
     .then(_ => {
