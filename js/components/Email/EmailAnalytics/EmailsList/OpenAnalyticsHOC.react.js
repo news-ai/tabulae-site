@@ -8,11 +8,14 @@ import moment from 'moment-timezone';
 
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
-const OpenItem = ({Type, CreatedAt}) => {
+const openItemStyle = {margin: '0 5px', color: grey600, fontSize: '0.9em'};
+const openItemContainerStyle = {margin: '5px 0'};
+
+const OpenItem = ({CreatedAt}) => {
   let createdDate = moment(CreatedAt);
   return (
-  <div className='row vertical-center' style={{margin: '5px 0'}}>
-    <span style={{margin: '0 5px', color: grey600, fontSize: '0.9em'}}>{createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
+  <div className='row vertical-center' style={openItemContainerStyle}>
+    <span style={openItemStyle}>{createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
   </div>
   );
 };
@@ -21,6 +24,8 @@ class OpenAnalyticsHOC extends Component {
   constructor(props) {
     super(props);
     this.state = {open: false};
+    this.onRequestClose = _ => this.setState({open: false});
+    this.onRequestOpen = _ => this.setState({open: true});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -34,10 +39,10 @@ class OpenAnalyticsHOC extends Component {
     const state = this.state;
     return (
       <div style={props.style}>
-        <Dialog autoScrollBodyContent title='Open Timeline' open={state.open} onRequestClose={_ => this.setState({open: false})}>
+        <Dialog autoScrollBodyContent title='Open Timeline' open={state.open} onRequestClose={this.onRequestClose}>
         {props.isReceiving ?
-          <FontIcon style={{margin: '10px 0'}} color={grey400} className='fa fa-spinner fa-spin'/> :
-          <div style={{margin: '20px 0'}}>
+          <FontIcon style={styles.loadingIcon} color={grey400} className='fa fa-spinner fa-spin'/> :
+          <div style={styles.openContaner}>
         {props.opens &&
           props.opens
           .map((item, i) =>
@@ -45,15 +50,21 @@ class OpenAnalyticsHOC extends Component {
           {!props.opens &&
             <span>Email was never opened.</span>}
         </div>}
-        <div style={{backgroundColor: yellow50, padding: 10, margin: 10, fontSize: '0.9em'}}>
+        <div style={styles.warning}>
           <span>Sometimes, open count might be off by +/-1 count depending on how your recipient's devices are set up to receive emails.
           On some phones, the email is previewed on the home screens and that would count as a view.</span>
         </div>
         </Dialog>
-        {props.children({onRequestOpen: _ => this.setState({open: true})})}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>);
   }
 }
+
+const styles = {
+  warning: {backgroundColor: yellow50, padding: 10, margin: 10, fontSize: '0.9em'},
+  openContaner: {margin: '20px 0'},
+  loadingIcon: {margin: '10px 0'},
+};
 
 const mapStateToProps = (state, props) => {
   const logs = state.stagingReducer[props.emailId].logs;

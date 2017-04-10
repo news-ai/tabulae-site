@@ -18,54 +18,6 @@ import Paper from 'material-ui/Paper';
 import moment from 'moment-timezone';
 
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
-
-const styles = {
-  analytics: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  wrapper: {
-    padding: 12,
-    margin: 5,
-    marginBottom: 10,
-  },
-  to: {
-    color: 'gray',
-    fontSize: '0.8em',
-    alignSelf: 'flex-start',
-    marginRight: 5
-  },
-  subjectText: {
-    fontWeight: 500,
-    color: grey800
-  },
-  sentFrom: {
-    color: 'gray',
-    fontSize: '0.8em',
-  },
-  linkContainerSpan: {
-    margin: '0 5px', fontSize: '0.9em'
-  },
-  attachmentIcon: {
-    fontSize: '0.8em', margin: '0 3px'
-  },
-  trashIcon: {
-    fontSize: '16px'
-  },
-  sentLabel: {
-    marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'
-  },
-  bouncedReason: {
-    color: deepOrange900
-  },
-  bouncedLabel: {
-    color: deepOrange700, fontSize: '0.8em'
-  },
-  tagContainer: {
-    padding: 3
-  },
-};
-
 const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
 
 class AnalyticsItem extends Component {
@@ -147,7 +99,7 @@ class AnalyticsItem extends Component {
             <span style={styles.to}>To</span>
             <span style={{fontSize: '0.9em', color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
           </div>
-          <div className='small-12 medium-5 large-5 columns' style={{margin: '15px 0'}}>
+          <div className='small-12 medium-5 large-5 columns' style={styles.toContainer}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
           {subject.length === 0 &&
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>(No Subject)</span>}
@@ -182,6 +134,54 @@ class AnalyticsItem extends Component {
       );
   }
 }
+
+const styles = {
+  analytics: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  wrapper: {
+    padding: 12,
+    margin: 5,
+    marginBottom: 10,
+  },
+  to: {
+    color: 'gray',
+    fontSize: '0.8em',
+    alignSelf: 'flex-start',
+    marginRight: 5
+  },
+  toContainer: {margin: '15px 0'},
+  subjectText: {
+    fontWeight: 500,
+    color: grey800
+  },
+  sentFrom: {
+    color: 'gray',
+    fontSize: '0.8em',
+  },
+  linkContainerSpan: {
+    margin: '0 5px', fontSize: '0.9em'
+  },
+  attachmentIcon: {
+    fontSize: '0.8em', margin: '0 3px'
+  },
+  trashIcon: {
+    fontSize: '16px'
+  },
+  sentLabel: {
+    marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'
+  },
+  bouncedReason: {
+    color: deepOrange900
+  },
+  bouncedLabel: {
+    color: deepOrange700, fontSize: '0.8em'
+  },
+  tagContainer: {
+    padding: 3
+  },
+};
 
 const mapStateToProps = (state, props) => {
   return {

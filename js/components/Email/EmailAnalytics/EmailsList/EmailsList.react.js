@@ -56,6 +56,7 @@ class EmailsList extends Component {
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
   }
 
   componentWillMount() {
@@ -114,7 +115,7 @@ class EmailsList extends Component {
           <div className='right'>
             <IconButton
             onClick={props.refreshEmails}
-            iconStyle={{color: grey500}}
+            iconStyle={styles.baseIcon}
             className='right'
             iconClassName={`fa fa-refresh ${props.isReceiving ? 'fa-spin' : ''}`}
             tooltip='Refresh'
@@ -131,7 +132,7 @@ class EmailsList extends Component {
               {({width}) =>
                 <CellMeasurer
                 ref={this._listCellMeasurerRef}
-                cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
+                cellRenderer={this.cellRenderer}
                 columnCount={1}
                 rowCount={state.dateOrder.length}
                 width={width}
@@ -156,11 +157,11 @@ class EmailsList extends Component {
           </WindowScroller>
         }
         {props.emails && props.emails.length === 0 &&
-          <span style={{color: grey700, fontSize: '0.9em'}}>{props.placeholder || placeholder}</span>}
+          <span style={styles.placeholder}>{props.placeholder || placeholder}</span>}
         </div>
       {props.isReceiving &&
-        <div className='horizontal-center' style={{margin: '10px 0'}}>
-          <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
+        <div className='horizontal-center' style={styles.loadingContainer}>
+          <FontIcon style={styles.loadingIcon} className='fa fa-spinner fa-spin'/>
         </div>}
       {props.hasNext && !props.isReceiving &&
         <div className='horizontal-center'>
@@ -169,12 +170,19 @@ class EmailsList extends Component {
           tooltipPosition='top-center'
           onClick={props.fetchEmails}
           iconClassName='fa fa-chevron-down'
-          iconStyle={{color: grey600}}
+          iconStyle={styles.baseIcon}
           />
         </div>}
       </div>
       );
   }
+}
+
+const styles = {
+  placeholder: {color: grey700, fontSize: '0.9em'},
+  loadingIcon: {color: grey400},
+  baseIcon: {color: grey600},
+  loadingContainer: {margin: '10px 0'},
 }
 
 export default EmailsList;

@@ -3,18 +3,8 @@ import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
-import {grey400, grey600} from 'material-ui/styles/colors';
-
-const LinkItem = ({link, count}) => (
-  <div className='row vertical-center' style={{margin: '5px 0'}}>
-    <div className='large-6 medium-8 small-8'>
-      <span style={{margin: '0 5px', color: grey600, fontSize: '0.9em'}}>{link}</span>
-    </div>
-    <div className='large-2 medium-3 small-4 columns'>
-      <span>{count}</span>
-    </div>
-  </div>
-  );
+import {grey400} from 'material-ui/styles/colors';
+import LinkItem from './LinkItem.react';
 
 class LinkAnalyticsHOC extends Component {
   constructor(props) {
@@ -22,6 +12,8 @@ class LinkAnalyticsHOC extends Component {
     this.state = {
       open: false
     };
+    this.onRequestClose = _ => this.setState({open: false});
+    this.onRequestOpen = _ => this.setState({open: true});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -35,7 +27,7 @@ class LinkAnalyticsHOC extends Component {
     const state = this.state;
     return (
       <div style={props.style}>
-        <Dialog title='Links Click Count' open={state.open} onRequestClose={_ => this.setState({open: false})}>
+        <Dialog title='Links Click Count' open={state.open} onRequestClose={this.onRequestClose}>
         {props.isReceiving ?
           <FontIcon color={grey400} className='fa fa-spinner fa-spin'/> :
           <div>
@@ -46,10 +38,9 @@ class LinkAnalyticsHOC extends Component {
             </div>}
           {!props.links &&
             <span>No links were clicked in this email.</span>}
-        </div>
-      }
+          </div>}
         </Dialog>
-        {props.children({onRequestOpen: _ => this.setState({open: true})})}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>);
   }
 }
