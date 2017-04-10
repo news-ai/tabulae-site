@@ -42,11 +42,31 @@ const styles = {
   sentFrom: {
     color: 'gray',
     fontSize: '0.8em',
-  }
+  },
+  linkContainerSpan: {
+    margin: '0 5px', fontSize: '0.9em'
+  },
+  attachmentIcon: {
+    fontSize: '0.8em', margin: '0 3px'
+  },
+  trashIcon: {
+    fontSize: '16px'
+  },
+  sentLabel: {
+    marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'
+  },
+  bouncedReason: {
+    color: deepOrange900
+  },
+  bouncedLabel: {
+    color: deepOrange700, fontSize: '0.8em'
+  },
+  tagContainer: {
+    padding: 3
+  },
 };
 
 const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
-
 
 class AnalyticsItem extends Component {
   constructor(props) {
@@ -55,6 +75,7 @@ class AnalyticsItem extends Component {
       isPreviewOpen: false,
     };
     this.onPreviewOpen = this._onPreviewOpen.bind(this);
+    this.onPreviewClose = _ => this.setState({isPreviewOpen: false});
   }
 
   _onPreviewOpen() {
@@ -96,11 +117,15 @@ class AnalyticsItem extends Component {
           {listid !== 0 &&
             <div>
               <span style={styles.sentFrom}>Sent from List</span>
-              <span style={{margin: '0 5px', fontSize: '0.9em'}}><Link to={`/tables/${listid}`}>{listname || `(Archived) ${listid}`}</Link></span>
-              {attachments !== null && <FontIcon style={{fontSize: '0.8em', margin: '0 3px'}} className='fa fa-paperclip'/>}
-              {!archived && <FontIcon
+              <span style={styles.linkContainerSpan}>
+                <Link to={`/tables/${listid}`}>{listname || `(Archived) ${listid}`}</Link>
+              </span>
+            {attachments !== null &&
+              <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip'/>}
+            {!archived &&
+              <FontIcon
               className='pointer fa fa-trash'
-              style={{fontSize: '16px'}}
+              style={styles.trashIcon}
               color={grey400}
               hoverColor={grey600}
               onClick={archiveEmail}
@@ -108,17 +133,13 @@ class AnalyticsItem extends Component {
             </div>}
           </div>
           <div className='small-12 medium-6 large-6 columns'>
-            <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
+            <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
           </div>
           <div className='small-12 medium-12 large-12 columns'>
-            <span style={{marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'}}><strong>Send at:</strong> {sendAtDatestring}</span>
+            <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>
           </div>
         </div>
-        <Dialog
-        open={this.state.isPreviewOpen}
-        onRequestClose={_ => this.setState({isPreviewOpen: false})}
-        autoScrollBodyContent
-        >
+        <Dialog autoScrollBodyContent open={state.isPreviewOpen} onRequestClose={this.onPreviewClose}>
           <StaticEmailContent {...this.props} />
         </Dialog>
         <div className='email-analytics row' style={styles.analytics}>
@@ -136,16 +157,16 @@ class AnalyticsItem extends Component {
               <p>Email ID: {id}</p>
             </div>}
           {bouncedreason &&
-            <p style={{color: deepOrange900}}>{bouncedreason}</p>}
+            <p style={styles.bouncedReason}>{bouncedreason}</p>}
           </div>
-          <div className='small-12 medium-2 large-2 columns horizontal-center' style={{padding: 3}}>
+          <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
           {(!bounced && delivered) &&
             <OpenAnalyticsHOC emailId={id} count={opened}>
             {({onRequestOpen}) => (
               <CountViewItem onTouchTap={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o'/>)}
             </OpenAnalyticsHOC>}
           </div>
-          <div className='small-12 medium-2 large-2 columns horizontal-center' style={{padding: 3}}>
+          <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
           {(!bounced && delivered) &&
             <LinkAnalyticsHOC emailId={id} count={clicked}>
             {({onRequestOpen}) => (
@@ -154,7 +175,7 @@ class AnalyticsItem extends Component {
           </div>
         {bounced &&
           <div className='small-12 large-6 columns left'>
-            <span style={{color: deepOrange700, fontSize: '0.8em'}}>email bounced</span>
+            <span style={styles.bouncedLabel}>email bounced</span>
           </div>}
         </div>
       </Paper>

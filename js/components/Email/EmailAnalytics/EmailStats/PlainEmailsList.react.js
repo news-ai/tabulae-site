@@ -7,6 +7,10 @@ import IconButton from 'material-ui/IconButton';
 import AnalyticsItem from 'components/Email/EmailAnalytics/EmailsList/AnalyticsItem.react';
 import ScheduledEmailItem from 'components/Email/EmailAnalytics/EmailsList/ScheduledEmailItem.react';
 
+const fontIconStyle = {color: grey400};
+const isReceivingContainerStyle = {margin: '10px 0'};
+const iconButtonIconStyle = {color: grey600};
+
 class PlainEmailsList extends Component {
   constructor(props) {
     super(props);
@@ -14,9 +18,7 @@ class PlainEmailsList extends Component {
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
   }
 
   _listRef(ref) {
@@ -51,7 +53,7 @@ class PlainEmailsList extends Component {
             {({width}) =>
               <CellMeasurer
               ref={this._listCellMeasurerRef}
-              cellRenderer={({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest})}
+              cellRenderer={this.cellRenderer}
               columnCount={1}
               rowCount={props.emails.length}
               width={width}
@@ -75,8 +77,8 @@ class PlainEmailsList extends Component {
           }
         </WindowScroller>
       {props.isReceiving &&
-        <div className='horizontal-center' style={{margin: '10px 0'}}>
-          <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>
+        <div className='horizontal-center' style={isReceivingContainerStyle}>
+          <FontIcon style={fontIconStyle} className='fa fa-spinner fa-spin'/>
         </div>}
       {props.hasNext && !props.isReceiving &&
         <div className='horizontal-center'>
@@ -85,7 +87,7 @@ class PlainEmailsList extends Component {
           tooltipPosition='top-center'
           onClick={props.fetchEmails}
           iconClassName='fa fa-chevron-down'
-          iconStyle={{color: grey600}}
+          iconStyle={iconButtonIconStyle}
           />
         </div>}
       </div>

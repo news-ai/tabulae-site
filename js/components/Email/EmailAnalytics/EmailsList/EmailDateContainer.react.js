@@ -12,6 +12,12 @@ function reformatDatestring(datestring) {
   return moment(new Date(datestring)).format('YYYY-MM-DD');
 }
 
+const linkStyle = {textDecoration: 'none'};
+const linkSpanStyle = {fontSize: '1.2em'};
+
+const iconButtonIconStyle = {width: 14, height: 14, fontSize: '14px', color: grey600};
+const iconButtonStyle = {width: 28, height: 28, padding: 7, margin: '0 5px'};
+
 class EmailDateContainer extends Component {
   constructor(props) {
     super(props);
@@ -24,14 +30,14 @@ class EmailDateContainer extends Component {
     return (
       <div style={{marginTop: 25}}>
         <div style={{margin: '10px 0', color: !isClosed ? grey600 : grey700}} className='vertical-center'>
-          <Link style={{textDecoration: 'none'}} to={`/emailStats/charts?date=${reformatDatestring(datestring)}`}>
-            <span className='hoverGray' style={{fontSize: '1.2em'}}>Sent on {datestring}</span>
+          <Link style={linkStyle} to={`/emailStats/charts?date=${reformatDatestring(datestring)}`}>
+            <span className='hoverGray' style={linkSpanStyle}>Sent on {datestring}</span>
           </Link>
           <IconButton
           tooltip='Collapse'
           tooltipPosition='top-right'
-          iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey600}}
-          style={{width: 28, height: 28, padding: 7, margin: '0 5px'}}
+          iconStyle={iconButtonIconStyle}
+          style={iconButtonStyle}
           onClick={onOpenClick}
           iconClassName={!isClosed ? 'fa fa-chevron-down' : 'fa fa-chevron-up'}
           />
