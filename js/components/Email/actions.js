@@ -272,6 +272,29 @@ export function fetchSentEmails() {
   };
 }
 
+export function fetchArchivedEmails() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().stagingReducer.archivedOffset;
+    if (OFFSET === null || getState().stagingReducer.isReceiving) return;
+    dispatch({type: 'FETCH_ARCHIVED_EMAILS'});
+    dispatch({type: REQUEST_MULTIPLE_EMAILS});
+    return api.get(`/emails/archived?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(emailSchema)});
+      let newOffset = OFFSET + PAGE_LIMIT;
+      if (response.data.length < PAGE_LIMIT) newOffset = null;
+      dispatch({type: EMAIL_SET_OFFSET, archivedOffset: newOffset});
+      return dispatch({
+        type: RECEIVE_MULTIPLE_EMAILS,
+        emails: res.entities.emails,
+        ids: res.result.data
+      });
+    })
+    .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
+  };
+}
+
 export function fetchScheduledEmails() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {

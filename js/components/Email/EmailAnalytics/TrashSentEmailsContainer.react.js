@@ -13,13 +13,13 @@ const mapStateToProps = (state, props) => {
     emails,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails trashed.',
-    hasNext: true
+    hasNext: state.stagingReducer.archivedOffset !== null,
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchEmails: _ => dispatch(stagingActions.fetchSentEmails()),
+    fetchEmails: _ => dispatch(stagingActions.fetchArchivedEmails()),
   };
 };
 

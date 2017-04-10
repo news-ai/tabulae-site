@@ -85,8 +85,11 @@ class EmailStats extends Component {
 
   _onRightClick() {
     const {currentOffset, currentLimit} = this.state;
-    if (currentOffset - currentLimit >= 0) {
+    if (currentOffset - currentLimit > 0) {
       this.setState({currentOffset: currentOffset - currentLimit});
+    } else {
+      // limit changed, set right as edge
+      this.setState({currentOffset: 0});
     }
   }
 
@@ -108,7 +111,6 @@ class EmailStats extends Component {
     if (left < 0) left = 0;
     const right = state.data.length - state.currentOffset;
     const data = state.data.slice(left, right);
-
     return (
       <div>
         <div className='vertical-center horizontal-center'>
@@ -159,7 +161,7 @@ class EmailStats extends Component {
           </DropDownMenu>
           <IconButton
           tooltip='Forward'
-          disabled={state.data.length === 0 || state.currentOffset - state.currentLimit < 0}
+          disabled={state.data.length === 0 || state.currentOffset === 0}
           onClick={this.onRightClick}
           iconClassName='fa fa-angle-right'
           />
