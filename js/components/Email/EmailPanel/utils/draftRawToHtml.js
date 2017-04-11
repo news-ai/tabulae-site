@@ -66,7 +66,7 @@ let inlineTagMap = {
 
 let combinableInlineTagMap = {
   'SIZE-5': ['font-size:5px;','span'],
-  'Times New Roman': ['font-family:&#39;Times New Roman&#39;, Times, serif', 'span'],
+  'Times New Roman': ['font-family:&#39;Times New Roman&#39;, Times, serif;', 'span'],
 }
 
 let entityTagMap = {

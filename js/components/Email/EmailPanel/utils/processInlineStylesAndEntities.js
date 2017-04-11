@@ -65,41 +65,10 @@ export default function processInlineStylesAndEntities(
     }
   });
 
-  // process combinable inline styles
-  console.log(sortedInlineStyleRanges);
-  if (sortedInlineStyleRanges.length > 0) {
-    const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
-    let itree = new IntervalTree(lastRange.offset + lastRange.length);
-    sortedInlineStyleRanges.map(range => {
-      let tag = combinableInlineTagMap[range.style];
-      if (!tag) return;
-      itree.add(range.offset, range.offset + range.length, range.style);
-    });
-
-    let cuts = new Set();
-    sortedInlineStyleRanges.map(range => {
-      cuts.add(range.offset);
-      cuts.add(range.offset + range.length);
-    });
-    const sortedCuts = [...cuts].sort((a, b) => a - b);
-    console.log(sortedCuts);
-    let currCut;
-    let nextCut;
-    console.log('check out the cuts');
-    for (let i = 0; i < sortedCuts.length - 1; i++) {
-      currCut = sortedCuts[i];
-      nextCut = sortedCuts[i + 1];
-      const results = itree.search((currCut + nextCut) / 2);
-      console.log(currCut);
-      console.log(nextCut);
-      console.log(results);
-      console.log('-------');
-
-    }
-  }
 
   // DO SPECIAL THINGS TO FIX
 
+  console.log(tagInsertMap);
 
   /*
    * FIX INVALID TAG NESTING ADJUSTMENT
@@ -152,8 +121,50 @@ export default function processInlineStylesAndEntities(
       // add tags that need re-opening to insert map, then set as new insert mat
       tagInsertMap[key] = newInsertMap.concat(tagsToReopen);
     }
-
   });
+
+  // process combinable inline styles
+  console.log(sortedInlineStyleRanges);
+  if (sortedInlineStyleRanges.length > 0) {
+    const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
+    let itree = new IntervalTree(lastRange.offset + lastRange.length);
+    sortedInlineStyleRanges.map(range => {
+      let tag = combinableInlineTagMap[range.style];
+      if (!tag) return;
+      itree.add(range.offset, range.offset + range.length, `${range.style}-${Math.random().toString().slice(2,11)}`);
+    });
+
+    let cuts = new Set();
+    sortedInlineStyleRanges.map(range => {
+      // ALSO ADD A WAY TO GET WHICH STYLE THE CUT IS ASSOCIATED WITH
+      cuts.add(range.offset);
+      cuts.add(range.offset + range.length);
+    });
+    const sortedCuts = [...cuts].sort((a, b) => a - b);
+
+    console.log(sortedCuts);
+    let currCut;
+    let nextCut;
+    console.log('check out the cuts');
+    for (let i = 0; i < sortedCuts.length - 1; i++) {
+      currCut = sortedCuts[i];
+      nextCut = sortedCuts[i + 1];
+      const results = itree.search((currCut + nextCut) / 2);
+      const styleString = results.map(result => result.id.substring(0, result.id.length - 10)).join();
+      if (!tagInsertMap[currCut]) {
+        tagInsertMap[currCut] = [];
+      }
+
+      if (!tagInsertMap[nextCut]) {
+        tagInsertMap[nextCut] = [];
+      }
+
+      console.log(currCut);
+      console.log(nextCut);
+      console.log(results);
+      console.log('-------');
+    }
+  }
 
   function toOpeningTag(t) {
     return t.replace('/', '');
