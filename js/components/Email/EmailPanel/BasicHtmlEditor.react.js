@@ -790,7 +790,7 @@ class BasicHtmlEditor extends Component {
           />
           <FontSizeControls
           editorState={editorState}
-          onToggle={newFontSize => this.toggleSingleInlineStyle(newFontSize, fontsizeMap)}
+          onToggle={newTypeface => this.toggleSingleInlineStyle(newTypeface, fontsizeMap)}
           inlineStyles={FONTSIZE_TYPES}
           />
           <TypefaceControls

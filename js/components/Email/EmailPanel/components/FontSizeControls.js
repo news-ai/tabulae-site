@@ -2,7 +2,6 @@ import React from 'react';
 import MenuItem from 'material-ui/MenuItem';
 import find from 'lodash/find';
 import DropDownMenu from 'material-ui/DropDownMenu';
-// import Immutable from 'immutable';
 
 const PLACEHOLDER = '---';
 
@@ -36,8 +35,11 @@ export default function FontSizeControls(props) {
   ];
 
   return (
-    <div className='RichEditor-controls'>
-      <DropDownMenu value={value} onChange={(e, index, newValue) => props.onToggle(newValue)}>
+    <div className='RichEditor-controls' style={{marginRight: 0}}>
+      <DropDownMenu
+      value={value}
+      onChange={(e, index, newValue) => props.onToggle(inlineStyles[index - 1].style)}
+      >
       {menuItems}
       </DropDownMenu>
     </div>
