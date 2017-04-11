@@ -125,6 +125,7 @@ export default function processInlineStylesAndEntities(
 
   // process combinable inline styles
   console.log(sortedInlineStyleRanges);
+
   if (sortedInlineStyleRanges.length > 0) {
     const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
     let itree = new IntervalTree(lastRange.offset + lastRange.length);
@@ -150,14 +151,19 @@ export default function processInlineStylesAndEntities(
       currCut = sortedCuts[i];
       nextCut = sortedCuts[i + 1];
       const results = itree.search((currCut + nextCut) / 2);
-      const styleString = results.map(result => result.id.substring(0, result.id.length - 10)).join();
+      const styles = results.map(result => result.id.substring(0, result.id.length - 10));
+      // only allow span to be combinable for now
+      const styleString = styles.map(style => combinableInlineTagMap[style][0]).join();
+      console.log(styleString);
       if (!tagInsertMap[currCut]) {
         tagInsertMap[currCut] = [];
       }
+      tagInsertMap[currCut].push(`<span style="${styleString}">`);
 
       if (!tagInsertMap[nextCut]) {
         tagInsertMap[nextCut] = [];
       }
+      tagInsertMap[nextCut].unshift(`</span>`);
 
       console.log(currCut);
       console.log(nextCut);
