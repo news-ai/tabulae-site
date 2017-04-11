@@ -76,8 +76,6 @@ const controlsStyle = {
   height: 40,
   zIndex: 200,
   bottom: 60,
-  // border: `solid 1px ${blue100}`,
-  // borderRadius: '0.9em',
   backgroundColor: 'white',
 };
 
@@ -226,6 +224,13 @@ class BasicHtmlEditor extends Component {
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
+
+    // cleanups
+    this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
+    this.onVariableMenuClose = _ => this.setState({variableMenuOpen: false});
+    this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
+    this.onImageDropzoneOpen = _ => this.imgDropzone.open();
+    this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -679,11 +684,11 @@ class BasicHtmlEditor extends Component {
 
     return (
       <div>
-        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
+        <Dialog actions={[<FlatButton label='Close' onClick={this.onImagePanelOpen}/>]}
         autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
-          <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
+          <div style={imgPanelStyles.label} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
           <div className='horizontal-center'>OR</div>
-          <div className='vertical-center horizontal-center' style={{margin: '15px 0'}}>
+          <div className='vertical-center horizontal-center' style={imgPanelStyles.panelContentContainer}>
             <div>
               <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
               {({onValueChange, errorMessage}) => (
@@ -700,21 +705,21 @@ class BasicHtmlEditor extends Component {
                 }}
                 />)}
               </ValidationHOC>
-              <RaisedButton style={{margin: 5}} label='Submit' onClick={this.onOnlineImageUpload}/>
+              <RaisedButton style={imgPanelStyles.submitBtn} label='Submit' onClick={this.onOnlineImageUpload}/>
             </div>
           </div>
           <div className='horizontal-center'>OR</div>
-          <div className='vertical-center horizontal-center' style={{margin: '10px 0'}}>
-            <RaisedButton label='Upload from File' onClick={_ => this.imgDropzone.open()}/>
+          <div className='vertical-center horizontal-center' style={imgPanelStyles.uploadBtn}>
+            <RaisedButton label='Upload from File' onClick={this.onImageDropzoneOpen}/>
           </div>
         </Dialog>
-        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+        <Dropzone ref={(node) => (this.imgDropzone = node)} style={styles.dropzone} onDrop={this.onImageUploadClicked}/>
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
-        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        anchorOrigin={styles.anchorOrigin}
+        targetOrigin={styles.targetOrigin}
+        onRequestClose={this.onVariableMenuClose}
         >
           <Menu desktop>
           {props.fieldsmap
@@ -723,7 +728,7 @@ class BasicHtmlEditor extends Component {
             <MenuItem key={i} primaryText={field.name} onClick={_ => {
               this.insertText(field.name);
               this.setState({variableMenuOpen: false});
-            }} />)}
+            }}/>)}
           </Menu>
         </Popover>
         <Subject
@@ -732,10 +737,7 @@ class BasicHtmlEditor extends Component {
         subjectHtml={props.subjectHtml}
         fieldsmap={props.fieldsmap}
         />
-        <div style={{
-          height: 460,
-          overflowY: 'scroll',
-        }}>
+        <div style={styles.editorContainer}>
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
@@ -761,10 +763,10 @@ class BasicHtmlEditor extends Component {
             />
           </div>
           <RaisedButton
-          style={{margin: 10}}
+          style={styles.insertPropertyBtn.style}
           label='Insert Property'
-          labelStyle={{textTransform: 'none'}}
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          labelStyle={styles.insertPropertyBtn.labelStyle}
+          onClick={this.onInsertPropertyClick}
           />
         </div>
       {state.isStyleBlockOpen &&
@@ -799,10 +801,10 @@ class BasicHtmlEditor extends Component {
           inlineStyles={TYPEFACE_TYPES}
           />
           <IconButton
-          iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
-          style={{width: 28, height: 28, padding: 6}}
+          iconStyle={styles.insertPropertyIcon.iconStyle}
+          style={styles.insertPropertyIcon.style}
           iconClassName='fa fa-plus pointer'
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          onClick={this.onVariableMenuOpen}
           tooltip='Insert Property'
           tooltipPosition='top-right'
           />
@@ -812,7 +814,7 @@ class BasicHtmlEditor extends Component {
           bottom: 3,
           width: props.width,
         }}>
-        <div style={{padding: 3, marginRight: 10}}>
+        <div style={styles.styleBlockIconContainer}>
           <FontIcon
           className={`fa fa-angle-double-${state.isStyleBlockOpen ? 'up' : 'down'} pointer`}
           style={{color: state.isStyleBlockOpen ? blue700 : grey700}}
@@ -826,6 +828,28 @@ class BasicHtmlEditor extends Component {
   }
 }
 
+const styles = {
+  styleBlockIconContainer: {padding: 3, marginRight: 10},
+  insertPropertyIcon: {
+    iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey800},
+    style: {width: 28, height: 28, padding: 6}
+  },
+  insertPropertyBtn: {
+    labelStyle: {textTransform: 'none'},
+    style: {margin: 10}
+  },
+  editorContainer: {height: 460, overflowY: 'scroll'},
+  anchorOrigin: {horizontal: 'left', vertical: 'bottom'},
+  targetOrigin: {horizontal: 'left', vertical: 'top'},
+  dropzone: {display: 'none'},
+};
+
+const imgPanelStyles = {
+  uploadBtn: {margin: '10px 0'},
+  submitBtn: {margin: 5},
+  panelContentContainer: {margin: '15px 0'},
+  label: {margin: '10px 0'},
+};
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 
