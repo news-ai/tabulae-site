@@ -26,7 +26,9 @@ import {
   mediaBlockRenderer,
   getBlockStyle,
   blockRenderMap,
-  styleMap
+  styleMap,
+  typefaceMap,
+  fontsizeMap
 } from 'components/Email/EmailPanel/utils/renderers';
 import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
@@ -223,6 +225,7 @@ class BasicHtmlEditor extends Component {
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
+    this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -284,7 +287,6 @@ class BasicHtmlEditor extends Component {
       }
       this.onChange(editorState);
     }
-
   }
 
   componentWillUnmount() {
@@ -292,10 +294,10 @@ class BasicHtmlEditor extends Component {
   }
 
   _onChange(editorState, onChangeType) {
-    let newEditorState = editorState;
+    const newEditorState = editorState;
     this.setState({editorState: newEditorState});
 
-    let previousContent = this.state.editorState.getCurrentContent();
+    const previousContent = this.state.editorState.getCurrentContent();
 
     // only emit html when content changes
     if (previousContent !== newEditorState.getCurrentContent() || onChangeType === 'force-emit-html') {
@@ -624,6 +626,42 @@ class BasicHtmlEditor extends Component {
     return false;
   }
 
+  _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+
+    // Let's just allow one color at a time. Turn off all active colors.
+    const nextContentState = Object.keys(inlineStyleMap)
+      .reduce((contentState, inlineStyle) => {
+        return Modifier.removeInlineStyle(contentState, selection, inlineStyle);
+      }, editorState.getCurrentContent());
+
+    let nextEditorState = EditorState.push(
+      editorState,
+      nextContentState,
+      'change-inline-style'
+    );
+
+    const currentStyle = editorState.getCurrentInlineStyle();
+
+    // Unset style override for current color.
+    if (selection.isCollapsed()) {
+      nextEditorState = currentStyle.reduce((state, inlineStyle) => {
+        return RichUtils.toggleInlineStyle(state, inlineStyle);
+      }, nextEditorState);
+    }
+
+    // If the color is being toggled on, apply it.
+    if (!currentStyle.has(toggledStyle)) {
+      nextEditorState = RichUtils.toggleInlineStyle(
+        nextEditorState,
+        toggledStyle
+      );
+    }
+
+    this.onChange(nextEditorState, 'force-emit-html');
+  }
+
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -752,12 +790,12 @@ class BasicHtmlEditor extends Component {
           />
           <FontSizeControls
           editorState={editorState}
-          onToggle={this.toggleInlineStyle}
+          onToggle={newFontSize => this.toggleSingleInlineStyle(newFontSize, fontsizeMap)}
           inlineStyles={FONTSIZE_TYPES}
           />
           <TypefaceControls
           editorState={editorState}
-          onToggle={this.toggleInlineStyle}
+          onToggle={newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap)}
           inlineStyles={TYPEFACE_TYPES}
           />
           <IconButton

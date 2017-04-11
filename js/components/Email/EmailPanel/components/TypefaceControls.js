@@ -7,15 +7,15 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 const PLACEHOLDER = '---';
 
 export default function TypefaceControls(props) {
-  const {inlineStyles} = props;
-  var currentStyle = props.editorState.getCurrentInlineStyle();
+  const {inlineStyles, editorState} = props;
+  const currentStyle = editorState.getCurrentInlineStyle();
   const currentType = find(inlineStyles, type => currentStyle.has(type.style));
-  const selection = props.editorState.getSelection();
+  const selection = editorState.getSelection();
   let value = 'Arial';
   if (currentType) {
     value = currentType.label;
   }
-  if (!selection.isCollapsed() && selection.getHasFocus() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
+  if (!selection.isCollapsed() && selection.getHasFocus() && !currentType) {
     // more than one fontSize selected
     value = PLACEHOLDER;
   }
@@ -37,20 +37,7 @@ export default function TypefaceControls(props) {
 
   return (
     <div className='RichEditor-controls'>
-      <DropDownMenu
-      value={value}
-      onChange={(e, index, newValue) => {
-        if (currentType) {
-          // untoggle size first if it exist
-          props.onToggle(currentType.style);
-          setTimeout(_ => {
-            props.onToggle(inlineStyles[index - 1].style);
-          }, 10);
-        } else {
-          props.onToggle(inlineStyles[index - 1].style);
-        }
-      }}
-      >
+      <DropDownMenu value={value} onChange={(e, index, newValue) => props.onToggle(newValue)}>
       {menuItems}
       </DropDownMenu>
     </div>

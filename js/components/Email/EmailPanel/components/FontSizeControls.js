@@ -37,20 +37,7 @@ export default function FontSizeControls(props) {
 
   return (
     <div className='RichEditor-controls'>
-      <DropDownMenu
-      value={value}
-      onChange={(e, index, newValue) => {
-        if (currentType) {
-          // untoggle size first if it exist
-          props.onToggle(currentType.style);
-          setTimeout(_ => {
-            props.onToggle(inlineStyles[index - 1].style);
-          }, 10);
-        } else {
-          props.onToggle(inlineStyles[index - 1].style);
-        }
-      }}
-      >
+      <DropDownMenu value={value} onChange={(e, index, newValue) => props.onToggle(newValue)}>
       {menuItems}
       </DropDownMenu>
     </div>

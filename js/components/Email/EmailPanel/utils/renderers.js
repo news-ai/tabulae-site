@@ -124,7 +124,7 @@ export const blockRenderMap = Immutable.Map({
   }
 });
 
-const fontsizeMap = {
+export const fontsizeMap = {
   'SIZE-5': {fontSize: 5.5},
   'SIZE-6': {fontSize: 6},
   'SIZE-7.5': {fontSize: 7.5},
@@ -147,20 +147,20 @@ const fontsizeMap = {
   'SIZE-72': {fontSize: 72},
 };
 
-const typefaceMap = {
+export const typefaceMap = {
   'Arial': {fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif'},
-  'Helvetica': {fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif;'},
+  'Helvetica': {fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif'},
   'Times New Roman': {fontFamily: '"Times New Roman", Times, serif'},
   'Courier New': {fontFamily: '"Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace'},
   'Courier': {fontFamily: 'Courier'},
   'Palatino': {fontFamily: 'Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif'},
-  'Garamond': {fontFamily: 'Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;'},
+  'Garamond': {fontFamily: 'Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif'},
   'Bookman': {fontFamily: 'Bookman'},
   'Avant Garde': {fontFamily: '"Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, AppleGothic, sans-serif'},
-  // 'Verdana': {fontFamily: 'Verdana, Geneva, sans-serif'},
-  // 'Tahoma': {fontFamily: 'Tahoma, Geneva, sans-serif'},
-  // 'Impact': {fontFamily: 'Impact, Charcoal, sans-serif'},
-  // 'Avenir': {fontFamily: '"Avenir Next", sans-serif'},
+  'Verdana': {fontFamily: 'Verdana, Geneva, sans-serif'},
+  'Tahoma': {fontFamily: 'Tahoma, Geneva, sans-serif'},
+  'Impact': {fontFamily: 'Impact, Charcoal, sans-serif'},
+  'Avenir': {fontFamily: '"Avenir Next", sans-serif'},
 };
 
 const customBlocks = {

@@ -68,7 +68,7 @@ export default function processInlineStylesAndEntities(
 
   // DO SPECIAL THINGS TO FIX
 
-  console.log(tagInsertMap);
+  // console.log(tagInsertMap);
 
   /*
    * FIX INVALID TAG NESTING ADJUSTMENT
@@ -124,7 +124,7 @@ export default function processInlineStylesAndEntities(
   });
 
   // process combinable inline styles
-  console.log(sortedInlineStyleRanges);
+  // console.log(sortedInlineStyleRanges);
 
   if (sortedInlineStyleRanges.length > 0) {
     const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
@@ -143,10 +143,10 @@ export default function processInlineStylesAndEntities(
     });
     const sortedCuts = [...cuts].sort((a, b) => a - b);
 
-    console.log(sortedCuts);
+    // console.log(sortedCuts);
     let currCut;
     let nextCut;
-    console.log('check out the cuts');
+    // console.log('check out the cuts');
     for (let i = 0; i < sortedCuts.length - 1; i++) {
       currCut = sortedCuts[i];
       nextCut = sortedCuts[i + 1];
@@ -154,7 +154,7 @@ export default function processInlineStylesAndEntities(
       const styles = results.map(result => result.id.substring(0, result.id.length - 10));
       // only allow span to be combinable for now
       const styleString = styles.map(style => combinableInlineTagMap[style][0]).join();
-      console.log(styleString);
+      // console.log(styleString);
       if (!tagInsertMap[currCut]) {
         tagInsertMap[currCut] = [];
       }
@@ -165,10 +165,10 @@ export default function processInlineStylesAndEntities(
       }
       tagInsertMap[nextCut].unshift(`</span>`);
 
-      console.log(currCut);
-      console.log(nextCut);
-      console.log(results);
-      console.log('-------');
+      // console.log(currCut);
+      // console.log(nextCut);
+      // console.log(results);
+      // console.log('-------');
     }
   }
 
