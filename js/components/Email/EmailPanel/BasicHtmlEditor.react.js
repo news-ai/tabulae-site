@@ -71,14 +71,6 @@ linkify
 .tlds(tlds)
 .set({fuzzyLink: false});
 
-const controlsStyle = {
-  position: 'fixed',
-  height: 40,
-  zIndex: 200,
-  bottom: 60,
-  backgroundColor: 'white',
-};
-
 class BasicHtmlEditor extends Component {
   constructor(props) {
     super(props);
@@ -231,6 +223,8 @@ class BasicHtmlEditor extends Component {
     this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
     this.onImageDropzoneOpen = _ => this.imgDropzone.open();
     this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
+    this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
+    this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -792,12 +786,12 @@ class BasicHtmlEditor extends Component {
           />
           <FontSizeControls
           editorState={editorState}
-          onToggle={newTypeface => this.toggleSingleInlineStyle(newTypeface, fontsizeMap)}
+          onToggle={this.onFontSizeToggle}
           inlineStyles={FONTSIZE_TYPES}
           />
           <TypefaceControls
           editorState={editorState}
-          onToggle={newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap)}
+          onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
           />
           <IconButton
@@ -849,6 +843,14 @@ const imgPanelStyles = {
   submitBtn: {margin: 5},
   panelContentContainer: {margin: '15px 0'},
   label: {margin: '10px 0'},
+};
+
+const controlsStyle = {
+  position: 'fixed',
+  height: 40,
+  zIndex: 200,
+  bottom: 60,
+  backgroundColor: 'white',
 };
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
