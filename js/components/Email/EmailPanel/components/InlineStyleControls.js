@@ -6,7 +6,7 @@ export default function InlineStyleControls(props) {
   var currentStyle = props.editorState.getCurrentInlineStyle();
 
   return (
-    <div className='RichEditor-controls' style={{display: 'flex'}}>
+    <div className='RichEditor-controls'>
       {inlineStyles.map(type =>
         <StyleButton
         key={type.label}

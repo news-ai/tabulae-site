@@ -153,8 +153,7 @@ export default function processInlineStylesAndEntities(
       const results = itree.search((currCut + nextCut) / 2);
       const styles = results.map(result => result.id.substring(0, result.id.length - 10));
       // only allow span to be combinable for now
-      const styleString = styles.map(style => combinableInlineTagMap[style][0]).join();
-      // console.log(styleString);
+      const styleString = styles.map(style => combinableInlineTagMap[style][0]).join('');
       if (!tagInsertMap[currCut]) {
         tagInsertMap[currCut] = [];
       }

@@ -161,6 +161,7 @@ export const typefaceMap = {
   'Tahoma': {fontFamily: 'Tahoma, Geneva, sans-serif'},
   'Impact': {fontFamily: 'Impact, Charcoal, sans-serif'},
   'Avenir': {fontFamily: '"Avenir Next", sans-serif'},
+  'Nunito': {fontFamily: 'Nunito'},
 };
 
 const customBlocks = {

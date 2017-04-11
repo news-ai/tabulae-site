@@ -54,15 +54,16 @@ let combinableInlineTagMap = {
   'Helvetica': ['font-family:&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif;', 'span'],
   'Times New Roman': ['font-family:&#39;Times New Roman&#39;, Times, serif;', 'span'],
   'Courier New': ['font-family:&#39;Courier New&#39;, Courier, &#39;Lucida Sans Typewriter&#39;, &#39;Lucida Typewriter&#39;, monospace;', 'span'],
-  'Courier': ['font-family:Courier">','</span>'],
+  'Courier': ['font-family:Courier;">','</span>'],
   'Palatino': ['font-family:Palatino, &#39;Palatino Linotype&#39;, &#39;Palatino LT STD&#39;, &#39;Book Antiqua&#39;, Georgia, serif;', 'span'],
   'Garamond': ['font-family:Garamond, Baskerville, &#39;Baskerville Old Face&#39;, &#39;Hoefler Text&#39;, &#39;Times New Roman&#39;, serif;', 'span'],
-  'Bookman': ['font-family:Bookman', 'span'],
+  'Bookman': ['font-family:Bookman;', 'span'],
   'Avant Garde': ['font-family:&#39;Avant Garde&#39;, Avantgarde, &#39;Century Gothic&#39;, CenturyGothic, AppleGothic, sans-serif;', 'span'],
-  'Verdana': ['font-family:Verdana, Geneva, sans-serif', 'span'],
-  'Tahoma': ['font-family:Tahoma, Geneva, sans-serif', 'span'],
-  'Impact': ['font-family:Impact, Charcoal, sans-serif', 'span'],
-  'Avenir': ['font-family:&#39;Avenir Next&#39;, sans-serif', 'span'],
+  'Verdana': ['font-family:Verdana, Geneva, sans-serif;', 'span'],
+  'Tahoma': ['font-family:Tahoma, Geneva, sans-serif;', 'span'],
+  'Impact': ['font-family:Impact, Charcoal, sans-serif;', 'span'],
+  'Avenir': ['font-family:&#39;Avenir Next&#39;, sans-serif;', 'span'],
+  'Nunito': ['font-family:Nunito;', 'span'],
 }
 
 let entityTagMap = {

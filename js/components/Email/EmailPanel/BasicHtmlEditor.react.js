@@ -764,7 +764,7 @@ class BasicHtmlEditor extends Component {
           />
         </div>
       {state.isStyleBlockOpen &&
-        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle}>
+        <Paper zDepth={1} className='vertical-center' style={controlsStyle}>
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}

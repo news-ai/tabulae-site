@@ -42,9 +42,6 @@ export default class StyleButton extends React.Component {
         <span className={pointerClassName} style={buttonStyle} onMouseDown={onClick}>{props.label}</span>);
     }
 
-    return (
-      <div>
-        {renderNode}
-      </div>);
+    return renderNode;
   }
 }

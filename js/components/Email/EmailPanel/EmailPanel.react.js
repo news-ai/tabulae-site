@@ -52,7 +52,7 @@ const styles = {
   },
   emailPanel: {
     height: 600,
-    width: 620,
+    width: 700,
   },
   sendButtonPosition: {
     position: 'absolute',

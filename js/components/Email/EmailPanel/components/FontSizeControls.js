@@ -22,6 +22,7 @@ export default function FontSizeControls(props) {
     <MenuItem
     key={`fontsize-select-default`}
     value={PLACEHOLDER}
+    labelStyle={{paddingLeft: 0}}
     primaryText={PLACEHOLDER}
     label={PLACEHOLDER}
     />,
@@ -35,13 +36,13 @@ export default function FontSizeControls(props) {
   ];
 
   return (
-    <div className='RichEditor-controls' style={{marginRight: 0}}>
-      <DropDownMenu
-      value={value}
-      onChange={(e, index, newValue) => props.onToggle(inlineStyles[index - 1].style)}
-      >
-      {menuItems}
-      </DropDownMenu>
-    </div>
+    <DropDownMenu
+    style={{fontSize: '0.9em', maxWidth: 70}}
+    underlineStyle={{display: 'none', margin: 0}}
+    value={value}
+    onChange={(e, index, newValue) => props.onToggle(inlineStyles[index - 1].style)}
+    >
+    {menuItems}
+    </DropDownMenu>
   );
 }

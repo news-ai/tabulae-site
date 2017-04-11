@@ -36,10 +36,14 @@ export default function TypefaceControls(props) {
   ];
 
   return (
-    <div className='RichEditor-controls'>
-      <DropDownMenu value={value} onChange={(e, index, newValue) => props.onToggle(newValue)}>
-      {menuItems}
-      </DropDownMenu>
-    </div>
+    <DropDownMenu
+    style={{fontSize: '0.9em', maxWidth: 135}}
+    underlineStyle={{display: 'none', margin: 0}}
+    labelStyle={{paddingLeft: 5}}
+    value={value}
+    onChange={(e, index, newValue) => props.onToggle(newValue)}
+    >
+    {menuItems}
+    </DropDownMenu>
   );
 }

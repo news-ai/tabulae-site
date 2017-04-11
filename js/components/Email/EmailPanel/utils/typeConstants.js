@@ -70,4 +70,5 @@ export const TYPEFACE_TYPES = [
   {inlineType: 'typeface', label: 'Tahoma', style: 'Tahoma'},
   {inlineType: 'typeface', label: 'Impact', style: 'Impact'},
   {inlineType: 'typeface', label: 'Avenir', style: 'Avenir'},
+  {inlineType: 'typeface', label: 'Nunito', style: 'Nunito'},
 ];
