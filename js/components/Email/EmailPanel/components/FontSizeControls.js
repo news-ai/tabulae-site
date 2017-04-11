@@ -37,7 +37,7 @@ export default function FontSizeControls(props) {
 
   return (
     <DropDownMenu
-    style={{fontSize: '0.9em', maxWidth: 70}}
+    style={{fontSize: '0.9em'}}
     underlineStyle={{display: 'none', margin: 0}}
     value={value}
     onChange={(e, index, newValue) => props.onToggle(inlineStyles[index - 1].style)}

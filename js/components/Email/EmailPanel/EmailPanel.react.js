@@ -438,7 +438,7 @@ class EmailPanel extends Component {
                 </div>
               </div>
               <div className='vertical-center'>
-                Emails are sent from: <span style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
+                <span style={{fontSize: '0.9em'}}>Emails are sent from: </span><span style={{fontSize: '0.9em', backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
               {props.isImageReceiving &&
                 <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
               </div>
