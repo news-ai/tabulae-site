@@ -6,12 +6,12 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 
 const PLACEHOLDER = '---';
 
-export default function FontSizeControls(props) {
+export default function TypefaceControls(props) {
   const {inlineStyles} = props;
-  const currentStyle = props.editorState.getCurrentInlineStyle();
+  var currentStyle = props.editorState.getCurrentInlineStyle();
   const currentType = find(inlineStyles, type => currentStyle.has(type.style));
   const selection = props.editorState.getSelection();
-  let value = '14';
+  let value = 'Arial';
   if (currentType) {
     value = currentType.label;
   }
@@ -21,14 +21,14 @@ export default function FontSizeControls(props) {
   }
   const menuItems = [
     <MenuItem
-    key={`fontsize-select-default`}
+    key={`typeface-select-default`}
     value={PLACEHOLDER}
     primaryText={PLACEHOLDER}
     label={PLACEHOLDER}
     />,
     ...inlineStyles.map(type =>
       <MenuItem
-      key={`fontsize-select-${type.label}`}
+      key={`typeface-select-${type.label}`}
       value={type.label}
       primaryText={type.label}
       label={type.label}

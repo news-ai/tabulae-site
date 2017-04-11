@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, {Component} from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
@@ -21,9 +21,8 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import {INLINE_STYLES, TYPEFACE_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {
-  stripATextNodeFromContent,
   mediaBlockRenderer,
   getBlockStyle,
   blockRenderMap,
@@ -47,13 +46,12 @@ import Link from 'components/Email/EmailPanel/components/Link';
 import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.react';
 import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
-import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyleControls';
 import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
+import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
-import Immutable from 'immutable';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
@@ -81,43 +79,7 @@ const controlsStyle = {
   backgroundColor: 'white',
 };
 
-class BasicHtmlEditor extends React.Component {
-  state : {
-    editorState: Object,
-    bodyHtml: ?string,
-    variableMenuOpen: bool,
-    variableMenuAnchorEl: Object,
-    isStyleBlockOpen: bool,
-    styleBlockAnchorEl: Object,
-    filePanelOpen: bool,
-    imagePanelOpen: bool,
-    imageLink: string
-  };
-  CONVERT_CONFIGS: Object;
-  EXTERNAL_CONTROLS: Array<Object>;
-  ENTITY_CONTROLS: Array<Object>;
-
-  toggleMinimize: (event: Event) => void;
-  focus: () => void;
-  onChange: (editorState: Object) => void;
-  handleTouchTap: (event: Event) => void;
-  emitHTML: (editorState: Object) => void;
-  insertText: (replaceText: string) => void;
-  handleKeyCommand: (command: string) => bool;
-  toggleBlockType: (blockType: string) => void;
-  toggleInlineStyle: (inlineStyle: string) => void;
-  handleReturn: (e: Event) => string;
-  addLink: () => void;
-  removeLink: () => void;
-  manageLink: () => void;
-  onCheck: () => void;
-  handlePastedText: (text: string, html: string) => bool;
-  handleDroppedFiles: (selection: Object, files: Array<Object>) => void;
-  handleImage: (url: string) => Object;
-  onImageUploadClicked: (acceptSelection: Array<Object>, rejectedFiles: Array<Object>) => void;
-  onOnlineImageUpload: () => void;
-  handleBeforeInput: (lastInsertedChar: string) => string;
-  linkifyLastWord: (insertChar: string) => string;
+class BasicHtmlEditor extends Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -178,7 +140,7 @@ class BasicHtmlEditor extends React.Component {
               src,
               size: `${size}%`,
               imageLink: imageLink || '#',
-              align: align || 'left'
+              align: align || 'left',
             });
 
             this.props.saveImageData(src);
@@ -239,7 +201,7 @@ class BasicHtmlEditor extends React.Component {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
       // console.log(raw);
-      // console.log(html);
+      console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -270,13 +232,7 @@ class BasicHtmlEditor extends React.Component {
       let newContent;
       let editorState;
       if (nextProps.savedBodyHtml) {
-        // console.log(nextProps.savedBodyHtml);
         const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
-
-        // let raw = convertToRaw(configuredContent);
-        // let html = draftRawToHtml(raw);
-        // console.log(raw);
-        // console.log(html);
         // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
         editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
         // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
@@ -286,9 +242,7 @@ class BasicHtmlEditor extends React.Component {
               const entityKey = character.getEntity();
               if (entityKey === null) return false;
               if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-                // console.log(convertToRaw(editorState.getCurrentContent()));
                 editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-                // console.log(convertToRaw(editorState.getCurrentContent()));
               }
               return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
             },
@@ -319,10 +273,6 @@ class BasicHtmlEditor extends React.Component {
           if (okayBlock) truncatedBlocks.push(block);
         });
         const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
-        // raw = convertToRaw(cleanedContentState);
-        // html = draftRawToHtml(raw);
-        // console.log(raw);
-        // console.log(html);
         editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
 
         this.setState({bodyHtml: nextProps.bodyHtml});
@@ -805,11 +755,11 @@ class BasicHtmlEditor extends React.Component {
           onToggle={this.toggleInlineStyle}
           inlineStyles={FONTSIZE_TYPES}
           />
-          {/*<BlockStyleControls
+          <TypefaceControls
           editorState={editorState}
-          blockTypes={BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-          />*/}
+          onToggle={this.toggleInlineStyle}
+          inlineStyles={TYPEFACE_TYPES}
+          />
           <IconButton
           iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
           style={{width: 28, height: 28, padding: 6}}

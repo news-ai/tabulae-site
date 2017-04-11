@@ -4,12 +4,14 @@ import sortBy from 'lodash/sortBy';
 import last from 'lodash/last';
 import clone from 'lodash/clone';
 import indexOf from 'lodash/indexOf';
+import IntervalTree from 'interval-tree2';
 
 export default function processInlineStylesAndEntities(
   inlineTagMap: Object,
   entityTagMap: Object,
   entityMap?: Object,
-  block?: Object
+  block?: Object,
+  combinableInlineTagMap?: Object
 ): string {
   if (!block) {
     return '';
@@ -45,11 +47,10 @@ export default function processInlineStylesAndEntities(
 
   // important to process in order, so sort
   let sortedInlineStyleRanges = sortBy(block.inlineStyleRanges, 'offset');
-
-  // map all the tag insertions we're going to do
+  // process styles we don't need to combine and can just stack
   sortedInlineStyleRanges.forEach(function(range) {
     let tag = inlineTagMap[range.style];
-
+    if (!tag) return;
     if (!tagInsertMap[range.offset]) {
       tagInsertMap[range.offset] = [];
     }
@@ -63,6 +64,41 @@ export default function processInlineStylesAndEntities(
       tagInsertMap[range.offset + range.length].unshift(tag[1]);
     }
   });
+
+  // process combinable inline styles
+  console.log(sortedInlineStyleRanges);
+  if (sortedInlineStyleRanges.length > 0) {
+    const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
+    let itree = new IntervalTree(lastRange.offset + lastRange.length);
+    sortedInlineStyleRanges.map(range => {
+      let tag = combinableInlineTagMap[range.style];
+      if (!tag) return;
+      itree.add(range.offset, range.offset + range.length, range.style);
+    });
+
+    let cuts = new Set();
+    sortedInlineStyleRanges.map(range => {
+      cuts.add(range.offset);
+      cuts.add(range.offset + range.length);
+    });
+    const sortedCuts = [...cuts].sort((a, b) => a - b);
+    console.log(sortedCuts);
+    let currCut;
+    let nextCut;
+    console.log('check out the cuts');
+    for (let i = 0; i < sortedCuts.length - 1; i++) {
+      currCut = sortedCuts[i];
+      nextCut = sortedCuts[i + 1];
+      const results = itree.search((currCut + nextCut) / 2);
+      console.log(currCut);
+      console.log(nextCut);
+      console.log(results);
+      console.log('-------');
+
+    }
+  }
+
+  // DO SPECIAL THINGS TO FIX
 
 
   /*
