@@ -18,6 +18,7 @@ class SwitchEmailHOC extends Component {
     const props = this.props;
     const state = this.state;
     const emails = props.emails.map((email, i) => <MenuItem key={`switch-email-${i}`} value={email} primaryText={email}/>);
+    const disableSwitching = props.person.gmail || props.person.outlook || props.person.externalemail;
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
@@ -26,15 +27,15 @@ class SwitchEmailHOC extends Component {
           You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>.
           </div>
           <DropDownMenu
-          disabled={props.person.gmail || props.person.externalemail}
+          disabled={disableSwitching}
           value={props.from}
           onChange={(e, i, value) => props.setFromEmail(value)}
           >
             {emails}
           </DropDownMenu>
-        {(props.person.gmail || props.person.externalemail) &&
+        {disableSwitching &&
           <div className='vertical-center' style={{margin: 10}}>
-            <span style={{color: grey500, fontSize: '0.9em'}}>*You must disable Gmail/SMTP integrations to use Email Switching.</span>
+            <span style={{color: grey500, fontSize: '0.9em'}}>*You must disable Gmail/Outlook/SMTP integrations to use Email Switching.</span>
           </div>}
         </Dialog>
         {props.children({onRequestOpen: _ => this.setState({open: true})})}
