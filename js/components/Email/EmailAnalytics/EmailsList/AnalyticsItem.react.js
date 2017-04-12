@@ -212,6 +212,7 @@ const mergeProps = (sProps, dProps, props) => {
     ...props,
     fetchList: _ => {
       if (!sProps.isFetchingList && !sProps.listname) {
+        // only fetch if it is not currently fetching
         dProps.startFetch();
         dProps.fetchList()
         .then(_ => dProps.endFetch());
