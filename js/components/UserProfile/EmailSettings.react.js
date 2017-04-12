@@ -199,7 +199,7 @@ class EmailSettings extends Component {
         </Panel>
         <Panel className='row' title='Email Signature'>
           <span className='smalltext'>If you added multiple emails, you can assign different signature to each one.</span>
-          <div style={{height: 400}}>
+          <div style={{height: 500}}>
             <EmailSignature/>
           </div>
         </Panel>
