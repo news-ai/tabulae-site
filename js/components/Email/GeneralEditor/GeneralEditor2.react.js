@@ -633,7 +633,7 @@ class GeneralEditor extends React.Component {
         fieldsmap={props.fieldsmap}
         />
         <div style={{
-          height: 460,
+          height: props.height || 460,
           overflowY: 'scroll',
         }}>
           <div className={className} onClick={this.focus}>
@@ -691,11 +691,11 @@ class GeneralEditor extends React.Component {
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
           />
-          <BlockStyleControls
+          {/*<BlockStyleControls
           editorState={editorState}
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
-          />
+          />*/}
         </Paper>
     </div>
     );
