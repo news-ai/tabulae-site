@@ -80,6 +80,44 @@ class EmailSettings extends Component {
     const {person} = this.props;
     const state = this.state;
     const props = this.props;
+
+    let googleNode = (
+      <ConnectToThirdPartyEmailService
+      serviceName='Gmail'
+      title='Connect to Gmail'
+      href='https://tabulae.newsai.org/api/auth/gmail'
+      />);
+    let outlookNode = (
+      <ConnectToThirdPartyEmailService
+      serviceName='Outlook'
+      title='Connect to Outlook'
+      href='https://tabulae.newsai.org/api/auth/outlook'
+      />);
+    if (!person.externalemail) {
+      if (person.gmail) {
+        googleNode = (
+          <FlatButton
+          secondary
+          label='Remove'
+          onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
+          />);
+        outlookNode = <span>Connected via Gmail</span>;
+      } else if (person.outlook) {
+        googleNode = <span>Connected via Outlook</span>;
+        outlookNode = (
+          <FlatButton
+          secondary
+          label='Remove'
+          onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-outlook')}
+          />);
+      }
+    } else {
+      if (person.smtpvalid) {
+        googleNode = <span>Connected via SMTP</span>;
+        outlookNode = <span>Connected via SMTP</span>;
+      }
+    }
+
     return (
       <div style={{margin: 50}}>
         <Panel className='row' title='Daily Email Subscription'>
@@ -101,44 +139,19 @@ class EmailSettings extends Component {
           <div className='vertical-center' style={styles.item}>
             <span style={spanStyle}>Gmail</span>
             <div>
-              {!person.externalemail && (person.gmail ?
-                <FlatButton
-                secondary
-                label='Remove'
-                onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
-                /> :
-                <ConnectToThirdPartyEmailService
-                serviceName='Gmail'
-                title='Connect to Gmail'
-                href='https://tabulae.newsai.org/api/auth/gmail'
-                />)
-            }
-              {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
+            {googleNode}
             </div>
           </div>}
-        {person.googleid &&
           <div className='vertical-center' style={styles.item}>
             <span style={spanStyle}>Outlook</span>
             <div>
-              {!person.externalemail && (person.outlook ?
-                <FlatButton
-                secondary
-                label='Remove'
-                onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-outlook')}
-                /> :
-                <ConnectToThirdPartyEmailService
-                serviceName='Outlook'
-                title='Connect to Outlook'
-                href='https://tabulae.newsai.org/api/auth/outlook'
-                />)
-            }
-              {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
+            {outlookNode}
             </div>
-          </div>}
+          </div>
           <div className='vertical-center' style={styles.item}>
             <span style={spanStyle}>SMTP Server</span>
             <div>
-          {(person.gmail || props.outlook) ? <span>Connected to Gmail/Outlook</span> : person.smtpvalid ?
+          {(person.gmail || person.outlook) ? <span>Connected to Gmail/Outlook</span> : person.smtpvalid ?
               <Toggle
               toggled={state.newPerson.get('externalemail')}
               onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
