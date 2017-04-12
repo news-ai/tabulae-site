@@ -14,6 +14,7 @@ import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import {actions as attachmentActions} from 'components/Email/EmailAttachment';
 import Paper from 'material-ui/Paper';
+import {actions as listActions} from 'components/Lists';
 
 import moment from 'moment-timezone';
 
@@ -28,6 +29,10 @@ class AnalyticsItem extends Component {
     };
     this.onPreviewOpen = this._onPreviewOpen.bind(this);
     this.onPreviewClose = _ => this.setState({isPreviewOpen: false});
+  }
+
+  componentWillMount() {
+    this.props.fetchList();
   }
 
   _onPreviewOpen() {
@@ -185,15 +190,35 @@ const styles = {
 
 const mapStateToProps = (state, props) => {
   return {
-    listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined
+    listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
+    isFetchingList: state.isFetchingReducer.lists && state.isFetchingReducer.lists[props.listid]
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(attachmentActions.fetchAttachment(id))),
-    archiveEmail: _ => dispatch(stagingActions.archiveEmail(props.id))
+    archiveEmail: _ => dispatch(stagingActions.archiveEmail(props.id)),
+    fetchList: _ => dispatch(listActions.fetchList(props.listid)),
+    startFetch: _ => dispatch({type: 'IS_FETCHING', resource: 'lists', id: props.listid}),
+    endFetch: _ => dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: props.listid}),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsItem);
+const mergeProps = (sProps, dProps, props) => {
+  return {
+    ...sProps,
+    ...dProps,
+    ...props,
+    fetchList: _ => {
+      if (!sProps.isFetchingList && !sProps.listname) {
+        // only fetch if it is not currently fetching
+        dProps.startFetch();
+        dProps.fetchList()
+        .then(_ => dProps.endFetch());
+      }
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(AnalyticsItem);
