@@ -31,7 +31,21 @@ class EmailSignature extends Component {
   }
 
   _handleChange(e, i, newEmail) {
-    this.setState({currentEmail: newEmail});
+    const emailsignatures = this.props.person.emailsignatures;
+    let bodyContent;
+    if (emailsignatures !== null && emailsignatures.some(signature => JSON.parse(signature).email === newEmail)) {
+      const sign = emailsignatures.filter(signature => JSON.parse(signature).email === newEmail)[0];
+      bodyContent = sign.data;
+    }
+    if (newEmail === this.props.person.email && this.props.signature !== null) {
+      bodyContent = this.props.signature;
+    }
+
+    console.log(bodyContent);
+    this.setState({
+      currentEmail: newEmail,
+      bodyContent
+    });
   }
 
   _onSaveClick() {
@@ -84,7 +98,7 @@ class EmailSignature extends Component {
           >
           {items}
           </DropDownMenu>
-          <FlatButton label='Save'/>
+          <FlatButton primary label='Save' onClick={this.onSave}/>
         </div>
         <div style={{display: 'block', border: '1px dotted black'}}>
           <GeneralEditor

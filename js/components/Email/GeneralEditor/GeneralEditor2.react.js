@@ -228,16 +228,18 @@ class GeneralEditor extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!this.props.bodyContent && nextProps.bodyContent && this.props.allowReplacement) {
+    if (this.props.bodyContent !== nextProps.bodyContent && this.props.allowReplacement) {
+      console.log(nextProps.bodyContent);
       let newContent;
       let editorState;
       // is HTML
-      if (nextProps.bodyContent && typeof nextProps.bodyContent === 'string' && nextProps.bodyContent.length > 0) {
-        newContent = this.cleanHTML2ContentState(nextProps.bodyContent);
+      if (nextProps.bodyContent) {
+        if (typeof nextProps.bodyContent === 'string') newContent = this.cleanHTMLToContentState(nextProps.bodyContent);
+        else newContent = convertFromRaw(nextProps.bodyContent);
+        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       } else {
-        newContent = convertFromRaw(nextProps.bodyContent);
+        editorState = EditorState.createEmpty(decorator);
       }
-      editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
     }
   }
@@ -670,6 +672,8 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    console.log(this.props.bodyContent);
+    console.log(this.props.allowReplacement);
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
