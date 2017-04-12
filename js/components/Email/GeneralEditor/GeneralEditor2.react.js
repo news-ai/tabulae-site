@@ -20,14 +20,13 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap} from 'components/Email/EmailPanel/utils/renderers';
+import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap} from 'components/Email/EmailPanel/utils/renderers';
 import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
-import {grey800} from 'material-ui/styles/colors';
 import FlatButton from 'material-ui/FlatButton';
 
 import Subject from 'components/Email/EmailPanel/Subject.react';
@@ -37,6 +36,7 @@ import EntityControls from 'components/Email/EmailPanel/components/EntityControl
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
 import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyleControls';
 import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
+import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import alertify from 'alertifyjs';
@@ -207,6 +207,9 @@ class GeneralEditor extends React.Component {
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
+    this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
+    this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
+    this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
   }
 
   _onChange(editorState, onChangeType) {
@@ -541,6 +544,41 @@ class GeneralEditor extends React.Component {
     }
     return false;
   }
+  _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+
+    // Let's just allow one color at a time. Turn off all active colors.
+    const nextContentState = Object.keys(inlineStyleMap)
+      .reduce((contentState, inlineStyle) => {
+        return Modifier.removeInlineStyle(contentState, selection, inlineStyle);
+      }, editorState.getCurrentContent());
+
+    let nextEditorState = EditorState.push(
+      editorState,
+      nextContentState,
+      'change-inline-style'
+    );
+
+    const currentStyle = editorState.getCurrentInlineStyle();
+
+    // Unset style override for current color.
+    if (selection.isCollapsed()) {
+      nextEditorState = currentStyle.reduce((state, inlineStyle) => {
+        return RichUtils.toggleInlineStyle(state, inlineStyle);
+      }, nextEditorState);
+    }
+
+    // If the color is being toggled on, apply it.
+    if (!currentStyle.has(toggledStyle)) {
+      nextEditorState = RichUtils.toggleInlineStyle(
+        nextEditorState,
+        toggledStyle
+      );
+    }
+
+    this.onChange(nextEditorState, 'force-emit-html');
+  }
 
   render() {
     const {editorState} = this.state;
@@ -645,8 +683,13 @@ class GeneralEditor extends React.Component {
           />
           <FontSizeControls
           editorState={editorState}
-          onToggle={this.toggleInlineStyle}
+          onToggle={this.onFontSizeToggle}
           inlineStyles={FONTSIZE_TYPES}
+          />
+          <TypefaceControls
+          editorState={editorState}
+          onToggle={this.onTypefaceToggle}
+          inlineStyles={TYPEFACE_TYPES}
           />
           <BlockStyleControls
           editorState={editorState}

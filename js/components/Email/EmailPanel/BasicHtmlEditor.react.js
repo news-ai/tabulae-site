@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, {Component} from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
@@ -21,13 +21,14 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import {INLINE_STYLES, TYPEFACE_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {
-  stripATextNodeFromContent,
   mediaBlockRenderer,
   getBlockStyle,
   blockRenderMap,
-  styleMap
+  styleMap,
+  typefaceMap,
+  fontsizeMap
 } from 'components/Email/EmailPanel/utils/renderers';
 import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
@@ -47,13 +48,12 @@ import Link from 'components/Email/EmailPanel/components/Link';
 import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.react';
 import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
-import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyleControls';
 import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
+import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
-import Immutable from 'immutable';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
@@ -71,53 +71,7 @@ linkify
 .tlds(tlds)
 .set({fuzzyLink: false});
 
-const controlsStyle = {
-  position: 'fixed',
-  height: 40,
-  zIndex: 200,
-  bottom: 60,
-  // border: `solid 1px ${blue100}`,
-  // borderRadius: '0.9em',
-  backgroundColor: 'white',
-};
-
-class BasicHtmlEditor extends React.Component {
-  state : {
-    editorState: Object,
-    bodyHtml: ?string,
-    variableMenuOpen: bool,
-    variableMenuAnchorEl: Object,
-    isStyleBlockOpen: bool,
-    styleBlockAnchorEl: Object,
-    filePanelOpen: bool,
-    imagePanelOpen: bool,
-    imageLink: string
-  };
-  CONVERT_CONFIGS: Object;
-  EXTERNAL_CONTROLS: Array<Object>;
-  ENTITY_CONTROLS: Array<Object>;
-
-  toggleMinimize: (event: Event) => void;
-  focus: () => void;
-  onChange: (editorState: Object) => void;
-  handleTouchTap: (event: Event) => void;
-  emitHTML: (editorState: Object) => void;
-  insertText: (replaceText: string) => void;
-  handleKeyCommand: (command: string) => bool;
-  toggleBlockType: (blockType: string) => void;
-  toggleInlineStyle: (inlineStyle: string) => void;
-  handleReturn: (e: Event) => string;
-  addLink: () => void;
-  removeLink: () => void;
-  manageLink: () => void;
-  onCheck: () => void;
-  handlePastedText: (text: string, html: string) => bool;
-  handleDroppedFiles: (selection: Object, files: Array<Object>) => void;
-  handleImage: (url: string) => Object;
-  onImageUploadClicked: (acceptSelection: Array<Object>, rejectedFiles: Array<Object>) => void;
-  onOnlineImageUpload: () => void;
-  handleBeforeInput: (lastInsertedChar: string) => string;
-  linkifyLastWord: (insertChar: string) => string;
+class BasicHtmlEditor extends Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
@@ -178,7 +132,7 @@ class BasicHtmlEditor extends React.Component {
               src,
               size: `${size}%`,
               imageLink: imageLink || '#',
-              align: align || 'left'
+              align: align || 'left',
             });
 
             this.props.saveImageData(src);
@@ -239,7 +193,7 @@ class BasicHtmlEditor extends React.Component {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
       // console.log(raw);
-      // console.log(html);
+      console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -261,6 +215,16 @@ class BasicHtmlEditor extends React.Component {
     this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
+    this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
+
+    // cleanups
+    this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
+    this.onVariableMenuClose = _ => this.setState({variableMenuOpen: false});
+    this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
+    this.onImageDropzoneOpen = _ => this.imgDropzone.open();
+    this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
+    this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
+    this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -270,13 +234,7 @@ class BasicHtmlEditor extends React.Component {
       let newContent;
       let editorState;
       if (nextProps.savedBodyHtml) {
-        // console.log(nextProps.savedBodyHtml);
         const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
-
-        // let raw = convertToRaw(configuredContent);
-        // let html = draftRawToHtml(raw);
-        // console.log(raw);
-        // console.log(html);
         // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
         editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
         // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
@@ -286,9 +244,7 @@ class BasicHtmlEditor extends React.Component {
               const entityKey = character.getEntity();
               if (entityKey === null) return false;
               if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-                // console.log(convertToRaw(editorState.getCurrentContent()));
                 editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-                // console.log(convertToRaw(editorState.getCurrentContent()));
               }
               return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
             },
@@ -319,10 +275,6 @@ class BasicHtmlEditor extends React.Component {
           if (okayBlock) truncatedBlocks.push(block);
         });
         const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
-        // raw = convertToRaw(cleanedContentState);
-        // html = draftRawToHtml(raw);
-        // console.log(raw);
-        // console.log(html);
         editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
 
         this.setState({bodyHtml: nextProps.bodyHtml});
@@ -334,7 +286,6 @@ class BasicHtmlEditor extends React.Component {
       }
       this.onChange(editorState);
     }
-
   }
 
   componentWillUnmount() {
@@ -342,10 +293,10 @@ class BasicHtmlEditor extends React.Component {
   }
 
   _onChange(editorState, onChangeType) {
-    let newEditorState = editorState;
+    const newEditorState = editorState;
     this.setState({editorState: newEditorState});
 
-    let previousContent = this.state.editorState.getCurrentContent();
+    const previousContent = this.state.editorState.getCurrentContent();
 
     // only emit html when content changes
     if (previousContent !== newEditorState.getCurrentContent() || onChangeType === 'force-emit-html') {
@@ -674,6 +625,42 @@ class BasicHtmlEditor extends React.Component {
     return false;
   }
 
+  _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+
+    // Let's just allow one color at a time. Turn off all active colors.
+    const nextContentState = Object.keys(inlineStyleMap)
+      .reduce((contentState, inlineStyle) => {
+        return Modifier.removeInlineStyle(contentState, selection, inlineStyle);
+      }, editorState.getCurrentContent());
+
+    let nextEditorState = EditorState.push(
+      editorState,
+      nextContentState,
+      'change-inline-style'
+    );
+
+    const currentStyle = editorState.getCurrentInlineStyle();
+
+    // Unset style override for current color.
+    if (selection.isCollapsed()) {
+      nextEditorState = currentStyle.reduce((state, inlineStyle) => {
+        return RichUtils.toggleInlineStyle(state, inlineStyle);
+      }, nextEditorState);
+    }
+
+    // If the color is being toggled on, apply it.
+    if (!currentStyle.has(toggledStyle)) {
+      nextEditorState = RichUtils.toggleInlineStyle(
+        nextEditorState,
+        toggledStyle
+      );
+    }
+
+    this.onChange(nextEditorState, 'force-emit-html');
+  }
+
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -691,11 +678,11 @@ class BasicHtmlEditor extends React.Component {
 
     return (
       <div>
-        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
+        <Dialog actions={[<FlatButton label='Close' onClick={this.onImagePanelOpen}/>]}
         autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
-          <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
+          <div style={imgPanelStyles.label} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
           <div className='horizontal-center'>OR</div>
-          <div className='vertical-center horizontal-center' style={{margin: '15px 0'}}>
+          <div className='vertical-center horizontal-center' style={imgPanelStyles.panelContentContainer}>
             <div>
               <ValidationHOC rules={[{validator: isURL, errorMessage: 'Not a valid url.'}]}>
               {({onValueChange, errorMessage}) => (
@@ -712,21 +699,21 @@ class BasicHtmlEditor extends React.Component {
                 }}
                 />)}
               </ValidationHOC>
-              <RaisedButton style={{margin: 5}} label='Submit' onClick={this.onOnlineImageUpload}/>
+              <RaisedButton style={imgPanelStyles.submitBtn} label='Submit' onClick={this.onOnlineImageUpload}/>
             </div>
           </div>
           <div className='horizontal-center'>OR</div>
-          <div className='vertical-center horizontal-center' style={{margin: '10px 0'}}>
-            <RaisedButton label='Upload from File' onClick={_ => this.imgDropzone.open()}/>
+          <div className='vertical-center horizontal-center' style={imgPanelStyles.uploadBtn}>
+            <RaisedButton label='Upload from File' onClick={this.onImageDropzoneOpen}/>
           </div>
         </Dialog>
-        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+        <Dropzone ref={(node) => (this.imgDropzone = node)} style={styles.dropzone} onDrop={this.onImageUploadClicked}/>
         <Popover
         open={state.variableMenuOpen}
         anchorEl={state.variableMenuAnchorEl}
-        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        anchorOrigin={styles.anchorOrigin}
+        targetOrigin={styles.targetOrigin}
+        onRequestClose={this.onVariableMenuClose}
         >
           <Menu desktop>
           {props.fieldsmap
@@ -735,7 +722,7 @@ class BasicHtmlEditor extends React.Component {
             <MenuItem key={i} primaryText={field.name} onClick={_ => {
               this.insertText(field.name);
               this.setState({variableMenuOpen: false});
-            }} />)}
+            }}/>)}
           </Menu>
         </Popover>
         <Subject
@@ -744,10 +731,7 @@ class BasicHtmlEditor extends React.Component {
         subjectHtml={props.subjectHtml}
         fieldsmap={props.fieldsmap}
         />
-        <div style={{
-          height: 460,
-          overflowY: 'scroll',
-        }}>
+        <div style={styles.editorContainer}>
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}
@@ -773,14 +757,14 @@ class BasicHtmlEditor extends React.Component {
             />
           </div>
           <RaisedButton
-          style={{margin: 10}}
+          style={styles.insertPropertyBtn.style}
           label='Insert Property'
-          labelStyle={{textTransform: 'none'}}
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          labelStyle={styles.insertPropertyBtn.labelStyle}
+          onClick={this.onInsertPropertyClick}
           />
         </div>
       {state.isStyleBlockOpen &&
-        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle}>
+        <Paper zDepth={1} className='vertical-center' style={controlsStyle}>
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -802,19 +786,19 @@ class BasicHtmlEditor extends React.Component {
           />
           <FontSizeControls
           editorState={editorState}
-          onToggle={this.toggleInlineStyle}
+          onToggle={this.onFontSizeToggle}
           inlineStyles={FONTSIZE_TYPES}
           />
-          {/*<BlockStyleControls
+          <TypefaceControls
           editorState={editorState}
-          blockTypes={BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-          />*/}
+          onToggle={this.onTypefaceToggle}
+          inlineStyles={TYPEFACE_TYPES}
+          />
           <IconButton
-          iconStyle={{width: 14, height: 14, fontSize: '14px', color: grey800}}
-          style={{width: 28, height: 28, padding: 6}}
+          iconStyle={styles.insertPropertyIcon.iconStyle}
+          style={styles.insertPropertyIcon.style}
           iconClassName='fa fa-plus pointer'
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          onClick={this.onVariableMenuOpen}
           tooltip='Insert Property'
           tooltipPosition='top-right'
           />
@@ -824,7 +808,7 @@ class BasicHtmlEditor extends React.Component {
           bottom: 3,
           width: props.width,
         }}>
-        <div style={{padding: 3, marginRight: 10}}>
+        <div style={styles.styleBlockIconContainer}>
           <FontIcon
           className={`fa fa-angle-double-${state.isStyleBlockOpen ? 'up' : 'down'} pointer`}
           style={{color: state.isStyleBlockOpen ? blue700 : grey700}}
@@ -838,6 +822,36 @@ class BasicHtmlEditor extends React.Component {
   }
 }
 
+const styles = {
+  styleBlockIconContainer: {padding: 3, marginRight: 10},
+  insertPropertyIcon: {
+    iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey800},
+    style: {width: 28, height: 28, padding: 6}
+  },
+  insertPropertyBtn: {
+    labelStyle: {textTransform: 'none'},
+    style: {margin: 10}
+  },
+  editorContainer: {height: 460, overflowY: 'scroll'},
+  anchorOrigin: {horizontal: 'left', vertical: 'bottom'},
+  targetOrigin: {horizontal: 'left', vertical: 'top'},
+  dropzone: {display: 'none'},
+};
+
+const imgPanelStyles = {
+  uploadBtn: {margin: '10px 0'},
+  submitBtn: {margin: 5},
+  panelContentContainer: {margin: '15px 0'},
+  label: {margin: '10px 0'},
+};
+
+const controlsStyle = {
+  position: 'fixed',
+  height: 40,
+  zIndex: 200,
+  bottom: 60,
+  backgroundColor: 'white',
+};
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);
 

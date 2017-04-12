@@ -25,28 +25,46 @@ let inlineTagMap = {
   'CODE': ['<code>','</code>'],
   'STRIKETHROUGH': ['<del>', '</del>'],
   'default': ['<span>','</span>'],
-  'SIZE-5': ['<span style="font-size:5px">','</span>'],
-  'SIZE-5.5': ['<span style="font-size:5.5px">','</span>'],
-  'SIZE-6': ['<span style="font-size:6px">','</span>'],
-  'SIZE-7.5': ['<span style="font-size:7.5px">','</span>'],
-  'SIZE-8': ['<span style="font-size:8px">','</span>'],
-  'SIZE-9': ['<span style="font-size:9px">','</span>'],
-  'SIZE-10': ['<span style="font-size:10px">','</span>'],
-  'SIZE-10.5': ['<span style="font-size:10.5px">','</span>'],
-  'SIZE-11': ['<span style="font-size:11px">','</span>'],
-  'SIZE-12': ['<span style="font-size:12px">','</span>'],
-  'SIZE-14': ['<span style="font-size:14px">','</span>'],
-  'SIZE-16': ['<span style="font-size:16px">','</span>'],
-  'SIZE-18': ['<span style="font-size:18px">','</span>'],
-  'SIZE-20': ['<span style="font-size:20px">','</span>'],
-  'SIZE-22': ['<span style="font-size:202x">','</span>'],
-  'SIZE-24': ['<span style="font-size:24px">','</span>'],
-  'SIZE-26': ['<span style="font-size:26px">','</span>'],
-  'SIZE-28': ['<span style="font-size:28px">','</span>'],
-  'SIZE-36': ['<span style="font-size:36px">','</span>'],
-  'SIZE-48': ['<span style="font-size:48px">','</span>'],
-  'SIZE-72': ['<span style="font-size:72px">','</span>'],
 };
+
+let combinableInlineTagMap = {
+  'SIZE-5': ['font-size:5px;', 'span'],
+  'SIZE-5.5': ['font-size:5.5px">', 'span'],
+  'SIZE-6': ['font-size:6px;', 'span'],
+  'SIZE-7.5': ['font-size:7.5px;', 'span'],
+  'SIZE-8': ['font-size:8px;', 'span'],
+  'SIZE-9': ['font-size:9px;', 'span'],
+  'SIZE-10': ['font-size:10px;', '</span>'],
+  'SIZE-10.5': ['font-size:10.5px;', '</span>'],
+  'SIZE-11': ['font-size:11px;', 'span'],
+  'SIZE-12': ['font-size:12px;', 'span'],
+  'SIZE-14': ['font-size:14px;', 'span'],
+  'SIZE-16': ['font-size:16px;', 'span'],
+  'SIZE-18': ['font-size:18px;', 'span'],
+  'SIZE-20': ['font-size:20px;', 'span'],
+  'SIZE-22': ['font-size:202x;', 'span'],
+  'SIZE-24': ['font-size:24px;', 'span'],
+  'SIZE-26': ['font-size:26px;', 'span'],
+  'SIZE-28': ['font-size:28px;', 'span'],
+  'SIZE-36': ['font-size:36px;', 'span'],
+  'SIZE-48': ['font-size:48px;', 'span'],
+  'SIZE-72': ['font-size:72px;', 'span'],
+
+  'Arial': ['font-family:Arial, &#39;Helvetica Neue&#39;, Helvetica, sans-serif;', 'span'],
+  'Helvetica': ['font-family:&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif;', 'span'],
+  'Times New Roman': ['font-family:&#39;Times New Roman&#39;, Times, serif;', 'span'],
+  'Courier New': ['font-family:&#39;Courier New&#39;, Courier, &#39;Lucida Sans Typewriter&#39;, &#39;Lucida Typewriter&#39;, monospace;', 'span'],
+  'Courier': ['font-family:Courier;">','</span>'],
+  'Palatino': ['font-family:Palatino, &#39;Palatino Linotype&#39;, &#39;Palatino LT STD&#39;, &#39;Book Antiqua&#39;, Georgia, serif;', 'span'],
+  'Garamond': ['font-family:Garamond, Baskerville, &#39;Baskerville Old Face&#39;, &#39;Hoefler Text&#39;, &#39;Times New Roman&#39;, serif;', 'span'],
+  'Bookman': ['font-family:Bookman;', 'span'],
+  'Avant Garde': ['font-family:&#39;Avant Garde&#39;, Avantgarde, &#39;Century Gothic&#39;, CenturyGothic, AppleGothic, sans-serif;', 'span'],
+  'Verdana': ['font-family:Verdana, Geneva, sans-serif;', 'span'],
+  'Tahoma': ['font-family:Tahoma, Geneva, sans-serif;', 'span'],
+  'Impact': ['font-family:Impact, Charcoal, sans-serif;', 'span'],
+  'Avenir': ['font-family:&#39;Avenir Next&#39;, sans-serif;', 'span'],
+  'Nunito': ['font-family:Nunito;', 'span'],
+}
 
 let entityTagMap = {
   'LINK': ['<a href="<%= url %>" target="_blank">', '</a>'],
@@ -89,10 +107,10 @@ export default function(raw: Object): string {
 
       html += blockTag ?
         blockTag[0] +
-          processInlineStylesAndEntities(inlineTagMap, entityTagMap, raw.entityMap, block) +
+          processInlineStylesAndEntities(inlineTagMap, entityTagMap, raw.entityMap, block, combinableInlineTagMap) +
           blockTag[1] :
         blockTagMap['default'][0] +
-          processInlineStylesAndEntities(inlineTagMap, block) +
+          processInlineStylesAndEntities(inlineTagMap, block, combinableInlineTagMap) +
           blockTagMap['default'][1];
     }
 

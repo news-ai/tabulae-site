@@ -43,7 +43,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchEmails: _ => dispatch(stagingActions.fetchScheduledEmails()),
     onCancelClick: id => dispatch(stagingActions.cancelScheduledEmail(id)),
-    onCancelAll: _ => dispatch(stagingActions.cancelAllScheduledEmails())
+    onCancelAll: _ => dispatch(stagingActions.cancelAllScheduledEmails()),
   };
 };
 

@@ -2,33 +2,33 @@ import React from 'react';
 import MenuItem from 'material-ui/MenuItem';
 import find from 'lodash/find';
 import DropDownMenu from 'material-ui/DropDownMenu';
+// import Immutable from 'immutable';
 
 const PLACEHOLDER = '---';
 
-export default function FontSizeControls(props) {
-  const {inlineStyles} = props;
-  const currentStyle = props.editorState.getCurrentInlineStyle();
+export default function TypefaceControls(props) {
+  const {inlineStyles, editorState} = props;
+  const currentStyle = editorState.getCurrentInlineStyle();
   const currentType = find(inlineStyles, type => currentStyle.has(type.style));
-  const selection = props.editorState.getSelection();
-  let value = '14';
+  const selection = editorState.getSelection();
+  let value = 'Arial';
   if (currentType) {
     value = currentType.label;
   }
-  if (!selection.isCollapsed() && selection.getHasFocus() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
+  if (!selection.isCollapsed() && selection.getHasFocus() && !currentType) {
     // more than one fontSize selected
     value = PLACEHOLDER;
   }
   const menuItems = [
     <MenuItem
-    key={`fontsize-select-default`}
+    key={`typeface-select-default`}
     value={PLACEHOLDER}
-    labelStyle={{paddingLeft: 0}}
     primaryText={PLACEHOLDER}
     label={PLACEHOLDER}
     />,
     ...inlineStyles.map(type =>
       <MenuItem
-      key={`fontsize-select-${type.label}`}
+      key={`typeface-select-${type.label}`}
       value={type.label}
       primaryText={type.label}
       label={type.label}
@@ -37,10 +37,11 @@ export default function FontSizeControls(props) {
 
   return (
     <DropDownMenu
-    style={{fontSize: '0.9em'}}
+    style={{fontSize: '0.9em', maxWidth: 135}}
     underlineStyle={{display: 'none', margin: 0}}
+    labelStyle={{paddingLeft: 5}}
     value={value}
-    onChange={(e, index, newValue) => props.onToggle(inlineStyles[index - 1].style)}
+    onChange={(e, index, newValue) => props.onToggle(newValue)}
     >
     {menuItems}
     </DropDownMenu>

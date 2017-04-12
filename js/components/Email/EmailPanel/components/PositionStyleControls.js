@@ -10,7 +10,7 @@ export default function PositionStyleControls(props) {
     .getType();
 
   return (
-    <div className='RichEditor-controls' style={{display: 'flex'}}>
+    <div className='RichEditor-controls'>
       {blockTypes.map(type =>
         <StyleButton
         key={`position-${type.label}`}

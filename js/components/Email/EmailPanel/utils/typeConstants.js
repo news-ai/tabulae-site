@@ -55,3 +55,20 @@ export const FONTSIZE_TYPES = [
   {inlineType: 'size', label: '48', style: 'SIZE-48'},
   {inlineType: 'size', label: '72', style: 'SIZE-72'},
 ];
+
+export const TYPEFACE_TYPES = [
+  {inlineType: 'typeface', label: 'Arial', style: 'Arial'},
+  {inlineType: 'typeface', label: 'Helvetica', style: 'Helvetica'},
+  {inlineType: 'typeface', label: 'Times New Roman', style: 'Times New Roman'},
+  {inlineType: 'typeface', label: 'Courier New', style: 'Courier New'},
+  {inlineType: 'typeface', label: 'Courier', style: 'Courier'},
+  {inlineType: 'typeface', label: 'Palatino', style: 'Palatino'},
+  {inlineType: 'typeface', label: 'Garamond', style: 'Garamond'},
+  {inlineType: 'typeface', label: 'Bookman', style: 'Bookman'},
+  {inlineType: 'typeface', label: 'Avant Garde', style: 'Avant Garde'},
+  {inlineType: 'typeface', label: 'Verdana', style: 'Verdana'},
+  {inlineType: 'typeface', label: 'Tahoma', style: 'Tahoma'},
+  {inlineType: 'typeface', label: 'Impact', style: 'Impact'},
+  {inlineType: 'typeface', label: 'Avenir', style: 'Avenir'},
+  {inlineType: 'typeface', label: 'Nunito', style: 'Nunito'},
+];
