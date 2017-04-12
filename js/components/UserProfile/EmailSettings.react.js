@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {fromJS, is} from 'immutable';
 import {grey500} from 'material-ui/styles/colors';
 import EmailSignatureEditor from './EmailSignatureEditor.react';
-import ConnectToGmail from './ConnectToGmail.react';
+import ConnectToThirdPartyEmailService from './ConnectToThirdPartyEmailService.react';
 import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
 import SMTPSettings from './SMTPSettings.react';
@@ -42,7 +42,7 @@ const Panel = props => {
 
 const styles = {
   item: {
-    margin: '10px 5px'
+    margin: '15px 5px'
   }
 };
 
@@ -106,14 +106,39 @@ class EmailSettings extends Component {
                 secondary
                 label='Remove'
                 onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
-                /> : <ConnectToGmail/>)}
+                /> :
+                <ConnectToThirdPartyEmailService
+                serviceName='Gmail'
+                title='Connect to Gmail'
+                href='https://tabulae.newsai.org/api/auth/gmail'
+                />)
+            }
+              {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
+            </div>
+          </div>}
+        {person.googleid &&
+          <div className='vertical-center' style={styles.item}>
+            <span style={spanStyle}>Outlook</span>
+            <div>
+              {!person.externalemail && (person.outlook ?
+                <FlatButton
+                secondary
+                label='Remove'
+                onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-outlook')}
+                /> :
+                <ConnectToThirdPartyEmailService
+                serviceName='Outlook'
+                title='Connect to Outlook'
+                href='https://tabulae.newsai.org/api/auth/outlook'
+                />)
+            }
               {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
             </div>
           </div>}
           <div className='vertical-center' style={styles.item}>
             <span style={spanStyle}>SMTP Server</span>
             <div>
-          {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
+          {(person.gmail || props.outlook) ? <span>Connected to Gmail/Outlook</span> : person.smtpvalid ?
               <Toggle
               toggled={state.newPerson.get('externalemail')}
               onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}

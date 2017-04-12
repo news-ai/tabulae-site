@@ -4,7 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {connect} from 'react-redux';
 import {blue600} from 'material-ui/styles/colors';
 
-class ConnectToGmail extends Component {
+class ConnectToThirdPartyEmailService extends Component {
   constructor(props) {
     super(props);
     this.state = {open: false};
@@ -12,18 +12,18 @@ class ConnectToGmail extends Component {
 
   render() {
     const actions = [
-      <FlatButton primary keyboardFocused label='Connect to Gmail' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/gmail')}/>,
+      <FlatButton primary keyboardFocused label={this.props.title} onClick={_ => (window.location.href = this.props.href)}/>,
       <FlatButton primary label='Cancel' onClick={_ => this.setState({open: false})}/>
     ];
     return (
       <div>
-        <Dialog title='Connect to Gmail' actions={actions} modal open={this.state.open}>
+        <Dialog title={this.props.title} actions={actions} modal open={this.state.open}>
           <p>
             <span>
               By default, Tabulae used <strong>Sendgrid</strong> to send emails.
-              By granting us permission to connect your Tabulae account to Gmail,
-              <strong>we'd send emails from your Gmail account instead of Sendgrid</strong>.
-              You'd be able to see the emails you sent from Tabulae in your <strong>Gmail Inbox</strong>.
+              By granting us permission to connect your Tabulae account to {this.props.serviceName},
+              <strong>we'd send emails from your {this.props.serviceName} account instead of Sendgrid</strong>.
+              You'd be able to see the emails you sent from Tabulae in your <strong>{this.props.serviceName} Inbox</strong>.
             </span>
           </p>
           <p>
@@ -43,7 +43,7 @@ class ConnectToGmail extends Component {
           </p>
           <p>
             <strong>
-              Please make sure the Gmail Inbox you connect with MATCHES with the one you are logged in with.
+              Please make sure the {this.props.serviceName} Inbox you connect with MATCHES with the one you are logged in with.
             </strong>
           </p>
           <p>
@@ -56,4 +56,4 @@ class ConnectToGmail extends Component {
   }
 }
 
-export default connect(state => ({person: state.personReducer.person}))(ConnectToGmail);
+export default connect(state => ({person: state.personReducer.person}))(ConnectToThirdPartyEmailService);
