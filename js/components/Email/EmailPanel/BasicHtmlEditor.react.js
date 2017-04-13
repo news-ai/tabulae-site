@@ -216,6 +216,7 @@ class BasicHtmlEditor extends Component {
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
+    this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
 
     // cleanups
     this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
@@ -234,51 +235,9 @@ class BasicHtmlEditor extends Component {
       let newContent;
       let editorState;
       if (nextProps.savedBodyHtml) {
-        const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(nextProps.savedBodyHtml);
-        // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
-        editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
-        // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
-        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-          block.findEntityRanges(
-            (character) => {
-              const entityKey = character.getEntity();
-              if (entityKey === null) return false;
-              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-                editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
-              }
-              return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
-            },
-            (start, end) => {});
-        });
-
-        // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
-        // rebuild contentState with valid blocks
-        let truncatedBlocks = [];
-        let okayBlock = true; // check if a block is atomic and has image
-        let ignoreRest = false;
-        editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-          ignoreRest = false;
-          block.findEntityRanges(
-            (character) => {
-              const entityKey = character.getEntity();
-              if (ignoreRest || entityKey === null) {
-                return false;
-              }
-              if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
-                if (block.getType() !== 'atomic') {
-                  okayBlock = false;
-                  ignoreRest = true;
-                }
-              }
-            },
-            (state, end) => {});
-          if (okayBlock) truncatedBlocks.push(block);
-        });
-        const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+        const cleanedContentState = this.cleanHTMLToContentState(nextProps.savedBodyHtml);
         editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
-
         this.setState({bodyHtml: nextProps.bodyHtml});
-
         this.props.clearCacheBodyHtml();
       } else {
         newContent = convertFromRaw(nextProps.savedEditorState);
@@ -290,6 +249,52 @@ class BasicHtmlEditor extends Component {
 
   componentWillUnmount() {
     this.props.clearAttachments();
+  }
+
+  _cleanHTMLToContentState(html) {
+    let editorState;
+    const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
+    // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
+    editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+    // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
+    editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      block.findEntityRanges(
+        (character) => {
+          const entityKey = character.getEntity();
+          if (entityKey === null) return false;
+          if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+            editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+          }
+          return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
+        },
+        (start, end) => {});
+    });
+
+    // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
+    // rebuild contentState with valid blocks
+    let truncatedBlocks = [];
+    let okayBlock = true; // check if a block is atomic and has image
+    let ignoreRest = false;
+    editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      ignoreRest = false;
+      block.findEntityRanges(
+        (character) => {
+          const entityKey = character.getEntity();
+          if (ignoreRest || entityKey === null) {
+            return false;
+          }
+          if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+            if (block.getType() !== 'atomic') {
+              okayBlock = false;
+              ignoreRest = true;
+            }
+          }
+        },
+        (state, end) => {});
+      if (okayBlock) truncatedBlocks.push(block);
+    });
+    const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+    return cleanedContentState;
   }
 
   _onChange(editorState, onChangeType) {
