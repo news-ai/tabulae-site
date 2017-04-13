@@ -18,7 +18,7 @@ const styles = {
   iconStyle: {
     marginRight: 15,
     color: grey800
-  }
+  },
 };
 
 let contentStyle = {

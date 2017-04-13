@@ -6,7 +6,7 @@ import find from 'lodash/find';
 function ContactCustomDescriptions({contact, patchContact, list}) {
   return (
     <div id='contact_profile_custom_hop' style={{marginTop: 10, marginBottom: 20, marginLeft: 8}}>
-      <h5>Custom Fields</h5>
+      <span style={{fontSize: '1.1em'}}>Custom Fields</span>
       <div style={{marginLeft: 5}}>
       {list && contact && list.fieldsmap.some(fieldObj => fieldObj.customfield && !fieldObj.readonly) ?
         list.fieldsmap
