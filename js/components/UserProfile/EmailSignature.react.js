@@ -35,13 +35,13 @@ class EmailSignature extends Component {
     let bodyContent;
     if (emailsignatures !== null && emailsignatures.some(signature => JSON.parse(signature).email === newEmail)) {
       const sign = emailsignatures.filter(signature => JSON.parse(signature).email === newEmail)[0];
-      bodyContent = sign.data;
+      bodyContent = JSON.parse(sign).data;
     }
     if (newEmail === this.props.person.email && this.props.signature !== null) {
       bodyContent = this.props.signature;
     }
-
     console.log(bodyContent);
+
     this.setState({
       currentEmail: newEmail,
       bodyContent
@@ -49,33 +49,39 @@ class EmailSignature extends Component {
   }
 
   _onSaveClick() {
-    const data = JSON.stringify({
-      type: 'DraftEditorState',
-      data: this.state.rawBodyContentState,
-      resource: 'signature',
-      email: this.state.currentEmail,
-    });
-    let emailsignatures = this.props.person.emailsignatures;
-    if (emailsignatures === null) emailsignatures = [data];
-    else {
-      emailsignatures = emailsignatures.map(signature => {
-        if (isJSON(signature)) {
-          const json = JSON.parse(signature);
-          if (json.email === this.state.currentEmail) {
-            return data;
-          }
-        }
-        return signature;
-      });
-    }
-
     const oldPerson = this.props.person;
-    const person = {
+    let person = {
       firstname: oldPerson.firstname,
       lastname: oldPerson.lastname,
       getdailyemails: oldPerson.getdailyemails,
-      emailsignatures
+      emailsignature: oldPerson.emailsignature
     };
+    if (this.state.currentEmail === this.props.signature) {
+      person.emailsignature = this.state.body;
+    } else {
+      const data = JSON.stringify({
+        type: 'DraftEditorState',
+        data: this.state.rawBodyContentState,
+        resource: 'signature',
+        email: this.state.currentEmail,
+      });
+      let emailsignatures = this.props.person.emailsignatures;
+      if (emailsignatures === null) emailsignatures = [data];
+      else {
+        emailsignatures = emailsignatures.map(signature => {
+          if (isJSON(signature)) {
+            const json = JSON.parse(signature);
+            if (json.email === this.state.currentEmail) {
+              return data;
+            }
+          }
+          return signature;
+        });
+      }
+      person.emailsignatures = emailsignatures;
+    }
+    console.log(person);
+
     this.props.patchPerson(person);
   }
 
@@ -98,7 +104,7 @@ class EmailSignature extends Component {
           >
           {items}
           </DropDownMenu>
-          <FlatButton primary label='Save' onClick={this.onSave}/>
+          <FlatButton primary label='Save' onClick={this.onSaveClick}/>
         </div>
         <div style={{display: 'block', border: '1px dotted black'}}>
           <GeneralEditor

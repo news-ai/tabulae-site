@@ -229,7 +229,6 @@ class GeneralEditor extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.bodyContent !== nextProps.bodyContent && this.props.allowReplacement) {
-      console.log(nextProps.bodyContent);
       let newContent;
       let editorState;
       // is HTML
@@ -672,8 +671,6 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    console.log(this.props.bodyContent);
-    console.log(this.props.allowReplacement);
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
