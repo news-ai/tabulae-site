@@ -63,6 +63,7 @@ function receiveContact(contact) {
 }
 
 function requestContactFail(message) {
+  console.log(message);
   return {
     type: contactConstant.REQUEST_FAIL,
     message
@@ -87,7 +88,7 @@ export function fetchContact(contactId) {
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.publications));
       return dispatch(receiveContacts(res.entities.contacts, [res.result.data]));
     })
-    .catch( message => dispatch(requestContactFail(message)));
+    .catch(message => dispatch(requestContactFail(message)));
   };
 }
 

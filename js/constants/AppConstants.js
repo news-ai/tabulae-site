@@ -1,5 +1,3 @@
-import {generateConstants} from './generateConstants';
-
 export const commonTypes = [
   'REQUEST',
   'RECEIVE',
@@ -19,5 +17,3 @@ export const commonTypes = [
   'ADD_RECEIVED',
   'REDUCER_RESET'
 ];
-
-export const publicationConstant = generateConstants(commonTypes, 'PUBLICATION');
