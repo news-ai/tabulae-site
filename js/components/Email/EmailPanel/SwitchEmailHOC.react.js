@@ -12,6 +12,16 @@ class SwitchEmailHOC extends Component {
   constructor(props) {
     super(props);
     this.state = {open: false};
+    this.onChange = this._onChange.bind(this);
+
+    // cleanups
+    this.onRequestClose = _ => this.setState({open: false});
+    this.onRequestOpen = _ => this.setState({open: true});
+  }
+
+  _onChange(e, i, value) {
+    window.Intercom('trackEvent', 'switch_email');
+    this.props.setFromEmail(value);
   }
 
   render() {
@@ -21,28 +31,34 @@ class SwitchEmailHOC extends Component {
     const disableSwitching = props.person.gmail || props.person.outlook || props.person.externalemail;
     return (
       <div>
-        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
-        title='Switch From Email' autoScrollBodyContent open={state.open} onRequestClose={_ => this.setState({open: false})}>
-          <div style={{margin: 10, padding: 10, backgroundColor: yellow50, fontSize: '0.9em'}}>
-          You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>.
+        <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
+        title='Switch From Email' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
+          <div className='text' style={styles.description}>
+          You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>. If you set an email signature, it'll get appended to existing content in the editor.
           </div>
           <DropDownMenu
           disabled={disableSwitching}
           value={props.from}
-          onChange={(e, i, value) => props.setFromEmail(value)}
+          onChange={this.onChange}
           >
             {emails}
           </DropDownMenu>
         {disableSwitching &&
-          <div className='vertical-center' style={{margin: 10}}>
-            <span style={{color: grey500, fontSize: '0.9em'}}>*You must disable Gmail/Outlook/SMTP integrations to use Email Switching.</span>
+          <div className='vertical-center' style={styles.warningContainer}>
+            <span className='text' style={styles.warningText}>*You must disable Gmail/Outlook/SMTP integrations to use Email Switching.</span>
           </div>}
         </Dialog>
-        {props.children({onRequestOpen: _ => this.setState({open: true})})}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>
       );
   }
 }
+
+const styles = {
+  warningText: {color: grey500},
+  warningContainer: {margin: 10},
+  description: {margin: 10, padding: 10, backgroundColor: yellow50},
+};
 
 const mapStateToProps = (state, props) => {
   const person = state.personReducer.person;

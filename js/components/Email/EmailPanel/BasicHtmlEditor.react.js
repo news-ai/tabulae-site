@@ -246,7 +246,6 @@ class BasicHtmlEditor extends Component {
       if (nextProps.templateChangeType === 'append') {
         // email signature
         console.log(nextProps.templateChangeType);
-        console.log('APPPEEENNNNDDD');
         const oldContent = this.state.editorState.getCurrentContent();
         newContent = this.appendToCurrentContentState(oldContent, newContent);
       }
