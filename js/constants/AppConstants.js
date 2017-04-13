@@ -20,9 +20,4 @@ export const commonTypes = [
   'REDUCER_RESET'
 ];
 
-export const listConstant = generateConstants(commonTypes, 'LIST');
-export const contactConstant = generateConstants(commonTypes, 'CONTACT');
 export const publicationConstant = generateConstants(commonTypes, 'PUBLICATION');
-
-// custom action types
-export const ADDING_CONTACT = 'ADDING_CONTACT';

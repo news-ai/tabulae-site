@@ -4,8 +4,8 @@ import {
   LIST_CONTACTS_SEARCH_REQUEST,
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL
-} from '../constants/AppConstants';
-import {initialState} from './initialState';
+} from './constants';
+import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 import _ from 'lodash';
 

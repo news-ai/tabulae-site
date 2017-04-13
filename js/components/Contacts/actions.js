@@ -1,11 +1,13 @@
 import {
   ADDING_CONTACT,
   contactConstant,
+} from './constants';
+import {
   listConstant,
   LIST_CONTACTS_SEARCH_REQUEST,
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL
-} from 'constants/AppConstants';
+} from 'components/Lists/constants';
 import * as api from 'actions/api';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as listActions} from 'components/Lists';

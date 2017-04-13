@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 
 import personReducer from 'components/Login/reducer';
-import contactReducer from './contactReducer';
+import contactReducer from 'components/Contacts/reducer';
 import listReducer from 'components/Lists/reducer';
 import stagingReducer from 'components/Email/reducer';
 import emailAttachmentReducer from 'components/Email/EmailAttachment/reducer';
