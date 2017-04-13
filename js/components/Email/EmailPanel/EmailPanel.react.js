@@ -218,8 +218,7 @@ class EmailPanel extends Component {
         this.props.setBodyHtml(emailsignature);
         this.setState({bodyHtml: emailsignature});
       }
-      this.props.turnOnTemplateChange();
-      emailsignature = '';
+      this.props.turnOnTemplateChange('append');
       setTimeout(_ => this.setState({dirty: false}), 10);
     }
   }
@@ -300,7 +299,7 @@ class EmailPanel extends Component {
           templateid: this.state.currentTemplateId,
           cc: this.props.cc.map(item => item.text),
           bcc: this.props.bcc.map(item => item.text),
-          fromemail: this.props.from
+          fromemail: this.props.from,
         };
         if (this.props.scheduledtime !== null) {
           emailObj.sendat = this.props.scheduledtime;
@@ -405,8 +404,7 @@ class EmailPanel extends Component {
   }
 
   _onClose() {
-    const state:any = this.state;
-    if (state.dirty) {
+    if (this.state.dirty) {
       alertify.promisifyConfirm(
         'Are you sure?',
         'Closing the editor will cause your subject/body to be discarded.',
@@ -610,7 +608,7 @@ const mapDispatchToProps = (dispatch, props) => {
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
-    turnOnTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_ON'}),
+    turnOnTemplateChange: changeType => dispatch({type: 'TEMPLATE_CHANGE_ON', changeType}),
     setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml})
   };
 };

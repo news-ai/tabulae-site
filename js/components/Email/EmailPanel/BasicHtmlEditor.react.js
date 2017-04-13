@@ -217,6 +217,7 @@ class BasicHtmlEditor extends Component {
     this.handleDrop = this._handleDrop.bind(this);
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
+    this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
 
     // cleanups
     this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
@@ -235,20 +236,34 @@ class BasicHtmlEditor extends Component {
       let newContent;
       let editorState;
       if (nextProps.savedBodyHtml) {
-        const cleanedContentState = this.cleanHTMLToContentState(nextProps.savedBodyHtml);
-        editorState = EditorState.push(this.state.editorState, cleanedContentState, 'insert-fragment');
         this.setState({bodyHtml: nextProps.bodyHtml});
+        newContent = this.cleanHTMLToContentState(nextProps.savedBodyHtml);
         this.props.clearCacheBodyHtml();
       } else {
         newContent = convertFromRaw(nextProps.savedEditorState);
-        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       }
+
+      if (nextProps.templateChangeType === 'append') {
+        // email signature
+        console.log(nextProps.templateChangeType);
+        console.log('APPPEEENNNNDDD');
+        const oldContent = this.state.editorState.getCurrentContent();
+        newContent = this.appendToCurrentContentState(oldContent, newContent);
+      }
+      editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
     }
   }
 
   componentWillUnmount() {
     this.props.clearAttachments();
+  }
+
+  _appendToCurrentContentState(oldContent, newContent) {
+    let blocks = [];
+    oldContent.getBlockMap().forEach(block => blocks.push(block));
+    newContent.getBlockMap().forEach(block => blocks.push(block));
+    return ContentState.createFromBlockArray(blocks);
   }
 
   _cleanHTMLToContentState(html) {
@@ -865,7 +880,8 @@ const mapStateToProps = (state, props) => {
     files: state.emailAttachmentReducer.attached,
     templateChanged: state.emailDraftReducer.templateChanged,
     savedEditorState: state.emailDraftReducer.editorState,
-    savedBodyHtml: state.emailDraftReducer.bodyHtml
+    savedBodyHtml: state.emailDraftReducer.bodyHtml,
+    templateChangeType: state.emailDraftReducer.templateChangeType,
   };
 };
 
