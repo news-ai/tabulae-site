@@ -1,7 +1,4 @@
-import {
-  ARCHIVE_LIST,
-  listConstant,
-} from 'constants/AppConstants';
+import {ARCHIVE_LIST, listConstant} from './constants';
 import * as api from 'actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 

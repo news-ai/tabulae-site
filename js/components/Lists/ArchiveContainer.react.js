@@ -3,7 +3,7 @@ import {actions as listActions} from 'components/Lists';
 import {connect} from 'react-redux';
 
 import Lists from './Lists';
-import InfiniteScroll from '../InfiniteScroll';
+import InfiniteScroll from 'components/InfiniteScroll';
 
 class ArchiveContainer extends Component {
   constructor(props) {

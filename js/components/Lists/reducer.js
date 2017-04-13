@@ -3,11 +3,11 @@ import {
   LIST_CONTACTS_SEARCH_REQUEST,
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL,
-} from '../constants/AppConstants';
+} from './constants';
 import {CLIENT_LISTS_REQUEST, CLIENT_LISTS_RECEIVED} from 'components/ClientDirectories/constants';
 
-import {assignToEmpty} from '../utils/assign';
-import {initialState} from './initialState';
+import {assignToEmpty} from 'utils/assign';
+import {initialState} from 'reducers/initialState';
 
 
 function listReducer(state = initialState.listReducer, action) {

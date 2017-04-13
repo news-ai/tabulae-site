@@ -7,8 +7,8 @@ import SkyLight from 'react-skylight';
 import RaisedButton from 'material-ui/RaisedButton';
 
 import Lists from './Lists';
-import InfiniteScroll from '../InfiniteScroll';
-import DropFileWrapper from '../DropFile/DropFileWrapper.react';
+import InfiniteScroll from 'components/InfiniteScroll';
+import DropFileWrapper from 'components/DropFile/DropFileWrapper.react';
 
 import {grey500} from 'material-ui/styles/colors';
 

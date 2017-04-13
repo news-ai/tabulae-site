@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import EmailSignatureEditor from './EmailSignatureEditor.react';
 import {actions as loginActions} from 'components/Login';
 import GeneralEditor from 'components/Email/GeneralEditor/GeneralEditor2.react';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import isJSON from 'validator/lib/isJSON';
+import {grey600} from 'material-ui/styles/colors';
 
 class EmailSignature extends Component {
   constructor(props) {
@@ -109,7 +109,7 @@ class EmailSignature extends Component {
     }
     return (
       <div className='row'>
-        <div className='large-10 medium-8 small-12 columns' style={{marginTop: 20, marginBottom: 10}}>
+        <div className='large-10 medium-8 small-12 columns' style={styles.dropdownContainer}>
           <DropDownMenu
           value={state.currentEmail}
           onChange={this.handleChange}
@@ -117,12 +117,12 @@ class EmailSignature extends Component {
           {items}
           </DropDownMenu>
         </div>
-        <div className='large-2 medium-4 small-12 columns' style={{margin: '5px 0'}}>
-          <FlatButton primary label='Save' onClick={this.onSaveClick}/>
-          {state.saved && <span style={{fontSize: '0.8em'}}>Saved.</span>}
+        <div className='large-2 medium-4 small-12 columns' style={styles.saveBtnContainer}>
+          <RaisedButton primary label='Save' onClick={this.onSaveClick}/>
+          {state.saved && <span className='smalltext'>Saved.</span>}
         </div>
-        <div className='large-12 medium-12 small-12 columns' style={{display: 'block', border: '1px dotted black', margin: 20}}>
-          <div style={{margin: 5}}>
+        <div className='large-12 medium-12 small-12 columns' style={styles.editorContainer}>
+          <div style={styles.editor}>
             <GeneralEditor
             width={550}
             height={350}
@@ -141,6 +141,12 @@ class EmailSignature extends Component {
   }
 }
 
+const styles = {
+  editor: {padding: 5},
+  editorContainer: {display: 'block', border: `1px dotted ${grey600}`, margin: 20},
+  saveBtnContainer: {margin: '5px 0'},
+  dropdownContainer: {marginTop: 20, marginBottom: 10},
+};
 
 const mapStateToProps = (state, props) => {
   return {

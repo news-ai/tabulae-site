@@ -1,12 +1,10 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';
 
 import Lists from './Lists';
-import InfiniteScroll from '../InfiniteScroll';
-
-import {grey500} from 'material-ui/styles/colors';
+import InfiniteScroll from 'components/InfiniteScroll';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
