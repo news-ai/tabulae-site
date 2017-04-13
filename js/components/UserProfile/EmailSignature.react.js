@@ -108,29 +108,33 @@ class EmailSignature extends Component {
       ];
     }
     return (
-      <div>
-        <div className='vertical-center'>
+      <div className='row'>
+        <div className='large-10 medium-8 small-12 columns' style={{marginTop: 20, marginBottom: 10}}>
           <DropDownMenu
           value={state.currentEmail}
           onChange={this.handleChange}
           >
           {items}
           </DropDownMenu>
-          <FlatButton primary label='Save' onClick={this.onSaveClick}/>
-          {state.saved && <span>Saved.</span>}
         </div>
-        <div style={{display: 'block', border: '1px dotted black'}}>
-          <GeneralEditor
-          width={550}
-          height={350}
-          onEditMode
-          allowReplacement
-          bodyContent={state.bodyContent}
-          rawBodyContentState={state.rawBodyContentState}
-          onBodyChange={this.updateBody}
-          debounce={500}
-          placeholder='Enter email signature here...'
-          />
+        <div className='large-2 medium-4 small-12 columns' style={{margin: '5px 0'}}>
+          <FlatButton primary label='Save' onClick={this.onSaveClick}/>
+          {state.saved && <span style={{fontSize: '0.8em'}}>Saved.</span>}
+        </div>
+        <div className='large-12 medium-12 small-12 columns' style={{display: 'block', border: '1px dotted black', margin: 20}}>
+          <div style={{margin: 5}}>
+            <GeneralEditor
+            width={550}
+            height={350}
+            onEditMode
+            allowReplacement
+            bodyContent={state.bodyContent}
+            rawBodyContentState={state.rawBodyContentState}
+            onBodyChange={this.updateBody}
+            debounce={500}
+            placeholder='Enter email signature here...'
+            />
+          </div>
         </div>
       </div>
       );
