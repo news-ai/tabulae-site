@@ -59,6 +59,14 @@ const styles = {
     bottom: 10,
     right: 10
   },
+  smallIcon: {
+    margin: '0 3px', fontSize: '14px', float: 'right'
+  },
+  attachTooltip: {
+    zIndex: 500,
+    float: 'right',
+    margin: '0 8px',
+  },
 };
 
 const emailPanelWrapper = {
@@ -134,27 +142,6 @@ const PauseOverlay = ({message}: {message: string}) => (
 
 
 class EmailPanel extends Component {
-  toggleMinimize: (event: Event) => void;
-  updateBodyHtml: (html: string) => void;
-  handleTemplateValueChange: (event: Event) => void;
-  onPreviewEmailsClick: (event: Event) => void;
-  getGeneratedHtmlEmails: (selectedContacts: Array<Object>, subject: string, body: string) => Array<Object>;
-  sendGeneratedEmails: (contactEmails: Array<Object>) => void;
-  onSubjectChange: (editorState: Object) => void;
-  onSaveNewTemplateClick: (event: Event) => void;
-  onDeleteTemplate: () => void;
-  onClose: (event: Event) => void;
-  state: {
-    subject: string,
-    bodyEditorState: ?Object,
-    fieldsmap: Array<Object>,
-    currentTemplateId: number,
-    bodyHtml: string,
-    body: string,
-    subjectHtml: ?string,
-    minimized: bool
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -162,17 +149,17 @@ class EmailPanel extends Component {
       fieldsmap: [],
       currentTemplateId: 0,
       bodyEditorState: null,
-      bodyHtml: this.props.emailsignature !== null ? this.props.emailsignature : '',
-      body: this.props.emailsignature !== null ? this.props.emailsignature : '',
+      bodyHtml: '',
+      body: '',
       subjectHtml: null,
       minimized: false,
       isPreveiwOpen: false,
       dirty: false,
     };
     this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
-    this.updateBodyHtml = (html, editorState) => {
-      this.setState({body: html, bodyEditorState: editorState, dirty: true});
-      this.props.saveEditorState(editorState);
+    this.updateBodyHtml = (html, rawContentState) => {
+      this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
+      this.props.saveEditorState(rawContentState);
     };
     this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
@@ -187,6 +174,10 @@ class EmailPanel extends Component {
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
     this.onClose = this._onClose.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
+    this.changeEmailSignature = this._changeEmailSignature.bind(this);
+
+    // cleanups
+    this.onEmailSendClick = _ => this.checkEmailDupes().then(this.onPreviewEmailsClick);
   }
 
   componentWillMount() {
@@ -194,15 +185,43 @@ class EmailPanel extends Component {
     this.props.initializeEmailDraft();
   }
 
+  componentDidMount() {
+    // treats it like a template
+    this.changeEmailSignature(this.props.emailsignature);
+  }
+
   componentWillReceiveProps(nextProps) {
     // add immutable here
     const fieldsmap = nextProps.fieldsmap;
     this.setState({fieldsmap});
+
+    if (this.props.from !== nextProps.from) {
+      // from email changed
+
+      let emailsignature = nextProps.emailsignature;
+      this.changeEmailSignature(nextProps.emailsignature)
+    }
   }
 
   componentWillUnmount() {
     this.props.clearUTCTime();
     this.props.initializeEmailDraft();
+  }
+
+  _changeEmailSignature(emailsignature) {
+    if (emailsignature !== null) {
+      if (isJSON(emailsignature)) {
+        const sign = JSON.parse(emailsignature);
+        this.setState({bodyEditorState: sign.data});
+        this.props.saveEditorState(sign.data);
+      } else {
+        this.props.setBodyHtml(emailsignature);
+        this.setState({bodyHtml: emailsignature});
+      }
+      this.props.turnOnTemplateChange();
+      emailsignature = '';
+      setTimeout(_ => this.setState({dirty: false}), 10);
+    }
   }
 
   _onArchiveTemplate() {
@@ -400,8 +419,8 @@ class EmailPanel extends Component {
   }
 
   render() {
-    const state:any = this.state;
-    const props:any = this.props;
+    const state = this.state;
+    const props = this.props;
     // add this button to fetch all staged emails for debugging purposes
     const templateMenuItems = props.templates.length > 0 ?
     [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>]
@@ -426,19 +445,19 @@ class EmailPanel extends Component {
           <Paper style={Object.assign({}, emailPanelWrapper, {display: state.minimized ? 'none' : 'block'})} zDepth={2}>
             <div className='RichEditor-root' style={styles.emailPanel}>
               <div>
-                <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
-                <FontIcon style={{margin: '0 3px', fontSize: '14px', float: 'right'}} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
-                <div onClick={props.onAttachmentPanelOpen} className='pointer' style={{
-                  zIndex: 500,
-                  float: 'right',
-                  margin: '0 8px',
-                  display: (props.files && props.files.length > 0) ? 'block' : 'none'
-                }}>
+                <FontIcon style={styles.smallIcon} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
+                <FontIcon style={styles.smallIcon} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
+                <div
+                onClick={props.onAttachmentPanelOpen}
+                className='pointer'
+                style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
+                >
                   <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: 'darkgray'}}>File{props.files.length > 1 && 's'} Attached</a>
                 </div>
               </div>
               <div className='vertical-center'>
-                <span style={{fontSize: '0.9em'}}>Emails are sent from: </span><span style={{fontSize: '0.9em', backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
+                <span className='text'>Emails are sent from: </span>
+                <span className='text' style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
               {props.isImageReceiving &&
                 <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
               </div>
@@ -512,13 +531,7 @@ class EmailPanel extends Component {
                 <div style={{position: 'absolute', right: 20, bottom: 3, zIndex: 300}}>
                   <IconButton
                   iconClassName={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}
-                  onClick={
-                    _ => this.checkEmailDupes()
-                    .then(
-                      this.onPreviewEmailsClick,
-                      _ => {/* do nothing*/}
-                      )
-                  }
+                  onClick={this.onEmailSendClick}
                   tooltip='Preview then Send'
                   tooltipPosition='top-left'
                   iconStyle={{color: 'white'}}
@@ -553,8 +566,13 @@ class EmailPanel extends Component {
 
 const mapStateToProps = (state, props) => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
+  const fromEmail = get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email;
+  const person = state.personReducer.person;
+  let emailsignature;
+  if (fromEmail === person.email) emailsignature = person.emailsignature || null;
+  else emailsignature = person.emailsignatures !== null ? find(person.emailsignatures, sign => JSON.parse(sign).email === fromEmail) : null;
   return {
-    person: state.personReducer.person,
+    person,
     scheduledtime: state.stagingReducer.utctime,
     isReceiving: state.stagingReducer.isReceiving,
     stagedEmailIds: state.stagingReducer.previewEmails,
@@ -566,13 +584,14 @@ const mapStateToProps = (state, props) => {
     selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
     attachedfiles: state.emailAttachmentReducer.attached,
     isAttaching: state.emailAttachmentReducer.isReceiving,
-    emailsignature: state.personReducer.person.emailsignature || null,
+    emailsignature: person.emailsignature || null,
     cc: get(state, `emailDraftReducer[${props.listId}].cc`) || [],
     bcc: get(state, `emailDraftReducer[${props.listId}].bcc`) || [],
-    from: get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email,
+    from: fromEmail,
     isImageReceiving: state.emailImageReducer.isReceiving,
     files: state.emailAttachmentReducer.attached,
     isAttachmentPanelOpen: state.emailDraftReducer.isAttachmentPanelOpen,
+    emailsignature,
   };
 };
 
