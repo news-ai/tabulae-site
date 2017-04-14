@@ -289,6 +289,7 @@ class SMTPSettings extends Component {
           </div>
         </Dialog>
         <FlatButton
+        primary
         onClick={_ => this.setState({open: true})}
         label='Connect'/>
       </div>

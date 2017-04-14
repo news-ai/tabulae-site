@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {fromJS, is} from 'immutable';
-import {grey500} from 'material-ui/styles/colors';
-import EmailSignatureEditor from './EmailSignatureEditor.react';
-import ConnectToGmail from './ConnectToGmail.react';
+import {grey500, grey800} from 'material-ui/styles/colors';
+import EmailSignature from './EmailSignature.react';
+import ConnectToThirdPartyEmailService from './ConnectToThirdPartyEmailService.react';
 import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
 import SMTPSettings from './SMTPSettings.react';
 import AddMultipleEmails from './AddMultipleEmails.react';
 import EmailItem from './EmailItem.react';
+import Paper from 'material-ui/Paper';
 
 import {actions as loginActions} from 'components/Login';
 
@@ -23,18 +24,48 @@ const spanStyle = {
   float: 'right'
 };
 
+const Panel = props => {
+  return (
+    <Paper className={props.className} zDepth={1} style={{margin: '5px 0'}}>
+      <div style={{padding: 10}}>
+        <div className='vertical-center'>
+          <span style={{fontSize: '1.2em', color: grey500}}>{props.title}</span>
+        </div>
+        <div style={{margin: '15px 10px'}}>
+          {props.children}
+        </div>
+      </div>
+    </Paper>);
+};
+
+const styles = {
+  item: {
+    margin: '15px 5px'
+  },
+  notAvailableSpan: {
+    fontSize: '0.9em',
+    color: grey800
+  }
+};
+
+
 class EmailSettings extends Component {
   constructor(props) {
     super(props);
-    this.setNewPerson = (key, value) => this.setState({newPerson: this.state.newPerson.set(key, value)});
+    this.setNewPerson = (key, value) => this.setState({newPerson: this.state.newPerson.set(key, value)}, this.updatePerson);
     this.state = {
       immuperson: fromJS(this.props.person),
       newPerson: fromJS(this.props.person),
     };
     this.props.getEmailMaxAllowance();
+    this.updatePerson = this._updatePerson.bind(this);
   }
 
   componentWillUnmount() {
+    this.updatePerson();
+  }
+
+  _updatePerson() {
     if (!is(this.state.immuperson, this.state.newPerson)) {
       const newPerson = this.state.newPerson;
       const person = {
@@ -52,78 +83,133 @@ class EmailSettings extends Component {
     const {person} = this.props;
     const state = this.state;
     const props = this.props;
+    const NoAccess = props.person.externalemail || props.person.gmail || props.person.outlook;
+
+    let googleNode = (
+      <ConnectToThirdPartyEmailService
+      serviceName='Gmail'
+      title='Connect to Gmail'
+      href='https://tabulae.newsai.org/api/auth/gmail'
+      />);
+    let outlookNode = (
+      <ConnectToThirdPartyEmailService
+      serviceName='Outlook'
+      title='Connect to Outlook'
+      href='https://tabulae.newsai.org/api/auth/outlook'
+      />);
+    let smtpNode = (<SMTPSettings/>);
+    if (!person.externalemail) {
+      if (person.gmail) {
+        // GOOGLE IS ON
+        googleNode = (
+          <FlatButton
+          secondary
+          label='Remove'
+          onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
+          />);
+        outlookNode = <span style={styles.notAvailableSpan}>Connected via Gmail</span>;
+        smtpNode = <span style={styles.notAvailableSpan}>Connected via Gmail</span>;
+      } else if (person.outlook) {
+        // OUTLOOK IS ON
+        googleNode = <span style={styles.notAvailableSpan}>Connected via Outlook</span>;
+        outlookNode = (
+          <FlatButton
+          secondary
+          label='Remove'
+          onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-outlook')}
+          />);
+        smtpNode = <span style={styles.notAvailableSpan}>Connected via Outlook</span>;
+      }
+    } else {
+      if (person.smtpvalid) {
+        googleNode = <span style={styles.notAvailableSpan}>Connected via SMTP</span>;
+        outlookNode = <span style={styles.notAvailableSpan}>Connected via SMTP</span>;
+        smtpNode = (
+          <Toggle
+          toggled={state.newPerson.get('externalemail')}
+          onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
+          />);
+      }
+    }
+
     return (
-       <div className='row horizontal-center' style={{margin: '50px 0'}}>
-          <div className='large-7 medium-9 small-12 columns'>
-            <div className='row vertical-center' style={inputHeight}>
-              <div className='large-4 medium-5 columns'>
-                <span style={spanStyle}>Subscribe to Emails</span>
-              </div>
-              <div className='large-8 medium-7 columns'>
-                <Toggle
-                toggled={state.newPerson.get('getdailyemails')}
-                onToggle={_ => this.setNewPerson('getdailyemails', !state.newPerson.get('getdailyemails'))}
-                />
-              </div>
+      <div style={{margin: 50}}>
+        <Panel className='row' title='Daily Digest Subscription'>
+          <div className='vertical-center'>
+            <div>
+              <span style={spanStyle}>Receive a daily email of feed activity at 8AM</span>
             </div>
-            {person.googleid && <div className='row vertical-center' style={inputHeight}>
-              <div className='large-4 medium-5 columns'>
-                <span style={spanStyle}>Connect via Gmail</span>
-              </div>
-              <div className='large-8 medium-7 columns'>
-                {!person.externalemail && (person.gmail ?
-                  <FlatButton
-                  secondary
-                  label='Remove'
-                  onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
-                  /> : <ConnectToGmail/>)}
-                {person.smtpvalid && person.externalemail && <span>Connected via SMTP</span>}
-              </div>
-            </div>}
-            <div className='row vertical-center' style={inputHeight}>
-              <div className='large-4 medium-5 columns'>
-                <span style={spanStyle}>Connect via SMTP</span>
-              </div>
-              <div className='large-8 medium-7 columns'>
-            {person.gmail ? <span>Connected to Gmail</span> : person.smtpvalid ?
-                <Toggle
-                toggled={state.newPerson.get('externalemail')}
-                onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
-                /> :
-                <SMTPSettings/>}
-              </div>
-            </div>
-            <div className='row vertical-center' style={{height: 80, margin: '5px 0'}}>
-              <div className='large-4 medium-5 columns'>
-                <span style={spanStyle}>Add Multiple Emails</span>
-              </div>
-              <div className='large-8 medium-7 columns'>
-                <AddMultipleEmails/>
-              </div>
-            </div>
-          {props.person.sendgridemails !== null &&
-            <div className='row vertical-center'>
-              <div className='large-4 medium-5 columns'>
-                <span style={spanStyle}>Currently Connected</span>
-              </div>
-              <div className='large-8 medium-7 columns'>
-              {props.person.sendgridemails.map(email =>
-                <EmailItem key={email} email={email}/>)}
-              </div>
-            </div>}
-            <div className='row' style={{height: 210, margin: '15px 0'}}>
-              <div className='large-4 medium-5 columns'>
-                <span style={spanStyle}>Email Signature</span>
-              </div>
-              <div className='large-8 medium-7 columns'>
-                <EmailSignatureEditor/>
-              </div>
+            <div>
+              <Toggle
+              toggled={state.newPerson.get('getdailyemails')}
+              onToggle={_ => this.setNewPerson('getdailyemails', !state.newPerson.get('getdailyemails'))}
+              />
             </div>
           </div>
-        </div>
+        </Panel>
+        <Panel className='row' title='Integrations'>
+          <span className='smalltext'>By default, we use a 3rd-party email service provider Sendgrid to deliver your emails. If you would like for us to deliver your emails through a different service, then you can enable those integrations here.</span>
+        {person.googleid &&
+          <div className='vertical-center' style={styles.item}>
+            <div className={spanCssClass}>
+              <span style={spanStyle}>Gmail</span>
+            </div>
+            <div className={bodyCssClass}>
+            {googleNode}
+            </div>
+          </div>}
+          <div className='vertical-center' style={styles.item}>
+            <div className={spanCssClass}>
+              <span style={spanStyle}>Outlook</span>
+            </div>
+            <div className={bodyCssClass}>
+            {outlookNode}
+            </div>
+          </div>
+          <div className='vertical-center' style={styles.item}>
+            <div className={spanCssClass}>
+              <span style={spanStyle}>SMTP Server</span>
+            </div>
+            <div className={bodyCssClass}>
+            {smtpNode}
+            </div>
+          </div>
+        </Panel>
+        <Panel className='row' title='Add Multiple Emails'>
+          <span className='smalltext'>You can add multiple emails to switch when you send your emails. This feature is not supported with Gmail/Outlook/SMTP integrations.</span>
+          <div className='vertical-center' style={styles.item}>
+            <div className={spanCssClass}>
+              <span style={spanStyle}>Add Emails</span>
+            </div>
+            <div className={bodyCssClass}>
+              <AddMultipleEmails/>
+            </div>
+          </div>
+        {props.person.sendgridemails !== null && !NoAccess &&
+          <div className='vertical-center' style={styles.item}>
+            <div className={spanCssClass}>
+              <span style={spanStyle}>Connected</span>
+            </div>
+            <div className={bodyCssClass}>
+          {props.person.sendgridemails.map(email =>
+            <EmailItem key={email} email={email}/>
+            )}
+            </div>
+          </div>}
+        </Panel>
+        <Panel className='row' title='Email Signature'>
+          <span className='smalltext'>If you added multiple emails, you can assign different signature to each one.</span>
+          <div style={{height: 500}}>
+            <EmailSignature/>
+          </div>
+        </Panel>
+      </div>
       );
   }
 }
+
+const spanCssClass = 'large-3 medium-5 small-6 columns';
+const bodyCssClass = 'large-8 medium-7 small-6 columns';
 
 const mapStateToProps = (state, props) => {
   return {

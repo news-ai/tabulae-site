@@ -1,11 +1,11 @@
 import {combineReducers} from 'redux';
 
 import personReducer from 'components/Login/reducer';
-import contactReducer from './contactReducer';
-import listReducer from './listReducer';
+import contactReducer from 'components/Contacts/reducer';
+import listReducer from 'components/Lists/reducer';
 import stagingReducer from 'components/Email/reducer';
 import emailAttachmentReducer from 'components/Email/EmailAttachment/reducer';
-import publicationReducer from './publicationReducer';
+import publicationReducer from 'components/Publications/reducer';
 import fileReducer from 'components/ImportFile/fileReducer';
 import headerReducer from 'components/ImportFile/headerReducer';
 import templateReducer from 'components/Email/Template/reducer';

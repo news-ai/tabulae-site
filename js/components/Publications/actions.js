@@ -1,4 +1,4 @@
-import {publicationConstant} from 'constants/AppConstants';
+import {publicationConstant} from './constants';
 import * as api from 'actions/api';
 import {normalize, Schema, arrayOf} from 'normalizr';
 

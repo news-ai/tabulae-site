@@ -1,11 +1,13 @@
 import {
   ADDING_CONTACT,
   contactConstant,
+} from './constants';
+import {
   listConstant,
   LIST_CONTACTS_SEARCH_REQUEST,
   LIST_CONTACTS_SEARCH_RECEIVED,
   LIST_CONTACTS_SEARCH_FAIL
-} from 'constants/AppConstants';
+} from 'components/Lists/constants';
 import * as api from 'actions/api';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as listActions} from 'components/Lists';
@@ -61,6 +63,7 @@ function receiveContact(contact) {
 }
 
 function requestContactFail(message) {
+  console.log(message);
   return {
     type: contactConstant.REQUEST_FAIL,
     message
@@ -85,7 +88,7 @@ export function fetchContact(contactId) {
       dispatch(publicationActions.receivePublications(res.entities.publications, res.result.publications));
       return dispatch(receiveContacts(res.entities.contacts, [res.result.data]));
     })
-    .catch( message => dispatch(requestContactFail(message)));
+    .catch(message => dispatch(requestContactFail(message)));
   };
 }
 

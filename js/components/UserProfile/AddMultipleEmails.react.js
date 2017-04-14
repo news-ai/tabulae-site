@@ -19,9 +19,9 @@ class AddMultipleEmails extends Component {
     const props = this.props;
     const state = this.state;
     const disabledInput = !isEmail(state.value);
-    const NoAccess = props.person.externalemail || props.person.gmail;
-    let hintText = NoAccess ? 'Disable Gmail/SMTP Connect to activate' : `${props.leftover} emails left`;
-    let floatingLabelText = NoAccess ? 'Disable Gmail/SMTP Connect to activate' : 'Email';
+    const NoAccess = props.person.externalemail || props.person.gmail || props.person.outlook;
+    let hintText = NoAccess ? 'Disable Integration to activate' : `${props.leftover} emails left`;
+    let floatingLabelText = NoAccess ? 'Disable Integrations to activate' : 'Email';
     if (props.ontrial) floatingLabelText = 'Upgrade to Pro plan to add emails';
     return (
       <div className='vertical-center'>

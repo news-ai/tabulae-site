@@ -137,7 +137,8 @@ export const initialState = {
   emailDraftReducer: {
     editorState: null,
     isAttachmentPanelOpen: false,
-    templateChanged: false
+    templateChanged: false,
+    templateChangeType: 'overwrite',
   },
   emailPreviewDraftReducer: {
   },

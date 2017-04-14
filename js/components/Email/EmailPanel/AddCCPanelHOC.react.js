@@ -12,6 +12,8 @@ class AddCCPanelHOC extends Component {
     this.state = {
       open: false
     };
+    this.onRequestClose = _ => this.setState({open: false});
+    this.onRequestOpen = _ => this.setState({open: true});
   }
 
   render() {
@@ -19,21 +21,17 @@ class AddCCPanelHOC extends Component {
     const state = this.state;
     return (
       <div>
-        <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({open: false})}/>]}
-        open={state.open} onRequestClose={_ => this.setState({open: false})}>
-          <div className='panel' style={{
-            backgroundColor: yellow50,
-            margin: 10,
-            padding: 10
-          }}>
+        <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
+        open={state.open} onRequestClose={this.onRequestClose}>
+          <div className='panel' style={styles.warningPanel}>
             <h5>Warning</h5>
-            <span style={{fontSize: '0.8em'}}>
+            <span className='smalltext'>
               If you set CC/BCC here, Tabulae will set the same CC/BCC on <strong>every
               emails generated and send them to every contacts selected!</strong> Proceed cautiously.
             </span>
           </div>
-          <div style={{margin: 10}}>
-            <span style={{fontSize: '0.8em', margin: '0 3px'}}>CC</span>
+          <div style={styles.labelContainer}>
+            <span className='smalltext' style={styles.label}>CC</span>
             <ReactTags
             tags={props.cc}
             placeholder='Hit Enter after input'
@@ -41,8 +39,8 @@ class AddCCPanelHOC extends Component {
             handleAddition={props.handleAdditionCC}
             />
           </div>
-          <div style={{margin: 10}}>
-            <span style={{fontSize: '0.8em', margin: '0 3px'}}>BCC</span>
+          <div style={styles.labelContainer}>
+            <span className='smalltext' style={styles.label}>BCC</span>
             <ReactTags
             tags={props.bcc}
             placeholder='Hit Enter after input'
@@ -51,12 +49,20 @@ class AddCCPanelHOC extends Component {
             />
           </div>
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>
       );
   }
+}
+
+const styles = {
+  warningPanel: {
+    backgroundColor: yellow50,
+    margin: 10,
+    padding: 10
+  },
+  label: {margin: '0 3px'},
+  labelContainer: {margin: 10},
 }
 
 const mapStateToProps = (state, props) => {

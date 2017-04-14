@@ -25,6 +25,14 @@
 	
 }
 
+.smalltext {
+  font-size: 0.8em;
+}
+
+.text {
+  font-size: 0.9em;
+}
+
 .hoverGray {
 /*  grey600 */
   color: #757575;

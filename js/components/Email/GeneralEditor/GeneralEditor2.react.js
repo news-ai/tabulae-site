@@ -67,21 +67,20 @@ const controlsStyle = {
   backgroundColor: 'white',
 };
 
+const decorator = new CompositeDecorator([
+  {
+    strategy: findEntities.bind(null, 'LINK'),
+    component: Link
+  },
+  {
+    strategy: curlyStrategy,
+    component: CurlySpan
+  }
+]);
 
 class GeneralEditor extends React.Component {
   constructor(props) {
     super(props);
-    const decorator = new CompositeDecorator([
-      {
-        strategy: findEntities.bind(null, 'LINK'),
-        component: Link
-      },
-      {
-        strategy: curlyStrategy,
-        component: CurlySpan
-      }
-    ]);
-
     this.ENTITY_CONTROLS = [
       {label: 'Hyperlink', action: this._manageLink.bind(this), icon: 'fa fa-link', entityType: 'LINK'}
     ];
@@ -210,6 +209,84 @@ class GeneralEditor extends React.Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
     this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
+    this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
+  }
+
+  componentWillMount() {
+    if (this.props.bodyContent) {
+      let editorState;
+      let contentState;
+
+      if (typeof this.props.bodyContent === 'string') {
+        contentState = this.cleanHTMLToContentState(this.props.bodyContent);
+      } else {
+        contentState = convertFromRaw(this.props.bodyContent, decorator);
+      }
+      editorState = EditorState.push(this.state.editorState, contentState, 'insert-fragment');
+      this.onChange(editorState);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.bodyContent !== nextProps.bodyContent && this.props.allowReplacement) {
+      let newContent;
+      let editorState;
+      // is HTML
+      if (nextProps.bodyContent) {
+        if (typeof nextProps.bodyContent === 'string') newContent = this.cleanHTMLToContentState(nextProps.bodyContent);
+        else newContent = convertFromRaw(nextProps.bodyContent);
+        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+      } else {
+        editorState = EditorState.createEmpty(decorator);
+      }
+      this.onChange(editorState);
+    }
+  }
+
+  _cleanHTMLToContentState(html) {
+    let editorState;
+    const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
+    // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
+    editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
+    // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
+    editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      block.findEntityRanges(
+        (character) => {
+          const entityKey = character.getEntity();
+          if (entityKey === null) return false;
+          if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+            editorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
+          }
+          return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
+        },
+        (start, end) => {});
+    });
+
+    // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
+    // rebuild contentState with valid blocks
+    let truncatedBlocks = [];
+    let okayBlock = true; // check if a block is atomic and has image
+    let ignoreRest = false;
+    editorState.getCurrentContent().getBlockMap().forEach((block, key) => {
+      ignoreRest = false;
+      block.findEntityRanges(
+        (character) => {
+          const entityKey = character.getEntity();
+          if (ignoreRest || entityKey === null) {
+            return false;
+          }
+          if (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE') {
+            if (block.getType() !== 'atomic') {
+              okayBlock = false;
+              ignoreRest = true;
+            }
+          }
+        },
+        (state, end) => {});
+      if (okayBlock) truncatedBlocks.push(block);
+    });
+    const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+    return cleanedContentState;
   }
 
   _onChange(editorState, onChangeType) {
@@ -626,15 +703,17 @@ class GeneralEditor extends React.Component {
           </div>
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+      {props.subjectHtml && props.onSubjectChange &&
         <Subject
         width={props.width}
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
         fieldsmap={props.fieldsmap}
-        />
+        />}
         <div style={{
-          height: 460,
+          height: props.height || 460,
           overflowY: 'scroll',
+          width: props.width || 500
         }}>
           <div className={className} onClick={this.focus}>
             <Editor
@@ -655,7 +734,7 @@ class GeneralEditor extends React.Component {
             handleBeforeInput={this.handleBeforeInput}
             handleDrop={this.handleDrop}
             onChange={this.onChange}
-            placeholder={placeholder}
+            placeholder={props.placeholder || placeholder}
             ref='editor'
             spellCheck
             />
@@ -691,11 +770,11 @@ class GeneralEditor extends React.Component {
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
           />
-          <BlockStyleControls
+          {/*<BlockStyleControls
           editorState={editorState}
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
-          />
+          />*/}
         </Paper>
     </div>
     );

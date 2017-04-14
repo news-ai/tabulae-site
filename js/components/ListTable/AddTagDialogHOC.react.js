@@ -14,6 +14,10 @@ class AddTagDialogHOC extends Component {
       open: false,
       value: '',
     };
+    this.onAddTagClick = _ => {
+      this.props.onAddTag(state.value);
+      this.setState({value: ''});
+    }
   }
 
   render() {
@@ -28,10 +32,12 @@ class AddTagDialogHOC extends Component {
           </div>
           <div className='row'>
             <TextField hintText='New Tag Name' value={state.value} onChange={e => this.setState({value: e.target.value})}/>
-            <IconButton iconClassName='fa fa-plus' style={{margin: '0 5px'}} tooltip='Add Tag' tooltipPosition='top-right' onClick={_ => {
-              props.onAddTag(state.value);
-              this.setState({value: ''});
-            }}/>
+            <IconButton
+            iconClassName='fa fa-plus'
+            style={{margin: '0 5px'}}
+            tooltip='Add Tag'
+            tooltipPosition='top-right'
+            onClick={this.onAddTagClick}/>
           </div>
         </Dialog>
         {props.children({

@@ -1,4 +1,4 @@
-import {publicationConstant} from 'constants/AppConstants';
+import {publicationConstant} from './constants';
 import {assignToEmpty} from 'utils/assign';
 import {initialState} from 'reducers/initialState';
 

@@ -114,7 +114,8 @@ class PreviewEmail extends Component {
         </div>
         {state.onEditMode ?
           <div>
-            {props.isImageReceiving && <PauseOverlay message='Image is Loading...'/>}
+          {props.isImageReceiving &&
+            <PauseOverlay message='Image is Loading...'/>}
             <GeneralEditor
             width={600}
             onEditMode={state.onEditMode}

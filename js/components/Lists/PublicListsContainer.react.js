@@ -3,7 +3,7 @@ import * as listActions from './actions';
 import {connect} from 'react-redux';
 
 import Lists from './Lists';
-import InfiniteScroll from '../InfiniteScroll';
+import InfiniteScroll from 'components/InfiniteScroll';
 
 class PublicListsContainer extends Component {
   constructor(props) {

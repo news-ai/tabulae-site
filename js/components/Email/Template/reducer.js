@@ -2,8 +2,8 @@ import {
   templateConstant
 } from './constants';
 
-import {initialState} from '../../../reducers/initialState';
-import {assignToEmpty} from '../../../utils/assign';
+import {initialState} from 'reducers/initialState';
+import {assignToEmpty} from 'utils/assign';
 
 
 function templateReducer(state = initialState.templateReducer, action) {

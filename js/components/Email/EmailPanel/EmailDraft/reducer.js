@@ -36,9 +36,10 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
     case 'CLEAR_CACHE_BODYHTML':
       return assignToEmpty(state, {bodyHtml: null});
     case 'TEMPLATE_CHANGE_ON':
-      return assignToEmpty(state, {templateChanged: true});
+      // available changeTypes: 'overwrite', 'append'
+      return assignToEmpty(state, {templateChanged: true, templateChangeType: action.changeType || 'overwrite'});
     case 'TEMPLATE_CHANGE_OFF':
-      return assignToEmpty(state, {templateChanged: false});
+      return assignToEmpty(state, {templateChanged: false, templateChangeType: 'overwrite'});
     default:
       return state;
   }

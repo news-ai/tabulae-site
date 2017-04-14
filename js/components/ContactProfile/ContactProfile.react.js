@@ -8,7 +8,7 @@ import {actions as loginActions} from 'components/Login';
 import {actions as contactActions} from 'components/Contacts';
 import {actions as feedActions} from './RSSFeed';
 import * as headlineActions from './Headlines/actions';
-import * as joyrideActions from '../Joyride/actions';
+import * as joyrideActions from 'components/Joyride/actions';
 import {grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
@@ -29,23 +29,13 @@ import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
+import AddTagHOC from './AddTagHOC.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
 import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
 import 'rc-tabs/assets/index.css';
 
-const styles = {
-  smallIcon: {
-    fontSize: 16,
-    color: grey700
-  },
-  small: {
-    width: 36,
-    height: 36,
-    padding: 2,
-  },
-};
 
 const Placeholder = props => <div style={{height: 700}}><span>Placeholder</span></div>;
 
@@ -68,6 +58,9 @@ class ContactProfile extends Component {
     };
     this.onTabChange = activeKey => this.setState({activeKey});
     this.onTabClick = key => key === this.state.activeKey && this.setState({activeKey: ''});
+    this.onStartTourClick = this._onStartTourClick.bind(this);
+    this.onSkipTourClick = this._onSkipTourClick.bind(this);
+    this.onModalRequestClose = _ => this.setState({firsttime: false});
   }
 
   componentWillMount() {
@@ -96,6 +89,38 @@ class ContactProfile extends Component {
     window.onresize = undefined;
   }
 
+  _onStartTourClick() {
+    this.setState({firsttime: false});
+    if (this.props.showUploadGuide) {
+      hopscotch.startTour(Object.assign({}, tour, {
+        steps: [
+          ...tour.steps,
+          {
+            title: 'Check out the Sample Table at Home',
+            content: 'Discover the full power of Tabulae when feeds are subscribed to on contacts. Check it out in the sample Table.',
+            target: 'breadcrumbs_hop',
+            placement: 'bottom'
+          }]}));
+    } else if (this.props.showGeneralGuide) {
+      hopscotch.startTour(Object.assign({}, tour, {
+        steps: [
+          ...tour.steps,
+          {
+            title: 'That\'s it!',
+            content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
+            target: 'breadcrumbs_hop',
+            placement: 'bottom'
+          }]}));
+    }
+    this.props.removeFirstTimeUser();
+  }
+
+  _onSkipTourClick() {
+
+    this.setState({firsttime: false});
+    this.props.removeFirstTimeUser();
+  }
+
   render() {
     const state = this.state;
     const props = this.props;
@@ -104,41 +129,14 @@ class ContactProfile extends Component {
       <div className='row horizontal-center'>
         {
           props.firstTimeUser &&
-          <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
+          <Dialog open={state.firsttime} modal onRequestClose={this.onModalRequestClose}>
             <p><span style={{fontWeight: 'bold'}}>Profile</span> is generated for every contact in <span style={{fontWeight: 'bold'}}>Table</span>.</p>
             <div className='horizontal-center' style={{margin: '10px 0'}}>
               <div style={{margin: '0 3px'}}>
-                <RaisedButton label='Skip Tour' onClick={_ => {
-                  this.setState({firsttime: false});
-                  props.removeFirstTimeUser();
-                }}/>
+                <RaisedButton label='Skip Tour' onClick={this.onSkipTourClick}/>
               </div>
               <div style={{margin: '0 3px'}}>
-                <RaisedButton primary label='Start Tour' onClick={_ => {
-                  this.setState({firsttime: false});
-                  if (props.showUploadGuide) {
-                    hopscotch.startTour(Object.assign({}, tour, {
-                      steps: [
-                        ...tour.steps,
-                        {
-                          title: 'Check out the Sample Table at Home',
-                          content: 'Discover the full power of Tabulae when feeds are subscribed to on contacts. Check it out in the sample Table.',
-                          target: 'breadcrumbs_hop',
-                          placement: 'bottom'
-                        }]}));
-                  } else if (props.showGeneralGuide) {
-                    hopscotch.startTour(Object.assign({}, tour, {
-                      steps: [
-                        ...tour.steps,
-                        {
-                          title: 'That\'s it!',
-                          content: 'Go back to Home and try it out by uploading one of your existing Excel sheets.',
-                          target: 'breadcrumbs_hop',
-                          placement: 'bottom'
-                        }]}));
-                  }
-                  props.removeFirstTimeUser();
-                }}/>
+                <RaisedButton primary label='Start Tour' onClick={this.onStartTourClick}/>
               </div>
             </div>
           </Dialog>
@@ -146,11 +144,11 @@ class ContactProfile extends Component {
         <div className='large-9 medium-12 small-12 columns'>
           {props.contact && (
             <div className='row' style={{marginTop: 40}}>
-              <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props} />
+              <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props}/>
               <div className='large-6 medium-12 small-12 columns'>
                 <div className='row'>
                   <div className='large-12 medium-12 small-12 columns'>
-                    <h5>Notes</h5>
+                    <span style={styles.header}>Notes</span>
                   </div>
                   <div className='large-12 medium-12 small-12 columns'>
                     <Textarea
@@ -164,7 +162,7 @@ class ContactProfile extends Component {
                 </div>
                 <div className='large-12 medium-12 small-12 columns'>
                   <div className='row vertical-center' style={{marginTop: 20}}>
-                    <h5>Current Publications/Employers</h5>
+                    <span style={styles.header}>Current Publications/Employers</span>
                     <AddEmployerHOC
                     title='Add Current Publication/Employer'
                     type='employers'
@@ -196,9 +194,7 @@ class ContactProfile extends Component {
                   </div>
                   <div style={{marginTop: 20}}>
                     <div className='row vertical-center'>
-                    <div className='large-12 medium-12 small-12 columns'>
-                    </div>
-                      <h5>Past Publications/Employers</h5>
+                      <span style={styles.header}>Past Publications/Employers</span>
                       <AddEmployerHOC
                       title='Add Past Publication/Employer'
                       type='pastemployers'
@@ -214,22 +210,41 @@ class ContactProfile extends Component {
                         tooltip='Add Publication/Employer'
                         tooltipPosition='top-right'
                         onClick={onRequestOpen}
-                        />
-                        )}
+                        />)}
                       </AddEmployerHOC>
                     </div>
                   </div>
                   <div>
                     {props.pastemployers &&
                       props.pastemployers.map((employer, i) =>
-                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
-                    {(props.pastemployers.length === 0 || !props.pastemployers) && <span>None added</span>}
+                      <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact}/>)}
+                    {(props.pastemployers.length === 0 || !props.pastemployers) && <span className='text'>None added</span>}
+                  </div>
+                  {/*<div className='row vertical-center' style={{marginTop: 20}}>
+                    <span style={styles.header}>Tags</span>
+                      <AddTagHOC>
+                      {({onRequestOpen}) =>
+                        <IconButton
+                        disabled={props.contact.readonly}
+                        iconStyle={styles.smallIcon}
+                        style={styles.small}
+                        iconClassName='fa fa-plus'
+                        tooltip='Add Tag'
+                        tooltipPosition='top-right'
+                        onClick={onRequestOpen}
+                        />}
+                      </AddTagHOC>
+                  </div>*/}
+                  <div>
+                    {props.contact.tags !== null &&
+                      props.contact.tags.map((tag, i) => <span>tag</span>)}
+                    {props.contact.tags === null && <span className='text'>None added</span>}
                   </div>
                 </div>
               </div>
             </div>
             )}
-          <div className='large-12 columns' style={{marginLeft: 8, marginRight: 8, marginTop: 20}}>
+          <div className='large-12 columns' style={{marginLeft: 8, marginRight: 8, marginTop: 30}}>
             <FeedsController {...props} />
               <Tabs
               ref='tabs'
@@ -336,9 +351,22 @@ function mapStateToProps(state, props) {
     showUploadGuide: state.joyrideReducer.showUploadGuide,
     showGeneralGuide: state.joyrideReducer.showGeneralGuide,
     listDidInvalidate: state.listReducer.didInvalidate,
-    contactDidInvalidate: state.contactReducer.didInvalidate
+    contactDidInvalidate: state.contactReducer.didInvalidate,
   };
 }
+
+const styles = {
+  smallIcon: {
+    fontSize: 16,
+    color: grey700
+  },
+  small: {
+    width: 36,
+    height: 36,
+    padding: 2,
+  },
+  header: {fontSize: '1.1em'},
+};
 
 function mapDispatchToProps(dispatch, props) {
   return {
@@ -349,7 +377,7 @@ function mapDispatchToProps(dispatch, props) {
     fetchPublication: pubId => dispatch(publicationActions.fetchPublication(pubId)),
     fetchList: listId => dispatch(listActions.fetchList(listId)),
     removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser()),
-    turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide())
+    turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
   };
 }
 
