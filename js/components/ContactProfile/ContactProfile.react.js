@@ -29,6 +29,7 @@ import ContactEmails from './ContactEmails.react';
 import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
+import AddTagHOC from './AddTagHOC.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
@@ -221,23 +222,24 @@ class ContactProfile extends Component {
                   </div>
                   {/*<div className='row vertical-center' style={{marginTop: 20}}>
                     <span style={styles.header}>Tags</span>
-                    <AddEmployerHOC
-                    title='Add Current Publication/Employer'
-                    type='employers'
-                    contact={props.contact}
-                    >
-                    {({onRequestOpen}) => (
-                      <IconButton
-                      disabled={props.contact.readonly}
-                      iconStyle={styles.smallIcon}
-                      style={styles.small}
-                      iconClassName='fa fa-plus'
-                      tooltip='Add Tag'
-                      tooltipPosition='top-right'
-                      onClick={onRequestOpen}
-                      />)}
-                    </AddEmployerHOC>
+                      <AddTagHOC>
+                      {({onRequestOpen}) =>
+                        <IconButton
+                        disabled={props.contact.readonly}
+                        iconStyle={styles.smallIcon}
+                        style={styles.small}
+                        iconClassName='fa fa-plus'
+                        tooltip='Add Tag'
+                        tooltipPosition='top-right'
+                        onClick={onRequestOpen}
+                        />}
+                      </AddTagHOC>
                   </div>*/}
+                  <div>
+                    {props.contact.tags !== null &&
+                      props.contact.tags.map((tag, i) => <span>tag</span>)}
+                    {props.contact.tags === null && <span className='text'>None added</span>}
+                  </div>
                 </div>
               </div>
             </div>
@@ -349,7 +351,7 @@ function mapStateToProps(state, props) {
     showUploadGuide: state.joyrideReducer.showUploadGuide,
     showGeneralGuide: state.joyrideReducer.showGeneralGuide,
     listDidInvalidate: state.listReducer.didInvalidate,
-    contactDidInvalidate: state.contactReducer.didInvalidate
+    contactDidInvalidate: state.contactReducer.didInvalidate,
   };
 }
 
