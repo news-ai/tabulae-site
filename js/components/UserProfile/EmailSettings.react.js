@@ -149,7 +149,6 @@ class EmailSettings extends Component {
         </Panel>
         <Panel className='row' title='Integrations'>
           <span className='smalltext'>By default, we use a 3rd-party email service provider Sendgrid to deliver your emails. If you would like for us to deliver your emails through a different service, then you can enable those integrations here.</span>
-        {person.googleid &&
           <div className='vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>Gmail</span>
@@ -157,7 +156,7 @@ class EmailSettings extends Component {
             <div className={bodyCssClass}>
             {googleNode}
             </div>
-          </div>}
+          </div>
           <div className='vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>Outlook</span>
