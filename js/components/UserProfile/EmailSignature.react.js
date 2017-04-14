@@ -22,6 +22,7 @@ class EmailSignature extends Component {
       bodyContent,
       rawBodyContentState: undefined,
       onEditMode: false,
+      isSaving: false
     };
     this.handleChange = this._handleChange.bind(this);
     this.updateBody = (html, raw) => {
@@ -93,8 +94,11 @@ class EmailSignature extends Component {
     }
     // console.log(person);
 
-    this.props.patchPerson(person)
-    .then(_ => this.setState({saved: true}, _ => setTimeout(_ => this.setState({saved: false}), 10000)));
+    this.setState({isSaving: true}, _ => {
+      this.props.patchPerson(person)
+      .then(_ => this.setState({saved: true, isSaving: false},
+        _ => setTimeout(_ => this.setState({saved: false}), 10000)));
+    });
   }
 
   render() {
@@ -118,13 +122,23 @@ class EmailSignature extends Component {
           </DropDownMenu>
         </div>
         <div className='large-2 medium-4 small-12 columns' style={styles.saveBtnContainer}>
-          <RaisedButton primary label='Save' onClick={this.onSaveClick}/>
-          {state.saved && <span className='smalltext'>Saved.</span>}
+          <div>
+            <RaisedButton
+            primary
+            label={state.isSaving ? 'Saving...' : 'Save'}
+            disabled={state.isSaving}
+            onClick={this.onSaveClick}
+            />
+          </div>
+          <div>
+          {state.saved &&
+            <span style={{color: grey600}} className='smalltext right'>Saved</span>}
+          </div>
         </div>
-        <div className='large-12 medium-12 small-12 columns' style={styles.editorContainer}>
+        <div className='large-12 medium-12 small-12 columns horizontal-center'>
           <div style={styles.editor}>
             <GeneralEditor
-            width={550}
+            width={600}
             height={350}
             onEditMode
             allowReplacement
@@ -142,8 +156,7 @@ class EmailSignature extends Component {
 }
 
 const styles = {
-  editor: {padding: 5},
-  editorContainer: {display: 'block', border: `1px dotted ${grey600}`, margin: 20},
+  editor: {padding: 10, border: `1px dotted ${grey600}`},
   saveBtnContainer: {margin: '5px 0'},
   dropdownContainer: {marginTop: 20, marginBottom: 10},
 };
@@ -151,7 +164,7 @@ const styles = {
 const mapStateToProps = (state, props) => {
   return {
     person: state.personReducer.person,
-    signature: state.personReducer.person.emailsignature || null
+    signature: state.personReducer.person.emailsignature || null,
   };
 };
 

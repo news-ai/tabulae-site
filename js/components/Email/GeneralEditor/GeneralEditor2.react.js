@@ -713,6 +713,7 @@ class GeneralEditor extends React.Component {
         <div style={{
           height: props.height || 460,
           overflowY: 'scroll',
+          width: props.width || 500
         }}>
           <div className={className} onClick={this.focus}>
             <Editor
