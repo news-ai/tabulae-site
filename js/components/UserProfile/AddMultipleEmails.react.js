@@ -13,6 +13,9 @@ class AddMultipleEmails extends Component {
     this.state = {
       value: ''
     };
+    this.onAddEmailClick = _ => {
+      if (this.state.value.length > 2) props.addExtraEmail(this.state.value).then(_ => this.setState({value: ''}));
+    };
   }
 
   render() {
@@ -50,9 +53,7 @@ class AddMultipleEmails extends Component {
         disabled={NoAccess && disabledInput && props.ontrial}
         iconStyle={{color: disabledInput ? grey500 : cyan500, fontSize: '16px'}}
         iconClassName='fa fa-chevron-right'
-        onClick={_ => {
-          if (state.value.length > 2) props.addExtraEmail(state.value).then(_ => this.setState({value: ''}));
-        }}
+        onClick={this.onAddEmailClick}
         />
       </div>);
   }

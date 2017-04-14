@@ -31,7 +31,7 @@
     "radium": "^0.18.1",
     "rc-slider": "^6.2.0",
     "rc-tabs": "^7.3.0",
-    "react": "^15.4.2",
+    "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.2.1",
     "react-addons-shallow-compare": "^15.3.2",
     "react-addons-update": "^15.3.0",
@@ -40,7 +40,7 @@
     "react-collapse": "^2.3.3",
     "react-datepicker": "^0.34.0",
     "react-dnd": "^2.3.0",
-    "react-dom": "^15.4.2",
+    "react-dom": "^15.5.4",
     "react-draggable": "^2.2.2",
     "react-dropzone": "^3.5.3",
     "react-height": "^2.2.0",
@@ -75,6 +75,7 @@
     "babel": "^6.0.0",
     "babel-core": "^6.0.0",
     "babel-eslint": "^4.1.2",
+    "babel-jest": "^19.0.0",
     "babel-loader": "^6.0.0",
     "babel-plugin-react-transform": "^2.0.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
@@ -91,6 +92,8 @@
     "cross-env": "1.0.6",
     "css-loader": "^0.23.0",
     "cssnano": "^3.0.1",
+    "enzyme": "^2.8.2",
+    "enzyme-to-json": "^1.5.1",
     "eslint": "^1.4.1",
     "eslint-config-airbnb": "1.0.0",
     "eslint-plugin-react": "^3.3.2",
@@ -99,7 +102,9 @@
     "file-loader": "^0.8.4",
     "flow-bin": "^0.34.0",
     "html-webpack-plugin": "^2.24.1",
+    "identity-obj-proxy": "^3.0.0",
     "ip": "1.1.0",
+    "jest": "^19.0.2",
     "json-loader": "^0.5.2",
     "mocha": "^2.3.2",
     "nock": "^8.0.0",
@@ -111,6 +116,7 @@
     "postcss-loader": "^0.8.0",
     "postcss-reporter": "^1.2.1",
     "postcss-simple-vars": "^1.0.0",
+    "react-addons-test-utils": "^15.5.1",
     "react-css-themr": "^1.2.0",
     "react-transform-hmr": "^1.0.1",
     "redux-logger": "^2.6.1",
@@ -127,8 +133,9 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha --compilers js:babel-core/register --recursive",
-    "test:watch": "npm test -- --watch",
+    "test": "node --harmony_proxies node_modules/.bin/jest",
+    "test:watch": "node --harmony_proxies node_modules/.bin/jest --watch",
+    "test:coverage": "node --harmony_proxies node_modules/.bin/jest --coverage",
     "start": "cross-env NODE_ENV=development node server.dev.js",
     "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors",
     "serve": "cross-env NODE_ENV=production node server.prod.js",
@@ -142,6 +149,18 @@
           "transform-react-inline-elements"
         ]
       }
+    }
+  },
+  "jest": {
+    "moduleDirectories": ["node_modules"],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
+      "\\.(css|less)$": "identity-obj-proxy",
+      "^components(.*)$": "<rootDir>/js/components$1",
+      "^reducers(.*)$": "<rootDir>/js/reducers$1",
+      "^constants(.*)$": "<rootDir>/js/constants$1",
+      "^actions(.*)$": "<rootDir>/js/actions$1",
+      "^utils(.*)$": "<rootDir>/js/utils$1"
     }
   }
 }
