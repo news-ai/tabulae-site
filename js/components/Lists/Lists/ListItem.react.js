@@ -5,8 +5,8 @@ import withRouter from 'react-router/lib/withRouter';
 import {listPropTypes} from 'constants/CommonPropTypes';
 import {teal50, teal200, grey700, grey500} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
-import Tags from '../../Tags/Tags.react';
-import Tag from '../../Tags/Tag.react';
+import Tags from 'components/Tags/TagsContainer.react';
+import Tag from 'components/Tags/Tag.react';
 import {connect} from 'react-redux';
 
 const styles = {

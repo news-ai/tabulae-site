@@ -48,7 +48,7 @@
     "react-motion": "^0.4.7",
     "react-notification": "^6.1.0",
     "react-redux": "^4.4.5",
-    "react-router": "^3.0.2",
+    "react-router": "^3.0.5",
     "react-search-bar": "^1.1.4",
     "react-select": "^1.0.0-beta14",
     "react-sidebar": "^2.2.1",
@@ -152,7 +152,9 @@
     }
   },
   "jest": {
-    "moduleDirectories": ["node_modules"],
+    "moduleDirectories": [
+      "node_modules"
+    ],
     "moduleNameMapper": {
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/fileMock.js",
       "\\.(css|less)$": "identity-obj-proxy",

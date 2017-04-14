@@ -30,6 +30,7 @@ import ContactEmployerDescriptor from './ContactEmployerDescriptor.react';
 import FeedsController from './FeedsController.react';
 import ContactProfileDescriptions from './ContactProfileDescriptions.react';
 import AddTagHOC from './AddTagHOC.react';
+import Tags from 'components/Tags/Tags.react';
 
 import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
@@ -220,9 +221,9 @@ class ContactProfile extends Component {
                       <ContactEmployerDescriptor style={{margin: 4}} key={i} employer={employer} which='pastemployers' contact={props.contact}/>)}
                     {(props.pastemployers.length === 0 || !props.pastemployers) && <span className='text'>None added</span>}
                   </div>
-                  {/*<div className='row vertical-center' style={{marginTop: 20}}>
+                  <div className='row vertical-center' style={{marginTop: 20}}>
                     <span style={styles.header}>Tags</span>
-                      <AddTagHOC>
+                      <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
                       {({onRequestOpen}) =>
                         <IconButton
                         disabled={props.contact.readonly}
@@ -234,10 +235,12 @@ class ContactProfile extends Component {
                         onClick={onRequestOpen}
                         />}
                       </AddTagHOC>
-                  </div>*/}
+                  </div>
                   <div>
-                    {props.contact.tags !== null &&
-                      props.contact.tags.map((tag, i) => <span>tag</span>)}
+                    <Tags
+                    onDeleteTag={tag => props.patchContact(props.contactId, {tags: props.contact.tags.filter(t => t !== tag)})}
+                    tags={props.contact.tags}
+                    />
                     {props.contact.tags === null && <span className='text'>None added</span>}
                   </div>
                 </div>
