@@ -23,7 +23,6 @@ import FeedbackPanel from './Feedback/FeedbackPanel.react';
 // import NotificationPanel from 'components/Notifications/NotificationPanel.react';
 import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
-import {StyleRoot} from 'radium';
 
 const navStyle = {
   position: 'fixed',
@@ -224,7 +223,6 @@ class App extends Component {
       );
     return (
       <div style={{width: '100%', height: '100%'}}>
-        <StyleRoot>
         {
           props.isLogin ?
             <div>
@@ -242,7 +240,6 @@ class App extends Component {
               />
             </div> : <Login />
         }
-        </StyleRoot>
       </div>
       );
   }
