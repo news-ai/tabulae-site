@@ -1,11 +1,15 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 import Link from 'react-router/lib/Link';
-import Radium from 'radium';
+
+const styles = {
+  container: {marginTop: 20},
+  text: {fontSize: '2em', marginRight: '10px'}
+};
 
 function ListManagerTitle({title, backRouteTitle, route, iconName}) {
   return (
-    <div style={{marginTop: '20px'}}>
-      <span style={{fontSize: '2em', marginRight: '10px'}}>{title}</span>
+    <div style={styles.container}>
+      <span style={styles.text}>{title}</span>
       {route && backRouteTitle && <Link to={route}>
         <span>{backRouteTitle}</span>
         <i className={iconName} aria-hidden='true'></i>
@@ -13,7 +17,4 @@ function ListManagerTitle({title, backRouteTitle, route, iconName}) {
     </div>);
 }
 
-ListManagerTitle.PropTypes = {
-};
-
-export default Radium(ListManagerTitle);
+export default ListManagerTitle;

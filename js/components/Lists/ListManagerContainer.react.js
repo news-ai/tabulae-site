@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';

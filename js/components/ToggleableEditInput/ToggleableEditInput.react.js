@@ -1,6 +1,6 @@
-import Radium from 'radium';
-import React, { PropTypes } from 'react';
+import React from 'react';
 import TextField from 'material-ui/TextField';
+import FontIcon from 'material-ui/FontIcon';
 
 const styles = {
   nameBlock: {
@@ -12,13 +12,11 @@ const styles = {
     }
   },
   icon: {
-    color: 'lightgray',
-    marginLeft: '5px',
-    ':hover': {
-      color: 'gray',
-      cursor: 'pointer'
-    }
-  }
+    fontSize: '0.9em'
+  },
+  textfield: {
+    left: 0, float: 'left'
+  },
 };
 
 function ToggleableEditInput({
@@ -38,7 +36,7 @@ function ToggleableEditInput({
   const renderNode = isTitleEditing && !disabled ? (
     <TextField
     className='u-full-width noprint'
-    style={{left: 0, float: 'left'}}
+    style={styles.textfield}
     id='toggle-text-field'
     type='text'
     name={name}
@@ -51,24 +49,18 @@ function ToggleableEditInput({
     <div className='u-full-width' onClick={onToggleTitleEdit}>
       <span
       className='print'
-      style={[spanStyle]}
+      style={spanStyle}
       >{maxTextLength && content.length >= maxTextLength - 4 ? `${content.substring(0, maxTextLength - 4)} ...` : content}</span>
       {!hideIcon && !disabled &&
-        <i
-        className='fa fa-pencil-square-o noprint'
-        style={[styles.icon]}
-        aria-hidden='true'
+        <FontIcon
+        className='fa fa-pencil-square-o pointer'
+        color='lightgray'
+        hoverColor='gray'
+        style={styles.icon}
         />}
     </div>
     );
   return <div>{renderNode}</div>;
 }
 
-ToggleableEditInput.PropTypes = {
-  isTitleEditing: PropTypes.bool.isRequired,
-  onToggleTitleEdit: PropTypes.func.isRequired,
-  onUpdateName: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired
-};
-
-export default Radium(ToggleableEditInput);
+export default ToggleableEditInput;
