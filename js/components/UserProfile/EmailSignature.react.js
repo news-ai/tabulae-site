@@ -12,7 +12,7 @@ class EmailSignature extends Component {
   constructor(props) {
     super(props);
     let bodyContent; 
-    if (isJSON(this.props.signature)) {
+    if (this.props.signature && this.props.signature.length > 0 && isJSON(this.props.signature)) {
       bodyContent = JSON.parse(this.props.signature).data;
     } else {
       bodyContent = this.props.signature;
