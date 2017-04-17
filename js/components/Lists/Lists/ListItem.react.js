@@ -1,8 +1,7 @@
 // @flow
-import React, {PropTypes} from 'react';
+import React from 'react';
 import Link from 'react-router/lib/Link';
 import withRouter from 'react-router/lib/withRouter';
-import {listPropTypes} from 'constants/CommonPropTypes';
 import {teal50, teal200, grey700, grey500} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import Tags from 'components/Tags/TagsContainer.react';
@@ -27,6 +26,7 @@ const styles = {
     height: 36,
     padding: 2,
   },
+  text: {fontSize: '0.8em', fontColor: grey500},
 };
 
 function ListItem({list, onToggle, iconName, tooltip, router, nameString, person}) {
@@ -38,7 +38,7 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
       id={list.name === 'My first list!' && 'listitem_table_hop'}
       className={listClassName}>
         <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
-          <div style={{float: 'right'}}>
+          <div className='right'>
           {list.publiclist &&
             <Tag
             hideDelete
@@ -52,11 +52,11 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
           </div>
       </div>
       <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
-        <span style={{fontSize: '0.8em', fontColor: grey500}}>{updatedDate.toLocaleDateString()}</span>
+        <span style={styles.text}>{updatedDate.toLocaleDateString()}</span>
       </div>
     {person.teamid > 0 &&
       <div className='small-4 medium-2 large-2 columns horizontal-center'>
-        <span style={{fontSize: '0.8em', fontColor: grey500}}>{nameString}</span>
+        <span style={styles.text}>{nameString}</span>
       </div>}
       <div className='hide-for-small-only medium-3 large-2 columns'>
         <Link to={`/listfeeds/${list.id}`}>
@@ -93,20 +93,8 @@ const mapStateToProps = (state, props) => {
   }
   return {
     nameString,
-    person: state.personReducer.person
+    person: state.personReducer.person,
   };
 };
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {};
-};
-
-ListItem.PropTypes = {
-  list: listPropTypes.isRequired,
-  key: PropTypes.number,
-  onToggle: PropTypes.func.isRequired,
-  iconName: PropTypes.string.isRequired,
-  tooltip: PropTypes.string
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ListItem));
+export default connect(mapStateToProps)(withRouter(ListItem));

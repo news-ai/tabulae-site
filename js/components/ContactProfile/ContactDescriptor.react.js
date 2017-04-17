@@ -19,6 +19,12 @@ const styles = {
     marginRight: 15,
     color: grey800
   },
+  errorText: {
+    fontSize: '0.7em', color: red600
+  },
+  container: {
+    height: 35
+  }
 };
 
 let contentStyle = {
@@ -46,10 +52,10 @@ function ContactDescriptor({
   if (content) contentStyle = Object.assign({}, contentStyle, {color: grey700});
 
   return (
-    <div className={`${className} vertical-center`} style={{height: 35}}>
+    <div className={`${className} vertical-center`} style={styles.container}>
       {iconClassName && icon}
       {showTitle && <span style={styles.iconStyle}>{contentTitle}</span>}
-      {errorText !== null && <span style={{fontSize: '0.7em', color: red600}}>{errorText}</span>}
+      {errorText !== null && <span style={styles.errorText}>{errorText}</span>}
       <ControlledInput
       disabled={disabled}
       nameStyle={contentStyle}

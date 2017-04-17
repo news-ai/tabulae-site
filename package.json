@@ -28,7 +28,6 @@
     "numbro": "^1.9.3",
     "object-assign": "^4.1.0",
     "pikaday": "^1.4.0",
-    "radium": "^0.18.1",
     "rc-slider": "^6.2.0",
     "rc-tabs": "^7.3.0",
     "react": "^15.5.4",

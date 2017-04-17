@@ -19,6 +19,8 @@ import {tour} from './tour';
 class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
+    this.onUploadFromExistingClick = _ => this.refs.input.show();
+    this.onUploadFromNewClick = _ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`);
   }
 
   componentDidMount() {
@@ -46,21 +48,22 @@ class ListManagerContainer extends Component {
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </SkyLight>
         <div className='large-offset-1 large-10 columns'>
-          <div style={{marginTop: 10}}>
+          <div style={styles.buttonContainer}>
             <RaisedButton
-            style={{float: 'right', margin: 10}}
+            style={styles.uploadBtn}
             label='Add New List'
-            onClick={_ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`)}
-            labelStyle={{textTransform: 'none'}}
-            icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
+            onClick={this.onUploadFromNewClick}
+            labelStyle={styles.uploadBtnLabel}
+            icon={<i style={styles.icon} className='fa fa-plus' aria-hidden='true' />}
             />
             <RaisedButton
             id='uploadButton'
-            style={{float: 'right', margin: 10}}
+            className='right'
+            style={styles.uploadBtn}
             label='Upload from Existing'
-            onClick={_ => this.refs.input.show()}
-            labelStyle={{textTransform: 'none'}}
-            icon={<i style={{color: grey500}} className='fa fa-plus' aria-hidden='true' />}
+            onClick={this.onUploadFromExistingClick}
+            labelStyle={styles.uploadBtnLabel}
+            icon={<i style={styles.icon} className='fa fa-plus' aria-hidden='true' />}
             />
           </div>
           <Lists {...this.props} />
@@ -70,6 +73,12 @@ class ListManagerContainer extends Component {
   }
 }
 
+const styles = {
+  uploadBtn: {margin: 10, float: 'right'},
+  uploadBtnLabel: {textTransform: 'none'},
+  buttonContainer: {marginTop: 10},
+  icon: {color: grey500}
+};
 
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;

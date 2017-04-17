@@ -8,14 +8,18 @@ const buttonStyle = {
 	margin: '0.1em'
 };
 
+const styles = {
+	container: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		minHeight: '50em'
+	},
+};
+
 function Login({loginWithGoogleClick, loginClick, registerClick}) {
 	return (
-		<div style={{
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-			minHeight: '50em'
-		}}>
+		<div style={styles.container}>
 			<div>
 				<RaisedButton style={buttonStyle} label='Login with Google' onClick={loginWithGoogleClick} />
 				<RaisedButton style={buttonStyle} label='Register' onClick={registerClick} />
@@ -39,6 +43,4 @@ const mapDispatchToProps = dispatch => {
 	};
 };
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

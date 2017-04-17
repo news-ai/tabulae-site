@@ -6,6 +6,10 @@ import {connect} from 'react-redux';
 import Lists from './Lists';
 import InfiniteScroll from 'components/InfiniteScroll';
 
+const style = {
+  container: {marginTop: 10}
+};
+
 class TeamListsContainer extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +23,7 @@ class TeamListsContainer extends Component {
   render() {
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
-        <div className='row' style={{marginTop: 10}}>
+        <div className='row' style={styles.container}>
           <div className='large-offset-1 large-10 columns'>
           <Lists {...this.props}/>
           </div>

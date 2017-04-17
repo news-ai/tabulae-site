@@ -5,7 +5,8 @@ import * as actions from './DatabaseProfile/actions';
 import isURL from 'validator/lib/isURL';
 import {blue700, grey400, grey700, grey200} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
-import Waiting from '../Waiting';
+import Waiting from 'components/Waiting';
+import Organization from './Organization.react';
 
 import alertify from 'alertifyjs';
 
@@ -23,40 +24,6 @@ const panelStyle = {
   margin: '20px 0',
   padding: '10px 0',
   border: `solid 1px ${grey200}`
-};
-
-const spanStyle = {
-  marginRight: 10,
-  color: grey700,
-  fontSize: '0.9em'
-};
-
-const Organization = ({name, approxEmployees, contactInfo, founded, images, keywords, links, logo}) => {
-  return (
-  <div className='row' style={panelStyle}>
-    <div style={{margin: '5px'}} className='large-12 medium-12 small-12 columns'>
-      <h5 style={{color: grey700}}>Organization</h5>
-    </div>
-    <div className='large-12 medium-12 small-12 columns'>
-      <span style={spanStyle}>Name:</span><span>{name}</span>
-    </div>
-    <div className='large-12 medium-12 small-12 columns'>
-      <span style={spanStyle}>Approx. Employees:</span><span>{approxEmployees}</span>
-    </div>
-    <div className='large-12 medium-12 small-12 columns'>
-      <span style={spanStyle}>Founded:</span><span>{founded}</span>
-    </div>
-    <div className='large-12 medium-12 small-12 columns'>
-    {contactInfo && contactInfo.addresses &&
-      <div>
-        <span style={spanStyle}>Location:</span><span>{contactInfo.addresses.map(addr => `${addr.locality}, ${addr.region.name}`)[0]}</span>
-      </div>}
-    </div>
-  {logo &&
-    <div className='large-12 medium-12 small-12 columns horizontal-center'>
-      <img style={{margin: 20}} src={logo}/>
-    </div>}
-  </div>);
 };
 
 const Keywords = ({keywords}) => {
