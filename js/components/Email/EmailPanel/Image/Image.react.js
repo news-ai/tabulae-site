@@ -9,6 +9,9 @@ class ImageContainer extends Component {
       hover: false,
     };
     this.onDivClick = this._onDivClick.bind(this);
+    this.setRef = div => this.div = div;
+    this.onMouseEnter = _ => this.setState({open: true});
+    this.onMouseLeave = _ => this.setState({open: false});
   }
 
   _onDivClick() {
@@ -22,7 +25,6 @@ class ImageContainer extends Component {
       position: 'relative',
       textAlign: props.align,
     };
-    const imgNode = this.refs[props.src];
     const img = (
       <img
       ref={props.src}
@@ -33,22 +35,20 @@ class ImageContainer extends Component {
         cursor: 'move',
       }}
       />);
+
     return (
       <div
+      ref={this.setRef}
       contentEditable={false}
-      onMouseEnter={_ => this.setState({open: true})}
-      onMouseLeave={_ => this.setState({open: false})}
+      onMouseEnter={this.onMouseEnter}
+      onMouseLeave={this.onMouseLeave}
       onDragStart={props.onDragStart}
-      draggable
       style={style}
+      draggable
       >
       {state.open &&
-        <ToolBar
-        left={imgNode && imgNode.getBoundingClientRect().left}
-        top={imgNode && imgNode.getBoundingClientRect().top}
-        {...props}
-        />}
-      {img}
+        <ToolBar {...props}/>}
+        {img}
       </div>);
   }
 }
