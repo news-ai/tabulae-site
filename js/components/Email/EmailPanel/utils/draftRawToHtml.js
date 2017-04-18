@@ -10,7 +10,7 @@ let blockTagMap = {
   'ordered-list-item':        ['<li>','</li>\n'],
   'unordered-list-item':      ['<li>','</li>\n'],
   // 'atomic':                   ['<figure>','</figure>\n'],
-  'atomic':                   ['',''],
+  'atomic':                   ['<figure style="margin: 0">','</figure>\n'],
   // 'atomic':              ['<figure style="text-align:center">','</figure>\n'],
   'center-align':             ['<div style="text-align:center">','</div>\n'],
   'left-align':               ['<div>','</div>\n'],
