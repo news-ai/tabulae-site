@@ -703,7 +703,7 @@ class GeneralEditor extends React.Component {
           </div>
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
-      {props.subjectHtml && props.onSubjectChange &&
+      {props.onSubjectChange &&
         <Subject
         width={props.width}
         onSubjectChange={props.onSubjectChange}

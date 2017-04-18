@@ -47,42 +47,42 @@ class ToolBar extends Component {
         {props.diableToolbar ?
           <span style={{fontSize: '0.8em', color: grey800}}>Image Toolbar disabled at Preview.</span> :
           <div className='vertical-center'>
-          <span style={{fontSize: '0.8em', width: 30}}>{`${state.sliderValue}%`}</span>
-          <Slider
-          min={0} max={100} step={1}
-          style={{width: 70, margin: '0 5px'}}
-          onChange={sliderValue => this.setState({sliderValue})}
-          onAfterChange={_ => props.onSizeChange(state.sliderValue)}
-          value={state.sliderValue}
-          />
-          <FontIcon
-          color={props.imageLink.length > 1 ? blue400 : grey800}
-          hoverColor={props.imageLink.length > 1 ? blue200 : grey400}
-          onClick={props.imageLink.length > 1 ? unsetLink : setLink}
-          style={{fontSize: '14px', margin: '0 4px'}}
-          className='fa fa-link span-button pointer'
-          />
-          <FontIcon
-          color={props.align === 'left' ? blue400 : grey800}
-          hoverColor={props.align === 'left' ? blue200 : grey400}
-          onClick={_ => props.onImageAlignChange('left')}
-          style={{fontSize: '14px', margin: '0 4px'}}
-          className='fa fa-align-left span-button pointer'
-          />
-          <FontIcon
-          color={props.align === 'center' ? blue400 : grey800}
-          hoverColor={props.align === 'center' ? blue200 : grey400}
-          onClick={_ => props.onImageAlignChange('center')}
-          style={{fontSize: '14px', margin: '0 4px'}}
-          className='fa fa-align-center span-button pointer'
-          />
-          <FontIcon
-          color={props.align === 'right' ? blue400 : grey800}
-          hoverColor={props.align === 'right' ? blue200 : grey400}
-          onClick={_ => props.onImageAlignChange('right')}
-          style={{fontSize: '14px', margin: '0 4px'}}
-          className='fa fa-align-right span-button pointer'
-          />
+            <span style={{fontSize: '0.8em', width: 30}}>{`${state.sliderValue}%`}</span>
+            <Slider
+            min={0} max={100} step={1}
+            style={{width: 70, margin: '0 5px'}}
+            onChange={sliderValue => this.setState({sliderValue})}
+            onAfterChange={_ => props.onSizeChange(state.sliderValue)}
+            value={state.sliderValue}
+            />
+            <FontIcon
+            color={props.imageLink.length > 1 ? blue400 : grey800}
+            hoverColor={props.imageLink.length > 1 ? blue200 : grey400}
+            onClick={props.imageLink.length > 1 ? unsetLink : setLink}
+            style={{fontSize: '14px', margin: '0 4px'}}
+            className='fa fa-link span-button pointer'
+            />
+            <FontIcon
+            color={props.align === 'left' ? blue400 : grey800}
+            hoverColor={props.align === 'left' ? blue200 : grey400}
+            onClick={_ => props.onImageAlignChange('left')}
+            style={{fontSize: '14px', margin: '0 4px'}}
+            className='fa fa-align-left span-button pointer'
+            />
+            <FontIcon
+            color={props.align === 'center' ? blue400 : grey800}
+            hoverColor={props.align === 'center' ? blue200 : grey400}
+            onClick={_ => props.onImageAlignChange('center')}
+            style={{fontSize: '14px', margin: '0 4px'}}
+            className='fa fa-align-center span-button pointer'
+            />
+            <FontIcon
+            color={props.align === 'right' ? blue400 : grey800}
+            hoverColor={props.align === 'right' ? blue200 : grey400}
+            onClick={_ => props.onImageAlignChange('right')}
+            style={{fontSize: '14px', margin: '0 4px'}}
+            className='fa fa-align-right span-button pointer'
+            />
         </div>}
       </div>
       );

@@ -8,6 +8,11 @@ class ImageContainer extends Component {
       open: false,
       hover: false,
     };
+    this.onDivClick = this._onDivClick.bind(this);
+  }
+
+  _onDivClick() {
+    this.setState({open: !this.state.open});
   }
 
   render() {
