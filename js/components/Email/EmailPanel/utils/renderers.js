@@ -107,6 +107,8 @@ export function getBlockStyle(block) {
       return 'RichEditor-center-align';
     case 'justify-align':
       return 'RichEditor-justify-align';
+    case 'atomic':
+      return 'RichEditor-atomic';
     default:
       return null;
   }
