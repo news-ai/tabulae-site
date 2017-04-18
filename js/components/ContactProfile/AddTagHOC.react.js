@@ -59,7 +59,7 @@ class AddTagHOC extends Component {
 
   _onSubmit() {
     const tags = this.state.tags.map(tag => tag.text);
-    this.props.submitTags(tags);
+    this.props.submitTags(tags).then(_ => this.setState({open: false}));
   }
 
   render() {
