@@ -12,33 +12,22 @@ import EmailDateContainer from './EmailDateContainer.react';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
 
+
 const bucketEmailsByDate = (emails) => {
   if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}};
-  const firstDateString = new Date(emails[0].created).toLocaleDateString();
-  let emailMap = {[firstDateString]: [emails[0]]};
-  let dateOrder = [firstDateString];
-  let dateMap = {[firstDateString]: true};
-  let datestring;
-  let sendat;
-  emails.map((email, i) => {
-    if (i === 0) return null;
-    sendat = email.sendat === DEFAULT_SENDAT ? email.created : email.sendat;
-    datestring = new Date(sendat).toLocaleDateString();
-    if (dateMap[datestring]) {
-      emailMap = Object.assign({}, emailMap, {
-        [datestring]: [...emailMap[datestring], email]
-      });
-    } else {
-      dateMap[datestring] = true;
-      dateOrder.push(datestring);
-      emailMap = Object.assign({}, emailMap, {
-        [datestring]: [email]
-      });
-    }
-  });
-  dateOrder.map(datestring => {
-    emailMap[datestring] = emailMap[datestring].sort((a, b) => b.opened - a.opened);
-  });
+
+  const emailMap = emails.reduce((acc, email) => {
+    const sendat = email.sendat === DEFAULT_SENDAT ? email.created : email.sendat;
+    const datestring = new Date(sendat).toLocaleDateString();
+    acc[datestring] = acc[datestring] ? [...acc[datestring], email] : [email];
+    return acc;
+  }, {});
+
+  const dateOrder = Object.keys(emailMap)
+  .map(date => new Date(date))
+  .sort((a, b) => a > b ? -1 : a < b ? 1 : 0)
+  .map(date => date.toLocaleDateString());
+
   return {dateOrder, emailMap};
 };
 
