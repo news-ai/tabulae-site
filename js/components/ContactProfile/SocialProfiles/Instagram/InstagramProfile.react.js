@@ -34,6 +34,7 @@ class InstagramProfile extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.open === false && this.state.open === true) {
       // onRequestOpen hit
+      window.Intercom('trackEvent', 'check_instagram_stats');
       if (!this.props.profile) this.props.fetchInstagram();
     }
   }
@@ -54,10 +55,10 @@ class InstagramProfile extends Component {
                 <div className='horizontal-center'><span>{profile.full_name}</span></div>
               </div>
               <div className='large-9 medium-8 small-12 columns'>
-                <div><span style={{fontSize: '0.9em'}}>Followers: </span><span>{profile.counts.followed_by}</span></div>
-                <div><span style={{fontSize: '0.9em'}}>Following: </span><span>{profile.counts.follows}</span></div>
-                <div><span style={{fontSize: '0.9em'}}>Media: </span><span>{profile.counts.media}</span></div>
-                <div><span style={{fontSize: '0.9em'}}>Website: </span><span>{profile.website}</span></div>
+                <div><span className='text'>Followers: </span><span>{profile.counts.followed_by}</span></div>
+                <div><span className='text'>Following: </span><span>{profile.counts.follows}</span></div>
+                <div><span className='text'>Media: </span><span>{profile.counts.media}</span></div>
+                <div><span className='text'>Website: </span><span>{profile.website}</span></div>
                 <div style={{margin: 10}}>
                   <span>{profile.bio}</span>
                 </div>
@@ -71,11 +72,10 @@ class InstagramProfile extends Component {
             params={graphParams}
             averageBy={graphAverageKeys}
             />}
-          {props.graphdata && props.graphdata.offset !== null && <RaisedButton label='Load More' onClick={props.fetchGraphData}/>}
+        {props.graphdata && props.graphdata.offset !== null &&
+          <RaisedButton label='Load More' onClick={props.fetchGraphData}/>}
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>
       );
   }
