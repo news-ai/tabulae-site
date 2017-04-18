@@ -34,6 +34,9 @@ class ListFeed extends Component {
       this.setState({screenWidth, screenHeight});
     };
     this.getPosition = this._getPosition.bind(this);
+    this.onTableClick = _ => this.props.router.push(`/tables/${this.props.listId}`);
+    this.turnOnFirstTime = _ => _ => this.setState({firsttime: false}, _ => hopscotch.startTour(tour));
+    this.turnOffFirstTime = _ => this.setState({firsttime: false});
   }
 
   componentWillMount() {
@@ -59,18 +62,16 @@ class ListFeed extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div style={{paddingTop: 30}}>
+      <div style={styles.container}>
         {
           props.firstTimeUser &&
-          <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
-            <div style={{margin: 20}}>
-              <span style={{fontWeight: 'bold'}}>List Feed</span> is a master feed all the attached social feeds and RSS feeds from all your contacts in a <span style={{fontWeight: 'bold'}}>Table</span>.
+          <Dialog open={state.firsttime} modal onRequestClose={this.turnOffFirstTime}>
+            <div style={styles.firsttime.container}>
+              <span style={styles.firsttime.bold}>List Feed</span> is a master feed all the attached social feeds and RSS feeds from all your contacts in a <span style={styles.firsttime.bold}>Table</span>.
               Scroll down to check it out!
             </div>
-            <div className='horizontal-center' style={{margin: '10px 0'}}>
-              <RaisedButton primary label='OK' onClick={_ => this.setState({firsttime: false}, _ => {
-                hopscotch.startTour(tour);
-              })}/>
+            <div className='horizontal-center' style={styles.firsttime.btnContainer}>
+              <RaisedButton primary label='OK' onClick={this.turnOnFirstTime}/>
             </div>
           </Dialog>
         }
@@ -80,14 +81,14 @@ class ListFeed extends Component {
           id='read_only_btn_hop'
           className='noprint'
           label='Table'
-          style={{marginLeft: 20}}
-          onClick={_ => props.router.push(`/tables/${props.listId}`)}
-          labelStyle={{textTransform: 'none', color: grey400}}
+          style={styles.btn.style}
+          onClick={this.onTableClick}
+          labelStyle={styles.btn.label}
           icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
         </div>
         {props.feed && props.feed.length === 0 &&
-          <div className='row horizontal-center vertical-center' style={{height: 400}}>
-            <span style={{color: grey700}}>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to contacts in Table to see a master feed of all the posts here.</span>
+          <div className='row horizontal-center vertical-center' style={styles.emptyContainer}>
+            <span style={styles.text}>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to contacts in Table to see a master feed of all the posts here.</span>
           </div>}
         <div className='row horizontal-center'>
           <MixedFeed
@@ -102,6 +103,21 @@ class ListFeed extends Component {
       </div>);
   }
 }
+
+const styles = {
+  container: {paddingTop: 30},
+  text: {color: grey700},
+  emptyContainer: {height: 400},
+  btn: {
+    label: {textTransform: 'none', color: grey400},
+    style: {marginLeft: 20}
+  },
+  firsttime: {
+    bold: {fontWeight: 'bold'},
+    container: {margin: 20},
+    btnContainer: {margin: '10px 0'}
+  },
+};
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);

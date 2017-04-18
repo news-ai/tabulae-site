@@ -1,14 +1,17 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import ListItem from './ListItem.react';
 import ListsTitle from './ListsTitle.react';
 import Waiting from '../../Waiting';
-import {listPropTypes} from 'constants/CommonPropTypes';
 
 const loading = {
   zIndex: 160,
   top: 80,
   right: 10,
   position: 'fixed'
+};
+
+const styles = {
+  listitemContainer: {marginBottom: 50, marginTop: 50}
 };
 
 function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle, tooltip}) {
@@ -21,7 +24,7 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
         iconName='fa fa-angle-right fa-fw'
         backRouteTitle={backRouteTitle}
         />
-      <div style={{marginBottom: 50, marginTop: 50}}>
+      <div style={styles.listitemContainer}>
        {lists.length === 0 && <span>{statementIfEmpty}</span>}
         {
           lists.map( (list, i) =>
@@ -36,17 +39,5 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
       </div>
     </div>);
 }
-
-Lists.PropTypes = {
-  isReceiving: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
-  lists: listPropTypes.isRequired,
-  statementIfEmpty: PropTypes.string.isRequired,
-  onToggle: PropTypes.func.isRequired,
-  listItemIcon: PropTypes.string.isRequired,
-  backRoute: PropTypes.string.isRequired,
-  backRouteTitle: PropTypes.string.isRequired,
-  tooltip: PropTypes.string
-};
 
 export default Lists;

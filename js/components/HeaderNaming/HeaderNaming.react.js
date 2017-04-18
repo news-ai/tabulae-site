@@ -181,13 +181,13 @@ class HeaderNaming extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className='horizontal-center' style={{margin: 30}}>
+      <div className='horizontal-center' style={styles.container}>
       {props.isReceiving && <span>LOADING ...</span>}
       {props.headers &&
-        <div style={{width: 750}}>
-          <div className='panel radius' style={{backgroundColor: lightBlue50, padding: 20, margin: 10}}>
+        <div style={styles.headerContainer}>
+          <div className='panel radius' style={styles.panel}>
             <h5>Name Your Columns</h5>
-            <span style={{fontSize: '0.9em'}}>
+            <span className='text'>
             Look through each column we pulled from your file and map it to Tabulae properties we have.
             Tabulae will start to aggregate feeds from each contact's social fields once its connected. <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>
             </span>
@@ -195,13 +195,13 @@ class HeaderNaming extends Component {
           <div>
             <FlatButton
             icon={<FontIcon className='fa fa-plus' color={grey500} />}
-            style={{float: 'right', margin: 10}}
-            labelStyle={{textTransform: 'none'}}
+            style={styles.customBtn.style}
+            labelStyle={styles.customBtn.label}
             label='Add Custom Properties'
             onClick={this.onAddCustom}
             />
           </div>
-          <div style={{marginBottom: 20}}>
+          <div style={styles.grid.container}>
             <Grid
             className='BodyGrid'
             cellRenderer={this.headerRenderer}
@@ -224,10 +224,10 @@ class HeaderNaming extends Component {
           rowCount={props.headers.length}
           rowHeight={60}
           />
-          <div style={{margin: 30}}>
+          <div style={styles.btn.container}>
             <RaisedButton
-            style={{float: 'right'}}
-            labelStyle={{color: 'white', textTransform: 'none'}}
+            className='right'
+            labelStyle={styles.btn.label}
             disabled={props.didInvalidate}
             backgroundColor={lightBlue300}
             icon={
@@ -240,7 +240,7 @@ class HeaderNaming extends Component {
             <span>Please be patient. This may take from a few seconds to a few minutes depending on file size.</span>}
           {props.didInvalidate &&
             <div>
-              <span style={{color: red800}}>Something went wrong while processing property headers.
+              <span style={styles.errorText}>Something went wrong while processing property headers.
               One common case is hidden columns/formulas on the Excel file which we can't parse. It can be solved by copy-paste the rows you want into a new Excel file.
               Please <a href={window.TABULAE_HOME}>Refresh</a> and try again or contact Support.
               </span>
@@ -250,6 +250,26 @@ class HeaderNaming extends Component {
       </div>);
   }
 }
+
+const styles = {
+  container: {margin: 30},
+  errorText: {color: red800},
+  btn: {
+    container: {margin: 30},
+    label: {color: 'white', textTransform: 'none'},
+  },
+  grid: {
+    container: {marginBottom: 20},
+  },
+  customBtn: {
+    label: {textTransform: 'none'},
+    style: {float: 'right', margin: 10},
+  },
+  panel: {
+    backgroundColor: lightBlue50, padding: 20, margin: 10
+  },
+  headerContainer: {width: 750},
+};
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);

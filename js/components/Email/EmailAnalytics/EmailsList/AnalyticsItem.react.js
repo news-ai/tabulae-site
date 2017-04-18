@@ -21,7 +21,7 @@ import moment from 'moment-timezone';
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
 
-class AnalyticsItem extends Component {
+export class AnalyticsItem extends Component {
   constructor(props) {
     super(props);
     this.state = {

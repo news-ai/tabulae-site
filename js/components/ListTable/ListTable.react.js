@@ -50,7 +50,7 @@ import EmptyListStatement from './EmptyListStatement.react';
 import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
 import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
 import ScatterPlotHOC from './ScatterPlotHOC.react';
-import Tags from '../Tags/Tags.react';
+import Tags from 'components/Tags/TagsContainer.react';
 import debounce from 'lodash/debounce';
 
 import {
