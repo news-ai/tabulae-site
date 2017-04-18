@@ -28,6 +28,10 @@ const bucketEmailsByDate = (emails) => {
   .sort((a, b) => a > b ? -1 : a < b ? 1 : 0)
   .map(date => date.toLocaleDateString());
 
+  dateOrder.map(datestring => {
+    emailMap[datestring] = emailMap[datestring].sort((a, b) => b.opened - a.opened);
+  });
+
   return {dateOrder, emailMap};
 };
 
