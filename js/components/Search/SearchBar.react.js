@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import TextField from 'material-ui/TextField';
@@ -7,7 +7,6 @@ import * as actions from './actions';
 import ContactItem from './ContactItem.react';
 import InfiniteScroll from '../InfiniteScroll';
 import Waiting from '../Waiting';
-
 
 class SearchBar extends Component {
   constructor(props) {
@@ -20,6 +19,8 @@ class SearchBar extends Component {
       navigate: false
     };
     this.onSearchClick = this._onSearchClick.bind(this);
+    this.onScrollBottom = _ => this.props.fetchSearch(this.state.prevQuery);
+    this.onKeyDown = e => e.keyCode === 13 ? this.onSearchClick() : null;
   }
 
   componentWillMount() {
@@ -52,7 +53,6 @@ class SearchBar extends Component {
     }
   }
 
-
   _onSearchClick() {
     if (this.props.isReceiving) return;
     const query = this.refs.searchQuery.input.value;
@@ -71,28 +71,27 @@ class SearchBar extends Component {
       else expectedResultsString = `${props.results.length} results`;
     }
     return (
-      <InfiniteScroll onScrollBottom={_ => props.fetchSearch(state.prevQuery)}>
-          <div
-          className='row horizontal-center'
-          style={{margin: '20px 0'}}>
-            <div className='vertical-center'>
-             <TextField
-              hintText='Search query here...'
-              ref='searchQuery'
-              onKeyDown={e => e.keyCode === 13 ? this.onSearchClick() : null}
-              />
-              <RaisedButton primary style={{marginLeft: 10}} onClick={this.onSearchClick} label='Search All Lists' labelStyle={{textTransform: 'none'}} />
-            </div>
+      <InfiniteScroll onScrollBottom={this.onScrollBottom}>
+        <div className='row horizontal-center' style={styles.topBar.container}>
+          <div className='vertical-center'>
+           <TextField
+            hintText='Search query here...'
+            ref='searchQuery'
+            onKeyDown={this.onKeyDown}
+            />
+            <RaisedButton primary style={styles.topBar.btn} onClick={this.onSearchClick} label='Search All Lists' labelStyle={styles.topBar.btnLabel} />
           </div>
-        {state.isSearchReceived ?
-          <div className='horizontal-center'>We found {expectedResultsString} for "{state.prevQuery}"</div> : null}
+        </div>
+      {state.isSearchReceived ?
+        <div className='horizontal-center'>We found {expectedResultsString} for "{state.prevQuery}"</div> : null}
           <div className='row'>
-            <Waiting isReceiving={props.isReceiving} style={{top: 80, right: 10, position: 'fixed'}} />
-            <div className='large-12 columns' style={{marginBottom: 30}}>
-              {props.results.map((contact, i) => <div key={i} style={{marginTop: '10px'}}><ContactItem {...contact} query={props.searchQuery} /></div>)}
+            <Waiting isReceiving={props.isReceiving} style={styles.waiting} />
+            <div className='large-12 columns' style={styles.resultContainer}>
+            {props.results.map((contact, i) =>
+              <div key={`contactitem-${i}`} style={styles.contactContainer}><ContactItem {...contact} query={props.searchQuery}/></div>)}
             </div>
           </div>
-          {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 &&
+        {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 &&
           <div className='row horizontal-center'>
             <span>Scroll to load more</span>
           </div>}
@@ -100,6 +99,17 @@ class SearchBar extends Component {
       );
   }
 }
+
+const styles = {
+  topBar: {
+    container: {margin: '20px 0'},
+    btn: {marginLeft: 10},
+    btnLabel: {textTransform: 'none'}
+  },
+  waiting: {top: 80, right: 10, position: 'fixed'},
+  contactContainer: {marginTop: 10},
+  resultContainer: {marginBottom: 30},
+};
 
 const mapStateToProps = (state, props) => {
   const searchQuery = props.location.query.query;

@@ -25,6 +25,10 @@
 	
 }
 
+.right {
+  float: right;
+}
+
 .smalltext {
   font-size: 0.8em;
 }

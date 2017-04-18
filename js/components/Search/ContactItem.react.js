@@ -2,9 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Link from 'react-router/lib/Link';
 import IconButton from 'material-ui/IconButton';
-import {contactPropTypes} from '../../constants/CommonPropTypes';
 import {grey50, grey700} from 'material-ui/styles/colors';
-import withRouter from 'react-router/lib/withRouter';
 
 const smallSpan = {
   fontSize: '0.8em',
@@ -12,17 +10,22 @@ const smallSpan = {
   marginRight: 5
 };
 
-const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, router, publications, list}) => {
+const styles = {
+  container: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 5,
+    paddingBottom: 5,
+    borderRadius: '1.2em',
+    backgroundColor: grey50
+  },
+  archivedSpan: {marginLeft: 5, fontSize: '0.9em', color: grey700},
+};
+
+const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, publications, list}) => {
   return (
     <div className='row horizontal-center'>
-      <div className='large-10 columns' style={{
-        paddingLeft: 15,
-        paddingRight: 15,
-        paddingTop: 5,
-        paddingBottom: 5,
-        borderRadius: '1.2em',
-        backgroundColor: grey50
-      }}>
+      <div className='large-10 columns' style={styles.container}>
         <div className='row'>
         <div className='large-10 medium-10 columns'>
           <div><span>{firstname} {lastname}</span></div>
@@ -34,7 +37,7 @@ const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, rou
           }
           <span style={smallSpan}>belongs in</span>
           <Link to={`/tables/${listid}`}><span>{list ? list.name : listid}</span></Link>
-          <span style={{marginLeft: 5, fontSize: '0.9em', color: grey700}}>{list && list.archived && '(Archived)'}</span>
+          <span style={styles.archivedSpan}>{list && list.archived && '(Archived)'}</span>
         </div>
         <div className='large-2 medium-2 columns vertical-center'>
           {listid &&
@@ -59,8 +62,6 @@ const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, rou
     </div>);
 };
 
-ContactItem.PropTypes = contactPropTypes;
-
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
   return {
@@ -69,11 +70,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {};
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(withRouter(ContactItem));
+export default connect(mapStateToProps)(ContactItem);
