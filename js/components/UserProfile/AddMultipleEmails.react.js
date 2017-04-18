@@ -14,7 +14,7 @@ class AddMultipleEmails extends Component {
       value: ''
     };
     this.onAddEmailClick = _ => {
-      if (this.state.value.length > 2) props.addExtraEmail(this.state.value).then(_ => this.setState({value: ''}));
+      if (this.state.value.length > 2) this.props.addExtraEmail(this.state.value).then(_ => this.setState({value: ''}));
     };
   }
 

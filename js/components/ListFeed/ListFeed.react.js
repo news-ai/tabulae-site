@@ -34,7 +34,7 @@ class ListFeed extends Component {
       this.setState({screenWidth, screenHeight});
     };
     this.getPosition = this._getPosition.bind(this);
-    this.onTableClick = _ => props.router.push(`/tables/${props.listId}`);
+    this.onTableClick = _ => this.props.router.push(`/tables/${this.props.listId}`);
     this.turnOnFirstTime = _ => _ => this.setState({firsttime: false}, _ => hopscotch.startTour(tour));
     this.turnOffFirstTime = _ => this.setState({firsttime: false});
   }
