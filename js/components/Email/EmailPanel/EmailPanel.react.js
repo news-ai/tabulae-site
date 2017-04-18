@@ -209,7 +209,7 @@ class EmailPanel extends Component {
   }
 
   _changeEmailSignature(emailsignature) {
-    if (emailsignature !== null) {
+    if (emailsignature && emailsignature !== null) {
       if (isJSON(emailsignature)) {
         const sign = JSON.parse(emailsignature);
         this.setState({bodyEditorState: sign.data});
@@ -564,8 +564,9 @@ class EmailPanel extends Component {
 
 const mapStateToProps = (state, props) => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
-  const fromEmail = get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email;
   const person = state.personReducer.person;
+  let fromEmail = get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email;
+  if (person.outlook) fromEmail = person.outlookusername;
   let emailsignature;
   if (fromEmail === person.email) emailsignature = person.emailsignature || null;
   else emailsignature = person.emailsignatures !== null ? find(person.emailsignatures, sign => JSON.parse(sign).email === fromEmail) : null;
