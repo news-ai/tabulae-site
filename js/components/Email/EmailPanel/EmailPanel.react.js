@@ -113,10 +113,10 @@ function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): st
     // count num custom vars used
     const matches = newHtml.match(regexValue);
     if (matches !== null) matchCount[fieldObj.name] = matches.length;
-
     newHtml = newHtml.replace(regexValue, value);
   });
   if (Object.keys(matchCount).length > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
+    console.log(newHtml);
   return newHtml;
 }
 
