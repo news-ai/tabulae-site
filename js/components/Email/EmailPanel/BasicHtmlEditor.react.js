@@ -61,7 +61,7 @@ import ValidationHOC from 'components/ValidationHOC';
 
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
-const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
+const placeholder = 'Tip: Use column names as variables in your template email by clicking on "Insert Property" or "+" icon. E.g. "Hi {First Name}! It was so good to see you at {Location} the other day...';
 
 import linkifyIt from 'linkify-it';
 import tlds from 'tlds';
