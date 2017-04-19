@@ -122,17 +122,18 @@ class EmailSignature extends Component {
           </DropDownMenu>
         </div>
         <div className='large-2 medium-4 small-12 columns' style={styles.saveBtnContainer}>
-          <div>
+          <div className='vertical-center'>
             <RaisedButton
             primary
+            className='right'
             label={state.isSaving ? 'Saving...' : 'Save'}
             disabled={state.isSaving}
             onClick={this.onSaveClick}
             />
           </div>
-          <div>
+          <div className='vertical-center'>
           {state.saved &&
-            <span style={{color: grey600}} className='smalltext right'>Saved</span>}
+            <span style={{color: grey600}} className='smalltext right'>saved</span>}
           </div>
         </div>
         <div className='large-12 medium-12 small-12 columns horizontal-center'>
