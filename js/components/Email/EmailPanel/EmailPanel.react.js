@@ -38,6 +38,7 @@ import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
 import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {_getter} from 'components/ListTable/helpers';
 
 const styles = {
   emailPanelOuterPosition: {
@@ -99,21 +100,6 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
       );
   });
 
-export function _getter(contact: Object, fieldObj: Object): ?string {
-  try {
-    if (fieldObj.customfield) {
-      if (fieldObj.readonly) return contact[fieldObj.value];
-      if (contact.customfields === null) return undefined;
-      else if (!contact.customfields.some(obj => obj.name === fieldObj.value)) return undefined;
-      else return find(contact.customfields, obj => obj.name === fieldObj.value).value;
-    } else {
-      if (fieldObj.strategy) return fieldObj.strategy(contact);
-      else return contact[fieldObj.value];
-    }
-  } catch (e) {
-    return undefined;
-  }
-}
 
 function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
   if (html === null || html.length === 0) return;

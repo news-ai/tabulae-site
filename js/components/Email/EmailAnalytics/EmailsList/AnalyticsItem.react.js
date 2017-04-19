@@ -15,6 +15,7 @@ import {actions as stagingActions} from 'components/Email';
 import {actions as attachmentActions} from 'components/Email/EmailAttachment';
 import Paper from 'material-ui/Paper';
 import {actions as listActions} from 'components/Lists';
+import get from 'lodash/get';
 
 import moment from 'moment-timezone';
 
@@ -191,7 +192,7 @@ const styles = {
 const mapStateToProps = (state, props) => {
   return {
     listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
-    isFetchingList: state.isFetchingReducer.lists && state.isFetchingReducer.lists[props.listid]
+    isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
   };
 };
 
@@ -200,8 +201,8 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchAttachments: _ => props.attachments !== null && props.attachments.map(id => dispatch(attachmentActions.fetchAttachment(id))),
     archiveEmail: _ => dispatch(stagingActions.archiveEmail(props.id)),
     fetchList: _ => dispatch(listActions.fetchList(props.listid)),
-    startFetch: _ => dispatch({type: 'IS_FETCHING', resource: 'lists', id: props.listid}),
-    endFetch: _ => dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: props.listid}),
+    startFetch: _ => dispatch({type: 'IS_FETCHING', resource: 'lists', id: props.listid, fetchType: 'isReceiving'}),
+    endFetch: _ => dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: props.listid, fetchType: 'isReceiving'}),
   };
 };
 
