@@ -7,6 +7,7 @@ import IconButton from 'material-ui/IconButton';
 import Tags from 'components/Tags/TagsContainer.react';
 import Tag from 'components/Tags/Tag.react';
 import {connect} from 'react-redux';
+import get from 'lodash/get';
 
 const styles = {
   parent: {
@@ -29,7 +30,7 @@ const styles = {
   text: {fontSize: '0.8em', fontColor: grey500},
 };
 
-function ListItem({list, onToggle, iconName, tooltip, router, nameString, person}) {
+function ListItem({list, onToggle, iconName, tooltip, router, nameString, person, isArchiving}) {
   const updatedDate = new Date(list.updated);
   const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
@@ -74,7 +75,7 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
           tooltip={tooltip}
           iconStyle={styles.smallIcon}
           style={styles.small}
-          iconClassName={iconName}
+          iconClassName={isArchiving ? 'fa fa-spin fa-spinner' : iconName}
           onClick={_ => onToggle(list.id)}
           tooltipPosition='top-left'
           />}
@@ -94,6 +95,7 @@ const mapStateToProps = (state, props) => {
   return {
     nameString,
     person: state.personReducer.person,
+    isArchiving: get(state, `isFetchingReducer.lists[${props.list.id}].isArchiving`, false),
   };
 };
 

@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import StaticEmailContent from './StaticEmailContent.react';
 import RaisedButton from 'material-ui/RaisedButton';
 import GeneralEditor from '../GeneralEditor/GeneralEditor2.react';
@@ -15,9 +15,10 @@ const styles = {
     position: 'relative',
     overflowWrap: 'break-word'
   },
-  bounced: {
-    color: 'red'
-  }
+  bounced: {color: 'red'},
+  btnLabel: {textTransform: 'none'},
+  btnContainer: {margin: '10px 0'},
+  topButtonContainer: {position: 'absolute', right: 10, top: 10}
 };
 
 const emailPanelPauseOverlay = {
@@ -30,10 +31,16 @@ const emailPanelPauseOverlay = {
   justifyContent: 'center',
 };
 
+const pauseOverlayStyle = {
+  container: {margin: 0},
+  text: {color: 'white', fontSize: '1.3em'}
+};
+
 const PauseOverlay = ({message}: {message: string}) => (
   <div style={Object.assign({}, styles.contentBox, emailPanelPauseOverlay)}>
-    <div style={{margin: 0}}>
-    <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
+    <div style={pauseOverlayStyle.container}>
+      <span style={pauseOverlayStyle.text}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/>
+    </div>
   </div>);
 
 class PreviewEmail extends Component {
@@ -55,7 +62,11 @@ class PreviewEmail extends Component {
     };
     this.toggleEditMode = _ => this.setState({onEditMode: true});
     this.onSave = this._onSave.bind(this);
-    this.onCancel = _ => this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false, rawBodyContentState: props.savedContentState});
+    this.onCancel = _ => {
+      this.props.turnOffDraft();
+      this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false, rawBodyContentState: props.savedContentState});
+    };
+    this.onEditSaveClick = this._onEditSaveClick.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,35 +93,32 @@ class PreviewEmail extends Component {
     .then(_ => this.setState({onEditMode: false}));
   }
 
+  _onEditSaveClick() {
+    if (state.onEditMode) {
+      this.props.turnOffDraft();
+      this.onSave();
+    } else {
+      if (!state.rawBodyContentState) {
+        this.setState({rawBodyContentState: this.props.savedContentState}, _ => {
+          this.props.turnOnDraft();
+          this.toggleEditMode();
+        });
+      } else {
+        this.props.turnOnDraft();
+        this.toggleEditMode();
+      }
+    }
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
     return (
       <div style={styles.contentBox}>
-        <div style={{position: 'absolute', right: 10, top: 10}}>
-          <RaisedButton
-          label={state.onEditMode ? 'Save' : 'Edit'}
-          onClick={_ => {
-            if (state.onEditMode) {
-              props.turnOffDraft();
-              this.onSave();
-            } else {
-              if (!state.rawBodyContentState) {
-                this.setState({rawBodyContentState: props.savedContentState}, _ => {
-                  props.turnOnDraft();
-                  this.toggleEditMode();
-                });
-              } else {
-                props.turnOnDraft();
-                this.toggleEditMode();
-              }
-            }
-          }}/>
+        <div style={styles.topButtonContainer}>
+          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={this.onEditSaveClick}/>
         {state.onEditMode &&
-          <RaisedButton label='Cancel' onClick={_ => {
-            props.turnOffDraft();
-            this.onCancel();
-          }}/>}
+          <RaisedButton label='Cancel' onClick={this.onCancel}/>}
         </div>
         {state.onEditMode ?
           <div>
@@ -127,27 +135,18 @@ class PreviewEmail extends Component {
             />
           </div> :
           <StaticEmailContent {...props} />}
-        {!state.onEditMode && <div style={{margin: '10px 0'}}>
-          <RaisedButton onClick={props.onSendEmailClick} labelStyle={{textTransform: 'none'}} label={props.sendLater ? 'Schedule' : 'Send'} />
-        </div>}
+        {!state.onEditMode &&
+          <div style={styles.btnContainer}>
+            <RaisedButton
+            onClick={props.onSendEmailClick}
+            labelStyle={styles.btnLabel}
+            label={props.sendLater ? 'Schedule' : 'Send'}
+            />
+          </div>}
       </div>
       );
   }
 }
-
-
-PreviewEmail.PropTypes = {
-  id: PropTypes.number.isRequired,
-  to: PropTypes.string.isRequired,
-  subject: PropTypes.string.isRequired,
-  body: PropTypes.string.isRequired,
-  onSendEmailClick: PropTypes.func,
-  issent: PropTypes.bool.isRequired,
-  bounced: PropTypes.bool.isRequired,
-  bouncedreason: PropTypes.string,
-  clicked: PropTypes.number,
-  opened: PropTypes.number
-};
 
 const mapStateToProps = (state, props) => {
   return {
@@ -161,7 +160,6 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     patchEmail: emailBody => dispatch(stagingActions.patchEmail(props.id, emailBody)),
-
   };
 };
 

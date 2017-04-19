@@ -160,5 +160,6 @@ export const initialState = {
     received: [],
   },
   isFetchingReducer: {
+    lists: {},
   },
 };

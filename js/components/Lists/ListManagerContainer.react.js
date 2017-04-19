@@ -103,14 +103,18 @@ const mapStateToProps = (state, props) => {
     tooltip: 'archive',
     showUploadGuide: state.joyrideReducer.showUploadGuide,
     showGeneralGuide: state.joyrideReducer.showGeneralGuide,
-    firstTimeUser: state.personReducer.firstTimeUser
+    firstTimeUser: state.personReducer.firstTimeUser,
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onToggle: listId => dispatch(listActions.archiveListToggle(listId))
-    .then( _ => dispatch(listActions.fetchLists())),
+    onToggle: listId => {
+      dispatch({type: 'IS_FETCHING', resource: 'lists', id: listId, fetchType: 'isArchiving'});
+      return dispatch(listActions.archiveListToggle(listId))
+      .then(_ => dispatch(listActions.fetchLists()))
+      .then(_ =>dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: listId, fetchType: 'isArchiving'}));
+    },
     newListOnClick: untitledNum => {
       dispatch(listActions.createEmptyList(untitledNum))
       .then(response => browserHistory.push(`/tables/${response.data.id}`));
