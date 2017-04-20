@@ -162,4 +162,10 @@ export const initialState = {
   isFetchingReducer: {
     lists: {},
   },
+  campaignStatsReducer: {
+    isReceiving: false,
+    didInvalidate: false,
+    offset: 0,
+    received: [],
+  }
 };

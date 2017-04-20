@@ -31,7 +31,6 @@ const styles = {
     borderBottom: `2px solid ${lightBlue200}`,
   },
   searchIcon: {color: grey600},
-  filterLabel: {fontSize: '0.9em', color: grey800},
   childrenMargin: {margin: 5},
   tabContainer: {borderBottom: `2px solid ${grey100}`, marginBottom: 15},
   label: {fontSize: '1.3em', marginRight: 10},
@@ -65,15 +64,8 @@ class SentEmailsPaginationContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filterValue: this.props.listId,
-      isShowingArchived: false,
       activeKey: this.props.listId > 0 ? '/emailstats' : this.props.location.pathname,
       start: 0,
-    };
-    this.handleFilterChange = (event, index, filterValue) => {
-      if (index === 0) this.props.router.push(`/emailstats`);
-      else this.props.router.push(`/emailstats/lists/${filterValue}`);
-      this.setState({filterValue});
     };
     this.onTabChange = activeKey => {
       this.props.router.push(activeKey);
@@ -84,13 +76,11 @@ class SentEmailsPaginationContainer extends Component {
   }
 
   componentWillMount() {
-    const {listReducer, fetchLists, searchQuery} = this.props;
-    if (listReducer.received.length === 0) fetchLists();
+    const {searchQuery} = this.props;
     if (searchQuery) this.onSearchClick(searchQuery);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.listId !== this.props.listId) this.setState({filterValue: nextProps.listId});
     if (nextProps.searchQuery && nextProps.searchQuery !== this.props.searchQuery) {
       this.onSearchClick(nextProps.searchQuery);
     }
@@ -105,13 +95,6 @@ class SentEmailsPaginationContainer extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
-    const selectable = [
-    <MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
-    .concat(filterLists.map((list, i) =>
-      <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
-      ));
-    // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
 
     return (
@@ -140,13 +123,6 @@ class SentEmailsPaginationContainer extends Component {
               <TabHandle pathKey='/emailstats/charts' activeKey={routeKey}>Charts</TabHandle>
             </div>
           </div>
-        {props.lists && (routeKey === '/emailstats' || props.listId > 0) &&
-          <div className='vertical-center'>
-            <span style={styles.filterLists}>Filter by List: </span>
-            <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
-            {selectable}
-            </DropDownMenu>
-          </div>}
           <div style={styles.childrenMargin}>
           {props.children}
           </div>
@@ -157,10 +133,7 @@ class SentEmailsPaginationContainer extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    listId: parseInt(props.params.listId, 10) || 0,
-    listReducer: state.listReducer,
     canLoadMore: state.stagingReducer.offset !== null,
-    lists: state.listReducer.lists && state.listReducer.lists.map(listId => state.listReducer[listId]),
     searchQuery: props.params.searchQuery,
   };
 };
@@ -168,8 +141,6 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchSentEmails: _ => dispatch(stagingActions.fetchSentEmails()),
-    fetchLists: listId => dispatch(listActions.fetchLists()),
-    fetchListEmails: listId => dispatch(stagingActions.fetchListEmails(listId))
   };
 };
 

@@ -24,14 +24,20 @@ const spanStyle = {
   float: 'right'
 };
 
+const panelStyles = {
+  container: {padding: 10},
+  title: {fontSize: '1.2em', color: grey500},
+  children: {margin: '15px 10px'}
+};
+
 const Panel = props => {
   return (
     <Paper className={props.className} zDepth={1} style={{margin: '5px 0'}}>
-      <div style={{padding: 10}}>
+      <div style={panelStyles.padding}>
         <div className='vertical-center'>
-          <span style={{fontSize: '1.2em', color: grey500}}>{props.title}</span>
+          <span style={panelStyles.title}>{props.title}</span>
         </div>
-        <div style={{margin: '15px 10px'}}>
+        <div style={panelStyles.children}>
           {props.children}
         </div>
       </div>
