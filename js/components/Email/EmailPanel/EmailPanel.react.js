@@ -194,7 +194,7 @@ class EmailPanel extends Component {
   }
 
   _changeEmailSignature(emailsignature) {
-    if (emailsignature && emailsignature !== null) {
+    const replaceSignature = () => {
       if (isJSON(emailsignature)) {
         const sign = JSON.parse(emailsignature);
         this.setState({bodyEditorState: sign.data});
@@ -203,8 +203,21 @@ class EmailPanel extends Component {
         this.props.setBodyHtml(emailsignature);
         this.setState({bodyHtml: emailsignature});
       }
-      this.props.turnOnTemplateChange('append');
-      setTimeout(_ => this.setState({dirty: false}), 10);
+      this.props.turnOnTemplateChange();
+      setTimeout(_ => this.setState({dirty: false}), 1000);
+    };
+    // check if want to replace
+    if (emailsignature && emailsignature !== null) {
+      if (this.state.dirty) {
+        alertify.confirm(
+          'Content Warning',
+          `Changing email signature will replace current content in your editor. Are you sure?`,
+          replaceSignature,
+          () => {}
+          );
+      } else {
+        replaceSignature();
+      }
     }
   }
 
