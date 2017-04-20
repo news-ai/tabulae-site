@@ -23,7 +23,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
   let unsorted, unseen;
   switch (action.type) {
     case SENDING_STAGED_EMAILS:
-      return assignToEmpty(state, {isReceiving: true});
+      return assignToEmpty(state, {isReceiving: true, didInvalidate: false});
     case RECEIVE_STAGED_EMAILS:
       obj = assignToEmpty(state, action.emails);
       obj.previewEmails = action.previewEmails;

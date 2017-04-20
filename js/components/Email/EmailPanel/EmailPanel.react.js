@@ -299,10 +299,8 @@ class EmailPanel extends Component {
     this.props.postEmails(contactEmails)
     .then(
       _ => this.refs.preview.show(),
-      ({errorType, message}) => {
-        console.log(errorType);
-        console.log(message);
-
+      err => {
+        alertify.alert(err.toString());
       });
   }
 

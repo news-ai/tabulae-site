@@ -64,14 +64,13 @@ class PreviewEmails extends Component {
 
 
     let renderNode;
-    if (previewEmails.length === 0) renderNode = <span>All done.</span>;
-    else if (props.emailDidInvalidate) {
+    if (props.emailDidInvalidate) {
       renderNode = (
         <div>
           An error occurred with generating previews of the emails.
         </div>);
-    } else if (props.attachmentDidInvalidate) {
-
+    } else if (previewEmails.length === 0) {
+      renderNode = <span>All done.</span>;
     } else {
       renderNode = (
       <div>
@@ -142,7 +141,7 @@ class PreviewEmails extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    emailDidInvalidate: state.emailAttachmentReducer.didInvalidate,
+    emailDidInvalidate: state.stagingReducer.didInvalidate,
     attachmentDidInvalidate: state.emailAttachmentReducer.didInvalidate,
     attachmentIsReceiving: state.emailAttachmentReducer.isReceiving,
     attachments: state.emailAttachmentReducer.attached,
