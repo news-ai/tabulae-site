@@ -116,7 +116,8 @@ class SentEmailsPaginationContainer extends Component {
           </div>
           <div className='row' style={styles.tabContainer}>
             <div className='vertical-center'>
-              <TabHandle pathKey='/emailstats' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
+              <TabHandle pathKey='/emailstats' activeKey={routeKey}>Wha</TabHandle>
+              <TabHandle pathKey='/emailstats/all' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
               <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
               <TabHandle pathKey='/emailstats/trash' activeKey={routeKey}>Trash</TabHandle>
               <TabHandle pathKey='/emailstats/search' alsoMatch={['/emailstats/search/:searchQuery']} activeKey={routeKey}>Search</TabHandle>

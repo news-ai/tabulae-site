@@ -47,7 +47,7 @@ class AllSentEmailsContainer extends Component {
     const routeKey = props.router.location.pathname;
     return (
       <div>
-      {props.lists && (routeKey === '/emailstats' || props.listId > 0) &&
+      {props.lists && (routeKey === '/emailstats/all' || props.listId > 0) &&
         <div className='vertical-center'>
           <span style={styles.filterLabel}>Filter by List: </span>
           <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>

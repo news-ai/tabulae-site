@@ -50,6 +50,7 @@ import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentE
 import SearchSentEmails from './components/Email/EmailAnalytics/SearchSentEmails.react';
 import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
 import EmailStatsContainer from './components/Email/EmailAnalytics/EmailStats/EmailStatsContainer.react';
+import CampaignContainer from './components/Email/EmailAnalytics/CampaignContainer.react';
 
 import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable';
@@ -111,7 +112,8 @@ ReactDOM.render(
             <Route path='team' name='Team Lists' component={TeamListsContainer} />
             <Route path='settings' name='Settings' component={UserProfile} />
             <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
-              <IndexRoute component={AllSentEmailsContainer}/>
+              <IndexRoute component={CampaignContainer}/>
+              <Route path='all' name='All Sent Emails' component={AllSentEmailsContainer} />
               <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
               <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
               <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
