@@ -64,7 +64,7 @@ const Campaign = ({
         <div style={styles.block}>
           <span style={styles.span}>Unique Open %</span>
           <div style={styles.number}>
-          {uniqueOpensPercentage.substring(4)}
+          {uniqueOpensPercentage}
           </div>
         </div>
       </div>
