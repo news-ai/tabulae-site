@@ -291,7 +291,11 @@ class EmailPanel extends Component {
 
   _sendGeneratedEmails(contactEmails) {
     this.props.postEmails(contactEmails)
-    .then(_ => this.refs.preview.show());
+    .then(
+      _ => this.refs.preview.show(),
+      err => {
+        alertify.alert(err.toString());
+      });
   }
 
   _checkEmailDupes() {

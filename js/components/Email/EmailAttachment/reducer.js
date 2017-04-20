@@ -24,10 +24,6 @@ function emailAttachmentReducer(state = initialState.emailAttachmentReducer, act
         isReceiving: false,
         didInvalidate: true
       });
-    // case 'ATTACHED_EMAIL_FILES':
-    //   return assignToEmpty(state, {
-    //     files: 
-    //   });
     default:
       return state;
   }

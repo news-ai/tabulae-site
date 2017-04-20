@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import PreviewEmail from './PreviewEmail.react';
 import Waiting from 'components/Waiting';
@@ -64,8 +64,14 @@ class PreviewEmails extends Component {
 
 
     let renderNode;
-    if (previewEmails.length === 0) renderNode = <span>All done.</span>;
-    else {
+    if (props.emailDidInvalidate) {
+      renderNode = (
+        <div>
+          An error occurred with generating previews of the emails.
+        </div>);
+    } else if (previewEmails.length === 0) {
+      renderNode = <span>All done.</span>;
+    } else {
       renderNode = (
       <div>
         <div className='vertical-center' style={{margin: '10px 0'}}>
@@ -94,15 +100,17 @@ class PreviewEmails extends Component {
           </div>
         </div>
         <div className='vertical-center'>
-          <span style={{color: grey700, fontSize: '0.8em'}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
+          <span className='smalltext' style={{color: grey700}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
         </div>
         <div style={{margin: '8px 0'}}>
-          <span style={{fontSize: '0.9em'}}>Attachments:</span>
+          <span className='text'>Attachments:</span>
       {props.attachments.length > 0 ? props.attachments.map(file =>
           <span key={file.name} style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>{file.name}</span>) : <span style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>None</span>}
           <div className='vertical-center'>
-            {props.attachmentIsReceiving && <span style={{color: grey700, fontSize: '0.8em'}}>Attaching files...</span>}
-            {props.finishedAttaching && <span style={{color: grey700, fontSize: '0.8em'}}>Succesfully attached.</span>}
+          {props.attachmentIsReceiving &&
+            <span className='smalltext' style={{color: grey700}}>Attaching files...</span>}
+          {props.finishedAttaching &&
+            <span className='smalltext' style={{color: grey700}}>Succesfully attached.</span>}
           </div>
         </div>
         {previewEmails.map((email, i) =>
@@ -125,20 +133,16 @@ class PreviewEmails extends Component {
     }
     return (
       <div style={{padding: 10}}>
-        <Waiting style={{position: 'absolute', right: 15, top: 15}} isReceiving={isReceiving} text='Generating emails' textStyle={{marginTop: '20px'}}/>
+        <Waiting style={{position: 'absolute', right: 15, top: 15}} isReceiving={isReceiving} text='Generating emails' textStyle={{marginTop: '20px', fontSize: '0.9em'}}/>
         {renderNode}
       </div>);
   }
 }
 
-PreviewEmails.PropTypes = {
-  isReceiving: PropTypes.bool.isRequired,
-  previewEmails: PropTypes.array.isRequired,
-  onSendEmailClick: PropTypes.func.isRequired,
-};
-
 const mapStateToProps = (state, props) => {
   return {
+    emailDidInvalidate: state.stagingReducer.didInvalidate,
+    attachmentDidInvalidate: state.emailAttachmentReducer.didInvalidate,
     attachmentIsReceiving: state.emailAttachmentReducer.isReceiving,
     attachments: state.emailAttachmentReducer.attached,
     finishedAttaching: state.emailAttachmentReducer.finished

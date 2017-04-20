@@ -8,6 +8,7 @@ import {
   FETCH_EMAIL_LOGS,
   FETCH_EMAIL_LOGS_FAIL,
   RECEIVE_EMAIL_LOGS,
+  STAGING_EMAILS_FAIL
 } from './constants';
 import {normalize, Schema, arrayOf} from 'normalizr';
 import * as api from 'actions/api';
@@ -55,23 +56,6 @@ export function cancelAllScheduledEmails() {
   };
 }
 
-export function postBatchEmails(emails) {
-  return dispatch => {
-    dispatch({type: SENDING_STAGED_EMAILS, emails});
-    return api.post(`/emails`, emails)
-    .then(response => {
-      const res = normalize(response, {data: arrayOf(emailSchema)});
-      return dispatch({
-        type: RECEIVE_STAGED_EMAILS,
-        emails: res.entities.emails,
-        ids: res.result.data,
-        previewEmails: response.data
-      });
-    })
-    .catch( message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
-  };
-}
-
 function chunkPostPromises(values, func, limit) {
   const LIMIT = limit || 70;
   let promises = [];
@@ -111,55 +95,64 @@ export function bulkSendStagingEmails(emails) {
         ids: res.result.data,
         previewEmails: response.data
       });
+    })
+    .catch(err => {
+      dispatch({type: STAGING_EMAILS_FAIL, message: err.message});
     });
   };
 }
 
-export function postAttachments(emailid) {
-  return (dispatch, getState) => {
-    const files = getState().emailAttachmentReducer.attached;
-    if (files.length === 0) return;
-    let data = new FormData();
-    files.map(file => data.append('file', file, file.name));
-    dispatch({type: 'ATTACHING_EMAIL_FILES', files});
-    return api.postFile(`/emails/${emailid}/attach`, data)
-    .then(response => {
-      return dispatch({type: 'ATTACHED_EMAIL_FILES', files: response.data});
-    })
-    .catch(err => dispatch({type: 'ATTACHED_EMAIL_FILES_FAIL', err}));
-  };
-}
-
 export function postBatchEmailsWithAttachments(emails) {
-  return dispatch => {
-    dispatch({type: SENDING_STAGED_EMAILS, emails});
+  return (dispatch, getState) => {
+    // function to be chunked
     const sendStagingPostRequest = s => {
       dispatch({type: 'SENDING_LIMITED_STAGING_EMAILS', emails: s});
       return api.post(`/emails`, s);
     };
-    const promises = chunkPostPromises(emails, sendStagingPostRequest, 70);
-    return Promise.all(promises)
-    .then(responses => {
-      // flatten responses into one response
-      let data = [];
-      responses.map(response => response.data.map(email => data.push(email)));
-      const response = {data};
-      const res = normalize(response, {data: arrayOf(emailSchema)});
-      const ids = res.result.data;
-      const postFilePromises = ids.map(id => dispatch(postAttachments(id)));
-      dispatch({type: 'ALL_EMAIL_ATTACHMENTS_START'});
-      return Promise.all(postFilePromises)
-        .then(results => {
-          dispatch({type: 'ALL_EMAIL_ATTACHMENTS_FINISHED'});
-          dispatch({
-            type: RECEIVE_STAGED_EMAILS,
-            emails: res.entities.emails,
-            ids,
-            previewEmails: response.data
-          });
+
+    const files = getState().emailAttachmentReducer.attached;
+    let data = new FormData();
+    files.map(file => data.append('file', file, file.name));
+    // send attachments first
+    return api.postFile(`/emails/bulkattach`, data)
+    .then(
+      response => response.data.map(file => file.id),
+      err => {
+        dispatch({type: 'ATTACHED_EMAIL_FILES_FAIL', message: err.message});
+        throw new Error('Cannot attach files at the moment.');
+        return 'Cannot attach files at the moment.';
+      })
+    .then(fileIds => {
+      // send emails next with attached files
+      dispatch({type: SENDING_STAGED_EMAILS, emails});
+      if (!fileIds) return; // ATTACH FAILED HANDLE CASE
+      const emailsWithAttachments = emails.map(email => {
+        email.attachments = fileIds;
+        return email;
+      });
+      const promises = chunkPostPromises(emailsWithAttachments, sendStagingPostRequest, 70);
+      return Promise.all(promises)
+        .then(
+          responses => {
+          // Promise.all returns multiple chunked responses, flatten to be normalized
+            let data = [];
+            responses.map(response => response.data.map(email => data.push(email)));
+            const response = {data};
+            const res = normalize(response, {data: arrayOf(emailSchema)});
+            const ids = res.result.data;
+            dispatch({type: 'ALL_EMAIL_ATTACHMENTS_FINISHED'});
+            return dispatch({
+              type: RECEIVE_STAGED_EMAILS,
+              emails: res.entities.emails,
+              ids,
+              previewEmails: response.data
+            });
+          }
+        )
+        .catch(err => {
+          dispatch({type: STAGING_EMAILS_FAIL, message: err.message});
         });
-    })
-    .catch( message => dispatch({type: 'STAGING_EMAILS_FAIL', message}));
+    });
   };
 }
 
