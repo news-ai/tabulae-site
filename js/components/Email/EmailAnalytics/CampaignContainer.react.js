@@ -37,7 +37,7 @@ const Campaign = ({
       <div className='large-12 medium-12 small-12 columns'>
         <span className='smalltext'>{date}</span>
       </div>
-      <div className='large-4 medium-5 small-12 columns'>
+      <div className='large-5 medium-5 small-12 columns'>
       {subject}
       </div>
       <div className='large-2 medium-4 small-4 columns'>
