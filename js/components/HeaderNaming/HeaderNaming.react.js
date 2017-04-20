@@ -26,6 +26,8 @@ const defaultSelectableOptions = [
   {value: 'website', label: 'Website', selected: false},
   {value: 'blog', label: 'Blog', selected: false},
   {value: 'notes', label: 'Notes', selected: false},
+  {value: 'location', label: 'Location', selected: false},
+  {value: 'phonenumber', label: 'Phone #', selected: false},
 ];
 
 class HeaderNaming extends Component {
