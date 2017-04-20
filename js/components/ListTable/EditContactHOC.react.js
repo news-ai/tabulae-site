@@ -36,8 +36,8 @@ function removeDupe(list) {
 
 const _getter = contact => {
   if (!contact) return;
-  const {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website} = contact;
-  return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
+  const {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, location} = contact;
+  return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, location};
 };
 
 const _getPublicationName = (contact, reducer) => {
@@ -108,9 +108,7 @@ class EditContact extends Component {
   }
 
   _onChange(name, value) {
-    this.setState({
-      contactBody: Object.assign({}, this.state.contactBody, {[name]: value})
-    });
+    this.setState({contactBody: Object.assign({}, this.state.contactBody, {[name]: value})});
   }
 
   _onCustomChange(name, value) {
@@ -235,6 +233,15 @@ class EditContact extends Component {
               value={state.contactBody.phonenumber || ''}
               name='phonenumber'
               onChange={e => this.onChange('phonenumber', e.target.value)}
+              />
+            </div>
+            <div className={columnClassname}>
+              <span>Location</span>
+              <TextField
+              style={textfieldStyle}
+              value={state.contactBody.location || ''}
+              name='location'
+              onChange={e => this.onChange('location', e.target.value)}
               />
             </div>
             <div className={columnClassname}>

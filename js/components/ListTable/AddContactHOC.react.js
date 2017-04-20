@@ -135,7 +135,8 @@ class AddContactHOC extends Component {
     return (
       <div>
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Add Contact' onRequestClose={_ => this.setState({open: false})}>
-          {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
+        {props.isReceiving &&
+          <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span style={{whiteSpace: 'nowrap'}}>First Name</span>
@@ -227,6 +228,10 @@ class AddContactHOC extends Component {
               <TextField style={textfieldStyle} value={state.contactBody.phonenumber || ''} name='phonenumber' onChange={e => this.onChange('phonenumber', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
+              <span>Location</span>
+              <TextField style={textfieldStyle} value={state.contactBody.location || ''} name='notes' onChange={e => this.onChange('location', e.target.value)}/>
+            </div>
+            <div className='large-6 medium-12 small-12 columns vertical-center'>
               <span>Blog</span>
               <TextField style={textfieldStyle} value={state.contactBody.blog || ''} name='blog' onChange={e => this.onChange('blog', e.target.value)}/>
             </div>
@@ -274,7 +279,7 @@ class AddContactHOC extends Component {
               margin: 10,
               padding: 10
             }}>
-              <span style={{fontSize: '0.8em'}}>
+              <span className='smalltext'>
               Many websites can be followed with RSS if they are powered by WordPress or Tumblr. You can discover their feed link by simply adding <strong>/feed</strong> or <strong>/rss</strong>.
               For example:
                 https://vogue.com/feed,
@@ -284,7 +289,7 @@ class AddContactHOC extends Component {
             </div>
             <div className='large-12 medium-12 small-12 columns'>
               <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
-              <span style={{whiteSpace: 'nowrap', fontSize: '0.8em'}}> * Separate feeds with a new line</span>
+              <span className='smalltext' style={{whiteSpace: 'nowrap'}}> * Separate feeds with a new line</span>
               <Textarea
               value={state.rssfeedsTextarea}
               maxRows={10}
@@ -293,9 +298,7 @@ class AddContactHOC extends Component {
             </div>
           </div>
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>);
   }
 }
