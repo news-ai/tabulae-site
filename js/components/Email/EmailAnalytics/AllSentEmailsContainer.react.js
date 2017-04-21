@@ -7,26 +7,48 @@ import {actions as stagingActions} from 'components/Email';
 import {grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
+import DatePicker from 'material-ui/DatePicker';
+import IconButton from 'material-ui/IconButton';
+import moment from 'moment';
 
 const styles = {
   filterLabel: {fontSize: '0.9em', color: grey800},
 };
 
+const DATEFORMAT = 'YYYY-MM-DD';
+const DEFAULT_DATE = '0001-01-01T00:00:00Z';
+
 class AllSentEmailsContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filterValue: this.props.listId || 0,
+      filterListValue: this.props.listId || 0,
+      filterDateValue: undefined,
       isShowingArchived: false,
     };
-    this.handleFilterChange = (event, index, filterValue) => {
+    this.handleListChange = (event, index, filterListValue) => {
+      let query = Object.assign({}, this.props.location.query);
       if (index === 0) {
-        this.props.router.push(`/emailstats/all`);
+        delete query.listId;
       } else {
-        this.props.fetchListEmails(filterValue);
-        this.props.router.push(`/emailstats/all?listId=${filterValue}`);
+        this.props.fetchListEmails(filterListValue);
+        query.listId = filterListValue;
       }
-      this.setState({filterValue});
+      this.props.router.push({pathname: `/emailstats/all`, query});
+      this.setState({filterListValue});
+    };
+    this.handleDateChange = (e, filterDateValue) => {
+      let query = Object.assign({}, this.props.location.query);
+      const queryDate = moment(filterDateValue).format(DATEFORMAT);
+      this.props.fetchSpecificDayEmails(queryDate);
+      query.date = queryDate;
+      this.props.router.push({pathname: `/emailstats/all`, query});
+      this.setState({filterDateValue});
+    };
+    this.onDateCancel = _ => {
+      let query = Object.assign({}, this.props.location.query);
+      delete query.date;
+      this.setState({filterDateValue: undefined});
     };
   }
 
@@ -38,7 +60,7 @@ class AllSentEmailsContainer extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.listId !== this.props.listId) {
       nextProps.fetchEmails();
-      this.setState({filterValue: nextProps.listId});
+      this.setState({filterListValue: nextProps.listId});
     }
   }
 
@@ -53,15 +75,24 @@ class AllSentEmailsContainer extends Component {
         ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
+    console.log(props.date);
     return (
       <div>
       {props.lists && (routeKey === '/emailstats/all' || props.listId > 0) &&
         <div className='vertical-center'>
           <span style={styles.filterLabel}>Filter by List: </span>
-          <DropDownMenu value={state.filterValue} onChange={this.handleFilterChange}>
+          <DropDownMenu value={state.filterListValue} onChange={this.handleListChange}>
           {selectable}
           </DropDownMenu>
+          <span style={styles.filterLabel}>Filter by Date: </span>
+          <DatePicker
+          value={state.filterDateValue}
+          onChange={this.handleDateChange}
+          autoOk hintText='Filter by Day' container='inline'
+          />
+          <IconButton iconClassName='fa fa-times' onClick={this.onDateCancel}/>
         </div>}
+
         <EmailsList {...this.props}/>
       </div>
       );
@@ -70,27 +101,27 @@ class AllSentEmailsContainer extends Component {
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
+  const date = props.router.location.query.date;
   let emails;
+  let validators = [];
   if (listId === 0) {
-    emails = state.stagingReducer.received.reduce((acc, id, i) => {
-      if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent) {
-        acc.push(state.stagingReducer[id]);
-      }
-      return acc;
-    }, []);
+    validators.push(id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent);
   } else {
-    emails = state.stagingReducer.received
-    .reduce((acc, id) => {
-      const email = state.stagingReducer[id];
-      if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && email.listid === listId) {
-        acc.push(email);
-      }
-      return acc;
-    }, []);
+    validators.push(id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId);
+  }
+  emails = state.stagingReducer.received.reduce((acc, id, i) => {
+    validators.map(validate => {
+      if (validate(id)) acc.push(state.stagingReducer[id]);
+    });
+    return acc;
+  }, []);
+  if (date && state.emailStatsReducer[date] && state.emailStatsReducer[date].received) {
+    emails = state.emailStatsReducer[date].received.map(id => state.stagingReducer[id]);
   }
 
 
   return {
+    date,
     emails,
     listId,
     isReceiving: state.stagingReducer.isReceiving,
@@ -103,6 +134,7 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
+  const date = props.router.location.query.date;
   return {
     fetchEmails: _ => listId === 0 ? dispatch(stagingActions.fetchSentEmails()) : dispatch(stagingActions.fetchListEmails(listId)),
     refreshEmails: _ => {
@@ -110,7 +142,8 @@ const mapDispatchToProps = (dispatch, props) => {
       dispatch(stagingActions.fetchSentEmails());
     },
     fetchLists: _ => dispatch(listActions.fetchLists()),
-    fetchListEmails: id => dispatch(stagingActions.fetchListEmails(id))
+    fetchListEmails: id => dispatch(stagingActions.fetchListEmails(id)),
+    fetchSpecificDayEmails: day => dispatch(stagingActions.fetchSpecificDayEmails(day)),
   };
 };
 
