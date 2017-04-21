@@ -20,8 +20,12 @@ class AllSentEmailsContainer extends Component {
       isShowingArchived: false,
     };
     this.handleFilterChange = (event, index, filterValue) => {
-      if (index === 0) this.props.router.push(`/emailstats/all`);
-      else this.props.router.push(`/emailstats/all?listId=${filterValue}`);
+      if (index === 0) {
+        this.props.router.push(`/emailstats/all`);
+      } else {
+        this.props.fetchListEmails(filterValue);
+        this.props.router.push(`/emailstats/all?listId=${filterValue}`);
+      }
       this.setState({filterValue});
     };
   }
@@ -33,7 +37,7 @@ class AllSentEmailsContainer extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.listId !== this.props.listId) {
-      this.props.fetchEmails();
+      nextProps.fetchEmails();
       this.setState({filterValue: nextProps.listId});
     }
   }
@@ -66,7 +70,6 @@ class AllSentEmailsContainer extends Component {
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
-  console.log(listId);
   let emails;
   if (listId === 0) {
     emails = state.stagingReducer.received.reduce((acc, id, i) => {
@@ -89,7 +92,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     emails,
-    // listId,
+    listId,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails found.',
     hasNext: true,
