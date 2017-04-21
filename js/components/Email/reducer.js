@@ -10,10 +10,11 @@ import {
   FETCH_EMAIL_LOGS,
   FETCH_EMAIL_LOGS_FAIL,
   RECEIVE_EMAIL_LOGS,
+  STAGING_EMAILS_FAIL,
 } from './constants';
 
-import {initialState} from '../../reducers/initialState';
-import {assignToEmpty} from '../../utils/assign';
+import {initialState} from 'reducers/initialState';
+import {assignToEmpty} from 'utils/assign';
 
 function stagingReducer(state = initialState.stagingReducer, action) {
   if (window.isDev) Object.freeze(state);
@@ -22,7 +23,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
   let unsorted, unseen;
   switch (action.type) {
     case SENDING_STAGED_EMAILS:
-      return Object.assign({}, state, {isReceiving: true});
+      return assignToEmpty(state, {isReceiving: true, didInvalidate: false});
     case RECEIVE_STAGED_EMAILS:
       obj = assignToEmpty(state, action.emails);
       obj.previewEmails = action.previewEmails;
@@ -35,7 +36,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       obj.isReceiving = false;
       return obj;
     case REQUEST_MULTIPLE_EMAILS:
-      return Object.assign({}, state, {isReceiving: true});
+      return assignToEmpty(state, {isReceiving: true});
     case RECEIVE_MULTIPLE_EMAILS:
       obj = assignToEmpty(state, action.emails);
       if (action.contactId) {
@@ -94,25 +95,27 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return Object.assign({}, state, {isReceiving: true});
     case RECEIVE_EMAIL_LOGS:
       return Object.assign({}, state, {
-        [action.emailId]: Object.assign({}, state[action.emailId], {
+        [action.emailId]: assignToEmpty(state[action.emailId], {
           logs: action.logs,
           links: action.links,
         }),
         isReceiving: false
       });
     case 'SEND_EMAIL':
-      return Object.assign({}, state, {isReceiving: true});
+      return assignToEmpty(state, {isReceiving: true});
     case 'PATCH_EMAIL':
-      return Object.assign({}, state, {isReceiving: true});
+      return assignToEmpty(state, {isReceiving: true});
     case 'STAGING_MANUALLY_SET_ISRECEIVING_ON':
-      return Object.assign({}, state, {isReceiving: true});
+      return assignToEmpty(state, {isReceiving: true});
     case 'STAGING_MANUALLY_SET_ISRECEIVING_OFF':
-      return Object.assign({}, state, {isReceiving: false});
+      return assignToEmpty(state, {isReceiving: false});
     case 'RESET_STAGING_CONTACT_OFFSET':
       obj = assignToEmpty(state, {});
       obj.contactOffsets = assignToEmpty(state.contactOffsets, {});
       obj.contactOffsets[action.contactId] = 0;
       return obj;
+    case STAGING_EMAILS_FAIL:
+      return assignToEmpty(state, {didInvalidate: true, isReceiving: false});
     case 'RESET_STAGING_OFFSET':
       obj = assignToEmpty(state, {offset: 0});
       return obj;
