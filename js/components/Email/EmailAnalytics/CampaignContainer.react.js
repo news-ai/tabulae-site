@@ -37,8 +37,8 @@ const Campaign = ({
       <div className='large-12 medium-12 small-12 columns'>
         <span className='smalltext'>{date}</span>
       </div>
-      <div className='large-5 medium-5 small-12 columns'>
-      {subject}
+      <div className='large-5 medium-12 small-12 columns'>
+      {subject || <span style={{color: grey800}}>(No Subject)</span>}
       </div>
       <div className='large-2 medium-4 small-4 columns'>
         <div style={styles.block}>
@@ -88,7 +88,7 @@ const Campaign = ({
         {bounces}
         </div>
       </div>
-      <div className='large-offset-10 medium-offset-10 small-offset-8 columns'>
+      <div className='large-offset-10 medium-offset-9 small-offset-8 columns'>
         <span className='text right'>See All Emails</span>
       </div>
     </div>

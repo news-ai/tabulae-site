@@ -6,7 +6,7 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
 
   const emails = state.stagingReducer.received
-  .reduce((acc, idd) => {
+  .reduce((acc, id) => {
     const email = state.stagingReducer[id];
     if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && email.listid === listId) {
       acc.push(email);

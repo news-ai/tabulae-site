@@ -6,6 +6,7 @@ import MenuItem from 'material-ui/MenuItem';
 import {actions as stagingActions} from 'components/Email';
 import {grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
+import withRouter from 'react-router/lib/withRouter';
 
 const styles = {
   filterLabel: {fontSize: '0.9em', color: grey800},
@@ -15,12 +16,12 @@ class AllSentEmailsContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filterValue: this.props.listId,
+      filterValue: this.props.listId || 0,
       isShowingArchived: false,
     };
     this.handleFilterChange = (event, index, filterValue) => {
-      if (index === 0) this.props.router.push(`/emailstats`);
-      else this.props.router.push(`/emailstats/lists/${filterValue}`);
+      if (index === 0) this.props.router.push(`/emailstats/all`);
+      else this.props.router.push(`/emailstats/all?listId=${filterValue}`);
       this.setState({filterValue});
     };
   }
@@ -31,7 +32,10 @@ class AllSentEmailsContainer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.listId !== this.props.listId) this.setState({filterValue: nextProps.listId});
+    if (nextProps.listId !== this.props.listId) {
+      this.props.fetchEmails();
+      this.setState({filterValue: nextProps.listId});
+    }
   }
 
   render() {
@@ -61,34 +65,50 @@ class AllSentEmailsContainer extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const emails = state.stagingReducer.received.reduce((acc, id, i) => {
-    if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent) {
-      acc.push(state.stagingReducer[id]);
-    }
-    return acc;
-  }, []);
+  const listId = parseInt(props.router.location.query.listId, 10) || 0;
+  console.log(listId);
+  let emails;
+  if (listId === 0) {
+    emails = state.stagingReducer.received.reduce((acc, id, i) => {
+      if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent) {
+        acc.push(state.stagingReducer[id]);
+      }
+      return acc;
+    }, []);
+  } else {
+    emails = state.stagingReducer.received
+    .reduce((acc, id) => {
+      const email = state.stagingReducer[id];
+      if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && email.listid === listId) {
+        acc.push(email);
+      }
+      return acc;
+    }, []);
+  }
+
 
   return {
     emails,
-    listId: parseInt(props.params.listId, 10) || 0,
+    // listId,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails found.',
     hasNext: true,
     listReceived: state.listReducer.received,
-    lists: state.listReducer.lists && state.listReducer.lists.map(listId => state.listReducer[listId]),
+    lists: state.listReducer.lists && state.listReducer.lists.map(id => state.listReducer[id]),
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
+  const listId = parseInt(props.router.location.query.listId, 10) || 0;
   return {
-    fetchEmails: _ => dispatch(stagingActions.fetchSentEmails()),
+    fetchEmails: _ => listId === 0 ? dispatch(stagingActions.fetchSentEmails()) : dispatch(stagingActions.fetchListEmails(listId)),
     refreshEmails: _ => {
       dispatch({type: 'RESET_STAGING_OFFSET'});
       dispatch(stagingActions.fetchSentEmails());
     },
-    fetchLists: listId => dispatch(listActions.fetchLists()),
-    fetchListEmails: listId => dispatch(stagingActions.fetchListEmails(listId))
+    fetchLists: _ => dispatch(listActions.fetchLists()),
+    fetchListEmails: id => dispatch(stagingActions.fetchListEmails(id))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AllSentEmailsContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AllSentEmailsContainer));

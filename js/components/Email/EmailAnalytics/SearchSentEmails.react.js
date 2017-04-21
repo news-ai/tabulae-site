@@ -44,7 +44,8 @@ const mapStateToProps = (state, props) => {
   return {
     emails,
     isReceiving: state.stagingReducer.isReceiving,
-    searchQuery: props.params.searchQuery
+    searchQuery: props.params.searchQuery,
+    queryDate: props.router.location.query.date,
   };
 };
 
