@@ -10,6 +10,7 @@ import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
 import IconButton from 'material-ui/IconButton';
 import moment from 'moment';
+import PlainEmailsList from './EmailStats/PlainEmailsList.react';
 
 const styles = {
   filterLabel: {fontSize: '0.9em', color: grey800},
@@ -48,6 +49,7 @@ class AllSentEmailsContainer extends Component {
     this.onDateCancel = _ => {
       let query = Object.assign({}, this.props.location.query);
       delete query.date;
+      this.props.router.push({pathname: `/emailstats/all`, query});
       this.setState({filterDateValue: undefined});
     };
   }
@@ -92,8 +94,13 @@ class AllSentEmailsContainer extends Component {
           />
           <IconButton iconClassName='fa fa-times' onClick={this.onDateCancel}/>
         </div>}
-
-        <EmailsList {...this.props}/>
+      {props.date ?
+        <PlainEmailsList
+        emails={props.emails}
+        fetchEmails={_ => this.fetchSpecificDayEmails(moment(state.filterDateValue).format(DATEFORMAT))}
+        hasNext
+        /> :
+        <EmailsList {...this.props}/>}
       </div>
       );
   }
