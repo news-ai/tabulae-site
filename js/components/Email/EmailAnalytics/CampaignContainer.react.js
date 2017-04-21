@@ -2,8 +2,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import EmailStats from './EmailStats/EmailStats.react';
 import {actions as campaignActions} from './Campaign';
-import {PieChart, Pie, Tooltip, Cell} from 'recharts';
-import {grey800} from 'material-ui/styles/colors';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
+import IconButton from 'material-ui/IconButton';
+import FontIcon from 'material-ui/FontIcon';
+import {grey400, grey600, grey700, grey500, grey800} from 'material-ui/styles/colors';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const styles = {
@@ -19,6 +21,10 @@ const styles = {
     display: 'block'
   }
 };
+
+const fontIconStyle = {color: grey400};
+const isReceivingContainerStyle = {margin: '10px 0'};
+const iconButtonIconStyle = {color: grey600};
 
 const Campaign = ({
   subject,
@@ -99,21 +105,82 @@ class CampaignContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.rowRenderer = this._rowRenderer.bind(this);
+    this._campaignRef = this._campaignRef.bind(this);
+    this._campaignCellMeasurerRef = this._campaignCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
+  }
+
+  _campaignRef(ref) {
+    this._campaign = ref;
+  }
+
+  _campaignCellMeasurerRef(ref) {
+    this._campaignCellMeasurer = ref;
   }
 
   componentWillMount() {
     this.props.fetchCampaignStats();
   }
 
+  _rowRenderer({key, index, isScrolling, isVisible, style}) {
+    return (
+      <div style={style} key={key}>
+        <Campaign {...this.props.campaigns[index]}/>
+      </div>);
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.campaigns);
+    
     return (
       <div>
         <EmailStats/>
-      {props.campaigns.map(campaign =>
-        <Campaign key={campaign.uniqueId} {...campaign}/>)}
+      {props.campaigns && 
+        <WindowScroller>
+        {({height, isScrolling, scrollTop}) =>
+          <AutoSizer disableHeight>
+            {({width}) =>
+              <CellMeasurer
+              ref={this._campaignCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
+              rowCount={props.campaigns.length}
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._campaignRef}
+                autoHeight
+                width={width}
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={props.campaigns.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
+              }
+              </CellMeasurer>
+            }
+            </AutoSizer>
+          }
+        </WindowScroller>}
+      {props.isReceiving &&
+        <div className='horizontal-center' style={isReceivingContainerStyle}>
+          <FontIcon style={fontIconStyle} className='fa fa-spinner fa-spin'/>
+        </div>}
+      {props.hasNext && !props.isReceiving &&
+        <div className='horizontal-center'>
+          <IconButton
+          tooltip='Load More'
+          tooltipPosition='top-center'
+          onClick={props.fetchCampaignStats}
+          iconClassName='fa fa-chevron-down'
+          iconStyle={iconButtonIconStyle}
+          />
+        </div>}
       </div>);
   }
 }
@@ -121,7 +188,9 @@ class CampaignContainer extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    campaigns: state.campaignStatsReducer.received.map(id => state.campaignStatsReducer[id])
+    campaigns: state.campaignStatsReducer.received.map(id => state.campaignStatsReducer[id]),
+    hasNext: state.campaignStatsReducer.offset !== null,
+    isReceiving: state.campaignStatsReducer.isReceiving,
   };
 };
 
