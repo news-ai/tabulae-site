@@ -34,7 +34,7 @@ class SwitchEmailHOC extends Component {
         <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
         title='Switch From Email' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
           <div className='text' style={styles.description}>
-          You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>. If you set an email signature, it'll replace existing content in the editor.
+          You can add a different email to send from in Email Settings at <Link to='/settings'>Setting</Link>. If you set an email signature, it'll get appended to existing content in the editor.
           </div>
           <DropDownMenu
           disabled={disableSwitching}
