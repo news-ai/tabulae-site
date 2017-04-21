@@ -5,26 +5,62 @@ import {actions as campaignActions} from './Campaign';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
-import {grey400, grey600, grey700, grey500, grey800} from 'material-ui/styles/colors';
+import {grey400, grey600, grey700, grey500, grey800, blue800} from 'material-ui/styles/colors';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+import {Tooltip} from 'react-lightweight-tooltip';
 
 const styles = {
+};
+
+const fontIconStyle = {color: grey400};
+const isReceivingContainerStyle = {margin: '10px 0'};
+const iconButtonIconStyle = {color: grey600};
+
+const blockStyles = {
   span: {
     fontSize: '0.8em',
     color: grey800,
     verticalAlign: 'text-top'
   },
   number: {
-    padding: 5,
+    padding: 2,
+  },
+  indicator: {
+    fontSize: '1.5em',
+    color: blue800
   },
   block: {
     display: 'block'
+  },
+  tooltip: {
+    fontSize: '0.8em',
+    color: 'darkgray'
   }
 };
 
-const fontIconStyle = {color: grey400};
-const isReceivingContainerStyle = {margin: '10px 0'};
-const iconButtonIconStyle = {color: grey600};
+const greenRoundedStyle = {
+  content: {
+  },
+  tooltip: {
+    borderRadius: '6px',
+    padding: 2
+  },
+  arrow: {
+  },
+};
+
+
+const Block = ({title, value, hint}) => {
+  return (
+    <div style={blockStyles.block}>
+      <Tooltip content={hint} styles={greenRoundedStyle}>
+        <span style={blockStyles.span}>{title}</span>
+      </Tooltip>
+      <div style={blockStyles.number}>
+      <span style={blockStyles.indicator}>{value}</span>
+      </div>
+    </div>);
+}
 
 const Campaign = ({
   subject,
@@ -47,52 +83,21 @@ const Campaign = ({
       {subject || <span style={{color: grey800}}>(No Subject)</span>}
       </div>
       <div className='large-2 medium-4 small-4 columns'>
-        <div style={styles.block}>
-          <span style={styles.span}>Total Opens</span>
-          <div style={styles.number}>
-          {opens}
-          </div>
-        </div>
-        <div style={styles.block}>
-          <span style={styles.span}>Total Clicks</span>
-          <div style={styles.number}>
-          {clicks}
-          </div>
-        </div>
+        <Block hint='Total number of email opens' value={opens} title='Total Opens'/>
+        <Block hint='Total number of clicks on embeded links' value={clicks} title='Total Clicks'/>
       </div>
       <div className='large-2 medium-4 small-4 columns'>
-        <div style={styles.block}>
-          <span style={styles.span}>Unique Opens</span>
-          <div style={styles.number}>
-          {uniqueOpens}
-          </div>
-        </div>
-        <div style={styles.block}>
-          <span style={styles.span}>Unique Open %</span>
-          <div style={styles.number}>
-          {uniqueOpensPercentage}
-          </div>
-        </div>
+        <Block hint='Total number of people who opened' value={uniqueOpens} title='Unique Opens'/>
+        <Block hint='How many people opened out of people delivered' value={`${uniqueOpensPercentage}%`} title='Unique Open Rate'/>
       </div>
+      {/*
       <div className='large-2 medium-4 small-4 columns'>
-        <div style={styles.block}>
-          <span style={styles.span}>Unique Clicks</span>
-          <div style={styles.number}>
-          {uniqueClicks}
-          </div>
-        </div>
-        <div style={styles.block}>
-          <span style={styles.span}>Unique Clicks %</span>
-          <div style={styles.number}>
-          {uniqueClicksPercentage}
-          </div>
-        </div>
+        <Block hint='' value={uniqueClicks} title='Unique Clicks'/>
+        <Block hint='' value={`${uniqueClicksPercentage}%`} title='Unique Clicks Rate'/>
       </div>
-      <div style={styles.block}>
-        <span style={styles.span}>Bounces</span>
-        <div style={styles.number}>
-        {bounces}
-        </div>
+    */}
+      <div className='large-2 medium-4 small-4 columns'>
+        <Block hint='How many emails did not reach recepients' value={bounces} title='Bounces'/>
       </div>
       <div className='large-offset-10 medium-offset-9 small-offset-8 columns'>
         <span className='text right'>See All Emails</span>
@@ -109,6 +114,16 @@ class CampaignContainer extends Component {
     this._campaignRef = this._campaignRef.bind(this);
     this._campaignCellMeasurerRef = this._campaignCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
+    window.onresize = () => {
+      if (this._campaign) {
+        this._campaignCellMeasurer.resetMeasurements();
+        this._campaign.recomputeRowHeights();
+      }
+    };
+  }
+
+  componentWillUnmount() {
+    window.onresize = undefined;
   }
 
   _campaignRef(ref) {
@@ -133,7 +148,7 @@ class CampaignContainer extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    
+
     return (
       <div>
         <EmailStats/>
