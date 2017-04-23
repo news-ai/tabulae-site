@@ -15,9 +15,11 @@ class AddTagDialogHOC extends Component {
       value: '',
     };
     this.onAddTagClick = _ => {
-      this.props.onAddTag(state.value);
+      this.props.onAddTag(this.state.value);
       this.setState({value: ''});
     }
+    this.onRequestOpen = _ => this.setState({open: true});
+    this.onRequestClose = _ => this.setState({open: false, value: ''});
   }
 
   render() {
@@ -25,28 +27,32 @@ class AddTagDialogHOC extends Component {
     const props = this.props;
     return (
       <div>
-        <Dialog open={state.open} title='Tags & Client' onRequestClose={_ => this.setState({open: false, value: ''})}>
-          <Waiting style={{float: 'right', margin: 5}} isReceiving={props.isReceiving}/>
-          <div className='row' style={{margin: '20px 0'}}>
+        <Dialog open={state.open} title='Tags & Client' onRequestClose={this.onRequestClose}>
+          <Waiting style={styles.waiting} isReceiving={props.isReceiving}/>
+          <div className='row' style={styles.client}>
             <ControlledInput async placeholder='----- Client name empty -----' disabled={props.list.readonly} name={props.list.client} onBlur={props.onAddClient}/>
           </div>
           <div className='row'>
             <TextField hintText='New Tag Name' value={state.value} onChange={e => this.setState({value: e.target.value})}/>
             <IconButton
             iconClassName='fa fa-plus'
-            style={{margin: '0 5px'}}
+            style={styles.icon}
             tooltip='Add Tag'
             tooltipPosition='top-right'
             onClick={this.onAddTagClick}/>
           </div>
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>
       );
   }
 }
+
+const styles = {
+  waiting: {float: 'right', margin: 5},
+  client: {margin: '20px 0'},
+  icon: {margin: '0 5px'}
+};
 
 const mapStateToProps = (state, props) => {
   return {
