@@ -37,7 +37,8 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
     <div key='parent' className='row align-middle hovergray' style={styles.parent}>
       <div
       id={list.name === 'My first list!' && 'listitem_table_hop'}
-      className={listClassName}>
+      className={listClassName}
+      >
         <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
           <div className='right'>
           {list.publiclist &&
@@ -49,7 +50,7 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
             text='Public'
             link='/public'
             />}
-            <Tags hideDelete listId={list.id}/>
+            <Tags hideDelete createLink={name => `/tags/${name}`} listId={list.id}/>
           </div>
       </div>
       <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>

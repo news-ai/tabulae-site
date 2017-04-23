@@ -188,6 +188,7 @@ class EmailPanel extends Component {
   }
 
   _changeEmailSignature(emailsignature) {
+    // check if want to replace
     if (emailsignature && emailsignature !== null) {
       if (isJSON(emailsignature)) {
         const sign = JSON.parse(emailsignature);
@@ -198,7 +199,7 @@ class EmailPanel extends Component {
         this.setState({bodyHtml: emailsignature});
       }
       this.props.turnOnTemplateChange('append');
-      setTimeout(_ => this.setState({dirty: false}), 10);
+      setTimeout(_ => this.setState({dirty: false}), 1000);
     }
   }
 
