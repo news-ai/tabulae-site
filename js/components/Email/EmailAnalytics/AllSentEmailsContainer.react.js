@@ -97,7 +97,7 @@ class AllSentEmailsContainer extends Component {
       {props.date ?
         <PlainEmailsList
         emails={props.emails}
-        fetchEmails={_ => this.fetchSpecificDayEmails(moment(state.filterDateValue).format(DATEFORMAT))}
+        fetchEmails={_ => props.fetchSpecificDayEmails(moment(state.filterDateValue).format(DATEFORMAT))}
         hasNext
         /> :
         <EmailsList {...this.props}/>}
@@ -109,12 +109,18 @@ class AllSentEmailsContainer extends Component {
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
+  const subject = props.router.location.query.subject;
+  console.log(subject);
   let emails;
   let validators = [];
   if (listId === 0) {
-    validators.push(id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent);
+    validators.push(
+      id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent
+      );
   } else {
-    validators.push(id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId);
+    validators.push(
+      id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId
+      );
   }
   emails = state.stagingReducer.received.reduce((acc, id, i) => {
     validators.map(validate => {
@@ -126,11 +132,11 @@ const mapStateToProps = (state, props) => {
     emails = state.emailStatsReducer[date].received.map(id => state.stagingReducer[id]);
   }
 
-
   return {
     date,
     emails,
     listId,
+    subject,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails found.',
     hasNext: true,
