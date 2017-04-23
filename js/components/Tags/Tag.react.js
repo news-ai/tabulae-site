@@ -31,7 +31,8 @@ const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link}) => {
         style={styles.icon}
         className='fa fa-times'
         color={grey500}
-        hoverColor={grey800}/>}
+        hoverColor={grey800}
+        />}
     </div>);
 };
 
