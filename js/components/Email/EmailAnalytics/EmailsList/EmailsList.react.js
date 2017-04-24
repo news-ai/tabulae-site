@@ -59,7 +59,9 @@ class EmailsList extends Component {
   }
 
   componentWillMount() {
-    if (this.props.fetchEmails) this.props.fetchEmails();
+    if (typeof this.props.fetchEmails === 'function') {
+      this.props.fetchEmails();
+    }
   }
 
   componentWillUnmount() {

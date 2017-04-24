@@ -421,6 +421,7 @@ export function fetchSpecificDayEmails(day) {
     return dispatch(fetchLimitedSpecificDayEmails(day, offset, limit, acc, threshold))
     .then(
       ({data, hitThreshold}) => {
+        console.log(data);
         const ids = emailStats && emailStats.received ? [...emailStats.received, ...data] : data;
         dispatch({type: 'RECEIVE_SPECIFIC_DAY_EMAILS', ids, day, hitThreshold});
         return Promise.resolve(ids.map(id => getState().stagingReducer[id]));

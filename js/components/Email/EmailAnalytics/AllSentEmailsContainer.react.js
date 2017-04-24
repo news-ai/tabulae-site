@@ -22,36 +22,15 @@ const DEFAULT_DATE = '0001-01-01T00:00:00Z';
 class AllSentEmailsContainer extends Component {
   constructor(props) {
     super(props);
+    const date = this.props.date ? new Date(this.props.date) : undefined;
     this.state = {
       filterListValue: this.props.listId || 0,
-      filterDateValue: undefined,
+      filterDateValue: date,
       isShowingArchived: false,
     };
-    this.handleListChange = (event, index, filterListValue) => {
-      let query = Object.assign({}, this.props.location.query);
-      if (index === 0) {
-        delete query.listId;
-      } else {
-        this.props.fetchListEmails(filterListValue);
-        query.listId = filterListValue;
-      }
-      this.props.router.push({pathname: `/emailstats/all`, query});
-      this.setState({filterListValue});
-    };
-    this.handleDateChange = (e, filterDateValue) => {
-      let query = Object.assign({}, this.props.location.query);
-      const queryDate = moment(filterDateValue).format(DATEFORMAT);
-      this.props.fetchSpecificDayEmails(queryDate);
-      query.date = queryDate;
-      this.props.router.push({pathname: `/emailstats/all`, query});
-      this.setState({filterDateValue});
-    };
-    this.onDateCancel = _ => {
-      let query = Object.assign({}, this.props.location.query);
-      delete query.date;
-      this.props.router.push({pathname: `/emailstats/all`, query});
-      this.setState({filterDateValue: undefined});
-    };
+    this.handleListChange = this._handleListChange.bind(this);
+    this.handleDateChange = this._handleDateChange.bind(this);
+    this.onDateCancel = this._onDateCancel.bind(this);
   }
 
   componentWillMount() {
@@ -62,8 +41,42 @@ class AllSentEmailsContainer extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.listId !== this.props.listId) {
       nextProps.fetchEmails();
-      this.setState({filterListValue: nextProps.listId});
+      const listId = nextProps.listId === 0 ? undefined : nextProps.listId;
+      this.setState({filterListValue: listId});
     }
+
+    if (nextProps.date !== this.props.date) {
+      const date = nextProps.date ? new Date(nextProps.date) : undefined;
+      this.setState({filterDateValue: date});
+    }
+  }
+
+  _handleListChange(e, index, filterListValue) {
+    let query = Object.assign({}, this.props.location.query);
+    if (index === 0) {
+      delete query.listId;
+    } else {
+      this.props.fetchListEmails(filterListValue);
+      query.listId = filterListValue;
+    }
+    this.props.router.push({pathname: `/emailstats/all`, query});
+    this.setState({filterListValue});
+  }
+
+  _handleDateChange(e, filterDateValue) {
+    let query = Object.assign({}, this.props.location.query);
+    const queryDate = moment(filterDateValue).format(DATEFORMAT);
+    this.props.fetchSpecificDayEmails(queryDate);
+    query.date = queryDate;
+    this.props.router.push({pathname: `/emailstats/all`, query});
+    this.setState({filterDateValue});
+  }
+
+  _onDateCancel() {
+    let query = Object.assign({}, this.props.location.query);
+    delete query.date;
+    this.props.router.push({pathname: `/emailstats/all`, query});
+    this.setState({filterDateValue: undefined});
   }
 
   render() {
@@ -77,7 +90,6 @@ class AllSentEmailsContainer extends Component {
         ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
-    console.log(props.date);
     return (
       <div>
       {props.lists && (routeKey === '/emailstats/all' || props.listId > 0) &&
@@ -128,9 +140,14 @@ const mapStateToProps = (state, props) => {
     });
     return acc;
   }, []);
+
   if (date && state.emailStatsReducer[date] && state.emailStatsReducer[date].received) {
     emails = state.emailStatsReducer[date].received.map(id => state.stagingReducer[id]);
   }
+
+  // if (subject) {
+  //   emails = emails.filter(email => email.subject === subject);
+  // }
 
   return {
     date,
@@ -148,8 +165,17 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
+  const subject = props.router.location.query.subject;
+
+  let fetchEmails = dispatch(stagingActions.fetchSentEmails());
+  if (listId > 0) {
+    fetchEmails = dispatch(stagingActions.fetchListEmails(listId));
+  }
+  if (date) {
+    fetchEmails = dispatch(stagingActions.fetchSpecificDayEmails(date));
+  }
   return {
-    fetchEmails: _ => listId === 0 ? dispatch(stagingActions.fetchSentEmails()) : dispatch(stagingActions.fetchListEmails(listId)),
+    fetchEmails: _ => fetchEmails,
     refreshEmails: _ => {
       dispatch({type: 'RESET_STAGING_OFFSET'});
       dispatch(stagingActions.fetchSentEmails());

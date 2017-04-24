@@ -81,7 +81,7 @@ const Campaign = ({
       </div>
       <div className='large-2 medium-4 small-4 columns'>
         <Block hint='Total number of people who opened' value={uniqueOpens} title='Unique Opens'/>
-        <Block hint='How many people opened out of people delivered' value={`${uniqueOpensPercentage}%`} title='Unique Open Rate'/>
+        <Block hint='How many people opened out of people delivered' value={`${Math.round(uniqueOpensPercentage * 100) / 100}%`} title='Unique Open Rate'/>
       </div>
       {/*
       <div className='large-2 medium-4 small-4 columns'>
