@@ -47,9 +47,9 @@ class PreviewEmail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      bodyHtml: props.body,
+      bodyHtml: this.props.body,
       rawBodyContentState: undefined,
-      subjectHtml: props.subject,
+      subjectHtml: this.props.subject,
       onEditMode: false
     };
     this.updateBodyHtml = (html, raw) => {
@@ -64,7 +64,7 @@ class PreviewEmail extends Component {
     this.onSave = this._onSave.bind(this);
     this.onCancel = _ => {
       this.props.turnOffDraft();
-      this.setState({bodyHtml: props.body, subjectHtml: props.subject, onEditMode: false, rawBodyContentState: props.savedContentState});
+      this.setState({bodyHtml: this.props.body, subjectHtml: this.props.subject, onEditMode: false, rawBodyContentState: this.props.savedContentState});
     };
     this.onEditSaveClick = this._onEditSaveClick.bind(this);
   }
@@ -94,11 +94,11 @@ class PreviewEmail extends Component {
   }
 
   _onEditSaveClick() {
-    if (state.onEditMode) {
+    if (this.state.onEditMode) {
       this.props.turnOffDraft();
       this.onSave();
     } else {
-      if (!state.rawBodyContentState) {
+      if (!this.state.rawBodyContentState) {
         this.setState({rawBodyContentState: this.props.savedContentState}, _ => {
           this.props.turnOnDraft();
           this.toggleEditMode();
