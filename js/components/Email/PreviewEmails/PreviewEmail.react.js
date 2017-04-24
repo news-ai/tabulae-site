@@ -94,11 +94,11 @@ class PreviewEmail extends Component {
   }
 
   _onEditSaveClick() {
-    if (state.onEditMode) {
+    if (this.state.onEditMode) {
       this.props.turnOffDraft();
       this.onSave();
     } else {
-      if (!state.rawBodyContentState) {
+      if (!this.state.rawBodyContentState) {
         this.setState({rawBodyContentState: this.props.savedContentState}, _ => {
           this.props.turnOnDraft();
           this.toggleEditMode();
