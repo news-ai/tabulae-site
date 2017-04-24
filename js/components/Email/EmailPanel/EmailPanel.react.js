@@ -182,7 +182,6 @@ class EmailPanel extends Component {
 
     if (this.props.from !== nextProps.from) {
       // from email changed
-
       let emailsignature = nextProps.emailsignature;
       this.changeEmailSignature(nextProps.emailsignature)
     }
@@ -267,7 +266,10 @@ class EmailPanel extends Component {
     }
     this.setState({currentTemplateId: value});
     this.props.turnOnTemplateChange();
-    setTimeout(_ => this.setState({dirty: false}), 10);
+    setTimeout(_ => {
+      this.changeEmailSignature(this.props.emailsignature)
+      this.setState({dirty: false});
+    }, 1000);
   }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {

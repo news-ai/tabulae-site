@@ -248,14 +248,11 @@ class BasicHtmlEditor extends Component {
       }
 
       if (nextProps.templateChangeType === 'append') {
-        // email signature
-        console.log(nextProps.templateChangeType);
+        // email signature should append to existing content
         let oldContent = this.state.editorState.getCurrentContent();
         if (nextProps.templateEntityType) {
           oldContent = this.stripOverwriteEntity(oldContent, nextProps.templateEntityType);
-          console.log(convertToRaw(oldContent));
           newContent = this.applyOverwriteEntity(newContent, nextProps.templateEntityType);
-          console.log(convertToRaw(newContent));
         }
         newContent = this.appendToCurrentContentState(oldContent, newContent);
       }
@@ -315,7 +312,7 @@ class BasicHtmlEditor extends Component {
     return ContentState.createFromBlockArray(blocks);
   }
 
-  _cleanHTMLToContentState(html, overwriteEntityType) {
+  _cleanHTMLToContentState(html) {
     let editorState;
     const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
     // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
