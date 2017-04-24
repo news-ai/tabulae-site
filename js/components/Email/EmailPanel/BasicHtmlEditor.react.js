@@ -160,6 +160,11 @@ class BasicHtmlEditor extends Component {
               type: 'justify-align',
               data: {}
             };
+          } else {
+            return {
+              type: 'unstyled',
+              data: {}
+            };
           }
         }
       },
@@ -524,11 +529,23 @@ class BasicHtmlEditor extends Component {
       blockMap = contentState.blockMap;
     }
 
+    // Linkify links within each block, save location of block/selection before paste
     const prePasteSelection = editorState.getSelection();
     const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
 
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
     let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
+
+
+    // // HACK: remove empty character in empty block to have paragraph breaks
+    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
+      if (block.getText() === ' ') {
+        // console.log('hit empty block');
+        const selection = SelectionState.createEmpty(block.getKey());
+        const newContent = Modifier.removeRange(newEditorState.getCurrentContent(), selection.merge({anchorOffset: 0, focusOffset: 1}), 'right');
+        newEditorState = EditorState.push(newEditorState, newContent, 'insert-fragment');
+      }
+    });
 
     let inPasteRange = false;
     newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
@@ -575,6 +592,7 @@ class BasicHtmlEditor extends Component {
         }
       }
     });
+
 
     newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
 
