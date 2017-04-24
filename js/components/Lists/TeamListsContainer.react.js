@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import Lists from './Lists';
 import InfiniteScroll from 'components/InfiniteScroll';
 
-const style = {
+const styles = {
   container: {marginTop: 10}
 };
 
