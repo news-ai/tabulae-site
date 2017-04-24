@@ -6,7 +6,6 @@ const EmptyListStatement = ({className, style}) => (
       <p>You haven't added any contacts. You will see a master sheet of them here after you added some.</p>
       <ul>
         <li>"Add Contact" icon on top to add ONE contact</li>
-        <li>"Go to Bulk Edit" to add MULTIPLE contacts</li>
         <li>Go back to Home and "Upload from Existing" Excel sheet</li>
       </ul>
     </div>
