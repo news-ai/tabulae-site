@@ -586,7 +586,6 @@ class BasicHtmlEditor extends Component {
 
     // // HACK: remove empty character in empty block to have paragraph breaks
     newEditorState.getCurrentContent().getBlockMap().forEach(block => {
-      console.log(block.toJS());
       if (block.getText() === ' ') {
         // console.log('hit empty block');
         const selection = SelectionState.createEmpty(block.getKey());
