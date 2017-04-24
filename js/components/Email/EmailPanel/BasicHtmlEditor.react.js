@@ -277,12 +277,11 @@ class BasicHtmlEditor extends Component {
         (character) => {
           const characterEntityKey = character.getEntity();
           if (characterEntityKey === null) return false;
-          console.log(characterEntityKey);
-          const characterEntityType = contentState.getEntity(characterEntityKey);
-          if (characterEntityType === overwriteEntityType) {
+          const characterEntity = contentState.getEntity(characterEntityKey);
+          if (characterEntity.getType() === overwriteEntityType) {
             if (!hasEntity) hasEntity = true;
           }
-          return characterEntityType === overwriteEntityType;
+          return characterEntity.getType() === overwriteEntityType;
         },
         (start, end) => {}
         );
