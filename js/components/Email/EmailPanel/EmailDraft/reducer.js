@@ -37,9 +37,17 @@ function emailDraftReducer(state = initialState.emailDraftReducer, action) {
       return assignToEmpty(state, {bodyHtml: null});
     case 'TEMPLATE_CHANGE_ON':
       // available changeTypes: 'overwrite', 'append'
-      return assignToEmpty(state, {templateChanged: true, templateChangeType: action.changeType || 'overwrite'});
+      return assignToEmpty(state, {
+        templateChanged: true,
+        templateChangeType: action.changeType || 'overwrite',
+        templateEntityType: action.entityType
+      });
     case 'TEMPLATE_CHANGE_OFF':
-      return assignToEmpty(state, {templateChanged: false, templateChangeType: 'overwrite'});
+      return assignToEmpty(state, {
+        templateChanged: false,
+        templateChangeType: 'overwrite',
+        templateEntityType: undefined
+      });
     default:
       return state;
   }
