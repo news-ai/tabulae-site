@@ -204,7 +204,7 @@ class EmailPanel extends Component {
         this.props.setBodyHtml(emailsignature);
         this.setState({bodyHtml: emailsignature});
       }
-      this.props.turnOnTemplateChange('append');
+      this.props.turnOnTemplateChange('append', 'EMAIL_SIGNATURE');
       setTimeout(_ => this.setState({dirty: false}), 1000);
     }
   }
@@ -599,7 +599,7 @@ const mapDispatchToProps = (dispatch, props) => {
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
-    turnOnTemplateChange: changeType => dispatch({type: 'TEMPLATE_CHANGE_ON', changeType}),
+    turnOnTemplateChange: (changeType, entityType) => dispatch({type: 'TEMPLATE_CHANGE_ON', changeType, entityType}),
     setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml})
   };
 };

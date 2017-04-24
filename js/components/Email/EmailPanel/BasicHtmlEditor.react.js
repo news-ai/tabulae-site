@@ -71,6 +71,8 @@ linkify
 .tlds(tlds)
 .set({fuzzyLink: false});
 
+const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
+
 class BasicHtmlEditor extends Component {
   constructor(props) {
     super(props);
@@ -218,6 +220,8 @@ class BasicHtmlEditor extends Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
+    this.applyOverwriteEntity = this._applyOverwriteEntity.bind(this);
+    this.stripOverwriteEntity = this._stripOverwriteEntity.bind(this);
 
     // cleanups
     this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
@@ -246,7 +250,13 @@ class BasicHtmlEditor extends Component {
       if (nextProps.templateChangeType === 'append') {
         // email signature
         console.log(nextProps.templateChangeType);
-        const oldContent = this.state.editorState.getCurrentContent();
+        let oldContent = this.state.editorState.getCurrentContent();
+        if (nextProps.templateEntityType) {
+          oldContent = this.stripOverwriteEntity(oldContent, nextProps.templateEntityType);
+          console.log(convertToRaw(oldContent));
+          newContent = this.applyOverwriteEntity(newContent, nextProps.templateEntityType);
+          console.log(convertToRaw(newContent));
+        }
         newContent = this.appendToCurrentContentState(oldContent, newContent);
       }
       editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
@@ -258,6 +268,47 @@ class BasicHtmlEditor extends Component {
     this.props.clearAttachments();
   }
 
+  _stripOverwriteEntity(contentState, overwriteEntityType) {
+    let truncatedBlocks = [];
+    const blocks = contentState.getBlockMap();
+    blocks.map(block => {
+      let hasEntity = false;
+      block.findEntityRanges(
+        (character) => {
+          const characterEntityKey = character.getEntity();
+          if (characterEntityKey === null) return false;
+          console.log(characterEntityKey);
+          const characterEntityType = contentState.getEntity(characterEntityKey);
+          if (characterEntityType === overwriteEntityType) {
+            if (!hasEntity) hasEntity = true;
+          }
+          return characterEntityType === overwriteEntityType;
+        },
+        (start, end) => {}
+        );
+      if (!hasEntity) truncatedBlocks.push(block);
+    });
+    // Now select all stripped blocks and insert overwriteEntityType
+    return ContentState.createFromBlockArray(truncatedBlocks);
+  }
+
+  _applyOverwriteEntity(contentState, overwriteEntityType) {
+    const content = contentState.createEntity(overwriteEntityType, 'MUTABLE');
+    const entityKey = content.getLastCreatedEntityKey();
+    if (overwriteEntityType) {
+      const blocks = contentState.getBlockMap();
+      const selection = SelectionState
+      .createEmpty()
+      .merge({
+        anchorKey: blocks.first().getKey(),
+        anchorOffset: 0,
+        focusKey: blocks.last().getKey(),
+        focusOffset: blocks.last().getLength()
+      });
+      return Modifier.applyEntity(contentState, selection, entityKey);
+    }
+  }
+
   _appendToCurrentContentState(oldContent, newContent) {
     let blocks = [];
     oldContent.getBlockMap().forEach(block => blocks.push(block));
@@ -265,7 +316,7 @@ class BasicHtmlEditor extends Component {
     return ContentState.createFromBlockArray(blocks);
   }
 
-  _cleanHTMLToContentState(html) {
+  _cleanHTMLToContentState(html, overwriteEntityType) {
     let editorState;
     const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
     // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
@@ -307,7 +358,7 @@ class BasicHtmlEditor extends Component {
         (state, end) => {});
       if (okayBlock) truncatedBlocks.push(block);
     });
-    const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+    let cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
     return cleanedContentState;
   }
 
@@ -694,6 +745,7 @@ class BasicHtmlEditor extends Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    // console.log(convertToRaw(state.editorState.getCurrentContent()));
 
     return (
       <div>
@@ -881,6 +933,7 @@ const mapStateToProps = (state, props) => {
     savedEditorState: state.emailDraftReducer.editorState,
     savedBodyHtml: state.emailDraftReducer.bodyHtml,
     templateChangeType: state.emailDraftReducer.templateChangeType,
+    templateEntityType: state.emailDraftReducer.templateEntityType,
   };
 };
 
