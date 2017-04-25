@@ -102,7 +102,7 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
 
 
 function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
-  if (html === null || html.length === 0) return;
+  if (html === null || html.length === 0) return {html: '', numMatches: 0};
   let newHtml = html;
   let matchCount = {};
   fieldsmap.map(fieldObj => {
@@ -117,7 +117,7 @@ function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): st
   });
   const numMatches = Object.keys(matchCount).length;
   if (numMatches > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
-  return {html: newHtml || '', numMatches: numMatches || 0};
+  return {html: newHtml, numMatches};
 }
 
 const PauseOverlay = ({message}: {message: string}) => (
