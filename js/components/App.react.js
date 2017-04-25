@@ -133,15 +133,15 @@ class App extends Component {
             <div className='horizontal-center'>
               <p>Your subscription is over. To re-subscribe please visit the our billing page.</p>
             </div>
-            <div className='horizontal-center' style={{margin: 10}}>
+            <div className='horizontal-center' style={styles.btn}>
               <RaisedButton primary label='Go to Billing' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} />
             </div>
-            <div className='horizontal-center' style={{margin: 10}}>
+            <div className='horizontal-center' style={styles.btn}>
               <Link to='/settings'>
                 <RaisedButton label='Invite friends, get 1 month' labelColor='white' backgroundColor={blue300} />
               </Link>
             </div>
-            <div className='horizontal-center' style={{margin: 10}}>
+            <div className='horizontal-center' style={styles.btn}>
               <RaisedButton label='Logout' onClick={props.logoutClick}/>
             </div>
             <div style={{margin: 30}}>

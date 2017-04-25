@@ -117,7 +117,7 @@ function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): st
   });
   const numMatches = Object.keys(matchCount).length;
   if (numMatches > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
-  return {html: newHtml, numMatches};
+  return {html: newHtml || '', numMatches: numMatches || 0};
 }
 
 const PauseOverlay = ({message}: {message: string}) => (

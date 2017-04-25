@@ -223,6 +223,7 @@ class BasicHtmlEditor extends Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
+    this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
 
     // cleanups
     this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
@@ -261,6 +262,22 @@ class BasicHtmlEditor extends Component {
 
   componentWillUnmount() {
     this.props.clearAttachments();
+  }
+
+  _removeWhiteSpace(editorState) {
+    // // HACK: remove empty character in empty block to have paragraph breaks
+    let newEditorState = editorState;
+    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
+      let text = block.getText();
+      text = text.replace(/^\s+/, '').replace(/\s+$/, '');
+      if (text === '') {
+        // console.log('hit empty block');
+        const selection = SelectionState.createEmpty(block.getKey());
+        const newContent = Modifier.removeRange(newEditorState.getCurrentContent(), selection.merge({anchorOffset: 0, focusOffset: block.getText().length}), 'right');
+        newEditorState = EditorState.push(newEditorState, newContent, 'insert-fragment');
+      }
+    });
+    return newEditorState;
   }
 
   _appendToCurrentContentState(oldContent, newContent) {
@@ -537,15 +554,8 @@ class BasicHtmlEditor extends Component {
     let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
 
 
-    // // HACK: remove empty character in empty block to have paragraph breaks
-    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
-      if (block.getText() === ' ') {
-        // console.log('hit empty block');
-        const selection = SelectionState.createEmpty(block.getKey());
-        const newContent = Modifier.removeRange(newEditorState.getCurrentContent(), selection.merge({anchorOffset: 0, focusOffset: 1}), 'right');
-        newEditorState = EditorState.push(newEditorState, newContent, 'insert-fragment');
-      }
-    });
+    // HACK: remove empty character in empty block to have paragraph breaks
+    newEditorState = this.removeWhiteSpace(newEditorState);
 
     let inPasteRange = false;
     newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
