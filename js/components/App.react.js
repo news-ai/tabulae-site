@@ -55,6 +55,16 @@ class App extends Component {
     };
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
+    this.turnOnGeneralGuide = _ => {
+      this.props.turnOnGeneralGuide();
+      this.setState({firstTimeUser: false});
+    };
+    this.turnOnUploadGuide = _ => {
+      this.props.turnOnUploadGuide();
+      this.setState({firstTimeUser: false});
+    };
+    this.onSkipTour = _ => this.setState({firstTimeUser: false});
+    this.onDrawerChange = isDrawerOpen => this.setState({isDrawerOpen});
   }
 
   componentWillMount() {
@@ -101,23 +111,15 @@ class App extends Component {
         {
           props.firstTimeUser &&
           <Dialog title={`Welcome, ${props.person.firstname}`} open={state.firstTimeUser}>
-            <div style={{margin: '10px 0'}}>
+            <div style={styles.dialogContainer}>
               <div className='horizontal-center'>
-                <RaisedButton primary style={{margin: 10}} label='Guide me through an existing sheet' onClick={_ => {
-                  props.turnOnGeneralGuide();
-                  this.setState({firstTimeUser: false});
-                }} />
+                <RaisedButton primary style={styles.btn} label='Guide me through an existing sheet' onClick={this.turnOnGeneralGuide}/>
               </div>
               <div className='horizontal-center'>
-                <RaisedButton primary style={{margin: 10}} label='Show me how to upload my first sheet' onClick={_ => {
-                  props.turnOnUploadGuide();
-                  this.setState({firstTimeUser: false});
-                }} />
+                <RaisedButton primary style={styles.btn} label='Show me how to upload my first sheet' onClick={this.turnOnUploadGuide}/>
               </div>
               <div className='horizontal-center'>
-                <RaisedButton style={{margin: 10}} label='Skip Tour' onClick={_ => {
-                  this.setState({firstTimeUser: false});
-                }} />
+                <RaisedButton style={styles.btn} label='Skip Tour' onClick={this.onSkipTour} />
               </div>
             </div>
           </Dialog>
@@ -136,11 +138,7 @@ class App extends Component {
             </div>
             <div className='horizontal-center' style={{margin: 10}}>
               <Link to='/settings'>
-              <RaisedButton
-              label='Invite friends, get 1 month'
-              labelColor='white'
-              backgroundColor={blue300}
-              />
+                <RaisedButton label='Invite friends, get 1 month' labelColor='white' backgroundColor={blue300} />
               </Link>
             </div>
             <div className='horizontal-center' style={{margin: 10}}>
@@ -156,19 +154,15 @@ class App extends Component {
             </div>
           </Dialog>
         }
-        <Drawer
-        containerClassName='noprint'
-        docked={false}
-        open={state.isDrawerOpen}
-        onRequestChange={isDrawerOpen => this.setState({isDrawerOpen})}>
-          <Link to={'/'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-home'/>}>Home</MenuItem></Link>
-          <Link to={'/clients'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-folder'/>}>Client Directory</MenuItem></Link>
-          <Link to={'/search'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-search'/>}>Search</MenuItem></Link>
-          <Link to={'/emailstats'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-envelope'/>}>Sent & Scheduled Emails</MenuItem></Link>
-          <Link to={'/public'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
+        <Drawer docked={false} open={state.isDrawerOpen} onRequestChange={this.onDrawerChange} >
+          <Link to='/'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-home'/>}>Home</MenuItem></Link>
+          <Link to='/clients'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-folder'/>}>Client Directory</MenuItem></Link>
+          <Link to='/search'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-search'/>}>Search</MenuItem></Link>
+          <Link to='/emailstats'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-envelope'/>}>Sent & Scheduled Emails</MenuItem></Link>
+          <Link to='/public'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
         {props.person.teamid > 0 &&
-          <Link to={'/team'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
-          <Link to={'/settings'}><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
+          <Link to='/team'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
+          <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
           <a href='https://help.newsai.co' target='_blank'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
         </Drawer>
@@ -181,48 +175,23 @@ class App extends Component {
               <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
             </div>
             <div id='breadcrumbs_hop' style={{marginTop: 16}}>
-              <Breadcrumbs
-              routes={props.routes}
-              params={props.params}
-              separator=' > '
-              />
+              <Breadcrumbs routes={props.routes} params={props.params} separator=' > '/>
             </div>
           </div>
           <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
-            {/*<IconButton
-            iconClassName='fa fa-bell'
-            onClick={e => {
-              e.preventDefault();
-              this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
-            }}
-            />
-            <Popover
-            open={state.notificationPanelOpen}
-            anchorEl={state.notificationAnchorEl}
-            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-            onRequestClose={_ => this.setState({notificationPanelOpen: false})}
-            >
-              <NotificationPanel/>
-            </Popover>*/}
             <Link to='/settings'>
-              <RaisedButton
-              label='Invite friends'
-              labelColor='white'
-              backgroundColor={blue300}
-              labelStyle={{textTransform: 'none'}}
-              />
+              <RaisedButton label='Invite friends' labelColor='white' backgroundColor={blue300} labelStyle={styles.btnLabel}/>
             </Link>
           </div>
           <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
-            <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={{textTransform: 'none'}} />
+            <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
           </div>
         </div>
         <div style={{height: 60}}></div>
       </div>
       );
     return (
-      <div style={{width: '100%', height: '100%'}}>
+      <div style={styles.container}>
         {
           props.isLogin ?
             <div>
@@ -231,19 +200,27 @@ class App extends Component {
               <FloatingActionButton
               id='custom_intercom_launcher'
               backgroundColor={blue600}
-              style={{
-                position: 'fixed',
-                bottom: 20,
-                right: 20
-              }}
+              style={styles.intercomBtn}
               iconClassName='fa fa-comment-o'
               />
-            </div> : <Login />
+            </div> : <Login/>
         }
       </div>
       );
   }
 }
+
+const styles = {
+  btn: {margin: 10},
+  dialogContainer: {margin: '10px 0'},
+  intercomBtn: {
+    position: 'fixed',
+    bottom: 20,
+    right: 20
+  },
+  container: {width: '100%', height: '100%'},
+  btnLabel: {textTransform: 'none'},
+};
 
 const mapStateToProps = (state, props) => {
   return {
