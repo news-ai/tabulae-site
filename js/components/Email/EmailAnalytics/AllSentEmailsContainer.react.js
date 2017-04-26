@@ -20,10 +20,15 @@ const styles = {
 const DATEFORMAT = 'YYYY-MM-DD';
 const DEFAULT_DATE = '0001-01-01T00:00:00Z';
 
+const parseDate = datestring => {
+  const parts = datestring.split('-').map(num => parseInt(num, 10));
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+};
+
 class AllSentEmailsContainer extends Component {
   constructor(props) {
     super(props);
-    const date = this.props.date ? new Date(this.props.date) : undefined;
+    const date = this.props.date ? new Date(parseDate(this.props.date)) : undefined;
     this.state = {
       filterListValue: this.props.listId || 0,
       filterDateValue: date,
@@ -48,7 +53,8 @@ class AllSentEmailsContainer extends Component {
     }
 
     if (nextProps.date !== this.props.date) {
-      const date = nextProps.date ? new Date(nextProps.date) : undefined;
+      const date = nextProps.date ? new Date(parseDate(nextProps.date)) : undefined;
+      console.log(date);
       this.setState({filterDateValue: date});
     }
   }
@@ -159,7 +165,8 @@ const mapStateToProps = (state, props) => {
         const email = state.stagingReducer[id];
         let sendat = email.sendat;
         if (sendat === DEFAULT_DATE) sendat = email.created;
-        return moment(sendat).format(DATEFORMAT) === date;
+        const datestring = moment(sendat).format(DATEFORMAT);
+        return datestring === date;
       });
   }
 

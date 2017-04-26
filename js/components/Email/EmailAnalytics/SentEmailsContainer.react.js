@@ -121,7 +121,9 @@ class SentEmailsPaginationContainer extends Component {
               <TabHandle pathKey='/emailstats/scheduled' activeKey={routeKey}>Scheduled Emails</TabHandle>
               <TabHandle pathKey='/emailstats/trash' activeKey={routeKey}>Trash</TabHandle>
               <TabHandle pathKey='/emailstats/search' alsoMatch={['/emailstats/search/:searchQuery']} activeKey={routeKey}>Search</TabHandle>
+            {/*
               <TabHandle pathKey='/emailstats/charts' activeKey={routeKey}>Charts</TabHandle>
+              */}
             </div>
           </div>
           <div style={styles.childrenMargin}>
