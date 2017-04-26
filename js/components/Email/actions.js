@@ -482,7 +482,7 @@ export function fetchSearchEmails(query) {
         dispatch({type: RECEIVE_SEARCH_EMAILS, ids, query, hitThreshold});
         return Promise.resolve(ids.map(id => getState().stagingReducer[id]));
       },
-      error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
+      error => dispatch({type: 'REQUEST_SEARCH_SENT_EMAILS_FAIL', message: error.message})
     );
   };
 }

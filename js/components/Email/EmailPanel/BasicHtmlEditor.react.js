@@ -309,6 +309,8 @@ class BasicHtmlEditor extends Component {
       });
       return Modifier.applyEntity(contentState, selection, entityKey);
     }
+  }
+  
   _removeWhiteSpace(editorState) {
     // // HACK: remove empty character in empty block to have paragraph breaks
     let newEditorState = editorState;
