@@ -106,11 +106,14 @@ class AllSentEmailsContainer extends Component {
             autoOk hintText='Filter by Day' container='inline'
             />
             <IconButton tooltip='Clear Date' iconClassName='fa fa-times' onClick={this.onDateCancel}/>
-          {props.subject &&
-            <span>Subject: {props.subject}</span>}
           </ToolbarGroup>
         </Toolbar>
       }
+
+      {props.subject &&
+        <div className='vertical-center'>
+          <span>Subject: {props.subject}</span>
+        </div>}
 
       {props.date ?
         <PlainEmailsList
@@ -140,20 +143,29 @@ const mapStateToProps = (state, props) => {
       id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId
       );
   }
+
+  if (subject) {
+    validators.push(
+      id => state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject
+      );
+  }
+
+  if (date) {
+    validators.push(
+      id => {
+        const email = state.stagingReducer[id];
+        let sendat = email.sendat;
+        if (sendat === DEFAULT_DATE) sendat = email.created;
+        return moment(sendat).format(DATEFORMAT) === date;
+      });
+  }
+
   emails = state.stagingReducer.received.reduce((acc, id, i) => {
     validators.map(validate => {
       if (validate(id)) acc.push(state.stagingReducer[id]);
     });
     return acc;
   }, []);
-
-  if (date && state.emailStatsReducer[date] && state.emailStatsReducer[date].received) {
-    emails = state.emailStatsReducer[date].received.map(id => state.stagingReducer[id]);
-  }
-
-  // if (subject) {
-  //   emails = emails.filter(email => email.subject === subject);
-  // }
 
   return {
     date,
@@ -177,14 +189,8 @@ const mapDispatchToProps = (dispatch, props) => {
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
-  if (date) {
-    if (subject) {
-      console.log(date);
-      console.log(subject);
-      fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails({date, subject}));
-    } else {
-      fetchEmails = _ => dispatch(stagingActions.fetchSpecificDayEmails(date));
-    }
+  if (date || subject) {
+    fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails({date, subject}));
   }
 
   return {

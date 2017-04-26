@@ -14,6 +14,7 @@ import {
   REQUEST_QUERY_EMAILS,
   RECEIVE_QUERY_EMAILS,
 } from './constants';
+import isEqual from 'lodash/isEqual';
 
 import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
@@ -130,9 +131,13 @@ function stagingReducer(state = initialState.stagingReducer, action) {
     case 'CANCEL_SCHEDULED_EMAILS_FINISHED':
       return assignToEmpty(state, {isReceiving: false});
     case REQUEST_QUERY_EMAILS:
-      return assignToEmpty(state, {searchQuery: action.query, isReceiving: true});
+      let filterQuery = {query: action.query, received: []};
+      if (state.filterQuery.query && isEqual(state.filterQuery.query, action.query)) {
+        filterQuery.received = state.filterQuery.received;
+      }
+      return assignToEmpty(state, {filterQuery, isReceiving: true});
     case RECEIVE_QUERY_EMAILS:
-      return assignToEmpty(state, {isReceiving: false});
+      return assignToEmpty(state, {isReceiving: false, filterQuery: assignToEmpty(state.filterQuery, {received: action.ids})});
     default:
       return state;
   }

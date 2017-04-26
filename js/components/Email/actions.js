@@ -410,10 +410,10 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator, t
 // threshold must always be larger than limit
 // threshold is the number of emails that can be recursely fetched at a time
 // to prevent fetching 1000s of emails at once and slow down UI
-const THRESHOLD_SIZE = 300;
-const LIMIT_SIZE = 50;
 
 export function fetchSpecificDayEmails(day) {
+  const THRESHOLD_SIZE = 300;
+  const LIMIT_SIZE = 50;
   return (dispatch, getState) => {
     dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS', day});
     const limit = LIMIT_SIZE;
@@ -438,7 +438,9 @@ export function fetchSpecificDayEmails(day) {
 
 function createQueryUrl(query) {
   const keys = Object.keys(query);
-  const queryString = keys.map(key => `${key}:${query[key]}`).join(',');
+  const queryString = keys
+  .filter(key => query[key])
+  .map(key => `${key}:${query[key]}`).join(',');
   return `/emails/search?q="${queryString}"`;
 }
 
@@ -447,7 +449,6 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
   return dispatch => {
     dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS', query, offset, limit});
     const url = createQueryUrl(query);
-    console.log(url);
 
     return api.get(`${url}&limit=${limit}&offset=${offset}`)
     .then(
@@ -469,10 +470,12 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
 }
 
 export function fetchFilterQueryEmails(query) {
+  const THRESHOLD_SIZE = 300;
+  const LIMIT_SIZE = 50;
   return (dispatch, getState) => {
     dispatch({type: REQUEST_QUERY_EMAILS, query});
     const limit = LIMIT_SIZE;
-    const received = [];
+    const received = getState().stagingReducer.filterQuery.received || [];
     const offset = received.length > 0 ? received.length : 0;
     const threshold = offset + THRESHOLD_SIZE;
     const acc = [];

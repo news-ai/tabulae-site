@@ -38,6 +38,7 @@ export const initialState = {
     archivedOffsets: {},
     utctime: null,
     scheduledOffset: 0,
+    filterQuery: {}
   },
   emailAttachmentReducer: {
     attached: [],
