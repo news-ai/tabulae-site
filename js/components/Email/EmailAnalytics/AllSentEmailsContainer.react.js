@@ -119,7 +119,7 @@ class AllSentEmailsContainer extends Component {
         <PlainEmailsList
         emails={props.emails}
         fetchEmails={props.fetchEmails}
-        hasNext
+        hasNext={props.hasNext}
         /> :
         <EmailsList {...this.props}/>}
       </div>
@@ -146,14 +146,14 @@ const mapStateToProps = (state, props) => {
   }
 
   if (subject) {
-    hasNext = state.stagingReducer.filterQuery.hitThreshold;
+    hasNext = !state.stagingReducer.filterQuery.hitThreshold;
     validators.push(
       id => state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject
       );
   }
 
   if (date) {
-    hasNext = state.stagingReducer.filterQuery.hitThreshold;
+    hasNext = !state.stagingReducer.filterQuery.hitThreshold;
     validators.push(
       id => {
         const email = state.stagingReducer[id];
@@ -169,6 +169,7 @@ const mapStateToProps = (state, props) => {
     });
     return acc;
   }, []);
+
 
   return {
     date,

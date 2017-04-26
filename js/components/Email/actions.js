@@ -461,7 +461,7 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
           // recurse call if not yet hit threshold
           return dispatch(fetchLimitedQueryEmails(query, offset + limit, limit, newAccumulator, threshold));
         } else {
-          return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold});
+          return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold || response.data.length === 0});
         }
       },
       error => dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message})
@@ -470,7 +470,7 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
 }
 
 export function fetchFilterQueryEmails(query) {
-  const THRESHOLD_SIZE = 300;
+  const THRESHOLD_SIZE = 100;
   const LIMIT_SIZE = 50;
   return (dispatch, getState) => {
     dispatch({type: REQUEST_QUERY_EMAILS, query});
