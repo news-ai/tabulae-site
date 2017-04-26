@@ -137,7 +137,12 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       }
       return assignToEmpty(state, {filterQuery, isReceiving: true});
     case RECEIVE_QUERY_EMAILS:
-      return assignToEmpty(state, {isReceiving: false, filterQuery: assignToEmpty(state.filterQuery, {received: action.ids})});
+      return assignToEmpty(state, {
+        isReceiving: false,
+        filterQuery: assignToEmpty(state.filterQuery, {
+          received: action.ids,
+          hitThreshold: action.hitThreshold,
+        })});
     default:
       return state;
   }

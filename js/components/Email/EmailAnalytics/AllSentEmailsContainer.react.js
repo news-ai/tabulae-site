@@ -131,7 +131,7 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
-  console.log(subject);
+  let hasNext = true;
   let emails;
   let validators = [];
   if (listId === 0) {
@@ -139,18 +139,21 @@ const mapStateToProps = (state, props) => {
       id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent
       );
   } else {
+    hasNext = state.stagingReducer.listOffsets[listId] !== null;
     validators.push(
       id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId
       );
   }
 
   if (subject) {
+    hasNext = state.stagingReducer.filterQuery.hitThreshold;
     validators.push(
       id => state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject
       );
   }
 
   if (date) {
+    hasNext = state.stagingReducer.filterQuery.hitThreshold;
     validators.push(
       id => {
         const email = state.stagingReducer[id];
@@ -174,7 +177,7 @@ const mapStateToProps = (state, props) => {
     subject,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails found.',
-    hasNext: true,
+    hasNext,
     listReceived: state.listReducer.received,
     lists: state.listReducer.lists && state.listReducer.lists.map(id => state.listReducer[id]),
   };
