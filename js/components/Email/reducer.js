@@ -11,6 +11,8 @@ import {
   FETCH_EMAIL_LOGS_FAIL,
   RECEIVE_EMAIL_LOGS,
   STAGING_EMAILS_FAIL,
+  REQUEST_SEARCH_EMAILS,
+  RECEIVE_SEARCH_EMAILS,
 } from './constants';
 
 import {initialState} from 'reducers/initialState';
@@ -117,21 +119,20 @@ function stagingReducer(state = initialState.stagingReducer, action) {
     case STAGING_EMAILS_FAIL:
       return assignToEmpty(state, {didInvalidate: true, isReceiving: false});
     case 'RESET_STAGING_OFFSET':
-      obj = assignToEmpty(state, {offset: 0});
-      return obj;
+      return assignToEmpty(state, {offset: 0});
     case 'RECEIVE_SEARCH_SENT_EMAILS':
       return assignToEmpty(state, {
         searchReceivedEmails: action.ids,
         searchQuery: action.query
       });
     case 'CANCEL_SCHEDULED_EMAILS':
-      return assignToEmpty(state, {
-        isReceiving: true
-      });
+      return assignToEmpty(state, {isReceiving: true});
     case 'CANCEL_SCHEDULED_EMAILS_FINISHED':
-      return assignToEmpty(state, {
-        isReceiving: false
-      });
+      return assignToEmpty(state, {isReceiving: false});
+    case REQUEST_SEARCH_EMAILS:
+      return assignToEmpty(state, {searchQuery: action.query, isReceiving: true});
+    case RECEIVE_SEARCH_EMAILS:
+      return assignToEmpty(state, {isReceiving: false});
     default:
       return state;
   }

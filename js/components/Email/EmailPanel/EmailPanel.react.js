@@ -96,7 +96,7 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
 
 
 function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
-  if (html === null || html.length === 0) return;
+  if (html === null || html.length === 0) return {html: '', numMatches: 0};
   let newHtml = html;
   let matchCount = {};
   fieldsmap.map(fieldObj => {
@@ -119,7 +119,6 @@ const PauseOverlay = ({message}: {message: string}) => (
     <div style={{margin: 0}}>
     <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
   </div>);
-
 
 class EmailPanel extends Component {
   constructor(props) {
