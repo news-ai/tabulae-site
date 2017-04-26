@@ -28,6 +28,15 @@ class PlainEmailsList extends Component {
     };
   }
 
+  componentWillMount() {
+    setTimeout(_ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
+  }
+
   componentWillUnmount() {
     window.onresize = undefined;
   }
