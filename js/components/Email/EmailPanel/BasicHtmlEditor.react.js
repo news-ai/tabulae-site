@@ -553,7 +553,6 @@ class BasicHtmlEditor extends Component {
     newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
     let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
 
-
     // HACK: remove empty character in empty block to have paragraph breaks
     newEditorState = this.removeWhiteSpace(newEditorState);
 

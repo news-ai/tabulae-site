@@ -126,7 +126,6 @@ const PauseOverlay = ({message}: {message: string}) => (
     <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
   </div>);
 
-
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
