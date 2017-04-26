@@ -4,11 +4,12 @@ import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {actions as stagingActions} from 'components/Email';
-import {grey800} from 'material-ui/styles/colors';
+import {grey500, grey600, grey700, grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
 import IconButton from 'material-ui/IconButton';
+import FontIcon from 'material-ui/FontIcon';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
@@ -37,6 +38,7 @@ class AllSentEmailsContainer extends Component {
     this.handleListChange = this._handleListChange.bind(this);
     this.handleDateChange = this._handleDateChange.bind(this);
     this.onDateCancel = this._onDateCancel.bind(this);
+    this.onSubjectCancel = this._onSubjectCancel.bind(this);
   }
 
   componentWillMount() {
@@ -56,6 +58,10 @@ class AllSentEmailsContainer extends Component {
       const date = nextProps.date ? new Date(parseDate(nextProps.date)) : undefined;
       console.log(date);
       this.setState({filterDateValue: date});
+    }
+
+    if (nextProps.subject !== this.props.subject) {
+      nextProps.fetchEmails();
     }
   }
 
@@ -85,6 +91,12 @@ class AllSentEmailsContainer extends Component {
     delete query.date;
     this.props.router.push({pathname: `/emailstats/all`, query});
     this.setState({filterDateValue: undefined});
+  }
+
+  _onSubjectCancel() {
+    let query = Object.assign({}, this.props.location.query);
+    delete query.subject;
+    this.props.router.push({pathname: `/emailstats/all`, query});
   }
 
   render() {
@@ -117,19 +129,27 @@ class AllSentEmailsContainer extends Component {
       }
 
       {props.subject &&
-        <div className='vertical-center'>
-          <span>Subject: {props.subject}</span>
+        <div className='vertical-center' style={{height: 40}}>
+          <span className='text'>Campaign:</span>
+          <span style={{color: grey800, margin: '0 10px'}}>{props.subject}</span>
+          <FontIcon
+          className='fa fa-times pointer'
+          color={grey500}
+          hoverColor={grey700}
+          onClick={this.onSubjectCancel}
+          style={{fontSize: '0.9em'}}
+          />
         </div>}
-
-      {props.date ?
-        <PlainEmailsList
-        emails={props.emails}
-        fetchEmails={props.fetchEmails}
-        hasNext={props.hasNext}
-        /> :
-        <EmailsList {...this.props}/>}
-      </div>
-      );
+        <div style={{margin: '10px 0'}}>
+        {props.date ?
+          <PlainEmailsList
+          emails={props.emails}
+          fetchEmails={props.fetchEmails}
+          hasNext={props.hasNext}
+          /> :
+          <EmailsList {...this.props}/>}
+        </div>
+      </div>);
   }
 }
 
@@ -204,10 +224,10 @@ const mapDispatchToProps = (dispatch, props) => {
 
   return {
     fetchEmails,
-    refreshEmails: _ => {
-      dispatch({type: 'RESET_STAGING_OFFSET'});
-      dispatch(stagingActions.fetchSentEmails());
-    },
+    // refreshEmails: _ => {
+    //   dispatch({type: 'RESET_STAGING_OFFSET'});
+    //   dispatch(stagingActions.fetchSentEmails());
+    // },
     fetchLists: _ => dispatch(listActions.fetchLists()),
     fetchListEmails: id => dispatch(stagingActions.fetchListEmails(id)),
     fetchSpecificDayEmails: day => dispatch(stagingActions.fetchSpecificDayEmails(day)),
