@@ -9,8 +9,8 @@ import {
   FETCH_EMAIL_LOGS_FAIL,
   RECEIVE_EMAIL_LOGS,
   STAGING_EMAILS_FAIL,
-  REQUEST_SEARCH_EMAILS,
-  RECEIVE_SEARCH_EMAILS
+  REQUEST_QUERY_EMAILS,
+  RECEIVE_QUERY_EMAILS
 } from './constants';
 import {normalize, Schema, arrayOf} from 'normalizr';
 import * as api from 'actions/api';
@@ -438,14 +438,16 @@ export function fetchSpecificDayEmails(day) {
 
 function createQueryUrl(query) {
   const keys = Object.keys(query);
-  return keys.reduce((url, key, i) => `${url}${key}:${query[key]}${i === keys.length - 1 ? '' : '&'}`, '/emails/search?');
+  const queryString = keys.map(key => `${key}:${query[key]}`).join(',');
+  return `/emails/search?q="${queryString}"`;
 }
 
-export function fetchLimitedSearchEmails(query, offset, limit, accumulator, threshold) {
+export function fetchLimitedQueryEmails(query, offset, limit, accumulator, threshold) {
   // day format: YYYY-MM-DD
   return dispatch => {
-    dispatch({type: 'REQUEST_LIMITED_SEARCH_SENT_EMAILS', query, offset, limit});
+    dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS', query, offset, limit});
     const url = createQueryUrl(query);
+    console.log(url);
 
     return api.get(`${url}&limit=${limit}&offset=${offset}`)
     .then(
@@ -456,33 +458,33 @@ export function fetchLimitedSearchEmails(query, offset, limit, accumulator, thre
         const newAccumulator = [...accumulator, ...res.result.data];
         if (response.data.length === limit && offset + limit < threshold) {
           // recurse call if not yet hit threshold
-          return dispatch(fetchLimitedSearchEmails(query, offset + limit, limit, newAccumulator, threshold));
+          return dispatch(fetchLimitedQueryEmails(query, offset + limit, limit, newAccumulator, threshold));
         } else {
           return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold});
         }
       },
-      error => dispatch({type: 'REQUEST_LIMITED_SEARCH_SENT_EMAILS_FAIL', message: error.message})
+      error => dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message})
       );
   };
 }
 
-export function fetchSearchEmails(query) {
+export function fetchFilterQueryEmails(query) {
   return (dispatch, getState) => {
-    dispatch({type: REQUEST_SEARCH_EMAILS, query});
+    dispatch({type: REQUEST_QUERY_EMAILS, query});
     const limit = LIMIT_SIZE;
     const received = [];
     const offset = received.length > 0 ? received.length : 0;
     const threshold = offset + THRESHOLD_SIZE;
     const acc = [];
-    return dispatch(fetchLimitedSearchEmails(query, offset, limit, acc, threshold))
+    return dispatch(fetchLimitedQueryEmails(query, offset, limit, acc, threshold))
     .then(
       ({data, hitThreshold}) => {
         // console.log(data);
         const ids = received.length > 0 ? [...received, ...data] : data;
-        dispatch({type: RECEIVE_SEARCH_EMAILS, ids, query, hitThreshold});
+        dispatch({type: RECEIVE_QUERY_EMAILS, ids, query, hitThreshold});
         return Promise.resolve(ids.map(id => getState().stagingReducer[id]));
       },
-      error => dispatch({type: 'REQUEST_SEARCH_SENT_EMAILS_FAIL', message: error.message})
+      error => dispatch({type: 'REQUEST_QUERY_SENT_EMAILS_FAIL', message: error.message})
     );
   };
 }

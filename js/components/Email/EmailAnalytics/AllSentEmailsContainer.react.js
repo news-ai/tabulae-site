@@ -11,6 +11,7 @@ import DatePicker from 'material-ui/DatePicker';
 import IconButton from 'material-ui/IconButton';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
+import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 
 const styles = {
   filterLabel: {fontSize: '0.9em', color: grey800},
@@ -36,6 +37,7 @@ class AllSentEmailsContainer extends Component {
   componentWillMount() {
     const {listReceived, fetchLists} = this.props;
     if (!listReceived || listReceived.length === 0) fetchLists();
+    this.props.fetchEmails();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -84,7 +86,7 @@ class AllSentEmailsContainer extends Component {
     const state = this.state;
     const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
     const selectable = [
-      <MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
+      <MenuItem key={0} value={0} primaryText='------- Filter By List -------' />]
       .concat(filterLists.map((list, i) =>
         <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
         ));
@@ -92,24 +94,28 @@ class AllSentEmailsContainer extends Component {
     const routeKey = props.router.location.pathname;
     return (
       <div>
-      {props.lists && (routeKey === '/emailstats/all' || props.listId > 0) &&
-        <div className='vertical-center'>
-          <span style={styles.filterLabel}>Filter by List: </span>
-          <DropDownMenu value={state.filterListValue} onChange={this.handleListChange}>
-          {selectable}
-          </DropDownMenu>
-          <span style={styles.filterLabel}>Filter by Date: </span>
-          <DatePicker
-          value={state.filterDateValue}
-          onChange={this.handleDateChange}
-          autoOk hintText='Filter by Day' container='inline'
-          />
-          <IconButton iconClassName='fa fa-times' onClick={this.onDateCancel}/>
-        </div>}
+      {props.lists &&
+        <Toolbar>
+          <ToolbarGroup firstChild>
+            <DropDownMenu value={state.filterListValue} onChange={this.handleListChange}>
+            {selectable}
+            </DropDownMenu>
+            <DatePicker
+            value={state.filterDateValue}
+            onChange={this.handleDateChange}
+            autoOk hintText='Filter by Day' container='inline'
+            />
+            <IconButton tooltip='Clear Date' iconClassName='fa fa-times' onClick={this.onDateCancel}/>
+          {props.subject &&
+            <span>Subject: {props.subject}</span>}
+          </ToolbarGroup>
+        </Toolbar>
+      }
+
       {props.date ?
         <PlainEmailsList
         emails={props.emails}
-        fetchEmails={_ => props.fetchSpecificDayEmails(moment(state.filterDateValue).format(DATEFORMAT))}
+        fetchEmails={props.fetchEmails}
         hasNext
         /> :
         <EmailsList {...this.props}/>}
@@ -167,15 +173,22 @@ const mapDispatchToProps = (dispatch, props) => {
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
 
-  let fetchEmails = dispatch(stagingActions.fetchSentEmails());
+  let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
   if (listId > 0) {
-    fetchEmails = dispatch(stagingActions.fetchListEmails(listId));
+    fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
   if (date) {
-    fetchEmails = dispatch(stagingActions.fetchSpecificDayEmails(date));
+    if (subject) {
+      console.log(date);
+      console.log(subject);
+      fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails({date, subject}));
+    } else {
+      fetchEmails = _ => dispatch(stagingActions.fetchSpecificDayEmails(date));
+    }
   }
+
   return {
-    fetchEmails: _ => fetchEmails,
+    fetchEmails,
     refreshEmails: _ => {
       dispatch({type: 'RESET_STAGING_OFFSET'});
       dispatch(stagingActions.fetchSentEmails());

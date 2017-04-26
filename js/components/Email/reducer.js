@@ -11,8 +11,8 @@ import {
   FETCH_EMAIL_LOGS_FAIL,
   RECEIVE_EMAIL_LOGS,
   STAGING_EMAILS_FAIL,
-  REQUEST_SEARCH_EMAILS,
-  RECEIVE_SEARCH_EMAILS,
+  REQUEST_QUERY_EMAILS,
+  RECEIVE_QUERY_EMAILS,
 } from './constants';
 
 import {initialState} from 'reducers/initialState';
@@ -129,9 +129,9 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return assignToEmpty(state, {isReceiving: true});
     case 'CANCEL_SCHEDULED_EMAILS_FINISHED':
       return assignToEmpty(state, {isReceiving: false});
-    case REQUEST_SEARCH_EMAILS:
+    case REQUEST_QUERY_EMAILS:
       return assignToEmpty(state, {searchQuery: action.query, isReceiving: true});
-    case RECEIVE_SEARCH_EMAILS:
+    case RECEIVE_QUERY_EMAILS:
       return assignToEmpty(state, {isReceiving: false});
     default:
       return state;

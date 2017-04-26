@@ -12,7 +12,12 @@ function campaignStatsReducer(state = initialState.campaignStatsReducer, action)
       return obj;
     case campaignStatsConstant.RECEIVE:
       obj = assignToEmpty(state, action.stats);
-      const newReceived = [...action.ids.filter(id => !state[id]), ...state.received];
+      const newReceived = [...action.ids.filter(id => !state[id]), ...state.received]
+      .sort((aId, bId) => {
+        const a = new Date(obj[aId].date);
+        const b = new Date(obj[bId].date);
+        return a > b ? -1 : a < b ? 1 : 0;
+      });
       obj.received = newReceived;
       obj.offset = action.offset;
       obj.isReceiving = false;
