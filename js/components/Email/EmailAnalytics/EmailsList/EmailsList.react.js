@@ -64,6 +64,15 @@ class EmailsList extends Component {
     }
   }
 
+  componentDidMount() {
+    setTimeout(_ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
+  }
+
   componentWillUnmount() {
     window.onresize = undefined;
   }
