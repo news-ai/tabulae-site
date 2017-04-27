@@ -127,6 +127,7 @@ class EmailSettings extends Component {
       }
       smtpNode = (
         <Toggle
+        disabled={person.gmail || person.outlook}
         toggled={state.newPerson.get('externalemail')}
         onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
         />);
