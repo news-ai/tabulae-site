@@ -104,38 +104,39 @@ class EmailSettings extends Component {
       href='https://tabulae.newsai.org/api/auth/outlook'
       />);
     let smtpNode = (<SMTPSettings/>);
-    if (!person.externalemail) {
-      if (person.gmail) {
-        // GOOGLE IS ON
-        googleNode = (
-          <FlatButton
-          secondary
-          label='Remove'
-          onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
-          />);
-        outlookNode = <span style={styles.notAvailableSpan}>Connected via Gmail</span>;
-        smtpNode = <span style={styles.notAvailableSpan}>Connected via Gmail</span>;
-      } else if (person.outlook) {
-        // OUTLOOK IS ON
-        googleNode = <span style={styles.notAvailableSpan}>Connected via Outlook</span>;
-        outlookNode = (
-          <FlatButton
-          secondary
-          label='Remove'
-          onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-outlook')}
-          />);
-        smtpNode = <span style={styles.notAvailableSpan}>Connected via Outlook</span>;
-      }
-    } else {
-      if (person.smtpvalid) {
+    if (person.gmail) {
+      // GOOGLE IS ON
+      googleNode = (
+        <FlatButton
+        secondary
+        label='Remove'
+        onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-gmail')}
+        />);
+      outlookNode = <span style={styles.notAvailableSpan}>Connected via Gmail</span>;
+      smtpNode = <span style={styles.notAvailableSpan}>Connected via Gmail</span>;
+    } else if (person.outlook) {
+      // OUTLOOK IS ON
+      googleNode = <span style={styles.notAvailableSpan}>Connected via Outlook</span>;
+      outlookNode = (
+        <FlatButton
+        secondary
+        label='Remove'
+        onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/auth/remove-outlook')}
+        />);
+      smtpNode = <span style={styles.notAvailableSpan}>Connected via Outlook</span>;
+    }
+    if (person.smtpvalid) {
+      // can turn on SMTP
+      if (person.externalemail) {
         googleNode = <span style={styles.notAvailableSpan}>Connected via SMTP</span>;
         outlookNode = <span style={styles.notAvailableSpan}>Connected via SMTP</span>;
-        smtpNode = (
-          <Toggle
-          toggled={state.newPerson.get('externalemail')}
-          onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
-          />);
       }
+      smtpNode = (
+        <Toggle
+        disabled={person.gmail || person.outlook}
+        toggled={state.newPerson.get('externalemail')}
+        onToggle={_ => this.setNewPerson('externalemail', !state.newPerson.get('externalemail'))}
+        />);
     }
 
     return (
