@@ -4,7 +4,7 @@ import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {actions as stagingActions} from 'components/Email';
-import {grey500, grey600, grey700, grey800} from 'material-ui/styles/colors';
+import {lightBlue50, lightBlue200, grey500, grey700, grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
@@ -16,6 +16,15 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 
 const styles = {
   filterLabel: {fontSize: '0.9em', color: grey800},
+  toolbar: {
+    // border: `1px solid ${lightBlue200}`,
+    backgroundColor: lightBlue50,
+  },
+  dropdown: {
+    labelStyle: {
+      color: grey700,
+    }
+  },
 };
 
 const DATEFORMAT = 'YYYY-MM-DD';
@@ -56,7 +65,6 @@ class AllSentEmailsContainer extends Component {
 
     if (nextProps.date !== this.props.date) {
       const date = nextProps.date ? new Date(parseDate(nextProps.date)) : undefined;
-      console.log(date);
       this.setState({filterDateValue: date});
     }
 
@@ -113,17 +121,32 @@ class AllSentEmailsContainer extends Component {
     return (
       <div>
       {props.lists &&
-        <Toolbar>
+        <Toolbar style={styles.toolbar}>
           <ToolbarGroup firstChild>
-            <DropDownMenu value={state.filterListValue} onChange={this.handleListChange}>
+            <DropDownMenu
+            value={state.filterListValue}
+            onChange={this.handleListChange}
+            labelStyle={styles.dropdown.labelStyle}
+            >
             {selectable}
             </DropDownMenu>
             <DatePicker
             value={state.filterDateValue}
             onChange={this.handleDateChange}
+            shouldDisableDate={date => date > new Date()}
+            firstDayOfWeek={1}
             autoOk hintText='Filter by Day' container='inline'
+            style={{selectColor: 'blue', width: 200}}
+            textFieldStyle={{color: grey800}}
+            hideCalendarDate
             />
-            <IconButton tooltip='Clear Date' iconClassName='fa fa-times' onClick={this.onDateCancel}/>
+            <FontIcon
+            className='fa fa-times pointer'
+            color={grey500}
+            hoverColor={grey700}
+            onClick={this.onDateCancel}
+            style={{fontSize: '0.9em'}}
+            />
           </ToolbarGroup>
         </Toolbar>
       }
@@ -195,7 +218,6 @@ const mapStateToProps = (state, props) => {
     return acc;
   }, []);
 
-  console.log(emails);
 
   return {
     date,
