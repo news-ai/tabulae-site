@@ -80,19 +80,23 @@ class EmailSignature extends Component {
       let emailsignatures = this.props.person.emailsignatures;
       if (emailsignatures === null) emailsignatures = [data];
       else {
+        let found = false;
+        // find and replace signature if existing
         emailsignatures = emailsignatures.map(signature => {
           if (isJSON(signature)) {
             const json = JSON.parse(signature);
             if (json.email === this.state.currentEmail) {
+              found = true;
               return data;
             }
           }
           return signature;
         });
+        // add new if it doesnt already exist
+        if (!found) emailsignatures = [...emailsignatures, data];
       }
       person.emailsignatures = emailsignatures;
     }
-    // console.log(person);
 
     this.setState({isSaving: true}, _ => {
       this.props.patchPerson(person)
