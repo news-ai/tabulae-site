@@ -102,7 +102,7 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
 
 
 function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
-  if (html === null || html.length === 0) return;
+  if (html === null || html.length === 0) return {html: '', numMatches: 0};
   let newHtml = html;
   let matchCount = {};
   fieldsmap.map(fieldObj => {
@@ -115,8 +115,9 @@ function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): st
     if (matches !== null) matchCount[fieldObj.name] = matches.length;
     newHtml = newHtml.replace(regexValue, value);
   });
-  if (Object.keys(matchCount).length > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
-  return newHtml;
+  const numMatches = Object.keys(matchCount).length;
+  if (numMatches > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
+  return {html: newHtml, numMatches};
 }
 
 const PauseOverlay = ({message}: {message: string}) => (
@@ -124,7 +125,6 @@ const PauseOverlay = ({message}: {message: string}) => (
     <div style={{margin: 0}}>
     <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
   </div>);
-
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -274,8 +274,11 @@ class EmailPanel extends Component {
     let contactEmails = [];
     selectedContacts.map((contact, i) => {
       if (contact && contact !== null) {
-        const replacedBody = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
-        const replacedSubject = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
+        const bodyObj = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
+        const replacedBody = bodyObj.html;
+        const subjectObj = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
+        const replacedSubject = subjectObj.html;
+        const subjectNumMatches = subjectObj.numMatches;
         let emailObj = {
           listid: this.props.listId,
           to: contact.email,
@@ -289,6 +292,9 @@ class EmailPanel extends Component {
         };
         if (this.props.scheduledtime !== null) {
           emailObj.sendat = this.props.scheduledtime;
+        }
+        if (subjectNumMatches > 0) {
+          emailObj.baseSubject = subject;
         }
         contactEmails.push(emailObj);
       }
