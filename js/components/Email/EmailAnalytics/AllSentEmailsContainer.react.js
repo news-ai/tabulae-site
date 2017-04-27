@@ -42,7 +42,6 @@ class AllSentEmailsContainer extends Component {
     this.state = {
       filterListValue: this.props.listId || 0,
       filterDateValue: date,
-      isShowingArchived: false,
     };
     this.handleListChange = this._handleListChange.bind(this);
     this.handleDateChange = this._handleDateChange.bind(this);
@@ -110,7 +109,7 @@ class AllSentEmailsContainer extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
+    const filterLists = props.lists || [];
     const selectable = [
       <MenuItem key={0} value={0} primaryText='------- Filter By List -------' />]
       .concat(filterLists.map((list, i) =>
