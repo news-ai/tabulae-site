@@ -105,7 +105,7 @@ class SentEmailsPaginationContainer extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    const filterLists = state.isShowingArchived ? props.archivedLists : props.lists;
+    const filterLists = props.lists || [];
     const selectable = [
     <MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
     .concat(filterLists.map((list, i) =>
