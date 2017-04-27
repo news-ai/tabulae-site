@@ -158,7 +158,6 @@ const mapStateToProps = (state, props) => {
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
   let hasNext = true;
-  let emails;
   let validators = [];
   if (listId === 0) {
     validators.push(
@@ -185,16 +184,18 @@ const mapStateToProps = (state, props) => {
         const email = state.stagingReducer[id];
         let sendat = email.sendat;
         if (sendat === DEFAULT_DATE) sendat = email.created;
-        const datestring = moment(sendat).format(DATEFORMAT);
+        const datestring = moment.utc(sendat).format(DATEFORMAT);
         return datestring === date;
       });
   }
 
-  emails = state.stagingReducer.received.reduce((acc, id, i) => {
+  let emails = state.stagingReducer.received.reduce((acc, id) => {
     const validated = validators.reduce((val, validator) => validator(id) && val, true);
     if (validated) acc.push(state.stagingReducer[id]);
     return acc;
   }, []);
+
+  console.log(emails);
 
   return {
     date,

@@ -193,6 +193,7 @@ const mapStateToProps = (state, props) => {
   return {
     listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
     isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
+    contact: get(state, `contactReducer[${props.contactid}]`, undefined),
   };
 };
 

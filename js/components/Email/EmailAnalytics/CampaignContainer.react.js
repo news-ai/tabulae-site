@@ -20,6 +20,7 @@ const styles = {
 const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
 const iconButtonIconStyle = {color: grey600};
+const pageTitleSpan = {fontSize: '1.5em'};
 
 class CampaignContainer extends Component {
   constructor(props) {
@@ -66,7 +67,13 @@ class CampaignContainer extends Component {
 
     return (
       <div>
+        <div className='row'>
+          <span style={pageTitleSpan}>Opens/Clicks History</span>
+        </div>
         <EmailStats/>
+        <div className='row'>
+          <span style={pageTitleSpan}>Campaigns</span>
+        </div>
       {props.campaigns && 
         <WindowScroller>
         {({height, isScrolling, scrollTop}) =>
