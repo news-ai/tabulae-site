@@ -4,28 +4,14 @@ import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {actions as stagingActions} from 'components/Email';
-import {lightBlue50, lightBlue200, grey500, grey700, grey800} from 'material-ui/styles/colors';
+import {lightBlue50, grey500, grey700, grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
-import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
-
-const styles = {
-  filterLabel: {fontSize: '0.9em', color: grey800},
-  toolbar: {
-    // border: `1px solid ${lightBlue200}`,
-    backgroundColor: lightBlue50,
-  },
-  dropdown: {
-    labelStyle: {
-      color: grey700,
-    }
-  },
-};
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 
 const DATEFORMAT = 'YYYY-MM-DD';
 const DEFAULT_DATE = '0001-01-01T00:00:00Z';
@@ -47,6 +33,7 @@ class AllSentEmailsContainer extends Component {
     this.handleDateChange = this._handleDateChange.bind(this);
     this.onDateCancel = this._onDateCancel.bind(this);
     this.onSubjectCancel = this._onSubjectCancel.bind(this);
+    this.shouldDisableDate = date => date > new Date();
   }
 
   componentWillMount() {
@@ -132,11 +119,11 @@ class AllSentEmailsContainer extends Component {
             <DatePicker
             value={state.filterDateValue}
             onChange={this.handleDateChange}
-            shouldDisableDate={date => date > new Date()}
+            shouldDisableDate={this.shouldDisableDate}
             firstDayOfWeek={1}
             autoOk hintText='Filter by Day' container='inline'
-            style={{selectColor: 'blue', width: 200}}
-            textFieldStyle={{color: grey800}}
+            style={styles.datepicker.style}
+            textFieldStyle={styles.datepicker.textFieldStyle}
             hideCalendarDate
             />
             <FontIcon
@@ -144,25 +131,25 @@ class AllSentEmailsContainer extends Component {
             color={grey500}
             hoverColor={grey700}
             onClick={this.onDateCancel}
-            style={{fontSize: '0.9em'}}
+            style={styles.smallIcon}
             />
           </ToolbarGroup>
         </Toolbar>
       }
 
       {props.subject &&
-        <div className='vertical-center' style={{height: 40}}>
+        <div className='vertical-center' style={styles.subjectContainer}>
           <span className='text'>Campaign:</span>
-          <span style={{color: grey800, margin: '0 10px'}}>{props.subject}</span>
+          <span style={styles.subject}>{props.subject}</span>
           <FontIcon
           className='fa fa-times pointer'
           color={grey500}
           hoverColor={grey700}
           onClick={this.onSubjectCancel}
-          style={{fontSize: '0.9em'}}
+          style={styles.smallIcon}
           />
         </div>}
-        <div style={{margin: '10px 0'}}>
+        <div style={styles.emaillist.containter}>
         {props.date ?
           <PlainEmailsList
           emails={props.emails}
@@ -174,6 +161,29 @@ class AllSentEmailsContainer extends Component {
       </div>);
   }
 }
+
+const styles = {
+  filterLabel: {fontSize: '0.9em', color: grey800},
+  toolbar: {
+    // border: `1px solid ${lightBlue200}`,
+    backgroundColor: lightBlue50,
+  },
+  dropdown: {
+    labelStyle: {
+      color: grey700,
+    }
+  },
+  smallIcon: {fontSize: '0.9em'},
+  subject: {color: grey800, margin: '0 10px'},
+  subjectContainer: {height: 40},
+  emaillist: {
+    containter: {margin: '10px 0'}
+  },
+  datepicker: {
+    style: {selectColor: 'blue', width: 200},
+    textFieldStyle: {color: grey800}
+  }
+};
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
