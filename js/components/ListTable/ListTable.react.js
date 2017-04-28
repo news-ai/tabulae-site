@@ -67,30 +67,17 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css'
 import './Table.css';
 
-const styles = {
-  nameBlock: {
-    parent: {
-      marginTop: 40,
-    },
-  },
-  emailPanel: {
-    position: 'fixed',
-    bottom: 0,
-    right: 0,
-    zIndex: 100,
-    height: 500,
-    width: 600,
-  },
-  loading: {
-    zIndex: 200,
-    top: 80,
-    right: 10,
-    position: 'fixed'
-  },
-};
 
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
+
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+  });
 
 class ListTable extends Component {
   constructor(props) {
@@ -116,6 +103,7 @@ class ListTable extends Component {
       leftoverHeight: undefined,
       scrollToRow: undefined,
       currentSearchIndex: 0,
+      isDeleting: false,
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -577,21 +565,27 @@ class ListTable extends Component {
 
   _onRemoveContacts() {
     const selected = this.state.selected;
-    const props = this.props;
     if (selected.length === 0) return;
-    const newListContacts = difference(props.listData.contacts, selected);
-    props.deleteContacts(selected);
-    props.patchList({
-      listId: props.listId,
-      contacts: newListContacts,
-      name: props.listData.name,
-    });
-    if (this.state.onSort) {
-      this.setState({
-        sortedIds: difference(this.state.sortedIds, selected),
-        selected: []
-      });
-    }
+    alertify.promisifyConfirm('Delete Contacts', `This action cannot be reversed. Are you you want to delete ${selected.length} contact(s).`)
+    .then(
+      _ => {
+        const newListContacts = difference(this.props.listData.contacts, selected);
+        this.props.deleteContacts(selected);
+        this.setState({isDeleting: true});
+        this.props.patchList({
+          listId: this.props.listId,
+          contacts: newListContacts,
+          name: this.props.listData.name,
+        }).then(_ => this.setState({isDeleting: false}));
+        if (this.state.onSort) {
+          this.setState({
+            sortedIds: difference(this.state.sortedIds, selected),
+            selected: []
+          });
+        }
+      },
+      _ => {}
+      );
   }
 
   _onSearchClick(searchValue) {
@@ -698,7 +692,7 @@ class ListTable extends Component {
         <div className='row vertical-center' style={{margin: 5}}>
             <div className='large-3 medium-4 columns vertical-center'>
               <div>
-                <span style={{fontSize: '0.8em', color: grey700}}>{props.listData.client}</span>
+                <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
                 <ControlledInput
                 async
                 disabled={props.listData.readonly}
@@ -712,7 +706,7 @@ class ListTable extends Component {
               tooltip='Email'
               tooltipPosition='top-left'
               iconClassName='fa fa-envelope'
-              iconStyle={{color: grey500}}
+              iconStyle={styles.iconBtn}
               onClick={_ => props.person.emailconfirmed ?
                 this.setState({isEmailPanelOpen: true}) :
                 alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {})}
@@ -722,58 +716,56 @@ class ListTable extends Component {
               tooltip='Export'
               tooltipPosition='top-left'
               iconClassName='fa fa-download'
-              iconStyle={{color: grey500}}
+              iconStyle={styles.iconBtn}
               onClick={this.onExportClick}
               />
-              <CopyToHOC
-              listId={props.listId}
-              selected={state.selected}>
+              <CopyToHOC listId={props.listId} selected={state.selected}>
               {({onRequestOpen}) => (
                 <IconButton
+                iconStyle={styles.iconBtn}
                 id='copy_contacts_hop'
                 tooltip='Copy to Another Table'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-copy'
-                iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
               </CopyToHOC>
               <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
               {({onRequestOpen}) => (
                 <IconButton
+                iconStyle={styles.iconBtn}
                 id='add_remove_columns_hop'
                 disabled={props.listData.readonly}
                 tooltip='Show/Hide columns'
                 tooltipPosition='top-left'
                 iconClassName='fa fa-table'
-                iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
               </AddOrRemoveColumnHOC>
               <AddContactHOC contacts={props.contacts} listId={props.listId}>
               {({onRequestOpen}) => (
                 <IconButton
+                iconStyle={styles.iconBtn}
                 tooltip='Add New Contact'
                 id='add_contact_hop'
                 disabled={props.listData.readonly}
                 tooltipPosition='top-left'
                 iconClassName='fa fa-plus'
-                iconStyle={{color: grey500}}
                 onClick={onRequestOpen}
                 />)}
               </AddContactHOC>
               <IconButton
+              iconStyle={styles.iconBtn}
               tooltip='Delete Contact'
               tooltipPosition='top-left'
-              iconClassName='fa fa-trash'
+              iconClassName={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
               disabled={props.listData.readonly}
-              iconStyle={{color: grey500}}
               onClick={this.onRemoveContacts}
               />
               <AddTagDialogHOC listId={props.listId}>
                 {({onRequestOpen}) =>
                 <IconButton
-                iconStyle={{color: grey500}}
+                iconStyle={styles.iconBtn}
                 iconClassName='fa fa-tags'
                 onClick={onRequestOpen}
                 tooltip='Add Tag & Client'
@@ -785,7 +777,7 @@ class ListTable extends Component {
               <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
               {({onRequestOpen}) =>
                 <IconButton
-                iconStyle={{color: grey500}}
+                iconStyle={styles.iconBtn}
                 iconClassName='fa fa-edit'
                 tooltip='Edit Multiple'
                 tooltipPosition='top-right'
@@ -941,6 +933,31 @@ class ListTable extends Component {
     </div>);
   }
 }
+
+const styles = {
+  nameBlock: {
+    parent: {
+      marginTop: 40,
+    },
+  },
+  emailPanel: {
+    position: 'fixed',
+    bottom: 0,
+    right: 0,
+    zIndex: 100,
+    height: 500,
+    width: 600,
+  },
+  loading: {
+    zIndex: 200,
+    top: 80,
+    right: 10,
+    position: 'fixed'
+  },
+  iconBtn: {
+    color: grey500
+  }
+};
 
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
