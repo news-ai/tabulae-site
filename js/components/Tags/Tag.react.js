@@ -10,7 +10,7 @@ const styles = {
     height: 20,
   },
   text: {
-    color: grey800, cursor: 'pointer'
+    color: grey800
   },
   icon: {fontSize: '0.8em', marginLeft: 8},
 };
@@ -29,7 +29,7 @@ const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link}) => {
         <FontIcon
         onClick={onDeleteTag}
         style={styles.icon}
-        className='fa fa-times'
+        className='fa fa-times pointer'
         color={grey500}
         hoverColor={grey800}
         />}

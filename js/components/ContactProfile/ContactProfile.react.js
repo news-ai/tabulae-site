@@ -229,7 +229,11 @@ class ContactProfile extends Component {
                       </AddTagHOC>
                   </div>
                   <div>
-                    <Tags onDeleteTag={this.onDeleteTag} tags={props.contact.tags}/>
+                    <Tags
+                    onDeleteTag={this.onDeleteTag}
+                    tags={props.contact.tags}
+                    createLink={name => `/contacts?tag=${name}`}
+                    />
                   {props.contact.tags === null &&
                     <span className='text'>None added</span>}
                   </div>

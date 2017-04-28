@@ -31,7 +31,8 @@ export function fetchContactsByTag(tag) {
         dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.data));
         return dispatch({
           type: TAG_CONTACTS_RECEIVE,
-          ids: res.result.data,
+          tag,
+          received: res.result.data,
           offset: newOffset
         });
       },

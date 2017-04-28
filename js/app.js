@@ -67,6 +67,7 @@ import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
 import ClientDirectories from './components/ClientDirectories/ClientDirectories.react';
 import ClientDirectory from './components/ClientDirectories/ClientDirectory.react';
 import Publication from './components/Publications/Publication.react';
+import ContactTags from './components/Contacts/ContactTags/ContactTags.react';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -102,6 +103,7 @@ ReactDOM.render(
           <Route path='/' name='Home' component={App}>
             <IndexRoute component={ListManagerContainer} />
             <Route path='lists' name='List Manager' component={ListManagerContainer} />
+            <Route path='contacts' name='Contacts' component={ContactTags}/>
             <Route path='tables/:listId' staticName name='Table'>
               <IndexRoute component={ListFetchingContainer}/>
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
