@@ -29,21 +29,21 @@ class CopyToHOC extends Component {
   }
 
   _onSubmit() {
-    const props = this.props;
-    const state = this.state;
-    if (state.value.length === 0 || props.selectedContacts.length === 0) return;
-    const selectedLists = state.value.map(obj => props.listReducer[obj.value]);
-    selectedLists.map(list => props.addContactsThenPatchList(props.selectedContacts, list));
+    if (this.state.value.length === 0 || this.props.selectedContacts.length === 0) return;
+    const selectedLists = this.state.value.map(obj => this.props.listReducer[obj.value]);
+    // selectedLists.map(list => props.addContactsThenPatchList(props.selectedContacts, list));
+    const contacts = this.props.selectedContacts.map(contact => contact.id);
+    selectedLists.map(list => this.props.copyContactsToList(contacts, list.id));
     window.Intercom('trackEvent', 'copy_to_existing_sheet');
   }
 
   _onNewSheetSubmit() {
-    const props = this.props;
     const val = this.refs.copyToHOC_newSheetName.input.value;
     let name;
     if (val.length > 0) name = val;
     else name = `${this.props.list.name} (Copy)`;
-    props.copyToNewList(props.selectedContacts, name);
+    const contacts = this.props.selectedContacts.map(contact => contact.id);
+    this.props.copyToNewList(contacts, name);
     window.Intercom('trackEvent', 'copy_to_new_sheet');
   }
 
@@ -71,19 +71,17 @@ class CopyToHOC extends Component {
           <div className='row'>
             <div
             className='panel large-12 medium-12 small-12 columns'
-            style={{
-              backgroundColor: yellow50,
-              margin: 10,
-              padding: 10
-            }}>
-              <span style={{fontSize: '0.8em'}}>
+            style={styles.panel}
+            >
+              <span className='smalltext'>
               The bigger the migration, the slower it is! Don't navigate from the page during migration.
               </span>
             </div>
             <strong>Method 1: Copy a Couple Contacts to an Existing/New List</strong>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
-              <span style={{fontWeight: 'bold', marginRight: 8}}>Selected Contacts</span>
-              {props.selected.length === 0 && <span>none selected</span>}
+              <span className='bold' style={{marginRight: 8}}>Selected Contacts</span>
+            {props.selected.length === 0 &&
+              <span>none selected</span>}
               {props.selectedContacts &&
                 <span>{props.selectedContacts
                 .map(contact => contact.firstname || contact.lastname || contact.email)
@@ -150,12 +148,18 @@ class CopyToHOC extends Component {
             </div>
           </div>
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>);
   }
 }
+
+const styles = {
+  panel: {
+    backgroundColor: yellow50,
+    margin: 10,
+    padding: 10
+  }
+};
 
 const mapStateToProps = (state, props) => {
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
@@ -171,24 +175,31 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
+  const copyContactsToList = (contacts, listid) =>  {
+    return dispatch(copyActions.copyContactsToList(contacts, listid))
+    .then(_ => alertify.notify('Copy completed!', 'custom', 2, function(){}))
+    .catch(err => {
+      console.log(err);
+      window.Intercom('trackEvent', 'copy_error', {error: err.toString()});
+      alertify.alert('Error', 'An error occured. Copy unavailable at this moment.');
+    });
+  };
   return {
     fetchLists: _ => dispatch(listActions.fetchLists()),
-    addContactsThenPatchList: (rawContacts, list) => dispatch(copyActions.addContactsThenPatchList(rawContacts, list, props.listId))
-    .then(_ => {
-      window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
-      alertify.notify('Copy completed!', 'custom', 2, function(){});
-    }),
-    copyToNewList: (rawContacts, name) => dispatch(listActions.createEmptyList(name))
-    .then(response => dispatch(copyActions.addContactsThenPatchList(rawContacts, response.data, props.listId)))
-    .then(_ => {
+    copyToNewList: (contacts, name) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
-      alertify.notify('Copy completed!', 'custom', 2, function(){});
-    }),
+      return dispatch(listActions.createEmptyList(name))
+      .then(response => copyContactsToList(contacts, response.data.id))
+    },
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
     .then(_ => {
       window.Intercom('trackEvent', 'copy_all_contacts_to_new');
       alertify.notify('Copy completed!', 'custom', 2, function(){});
     }),
+    copyContactsToList: (contacts, listid) => {
+      window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
+      return copyContactsToList(contacts, listid);
+    },
   };
 };
 

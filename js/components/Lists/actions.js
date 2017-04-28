@@ -81,7 +81,6 @@ function requestListFail(message) {
 
 export function fetchList(listId) {
   return (dispatch, getState) => {
-    if (getState().listReducer[listId]) return Promise.resolve();
     dispatch(requestList(listId));
     return api.get(`/lists/${listId}`)
     .then(response => {
