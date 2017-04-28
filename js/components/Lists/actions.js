@@ -51,7 +51,7 @@ function requestListsFail(message) {
 export function listLastUsed() {
   return {
     type: listConstant.LAST_USED,
-    time: Date.now()
+    time: new Date()
   };
 }
 
