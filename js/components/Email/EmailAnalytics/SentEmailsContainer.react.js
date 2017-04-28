@@ -105,8 +105,8 @@ class SentEmailsPaginationContainer extends Component {
     const routeKey = props.router.location.pathname;
 
     return (
-        <div className='large-10 large-offset-1 columns'>
-          <div className='vertical-center' style={styles.labelContainer}>
+        <div className='row'>
+          <div className='large-12 columns vertical-center' style={styles.labelContainer}>
             <span style={styles.label}>Emails You Sent</span>
             <div className='right'>
               <TextField
@@ -121,7 +121,7 @@ class SentEmailsPaginationContainer extends Component {
               />
             </div>
           </div>
-          <div className='row' style={styles.tabContainer}>
+          <div className='large-12 columns' style={styles.tabContainer}>
             <div className='vertical-center'>
               <TabHandle pathKey='/emailstats' activeKey={routeKey}>Campaigns</TabHandle>
               <TabHandle pathKey='/emailstats/all' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
@@ -133,7 +133,7 @@ class SentEmailsPaginationContainer extends Component {
               */}
             </div>
           </div>
-          <div style={styles.childrenMargin}>
+          <div className='large-12 columns' style={styles.childrenMargin}>
           {props.children}
           </div>
         </div>
