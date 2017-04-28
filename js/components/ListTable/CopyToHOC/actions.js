@@ -1,42 +1,28 @@
-import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
+import * as api from 'actions/api';
 import {actions as listActions} from 'components/Lists';
 import {actions as contactActions} from 'components/Contacts';
-import isEmpty from 'lodash/isEmpty';
-import differenceBy from 'lodash/differenceBy';
+import {constants as contactConstant} from 'components/Contacts';
+import {normalize, Schema, arrayOf} from 'normalizr';
+const contactSchema = new Schema('contacts', { idAttribute: 'id' });
+const publicationSchema = new Schema('publications', { idAttribute: 'id' });
 
-export function addContactsThenPatchList(rawContacts, list, origListId) {
-  return (dispatch, getState) => {
-    if (rawContacts.length === 0) return;
-    const contacts = rawContacts.map(contact => {
-      let obj = {listid: list.id};
-      list.fieldsmap
-      .filter(fieldObj => !fieldObj.customfield)
-      .map(fieldObj => {
-        if (!isEmpty(contact[fieldObj.value])) obj[fieldObj.value] = contact[fieldObj.value];
+export function copyContactsToList(contacts, listid) {
+  return dispatch => {
+    dispatch({type: 'COPY_CONTACTS_TO_LIST', contacts, listid});
+    dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+    return api.post(`/contacts/copy`, {contacts, listid})
+    .then(response => {
+      const res = normalize(response, {
+        data: arrayOf(contactSchema),
+        included: arrayOf(publicationSchema)
       });
-      obj.customfields = contact.customfields;
-      return obj;
-    });
-
-    return dispatch(contactActions.addContacts(contacts))
-    .then(addedContacts => {
-      // copy feeds over
-      for (let i = 0; i < addedContacts.length; i++) {
-        dispatch(feedActions.copyFeeds(rawContacts[i].id, addedContacts[i].id, list.id));
-      }
-
-      const oldList = getState().listReducer[origListId];
-      const extraFields = differenceBy(oldList.fieldsmap, list.fieldsmap, 'value');
-
-      const ids = addedContacts.map(contact => contact.id);
-      // update list
-      const listBody = {
-        listId: list.id,
-        name: list.name,
-        contacts: list.contacts !== null ? [...list.contacts, ...ids] : ids,
-        fieldsmap: list.fieldsmap.filter(fieldObj => !fieldObj.readonly).concat(extraFields)
-      };
-      return dispatch(listActions.patchList(listBody));
-    });
+      return dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.data))
+    },
+    err => {
+      dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
+      Promise.reject(err);
+    })
+    .then(_ => dispatch(listActions.fetchList(listid)));
   };
 }
+
