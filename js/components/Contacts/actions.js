@@ -39,12 +39,11 @@ function stripOutEmployers(publicationReducer, contacts, ids) {
   return newContacts;
 }
 
-function receiveContacts(contacts, ids) {
+export function receiveContacts(contacts, ids) {
   return (dispatch, getState) => {
     const publicationReducer = getState().publicationReducer;
     const contactsWithEmployers = stripOutEmployers(publicationReducer, contacts, ids);
-
-    dispatch({
+    return dispatch({
       type: contactConstant.RECEIVE_MULTIPLE,
       contacts: contactsWithEmployers,
       ids

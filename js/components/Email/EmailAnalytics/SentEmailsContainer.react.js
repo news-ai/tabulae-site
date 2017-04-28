@@ -95,6 +95,13 @@ class SentEmailsPaginationContainer extends Component {
   render() {
     const state = this.state;
     const props = this.props;
+    const filterLists = props.lists || [];
+    const selectable = [
+    <MenuItem key={0} value={0} primaryText='------- All Emails -------' />]
+    .concat(filterLists.map((list, i) =>
+      <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
+      ));
+    // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
 
     return (
