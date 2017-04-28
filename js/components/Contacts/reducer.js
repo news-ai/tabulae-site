@@ -7,7 +7,6 @@ import {
 } from './constants';
 import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
-import _ from 'lodash';
 
 function contactReducer(state = initialState.contactReducer, action) {
   if (window.isDev) Object.freeze(state);

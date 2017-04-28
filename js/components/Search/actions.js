@@ -45,3 +45,4 @@ export function fetchSearch(query) {
     .catch(err => console.log(err));
   };
 }
+
