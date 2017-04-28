@@ -50,10 +50,31 @@ class EmailsList extends Component {
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
+    window.onresize = () => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    };
   }
 
   componentWillMount() {
-    if (this.props.fetchEmails) this.props.fetchEmails();
+    if (typeof this.props.fetchEmails === 'function') {
+      this.props.fetchEmails();
+    }
+  }
+
+  componentDidMount() {
+    setTimeout(_ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
+  }
+
+  componentWillUnmount() {
+    window.onresize = undefined;
   }
 
   _listRef(ref) {

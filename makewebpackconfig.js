@@ -94,7 +94,7 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: 'cheap-module-source-map',
+    devtool: 'eval-cheap-module-source-map',
     // devtool: 'source-map',
     entry: entry,
     output: { // Compile into js/build.js

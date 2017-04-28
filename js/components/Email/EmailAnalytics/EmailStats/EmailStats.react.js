@@ -108,7 +108,7 @@ class EmailStats extends Component {
 
   _handleAreaChartOnClick(args) {
     const datestring = args.activeLabel;
-    this.props.onDateSelected(datestring);
+    if (this.props.onDateSelected) this.props.onDateSelected(datestring);
   }
 
   render() {

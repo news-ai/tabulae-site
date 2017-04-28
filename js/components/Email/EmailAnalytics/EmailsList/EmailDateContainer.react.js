@@ -24,7 +24,7 @@ class EmailDateContainer extends Component {
     return (
       <div style={styles.container}>
         <div style={{margin: '10px 0', color: !isClosed ? grey600 : grey700}} className='vertical-center'>
-          <Link style={styles.link} to={`/emailStats/charts?date=${reformatDatestring(datestring)}`}>
+          <Link style={styles.link} to={`/emailstats/all?date=${reformatDatestring(datestring)}`}>
             <span className='hoverGray' style={styles.linkSpan}>Sent on {datestring}</span>
           </Link>
           <IconButton

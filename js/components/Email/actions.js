@@ -8,7 +8,9 @@ import {
   FETCH_EMAIL_LOGS,
   FETCH_EMAIL_LOGS_FAIL,
   RECEIVE_EMAIL_LOGS,
-  STAGING_EMAILS_FAIL
+  STAGING_EMAILS_FAIL,
+  REQUEST_QUERY_EMAILS,
+  RECEIVE_QUERY_EMAILS
 } from './constants';
 import {normalize, Schema, arrayOf} from 'normalizr';
 import * as api from 'actions/api';
@@ -394,6 +396,7 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator, t
 
         const newAccumulator = [...accumulator, ...res.result.data];
         if (response.data.length === limit && offset + limit < threshold) {
+          // recurse call if not yet hit threshold
           return dispatch(fetchLimitedSpecificDayEmails(day, offset + limit, limit, newAccumulator, threshold));
         } else {
           return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold});
@@ -407,10 +410,10 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator, t
 // threshold must always be larger than limit
 // threshold is the number of emails that can be recursely fetched at a time
 // to prevent fetching 1000s of emails at once and slow down UI
-const THRESHOLD_SIZE = 300;
-const LIMIT_SIZE = 50;
 
 export function fetchSpecificDayEmails(day) {
+  const THRESHOLD_SIZE = 300;
+  const LIMIT_SIZE = 50;
   return (dispatch, getState) => {
     dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS', day});
     const limit = LIMIT_SIZE;
@@ -421,11 +424,70 @@ export function fetchSpecificDayEmails(day) {
     return dispatch(fetchLimitedSpecificDayEmails(day, offset, limit, acc, threshold))
     .then(
       ({data, hitThreshold}) => {
+        // console.log(data);
         const ids = emailStats && emailStats.received ? [...emailStats.received, ...data] : data;
         dispatch({type: 'RECEIVE_SPECIFIC_DAY_EMAILS', ids, day, hitThreshold});
         return Promise.resolve(ids.map(id => getState().stagingReducer[id]));
       },
       error => dispatch({type: 'REQUEST_SPECIFIC_DAY_SENT_EMAILS_FAIL', message: error.message})
+    );
+  };
+}
+
+// -------------------------------------------------
+
+function createQueryUrl(query) {
+  const keys = Object.keys(query);
+  const queryString = keys
+  .filter(key => query[key])
+  .map(key => `${key}:${query[key]}`).join(',');
+  return `/emails/search?q="${queryString}"`;
+}
+
+export function fetchLimitedQueryEmails(query, offset, limit, accumulator, threshold) {
+  // day format: YYYY-MM-DD
+  return dispatch => {
+    dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS', query, offset, limit});
+    const url = createQueryUrl(query);
+
+    return api.get(`${url}&limit=${limit}&offset=${offset}`)
+    .then(
+      response => {
+        const res = normalize(response, {data: arrayOf(emailSchema)});
+        dispatch({type: RECEIVE_MULTIPLE_EMAILS, emails: res.entities.emails, ids: res.result.data});
+
+        const newAccumulator = [...accumulator, ...res.result.data];
+        if (response.data.length === limit && offset + limit < threshold) {
+          // recurse call if not yet hit threshold
+          return dispatch(fetchLimitedQueryEmails(query, offset + limit, limit, newAccumulator, threshold));
+        } else {
+          return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold || response.data.length === 0});
+        }
+      },
+      error => dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message})
+      );
+  };
+}
+
+export function fetchFilterQueryEmails(query) {
+  const THRESHOLD_SIZE = 100;
+  const LIMIT_SIZE = 50;
+  return (dispatch, getState) => {
+    dispatch({type: REQUEST_QUERY_EMAILS, query});
+    const limit = LIMIT_SIZE;
+    const received = getState().stagingReducer.filterQuery.received || [];
+    const offset = received.length > 0 ? received.length : 0;
+    const threshold = offset + THRESHOLD_SIZE;
+    const acc = [];
+    return dispatch(fetchLimitedQueryEmails(query, offset, limit, acc, threshold))
+    .then(
+      ({data, hitThreshold}) => {
+        // console.log(data);
+        const ids = received.length > 0 ? [...received, ...data] : data;
+        dispatch({type: RECEIVE_QUERY_EMAILS, ids, query, hitThreshold});
+        return Promise.resolve(ids.map(id => getState().stagingReducer[id]));
+      },
+      error => dispatch({type: 'REQUEST_QUERY_SENT_EMAILS_FAIL', message: error.message})
     );
   };
 }

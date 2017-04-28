@@ -6,10 +6,13 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
 
   const emails = state.stagingReducer.received
-  .filter(id => state.stagingReducer[id].delivered)
-  .filter(id => !state.stagingReducer[id].archived)
-  .map(id => state.stagingReducer[id])
-  .filter(email => email.listid === listId);
+  .reduce((acc, id) => {
+    const email = state.stagingReducer[id];
+    if (state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && email.listid === listId) {
+      acc.push(email);
+    }
+    return acc;
+  }, []);
   return {
     emails,
     isReceiving: state.stagingReducer.isReceiving,

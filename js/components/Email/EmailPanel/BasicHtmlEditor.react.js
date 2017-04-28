@@ -71,6 +71,8 @@ linkify
 .tlds(tlds)
 .set({fuzzyLink: false});
 
+const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
+
 class BasicHtmlEditor extends Component {
   constructor(props) {
     super(props);
@@ -223,6 +225,8 @@ class BasicHtmlEditor extends Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
+    this.applyOverwriteEntity = this._applyOverwriteEntity.bind(this);
+    this.stripOverwriteEntity = this._stripOverwriteEntity.bind(this);
     this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
 
     // cleanups
@@ -250,9 +254,12 @@ class BasicHtmlEditor extends Component {
       }
 
       if (nextProps.templateChangeType === 'append') {
-        // email signature
-        console.log(nextProps.templateChangeType);
-        const oldContent = this.state.editorState.getCurrentContent();
+        // email signature should append to existing content
+        let oldContent = this.state.editorState.getCurrentContent();
+        if (nextProps.templateEntityType) {
+          oldContent = this.stripOverwriteEntity(oldContent, nextProps.templateEntityType);
+          newContent = this.applyOverwriteEntity(newContent, nextProps.templateEntityType);
+        }
         newContent = this.appendToCurrentContentState(oldContent, newContent);
       }
       editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
@@ -262,6 +269,46 @@ class BasicHtmlEditor extends Component {
 
   componentWillUnmount() {
     this.props.clearAttachments();
+  }
+
+  _stripOverwriteEntity(contentState, overwriteEntityType) {
+    let truncatedBlocks = [];
+    const blocks = contentState.getBlockMap();
+    blocks.map(block => {
+      let hasEntity = false;
+      block.findEntityRanges(
+        (character) => {
+          const characterEntityKey = character.getEntity();
+          if (characterEntityKey === null) return false;
+          const characterEntity = contentState.getEntity(characterEntityKey);
+          if (characterEntity.getType() === overwriteEntityType) {
+            if (!hasEntity) hasEntity = true;
+          }
+          return characterEntity.getType() === overwriteEntityType;
+        },
+        (start, end) => {}
+        );
+      if (!hasEntity) truncatedBlocks.push(block);
+    });
+    // Now select all stripped blocks and insert overwriteEntityType
+    return ContentState.createFromBlockArray(truncatedBlocks);
+  }
+
+  _applyOverwriteEntity(contentState, overwriteEntityType) {
+    const content = contentState.createEntity(overwriteEntityType, 'MUTABLE');
+    const entityKey = content.getLastCreatedEntityKey();
+    if (overwriteEntityType) {
+      const blocks = contentState.getBlockMap();
+      const selection = SelectionState
+      .createEmpty()
+      .merge({
+        anchorKey: blocks.first().getKey(),
+        anchorOffset: 0,
+        focusKey: blocks.last().getKey(),
+        focusOffset: blocks.last().getLength()
+      });
+      return Modifier.applyEntity(contentState, selection, entityKey);
+    }
   }
 
   _removeWhiteSpace(editorState) {
@@ -329,7 +376,7 @@ class BasicHtmlEditor extends Component {
         (state, end) => {});
       if (okayBlock) truncatedBlocks.push(block);
     });
-    const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+    let cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
     return cleanedContentState;
   }
 
@@ -908,6 +955,7 @@ const mapStateToProps = (state, props) => {
     savedEditorState: state.emailDraftReducer.editorState,
     savedBodyHtml: state.emailDraftReducer.bodyHtml,
     templateChangeType: state.emailDraftReducer.templateChangeType,
+    templateEntityType: state.emailDraftReducer.templateEntityType,
   };
 };
 

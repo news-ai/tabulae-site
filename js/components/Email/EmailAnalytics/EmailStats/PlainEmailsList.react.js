@@ -10,6 +10,7 @@ import ScheduledEmailItem from 'components/Email/EmailAnalytics/EmailsList/Sched
 const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
 const iconButtonIconStyle = {color: grey600};
+const placeholder = 'No emails found.';
 
 class PlainEmailsList extends Component {
   constructor(props) {
@@ -19,6 +20,25 @@ class PlainEmailsList extends Component {
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
+    window.onresize = () => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    };
+  }
+
+  componentWillMount() {
+    setTimeout(_ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
+  }
+
+  componentWillUnmount() {
+    window.onresize = undefined;
   }
 
   _listRef(ref) {
@@ -80,6 +100,8 @@ class PlainEmailsList extends Component {
         <div className='horizontal-center' style={isReceivingContainerStyle}>
           <FontIcon style={fontIconStyle} className='fa fa-spinner fa-spin'/>
         </div>}
+      {props.emails && props.emails.length === 0 &&
+        <span style={styles.placeholder}>{props.placeholder || placeholder}</span>}
       {props.hasNext && !props.isReceiving &&
         <div className='horizontal-center'>
           <IconButton
@@ -94,6 +116,10 @@ class PlainEmailsList extends Component {
       );
   }
 }
+
+const styles = {
+  placeholder: {color: grey700, fontSize: '0.9em'},
+};
 
 
 const mapStateToProps = (state, props) => {
