@@ -225,8 +225,8 @@ class BasicHtmlEditor extends Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
-    this.applyOverwriteEntity = this._applyOverwriteEntity.bind(this);
-    this.stripOverwriteEntity = this._stripOverwriteEntity.bind(this);
+    // this.applyOverwriteEntity = this._applyOverwriteEntity.bind(this);
+    this.stripOverwriteStyle = this._stripOverwriteStyle.bind(this);
     this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
 
     // cleanups
@@ -253,16 +253,34 @@ class BasicHtmlEditor extends Component {
         newContent = convertFromRaw(nextProps.savedEditorState);
       }
 
-      if (nextProps.templateChangeType === 'append') {
+      if (nextProps.templateChangeType === 'append' && nextProps.templateEntityType) {
         // email signature should append to existing content
         let oldContent = this.state.editorState.getCurrentContent();
-        if (nextProps.templateEntityType) {
-          oldContent = this.stripOverwriteEntity(oldContent, nextProps.templateEntityType);
-          newContent = this.applyOverwriteEntity(newContent, nextProps.templateEntityType);
-        }
+        oldContent = this.stripOverwriteStyle(oldContent, nextProps.templateEntityType);
+        // newContent = this.applyOverwriteEntity(newContent, nextProps.templateEntityType);
+        const blocks = newContent.getBlockMap();
+        const newContentSelection = SelectionState
+          .createEmpty()
+          .merge({
+            anchorKey: blocks.first().getKey(),
+            anchorOffset: 0,
+            focusKey: blocks.last().getKey(),
+            focusOffset: blocks.last().getLength()
+          });
         newContent = this.appendToCurrentContentState(oldContent, newContent);
+
+        // merge content to editorState first
+        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+        // apply selection to turn on inline style since it cant be done via contentState
+        editorState = EditorState.acceptSelection(editorState, newContentSelection);
+        const currentStyle = editorState.getCurrentInlineStyle();
+        if (!currentStyle.has('EMAIL_SIGNATURE')) {
+          editorState = RichUtils.toggleInlineStyle(editorState, 'EMAIL_SIGNATURE');
+        }
+        // console.log(convertToRaw(editorState.getCurrentContent()));
+      } else {
+        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       }
-      editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       this.onChange(editorState);
     }
   }
@@ -271,45 +289,43 @@ class BasicHtmlEditor extends Component {
     this.props.clearAttachments();
   }
 
-  _stripOverwriteEntity(contentState, overwriteEntityType) {
+  _stripOverwriteStyle(contentState, overwriteStyle) {
+    // used to strip EMAIL_SIGNATURE inline style when switching emails
     let truncatedBlocks = [];
     const blocks = contentState.getBlockMap();
     blocks.map(block => {
-      let hasEntity = false;
-      block.findEntityRanges(
+      let hasStyle = false;
+      block.findStyleRanges(
         (character) => {
-          const characterEntityKey = character.getEntity();
-          if (characterEntityKey === null) return false;
-          const characterEntity = contentState.getEntity(characterEntityKey);
-          if (characterEntity.getType() === overwriteEntityType) {
-            if (!hasEntity) hasEntity = true;
+          if (character.hasStyle(overwriteStyle)) {
+            if (!hasStyle) hasStyle = true;
           }
-          return characterEntity.getType() === overwriteEntityType;
+          return character.hasStyle(overwriteStyle);
         },
         (start, end) => {}
         );
-      if (!hasEntity) truncatedBlocks.push(block);
+      if (!hasStyle) truncatedBlocks.push(block);
     });
     // Now select all stripped blocks and insert overwriteEntityType
     return ContentState.createFromBlockArray(truncatedBlocks);
   }
 
-  _applyOverwriteEntity(contentState, overwriteEntityType) {
-    const content = contentState.createEntity(overwriteEntityType, 'MUTABLE');
-    const entityKey = content.getLastCreatedEntityKey();
-    if (overwriteEntityType) {
-      const blocks = contentState.getBlockMap();
-      const selection = SelectionState
-      .createEmpty()
-      .merge({
-        anchorKey: blocks.first().getKey(),
-        anchorOffset: 0,
-        focusKey: blocks.last().getKey(),
-        focusOffset: blocks.last().getLength()
-      });
-      return Modifier.applyEntity(contentState, selection, entityKey);
-    }
-  }
+  // _applyOverwriteEntity(contentState, overwriteEntityType) {
+  //   const content = contentState.createEntity(overwriteEntityType, 'MUTABLE');
+  //   const entityKey = content.getLastCreatedEntityKey();
+  //   if (overwriteEntityType) {
+  //     const blocks = contentState.getBlockMap();
+  //     const selection = SelectionState
+  //     .createEmpty()
+  //     .merge({
+  //       anchorKey: blocks.first().getKey(),
+  //       anchorOffset: 0,
+  //       focusKey: blocks.last().getKey(),
+  //       focusOffset: blocks.last().getLength()
+  //     });
+  //     return Modifier.applyEntity(contentState, selection, entityKey);
+  //   }
+  // }
 
   _removeWhiteSpace(editorState) {
     // // HACK: remove empty character in empty block to have paragraph breaks
@@ -376,7 +392,7 @@ class BasicHtmlEditor extends Component {
         (state, end) => {});
       if (okayBlock) truncatedBlocks.push(block);
     });
-    let cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
+    const cleanedContentState = ContentState.createFromBlockArray(truncatedBlocks);
     return cleanedContentState;
   }
 
@@ -768,6 +784,8 @@ class BasicHtmlEditor extends Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+
+    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
 
     return (
       <div>
