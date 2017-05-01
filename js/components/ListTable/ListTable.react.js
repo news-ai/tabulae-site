@@ -591,6 +591,8 @@ class ListTable extends Component {
         sortedIds: difference(this.state.sortedIds, selected),
         selected: []
       });
+    } else {
+      this.setState({selected: []});
     }
   }
 
