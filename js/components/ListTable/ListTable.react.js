@@ -566,7 +566,6 @@ class ListTable extends Component {
   _onRemoveContacts() {
     const selected = this.state.selected;
     if (selected.length === 0) return;
-<<<<<<< HEAD
     alertify.promisifyConfirm('Delete Contacts', `This action cannot be reversed. Are you you want to delete ${selected.length} contact(s).`)
     .then(
       _ => {
@@ -583,27 +582,12 @@ class ListTable extends Component {
             sortedIds: difference(this.state.sortedIds, selected),
             selected: []
           });
+        } else {
+          this.setState({selected: []});
         }
       },
       _ => {}
       );
-=======
-    const newListContacts = difference(props.listData.contacts, selected);
-    props.deleteContacts(selected);
-    props.patchList({
-      listId: props.listId,
-      contacts: newListContacts,
-      name: props.listData.name,
-    });
-    if (this.state.onSort) {
-      this.setState({
-        sortedIds: difference(this.state.sortedIds, selected),
-        selected: []
-      });
-    } else {
-      this.setState({selected: []});
-    }
->>>>>>> 5e78645c2ed5780ffe05d8961461f5e1555e0510
   }
 
   _onSearchClick(searchValue) {
