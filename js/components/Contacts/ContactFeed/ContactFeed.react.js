@@ -13,22 +13,18 @@ class ContactTags extends Component {
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
-    window.onresize = () => {
+    this.onResize = _ => {
       if (this._list) {
         this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
     };
+    window.onresize = this.onResize;
   }
 
   componentWillMount() {
     if (this.props.tag) this.props.fetchContactsByTag();
-    setTimeout(_ => {
-      if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
-        this._list.recomputeRowHeights();
-      }
-    }, 2000);
+    setTimeout(this.onResize, 2000);
   }
 
   componentWillUnmount() {
@@ -45,7 +41,7 @@ class ContactTags extends Component {
 
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const contact = this.props.contacts[index];
-    const renderNode = <ContactItem {...contact}/>
+    const renderNode = <ContactItem onResize={this.onResize} {...contact}/>
 
     return (
       <div style={Object.assign({}, style, {padding: 5})} key={key}>

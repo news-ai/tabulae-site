@@ -3,21 +3,78 @@ import {connect} from 'react-redux';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
+import Link from 'react-router/lib/Link';
+import {grey700, grey800, grey500} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
+import {actions as publicationActions} from 'components/Publications';
 import get from 'lodash/get';
 // import ContactItem from 'components/Search/ContactItem.react';
+import Tags from 'components/Tags/Tags.react';
+import Collapse from 'react-collapse';
+// import {Tooltip} from 'react-lightweight-tooltip';
 
+const spanStyle = {color: grey700}
+
+const PublicationSpan = ({name, id}) => (
+  <Link className='hoverGray' to={`/publications/${id}`}>
+    <span className='text'>{name}</span>
+  </Link>
+  );
+
+const greenRoundedStyle = {
+  content: {
+  },
+  tooltip: {
+    borderRadius: '6px',
+    padding: 2
+  },
+  arrow: {
+  },
+};
+
+const span = {
+  fontSize: '0.8em',
+  color: grey800,
+  verticalAlign: 'text-top'
+};
 
 // TODO: implement isFetchingList like AnalyticsItem
-const ContactItem = ({firstname, lastname, email, employers, listname}) => {
+const ContactItem = ({onExpandClick, expanded, id, firstname, lastname, email, employers, publications, listname, listid, tags}) => {
   return (
     <Paper zDepth={1} style={{padding: 10}}>
       <div className='row'>
-        <div className='large-10 columns'>{firstname} {lastname}</div>
-        <div className='large-2 columns'>{listname}</div>
+        <div className='large-10 columns'>
+          <Link to={`/tables/${listid}/${id}`}>{firstname} {lastname}</Link>
+        </div>
+        <div className='large-2 columns smalltext'>
+          <Link to={`/tables/${listid}`}>List: {listname}</Link>
+        </div>
       </div>
       <div><span className='text'>{email}</span></div>
-      <div></div>
+      <div className='row'>
+        <div className='large-8 columns'>
+        {publications.reduce((acc, pub, i) => {
+          // separator
+          acc.push(<PublicationSpan key={i} {...pub}/>);
+          if (i !== publications.length - 1) acc.push(<span key={`span-${i}`} style={spanStyle}>, </span>);
+          return acc;
+        }, [])}
+        </div>
+        <div className='large-4 columns'>
+        {tags !== null &&
+          <Tags tags={tags.slice(0, 3)} createLink={name => `/contacts?tag=${name}`}/>}
+        {tags!== null && tags.length > 3 &&
+          <span style={span}>...</span>}
+        </div>
+      </div>
+      <div className='row horizontal-center'>
+        <FontIcon
+        className={`fa fa-angle-double-${expanded ? 'up' : 'down'} pointer`}
+        color={grey500}
+        hoverColor={grey700}
+        onClick={onExpandClick}
+        />
+      </div>
     </Paper>
     );
 };
@@ -25,13 +82,25 @@ const ContactItem = ({firstname, lastname, email, employers, listname}) => {
 class ContactItemContainer extends Component {
   constructor(props) {
     super(props);
+    this.state = {expanded: false};
+    this.onExpandClick = _ => this.setState({expanded: !this.state.expanded});
   }
 
   componentWillMount() {
     this.props.fetchList();
+    if (this.props.employers !== null) {
+      this.props.employers.map(eId => this.props.fetchPublication(eId));
+    }
   }
+
   render() {
-    return <ContactItem {...this.props}/>;
+    return (
+      <ContactItem
+      onExpandClick={this.onExpandClick}
+      expanded={this.state.expanded}
+      {...this.props}
+      />
+    );
   }
 }
 
@@ -44,6 +113,7 @@ const mapStateToProps = (state, props) => {
     }, []) : [],
     listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
     isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
+    publicationReducer: state.publicationReducer,
   };
 };
 
@@ -52,6 +122,9 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchList: _ => dispatch(listActions.fetchList(props.listid)),
     startListFetch: _ => dispatch({type: 'IS_FETCHING', resource: 'lists', id: props.listid, fetchType: 'isReceiving'}),
     endListFetch: _ => dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: props.listid, fetchType: 'isReceiving'}),
+    fetchPublication: pubId => dispatch(publicationActions.fetchPublication(pubId)),
+    startPublicationFetch: pubId => dispatch({type: 'IS_FETCHING', resource: 'publications', id: pubId, fetchType: 'isReceiving'}),
+    endPublicationFetch: pubId => dispatch({type: 'IS_FETCHING_DONE', resource: 'publications', id: pubId, fetchType: 'isReceiving'}),
   };
 };
 
@@ -66,6 +139,14 @@ const mergeProps = (sProps, dProps, props) => {
         dProps.startListFetch();
         dProps.fetchList()
         .then(_ => dProps.endListFetch());
+      }
+    },
+    fetchPublication: pubId => {
+      if (!get(state, `isFetchingReducer.publications[${pubId}].isReceiving`, false) && !sProps.publication.some(pub => pub.id === pubId)) {
+        // only fetch if it is not currently fetching
+        dProps.startPublicationFetch(pubId);
+        dProps.fetchPublication(pubId)
+        .then(_ => dProps.endPublicationFetch(pubId));
       }
     }
   };

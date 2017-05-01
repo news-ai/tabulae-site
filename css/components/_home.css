@@ -42,13 +42,13 @@
 }
 
 .hoverGray {
-/*  grey600 */
-  color: #757575;
+/*  grey500 */
+  color: #9E9E9E;
 }
 
 .hoverGray:hover {
-/*  grey500 */
-  color: #9E9E9E;
+/*  grey600 */
+  color: #757575;
 }
 
 .wrapper {

@@ -37,7 +37,7 @@ function requestPublicationFail(message) {
 
 export function fetchPublication(id) {
   return (dispatch, getState) => {
-    if (getState().publicationReducer[id]) if (getState().publicationReducer[id].isReceiving) return;
+    // if (getState().publicationReducer[id]) if (getState().publicationReducer[id].isReceiving) return;
     dispatch(requestPublication(id));
     return api.get(`/publications/${id}`)
     .then(response => dispatch(receivePublication(response.data)))
