@@ -463,7 +463,7 @@ class GeneralEditor extends React.Component {
       'http://',
       (e, url) => {
         const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
-        this.onChange(RichUtils.toggleLink(editorState, selection, entityKey));
+        this.onChange(RichUtils.toggleLink(editorState, selection, entityKey), 'force-emit-html');
       },
       _ => {});
   }
@@ -474,7 +474,7 @@ class GeneralEditor extends React.Component {
     if (selection.isCollapsed()) {
       return;
     }
-    this.onChange(RichUtils.toggleLink(editorState, selection, null));
+    this.onChange(RichUtils.toggleLink(editorState, selection, null), 'force-emit-html');
   }
 
   _handlePastedText(text, html) {

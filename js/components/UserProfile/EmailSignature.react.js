@@ -68,6 +68,7 @@ class EmailSignature extends Component {
       emailsignature: oldPerson.emailsignature,
       emailsignatures: oldPerson.emailsignatures,
     };
+    console.log(this.state.rawBodyContentState);
     const data = JSON.stringify({
       type: 'DraftEditorState',
       data: this.state.rawBodyContentState,
