@@ -32,7 +32,7 @@ const panelStyles = {
 
 const Panel = props => {
   return (
-    <Paper className={props.className} zDepth={1} style={{margin: '5px 0'}}>
+    <Paper className={props.className} zDepth={1} style={{margin: '5px 0', padding: 10}}>
       <div style={panelStyles.padding}>
         <div className='vertical-center'>
           <span style={panelStyles.title}>{props.title}</span>
