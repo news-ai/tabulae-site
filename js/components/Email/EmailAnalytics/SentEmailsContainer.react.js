@@ -106,7 +106,7 @@ class SentEmailsPaginationContainer extends Component {
 
     return (
         <div className='row'>
-          <div className='large-12 columns vertical-center' style={styles.labelContainer}>
+          <div className='large-12 medium-12 small-12 columns vertical-center' style={styles.labelContainer}>
             <span style={styles.label}>Emails You Sent</span>
             <div className='right'>
               <TextField
@@ -121,7 +121,7 @@ class SentEmailsPaginationContainer extends Component {
               />
             </div>
           </div>
-          <div className='large-12 columns' style={styles.tabContainer}>
+          <div className='large-12 medium-12 small-12 columns' style={styles.tabContainer}>
             <div className='vertical-center'>
               <TabHandle pathKey='/emailstats' activeKey={routeKey}>Campaigns</TabHandle>
               <TabHandle pathKey='/emailstats/all' alsoMatch={['/emailstats/lists/:listId']} activeKey={routeKey}>All Sent Emails</TabHandle>
@@ -133,7 +133,7 @@ class SentEmailsPaginationContainer extends Component {
               */}
             </div>
           </div>
-          <div className='large-12 columns' style={styles.childrenMargin}>
+          <div className='large-12 medium-12 small-12 columns' style={styles.childrenMargin}>
           {props.children}
           </div>
         </div>

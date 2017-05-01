@@ -70,7 +70,7 @@ const Campaign = ({
   return (
     <Paper className='row' zDepth={1} style={{margin: 10, padding: 10}}>
       <div className='large-12 medium-12 small-12 columns'>
-        <span className='smalltext' style={{color: grey800}}>{date}</span>
+        <span className='smalltext' style={{color: grey800}}>Created: {date}</span>
       </div>
       <div className='large-5 medium-12 small-12 columns'>
       {subject || <span style={{color: grey800}}>(No Subject)</span>}
