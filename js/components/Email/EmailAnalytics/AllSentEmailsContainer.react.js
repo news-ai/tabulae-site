@@ -104,6 +104,7 @@ class AllSentEmailsContainer extends Component {
         ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
+    // console.log(props.emails);
     return (
       <div>
       {props.lists &&
@@ -121,7 +122,7 @@ class AllSentEmailsContainer extends Component {
             onChange={this.handleDateChange}
             shouldDisableDate={this.shouldDisableDate}
             firstDayOfWeek={1}
-            autoOk hintText='Filter by Day' container='inline'
+            autoOk hintText='Filter by Day Created' container='inline'
             style={styles.datepicker.style}
             textFieldStyle={styles.datepicker.textFieldStyle}
             hideCalendarDate
@@ -193,8 +194,10 @@ const mapStateToProps = (state, props) => {
   let validators = [];
   if (listId === 0) {
     validators.push(
-      id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].issent
-      );
+      id => {
+        // console.log(state.stagingReducer[id].delivered && state.stagingReducer[id].issent);
+        return state.stagingReducer[id].delivered && state.stagingReducer[id].issent;
+      });
   } else {
     hasNext = state.stagingReducer.listOffsets[listId] !== null;
     validators.push(
@@ -205,8 +208,14 @@ const mapStateToProps = (state, props) => {
   if (subject) {
     hasNext = !state.stagingReducer.filterQuery.hitThreshold;
     validators.push(
-      id => state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject
-      );
+      id => {
+        // console.log('has subject');
+        // console.log(subject);
+        // console.log(state.stagingReducer[id].baseSubject);
+        // console.log(state.stagingReducer[id].subject);
+        // console.log(state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject);
+        return state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject;
+      });
   }
 
   if (date) {
@@ -214,19 +223,27 @@ const mapStateToProps = (state, props) => {
     validators.push(
       id => {
         const email = state.stagingReducer[id];
-        let sendat = email.sendat;
-        if (sendat === DEFAULT_DATE) sendat = email.created;
-        const datestring = moment.utc(sendat).format(DATEFORMAT);
+        // let sendat = email.sendat;
+        // if (sendat === DEFAULT_DATE) sendat = email.created;
+        const datestring = moment.utc(email.created).format(DATEFORMAT);
+        // console.log('has date');
+        // console.log(email.created);
+        // console.log(datestring);
+        // console.log(date);
+        // console.log(datestring === date);
         return datestring === date;
       });
   }
+  // console.log(validators);
 
   let emails = state.stagingReducer.received.reduce((acc, id) => {
-    const validated = validators.reduce((val, validator) => validator(id) && val, true);
+    const validated = validators.reduce((val, validator) => {
+      if (validator(id) && val) return true;
+      return false;
+    }, true);
     if (validated) acc.push(state.stagingReducer[id]);
     return acc;
   }, []);
-
 
   return {
     date,

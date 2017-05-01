@@ -68,7 +68,9 @@ class CampaignContainer extends Component {
     return (
       <div>
         <div className='row'>
-          <span style={pageTitleSpan}>Opens/Clicks History</span>
+          <div className='large-12 medium-12 small-12 columns'>
+            <span style={pageTitleSpan}>Opens/Clicks History</span>
+          </div>
         </div>
         <EmailStats/>
         <div className='row'>
