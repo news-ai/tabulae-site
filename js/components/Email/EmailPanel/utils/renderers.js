@@ -166,6 +166,10 @@ export const typefaceMap = {
   'Nunito': {fontFamily: 'Nunito'},
 };
 
+export const specialMap = {
+  'EMAIL_SIGNATURE': {}
+};
+
 const customBlocks = {
   CODE: {
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
@@ -176,4 +180,4 @@ const customBlocks = {
 };
 
 // Custom overrides for "code" style.
-export const styleMap = Object.assign({}, fontsizeMap, customBlocks, typefaceMap);
+export const styleMap = Object.assign({}, fontsizeMap, customBlocks, typefaceMap, specialMap);
