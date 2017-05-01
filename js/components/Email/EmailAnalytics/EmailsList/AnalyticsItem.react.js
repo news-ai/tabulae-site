@@ -80,14 +80,14 @@ export class AnalyticsItem extends Component {
               </span>
             {attachments !== null &&
               <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip'/>}
-            {!archived &&
+            {!archived ?
               <FontIcon
               className='pointer fa fa-trash'
               style={styles.trashIcon}
               color={grey400}
               hoverColor={grey600}
               onClick={archiveEmail}
-              />}
+              /> : <span className='smalltext' styles={styles.archived}>(Archived)</span>}
             </div>}
           </div>
           <div className='small-12 medium-6 large-6 columns'>
@@ -187,6 +187,7 @@ const styles = {
   tagContainer: {
     padding: 3
   },
+  archived: {color: grey600}
 };
 
 const mapStateToProps = (state, props) => {
