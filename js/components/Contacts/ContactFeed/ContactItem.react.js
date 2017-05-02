@@ -1,7 +1,7 @@
 import React from 'react';
 import Paper from 'material-ui/Paper';
 import Link from 'react-router/lib/Link';
-import {blue200, blue800, indigo50, indigo200, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
+import {blue800, indigo50, indigo200, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
 // import ContactItem from 'components/Search/ContactItem.react';
 import Tags from 'components/Tags/Tags.react';
 // import {Tooltip} from 'react-lightweight-tooltip';
