@@ -116,7 +116,12 @@ export function deleteContact(contactId) {
 export function deleteContacts(ids) {
   return dispatch => {
     dispatch({type: 'DELETE_CONTACTS', ids});
-    ids.map(id => dispatch(deleteContact(id)));
+    return api.post(`/contacts/bulkdelete`, {contacts: ids})
+    .then(response => {
+      // console.log(response);
+      return dispatch({type: 'DELETED_CONTACTS', data: response.data});
+    })
+    .catch(err => console.log(err));
   };
 }
 
