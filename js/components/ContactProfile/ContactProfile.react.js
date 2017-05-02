@@ -9,7 +9,7 @@ import {actions as contactActions} from 'components/Contacts';
 import {actions as feedActions} from './RSSFeed';
 import * as headlineActions from './Headlines/actions';
 import * as joyrideActions from 'components/Joyride/actions';
-import {purple50, purple200, grey700, grey500} from 'material-ui/styles/colors';
+import {indigo50, indigo200, grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -130,7 +130,7 @@ class ContactProfile extends Component {
     const props = this.props;
 
     return (
-      <div className='row horizontal-center'>
+      <div className='row align-center'>
         {
           props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={this.onModalRequestClose}>
@@ -230,8 +230,8 @@ class ContactProfile extends Component {
                   </div>
                   <div>
                     <Tags
-                    color={purple50}
-                    borderColor={purple200}
+                    color={indigo50}
+                    borderColor={indigo200}
                     onDeleteTag={this.onDeleteTag}
                     tags={props.contact.tags}
                     createLink={name => `/contacts?tag=${name}`}

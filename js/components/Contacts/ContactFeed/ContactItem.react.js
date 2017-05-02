@@ -4,7 +4,8 @@ import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
 import Link from 'react-router/lib/Link';
-import {blue800, purple50, purple200, grey700, grey800, grey500} from 'material-ui/styles/colors';
+import Checkbox from 'material-ui/Checkbox';
+import {blue800, indigo50, indigo200, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import get from 'lodash/get';
@@ -21,33 +22,30 @@ const PublicationSpan = ({name, id}) => (
   </Link>
   );
 
+const defaultFieldStyles = {
+  value: {color: grey800},
+  label: {
+    color: blue800,
+    marginRight: 5,
+  }
+};
+
 const DefaultField = ({label, value}) => {
   return value ?
     <div className='large-12 medium-12 small-12 columns'>
-      <span className='bold smalltext' style={styles.defaultField.label}>{label}</span>
-      <span className='text'>{value}</span>
+      <span className='bold smalltext' style={defaultFieldStyles.label}>{label}</span>
+      <span className='text' style={defaultFieldStyles.value}>{value}</span>
     </div> : null;
 };
 
 const styles = {
-  defaultField: {
-    label: {
-      color: blue800,
-      marginRight: 5,
+  checkbox: {
+    container: {
+      borderRight: `1px solid ${grey300}`,
+      padding: 5
     }
   }
 }
-
-const greenRoundedStyle = {
-  content: {
-  },
-  tooltip: {
-    borderRadius: '6px',
-    padding: 2
-  },
-  arrow: {
-  },
-};
 
 const span = {
   fontSize: '0.8em',
@@ -59,38 +57,40 @@ const span = {
 const ContactItem = ({id, firstname, lastname, email, employers, publications, listname, listid, tags,
   location, phonenumber, twitter, instagram, website, linkedin}) => {
   return (
-    <Paper zDepth={1} style={{padding: 10}}>
-      <div className='row'>
-        <div className='large-10 columns'>
-          <Link to={`/tables/${listid}/${id}`}>
-            <span style={{fontSize: '1.1em'}}>{firstname} {lastname}</span>
-          </Link>
-        </div>
-        <div className='large-2 columns smalltext'>
-          <Link to={`/tables/${listid}`}>List: {listname}</Link>
-        </div>
+    <Paper className='row' zDepth={1} style={{margin: 5}}>
+      <div className='large-1 medium-1 small-2 columns vertical-center horizontal-center' style={styles.checkbox.container}>
+        <div style={{height: 10, width: 10, backgroundColor: 'red'}}></div>
       </div>
-      <div><span className='text'>{email}</span></div>
-      <div className='row'>
-        <div className='large-8 columns'>
-        {publications.length > 0 && publications.reduce((acc, pub, i) => {
-          // separator
-          acc.push(<PublicationSpan key={i} {...pub}/>);
-          if (i !== publications.length - 1) acc.push(<span key={`span-${i}`} style={spanStyle}>, </span>);
-          return acc;
-        }, [])}
+      <div className='large-11 medium-11 small-10 columns' style={{padding: 10}}>
+        <div className='row'>
+          <div className='large-10 medium-8 small-12 columns vertical-center'>
+            <Link to={`/tables/${listid}/${id}`}>
+              <span style={{fontSize: '1.1em'}}>{firstname} {lastname}</span>
+            </Link>
+            <span style={{margin: '0 10px', color: grey500}}>-</span>
+            <span className='text'>{email}</span>
+          </div>
+          <div className='large-2 medium-4 small-12 columns smalltext'>
+            <Link to={`/tables/${listid}`}>List: {listname}</Link>
+          </div>
+          <div className='large-12 columns'>
+          {publications.length > 0 && publications.reduce((acc, pub, i) => {
+            // separator
+            acc.push(<PublicationSpan key={i} {...pub}/>);
+            if (i !== publications.length - 1) acc.push(<span key={`span-${i}`} style={spanStyle}>, </span>);
+            return acc;
+          }, [])}
+          </div>
+          <DefaultField label='Phone #' value={phonenumber}/>
+          <DefaultField label='Location' value={location}/>
+          <DefaultField label='Twitter' value={twitter}/>
+          <DefaultField label='Instagram' value={instagram}/>
+          <DefaultField label='LinkedIn' value={linkedin}/>
+          <div className='large-12 end columns'>
+          {tags !== null &&
+            <Tags hideDelete color={indigo50} borderColor={indigo200} tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
+          </div>
         </div>
-        <div className='large-4 columns'>
-        {tags !== null &&
-          <Tags color={purple50} borderColor={purple200} tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
-        </div>
-      </div>
-      <div className='row'>
-        <DefaultField label='Phone #' value={phonenumber}/>
-        <DefaultField label='Location' value={location}/>
-        <DefaultField label='Twitter' value={twitter}/>
-        <DefaultField label='Instagram' value={instagram}/>
-        <DefaultField label='LinkedIn' value={linkedin}/>
       </div>
     </Paper>
     );

@@ -29,7 +29,7 @@ class ContactTags extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className='row horizontal-center'>
+      <div className='row align-center'>
         <div className='large-10 medium-10 small-12 columns'>
           <div style={styles.container}>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
