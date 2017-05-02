@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
-import ContactItem from './ContactItem.react';
+import ContactItemContainer from './ContactItemContainer.react';
 
 class ContactTags extends Component {
   constructor(props) {
@@ -44,7 +44,7 @@ class ContactTags extends Component {
 
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const contact = this.props.contacts[index];
-    const renderNode = <ContactItem onResize={this.onResize} {...contact}/>
+    const renderNode = <ContactItemContainer onResize={this.onResize} {...contact}/>
 
     return (
       <div style={Object.assign({}, style, {padding: 5})} key={key}>
