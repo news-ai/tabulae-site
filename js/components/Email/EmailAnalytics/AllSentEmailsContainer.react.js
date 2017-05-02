@@ -239,10 +239,7 @@ const mapStateToProps = (state, props) => {
   // console.log(validators);
 
   let emails = state.stagingReducer.received.reduce((acc, id) => {
-    const validated = validators.reduce((val, validator) => {
-      if (validator(id) && val) return true;
-      return false;
-    }, true);
+    const validated = validators.reduce((val, validator) => validator(id) && val, true);
     if (validated) acc.push(state.stagingReducer[id]);
     return acc;
   }, []);
