@@ -15,6 +15,7 @@ class ContactTags extends Component {
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onResize = _ => {
       if (this._list) {
+        console.log('recompute');
         this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }

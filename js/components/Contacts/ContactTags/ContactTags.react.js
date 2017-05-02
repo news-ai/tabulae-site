@@ -4,6 +4,11 @@ import withRouter from 'react-router/lib/withRouter';
 import ContactFeed from 'components/Contacts/ContactFeed/ContactFeed.react';
 import * as actions from './actions';
 
+const styles = {
+  container: {marginTop: 20, marginBottom: 10},
+  text: {fontSize: '2em', marginRight: '10px'}
+};
+
 class ContactTags extends Component {
   constructor(props) {
     super(props);
@@ -26,7 +31,9 @@ class ContactTags extends Component {
     return (
       <div className='row horizontal-center'>
         <div className='large-10 medium-10 small-12 columns'>
-          Contacts with Tag: {props.tag}
+          <div style={styles.container}>
+            <span style={styles.text}>Contact Tag: {props.tag}</span>
+          </div>
           <ContactFeed contacts={props.contacts}/>
         </div>
       </div>
@@ -37,7 +44,6 @@ class ContactTags extends Component {
 const mapStateToProps = (state, props) => {
   const tag = props.router.location.query.tag;
   let contacts = [];
-  console.log(state.contactTagReducer[tag]);
   if (tag && state.contactTagReducer[tag]) {
     contacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
   }

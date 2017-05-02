@@ -39,7 +39,7 @@ const span = {
 };
 
 // TODO: implement isFetchingList like AnalyticsItem
-const ContactItem = ({onExpandClick, expanded, id, firstname, lastname, email, employers, publications, listname, listid, tags}) => {
+const ContactItem = ({id, firstname, lastname, email, employers, publications, listname, listid, tags}) => {
   return (
     <Paper zDepth={1} style={{padding: 10}}>
       <div className='row'>
@@ -53,7 +53,7 @@ const ContactItem = ({onExpandClick, expanded, id, firstname, lastname, email, e
       <div><span className='text'>{email}</span></div>
       <div className='row'>
         <div className='large-8 columns'>
-        {publications.reduce((acc, pub, i) => {
+        {publications.length > 0 && publications.reduce((acc, pub, i) => {
           // separator
           acc.push(<PublicationSpan key={i} {...pub}/>);
           if (i !== publications.length - 1) acc.push(<span key={`span-${i}`} style={spanStyle}>, </span>);
@@ -62,18 +62,8 @@ const ContactItem = ({onExpandClick, expanded, id, firstname, lastname, email, e
         </div>
         <div className='large-4 columns'>
         {tags !== null &&
-          <Tags tags={tags.slice(0, 3)} createLink={name => `/contacts?tag=${name}`}/>}
-        {tags!== null && tags.length > 3 &&
-          <span style={span}>...</span>}
+          <Tags tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
         </div>
-      </div>
-      <div className='row horizontal-center'>
-        <FontIcon
-        className={`fa fa-angle-double-${expanded ? 'up' : 'down'} pointer`}
-        color={grey500}
-        hoverColor={grey700}
-        onClick={onExpandClick}
-        />
       </div>
     </Paper>
     );
@@ -82,8 +72,6 @@ const ContactItem = ({onExpandClick, expanded, id, firstname, lastname, email, e
 class ContactItemContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = {expanded: false};
-    this.onExpandClick = _ => this.setState({expanded: !this.state.expanded});
   }
 
   componentWillMount() {
@@ -95,11 +83,7 @@ class ContactItemContainer extends Component {
 
   render() {
     return (
-      <ContactItem
-      onExpandClick={this.onExpandClick}
-      expanded={this.state.expanded}
-      {...this.props}
-      />
+      <ContactItem {...this.props}/>
     );
   }
 }

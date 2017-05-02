@@ -390,11 +390,7 @@ class ListTable extends Component {
     }
 
     return (
-      <div
-      className='headercell'
-      key={key}
-      style={style}
-      >
+      <div className='headercell' key={key} style={style}>
         {customSpan || <span style={{whiteSpace: 'nowrap'}}>{content}</span>}
         {sortDirection !== 2 &&
           <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
@@ -444,9 +440,7 @@ class ListTable extends Component {
         case 'profile':
           const state = this.state;
           contentBody = (
-              <Link
-              to={`/tables/${this.props.listId}/${rowData.id}`}
-              >
+              <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
                 <div
                 className='pointer'
                 style={{padding: '0 1px', marginRight: 15}}
@@ -493,10 +487,7 @@ class ListTable extends Component {
     }
 
     return (
-      <div
-      className={className}
-      key={key}
-      style={style}>
+      <div className={className} key={key} style={style}>
       {contentBody}{contentBody2}
       </div>);
     }
@@ -692,184 +683,184 @@ class ListTable extends Component {
           listId={props.listId}
           />}
         <div className='row vertical-center' style={{margin: 5}}>
-            <div className='large-3 medium-4 columns vertical-center'>
-              <div>
-                <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
-                <ControlledInput
-                async
-                disabled={props.listData.readonly}
-                name={props.listData.name}
-                onBlur={value => props.patchList({listId: props.listId, name: value})}
-                />
-              </div>
-            </div>
-            <div className='large-4 medium-4 columns vertical-center'>
-              <IconButton
-              tooltip='Email'
-              tooltipPosition='top-left'
-              iconClassName='fa fa-envelope'
-              iconStyle={styles.iconBtn}
-              onClick={_ => props.person.emailconfirmed ?
-                this.setState({isEmailPanelOpen: true}) :
-                alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {})}
-              disabled={state.isEmailPanelOpen || props.listData.readonly}
-              />
-              <IconButton
-              tooltip='Export'
-              tooltipPosition='top-left'
-              iconClassName='fa fa-download'
-              iconStyle={styles.iconBtn}
-              onClick={this.onExportClick}
-              />
-              <CopyToHOC listId={props.listId} selected={state.selected}>
-              {({onRequestOpen}) => (
-                <IconButton
-                iconStyle={styles.iconBtn}
-                id='copy_contacts_hop'
-                tooltip='Copy to Another Table'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-copy'
-                onClick={onRequestOpen}
-                />)}
-              </CopyToHOC>
-              <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
-              {({onRequestOpen}) => (
-                <IconButton
-                iconStyle={styles.iconBtn}
-                id='add_remove_columns_hop'
-                disabled={props.listData.readonly}
-                tooltip='Show/Hide columns'
-                tooltipPosition='top-left'
-                iconClassName='fa fa-table'
-                onClick={onRequestOpen}
-                />)}
-              </AddOrRemoveColumnHOC>
-              <AddContactHOC contacts={props.contacts} listId={props.listId}>
-              {({onRequestOpen}) => (
-                <IconButton
-                iconStyle={styles.iconBtn}
-                tooltip='Add New Contact'
-                id='add_contact_hop'
-                disabled={props.listData.readonly}
-                tooltipPosition='top-left'
-                iconClassName='fa fa-plus'
-                onClick={onRequestOpen}
-                />)}
-              </AddContactHOC>
-              <IconButton
-              iconStyle={styles.iconBtn}
-              tooltip='Delete Contact'
-              tooltipPosition='top-left'
-              iconClassName={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
+          <div className='large-3 medium-4 columns vertical-center'>
+            <div>
+              <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
+              <ControlledInput
+              async
               disabled={props.listData.readonly}
-              onClick={this.onRemoveContacts}
+              name={props.listData.name}
+              onBlur={value => props.patchList({listId: props.listId, name: value})}
               />
-              <AddTagDialogHOC listId={props.listId}>
-                {({onRequestOpen}) =>
-                <IconButton
-                iconStyle={styles.iconBtn}
-                iconClassName='fa fa-tags'
-                onClick={onRequestOpen}
-                tooltip='Add Tag & Client'
-                tooltipPosition='top-right'
-                disabled={props.listData.readonly}
-                />}
-              </AddTagDialogHOC>
-            {state.selected.length > 1 &&
-              <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
-              {({onRequestOpen}) =>
-                <IconButton
-                iconStyle={styles.iconBtn}
-                iconClassName='fa fa-edit'
-                tooltip='Edit Multiple'
-                tooltipPosition='top-right'
-                disabled={props.listData.readonly}
-                onClick={onRequestOpen}
-                />}
-              </EditMultipleContactsHOC>}
             </div>
-            <div className='large-4 columns vertical-center'>
-              <TextField
-              id='search-input'
-              ref='searchValue'
-              hintText='Search...'
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  const searchValue = this.refs.searchValue.input.value;
-                  props.router.push(`/tables/${props.listId}?search=${searchValue}`);
-                  this.setState({searchValue});
-                }
-              }}
-              floatingLabelText={state.isSearchOn ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
-              floatingLabelFixed={state.isSearchOn}
-              defaultValue={props.searchQuery || ''}
-              errorText={state.errorText}
-              />
+          </div>
+          <div className='large-4 medium-4 columns vertical-center'>
+            <IconButton
+            tooltip='Email'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-envelope'
+            iconStyle={styles.iconBtn}
+            onClick={_ => props.person.emailconfirmed ?
+              this.setState({isEmailPanelOpen: true}) :
+              alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {})}
+            disabled={state.isEmailPanelOpen || props.listData.readonly}
+            />
+            <IconButton
+            tooltip='Export'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-download'
+            iconStyle={styles.iconBtn}
+            onClick={this.onExportClick}
+            />
+            <CopyToHOC listId={props.listId} selected={state.selected}>
+            {({onRequestOpen}) => (
               <IconButton
-              className='noprint'
-              iconClassName='fa fa-search'
-              tooltip='Search'
-              tooltipPosition='top-center'
-              style={{marginLeft: 5}}
-              onClick={e => {
+              iconStyle={styles.iconBtn}
+              id='copy_contacts_hop'
+              tooltip='Copy to Another Table'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-copy'
+              onClick={onRequestOpen}
+              />)}
+            </CopyToHOC>
+            <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
+            {({onRequestOpen}) => (
+              <IconButton
+              iconStyle={styles.iconBtn}
+              id='add_remove_columns_hop'
+              disabled={props.listData.readonly}
+              tooltip='Show/Hide columns'
+              tooltipPosition='top-left'
+              iconClassName='fa fa-table'
+              onClick={onRequestOpen}
+              />)}
+            </AddOrRemoveColumnHOC>
+            <AddContactHOC contacts={props.contacts} listId={props.listId}>
+            {({onRequestOpen}) => (
+              <IconButton
+              iconStyle={styles.iconBtn}
+              tooltip='Add New Contact'
+              id='add_contact_hop'
+              disabled={props.listData.readonly}
+              tooltipPosition='top-left'
+              iconClassName='fa fa-plus'
+              onClick={onRequestOpen}
+              />)}
+            </AddContactHOC>
+            <IconButton
+            iconStyle={styles.iconBtn}
+            tooltip='Delete Contact'
+            tooltipPosition='top-left'
+            iconClassName={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
+            disabled={props.listData.readonly}
+            onClick={this.onRemoveContacts}
+            />
+            <AddTagDialogHOC listId={props.listId}>
+              {({onRequestOpen}) =>
+              <IconButton
+              iconStyle={styles.iconBtn}
+              iconClassName='fa fa-tags'
+              onClick={onRequestOpen}
+              tooltip='Add Tag & Client'
+              tooltipPosition='top-right'
+              disabled={props.listData.readonly}
+              />}
+            </AddTagDialogHOC>
+          {state.selected.length > 1 &&
+            <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
+            {({onRequestOpen}) =>
+              <IconButton
+              iconStyle={styles.iconBtn}
+              iconClassName='fa fa-edit'
+              tooltip='Edit Multiple'
+              tooltipPosition='top-right'
+              disabled={props.listData.readonly}
+              onClick={onRequestOpen}
+              />}
+            </EditMultipleContactsHOC>}
+          </div>
+          <div className='large-4 columns vertical-center'>
+            <TextField
+            id='search-input'
+            ref='searchValue'
+            hintText='Search...'
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
                 const searchValue = this.refs.searchValue.input.value;
-                if (searchValue.length === 0) {
-                  props.router.push(`/tables/${props.listId}`);
-                  this.onSearchClearClick();
-                } else if (state.isSearchOn && searchValue === state.searchValue && props.listData.searchResults.length > 0) {
-                  this.getNextSearchResult();
-                } else {
-                  props.router.push(`/tables/${props.listId}?search=${searchValue}`);
-                  this.setState({searchValue});
-                }
-              }}
-              />
-            </div>
-          {
-            props.fieldsmap !== null &&
-            <div className='large-1 columns vertical-center'>
-              <ScatterPlotHOC selected={state.selected} defaultYFieldname='instagramlikes' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
-              {sc => (
-                <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
-                {inst => (
-                 <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
-                  {twt => (
-                    <IconMenu
-                    iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
-                    anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                    >
-                      <MenuItem
-                      primaryText='Twitter Contacts'
-                      leftIcon={<FontIcon className='fa fa-twitter'/>}
-                      onTouchTap={twt.onRequestOpen}
-                      />
-                      <MenuItem
-                      primaryText='Instagram Contacts'
-                      leftIcon={<FontIcon className='fa fa-instagram'/>}
-                      onTouchTap={inst.onRequestOpen}
-                      />
-                      <MenuItem
-                      primaryText='Trendline'
-                      leftIcon={<FontIcon className='fa fa-area-chart'/>}
-                      onTouchTap={sc.onRequestOpen}
-                      disabled={state.selected.length === 0}
-                      />
-                    </IconMenu>)}
-                  </AnalyzeSelectedTwitterHOC>)}
-                </AnalyzeSelectedInstagramHOC>)}
-             </ScatterPlotHOC>
-            </div>
-          }
+                props.router.push(`/tables/${props.listId}?search=${searchValue}`);
+                this.setState({searchValue});
+              }
+            }}
+            floatingLabelText={state.isSearchOn ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
+            floatingLabelFixed={state.isSearchOn}
+            defaultValue={props.searchQuery || ''}
+            errorText={state.errorText}
+            />
+            <IconButton
+            className='noprint'
+            iconClassName='fa fa-search'
+            tooltip='Search'
+            tooltipPosition='top-center'
+            style={{marginLeft: 5}}
+            onClick={e => {
+              const searchValue = this.refs.searchValue.input.value;
+              if (searchValue.length === 0) {
+                props.router.push(`/tables/${props.listId}`);
+                this.onSearchClearClick();
+              } else if (state.isSearchOn && searchValue === state.searchValue && props.listData.searchResults.length > 0) {
+                this.getNextSearchResult();
+              } else {
+                props.router.push(`/tables/${props.listId}?search=${searchValue}`);
+                this.setState({searchValue});
+              }
+            }}
+            />
+          </div>
+        {
+          props.fieldsmap !== null &&
+          <div className='large-1 columns vertical-center'>
+            <ScatterPlotHOC selected={state.selected} defaultYFieldname='instagramlikes' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
+            {sc => (
+              <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
+              {inst => (
+               <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
+                {twt => (
+                  <IconMenu
+                  iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
+                  anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+                  targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                  >
+                    <MenuItem
+                    primaryText='Twitter Contacts'
+                    leftIcon={<FontIcon className='fa fa-twitter'/>}
+                    onTouchTap={twt.onRequestOpen}
+                    />
+                    <MenuItem
+                    primaryText='Instagram Contacts'
+                    leftIcon={<FontIcon className='fa fa-instagram'/>}
+                    onTouchTap={inst.onRequestOpen}
+                    />
+                    <MenuItem
+                    primaryText='Trendline'
+                    leftIcon={<FontIcon className='fa fa-area-chart'/>}
+                    onTouchTap={sc.onRequestOpen}
+                    disabled={state.selected.length === 0}
+                    />
+                  </IconMenu>)}
+                </AnalyzeSelectedTwitterHOC>)}
+              </AnalyzeSelectedInstagramHOC>)}
+           </ScatterPlotHOC>
+          </div>
+        }
         </div>
-        {state.isEmailPanelOpen &&
-          <EmailPanel
-          person={props.person}
-          selected={state.selected}
-          fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
-          listId={props.listId}
-          onClose={_ => this.setState({isEmailPanelOpen: false})}
-          />}
+      {state.isEmailPanelOpen &&
+        <EmailPanel
+        person={props.person}
+        selected={state.selected}
+        fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
+        listId={props.listId}
+        onClose={_ => this.setState({isEmailPanelOpen: false})}
+        />}
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='row vertical-center' style={{margin: '10px 0'}}>
           <Tags listId={props.listId}/>
@@ -878,7 +869,7 @@ class ListTable extends Component {
         {props.listData.contacts === null &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
         <div>
-          {props.listData.contacts && props.listData.contacts !== null && props.contacts &&
+        {props.listData.contacts && props.listData.contacts !== null && props.contacts &&
           <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
         </div>
       {props.received.length > 0 && state.columnWidths !== null &&
