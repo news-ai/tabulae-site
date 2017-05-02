@@ -4,7 +4,7 @@ import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
 import Link from 'react-router/lib/Link';
-import {purple50, purple200, grey700, grey800, grey500} from 'material-ui/styles/colors';
+import {blue800, purple50, purple200, grey700, grey800, grey500} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import get from 'lodash/get';
@@ -20,6 +20,23 @@ const PublicationSpan = ({name, id}) => (
     <span className='text'>{name}</span>
   </Link>
   );
+
+const DefaultField = ({label, value}) => {
+  return value ?
+    <div className='large-12 medium-12 small-12 columns'>
+      <span className='bold smalltext' style={styles.defaultField.label}>{label}</span>
+      <span className='text'>{value}</span>
+    </div> : null;
+};
+
+const styles = {
+  defaultField: {
+    label: {
+      color: blue800,
+      marginRight: 5,
+    }
+  }
+}
 
 const greenRoundedStyle = {
   content: {
@@ -39,12 +56,15 @@ const span = {
 };
 
 // TODO: implement isFetchingList like AnalyticsItem
-const ContactItem = ({id, firstname, lastname, email, employers, publications, listname, listid, tags}) => {
+const ContactItem = ({id, firstname, lastname, email, employers, publications, listname, listid, tags,
+  location, phonenumber, twitter, instagram, website, linkedin}) => {
   return (
     <Paper zDepth={1} style={{padding: 10}}>
       <div className='row'>
         <div className='large-10 columns'>
-          <Link to={`/tables/${listid}/${id}`}>{firstname} {lastname}</Link>
+          <Link to={`/tables/${listid}/${id}`}>
+            <span style={{fontSize: '1.1em'}}>{firstname} {lastname}</span>
+          </Link>
         </div>
         <div className='large-2 columns smalltext'>
           <Link to={`/tables/${listid}`}>List: {listname}</Link>
@@ -64,6 +84,13 @@ const ContactItem = ({id, firstname, lastname, email, employers, publications, l
         {tags !== null &&
           <Tags color={purple50} borderColor={purple200} tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
         </div>
+      </div>
+      <div className='row'>
+        <DefaultField label='Phone #' value={phonenumber}/>
+        <DefaultField label='Location' value={location}/>
+        <DefaultField label='Twitter' value={twitter}/>
+        <DefaultField label='Instagram' value={instagram}/>
+        <DefaultField label='LinkedIn' value={linkedin}/>
       </div>
     </Paper>
     );
