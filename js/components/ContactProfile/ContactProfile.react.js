@@ -228,8 +228,9 @@ class ContactProfile extends Component {
                         />}
                       </AddTagHOC>
                   </div>
-                  <div>
+                  <div className='row'>
                     <Tags
+                    className='columns'
                     color={indigo50}
                     borderColor={indigo200}
                     onDeleteTag={this.onDeleteTag}

@@ -2,9 +2,9 @@ import React from 'react';
 import {blue50, blue200} from 'material-ui/styles/colors';
 import Tag from './Tag.react';
 
-const Tags = ({createLink, hideDelete, tags, onDeleteTag, color, borderColor}) => {
+const Tags = ({className, createLink, hideDelete, tags, onDeleteTag, color, borderColor}) => {
   return (
-    <div className='vertical-center'>
+    <div className={className || 'vertical-center'}>
   {tags && tags !== null && tags
     .map((name, i) =>
       <Tag

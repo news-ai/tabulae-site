@@ -5,7 +5,7 @@ import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
 import Link from 'react-router/lib/Link';
 import Checkbox from 'material-ui/Checkbox';
-import {blue800, indigo50, indigo200, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
+import {blue200, blue800, indigo50, indigo200, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import get from 'lodash/get';
@@ -54,12 +54,18 @@ const span = {
 };
 
 // TODO: implement isFetchingList like AnalyticsItem
-const ContactItem = ({id, firstname, lastname, email, employers, publications, listname, listid, tags,
+const ContactItem = ({
+  onCheck, checked,
+  id, firstname, lastname, email, employers, publications, listname, listid, tags,
   location, phonenumber, twitter, instagram, website, linkedin}) => {
   return (
     <Paper className='row' zDepth={1} style={{margin: 5}}>
       <div className='large-1 medium-1 small-2 columns vertical-center horizontal-center' style={styles.checkbox.container}>
-        <div style={{height: 10, width: 10, backgroundColor: 'red'}}></div>
+        <FontIcon
+        onClick={onCheck}
+        color={blue200}
+        className={`fa fa-square${checked ? '' : '-o'} pointer`}
+        />
       </div>
       <div className='large-11 medium-11 small-10 columns' style={{padding: 10}}>
         <div className='row'>
@@ -99,6 +105,8 @@ const ContactItem = ({id, firstname, lastname, email, employers, publications, l
 class ContactItemContainer extends Component {
   constructor(props) {
     super(props);
+    this.state = {checked: false};
+    this.onCheck = _ => this.setState(prev => ({checked: !prev.checked}));
   }
 
   componentWillMount() {
@@ -110,7 +118,7 @@ class ContactItemContainer extends Component {
 
   render() {
     return (
-      <ContactItem {...this.props}/>
+      <ContactItem onCheck={this.onCheck} checked={this.state.checked} {...this.props}/>
     );
   }
 }

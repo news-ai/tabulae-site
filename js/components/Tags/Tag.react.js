@@ -5,9 +5,11 @@ import FontIcon from 'material-ui/FontIcon';
 
 const styles = {
   container: {
-    margin: '0 5px',
-    padding: '1px 8px',
-    height: 20,
+    margin: '2px 5px',
+    padding: '0 8px',
+    display: 'inline-block',
+    textAlign: 'center',
+    lineHeight: '100%'
   },
   text: {
     color: grey800
@@ -19,7 +21,7 @@ const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link}) => {
   const span = <span className='smalltext' style={styles.text}>{text}</span>;
 
   return (
-    <div className='vertical-center' style={Object.assign({}, styles.container, {
+    <div style={Object.assign({}, styles.container, {
       backgroundColor: color,
       borderRight: `1px solid ${borderColor}`,
       borderBottom: `1px solid ${borderColor}`,
