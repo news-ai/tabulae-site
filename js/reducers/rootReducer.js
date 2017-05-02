@@ -30,6 +30,7 @@ import notificationReducer from 'components/Notifications/reducer';
 import emailStatsReducer from 'components/Email/EmailAnalytics/EmailStats/reducer';
 import isFetchingReducer from 'components/IsFetching/reducer';
 import campaignStatsReducer from 'components/Email/EmailAnalytics/Campaign/reducer';
+import contactTagReducer from 'components/Contacts/ContactTags/reducer';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -62,6 +63,7 @@ const rootReducer = combineReducers({
   emailStatsReducer,
   isFetchingReducer,
   campaignStatsReducer,
+  contactTagReducer
 });
 
 export default rootReducer;

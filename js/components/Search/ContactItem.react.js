@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Link from 'react-router/lib/Link';
 import IconButton from 'material-ui/IconButton';
+import Paper from 'material-ui/Paper';
 import {grey50, grey700} from 'material-ui/styles/colors';
 
 const smallSpan = {
@@ -16,8 +17,6 @@ const styles = {
     paddingRight: 15,
     paddingTop: 5,
     paddingBottom: 5,
-    borderRadius: '1.2em',
-    backgroundColor: grey50
   },
   archivedSpan: {marginLeft: 5, fontSize: '0.9em', color: grey700},
 };
@@ -25,7 +24,7 @@ const styles = {
 const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, publications, list}) => {
   return (
     <div className='row horizontal-center'>
-      <div className='large-10 columns' style={styles.container}>
+      <Paper className='large-10 columns' zDepth={1} style={styles.container}>
         <div className='row'>
         <div className='large-10 medium-10 columns'>
           <div><span>{firstname} {lastname}</span></div>
@@ -58,7 +57,7 @@ const ContactItem = ({email, firstname, lastname, listid, rowNum, query, id, pub
             </Link>}
         </div>
         </div>
-      </div>
+      </Paper>
     </div>);
 };
 

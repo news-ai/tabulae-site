@@ -46,3 +46,11 @@
   display: flex;
   justify-content: center;
 }
+
+.hoverGrey800to900 {
+  color: #424242;
+}
+
+.hoverGrey800to900:hover {
+  color: #212121;
+}

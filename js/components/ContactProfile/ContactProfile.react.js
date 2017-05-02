@@ -9,7 +9,7 @@ import {actions as contactActions} from 'components/Contacts';
 import {actions as feedActions} from './RSSFeed';
 import * as headlineActions from './Headlines/actions';
 import * as joyrideActions from 'components/Joyride/actions';
-import {grey700, grey500} from 'material-ui/styles/colors';
+import {indigo50, indigo200, grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -130,7 +130,7 @@ class ContactProfile extends Component {
     const props = this.props;
 
     return (
-      <div className='row horizontal-center'>
+      <div className='row align-center'>
         {
           props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={this.onModalRequestClose}>
@@ -213,7 +213,8 @@ class ContactProfile extends Component {
                   {(props.pastemployers.length === 0 || !props.pastemployers) &&
                     <span className='text'>None added</span>}
                   </div>
-                  {/*<div className='row vertical-center' style={styles.employerContainer}>
+                  {/*
+                  <div className='row vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Tags</span>
                       <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
                       {({onRequestOpen}) =>
@@ -228,11 +229,19 @@ class ContactProfile extends Component {
                         />}
                       </AddTagHOC>
                   </div>
-                  <div>
-                    <Tags onDeleteTag={this.onDeleteTag} tags={props.contact.tags}/>
+                  <div className='row'>
+                    <Tags
+                    className='columns'
+                    color={indigo50}
+                    borderColor={indigo200}
+                    onDeleteTag={this.onDeleteTag}
+                    tags={props.contact.tags}
+                    createLink={name => `/contacts?tag=${name}`}
+                    />
                   {props.contact.tags === null &&
                     <span className='text'>None added</span>}
-                  </div>*/}
+                  </div>
+                  */}
                 </div>
               </div>
             </div>

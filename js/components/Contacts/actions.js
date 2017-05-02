@@ -187,11 +187,7 @@ export function loadAllContacts(listId) {
         })
       );
     }
-    dispatch({
-      type: listConstant.SET_OFFSET,
-      offset: null,
-      listId
-    });
+    dispatch({ type: listConstant.SET_OFFSET, offset: null, listId});
     return Promise.all(promises);
   };
 }

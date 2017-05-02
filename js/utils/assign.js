@@ -4,10 +4,6 @@ export function assignToEmpty(oldObject, newObject) {
   return assign({}, oldObject, newObject);
 }
 
-export function removeCache() {
-  return window.isDev ? `?${Date.now()}` : ``;
-}
-
 export function isJsonString(str) {
   try {
     JSON.parse(str);

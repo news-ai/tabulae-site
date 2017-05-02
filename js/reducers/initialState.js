@@ -168,5 +168,9 @@ export const initialState = {
     didInvalidate: false,
     offset: 0,
     received: [],
+  },
+  contactTagReducer: {
+    isReceiving: false,
+    didInvalidate: false,
   }
 };
