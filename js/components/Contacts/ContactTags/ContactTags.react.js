@@ -35,6 +35,7 @@ class ContactTags extends Component {
             <span style={styles.text}>Contact Tag: {props.tag}</span>
           </div>
           <ContactFeed contacts={props.contacts}/>
+          {props.contacts.length === 0 && <div>None found</div>}
         </div>
       </div>
       );

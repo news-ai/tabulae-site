@@ -61,11 +61,7 @@ const ContactItem = ({
   return (
     <Paper className='row' zDepth={1} style={{margin: 5}}>
       <div className='large-1 medium-1 small-2 columns vertical-center horizontal-center' style={styles.checkbox.container}>
-        <FontIcon
-        onClick={onCheck}
-        color={blue200}
-        className={`fa fa-square${checked ? '' : '-o'} pointer`}
-        />
+        <input type='checkbox' checked={checked} onChange={onCheck}/>
       </div>
       <div className='large-11 medium-11 small-10 columns' style={{padding: 10}}>
         <div className='row'>

@@ -18,7 +18,7 @@ const styles = {
 };
 
 const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link}) => {
-  const span = <span className='smalltext' style={styles.text}>{text}</span>;
+  const span = <span className='smalltext hoverGrey800to900' style={styles.text}>{text}</span>;
 
   return (
     <div style={Object.assign({}, styles.container, {
