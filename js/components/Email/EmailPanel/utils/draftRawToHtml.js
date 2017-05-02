@@ -72,7 +72,7 @@ let entityTagMap = {
   'IMAGE': [
     `<div style="text-align:<%= align %>">
       <a href="<%= imageLink %>" target="_blank">
-        <img src="<%= src %>" style="max-height:<%= size %>;max-width:<%= size %>;">`,
+        <img src="<%= src %>">`,
         `</img>
       </a>
     </div>`],
@@ -83,7 +83,16 @@ let nestedTagMap = {
   'unordered-list-item': ['<ul>', '</ul>']
 };
 
-export default function(raw: Object): string {
+const entityDataConversionMap = {
+  IMAGE: data => {
+    const size = parseInt(data.size.slice(0, -1), 10) / 100;
+    return Object.assign({}, data, {
+      src: data.size === '100%' ? data.src : `https://image1.newsai.org/${size.toFixed(2)}x/${data.src}`
+    });
+  }
+};
+
+export default function(raw): string {
   let html = '';
   let nestLevel = [];
   let lastIndex = raw.blocks.length - 1;
@@ -108,10 +117,10 @@ export default function(raw: Object): string {
 
       html += blockTag ?
         blockTag[0] +
-          processInlineStylesAndEntities(inlineTagMap, entityTagMap, raw.entityMap, block, combinableInlineTagMap) +
+          processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineTagMap, entityDataConversionMap}) +
           blockTag[1] :
         blockTagMap['default'][0] +
-          processInlineStylesAndEntities(inlineTagMap, block, combinableInlineTagMap) +
+          processInlineStylesAndEntities({inlineTagMap, block, combinableInlineTagMap, entityDataConversionMap}) +
           blockTagMap['default'][1];
     }
 

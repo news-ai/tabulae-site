@@ -6,13 +6,14 @@ import clone from 'lodash/clone';
 import indexOf from 'lodash/indexOf';
 import IntervalTree from 'interval-tree2';
 
-export default function processInlineStylesAndEntities(
-  inlineTagMap: Object,
-  entityTagMap: Object,
-  entityMap?: Object,
-  block?: Object,
-  combinableInlineTagMap?: Object
-): string {
+export default function processInlineStylesAndEntities({
+  inlineTagMap,
+  entityTagMap,
+  entityMap,
+  entityDataConversionMap,
+  block,
+  combinableInlineTagMap,
+}) {
   if (!block) {
     return '';
   }
@@ -204,9 +205,10 @@ export default function processInlineStylesAndEntities(
     let entity = entityMap[range.key];
     let tag = entityTagMap[entity.type];
     if (!tag) return;
+    const data = entityDataConversionMap[entity.type] ? entityDataConversionMap[entity.type](entity.data) : entity.data;
 
-    let compiledTag0 = template(tag[0])(entity.data);
-    let compiledTag1 = template(tag[1])(entity.data);
+    let compiledTag0 = template(tag[0])(data);
+    let compiledTag1 = template(tag[1])(data);
 
     if (!tagInsertMap[range.offset]) {
       tagInsertMap[range.offset] = [];

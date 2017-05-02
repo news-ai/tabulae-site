@@ -25,13 +25,15 @@ class ImageContainer extends Component {
       position: 'relative',
       textAlign: props.align,
     };
+    // convert size to float
+    const size = parseInt(props.size.slice(0, -1), 10) / 100;
     const img = (
       <img
       ref={props.src}
-      src={props.src}
+      src={props.size === '100%' ? props.src : `https://image1.newsai.org/${size.toFixed(2)}x/${props.src}`}
       style={{
-        maxWidth: props.size,
-        maxHeight: props.size,
+        // maxWidth: props.size,
+        // maxHeight: props.size,
         cursor: 'move',
       }}
       />);
