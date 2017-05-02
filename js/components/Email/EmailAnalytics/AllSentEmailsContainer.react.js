@@ -190,6 +190,7 @@ const mapStateToProps = (state, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
+  const baseSubject = props.router.location.query.baseSubject;
   let hasNext = true;
   let validators = [];
   if (listId === 0) {
@@ -205,7 +206,7 @@ const mapStateToProps = (state, props) => {
       );
   }
 
-  if (subject) {
+  if (subject || baseSubject) {
     hasNext = !state.stagingReducer.filterQuery.hitThreshold;
     validators.push(
       id => {
@@ -214,7 +215,8 @@ const mapStateToProps = (state, props) => {
         // console.log(state.stagingReducer[id].baseSubject);
         // console.log(state.stagingReducer[id].subject);
         // console.log(state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject);
-        return state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject;
+        if (baseSubject) return state.stagingReducer[id].baseSubject === baseSubject;
+        return state.stagingReducer[id].subject === subject;
       });
   }
 
@@ -262,13 +264,14 @@ const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
+  const baseSubject = props.router.location.query.baseSubject;
 
   let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
   if (date || subject) {
-    fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails({date, subject}));
+    fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails({date, subject, baseSubject}));
   }
 
   return {

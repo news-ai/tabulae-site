@@ -56,6 +56,7 @@ const Block = ({title, value, hint}) => {
 
 const Campaign = ({
   subject,
+  baseSubject,
   delivered,
   opens,
   uniqueOpens,
@@ -98,7 +99,7 @@ const Campaign = ({
           primary
           label='See Emails'
           icon={<FontIcon className='fa fa-chevron-right'/>}
-          onClick={_ => router.push({pathname: `/emailstats/all`, query: {subject: subject, date: date}})}
+          onClick={_ => router.push({pathname: `/emailstats/all`, query: {subject, date, baseSubject}})}
           />
         </div>
       </div>
