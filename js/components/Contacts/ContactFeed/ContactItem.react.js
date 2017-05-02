@@ -4,7 +4,7 @@ import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
 import Link from 'react-router/lib/Link';
-import {grey700, grey800, grey500} from 'material-ui/styles/colors';
+import {purple50, purple200, grey700, grey800, grey500} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import get from 'lodash/get';
@@ -62,7 +62,7 @@ const ContactItem = ({id, firstname, lastname, email, employers, publications, l
         </div>
         <div className='large-4 columns'>
         {tags !== null &&
-          <Tags tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
+          <Tags color={purple50} borderColor={purple200} tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
         </div>
       </div>
     </Paper>
