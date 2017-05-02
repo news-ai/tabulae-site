@@ -20,7 +20,9 @@ class ContactTags extends Component {
         this._list.recomputeRowHeights();
       }
     };
-    window.onresize = this.onResize;
+    window.onresize = _ => {
+      this.onResize();
+    }
   }
 
   componentWillMount() {
@@ -53,7 +55,7 @@ class ContactTags extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.contacts);
+    // console.log(props.contacts);
     return (
         <WindowScroller>
         {({height, isScrolling, scrollTop}) =>
