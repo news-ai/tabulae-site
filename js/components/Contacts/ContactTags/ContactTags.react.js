@@ -9,6 +9,9 @@ const styles = {
   text: {fontSize: '2em', marginRight: '10px'}
 };
 
+// utility wrapper to avoid grid confusion
+const Centering = ({children}) => <div className='row align-center'><div className='large-10 medium-10 small-12 columns'>{children}</div></div>;
+
 class ContactTags extends Component {
   constructor(props) {
     super(props);
@@ -47,21 +50,22 @@ class ContactTags extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className='row align-center'>
-        <div className='large-10 medium-10 small-12 columns'>
-          <div style={styles.container}>
+      <Centering>
+        <div className='row' style={styles.container}>
+          <div className='large-12 medium-12 small-12 columns'>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
           </div>
-          <div>
+          <div className='large-12 medium-12 small-12 columns'>
             <span className='smalltext'>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
           </div>
-          <ContactFeed selected={state.selected} onSelect={this.onSelect} contacts={props.contacts}/>
-          {props.contacts.length === 0 && <div>None found</div>}
         </div>
-      </div>
+        <ContactFeed selected={state.selected} onSelect={this.onSelect} contacts={props.contacts}/>
+        {props.contacts.length === 0 && <div>None found</div>}
+      </Centering>
       );
   }
 }
+
 
 const mapStateToProps = (state, props) => {
   const tag = props.router.location.query.tag;

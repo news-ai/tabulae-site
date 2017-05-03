@@ -160,7 +160,7 @@ class ContactProfile extends Component {
                   </div>
                 </div>
                 <div className='large-12 medium-12 small-12 columns'>
-                  <div className='row vertical-center' style={styles.employerContainer}>
+                  <div className='vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Current Publications/Employers</span>
                     <AddEmployerHOC title='Add Current Publication/Employer' type='employers' contact={props.contact}>
                     {({onRequestOpen}) => (
@@ -186,10 +186,10 @@ class ContactProfile extends Component {
                     contact={props.contact}
                     />)}
                   {(props.employers.length === 0 || !props.employers) &&
-                    <span>None added</span>}
+                    <None/>}
                   </div>
                   <div style={styles.employerContainer}>
-                    <div className='row vertical-center'>
+                    <div className='vertical-center'>
                       <span style={styles.header}>Past Publications/Employers</span>
                       <AddEmployerHOC title='Add Past Publication/Employer' type='pastemployers' contact={props.contact}>
                       {({onRequestOpen}) => (
@@ -211,24 +211,24 @@ class ContactProfile extends Component {
                   props.pastemployers.map((employer, i) =>
                     <ContactEmployerDescriptor style={styles.contactemployer} key={i} employer={employer} which='pastemployers' contact={props.contact}/>)}
                   {(props.pastemployers.length === 0 || !props.pastemployers) &&
-                    <span className='text'>None added</span>}
+                    <None/>}
                   </div>
-                  <div className='row vertical-center' style={styles.employerContainer}>
+                  <div className='vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Tags</span>
-                      <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
-                      {({onRequestOpen}) =>
-                        <IconButton
-                        disabled={props.contact.readonly}
-                        iconStyle={styles.smallIcon}
-                        style={styles.small}
-                        iconClassName='fa fa-plus'
-                        tooltip='Add Tag'
-                        tooltipPosition='top-right'
-                        onClick={onRequestOpen}
-                        />}
-                      </AddTagHOC>
+                    <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
+                    {({onRequestOpen}) =>
+                      <IconButton
+                      disabled={props.contact.readonly}
+                      iconStyle={styles.smallIcon}
+                      style={styles.small}
+                      iconClassName='fa fa-plus'
+                      tooltip='Add Tag'
+                      tooltipPosition='top-right'
+                      onClick={onRequestOpen}
+                      />}
+                    </AddTagHOC>
                   </div>
-                  <div className='row'>
+                  <div>
                     <Tags
                     whiteLabel
                     className='columns'
@@ -239,7 +239,7 @@ class ContactProfile extends Component {
                     createLink={name => `/contacts?tag=${name}`}
                     />
                   {props.contact.tags === null &&
-                    <span className='text'>None added</span>}
+                    <None/>}
                   </div>
                 </div>
               </div>
@@ -315,6 +315,8 @@ class ContactProfile extends Component {
     );
   }
 }
+
+const None = _ => <span className='text' style={{marginLeft: 10, color: grey700}} >None Added</span>;
 
 function mapStateToProps(state, props) {
   const listId = parseInt(props.params.listId, 10);
