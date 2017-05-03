@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import ToolBar from './ToolBar.react';
+const imgStyle = {cursor: 'move'};
 
 class ImageContainer extends Component {
   constructor(props) {
@@ -25,16 +26,10 @@ class ImageContainer extends Component {
       position: 'relative',
       textAlign: props.align,
     };
-    const img = (
-      <img
-      ref={props.src}
-      src={props.src}
-      style={{
-        maxWidth: props.size,
-        maxHeight: props.size,
-        cursor: 'move',
-      }}
-      />);
+    // convert size to float
+    const size = parseInt(props.size.slice(0, -1), 10) / 100;
+    const src = props.size === '100%' ? props.src : `https://image1.newsai.org/${size.toFixed(2)}x/${props.src}`;
+    const img = <img ref={props.src} src={src} style={imgStyle}/>;
 
     return (
       <div
