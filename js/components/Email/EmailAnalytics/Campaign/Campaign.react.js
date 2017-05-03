@@ -68,6 +68,9 @@ const Campaign = ({
   date,
   router
 }) => {
+  let query = {date};
+  if (baseSubject) query.baseSubject = baseSubject;
+  else query.subject = subject;
   return (
     <Paper className='row' zDepth={1} style={{margin: 10, padding: 10}}>
       <div className='large-12 medium-12 small-12 columns'>
@@ -99,7 +102,7 @@ const Campaign = ({
           primary
           label='See Emails'
           icon={<FontIcon className='fa fa-chevron-right'/>}
-          onClick={_ => router.push({pathname: `/emailstats/all`, query: {subject, date, baseSubject}})}
+          onClick={_ => router.push({pathname: `/emailstats/all`, query})}
           />
         </div>
       </div>

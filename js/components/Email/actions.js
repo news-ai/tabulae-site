@@ -17,6 +17,16 @@ import * as api from 'actions/api';
 import isEmpty from 'lodash/isEmpty';
 
 const emailSchema = new Schema('emails');
+const contactSchema = new Schema('contacts');
+import {actions as contactActions} from 'components/Contacts';
+// dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.data));
+// const listOnly = response.included.filter(item => item.type === 'lists');
+// const res = normalize(response, {
+//   data: arrayOf(contactSchema),
+//   lists: arrayOf(listSchema),
+//   publications: arrayOf(publicationSchema)
+// });
+// dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, 0));
 
 export function archiveEmail(emailId) {
   return dispatch => {
@@ -166,7 +176,7 @@ export function sendEmail(id) {
       const res = normalize(response.data, emailSchema);
       dispatch({type: RECEIVE_EMAIL, email: res.entities.emails, id: res.result});
     })
-    .catch( message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
+    .catch(message => dispatch({type: 'SEND_EMAILS_FAIL', message}));
   };
 }
 
@@ -253,7 +263,13 @@ export function fetchSentEmails() {
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails/sent?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then(response => {
-      const res = normalize(response, {data: arrayOf(emailSchema)});
+      const contactOnly = response.included.filter(item => item.type === 'contacts');
+      response.contacts = contactOnly;
+      const res = normalize(response, {
+        data: arrayOf(emailSchema),
+        contacts: arrayOf(contactSchema)
+      });
+      dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
       let newOffset = OFFSET + PAGE_LIMIT;
       if (response.data.length < PAGE_LIMIT) newOffset = null;
       dispatch({type: EMAIL_SET_OFFSET, offset: newOffset});
@@ -276,7 +292,13 @@ export function fetchArchivedEmails() {
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails/archived?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then(response => {
-      const res = normalize(response, {data: arrayOf(emailSchema)});
+      const contactOnly = response.included.filter(item => item.type === 'contacts');
+      response.contacts = contactOnly;
+      const res = normalize(response, {
+        data: arrayOf(emailSchema),
+        contacts: arrayOf(contactSchema)
+      });
+      dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
       let newOffset = OFFSET + PAGE_LIMIT;
       if (response.data.length < PAGE_LIMIT) newOffset = null;
       dispatch({type: EMAIL_SET_OFFSET, archivedOffset: newOffset});
@@ -297,8 +319,14 @@ export function fetchScheduledEmails() {
     if (OFFSET === null || getState().stagingReducer.isReceiving) return;
     dispatch({type: REQUEST_MULTIPLE_EMAILS});
     return api.get(`/emails/scheduled?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
-    .then( response => {
-      const res = normalize(response, {data: arrayOf(emailSchema)});
+    .then(response => {
+      const contactOnly = response.included.filter(item => item.type === 'contacts');
+      response.contacts = contactOnly;
+      const res = normalize(response, {
+        data: arrayOf(emailSchema),
+        contacts: arrayOf(contactSchema)
+      });
+      dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
       let newOffset = OFFSET + PAGE_LIMIT;
       if (response.data.length < PAGE_LIMIT) newOffset = null;
       dispatch({type: EMAIL_SET_OFFSET, scheduledOffset: newOffset});
@@ -345,7 +373,13 @@ export function fetchSearchSentEmails(query) {
     dispatch({type: REQUEST_MULTIPLE_EMAILS, query});
     return api.get(`/emails/search?q="${query}"`)
     .then(response => {
-      const res = normalize(response, {data: arrayOf(emailSchema)});
+      const contactOnly = response.included.filter(item => item.type === 'contacts');
+      response.contacts = contactOnly;
+      const res = normalize(response, {
+        data: arrayOf(emailSchema),
+        contacts: arrayOf(contactSchema)
+      });
+      dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
       dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
         emails: res.entities.emails,
@@ -387,7 +421,13 @@ export function fetchLimitedSpecificDayEmails(day, offset, limit, accumulator, t
     return api.get(`/emails/search?q=date:${day}&limit=${limit}&offset=${offset}`)
     .then(
       response => {
-        const res = normalize(response, {data: arrayOf(emailSchema)});
+        const contactOnly = response.included.filter(item => item.type === 'contacts');
+        response.contacts = contactOnly;
+        const res = normalize(response, {
+          data: arrayOf(emailSchema),
+          contacts: arrayOf(contactSchema)
+        });
+        dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
         dispatch({
           type: RECEIVE_MULTIPLE_EMAILS,
           emails: res.entities.emails,
@@ -453,7 +493,13 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
     return api.get(`${url}&limit=${limit}&offset=${offset}`)
     .then(
       response => {
-        const res = normalize(response, {data: arrayOf(emailSchema)});
+        const contactOnly = response.included.filter(item => item.type === 'contacts');
+        response.contacts = contactOnly;
+        const res = normalize(response, {
+          data: arrayOf(emailSchema),
+          contacts: arrayOf(contactSchema)
+        });
+        dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
         dispatch({type: RECEIVE_MULTIPLE_EMAILS, emails: res.entities.emails, ids: res.result.data});
 
         const newAccumulator = [...accumulator, ...res.result.data];

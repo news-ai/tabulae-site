@@ -90,6 +90,7 @@ class AllSentEmailsContainer extends Component {
   _onSubjectCancel() {
     let query = Object.assign({}, this.props.location.query);
     delete query.subject;
+    delete query.baseSubject;
     this.props.router.push({pathname: `/emailstats/all`, query});
   }
 
@@ -138,10 +139,10 @@ class AllSentEmailsContainer extends Component {
         </Toolbar>
       }
 
-      {props.subject &&
+      {(props.subject || props.baseSubject) &&
         <div className='vertical-center' style={styles.subjectContainer}>
           <span className='text'>Campaign:</span>
-          <span style={styles.subject}>{props.subject}</span>
+          <span style={styles.subject}>{props.subject || props.baseSubject}</span>
           <FontIcon
           className='fa fa-times pointer'
           color={grey500}
@@ -267,8 +268,11 @@ const mapDispatchToProps = (dispatch, props) => {
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
-  if (date || subject) {
-    fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails({date, subject, baseSubject}));
+  if (date || subject || baseSubject) {
+    let query = {date};
+    if (baseSubject) query.baseSubject = baseSubject;
+    else query.subject = subject;
+    fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails(query));
   }
 
   return {

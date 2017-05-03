@@ -60,7 +60,8 @@ export class AnalyticsItem extends Component {
       cc,
       bcc,
       archiveEmail,
-      archived
+      archived,
+      contact
     } = this.props;
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
@@ -136,6 +137,13 @@ export class AnalyticsItem extends Component {
             <span style={styles.bouncedLabel}>email bounced</span>
           </div>}
         </div>
+      {contact &&
+        <div className='row'>
+          <div className='large-12 medium-12 small-12 columns'>
+            <span style={styles.to}>Full Name</span>
+            <span className='text' style={styles.fullname}>{contact.firstname} {contact.lastname}</span>
+          </div>
+        </div>}
       </Paper>
       );
   }
@@ -187,14 +195,15 @@ const styles = {
   tagContainer: {
     padding: 3
   },
-  archived: {color: grey600}
+  archived: {color: grey600},
+  fullname: {color: grey800}
 };
 
 const mapStateToProps = (state, props) => {
   return {
     listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
     isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
-    contact: get(state, `contactReducer[${props.contactid}]`, undefined),
+    contact: state.contactReducer[props.contactId],
   };
 };
 
