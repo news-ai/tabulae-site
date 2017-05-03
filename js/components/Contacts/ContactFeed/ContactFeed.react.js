@@ -27,7 +27,7 @@ class ContactTags extends Component {
 
   componentWillMount() {
     if (this.props.tag) this.props.fetchContactsByTag();
-    setTimeout(this.onResize, 2000);
+    setTimeout(_ => this.onResize(), 3000);
   }
 
   componentWillReceiveProps(nextProps) {
