@@ -30,7 +30,8 @@ class ContactTags extends Component {
     this.state = {
       selected: [],
       listDialogOpen: false,
-      listValue: false
+      listValue: false,
+      pageLimit: 10,
     };
     this.onSelect = this._onSelect.bind(this);
     this.onSelectAll = _ => this.setState({
@@ -48,6 +49,7 @@ class ContactTags extends Component {
       this.state.listValue.map(({value}) => this.props.copyContactsToList(this.state.selected, value));
       this.setState({listValue: false, listDialogOpen: false});
     };
+    this.handlePageLimitChange = e => this.setState({pageLimit: e.target.value});
   }
 
   componentWillMount() {
@@ -121,7 +123,15 @@ class ContactTags extends Component {
         </div>
         <div>
           <div className='large-12 medium-12 small-12 columns'>
-            <span className='smalltext'>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
+            <span className='smalltext' style={{margin: '0 5px'}}>Showing</span>
+            <select className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>results per page</span>
+            <span className='smalltext' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
           </div>
         </div>
         <ContactFeed selected={state.selected} onSelect={this.onSelect} contacts={props.contacts}/>

@@ -11,9 +11,11 @@ class ContactItemContainer extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchList();
+    if (!this.props.list) this.props.fetchList();
     if (this.props.employers !== null) {
-      this.props.employers.map(eId => this.props.fetchPublication(eId));
+      this.props.employers.map(eId => {
+        this.props.fetchPublication(eId);
+      });
     }
   }
 
@@ -25,6 +27,7 @@ class ContactItemContainer extends Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const isFetchingPublications = props.employers !== null ? props.employers.some(pubId => !state.publicationReducer[pubId] && !get(state, `isFetchingReducer.publications[${pubId}].isReceiving`, false)) : false;
   return {
     publications: props.employers !== null ? props.employers
     .reduce((acc, eId) => {
@@ -33,7 +36,8 @@ const mapStateToProps = (state, props) => {
     }, []) : [],
     listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
     isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
-    publicationReducer: state.publicationReducer,
+    list: state.listReducer[props.listid],
+    isFetchingPublications
   };
 };
 
@@ -62,7 +66,7 @@ const mergeProps = (sProps, dProps, props) => {
       }
     },
     fetchPublication: pubId => {
-      if (!get(state, `isFetchingReducer.publications[${pubId}].isReceiving`, false) && !sProps.publication.some(pub => pub.id === pubId)) {
+      if (sProps.isFetchingPublications) {
         // only fetch if it is not currently fetching
         dProps.startPublicationFetch(pubId);
         dProps.fetchPublication(pubId)
@@ -72,4 +76,4 @@ const mergeProps = (sProps, dProps, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContactItemContainer);
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(ContactItemContainer);
