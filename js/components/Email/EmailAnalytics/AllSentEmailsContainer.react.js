@@ -57,6 +57,10 @@ class AllSentEmailsContainer extends Component {
     if (nextProps.subject !== this.props.subject) {
       nextProps.fetchEmails();
     }
+
+    if (nextProps.baseSubject !== this.props.baseSubject) {
+      nextProps.fetchEmails();
+    }
   }
 
   _handleListChange(e, index, filterListValue) {
