@@ -12,7 +12,10 @@ const styles = {
 class ContactTags extends Component {
   constructor(props) {
     super(props);
-    this.state = {selected: []};
+    this.state = {
+      selected: []
+    };
+    this.onSelect = this._onSelect.bind(this);
   }
 
   componentWillMount() {
@@ -25,6 +28,21 @@ class ContactTags extends Component {
     }
   }
 
+  _onSelect(contactId) {
+    let newSelected = [];
+    let seen = false;
+    this.state.selected.forEach(id => {
+      if (id !== contactId) {
+        newSelected.push(id);
+      } else {
+        seen = true;
+        return false;
+      }
+    });
+    if (!seen) newSelected.push(contactId);
+    this.setState({selected: newSelected});
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
@@ -34,7 +52,10 @@ class ContactTags extends Component {
           <div style={styles.container}>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
           </div>
-          <ContactFeed contacts={props.contacts}/>
+          <div>
+            <span className='smalltext'>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
+          </div>
+          <ContactFeed selected={state.selected} onSelect={this.onSelect} contacts={props.contacts}/>
           {props.contacts.length === 0 && <div>None found</div>}
         </div>
       </div>

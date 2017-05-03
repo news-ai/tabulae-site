@@ -8,8 +8,6 @@ import ContactItem from './ContactItem.react';
 class ContactItemContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = {checked: false};
-    this.onCheck = _ => this.setState(prev => ({checked: !prev.checked}));
   }
 
   componentWillMount() {
@@ -21,7 +19,7 @@ class ContactItemContainer extends Component {
 
   render() {
     return (
-      <ContactItem onCheck={this.onCheck} checked={this.state.checked} {...this.props}/>
+      <ContactItem onCheck={this.props.onSelect} {...this.props}/>
     );
   }
 }
