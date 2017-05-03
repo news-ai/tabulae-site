@@ -9,7 +9,7 @@ import {actions as contactActions} from 'components/Contacts';
 import {actions as feedActions} from './RSSFeed';
 import * as headlineActions from './Headlines/actions';
 import * as joyrideActions from 'components/Joyride/actions';
-import {indigo50, indigo200, grey700, grey500} from 'material-ui/styles/colors';
+import {teal400, teal900, grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -230,9 +230,10 @@ class ContactProfile extends Component {
                   </div>
                   <div className='row'>
                     <Tags
+                    whiteLabel
                     className='columns'
-                    color={indigo50}
-                    borderColor={indigo200}
+                    color={teal400}
+                    borderColor={teal900}
                     onDeleteTag={this.onDeleteTag}
                     tags={props.contact.tags}
                     createLink={name => `/contacts?tag=${name}`}

@@ -1,9 +1,9 @@
 import React from 'react';
 import Paper from 'material-ui/Paper';
 import Link from 'react-router/lib/Link';
-import {blue800, indigo50, indigo200, grey50, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
+import {blue800, teal400, teal900, grey50, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
 // import ContactItem from 'components/Search/ContactItem.react';
-import Tags from 'components/Tags/Tags.react';
+import Tag from 'components/Tags/Tag.react';
 // import {Tooltip} from 'react-lightweight-tooltip';
 
 const spanStyle = {color: grey700};
@@ -21,13 +21,13 @@ const defaultFieldStyles = {
     marginRight: 5,
   },
   container: {
-    marginLeft: 10
+    marginLeft: 20
   }
 };
 
 const DefaultField = ({label, value}) => {
   return value ?
-    <div className='large-12 medium-12 small-12 columns' style={defaultFieldStyles.container} >
+    <div className='large-6 medium-12 small-12 columns' style={defaultFieldStyles.container} >
       <span className='bold smalltext' style={defaultFieldStyles.label}>{label}</span>
       <span className='text' style={defaultFieldStyles.value}>{value}</span>
     </div> : null;
@@ -71,15 +71,16 @@ const ContactItem = ({
           <div className='large-2 medium-4 small-12 columns smalltext'>
             <Link to={`/tables/${listid}`}>List: {listname}</Link>
           </div>
+          <div className='large-12 columns' style={{marginBottom: 10, marginLeft: 5}}>
         {publications.length > 0 &&
-          <div className='large-12 columns' style={{marginBottom: 10}}>
-            {publications.reduce((acc, pub, i) => {
+            publications.reduce((acc, pub, i) => {
               // separator
               acc.push(<PublicationSpan key={i} {...pub}/>);
               if (i !== publications.length - 1) acc.push(<span key={`span-${i}`} style={spanStyle}>, </span>);
               return acc;
-            }, [])}
-          </div>}
+            }, [])
+          }
+          </div>
           <DefaultField label='Phone #' value={phonenumber}/>
           <DefaultField label='Location' value={location}/>
           <DefaultField label='Twitter' value={twitter}/>
@@ -89,10 +90,19 @@ const ContactItem = ({
           <DefaultField label='Notes' value={notes}/>
         {customfields !== null && customfields.map((field, i) =>
           <DefaultField key={`${field.name}-${i}`} label={field.name} value={field.value} />)}
-          <div className='large-12 medium-12 small-12 columns align-middle' style={{marginTop: 15}}>
-            <span className='smalltext'>Tags:</span>
-          {tags !== null &&
-            <Tags hideDelete color={indigo50} borderColor={indigo200} tags={tags} createLink={name => `/contacts?tag=${name}`}/>}
+          <div className='large-12 medium-12 small-12 columns' style={{marginTop: 15}}>
+            <span className='smalltext' style={{margin: '0 5px'}} >Tags:</span>
+          {tags !== null && tags.map((tag, i) => (
+            <Tag
+            key={`${tag}-${i}`}
+            hideDelete
+            whiteLabel
+            text={tag}
+            color={teal400}
+            borderColor={teal900}
+            link={`/contacts?tag=${tag}`}
+            />
+            ))}
           </div>
         </div>
       </div>
