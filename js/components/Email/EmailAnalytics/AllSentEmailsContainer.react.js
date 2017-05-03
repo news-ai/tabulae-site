@@ -250,6 +250,7 @@ const mapStateToProps = (state, props) => {
     emails,
     listId,
     subject,
+    baseSubject,
     isReceiving: state.stagingReducer.isReceiving,
     placeholder: 'No emails found.',
     hasNext,
