@@ -3,7 +3,11 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import ContactFeed from 'components/Contacts/ContactFeed/ContactFeed.react';
 import Checkbox from 'material-ui/Checkbox';
-import * as actions from './actions';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import Dialog from 'material-ui/Dialog';
+import Select from 'react-select';
+import * as contactTagActions from './actions';
 import {actions as copyActions} from 'components/ListTable/CopyToHOC';
 import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
@@ -24,7 +28,9 @@ class ContactTags extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: []
+      selected: [],
+      listDialogOpen: false,
+      listValue: false
     };
     this.onSelect = this._onSelect.bind(this);
     this.onSelectAll = _ => this.setState({
@@ -36,11 +42,18 @@ class ContactTags extends Component {
       `What would you like to name the list?`,
       ''
       ).then(newListName => this.props.copyToNewList(this.state.selected, newListName || `untitled_copied_from_tag_${this.props.tag}`));
+    this.onRequestClose = _ => this.setState({listValue: false, listDialogOpen: false});
+    this.onRequestOpen = _ => this.setState({listDialogOpen: true});
+    this.onSubmit = _ => {
+      this.state.listValue.map(({value}) => this.props.copyContactsToList(this.state.selected, value));
+      this.setState({listValue: false, listDialogOpen: false});
+    };
   }
 
   componentWillMount() {
     window.Intercom('trackEvent', 'access_contact_tag', {tag: this.props.tag});
     if (this.props.tag) this.props.fetchContactsByTag();
+    this.props.fetchLists();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -67,17 +80,46 @@ class ContactTags extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    const actions = [
+      <FlatButton label='Cancel' onTouchTap={this.onRequestClose}/>,
+      <FlatButton
+        label='Submit'
+        primary
+        keyboardFocused
+        onTouchTap={this.onSubmit}
+      />
+    ];
+
     return (
       <Centering>
+        <Dialog actions={actions} open={state.listDialogOpen} onRequestClose={this.onRequestClose}>
+          <div style={{height: 400}}>
+            <p>Select the List(s) to Copy these selected contacts to:</p>
+          {props.lists &&
+            <Select
+            multi
+            value={state.listValue}
+            options={props.options}
+            onChange={listValue => this.setState({listValue})}
+            onValueClick={({value}) => props.router.push(`/tables/${value}`)}
+            />}
+          </div>
+        </Dialog>
         <div className='row' style={styles.container}>
           <div className='large-12 medium-12 small-12 columns'>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
           </div>
-          <div className='large-12 medium-12 small-12 columns' style={{margin: 10}} >
+        </div>
+        <div className='row'>
+          <div className='large-6 medium-6 small-12 columns' >
             <Checkbox onCheck={this.onSelectAll} label='Select All' />
-            <button className='button' onClick={this.onCopySelectedToNew}>Copy Selected to New List</button>
-            <button className='button'>Copy Selected to Existing List</button>
           </div>
+          <div className='columns'>
+            <RaisedButton disabled={state.selected.length === 0} style={{margin: '0 5px', float: 'right'}} onClick={this.onCopySelectedToNew} label='Copy to New List'/>
+            <RaisedButton disabled={state.selected.length === 0} style={{margin: '0 5px', float: 'right'}} onClick={this.onRequestOpen} label='Copy to Existing List'/>
+          </div>
+        </div>
+        <div>
           <div className='large-12 medium-12 small-12 columns'>
             <span className='smalltext'>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
           </div>
@@ -96,7 +138,10 @@ const mapStateToProps = (state, props) => {
   if (tag && state.contactTagReducer[tag]) {
     contacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
   }
+  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   return {
+    lists,
+    options: lists.map(list => ({label: list.name, value: list.id})),
     contacts,
     tag,
   };
@@ -115,7 +160,8 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 
   return {
-    fetchContactsByTag: _ => dispatch(actions.fetchContactsByTag(tag)),
+    fetchLists: _ => dispatch(listActions.fetchLists()),
+    fetchContactsByTag: _ => dispatch(contactTagActions.fetchContactsByTag(tag)),
     copyToNewList: (contacts, name) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
       return dispatch(listActions.createEmptyList(name))
