@@ -61,6 +61,8 @@ class ScheduledEmailItem extends Component {
     const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
     const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
+    // console.log(cancel);
+    // console.log(id);
     return (
       <Paper zDepth={1} className='clearfix' style={styles.wrapper}>
         <div className='row'>

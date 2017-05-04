@@ -9,6 +9,7 @@ import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import EmailDateContainer from './EmailDateContainer.react';
+import {fromJS} from 'immutable';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
 
@@ -44,7 +45,7 @@ class EmailsList extends Component {
     this.state = {
       dateOrder,
       emailMap,
-      isClosedMap: {}
+      isClosedMap: {},
     };
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
@@ -87,7 +88,8 @@ class EmailsList extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
-    if (this.props.emails.length !== nextProps.emails.length) {
+    if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
+      console.log('hit');
       const {dateOrder, emailMap} = bucketEmailsByDate(nextProps.emails);
       this.setState({dateOrder, emailMap}, _ => {
         if (this._list) {
