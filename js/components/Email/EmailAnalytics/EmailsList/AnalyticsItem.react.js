@@ -10,6 +10,7 @@ import {
   grey400, grey600, grey800
 } from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
+import IconButton from 'material-ui/IconButton';
 import {connect} from 'react-redux';
 import {actions as stagingActions} from 'components/Email';
 import {actions as attachmentActions} from 'components/Email/EmailAttachment';
@@ -61,7 +62,8 @@ export class AnalyticsItem extends Component {
       bcc,
       archiveEmail,
       archived,
-      contact
+      contact,
+      contactId
     } = this.props;
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
@@ -69,6 +71,7 @@ export class AnalyticsItem extends Component {
     let sendAtDate = moment(sendat);
     const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
+    const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
     return (
       <Paper zDepth={1} className='clearfix' style={wrapperStyle}>
         <div className='row'>
@@ -90,26 +93,26 @@ export class AnalyticsItem extends Component {
               onClick={archiveEmail}
               /> : <span className='smalltext' styles={styles.archived}>(Archived)</span>}
             </div>}
+            <span style={styles.to}>To</span>
+            <span className='text' style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{recepientString}</span>
           </div>
           <div className='small-12 medium-6 large-6 columns'>
-            <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
-          </div>
-          <div className='small-12 medium-12 large-12 columns'>
-            <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>
+            <div className='row'>
+              <div className='large-12 medium-12 small-12 columns'>
+                <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
+              </div>
+              <div className='large-12 medium-12 small-12 columns'>
+                <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>
+              </div>
+            </div>
           </div>
         </div>
         <Dialog autoScrollBodyContent open={state.isPreviewOpen} onRequestClose={this.onPreviewClose}>
           <StaticEmailContent {...this.props} />
         </Dialog>
-        <div className='email-analytics row' style={styles.analytics}>
-          <div className='small-12 medium-3 large-3 columns'>
-            <span style={styles.to}>To</span>
-            <span style={{fontSize: '0.9em', color: (bounced || !delivered) ? deepOrange900 : grey800}}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
-          </div>
-          <div className='small-12 medium-5 large-5 columns' style={styles.toContainer}>
-            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
-          {subject.length === 0 &&
-            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>(No Subject)</span>}
+        <div className='row' style={styles.analytics}>
+          <div className='small-12 medium-8 large-8 columns truncate-ellipsis' style={styles.toContainer}>
+            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText} >{subject || '(No Subject)'}</span>
           {!delivered &&
             <div style={styles.errorText}>
               <span>Something went wrong on our end. Let us know!</span>
@@ -137,13 +140,6 @@ export class AnalyticsItem extends Component {
             <span style={styles.bouncedLabel}>email bounced</span>
           </div>}
         </div>
-      {contact &&
-        <div className='row'>
-          <div className='large-12 medium-12 small-12 columns'>
-            <span style={styles.to}>Full Name</span>
-            <span className='text' style={styles.fullname}>{contact.firstname} {contact.lastname}</span>
-          </div>
-        </div>}
       </Paper>
       );
   }
@@ -162,26 +158,28 @@ const styles = {
   to: {
     color: 'gray',
     fontSize: '0.8em',
-    alignSelf: 'flex-start',
     marginRight: 5
   },
   toContainer: {margin: '15px 0'},
   subjectText: {
     fontWeight: 500,
-    color: grey800
+    color: grey800,
+    marginLeft: 10
   },
   sentFrom: {
     color: 'gray',
     fontSize: '0.8em',
+    marginRight: 5
   },
   linkContainerSpan: {
-    margin: '0 5px', fontSize: '0.9em'
+    fontSize: '0.9em'
   },
   attachmentIcon: {
     fontSize: '0.8em', margin: '0 3px'
   },
   trashIcon: {
-    fontSize: '16px'
+    fontSize: '16px',
+    marginLeft: 8
   },
   sentLabel: {
     marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'

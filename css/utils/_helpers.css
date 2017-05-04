@@ -54,3 +54,16 @@
 .hoverGrey800to900:hover {
   color: #212121;
 }
+
+.truncate-ellipsis {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  white-space: nowrap;
+}
+ 
+.truncate-ellipsis > * {
+  display: table-cell;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
