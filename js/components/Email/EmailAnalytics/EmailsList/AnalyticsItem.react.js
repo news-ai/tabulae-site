@@ -91,7 +91,7 @@ export class AnalyticsItem extends Component {
               color={grey400}
               hoverColor={grey600}
               onClick={archiveEmail}
-              /> : <span className='smalltext' styles={styles.archived}>(Archived)</span>}
+              /> : <span className='smalltext' style={styles.archived}>(Archived)</span>}
             </div>}
             <span style={styles.to}>To</span>
             <span className='text' style={{color: (bounced || !delivered) ? deepOrange900 : grey800}}>{recepientString}</span>
