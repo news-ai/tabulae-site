@@ -2,7 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Tooltip} from 'react-lightweight-tooltip';
 
-import withRouter from 'react-router/lib/withRouter';
+import Link from 'react-router/lib/Link';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
@@ -98,12 +98,9 @@ const Campaign = ({
       </div>
       <div className='large-offset-9 medium-offset-8 small-offset-6 columns'>
         <div className='right'>
-          <FlatButton
-          primary
-          label='See Emails'
-          icon={<FontIcon className='fa fa-chevron-right'/>}
-          onClick={_ => router.push({pathname: `/emailstats/all`, query})}
-          />
+          <Link to={{pathname: '/emailstats/all', query}}>
+            <FlatButton primary label='See Emails' icon={<FontIcon className='fa fa-chevron-right'/>} onClick={_ => window.Intercom('trackEvent', 'check_campaign_emails')} />
+          </Link>
         </div>
       </div>
     </Paper>
@@ -118,4 +115,4 @@ const mapDispatchToProps = (dispatch, props) => {
   return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Campaign));
+export default connect(mapStateToProps, mapDispatchToProps)(Campaign);
