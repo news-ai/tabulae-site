@@ -34,6 +34,7 @@ class ContactTags extends Component {
     if (nextProps.selected.length !== this.props.selected.length) {
       this._list.forceUpdateGrid();
     }
+    console.log(nextProps);
   }
 
   componentWillUnmount() {

@@ -53,7 +53,7 @@ class ContactTags extends Component {
     };
     this.handlePageLimitChange = e => {
       this.props.router.push({pathname: '/contacts', query: {tag: props.tag, limit: e.target.value, currentPage: 0}});
-    }
+    };
   }
 
   componentWillMount() {
@@ -102,13 +102,13 @@ class ContactTags extends Component {
         onTouchTap={this.onSubmit}
       />
     ];
-    console.log(props.contacts);
+    // console.log(props.contacts);
 
     const contacts = props.contacts.slice(
       state.currentPage * state.pageLimit,
       (state.currentPage + 1) * state.pageLimit
       );
-    console.log(contacts);
+    // console.log(contacts);
 
     return (
       <Centering>

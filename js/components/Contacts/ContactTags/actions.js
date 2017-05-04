@@ -41,7 +41,8 @@ export function fetchContactsByTag(tag) {
           type: TAG_CONTACTS_RECEIVE,
           tag,
           received: res.result.data,
-          offset: newOffset
+          offset: newOffset,
+          total: response.summary.total,
         });
       },
       err => {
