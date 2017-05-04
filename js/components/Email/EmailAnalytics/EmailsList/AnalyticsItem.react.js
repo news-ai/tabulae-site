@@ -193,7 +193,7 @@ const styles = {
   tagContainer: {
     padding: 3
   },
-  archived: {color: grey600},
+  archived: {color: grey600, margin: '0 3px'},
   fullname: {color: grey800}
 };
 

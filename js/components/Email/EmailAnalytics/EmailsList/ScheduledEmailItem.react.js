@@ -178,7 +178,7 @@ const styles = {
     padding: 3
   },
   toLabel: {color: grey800},
-  archived: {color: grey600},
+  archived: {color: grey600, margin: '0 3px'},
   fullname: {color: grey800},
   cancel: {color: deepOrange600, fontSize: '0.8em'},
 };
