@@ -51,13 +51,16 @@ class ScheduledEmailItem extends Component {
       archiveEmail,
       archived,
       cancel,
-      onCancelClick
+      onCancelClick,
+      contact,
+      contactId
     } = this.props;
     const state = this.state;
     const SUBTRING_LIMIT = 20;
     let sendAtDate = moment(sendat);
     const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
+    const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
     return (
       <Paper zDepth={1} className='clearfix' style={styles.wrapper}>
         <div className='row'>
@@ -66,25 +69,31 @@ class ScheduledEmailItem extends Component {
             <div>
               <span style={styles.sentFrom}>Sent from List</span>
               <span style={styles.linkContainerSpan}>
-                <Link to={`/tables/${listid}`}>{listname || listid}</Link>
+                <Link to={`/tables/${listid}`}>{listname || `(Archived) ${listid}`}</Link>
               </span>
             {attachments !== null &&
               <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip'/>}
-            {!archived &&
+            {!archived ?
               <FontIcon
               className='pointer fa fa-trash'
               style={styles.trashIcon}
               color={grey400}
               hoverColor={grey600}
               onClick={archiveEmail}
-              />}
+              /> : <span className='smalltext' styles={styles.archived}>(Archived)</span>}
             </div>}
+            <span style={styles.to}>To</span>
+            <span className='text' style={styles.toLabel}>{recepientString}</span>
           </div>
           <div className='small-12 medium-6 large-6 columns'>
-            <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
-          </div>
-          <div className='small-12 medium-12 large-12 columns'>
-            <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>
+            <div className='row'>
+              <div className='large-12 medium-12 small-12 columns'>
+                <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
+              </div>
+              <div className='large-12 medium-12 small-12 columns'>
+                <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>
+              </div>
+            </div>
           </div>
         </div>
         <Dialog
@@ -94,15 +103,9 @@ class ScheduledEmailItem extends Component {
         >
           <StaticEmailContent {...this.props} />
         </Dialog>
-        <div className='email-analytics row' style={styles.analytics}>
-          <div className='small-12 medium-3 large-3 columns'>
-            <span style={styles.to}>To</span>
-            <span style={styles.toLabel}>{to.substring(0, SUBTRING_LIMIT)} {to.length > SUBTRING_LIMIT && `...`}</span>
-          </div>
-          <div className='small-12 medium-5 large-5 columns' style={styles.toContainer}>
-            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>{subject.substring(0, 45)} {subject.length > 42 && `...`}</span>
-          {subject.length === 0 &&
-            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText}>(No Subject)</span>}
+        <div className='row' style={styles.analytics}>
+          <div className='small-12 medium-8 large-8 columns truncate-ellipsis' style={styles.toContainer}>
+            <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText} >{subject || '(No Subject)'}</span>
           </div>
           <div className='small-12 medium-4 large-4 columns horizontal-center'>
             {!cancel &&
@@ -139,22 +142,44 @@ const styles = {
   to: {
     color: 'gray',
     fontSize: '0.8em',
-    alignSelf: 'flex-start',
     marginRight: 5
   },
   toContainer: {margin: '15px 0'},
-  subjectText: {fontWeight: 500, color: grey800},
-  sentFrom: {color: 'gray', fontSize: '0.8em', },
-  linkContainerSpan: {margin: '0 5px', fontSize: '0.9em'},
-  attachmentIcon: {fontSize: '0.8em', margin: '0 3px'},
-  trashIcon: {fontSize: '16px'},
+  subjectText: {
+    fontWeight: 500,
+    color: grey800,
+    marginLeft: 10
+  },
+  sentFrom: {
+    color: 'gray',
+    fontSize: '0.8em',
+    marginRight: 5
+  },
+  linkContainerSpan: {
+    fontSize: '0.9em'
+  },
+  attachmentIcon: {
+    fontSize: '0.8em', margin: '0 3px'
+  },
+  trashIcon: {
+    fontSize: '16px',
+    marginLeft: 8
+  },
   sentLabel: {
     marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'
   },
-  bouncedReason: {color: deepOrange900},
-  bouncedLabel: {color: deepOrange700, fontSize: '0.8em'},
-  tagContainer: {padding: 3},
-  toLabel: {fontSize: '0.9em', color: grey800},
+  bouncedReason: {
+    color: deepOrange900
+  },
+  bouncedLabel: {
+    color: deepOrange700, fontSize: '0.8em'
+  },
+  tagContainer: {
+    padding: 3
+  },
+  toLabel: {color: grey800},
+  archived: {color: grey600},
+  fullname: {color: grey800},
   cancel: {color: deepOrange600, fontSize: '0.8em'},
 };
 
