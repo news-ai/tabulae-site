@@ -42,7 +42,6 @@ class EmailStats extends Component {
   }
 
   componentWillMount() {
-    window.Intercom('trackEvent', 'load_stats');
     this.fetchEmailStats();
   }
 
