@@ -1,5 +1,5 @@
 import React from 'react';
-import {grey800, grey500} from 'material-ui/styles/colors';
+import {grey50, grey200, grey800, grey500} from 'material-ui/styles/colors';
 import Link from 'react-router/lib/Link';
 import FontIcon from 'material-ui/FontIcon';
 
@@ -17,8 +17,11 @@ const styles = {
   icon: {fontSize: '0.8em', marginLeft: 8},
 };
 
-const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link}) => {
-  const span = <span className='smalltext hoverGrey800to900' style={styles.text}>{text}</span>;
+const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link, whiteLabel}) => {
+  const span = (
+    <span
+    className={`smalltext`}
+    style={{color: whiteLabel ? 'white' : grey800}}>{text}</span>);
 
   return (
     <div style={Object.assign({}, styles.container, {
@@ -32,8 +35,8 @@ const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link}) => {
         onClick={onDeleteTag}
         style={styles.icon}
         className='fa fa-times pointer'
-        color={grey500}
-        hoverColor={grey800}
+        color={whiteLabel ? grey200 : grey500}
+        hoverColor={whiteLabel ? grey50 : grey800}
         />}
     </div>);
 };

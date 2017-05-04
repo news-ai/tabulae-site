@@ -9,7 +9,7 @@ import {actions as contactActions} from 'components/Contacts';
 import {actions as feedActions} from './RSSFeed';
 import * as headlineActions from './Headlines/actions';
 import * as joyrideActions from 'components/Joyride/actions';
-import {indigo50, indigo200, grey700, grey500} from 'material-ui/styles/colors';
+import {teal400, teal900, grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -160,7 +160,7 @@ class ContactProfile extends Component {
                   </div>
                 </div>
                 <div className='large-12 medium-12 small-12 columns'>
-                  <div className='row vertical-center' style={styles.employerContainer}>
+                  <div className='vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Current Publications/Employers</span>
                     <AddEmployerHOC title='Add Current Publication/Employer' type='employers' contact={props.contact}>
                     {({onRequestOpen}) => (
@@ -186,10 +186,10 @@ class ContactProfile extends Component {
                     contact={props.contact}
                     />)}
                   {(props.employers.length === 0 || !props.employers) &&
-                    <span>None added</span>}
+                    <None/>}
                   </div>
                   <div style={styles.employerContainer}>
-                    <div className='row vertical-center'>
+                    <div className='vertical-center'>
                       <span style={styles.header}>Past Publications/Employers</span>
                       <AddEmployerHOC title='Add Past Publication/Employer' type='pastemployers' contact={props.contact}>
                       {({onRequestOpen}) => (
@@ -211,37 +211,38 @@ class ContactProfile extends Component {
                   props.pastemployers.map((employer, i) =>
                     <ContactEmployerDescriptor style={styles.contactemployer} key={i} employer={employer} which='pastemployers' contact={props.contact}/>)}
                   {(props.pastemployers.length === 0 || !props.pastemployers) &&
-                    <span className='text'>None added</span>}
+                    <None/>}
                   </div>
-                  {/*
-                  <div className='row vertical-center' style={styles.employerContainer}>
+                {/*
+                  <div className='vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Tags</span>
-                      <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
-                      {({onRequestOpen}) =>
-                        <IconButton
-                        disabled={props.contact.readonly}
-                        iconStyle={styles.smallIcon}
-                        style={styles.small}
-                        iconClassName='fa fa-plus'
-                        tooltip='Add Tag'
-                        tooltipPosition='top-right'
-                        onClick={onRequestOpen}
-                        />}
-                      </AddTagHOC>
+                    <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
+                    {({onRequestOpen}) =>
+                      <IconButton
+                      disabled={props.contact.readonly}
+                      iconStyle={styles.smallIcon}
+                      style={styles.small}
+                      iconClassName='fa fa-plus'
+                      tooltip='Add Tag'
+                      tooltipPosition='top-right'
+                      onClick={onRequestOpen}
+                      />}
+                    </AddTagHOC>
                   </div>
-                  <div className='row'>
+                  <div>
                     <Tags
+                    whiteLabel
                     className='columns'
-                    color={indigo50}
-                    borderColor={indigo200}
+                    color={teal400}
+                    borderColor={teal900}
                     onDeleteTag={this.onDeleteTag}
                     tags={props.contact.tags}
                     createLink={name => `/contacts?tag=${name}`}
                     />
                   {props.contact.tags === null &&
-                    <span className='text'>None added</span>}
+                    <None/>}
                   </div>
-                  */}
+                */}
                 </div>
               </div>
             </div>
@@ -316,6 +317,8 @@ class ContactProfile extends Component {
     );
   }
 }
+
+const None = _ => <span className='text' style={{marginLeft: 10, color: grey700}} >None Added</span>;
 
 function mapStateToProps(state, props) {
   const listId = parseInt(props.params.listId, 10);

@@ -189,7 +189,7 @@ const mapDispatchToProps = (dispatch, props) => {
     copyToNewList: (contacts, name) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
       return dispatch(listActions.createEmptyList(name))
-      .then(response => copyContactsToList(contacts, response.data.id))
+      .then(response => copyContactsToList(contacts, response.data.id));
     },
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
     .then(_ => {

@@ -27,7 +27,13 @@ class ContactTags extends Component {
 
   componentWillMount() {
     if (this.props.tag) this.props.fetchContactsByTag();
-    setTimeout(this.onResize, 2000);
+    setTimeout(_ => this.onResize(), 3000);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.selected.length !== this.props.selected.length) {
+      this._list.forceUpdateGrid();
+    }
   }
 
   componentWillUnmount() {
@@ -44,7 +50,8 @@ class ContactTags extends Component {
 
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const contact = this.props.contacts[index];
-    const renderNode = <ContactItemContainer onResize={this.onResize} {...contact}/>
+    const checked = this.props.selected.some(contactId => contactId === contact.id);
+    const renderNode = <ContactItemContainer checked={checked} onSelect={this.props.onSelect} {...contact}/>
 
     return (
       <div style={Object.assign({}, style, {padding: 5})} key={key}>

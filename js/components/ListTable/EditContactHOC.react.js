@@ -44,7 +44,8 @@ const _getPublicationName = (contact, reducer) => {
   if (contact.employers === null) return '';
   else {
     const id = contact.employers[0];
-    return reducer[id].name;
+    if (reducer[id]) return reducer[id].name;
+    return '';
   }
 };
 

@@ -1,53 +1,23 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as contactActions} from 'components/Contacts';
-import {actions as listActions} from 'components/Lists';
-import {actions as publicationActions} from 'components/Publications';
 
 import Dialog from 'material-ui/Dialog';
-import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
-import Textarea from 'react-textarea-autosize';
-import Collapse from 'react-collapse';
-import PublicationFormStateful from './PublicationFormStateful.react';
 
 import 'react-select/dist/react-select.css';
-import isURL from 'validator/lib/isURL';
-import {fromJS, is} from 'immutable';
 import {yellow50} from 'material-ui/styles/colors';
-import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
 
 const textfieldStyle = {
   marginLeft: 10
 };
 
-function removeDupe(list) {
-  let m = {};
-  let ret;
-  return list.filter(item => {
-    if (m[item] === true) ret = false;
-    else ret = true;
-    m[item] = true;
-    return ret;
-  });
-}
-
 const _getter = contact => {
   if (!contact) return;
   const {listid, id, firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website} = contact;
   return {listid, id, firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
-};
-
-const _getPublicationName = (contact, reducer) => {
-  if (contact.employers === null) return '';
-  else {
-    const id = contact.employers[0];
-    return reducer[id].name;
-  }
 };
 
 const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
