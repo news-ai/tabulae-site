@@ -213,6 +213,7 @@ class ContactProfile extends Component {
                   {(props.pastemployers.length === 0 || !props.pastemployers) &&
                     <None/>}
                   </div>
+                {/*
                   <div className='vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Tags</span>
                     <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
@@ -241,6 +242,7 @@ class ContactProfile extends Component {
                   {props.contact.tags === null &&
                     <None/>}
                   </div>
+                */}
                 </div>
               </div>
             </div>
