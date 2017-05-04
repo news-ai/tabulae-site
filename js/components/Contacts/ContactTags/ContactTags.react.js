@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
+import Link from 'react-router/lib/Link';
 import ContactFeed from 'components/Contacts/ContactFeed/ContactFeed.react';
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
@@ -31,7 +32,8 @@ class ContactTags extends Component {
       selected: [],
       listDialogOpen: false,
       listValue: false,
-      pageLimit: 10,
+      pageLimit: this.props.limit || 10,
+      currentPage: this.props.currentPage || 0,
     };
     this.onSelect = this._onSelect.bind(this);
     this.onSelectAll = _ => this.setState({
@@ -49,11 +51,14 @@ class ContactTags extends Component {
       this.state.listValue.map(({value}) => this.props.copyContactsToList(this.state.selected, value));
       this.setState({listValue: false, listDialogOpen: false});
     };
-    this.handlePageLimitChange = e => this.setState({pageLimit: e.target.value});
+    this.handlePageLimitChange = e => {
+      this.props.router.push({pathname: '/contacts', query: {tag: props.tag, limit: e.target.value, currentPage: 0}});
+    }
   }
 
   componentWillMount() {
     window.Intercom('trackEvent', 'access_contact_tag', {tag: this.props.tag});
+    this.props.resetTagContacts();
     if (this.props.tag) this.props.fetchContactsByTag();
     this.props.fetchLists();
   }
@@ -61,6 +66,12 @@ class ContactTags extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.tag !== nextProps.tag) {
       nextProps.fetchContactsByTag();
+    }
+    if (this.props.limit !== nextProps.limit) {
+      this.setState({pageLimit: nextProps.limit});
+    }
+    if (this.props.currentPage !== nextProps.currentPage) {
+      this.setState({currentPage: nextProps.currentPage});
     }
   }
 
@@ -91,6 +102,13 @@ class ContactTags extends Component {
         onTouchTap={this.onSubmit}
       />
     ];
+    console.log(props.contacts);
+
+    const contacts = props.contacts.slice(
+      state.currentPage * state.pageLimit,
+      (state.currentPage + 1) * state.pageLimit
+      );
+    console.log(contacts);
 
     return (
       <Centering>
@@ -124,7 +142,8 @@ class ContactTags extends Component {
         <div>
           <div className='large-12 medium-12 small-12 columns'>
             <span className='smalltext' style={{margin: '0 5px'}}>Showing</span>
-            <select className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
+            <select style={{width: 200}} className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
+              <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={20}>20</option>
               <option value={50}>50</option>
@@ -134,8 +153,14 @@ class ContactTags extends Component {
             <span className='smalltext' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
           </div>
         </div>
-        <ContactFeed selected={state.selected} onSelect={this.onSelect} contacts={props.contacts}/>
+        <ContactFeed
+        selected={state.selected}
+        onSelect={this.onSelect}
+        contacts={contacts}
+        />
         {props.contacts.length === 0 && <div>None found</div>}
+        <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage - 1}}}>Prev</Link>
+        <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage + 1}}}>Next</Link>
       </Centering>
       );
   }
@@ -144,12 +169,16 @@ class ContactTags extends Component {
 
 const mapStateToProps = (state, props) => {
   const tag = props.router.location.query.tag;
+  const currentPage = props.router.location.query.currentPage;
+  const limit = props.router.location.query.limit;
   let contacts = [];
   if (tag && state.contactTagReducer[tag]) {
     contacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
   }
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   return {
+    currentPage: currentPage ? parseInt(currentPage, 10) : currentPage,
+    limit: limit ? parseInt(limit, 10) : limit,
     lists,
     options: lists.map(list => ({label: list.name, value: list.id})),
     contacts,
@@ -181,6 +210,7 @@ const mapDispatchToProps = (dispatch, props) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
       return copyContactsToList(contacts, listid);
     },
+    resetTagContacts: _ => dispatch({type: 'TAG_CONTACTS_RESET', tag})
   };
 };
 

@@ -23,6 +23,10 @@ function contactTagReducer(state = initialState.contactTagReducer, action) {
           received: [...state[action.tag].received, ...action.received]
         })
       });
+    case 'TAG_CONTACTS_RESET':
+      return assignToEmpty(state, {
+        [action.tag]: {offset: 0, received: []}
+      });
     default:
       return state;
   }
