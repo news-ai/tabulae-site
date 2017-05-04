@@ -71,6 +71,7 @@ class AllSentEmailsContainer extends Component {
       this.props.fetchListEmails(filterListValue);
       query.listId = filterListValue;
     }
+    window.Intercom('trackEvent', 'filter_emails_by_list');
     this.props.router.push({pathname: `/emailstats/all`, query});
     this.setState({filterListValue});
   }
@@ -80,6 +81,7 @@ class AllSentEmailsContainer extends Component {
     const queryDate = moment(filterDateValue).format(DATEFORMAT);
     this.props.fetchSpecificDayEmails(queryDate);
     query.date = queryDate;
+    window.Intercom('trackEvent', 'filter_emails_by_date');
     this.props.router.push({pathname: `/emailstats/all`, query});
     this.setState({filterDateValue});
   }
