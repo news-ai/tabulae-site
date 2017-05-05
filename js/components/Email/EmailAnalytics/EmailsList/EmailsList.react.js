@@ -1,22 +1,24 @@
 // @flow
 import React, {Component} from 'react';
 import InfiniteScroll from 'components/InfiniteScroll';
-import AnalyticsItem from './AnalyticsItem.react';
-import ScheduledEmailItem from './ScheduledEmailItem.react';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
-import EmailDateContainer from './EmailDateContainer.react';
+// import EmailDateContainer from './EmailDateContainer.react';
 import {fromJS} from 'immutable';
+import AnalyticsItem from './AnalyticsItem.react';
+import ScheduledEmailItem from './ScheduledEmailItem.react';
+import Link from 'react-router/lib/Link';
+import moment from 'moment-timezone';
+import find from 'lodash/find';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
 
 
-const bucketEmailsByDate = (emails) => {
-  if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}};
-
+const reformatEmails = (emails, prevDateOrder) => {
+  if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}, reformattedEmails: []};
   const emailMap = emails.reduce((acc, email) => {
     const sendat = email.sendat === DEFAULT_SENDAT ? email.created : email.sendat;
     const datestring = new Date(sendat).toLocaleDateString();
@@ -27,30 +29,66 @@ const bucketEmailsByDate = (emails) => {
   const dateOrder = Object.keys(emailMap)
   .map(date => new Date(date))
   .sort((a, b) => a > b ? -1 : a < b ? 1 : 0)
-  .map(date => date.toLocaleDateString());
-
-  dateOrder.map(datestring => {
-    emailMap[datestring] = emailMap[datestring].sort((a, b) => b.opened - a.opened);
+  .map(date => {
+    const datestring = date.toLocaleDateString();
+    const prevDateOrderObj = find(prevDateOrder, dateOrderObj => dateOrderObj.datestring === datestring);
+    const isClosed = prevDateOrderObj ? prevDateOrderObj.isClosed : false;
+    return {type: 'datestring', datestring, isClosed};
   });
 
-  return {dateOrder, emailMap};
-};
+  let reformattedEmails = [];
+  dateOrder.map(dateOrderObj => {
+    const sortedEmails = emailMap[dateOrderObj.datestring].sort((a, b) => b.opened - a.opened);
+    reformattedEmails.push(dateOrderObj);
+    if (!dateOrderObj.isClosed) {
+      reformattedEmails = [...reformattedEmails, ...sortedEmails];
+    }
+  });
+  return {dateOrder, emailMap, reformattedEmails};
+}
 
 const placeholder = 'No emails scheduled for delivery.';
+
+const dividerStyles = {
+  linkStyle: {textDecoration: 'none'},
+  linkSpan: {fontSize: '1.2em'},
+  iconButtonIcon: {width: 14, height: 14, fontSize: '14px', color: grey600},
+  iconButton: {width: 28, height: 28, padding: 7, margin: '0 5px'},
+  container: {marginTop: 25},
+};
+
+function reformatDatestring(datestring) {
+  return moment(new Date(datestring)).format('YYYY-MM-DD');
+}
+
+const DatestringDivider = ({isClosed, datestring, onOpenClick}) => (
+  <div style={{margin: '10px 0', marginTop: 15, color: !isClosed ? grey600 : grey700}} className='vertical-center'>
+    <span style={dividerStyles.linkSpan}>Sent on {datestring}</span>
+    <IconButton
+    tooltip='Collapse'
+    tooltipPosition='top-right'
+    iconStyle={dividerStyles.iconButtonIcon}
+    style={dividerStyles.iconButton}
+    onClick={_ => onOpenClick(datestring)}
+    iconClassName={!isClosed ? 'fa fa-chevron-down' : 'fa fa-chevron-up'}
+    />
+  </div>);
 
 class EmailsList extends Component {
   constructor(props) {
     super(props);
-    const {dateOrder, emailMap} = bucketEmailsByDate(this.props.emails);
+    const {dateOrder, emailMap, reformattedEmails} = reformatEmails(this.props.emails);
     this.state = {
       dateOrder,
       emailMap,
       isClosedMap: {},
+      reformattedEmails
     };
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
+    this.onOpenContainer = this._onOpenContainer.bind(this);
     window.onresize = () => {
       if (this._list) {
         this._listCellMeasurer.resetMeasurements();
@@ -90,8 +128,8 @@ class EmailsList extends Component {
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
     if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
       console.log('hit');
-      const {dateOrder, emailMap} = bucketEmailsByDate(nextProps.emails);
-      this.setState({dateOrder, emailMap}, _ => {
+      const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
+      this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
         if (this._list) {
           this._listCellMeasurer.resetMeasurements();
           this._list.recomputeRowHeights();
@@ -100,21 +138,43 @@ class EmailsList extends Component {
     }
   }
 
+  _onOpenContainer(datestring) {
+    const dateOrder = this.state.dateOrder.reduce((acc, dateOrderObj) => {
+      if (dateOrderObj.datestring === datestring) acc.push(Object.assign({}, dateOrderObj, {isClosed: !dateOrderObj.isClosed}));
+      else acc.push(dateOrderObj);
+      return acc;
+    }, []);
+    let reformattedEmails = [];
+    dateOrder.map(dateOrderObj => {
+      const sortedEmails = this.state.emailMap[dateOrderObj.datestring];
+      reformattedEmails.push(dateOrderObj);
+      if (!dateOrderObj.isClosed) {
+        reformattedEmails = [...reformattedEmails, ...sortedEmails];
+      }
+    });
+    this.setState({dateOrder, reformattedEmails}, _ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    });
+  }
+
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
-    const datestring = this.state.dateOrder[index];
+    const node = this.state.reformattedEmails[index];
+    const rightNow = new Date();
+    let renderNode;
+    if (node.type === 'emails') {
+      const email = node;
+      renderNode = new Date(email.sendat) > rightNow ?
+        <ScheduledEmailItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/> :
+        <AnalyticsItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/>;
+    } else {
+      renderNode = <DatestringDivider onOpenClick={this.onOpenContainer} {...node} />;
+    }
     return (
       <div style={style} key={key}>
-        <EmailDateContainer
-        key={`email-date-${datestring}`}
-        datestring={datestring}
-        emailBucket={this.state.emailMap[datestring]}
-        isClosed={this.state.isClosedMap[index]}
-        onOpenClick={_ => this.setState({isClosedMap: Object.assign({}, this.state.isClosedMap, {[index]: !this.state.isClosedMap[index]})},
-          _ => {
-            this._listCellMeasurer.resetMeasurements();
-            this._list.recomputeRowHeights();
-          })}
-        />
+        {renderNode}
       </div>);
   }
 
@@ -141,37 +201,35 @@ class EmailsList extends Component {
         </div>
       }
         <div style={style}>
-        {this.state.dateOrder && this.state.dateOrder.length > 0 &&
-          <WindowScroller>
-          {({height, isScrolling, scrollTop}) =>
-            <AutoSizer disableHeight>
-              {({width}) =>
-                <CellMeasurer
-                ref={this._listCellMeasurerRef}
-                cellRenderer={this.cellRenderer}
-                columnCount={1}
-                rowCount={state.dateOrder.length}
+        <WindowScroller>
+        {({height, isScrolling, scrollTop}) =>
+          <AutoSizer disableHeight>
+            {({width}) =>
+              <CellMeasurer
+              ref={this._listCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
+              rowCount={state.reformattedEmails.length}
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._listRef}
+                autoHeight
                 width={width}
-                >
-                {({getRowHeight}) =>
-                  <List
-                  ref={this._listRef}
-                  autoHeight
-                  width={width}
-                  height={height}
-                  rowHeight={getRowHeight}
-                  rowCount={state.dateOrder.length}
-                  rowRenderer={this.rowRenderer}
-                  scrollTop={scrollTop}
-                  isScrolling={isScrolling}
-                  />
-                }
-                </CellMeasurer>
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={state.reformattedEmails.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
               }
-              </AutoSizer>
+              </CellMeasurer>
             }
-          </WindowScroller>
-        }
+            </AutoSizer>
+          }
+        </WindowScroller>
         {props.emails && props.emails.length === 0 &&
           <span style={styles.placeholder}>{props.placeholder || placeholder}</span>}
         </div>
