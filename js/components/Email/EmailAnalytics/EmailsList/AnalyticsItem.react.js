@@ -45,6 +45,7 @@ export class AnalyticsItem extends Component {
 
   render() {
     const {
+      isScrolling,
       id,
       opened,
       clicked,
@@ -108,9 +109,10 @@ export class AnalyticsItem extends Component {
             </div>
           </div>
         </div>
+      {!isScrolling &&
         <Dialog autoScrollBodyContent open={state.isPreviewOpen} onRequestClose={this.onPreviewClose}>
           <StaticEmailContent {...this.props} />
-        </Dialog>
+        </Dialog>}
         <div className='row' style={styles.analytics}>
           <div className='small-12 medium-8 large-8 columns truncate-ellipsis' style={styles.toContainer}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText} >{subject || '(No Subject)'}</span>
@@ -123,14 +125,14 @@ export class AnalyticsItem extends Component {
             <p style={styles.bouncedReason}>{bouncedreason}</p>}
           </div>
           <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
-          {(!bounced && delivered) &&
+          {(!bounced && delivered) && !isScrolling &&
             <OpenAnalyticsHOC emailId={id} count={opened}>
             {({onRequestOpen}) => (
               <CountViewItem onTouchTap={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o'/>)}
             </OpenAnalyticsHOC>}
           </div>
           <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
-          {(!bounced && delivered) &&
+          {(!bounced && delivered) && !isScrolling &&
             <LinkAnalyticsHOC emailId={id} count={clicked}>
             {({onRequestOpen}) => (
               <CountViewItem onTouchTap={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o'/>)}
