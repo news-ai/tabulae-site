@@ -62,7 +62,7 @@ function reformatDatestring(datestring) {
 }
 
 const DatestringDivider = ({isClosed, datestring, onOpenClick}) => (
-  <div style={{margin: '10px 0', color: !isClosed ? grey600 : grey700}} className='vertical-center'>
+  <div style={{margin: '10px 0', marginTop: 15, color: !isClosed ? grey600 : grey700}} className='vertical-center'>
     <span style={dividerStyles.linkSpan}>Send on {datestring}</span>
     <IconButton
     tooltip='Collapse'
@@ -167,8 +167,8 @@ class EmailsList extends Component {
     if (node.type === 'emails') {
       const email = node;
       renderNode = new Date(email.sendat) > rightNow ?
-        <ScheduledEmailItem key={`email-analytics-${index}`} {...email}/> :
-        <AnalyticsItem key={`email-analytics-${index}`} {...email}/>;
+        <ScheduledEmailItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/> :
+        <AnalyticsItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/>;
     } else {
       renderNode = <DatestringDivider onOpenClick={this.onOpenContainer} {...node} />;
     }
