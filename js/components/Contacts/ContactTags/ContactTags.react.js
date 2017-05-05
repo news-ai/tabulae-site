@@ -12,6 +12,9 @@ import * as contactTagActions from './actions';
 import {actions as copyActions} from 'components/ListTable/CopyToHOC';
 import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
+import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
+
+import {grey50, blue800, grey800} from 'material-ui/styles/colors';
 
 const styles = {
   container: {marginTop: 20, marginBottom: 10},
@@ -20,6 +23,20 @@ const styles = {
 
 // utility wrapper to avoid grid confusion
 const Centering = ({children}) => <div className='row align-center'><div className='large-10 medium-10 small-12 columns'>{children}</div></div>;
+
+const PageItem = ({pageNumber, isActive, link}) => (
+  <Link to={link} >
+    <div style={{
+      padding: '2px 5px',
+      border: `1px solid ${isActive ? blue800 : grey800}`,
+      margin: '0 3px',
+      color: isActive ? 'white' : grey800,
+      backgroundColor: isActive ? blue800 : grey50
+    }}>
+      {pageNumber}
+    </div>
+  </Link>
+  );
 
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
   alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
@@ -95,12 +112,7 @@ class ContactTags extends Component {
     const state = this.state;
     const actions = [
       <FlatButton label='Cancel' onTouchTap={this.onRequestClose}/>,
-      <FlatButton
-        label='Submit'
-        primary
-        keyboardFocused
-        onTouchTap={this.onSubmit}
-      />
+      <FlatButton label='Submit' primary onTouchTap={this.onSubmit} />
     ];
     // console.log(props.contacts);
 
@@ -109,13 +121,24 @@ class ContactTags extends Component {
       (state.currentPage + 1) * state.pageLimit
       );
     // console.log(contacts);
+    const numOfPages = Math.floor(props.total / state.pageLimit) + 1;
+    let pages = [];
+    for (let i = 1; i < numOfPages + 1; i++) {
+      pages.push(
+        <PageItem
+        key={`page-${i}`}
+        pageNumber={i}
+        isActive={i - 1 === state.currentPage}
+        link={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: i - 1}}}
+        />);
+    }
 
     return (
       <Centering>
         <Dialog actions={actions} open={state.listDialogOpen} onRequestClose={this.onRequestClose}>
           <div style={{height: 400}}>
             <p>Select the List(s) to Copy these selected contacts to:</p>
-          {props.lists &&
+          {props.lists &
             <Select
             multi
             value={state.listValue}
@@ -135,8 +158,18 @@ class ContactTags extends Component {
             <Checkbox onCheck={this.onSelectAll} label='Select All' />
           </div>
           <div className='columns'>
-            <RaisedButton disabled={state.selected.length === 0} style={{margin: '0 5px', float: 'right'}} onClick={this.onCopySelectedToNew} label='Copy to New List'/>
-            <RaisedButton disabled={state.selected.length === 0} style={{margin: '0 5px', float: 'right'}} onClick={this.onRequestOpen} label='Copy to Existing List'/>
+            <RaisedButton
+            disabled={state.selected.length === 0}
+            style={{margin: '0 5px', float: 'right'}}
+            onClick={this.onCopySelectedToNew}
+            label='Copy to New List'
+            />
+            <RaisedButton
+            disabled={state.selected.length === 0}
+            style={{margin: '0 5px', float: 'right'}}
+            onClick={this.onRequestOpen}
+            label='Copy to Existing List'
+            />
           </div>
         </div>
         <div>
@@ -150,17 +183,26 @@ class ContactTags extends Component {
               <option value={100}>100</option>
             </select>
             <span>results per page</span>
-            <span className='smalltext' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} </span>
+            <span className='smalltext' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} out of {props.total} </span>
           </div>
         </div>
-        <ContactFeed
-        selected={state.selected}
-        onSelect={this.onSelect}
-        contacts={contacts}
-        />
+        {contacts.map((contact, index) => (
+          <ContactItemContainer
+          key={contact.id}
+          index={index}
+          checked={state.selected.some(id => id === contact.id)}
+          onSelect={this.onSelect}
+          {...contact}
+          />
+          ))}
         {props.contacts.length === 0 && <div>None found</div>}
-        <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage - 1}}}>Prev</Link>
-        <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage + 1}}}>Next</Link>
+        <div className='vertical-center horizontal-center' style={{padding: '15px 10px', margin: '30px 10px'}} >
+      {/*
+          <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage - 1}}}>Prev</Link>
+          <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage + 1}}}>Next</Link>
+      */}
+          {pages}
+        </div>
       </Centering>
       );
   }
@@ -172,8 +214,10 @@ const mapStateToProps = (state, props) => {
   const currentPage = props.router.location.query.currentPage;
   const limit = props.router.location.query.limit;
   let contacts = [];
+  let total = 0;
   if (tag && state.contactTagReducer[tag]) {
     contacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
+    total = state.contactTagReducer[tag].total;
   }
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   return {
@@ -183,6 +227,7 @@ const mapStateToProps = (state, props) => {
     options: lists.map(list => ({label: list.name, value: list.id})),
     contacts,
     tag,
+    total
   };
 };
 

@@ -57,7 +57,7 @@ const ContactItem = ({
   return (
     <Paper className='row' zDepth={1} style={{margin: 5}}>
       <div onClick={onSelect} className='large-1 medium-1 small-2 columns vertical-center horizontal-center pointer' style={styles.checkbox.container}>
-        <span>{index}</span>
+        <span>{index + 1}</span>
         <input type='checkbox' checked={checked} onChange={onSelect}/>
       </div>
       <div className='large-11 medium-11 small-10 columns' style={{padding: '10px 10px 10px 20px'}}>
