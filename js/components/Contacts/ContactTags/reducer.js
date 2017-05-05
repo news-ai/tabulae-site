@@ -18,6 +18,7 @@ function contactTagReducer(state = initialState.contactTagReducer, action) {
       return obj;
     case TAG_CONTACTS_RECEIVE:
       return assignToEmpty(state, {
+        isReceiving: false,
         [action.tag]: assignToEmpty(state[action.tag], {
           offset: action.offset,
           received: [...state[action.tag].received, ...action.received],
