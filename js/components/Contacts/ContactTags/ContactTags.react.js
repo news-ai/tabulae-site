@@ -67,7 +67,7 @@ class ContactTags extends Component {
     this.onRequestOpen = _ => this.setState({listDialogOpen: true});
     this.onSubmit = _ => {
       this.state.listValue.map(({value}) => this.props.copyContactsToList(this.state.selected, value));
-      this.setState({listValue: false, listDialogOpen: false});
+      this.setState({listValue: [], listDialogOpen: false});
     };
     this.handlePageLimitChange = e => {
       this.props.router.push({pathname: '/contacts', query: {tag: props.tag, limit: e.target.value, currentPage: 0}});
