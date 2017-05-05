@@ -63,9 +63,7 @@ function reformatDatestring(datestring) {
 
 const DatestringDivider = ({isClosed, datestring, onOpenClick}) => (
   <div style={{margin: '10px 0', color: !isClosed ? grey600 : grey700}} className='vertical-center'>
-    <Link style={dividerStyles.link} to={`/emailstats/all?date=${reformatDatestring(datestring)}`}>
-      <span className='hoverGray' style={dividerStyles.linkSpan}>Send on {datestring}</span>
-    </Link>
+    <span style={dividerStyles.linkSpan}>Send on {datestring}</span>
     <IconButton
     tooltip='Collapse'
     tooltipPosition='top-right'
