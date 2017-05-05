@@ -153,7 +153,7 @@ class ContactTags extends Component {
             <span style={styles.text}>Contact Tag: {props.tag}</span>
           </div>
         </div>
-        <div className='row'>
+        <div className='row' style={{margin: '10px 0'}} >
           <div className='large-6 medium-6 small-12 columns' >
             <Checkbox onCheck={this.onSelectAll} label='Select All' />
           </div>
@@ -172,18 +172,23 @@ class ContactTags extends Component {
             />
           </div>
         </div>
-        <div>
-          <div className='large-12 medium-12 small-12 columns'>
-            <span className='smalltext' style={{margin: '0 5px'}}>Showing</span>
-            <select style={{width: 200}} className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span>results per page</span>
-            <span className='smalltext' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} out of {props.total} </span>
+        <div className='row'>
+          <div className='large-3 columns'>
+            <span className='text' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} out of {props.total} </span>
+          </div>
+          <div className='columns'>
+            <div style={{float: 'right'}}>
+              <span className='text' style={{margin: '0 5px'}}>Showing</span>
+              <select style={{width: 60}} className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={200}>200</option>
+              </select>
+              <span className='text' style={{margin: '0 5px'}} >results per page</span>
+            </div>
           </div>
         </div>
         {contacts.map((contact, index) => (
