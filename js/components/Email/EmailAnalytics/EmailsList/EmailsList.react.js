@@ -63,7 +63,7 @@ function reformatDatestring(datestring) {
 
 const DatestringDivider = ({isClosed, datestring, onOpenClick}) => (
   <div style={{margin: '10px 0', marginTop: 15, color: !isClosed ? grey600 : grey700}} className='vertical-center'>
-    <span style={dividerStyles.linkSpan}>Send on {datestring}</span>
+    <span style={dividerStyles.linkSpan}>Sent on {datestring}</span>
     <IconButton
     tooltip='Collapse'
     tooltipPosition='top-right'
