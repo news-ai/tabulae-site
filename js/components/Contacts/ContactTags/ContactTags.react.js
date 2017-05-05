@@ -2,11 +2,12 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
-import ContactFeed from 'components/Contacts/ContactFeed/ContactFeed.react';
+// import ContactFeed from 'components/Contacts/ContactFeed/ContactFeed.react';
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
+import FontIcon from 'material-ui/FontIcon';
 import Select from 'react-select';
 import * as contactTagActions from './actions';
 import {actions as copyActions} from 'components/ListTable/CopyToHOC';
@@ -14,7 +15,7 @@ import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
 
-import {grey50, blue500, blue800, grey800} from 'material-ui/styles/colors';
+import {blue500, blue800, grey50, grey500, grey800} from 'material-ui/styles/colors';
 
 const styles = {
   container: {marginTop: 20, marginBottom: 10},
@@ -83,7 +84,16 @@ class ContactTags extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.tag !== nextProps.tag) {
       nextProps.fetchContactsByTag();
+    } else {
+      if (
+        nextProps.contacts.length < nextProps.total &&
+        (nextProps.currentPage + 1) * nextProps.limit > nextProps.contacts.length
+        ) {
+        nextProps.fetchContactsByTag();
+      }
     }
+
+
     if (this.props.limit !== nextProps.limit) {
       this.setState({pageLimit: nextProps.limit});
     }
@@ -151,6 +161,8 @@ class ContactTags extends Component {
         <div className='row' style={styles.container}>
           <div className='large-12 medium-12 small-12 columns'>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
+          {props.isReceiving &&
+            <FontIcon color={grey500} className='fa fa-spin fa-spinner'/>}
           </div>
         </div>
         <div className='row' style={{margin: '10px 0'}} >
@@ -226,13 +238,14 @@ const mapStateToProps = (state, props) => {
   }
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   return {
+    isReceiving: state.contactTagReducer.isReceiving,
     currentPage: currentPage ? parseInt(currentPage, 10) : currentPage,
     limit: limit ? parseInt(limit, 10) : limit,
     lists,
     options: lists.map(list => ({label: list.name, value: list.id})),
     contacts,
     tag,
-    total
+    total,
   };
 };
 
@@ -260,7 +273,7 @@ const mapDispatchToProps = (dispatch, props) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
       return copyContactsToList(contacts, listid);
     },
-    resetTagContacts: _ => dispatch({type: 'TAG_CONTACTS_RESET', tag})
+    resetTagContacts: _ => dispatch({type: 'TAG_CONTACTS_RESET', tag}),
   };
 };
 
