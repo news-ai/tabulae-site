@@ -14,7 +14,7 @@ import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
 
-import {grey50, blue800, grey800} from 'material-ui/styles/colors';
+import {grey50, blue500, blue800, grey800} from 'material-ui/styles/colors';
 
 const styles = {
   container: {marginTop: 20, marginBottom: 10},
@@ -155,7 +155,7 @@ class ContactTags extends Component {
         </div>
         <div className='row' style={{margin: '10px 0'}} >
           <div className='large-6 medium-6 small-12 columns' >
-            <Checkbox onCheck={this.onSelectAll} label='Select All' />
+            <Checkbox iconStyle={{fill: blue500}} onCheck={this.onSelectAll} label='Select All' />
           </div>
           <div className='columns'>
             <RaisedButton
