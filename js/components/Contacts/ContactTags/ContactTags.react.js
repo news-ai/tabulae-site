@@ -49,7 +49,7 @@ class ContactTags extends Component {
     this.state = {
       selected: [],
       listDialogOpen: false,
-      listValue: false,
+      listValue: [],
       pageLimit: this.props.limit || 10,
       currentPage: this.props.currentPage || 0,
     };
@@ -142,13 +142,15 @@ class ContactTags extends Component {
         link={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: i - 1}}}
         />);
     }
+    // console.log(props.lists);
+    // console.log(props.options)
 
     return (
       <Centering>
         <Dialog actions={actions} open={state.listDialogOpen} onRequestClose={this.onRequestClose}>
           <div style={{height: 400}}>
             <p>Select the List(s) to Copy these selected contacts to:</p>
-          {props.lists &
+          {props.lists &&
             <Select
             multi
             value={state.listValue}
@@ -239,6 +241,7 @@ const mapStateToProps = (state, props) => {
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   return {
     isReceiving: state.contactTagReducer.isReceiving,
+    options: lists.map(list => ({label: list.name, value: list.id})),
     currentPage: currentPage ? parseInt(currentPage, 10) : currentPage,
     limit: limit ? parseInt(limit, 10) : limit,
     lists,
