@@ -41,7 +41,6 @@ const styles = {
       backgroundColor: grey50
     }
   },
-  container: {margin: '10px 5px'},
 };
 
 const span = {
@@ -56,7 +55,7 @@ const ContactItem = ({
   location, phonenumber, twitter, instagram, website, linkedin, notes}) => {
   const onSelect = _ => onCheck(id);
   return (
-    <Paper className='row' zDepth={1} style={styles.container}>
+    <Paper className='row' zDepth={1}>
       <div onClick={onSelect} className='large-1 medium-1 small-2 columns vertical-center horizontal-center pointer' style={styles.checkbox.container}>
         <input type='checkbox' checked={checked} onChange={onSelect}/>
       </div>

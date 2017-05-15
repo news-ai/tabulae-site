@@ -14,6 +14,7 @@ import {actions as copyActions} from 'components/ListTable/CopyToHOC';
 import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
+import BucketContactItem from './BucketContactItem.react';
 
 import {blue500, blue600, blue800, grey50, grey500, grey800} from 'material-ui/styles/colors';
 
@@ -21,6 +22,11 @@ const styles = {
   container: {marginTop: 20, marginBottom: 10},
   text: {fontSize: '2em', marginRight: '10px'}
 };
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+});
+
 
 // utility wrapper to avoid grid confusion
 const Centering = ({children}) => <div className='row align-center'><div className='large-10 medium-10 small-12 columns'>{children}</div></div>;
@@ -39,10 +45,6 @@ const PageItem = ({pageNumber, isActive, link}) => (
     </div>
   </Link>
   );
-
-alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-});
 
 class ContactTags extends Component {
   constructor(props) {
@@ -187,7 +189,7 @@ class ContactTags extends Component {
         <div className='row' style={{margin: '10px 0'}} >
           <div className='large-6 medium-6 small-12 columns' >
             <Checkbox iconStyle={{fill: blue500}} onCheck={this.onSelectAll} label='Select All' />
-            <Checkbox iconStyle={{fill: blue500}} onCheck={this.onRemoveDuplicateEmails} label='Remove Duplicate Emails' />
+            <Checkbox checked={props.removeDupes} iconStyle={{fill: blue500}} onCheck={this.onRemoveDuplicateEmails} label='Remove Duplicate Emails' />
           </div>
           <div className='columns'>
             <RaisedButton
@@ -223,14 +225,24 @@ class ContactTags extends Component {
             </div>
           </div>
         </div>
-      {contacts.map((contact, index) => (
-        <ContactItemContainer
-        key={contact.id}
-        index={index}
-        checked={state.selected.some(id => id === contact.id)}
+      {props.removeDupes ?
+        props.bucketedContacts.map((bucket, i) =>
+        <BucketContactItem
+        key={`bucket-${i}`}
+        contacts={bucket || []}
+        selected={state.selected}
         onSelect={this.onSelect}
-        {...contact}
-        />
+        />)
+       : contacts.map((contact, index) => (
+        <div key={contact.id} style={{margin: '10px 5px'}} >
+          <ContactItemContainer
+          key={contact.id}
+          index={index}
+          checked={state.selected.some(id => id === contact.id)}
+          onSelect={this.onSelect}
+          {...contact}
+          />
+        </div>
         ))}
       {contacts.length === 0 &&
         <div>None found</div>}
@@ -252,12 +264,15 @@ const mapStateToProps = (state, props) => {
   const limit = props.router.location.query.limit;
   const removeDupes = props.router.location.query.removeDupes === 'true' ? true : false;
   let contacts = [];
+  let rawContacts = [];
   let total = 0;
   if (tag && state.contactTagReducer[tag]) {
     contacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
+    rawContacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
     total = state.contactTagReducer[tag].total;
   }
 
+  let bucketedContacts = [];
   if (removeDupes) {
     // all are fetched
     let seen = {};
@@ -269,6 +284,21 @@ const mapStateToProps = (state, props) => {
       }
       return acc;
     }, []);
+
+    const buckets = rawContacts.reduce((acc, contact) => {
+      if (!contact.email) {
+        // acc.push(contact);
+        acc[contact.id] = contact;
+      } else {
+        if (!acc[contact.email]) {
+          acc[contact.email] = [contact];
+        } else {
+          acc[contact.email] = [...acc[contact.email], contact];
+        }
+      }
+      return acc;
+    }, {});
+    bucketedContacts = Object.keys(buckets).map(key => buckets[key]);
     total = contacts.length;
   }
 
@@ -281,6 +311,8 @@ const mapStateToProps = (state, props) => {
     limit: limit ? parseInt(limit, 10) : limit,
     lists,
     options: lists.map(list => ({label: list.name, value: list.id})),
+    bucketedContacts,
+    rawContacts,
     contacts,
     tag,
     total,
