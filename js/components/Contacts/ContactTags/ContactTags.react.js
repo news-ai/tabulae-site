@@ -85,6 +85,7 @@ class ContactTags extends Component {
     if (this.props.tag !== nextProps.tag) {
       nextProps.fetchContactsByTag();
     } else {
+      // fetch more contacts if not yet loaded
       if (
         nextProps.contacts.length < nextProps.total &&
         (nextProps.currentPage + 1) * nextProps.limit > nextProps.contacts.length
@@ -226,7 +227,6 @@ class ContactTags extends Component {
       );
   }
 }
-
 
 const mapStateToProps = (state, props) => {
   const tag = props.router.location.query.tag;

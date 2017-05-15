@@ -18,7 +18,7 @@ export function fetchContactsByTag(tag) {
   return (dispatch, getState) => {
     const tagObj = getState().contactTagReducer[tag];
     const OFFSET = tagObj ? tagObj.offset : 0;
-    if (OFFSET === null || getState().emailStatsReducer.isReceiving) return;
+    if (OFFSET === null || getState().contactTagReducer.isReceiving) return;
     dispatch({type: TAG_CONTACTS_REQUEST, tag});
     return api.get(`/contacts?q=tag:${tag}&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(

@@ -6,7 +6,7 @@ import FontIcon from 'material-ui/FontIcon';
 const styles = {
   container: {
     margin: '2px 5px',
-    padding: '0 8px',
+    padding: '1px 8px',
     display: 'inline-block',
     textAlign: 'center',
     lineHeight: '100%'
