@@ -85,7 +85,7 @@ class ContactTags extends Component {
     if (this.props.tag !== nextProps.tag) {
       nextProps.fetchContactsByTag();
     } else {
-      // fetch more contacts if not yet loaded
+      // fetch more contacts for current page if not yet loaded
       if (
         nextProps.contacts.length < nextProps.total &&
         (nextProps.currentPage + 1) * nextProps.limit > nextProps.contacts.length
@@ -93,7 +93,6 @@ class ContactTags extends Component {
         nextProps.fetchContactsByTag();
       }
     }
-
 
     if (this.props.limit !== nextProps.limit) {
       this.setState({pageLimit: nextProps.limit});

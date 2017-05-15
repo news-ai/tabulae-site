@@ -20,7 +20,7 @@
     "json-loader": "^0.5.4",
     "linkify-it": "^2.0.3",
     "lodash": "^4.13.1",
-    "material-ui": "^0.17.4",
+    "material-ui": "^0.18.1",
     "moment": "^2.14.1",
     "moment-timezone": "^0.5.9",
     "normalizr": "^2.2.1",
