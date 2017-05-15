@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import * as stagingActions from '../Email/actions';
 import EmailsList from 'components/Email/EmailAnalytics/EmailsList';

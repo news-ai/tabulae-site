@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import * as actions from './actions';
 import withRouter from 'react-router/lib/withRouter';
 import Waiting from '../Waiting';

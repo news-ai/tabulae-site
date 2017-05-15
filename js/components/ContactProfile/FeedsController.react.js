@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import validator from 'validator';
 import {actions as feedActions} from './RSSFeed';
@@ -95,7 +95,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(FeedsController);
+export default connect(mapStateToProps, mapDispatchToProps)(FeedsController);

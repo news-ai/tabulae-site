@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import HeadlineItem from './HeadlineItem.react';
 import * as headlineActions from './actions';

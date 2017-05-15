@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';

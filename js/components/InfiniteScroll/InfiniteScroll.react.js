@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, {Component} from 'react';
 
 class InfiniteScroll extends Component {
   constructor(props) {
@@ -31,9 +31,5 @@ class InfiniteScroll extends Component {
       </div>);
   }
 }
-
-InfiniteScroll.PropTypes = {
-  onScrollBottom: PropTypes.func.isRequired
-};
 
 export default InfiniteScroll;
