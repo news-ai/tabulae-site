@@ -59,6 +59,18 @@ class ContactTags extends Component {
       selected: this.state.selected.length === this.props.contacts.length ?
       [] : this.props.contacts.map(contact => contact.id)
     });
+    this.onRemoveDuplicateEmails = (e, isChecked) => {
+      this.props.fetchAllContactsByTag(this.props.tag);
+      this.props.router.push({
+        pathname: '/contacts',
+        query: {
+          tag: this.props.tag,
+          limit: this.state.pageLimit,
+          currentPage: this.props.currentPage,
+          removeDupes: isChecked
+        },
+      });
+    };
     this.onCopySelectedToNew = _ => alertify.promisifyPrompt(
       'New List',
       `What would you like to name the list?`,
@@ -71,7 +83,10 @@ class ContactTags extends Component {
       this.setState({listValue: [], listDialogOpen: false});
     };
     this.handlePageLimitChange = e => {
-      this.props.router.push({pathname: '/contacts', query: {tag: props.tag, limit: e.target.value, currentPage: 0}});
+      this.props.router.push({
+        pathname: '/contacts',
+        query: {tag: this.props.tag, limit: e.target.value, currentPage: 0, removeDupes: this.props.removeDupes}
+      });
     };
   }
 
@@ -125,14 +140,15 @@ class ContactTags extends Component {
       <FlatButton label='Cancel' onTouchTap={this.onRequestClose}/>,
       <FlatButton label='Submit' primary onTouchTap={this.onSubmit} />
     ];
-    // console.log(props.contacts);
 
-    const contacts = props.contacts.slice(
+    const total = props.total;
+
+    let contacts = props.contacts.slice(
       state.currentPage * state.pageLimit,
       (state.currentPage + 1) * state.pageLimit
       );
     // console.log(contacts);
-    const numOfPages = props.total % state.pageLimit > 0 ? Math.floor(props.total / state.pageLimit) + 1 : Math.floor(props.total / state.pageLimit);
+    const numOfPages = total % state.pageLimit > 0 ? Math.floor(total / state.pageLimit) + 1 : Math.floor(total / state.pageLimit);
     let pages = [];
     for (let i = 1; i < numOfPages + 1; i++) {
       pages.push(
@@ -143,8 +159,8 @@ class ContactTags extends Component {
         link={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: i - 1}}}
         />);
     }
-    // console.log(props.lists);
-    // console.log(props.options)
+
+    // console.log(props.contacts);
 
     return (
       <Centering>
@@ -171,6 +187,7 @@ class ContactTags extends Component {
         <div className='row' style={{margin: '10px 0'}} >
           <div className='large-6 medium-6 small-12 columns' >
             <Checkbox iconStyle={{fill: blue500}} onCheck={this.onSelectAll} label='Select All' />
+            <Checkbox iconStyle={{fill: blue500}} onCheck={this.onRemoveDuplicateEmails} label='Remove Duplicate Emails' />
           </div>
           <div className='columns'>
             <RaisedButton
@@ -189,7 +206,7 @@ class ContactTags extends Component {
         </div>
         <div className='row' style={{margin: '10px 0'}} >
           <div className='large-3 columns'>
-            <span className='text' style={{margin: '0 5px'}}>Selected {state.selected.length} out of {props.total} result(s)</span>
+            <span className='text' style={{margin: '0 5px'}}>Selected {state.selected.length} out of {total} result(s)</span>
           </div>
           <div className='columns'>
             <div style={{float: 'right'}}>
@@ -206,16 +223,17 @@ class ContactTags extends Component {
             </div>
           </div>
         </div>
-        {contacts.map((contact, index) => (
-          <ContactItemContainer
-          key={contact.id}
-          index={index}
-          checked={state.selected.some(id => id === contact.id)}
-          onSelect={this.onSelect}
-          {...contact}
-          />
-          ))}
-        {props.contacts.length === 0 && <div>None found</div>}
+      {contacts.map((contact, index) => (
+        <ContactItemContainer
+        key={contact.id}
+        index={index}
+        checked={state.selected.some(id => id === contact.id)}
+        onSelect={this.onSelect}
+        {...contact}
+        />
+        ))}
+      {contacts.length === 0 &&
+        <div>None found</div>}
         <div className='vertical-center horizontal-center' style={{padding: '15px 10px', margin: '30px 10px'}} >
       {/*
           <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage - 1}}}>Prev</Link>
@@ -232,13 +250,30 @@ const mapStateToProps = (state, props) => {
   const tag = props.router.location.query.tag;
   const currentPage = props.router.location.query.currentPage;
   const limit = props.router.location.query.limit;
+  const removeDupes = props.router.location.query.removeDupes === 'true' ? true : false;
   let contacts = [];
   let total = 0;
   if (tag && state.contactTagReducer[tag]) {
     contacts = state.contactTagReducer[tag].received.map(id => state.contactReducer[id]);
     total = state.contactTagReducer[tag].total;
   }
+
+  if (removeDupes) {
+    // all are fetched
+    let seen = {};
+    contacts = contacts.reduce((acc, contact) => {
+      if (!contact.email) acc.push(contact);
+      else if (!seen[contact.email]) {
+        acc.push(contact);
+        seen[contact.email] = true;
+      }
+      return acc;
+    }, []);
+    total = contacts.length;
+  }
+
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+
   return {
     isReceiving: state.contactTagReducer.isReceiving,
     options: lists.map(list => ({label: list.name, value: list.id})),
@@ -249,6 +284,7 @@ const mapStateToProps = (state, props) => {
     contacts,
     tag,
     total,
+    removeDupes,
   };
 };
 
@@ -267,6 +303,7 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     fetchLists: _ => dispatch(listActions.fetchLists()),
     fetchContactsByTag: _ => dispatch(contactTagActions.fetchContactsByTag(tag)),
+    fetchAllContactsByTag: _ => dispatch(contactTagActions.fetchAllContactsByTag(tag)),
     copyToNewList: (contacts, name) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
       return dispatch(listActions.createEmptyList(name))

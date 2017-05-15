@@ -13,13 +13,9 @@ import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as contactActions} from 'components/Contacts';
 
-export function fetchContactsByTag(tag) {
-  const PAGE_LIMIT = 50;
-  return (dispatch, getState) => {
-    const tagObj = getState().contactTagReducer[tag];
-    const OFFSET = tagObj ? tagObj.offset : 0;
-    if (OFFSET === null || getState().contactTagReducer.isReceiving) return;
-    dispatch({type: TAG_CONTACTS_REQUEST, tag});
+export function fetchPaginatedContactsByTag(tag, OFFSET = 0, PAGE_LIMIT = 50) {
+  return dispatch => {
+    dispatch({type: TAG_CONTACTS_REQUEST, tag, offset: OFFSET, limit: PAGE_LIMIT});
     return api.get(`/contacts?q=tag:${tag}&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(
       response => {
@@ -52,3 +48,36 @@ export function fetchContactsByTag(tag) {
     );
   };
 }
+
+export function fetchContactsByTag(tag) {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const tagObj = getState().contactTagReducer[tag];
+    const OFFSET = tagObj ? tagObj.offset : 0;
+    if (OFFSET === null || getState().contactTagReducer.isReceiving) return;
+    return dispatch(fetchPaginatedContactsByTag(tag, OFFSET, PAGE_LIMIT));
+  };
+}
+
+// fetch all of paginated contacts presuming one fetch has already been done
+// relies on knowing how many contacts is there to fetch
+// TODO: could be optimized by fetching from when last offset is AND make it recursive so it doesnt rely on total
+// TODO: also has to fix isReceiving
+export function fetchAllContactsByTag(tag) {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const tagObj = getState().contactTagReducer[tag];
+    const OFFSET = tagObj ? tagObj.offset : 0;
+    if (OFFSET === null || getState().contactTagReducer.isReceiving) return;
+    dispatch({type: TAG_CONTACTS_REQUEST, tag});
+    let promises = [];
+    for (let i = 0; i < (tagObj.total / PAGE_LIMIT) + 1; i++) {
+      promises.push(
+        dispatch(fetchPaginatedContactsByTag(tag, PAGE_LIMIT, i * PAGE_LIMIT))
+      );
+    }
+    return Promise.all(promises);
+  };
+}
+
+
