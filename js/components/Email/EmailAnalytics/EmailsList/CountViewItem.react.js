@@ -12,7 +12,7 @@ function CountViewItem({label, count, iconName, onTouchTap, style}) {
         <Avatar
         size={25}
         backgroundColor={blue200}
-        color='white'
+        color='#ffffff'
         >{count}</Avatar>
         {label} <FontIcon style={fontIconStyle} className={iconName}/>
       </Chip>

@@ -31,7 +31,7 @@ const PageItem = ({pageNumber, isActive, link}) => (
       padding: '2px 5px',
       border: `1px solid ${isActive ? blue800 : grey800}`,
       margin: '0 3px',
-      color: isActive ? 'white' : grey800,
+      color: isActive ? '#ffffff' : grey800,
       backgroundColor: isActive ? blue800 : grey50
     }}>
       {pageNumber}

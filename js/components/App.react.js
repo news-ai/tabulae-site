@@ -26,7 +26,7 @@ import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
 const navStyle = {
   position: 'fixed',
-  backgroundColor: 'white',
+  backgroundColor: '#ffffff',
   // border: '1px dotted black',
   boxShadow: '0px 0px 5px 3px rgba(0, 0, 0, 0.1)',
   top: 0,
@@ -138,7 +138,7 @@ class App extends Component {
             </div>
             <div className='horizontal-center' style={styles.btn}>
               <Link to='/settings'>
-                <RaisedButton label='Invite friends, get 1 month' labelColor='white' backgroundColor={blue300} />
+                <RaisedButton label='Invite friends, get 1 month' labelColor='#ffffff' backgroundColor={blue300} />
               </Link>
             </div>
             <div className='horizontal-center' style={styles.btn}>
@@ -180,7 +180,7 @@ class App extends Component {
           </div>
           <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
             <Link to='/settings'>
-              <RaisedButton label='Invite friends' labelColor='white' backgroundColor={blue300} labelStyle={styles.btnLabel}/>
+              <RaisedButton label='Invite friends' labelColor='#ffffff' backgroundColor={blue300} labelStyle={styles.btnLabel}/>
             </Link>
           </div>
           <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>

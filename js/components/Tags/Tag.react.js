@@ -22,7 +22,7 @@ const Tag = ({textStyle, text, onDeleteTag, hideDelete, color, borderColor, link
     <span style={Object.assign(
       {},
       styles.text,
-      {color: whiteLabel ? 'white' : grey800},
+      {color: whiteLabel ? '#ffffff' : grey800},
       textStyle)}>{text}</span>);
 
   return (

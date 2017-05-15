@@ -64,7 +64,7 @@ const controlsStyle = {
   // overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
-  backgroundColor: 'white',
+  backgroundColor: '#ffffff',
 };
 
 const decorator = new CompositeDecorator([

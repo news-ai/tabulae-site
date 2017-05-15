@@ -74,7 +74,7 @@ class ToolBar extends Component {
 
 const styles = {
   container: {
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     position: 'absolute',
     marginLeft: 0,
     marginTop: 0,
