@@ -15,7 +15,7 @@ import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
 
-import {blue500, blue800, grey50, grey500, grey800} from 'material-ui/styles/colors';
+import {blue500, blue600, blue800, grey50, grey500, grey800} from 'material-ui/styles/colors';
 
 const styles = {
   container: {marginTop: 20, marginBottom: 10},
@@ -29,10 +29,11 @@ const PageItem = ({pageNumber, isActive, link}) => (
   <Link to={link} >
     <div style={{
       padding: '2px 5px',
-      border: `1px solid ${isActive ? blue800 : grey800}`,
+      border: `1px solid ${isActive ? blue800 : grey500}`,
+      borderRadius: '5%',
       margin: '0 3px',
       color: isActive ? '#ffffff' : grey800,
-      backgroundColor: isActive ? blue800 : grey50
+      backgroundColor: isActive ? blue600 : grey50
     }}>
       {pageNumber}
     </div>
@@ -131,7 +132,7 @@ class ContactTags extends Component {
       (state.currentPage + 1) * state.pageLimit
       );
     // console.log(contacts);
-    const numOfPages = Math.floor(props.total / state.pageLimit) + 1;
+    const numOfPages = props.total % state.pageLimit > 0 ? Math.floor(props.total / state.pageLimit) + 1 : Math.floor(props.total / state.pageLimit);
     let pages = [];
     for (let i = 1; i < numOfPages + 1; i++) {
       pages.push(
@@ -186,9 +187,9 @@ class ContactTags extends Component {
             />
           </div>
         </div>
-        <div className='row'>
+        <div className='row' style={{margin: '10px 0'}} >
           <div className='large-3 columns'>
-            <span className='text' style={{margin: '0 5px'}}>selected {state.selected.length} contact{state.selected.length > 1 ? 's' : null} out of {props.total} </span>
+            <span className='text' style={{margin: '0 5px'}}>Selected {state.selected.length} out of {props.total} result(s)</span>
           </div>
           <div className='columns'>
             <div style={{float: 'right'}}>
