@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Link from 'react-router/lib/Link';
+import FontIcon from 'material-ui/FontIcon';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
-import {grey100, grey400, grey600} from 'material-ui/styles/colors';
+import {blue500, grey100, grey300, grey400, grey500, grey600} from 'material-ui/styles/colors';
 import Paper from 'material-ui/Paper';
 
 const defaultPaperStyle = {
@@ -21,10 +22,11 @@ class BucketContactItemContainer extends Component {
     const props = this.props;
     const state = this.state;
     const paperStyle = state.hover ? Object.assign({}, defaultPaperStyle, {backgroundColor: grey100}) : defaultPaperStyle;
+    const checked = props.selected.some(id => id === props.id);
 
     return props.currentSelected === props.id ?
     <div style={{margin: '2px 0'}} >
-      <ContactItemContainer checked={props.selected.some(id => id === props.id)} {...props} />
+      <ContactItemContainer checked={checked} {...props} />
     </div>
      : (
       <Paper
@@ -38,7 +40,10 @@ class BucketContactItemContainer extends Component {
       }}
       style={paperStyle}
       >
-        <div className='large-10 medium-10 small-9 columns'>
+        <div className='large-1 medium-1 small-1 columns'>
+          <FontIcon style={{fontSize: '0.9em'}} color={checked ? blue500 : grey300} className='fa fa-check'/>
+        </div>
+        <div className='large-9 medium-9 small-8 columns'>
         {props.list &&
           <span style={{color: grey600}} className='smalltext'>List: {props.list.name}</span>}
         </div>
