@@ -55,12 +55,23 @@ class ContactTags extends Component {
       listValue: [],
       pageLimit: this.props.limit || 10,
       currentPage: this.props.currentPage || 0,
+      currentlyShowingContacts: [],
     };
     this.onSelect = this._onSelect.bind(this);
-    this.onSelectAll = _ => this.setState({
-      selected: this.state.selected.length === this.props.rawContacts.length ?
-      [] : this.props.rawContacts.map(contact => contact.id)
-    });
+    this.onSelectAll = _ => {
+      const contacts = this.props.removeDupes ?
+      [
+      ...this.state.currentlyShowingContacts,
+      // ...this.props.rawContacts
+      // .filter(contact => !this.state.currentlyShowingContacts.some(cId => cId === contact.id))
+      // .map(contact => contact.id)
+      ] :
+      this.props.rawContacts.map(contact => contact.id);
+      this.setState({
+        selected: this.state.selected.length === contacts.length ?
+        [] : contacts
+      });
+    };
     this.onRemoveDuplicateEmails = (e, isChecked) => {
       this.props.fetchAllContactsByTag(this.props.tag);
       this.props.router.push({
@@ -115,8 +126,14 @@ class ContactTags extends Component {
     if (this.props.limit !== nextProps.limit) {
       this.setState({pageLimit: nextProps.limit});
     }
+
     if (this.props.currentPage !== nextProps.currentPage) {
       this.setState({currentPage: nextProps.currentPage});
+    }
+
+    if (this.props.bucketedContacts.length !== nextProps.bucketedContacts.length && nextProps.bucketedContacts.length > 0) {
+      const currentlyShowingContacts = nextProps.bucketedContacts.map(bucket => bucket[0].id);
+      this.setState({currentlyShowingContacts});
     }
   }
 
@@ -232,6 +249,7 @@ class ContactTags extends Component {
         contacts={bucket || []}
         selected={state.selected}
         onSelect={this.onSelect}
+        onSwitchingContact={(prevId, nextId) => this.setState({currentlyShowingContacts: state.currentlyShowingContacts.map(id => id === prevId ? nextId : id)})}
         />)
        : contacts.map((contact, index) => (
         <div key={contact.id} style={{margin: '10px 5px'}} >
@@ -288,7 +306,7 @@ const mapStateToProps = (state, props) => {
     const buckets = rawContacts.reduce((acc, contact) => {
       if (!contact.email) {
         // acc.push(contact);
-        acc[contact.id] = contact;
+        acc[contact.id] = [contact];
       } else {
         if (!acc[contact.email]) {
           acc[contact.email] = [contact];

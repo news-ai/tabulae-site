@@ -8,13 +8,17 @@ class BucketContacts extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentSelected: this.props.contacts.length > 0 ? this.props.contacts[0].id : undefined,
+      currentlyShowing: this.props.contacts.length > 0 ? this.props.contacts[0].id : undefined,
+    };
+    this.onSwitch = contactId => {
+      this.props.onSwitchingContact(this.state.currentlyShowing, contactId);
+      this.setState({currentlyShowing: contactId});
     };
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.contacts.length !== nextProps.contacts.length && nextProps.contacts.length > 0) {
-      this.setState({currentSelected: nextProps.contacts[0].id});
+      this.setState({currentlyShowing: nextProps.contacts[0].id});
     }
   }
 
@@ -22,7 +26,7 @@ class BucketContacts extends Component {
     const props = this.props;
     const state = this.state;
     // console.log(props.contacts);
-    // console.log(state.currentSelected);
+    // console.log(state.currentlyShowing);
 
     return props.contacts.length > 0 ? (
       <div style={{margin: '10px 5px'}}>
@@ -31,8 +35,8 @@ class BucketContacts extends Component {
           key={`bucket-${i}`}
           selected={props.selected}
           onSelect={this.props.onSelect}
-          currentSelected={state.currentSelected}
-          onSwitch={contactId => this.setState({currentSelected: contactId})}
+          currentlyShowing={state.currentlyShowing}
+          onSwitch={this.onSwitch}
           {...contact}
           />
           )}

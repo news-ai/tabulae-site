@@ -24,7 +24,7 @@ class BucketContactItemContainer extends Component {
     const paperStyle = state.hover ? Object.assign({}, defaultPaperStyle, {backgroundColor: grey100}) : defaultPaperStyle;
     const checked = props.selected.some(id => id === props.id);
 
-    return props.currentSelected === props.id ?
+    return props.currentlyShowing === props.id ?
     <div style={{margin: '2px 0'}} >
       <ContactItemContainer checked={checked} {...props} />
     </div>
