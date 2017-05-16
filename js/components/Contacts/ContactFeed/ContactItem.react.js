@@ -55,7 +55,7 @@ const ContactItem = ({
   location, phonenumber, twitter, instagram, website, linkedin, notes}) => {
   const onSelect = _ => onCheck(id);
   return (
-    <Paper className='row' zDepth={1}>
+    <Paper className='row' zDepth={1} style={{zIndex: 500}} >
       <div onClick={onSelect} className='large-1 medium-1 small-2 columns vertical-center horizontal-center pointer' style={styles.checkbox.container}>
         <input type='checkbox' checked={checked} onChange={onSelect}/>
       </div>

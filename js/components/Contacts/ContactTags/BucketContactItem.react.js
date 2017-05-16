@@ -13,7 +13,7 @@ class BucketContactItem extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.contacts.length !== nextProps.contacts.length && nextProps.contacts.length > 0) {
+    if (this.props.contacts.length !== nextProps.contacts.length && nextProps.contacts.length > 0) {
       this.setState({currentSelected: nextProps.contacts[0].id});
     }
   }
@@ -29,7 +29,7 @@ class BucketContactItem extends Component {
         {props.contacts.map((contact, i) =>
           <BucketContactItemContainer
           key={`bucket-${i}`}
-          checked={props.selected.some(id => id === props.contacts[0].id)}
+          selected={props.selected}
           onSelect={this.props.onSelect}
           currentSelected={state.currentSelected}
           onSwitch={contactId => this.setState({currentSelected: contactId})}
