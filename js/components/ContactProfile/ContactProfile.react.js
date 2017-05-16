@@ -239,7 +239,7 @@ class ContactProfile extends Component {
                     createLink={name => `/contacts?tag=${name}`}
                     textStyle={{fontSize: '1em'}}
                     />
-                  {props.contact.tags === null &&
+                  {(props.contact.tags === null || props.contact.tags.length === 0) &&
                     <None/>}
                   </div>
                 </div>
