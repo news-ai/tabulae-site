@@ -169,7 +169,7 @@ class ContactTags extends Component {
         />);
     }
     // console.log(contacts);
-    console.log(state.currentPage);
+    // console.log(state.currentPage);
 
     return (
       <Centering>
@@ -189,7 +189,7 @@ class ContactTags extends Component {
         <div className='row vertical-center' style={styles.container}>
           <div className='large-8 medium-6 small-12 columns'>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
-          {props.isReceiving &&
+          {(props.isReceiving || props.isCopying) &&
             <FontIcon color={grey500} className='fa fa-spin fa-spinner'/>}
           </div>
           <div className='large-4 medium-6 small-12 columns'>
@@ -255,10 +255,6 @@ class ContactTags extends Component {
       {props.rawContacts.length === 0 &&
         <div>None found</div>}
         <div className='vertical-center horizontal-center' style={{padding: '15px 10px', margin: '30px 10px'}} >
-      {/*
-          <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage - 1}}}>Prev</Link>
-          <Link to={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: state.currentPage + 1}}}>Next</Link>
-      */}
           {pages}
         </div>
       </Centering>
@@ -314,6 +310,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     isReceiving: state.contactTagReducer.isReceiving,
+    isCopying: state.contactReducer.isReceiving,
     options: lists.map(list => ({label: list.name, value: list.id})),
     currentPage: currentPage ? parseInt(currentPage, 10) : currentPage,
     limit: limit ? parseInt(limit, 10) : limit,

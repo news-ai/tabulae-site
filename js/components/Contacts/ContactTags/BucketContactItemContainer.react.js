@@ -45,11 +45,11 @@ class BucketContactItemContainer extends Component {
         </div>
         <div className='large-9 medium-9 small-8 columns'>
         {props.list &&
-          <span style={{color: grey600}} className='smalltext'>List: {props.list.name}</span>}
+          <span style={{color: grey600, fontSize: '0.7em'}}>List: {props.list.name}</span>}
         </div>
         <div className='large-2 medium-2 small-3 columns'>
         {state.hover &&
-          <span style={{color: grey600}} className='smalltext'>Expand +</span>}
+          <span style={{color: grey600, fontSize: '0.7em'}}>Expand +</span>}
         </div>
       </Paper>
       );
