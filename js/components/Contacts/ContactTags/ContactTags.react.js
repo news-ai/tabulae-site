@@ -53,7 +53,7 @@ class ContactTags extends Component {
       selected: [],
       listDialogOpen: false,
       listValue: [],
-      pageLimit: this.props.limit || 10,
+      pageLimit: this.props.limit || 20,
       currentPage: this.props.currentPage || 0,
       currentlyShowingContacts: [],
     };
