@@ -148,7 +148,12 @@ class AllSentEmailsContainer extends Component {
               <MenuItem value='bounce' primaryText='Bounce' />
               <MenuItem value='click' primaryText='Click' />
             </DropDownMenu>
-            <DropDownMenu value={state.filterListValue} onChange={this.handleListChange} labelStyle={styles.listDropdown.labelStyle} >
+            <DropDownMenu
+            value={state.filterListValue}
+            onChange={this.handleListChange}
+            labelStyle={styles.listDropdown.labelStyle}
+            style={styles.listDropdown.dropdown}
+            >
             {selectable}
             </DropDownMenu>
             <DatePicker
@@ -208,6 +213,7 @@ const styles = {
     labelStyle: {
       color: grey700,
     },
+    dropdown: {margin: 0}
   },
   typeDropdown: {
     labelStyle: {
@@ -224,7 +230,7 @@ const styles = {
     containter: {margin: '10px 0'}
   },
   datepicker: {
-    style: {selectColor: 'blue', width: 200},
+    style: {selectColor: 'blue', width: 200, marginLeft: 15},
     textFieldStyle: {color: grey800}
   }
 };
