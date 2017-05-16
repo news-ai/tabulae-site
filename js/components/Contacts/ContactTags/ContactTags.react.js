@@ -18,11 +18,6 @@ import BucketContacts from './BucketContacts.react';
 
 import {blue500, blue600, blue800, grey50, grey500, grey700, grey800} from 'material-ui/styles/colors';
 
-const styles = {
-  container: {marginTop: 20, marginBottom: 10},
-  text: {fontSize: '2em', marginRight: '10px'}
-};
-
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
   alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
 });
@@ -281,6 +276,8 @@ const styles = {
   dialog: {
     container: {height: 400},
   },
+  container: {marginTop: 20, marginBottom: 10},
+  text: {fontSize: '2em', marginRight: '10px'}
 };
 
 const mapStateToProps = (state, props) => {

@@ -1,8 +1,5 @@
 import React, {Component} from 'react';
-import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
 import BucketContactItemContainer from './BucketContactItemContainer.react';
-import FontIcon from 'material-ui/FontIcon';
-import {grey500} from 'material-ui/styles/colors';
 
 class BucketContacts extends Component {
   constructor(props) {
@@ -29,7 +26,7 @@ class BucketContacts extends Component {
     // console.log(state.currentlyShowing);
 
     return props.contacts.length > 0 ? (
-      <div style={{margin: '15px 5px'}}>
+      <div style={styles.container}>
         {props.contacts.map((contact, i) =>
           <BucketContactItemContainer
           key={`bucket-${i}`}
@@ -44,5 +41,7 @@ class BucketContacts extends Component {
       ) : null;
   }
 }
+
+const styles = {container: '15px 5px'};
 
 export default BucketContacts;
