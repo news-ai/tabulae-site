@@ -58,19 +58,9 @@ class ContactTags extends Component {
       currentlyShowingContacts: [],
     };
     this.onSelect = this._onSelect.bind(this);
-    this.onSelectAll = _ => {
-      const contacts = this.props.removeDupes ?
-      [
-      ...this.state.currentlyShowingContacts,
-      // ...this.props.rawContacts
-      // .filter(contact => !this.state.currentlyShowingContacts.some(cId => cId === contact.id))
-      // .map(contact => contact.id)
-      ] :
-      this.props.rawContacts.map(contact => contact.id);
-      this.setState({
-        selected: this.state.selected.length === contacts.length ?
-        [] : contacts
-      });
+    this.onSelectAll = (e, isChecked) => {
+      const contacts = this.props.removeDupes ? this.state.currentlyShowingContacts : this.props.rawContacts.map(contact => contact.id);
+      this.setState({selected: isChecked ? contacts : []});
     };
     this.onRemoveDuplicateEmails = (e, isChecked) => {
       this.props.fetchAllContactsByTag(this.props.tag);
@@ -178,8 +168,6 @@ class ContactTags extends Component {
         link={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: i - 1}}}
         />);
     }
-
-    // console.log(props.contacts);
 
     return (
       <Centering>
