@@ -9,9 +9,10 @@ import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
 import FontIcon from 'material-ui/FontIcon';
+import Checkbox from 'material-ui/Checkbox';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
-import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup, ToolbarSeparator} from 'material-ui/Toolbar';
 
 const DATEFORMAT = 'YYYY-MM-DD';
 const DEFAULT_DATE = '0001-01-01T00:00:00Z';
@@ -28,7 +29,9 @@ class AllSentEmailsContainer extends Component {
     this.state = {
       filterListValue: this.props.listId || 0,
       filterDateValue: date,
+      filterTypeValue: this.props.filter || 'none',
     };
+    this.handleTypeChange = this._handleTypeChange.bind(this);
     this.handleListChange = this._handleListChange.bind(this);
     this.handleDateChange = this._handleDateChange.bind(this);
     this.onDateCancel = this._onDateCancel.bind(this);
@@ -61,6 +64,22 @@ class AllSentEmailsContainer extends Component {
     if (nextProps.baseSubject !== this.props.baseSubject) {
       nextProps.fetchEmails();
     }
+
+    if (nextProps.filter !== this.props.filter) {
+      nextProps.fetchEmails();
+    }
+  }
+
+  _handleTypeChange(e, index, filterTypeValue) {
+    let query = Object.assign({}, this.props.location.query);
+    if (index === 0) {
+      delete query.filter;
+    } else {
+      query.filter = filterTypeValue;
+    }
+    window.Intercom('trackEvent', 'filter_emails_by_type', {type: filterTypeValue});
+    this.props.router.push({pathname: `/emailstats/all`, query});
+    this.setState({filterTypeValue});
   }
 
   _handleListChange(e, index, filterListValue) {
@@ -117,11 +136,13 @@ class AllSentEmailsContainer extends Component {
       {props.lists &&
         <Toolbar style={styles.toolbar}>
           <ToolbarGroup firstChild>
-            <DropDownMenu
-            value={state.filterListValue}
-            onChange={this.handleListChange}
-            labelStyle={styles.dropdown.labelStyle}
-            >
+            <DropDownMenu value={state.filterTypeValue} onChange={this.handleTypeChange} labelStyle={styles.dropdown.labelStyle} >
+              <MenuItem value='none' primaryText='------- Filter By Type -------' />
+              <MenuItem value='open' primaryText='Open' />
+              <MenuItem value='bounce' primaryText='Bounce' />
+              <MenuItem value='click' primaryText='Click' />
+            </DropDownMenu>
+            <DropDownMenu value={state.filterListValue} onChange={this.handleListChange} labelStyle={styles.dropdown.labelStyle} >
             {selectable}
             </DropDownMenu>
             <DatePicker
@@ -198,6 +219,7 @@ const mapStateToProps = (state, props) => {
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
   const baseSubject = props.router.location.query.baseSubject;
+  const filter = props.router.location.query.filter;
   let hasNext = true;
   let validators = [];
   if (listId === 0) {
@@ -212,9 +234,9 @@ const mapStateToProps = (state, props) => {
       id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId
       );
   }
-
+  const filterQuery = state.stagingReducer.filterQuery;
   if (subject || baseSubject) {
-    hasNext = !state.stagingReducer.filterQuery.hitThreshold;
+    hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
       id => {
         // console.log('has subject');
@@ -228,7 +250,7 @@ const mapStateToProps = (state, props) => {
   }
 
   if (date) {
-    hasNext = !state.stagingReducer.filterQuery.hitThreshold;
+    hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
       id => {
         const email = state.stagingReducer[id];
@@ -255,6 +277,7 @@ const mapStateToProps = (state, props) => {
     date,
     emails,
     listId,
+    filter,
     subject,
     baseSubject,
     isReceiving: state.stagingReducer.isReceiving,
@@ -269,16 +292,18 @@ const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
+  const filter = props.router.location.query.filter;
   const baseSubject = props.router.location.query.baseSubject;
 
   let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
-  if (date || subject || baseSubject) {
+  if (date || subject || baseSubject || filter) {
     let query = {date};
     if (baseSubject) query.baseSubject = baseSubject;
     else query.subject = subject;
+    if (filter) query.filter = filter;
     fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails(query));
   }
 
