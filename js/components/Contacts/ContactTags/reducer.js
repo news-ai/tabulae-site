@@ -13,15 +13,21 @@ function contactTagReducer(state = initialState.contactTagReducer, action) {
     case TAG_CONTACTS_REQUEST:
       obj = assignToEmpty(state, {isReceiving: true});
       if (!obj[action.tag]) {
-        obj[action.tag] = {received: [], offset: 0};
+        obj[action.tag] = {received: [], offset: 0, total: undefined};
       }
       return obj;
     case TAG_CONTACTS_RECEIVE:
       return assignToEmpty(state, {
+        isReceiving: false,
         [action.tag]: assignToEmpty(state[action.tag], {
           offset: action.offset,
-          received: [...state[action.tag].received, ...action.received]
+          received: [...state[action.tag].received, ...action.received],
+          total: action.total
         })
+      });
+    case 'TAG_CONTACTS_RESET':
+      return assignToEmpty(state, {
+        [action.tag]: {offset: 0, received: [], total: undefined}
       });
     default:
       return state;

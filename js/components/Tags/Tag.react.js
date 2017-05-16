@@ -6,22 +6,24 @@ import FontIcon from 'material-ui/FontIcon';
 const styles = {
   container: {
     margin: '2px 5px',
-    padding: '0 8px',
+    padding: '1px 8px',
     display: 'inline-block',
     textAlign: 'center',
     lineHeight: '100%'
   },
   text: {
-    color: grey800
+    fontSize: '0.8em'
   },
   icon: {fontSize: '0.8em', marginLeft: 8},
 };
 
-const Tag = ({text, onDeleteTag, hideDelete, color, borderColor, link, whiteLabel}) => {
+const Tag = ({textStyle, text, onDeleteTag, hideDelete, color, borderColor, link, whiteLabel}) => {
   const span = (
-    <span
-    className={`smalltext`}
-    style={{color: whiteLabel ? 'white' : grey800}}>{text}</span>);
+    <span style={Object.assign(
+      {},
+      styles.text,
+      {color: whiteLabel ? '#ffffff' : grey800},
+      textStyle)}>{text}</span>);
 
   return (
     <div style={Object.assign({}, styles.container, {

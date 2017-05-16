@@ -213,7 +213,6 @@ class ContactProfile extends Component {
                   {(props.pastemployers.length === 0 || !props.pastemployers) &&
                     <None/>}
                   </div>
-                {/*
                   <div className='vertical-center' style={styles.employerContainer}>
                     <span style={styles.header}>Tags</span>
                     <AddTagHOC contactId={props.contact.id} tags={props.contact.tags}>
@@ -238,11 +237,11 @@ class ContactProfile extends Component {
                     onDeleteTag={this.onDeleteTag}
                     tags={props.contact.tags}
                     createLink={name => `/contacts?tag=${name}`}
+                    textStyle={{fontSize: '1em'}}
                     />
-                  {props.contact.tags === null &&
+                  {(props.contact.tags === null || props.contact.tags.length === 0) &&
                     <None/>}
                   </div>
-                */}
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {grey400} from 'material-ui/styles/colors';
 import {actions as publicationActions} from 'components/Publications';

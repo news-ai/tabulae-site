@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import InstagramItem from './InstagramItem.react';
 import * as instagramActions from './actions';

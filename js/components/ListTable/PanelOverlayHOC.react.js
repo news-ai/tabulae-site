@@ -47,7 +47,7 @@ const PanelOverlayHOC = ({
         border: `1px solid ${grey300}`,
         borderRadius: '0.2em',
         position: 'fixed',
-        backgroundColor: 'white',
+        backgroundColor: '#ffffff',
         boxShadow: `0 0 30px -10px ${grey500}`
       }}>
         <div

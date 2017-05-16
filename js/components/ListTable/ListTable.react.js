@@ -1008,7 +1008,6 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchList: listId => dispatch(listActions.fetchList(listId)),
     fetchContacts: listId => dispatch(contactActions.fetchContacts(listId)),
     searchPublications: query => dispatch(publicationActions.searchPublications(query)),
-    fetchAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
     clearSearchCache: listId => dispatch({type: 'CLEAR_LIST_SEARCH', listId}),
     deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
     loadAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
@@ -1016,7 +1015,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(withRouter(ListTable));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ListTable));

@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
 import Tweet from '../Tweets/Tweet.react';
 import HeadlineItem from '../Headlines/HeadlineItem.react';
 import InstagramItem from '../Instagram/InstagramItem.react';

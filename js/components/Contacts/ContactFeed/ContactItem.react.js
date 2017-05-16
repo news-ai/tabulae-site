@@ -40,7 +40,7 @@ const styles = {
       padding: 5,
       backgroundColor: grey50
     }
-  }
+  },
 };
 
 const span = {
@@ -50,25 +50,25 @@ const span = {
 };
 
 const ContactItem = ({
-  onCheck, checked,
+  onCheck, checked, index,
   id, firstname, lastname, email, employers, publications, listname, listid, tags, customfields,
   location, phonenumber, twitter, instagram, website, linkedin, notes}) => {
   const onSelect = _ => onCheck(id);
   return (
-    <Paper className='row' zDepth={1} style={{margin: 5}}>
+    <Paper className='row' zDepth={1} style={{zIndex: 500}} >
       <div onClick={onSelect} className='large-1 medium-1 small-2 columns vertical-center horizontal-center pointer' style={styles.checkbox.container}>
         <input type='checkbox' checked={checked} onChange={onSelect}/>
       </div>
       <div className='large-11 medium-11 small-10 columns' style={{padding: '10px 10px 10px 20px'}}>
         <div className='row'>
-          <div className='large-10 medium-8 small-12 columns vertical-center'>
+          <div className='large-9 medium-8 small-12 columns vertical-center'>
             <Link to={`/tables/${listid}/${id}`}>
               <span style={{fontSize: '1.1em'}}>{firstname} {lastname}</span>
             </Link>
             <span style={{margin: '0 10px', color: grey500}}>-</span>
             <span className='text'>{email}</span>
           </div>
-          <div className='large-2 medium-4 small-12 columns smalltext'>
+          <div className='large-3 medium-4 small-12 columns smalltext'>
             <Link to={`/tables/${listid}`}>List: {listname}</Link>
           </div>
           <div className='large-12 columns' style={{marginBottom: 10, marginLeft: 5}}>

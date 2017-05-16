@@ -33,13 +33,13 @@ const emailPanelPauseOverlay = {
 
 const pauseOverlayStyle = {
   container: {margin: 0},
-  text: {color: 'white', fontSize: '1.3em'}
+  text: {color: '#ffffff', fontSize: '1.3em'}
 };
 
 const PauseOverlay = ({message}: {message: string}) => (
   <div style={Object.assign({}, styles.contentBox, emailPanelPauseOverlay)}>
     <div style={pauseOverlayStyle.container}>
-      <span style={pauseOverlayStyle.text}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/>
+      <span style={pauseOverlayStyle.text}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/>
     </div>
   </div>);
 

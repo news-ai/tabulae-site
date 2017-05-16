@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
@@ -12,17 +12,11 @@ function CountViewItem({label, count, iconName, onTouchTap, style}) {
         <Avatar
         size={25}
         backgroundColor={blue200}
-        color='white'
+        color='#ffffff'
         >{count}</Avatar>
         {label} <FontIcon style={fontIconStyle} className={iconName}/>
       </Chip>
     );
 }
-
-CountViewItem.PropTypes = {
-  label: PropTypes.string.isRequired,
-  count: PropTypes.number.isRequired,
-  iconName: PropTypes.string.isRequired
-};
 
 export default CountViewItem;

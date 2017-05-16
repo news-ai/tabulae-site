@@ -5,6 +5,8 @@ import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import ContactItemContainer from './ContactItemContainer.react';
 
+// NO NEED FOR VIRTUALIZED IF PAGINATED
+
 class ContactTags extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +17,6 @@ class ContactTags extends Component {
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onResize = _ => {
       if (this._list) {
-        console.log('recompute');
         this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
@@ -34,6 +35,11 @@ class ContactTags extends Component {
     if (nextProps.selected.length !== this.props.selected.length) {
       this._list.forceUpdateGrid();
     }
+
+    if (nextProps.contacts !== this.props.contacts) {
+      console.log('hit not the smae');
+      this.onResize();
+    }
   }
 
   componentWillUnmount() {
@@ -51,7 +57,7 @@ class ContactTags extends Component {
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const contact = this.props.contacts[index];
     const checked = this.props.selected.some(contactId => contactId === contact.id);
-    const renderNode = <ContactItemContainer checked={checked} onSelect={this.props.onSelect} {...contact}/>
+    const renderNode = <ContactItemContainer index={index} checked={checked} onSelect={this.props.onSelect} {...contact}/>
 
     return (
       <div style={Object.assign({}, style, {padding: 5})} key={key}>

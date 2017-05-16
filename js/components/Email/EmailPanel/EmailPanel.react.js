@@ -117,7 +117,7 @@ function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): st
 const PauseOverlay = ({message}: {message: string}) => (
   <div style={Object.assign({}, emailPanelWrapper, emailPanelPauseOverlay)}>
     <div style={{margin: 0}}>
-    <span style={{color: 'white', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='white' className='fa fa-spin fa-spinner'/></div>
+    <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/></div>
   </div>);
 
 class EmailPanel extends Component {
@@ -462,7 +462,7 @@ class EmailPanel extends Component {
               debounce={500}
               person={props.person}
               >
-                <div style={{backgroundColor: 'white'}} className='vertical-center'>
+                <div style={{backgroundColor: '#ffffff'}} className='vertical-center'>
                   <SelectField
                   style={{overflowX: 'hidden'}}
                   value={state.currentTemplateId}
@@ -524,7 +524,7 @@ class EmailPanel extends Component {
                   onClick={this.onEmailSendClick}
                   tooltip='Preview then Send'
                   tooltipPosition='top-left'
-                  iconStyle={{color: 'white'}}
+                  iconStyle={{color: '#ffffff'}}
                   style={{backgroundColor: lightBlue500}}
                   />
                 </div>

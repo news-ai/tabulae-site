@@ -9,6 +9,7 @@ import TextField from 'material-ui/TextField';
 import 'react-select/dist/react-select.css';
 import {yellow50} from 'material-ui/styles/colors';
 import isEmpty from 'lodash/isEmpty';
+import {WithContext as ReactTags} from 'react-tag-input';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -16,8 +17,8 @@ const textfieldStyle = {
 
 const _getter = contact => {
   if (!contact) return;
-  const {listid, id, firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website} = contact;
-  return {listid, id, firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website};
+  const {listid, id, firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, tags} = contact;
+  return {listid, id, firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, tags};
 };
 
 const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
@@ -28,10 +29,16 @@ class EditMultipleContacts extends Component {
     this.state = {
       open: false,
       contactBody: {},
-      customfields: []
+      customfields: [],
+      tags: [],
     };
+    this.handleAddition = this._handleAddition.bind(this);
+    this.handleDelete = this._handleDelete.bind(this);
+    this.handleDrag = this._handleDrag.bind(this);
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
+    this.onRequestClose = _ => this.setState({open: false, tags: []});
+    this.onRequestOpen = _ => this.setState({open: true, tags: []});
   }
 
   componentWillMount() {
@@ -47,7 +54,38 @@ class EditMultipleContacts extends Component {
     }
   }
 
+  _handleDelete(i) {
+    this.setState({
+      tags: this.state.tags.filter((tag, index) => index !== i)
+    });
+  }
+
+  _handleAddition(tag) {
+    if (this.state.tags.some(cTag => cTag.text === tag)) return;
+    this.setState({
+      tags: [
+        ...this.state.tags,
+        {
+          id: this.state.tags.length + 1,
+          text: tag
+        }
+      ]
+    });
+  }
+
+  _handleDrag(tag, currPos, newPos) {
+    const tags = [ ...this.state.tags ];
+
+    // mutate array
+    tags.splice(currPos, 1);
+    tags.splice(newPos, 0, tag);
+
+    // re-render
+    this.setState({tags});
+  }
+
   _onSubmit() {
+    // checking uncontrolled input elements
     let patchCustomfields = {};
     this.props.list.fieldsmap
     .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
@@ -56,22 +94,38 @@ class EditMultipleContacts extends Component {
       if (!val) return;
       patchCustomfields[fieldObj.value] = val;
     });
-    if (isEmpty(patchCustomfields) && isEmpty(this.state.contactBody)) return;
+    if (isEmpty(patchCustomfields) && isEmpty(this.state.contactBody) && this.state.tags.length === 0) return;
+
+    // handle default field edits
     let patchContact = {};
     Object.keys(this.state.contactBody)
     .filter(key => this.state.contactBody[key])
     .map(key => patchContact[key] = this.state.contactBody[key]);
 
+    // manage customfields edits
     let strippedCustomfieldsMap = {};
     this.props.list.fieldsmap.filter(fieldObj => strippedCustomfieldsMap[fieldObj.value] = fieldObj.readonly);
-
-    const newContacts = this.props.selectContacts.map(contact => {
-      let fields = contact.customfields === null ? [] : contact.customfields;
-      let customfields = fields
-      .filter(field => !strippedCustomfieldsMap[field.name] && !patchCustomfields[field.name]);
+    let newContacts = this.props.selectContacts.map(contact => {
+      const fields = contact.customfields === null ? [] : contact.customfields;
+      const customfields = fields.filter(field => !strippedCustomfieldsMap[field.name] && !patchCustomfields[field.name]);
       Object.keys(patchCustomfields).map(key => customfields.push({name: key, value: patchCustomfields[key]}));
       return Object.assign({}, _getter(contact), patchContact, {customfields});
     });
+
+    // manage tag edits
+    if (this.state.tags.length > 0) {
+      const tags = this.state.tags.map(tag => tag.text);
+      newContacts = newContacts.map(contact => {
+        if (contact.tags === null) {
+          return Object.assign({}, contact, {tags: [...tags]});
+        } else {
+          // remove dupes
+          const set = new Set([...tags, ...contact.tags]);
+          return Object.assign({}, contact, {tags: [...set]});
+        }
+      });
+    }
+
     this.props.patchContacts(newContacts)
     .then(_ => this.setState({open: false, contactBody: {}, customfields: []}));
   }
@@ -87,7 +141,7 @@ class EditMultipleContacts extends Component {
       <FlatButton
       label='Cancel'
       disabled={props.isReceiving}
-      onClick={_ => this.setState({open: false, contactBody: {}, customfields: []})}
+      onClick={_ => this.setState({open: false, contactBody: {}, customfields: [], tags: []})}
       />,
       <FlatButton
       label={props.isReceiving ? 'Updating...' : 'Submit'}
@@ -95,10 +149,11 @@ class EditMultipleContacts extends Component {
       onClick={this.onSubmit}
       />,
     ];
+
     return (
       <div className={props.className}>
         {state.open &&
-          <Dialog actions={actions} autoScrollBodyContent modal open={state.open} title='Edit Multiple Contacts' onRequestClose={_ => this.setState({open: false})}>
+          <Dialog actions={actions} autoScrollBodyContent modal open={state.open} title='Edit Multiple Contacts' onRequestClose={this.onRequestClose}>
           <div style={{margin: 10, padding: 10, fontSize: '0.8em', backgroundColor: yellow50}}>
             Warning: content added here will be applied to all selected contacts.
           </div>
@@ -136,9 +191,20 @@ class EditMultipleContacts extends Component {
               <span>{fieldObj.name}</span>
               <TextField ref={fieldObj.name} name={fieldObj.name} style={textfieldStyle}/>
             </div>)}
+            <div className={columnClassname}>
+              <span>Tags</span>
+              <ReactTags
+              style={{margin: '0 5px'}}
+              tags={state.tags}
+              placeholder='Hit Enter after input'
+              handleDelete={this.handleDelete}
+              handleAddition={this.handleAddition}
+              handleDrag={this.handleDrag}
+              />
+            </div>
           </div>
         </Dialog>}
-        {props.children({onRequestOpen: _ => this.setState({open: true})})}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>);
   }
 }

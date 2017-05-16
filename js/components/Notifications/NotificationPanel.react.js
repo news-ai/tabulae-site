@@ -10,7 +10,7 @@ const Notification = ({message}) => (
 const NotificationPanel = ({notifications}) => {
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: '#ffffff',
       width: 250,
       minHeight: 30,
       maxHeight: 300

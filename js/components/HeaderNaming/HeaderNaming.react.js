@@ -233,7 +233,7 @@ class HeaderNaming extends Component {
             disabled={props.didInvalidate}
             backgroundColor={lightBlue300}
             icon={
-              <FontIcon color='white'
+              <FontIcon color='#ffffff'
               className={!props.didInvalidate && props.isProcessWaiting ? 'fa fa-spinner fa-spin' : 'fa fa-paper-plane'}
               />}
             label='Submit'
@@ -258,7 +258,7 @@ const styles = {
   errorText: {color: red800},
   btn: {
     container: {margin: 30},
-    label: {color: 'white', textTransform: 'none'},
+    label: {color: '#ffffff', textTransform: 'none'},
   },
   grid: {
     container: {marginBottom: 20},

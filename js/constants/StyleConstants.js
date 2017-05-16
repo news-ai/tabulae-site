@@ -35,7 +35,7 @@ export const skylightStyles = {
 };
 
 export const buttonStyle = {
-  backgroundColor: 'white'
+  backgroundColor: '#ffffff'
 };
 
 export const iconStyle = {

@@ -961,7 +961,7 @@ const controlsStyle = {
   height: 40,
   zIndex: 200,
   bottom: 60,
-  backgroundColor: 'white',
+  backgroundColor: '#ffffff',
 };
 
 const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRenderMap);

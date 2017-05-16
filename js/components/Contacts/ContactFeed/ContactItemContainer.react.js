@@ -37,7 +37,7 @@ const mapStateToProps = (state, props) => {
     listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
     isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
     list: state.listReducer[props.listid],
-    isFetchingPublications
+    isFetchingPublications,
   };
 };
 
