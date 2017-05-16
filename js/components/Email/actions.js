@@ -477,7 +477,13 @@ export function fetchSpecificDayEmails(day) {
 // -------------------------------------------------
 
 function createQueryUrl(query) {
-  const keys = Object.keys(query);
+  let keys = Object.keys(query);
+  if (keys.some(key => key === 'subject')) {
+    keys = [...keys.filter(key => key !== 'subject'), 'subject'];
+  } else if (keys.some(key => key === 'baseSubject')) {
+    keys = [...keys.filter(key => key !== 'baseSubject'), 'baseSubject'];
+  }
+
   const queryString = keys
   .filter(key => query[key])
   .map(key => `${key}:${query[key]}`).join(',');
