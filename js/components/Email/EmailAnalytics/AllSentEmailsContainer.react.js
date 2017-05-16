@@ -12,7 +12,7 @@ import FontIcon from 'material-ui/FontIcon';
 import Checkbox from 'material-ui/Checkbox';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
-import {Toolbar, ToolbarGroup, ToolbarSeparator} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup, ToolbarTitle} from 'material-ui/Toolbar';
 
 const DATEFORMAT = 'YYYY-MM-DD';
 const DEFAULT_DATE = '0001-01-01T00:00:00Z';
@@ -124,7 +124,7 @@ class AllSentEmailsContainer extends Component {
     const state = this.state;
     const filterLists = props.lists || [];
     const selectable = [
-      <MenuItem key={0} value={0} primaryText='------- Filter By List -------' />]
+      <MenuItem key={0} value={0} primaryText='------- By List -------' />]
       .concat(filterLists.map((list, i) =>
         <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
         ));
@@ -136,13 +136,19 @@ class AllSentEmailsContainer extends Component {
       {props.lists &&
         <Toolbar style={styles.toolbar}>
           <ToolbarGroup firstChild>
-            <DropDownMenu value={state.filterTypeValue} onChange={this.handleTypeChange} labelStyle={styles.dropdown.labelStyle} >
-              <MenuItem value='none' primaryText='------- Filter By Type -------' />
+            <ToolbarTitle style={styles.toolbarTitle} text='Filters' />
+            <DropDownMenu
+            value={state.filterTypeValue}
+            onChange={this.handleTypeChange}
+            labelStyle={styles.typeDropdown.labelStyle}
+            style={styles.typeDropdown.dropdown}
+            >
+              <MenuItem value='none' primaryText='--- By Type ---' />
               <MenuItem value='open' primaryText='Open' />
               <MenuItem value='bounce' primaryText='Bounce' />
               <MenuItem value='click' primaryText='Click' />
             </DropDownMenu>
-            <DropDownMenu value={state.filterListValue} onChange={this.handleListChange} labelStyle={styles.dropdown.labelStyle} >
+            <DropDownMenu value={state.filterListValue} onChange={this.handleListChange} labelStyle={styles.listDropdown.labelStyle} >
             {selectable}
             </DropDownMenu>
             <DatePicker
@@ -150,7 +156,7 @@ class AllSentEmailsContainer extends Component {
             onChange={this.handleDateChange}
             shouldDisableDate={this.shouldDisableDate}
             firstDayOfWeek={1}
-            autoOk hintText='Filter by Day Created' container='inline'
+            autoOk hintText='By Day Created' container='inline'
             style={styles.datepicker.style}
             textFieldStyle={styles.datepicker.textFieldStyle}
             hideCalendarDate
@@ -197,9 +203,18 @@ const styles = {
     // border: `1px solid ${lightBlue200}`,
     backgroundColor: lightBlue50,
   },
-  dropdown: {
+  toolbarTitle: {marginLeft: 15},
+  listDropdown: {
     labelStyle: {
       color: grey700,
+    },
+  },
+  typeDropdown: {
+    labelStyle: {
+      color: grey700,
+    },
+    dropdown: {
+      margin: 0
     }
   },
   smallIcon: {fontSize: '0.9em'},
@@ -269,7 +284,7 @@ const mapStateToProps = (state, props) => {
   if (filter) {
     hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
-      id => filterQuery.received.some(emailId => emailId === id));
+      id => filterQuery && filterQuery.received.some(emailId => emailId === id));
   }
   // console.log(validators);
 
