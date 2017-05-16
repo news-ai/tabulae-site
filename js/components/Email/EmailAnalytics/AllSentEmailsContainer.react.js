@@ -265,6 +265,12 @@ const mapStateToProps = (state, props) => {
         return datestring === date;
       });
   }
+
+  if (filter) {
+    hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
+    validators.push(
+      id => filterQuery.received.some(emailId => emailId === id));
+  }
   // console.log(validators);
 
   let emails = state.stagingReducer.received.reduce((acc, id) => {
