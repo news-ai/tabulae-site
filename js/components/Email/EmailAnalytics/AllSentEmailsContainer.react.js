@@ -4,7 +4,7 @@ import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {actions as stagingActions} from 'components/Email';
-import {lightBlue50, grey500, grey700, grey800} from 'material-ui/styles/colors';
+import {lightBlue50, grey100, grey500, grey700, grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
@@ -179,7 +179,7 @@ class AllSentEmailsContainer extends Component {
 
       {(props.subject || props.baseSubject) &&
         <div className='vertical-center' style={styles.subjectContainer}>
-          <span className='text'>Campaign:</span>
+          <span className='text' style={styles.subjectLabel}>Campaign:</span>
           <span style={styles.subject}>{props.subject || props.baseSubject}</span>
           <FontIcon
           className='fa fa-times pointer'
@@ -224,8 +224,16 @@ const styles = {
     }
   },
   smallIcon: {fontSize: '0.9em'},
-  subject: {color: grey800, margin: '0 10px'},
-  subjectContainer: {height: 40},
+  subject: {
+    color: grey800,
+    margin: '0 10px',
+  },
+  subjectLabel: {
+    color: grey500,
+  },
+  subjectContainer: {
+    height: 40,
+  },
   emaillist: {
     containter: {margin: '10px 0'}
   },
