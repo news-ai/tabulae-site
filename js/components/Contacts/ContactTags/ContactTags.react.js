@@ -14,7 +14,7 @@ import {actions as copyActions} from 'components/ListTable/CopyToHOC';
 import {actions as listActions} from 'components/Lists';
 import alertify from 'alertifyjs';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
-import BucketContactItem from './BucketContactItem.react';
+import BucketContacts from './BucketContacts.react';
 
 import {blue500, blue600, blue800, grey50, grey500, grey800} from 'material-ui/styles/colors';
 
@@ -58,8 +58,8 @@ class ContactTags extends Component {
     };
     this.onSelect = this._onSelect.bind(this);
     this.onSelectAll = _ => this.setState({
-      selected: this.state.selected.length === this.props.contacts.length ?
-      [] : this.props.contacts.map(contact => contact.id)
+      selected: this.state.selected.length === this.props.rawContacts.length ?
+      [] : this.props.rawContacts.map(contact => contact.id)
     });
     this.onRemoveDuplicateEmails = (e, isChecked) => {
       this.props.fetchAllContactsByTag(this.props.tag);
@@ -227,7 +227,7 @@ class ContactTags extends Component {
         </div>
       {props.removeDupes ?
         props.bucketedContacts.map((bucket, i) =>
-        <BucketContactItem
+        <BucketContacts
         key={`bucket-${i}`}
         contacts={bucket || []}
         selected={state.selected}
