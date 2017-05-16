@@ -29,7 +29,7 @@ class BucketContacts extends Component {
     // console.log(state.currentlyShowing);
 
     return props.contacts.length > 0 ? (
-      <div style={{margin: '10px 5px'}}>
+      <div style={{margin: '15px 5px'}}>
         {props.contacts.map((contact, i) =>
           <BucketContactItemContainer
           key={`bucket-${i}`}

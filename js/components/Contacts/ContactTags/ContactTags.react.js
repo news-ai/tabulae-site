@@ -16,7 +16,7 @@ import alertify from 'alertifyjs';
 import ContactItemContainer from '../ContactFeed/ContactItemContainer.react';
 import BucketContacts from './BucketContacts.react';
 
-import {blue500, blue600, blue800, grey50, grey500, grey800} from 'material-ui/styles/colors';
+import {blue500, blue600, blue800, grey50, grey500, grey700, grey800} from 'material-ui/styles/colors';
 
 const styles = {
   container: {marginTop: 20, marginBottom: 10},
@@ -69,7 +69,7 @@ class ContactTags extends Component {
         query: {
           tag: this.props.tag,
           limit: this.state.pageLimit,
-          currentPage: this.props.currentPage,
+          currentPage: 0,
           removeDupes: isChecked
         },
       });
@@ -156,18 +156,20 @@ class ContactTags extends Component {
       state.currentPage * state.pageLimit,
       (state.currentPage + 1) * state.pageLimit
       );
-    // console.log(contacts);
     const numOfPages = total % state.pageLimit > 0 ? Math.floor(total / state.pageLimit) + 1 : Math.floor(total / state.pageLimit);
     let pages = [];
+
     for (let i = 1; i < numOfPages + 1; i++) {
       pages.push(
         <PageItem
         key={`page-${i}`}
         pageNumber={i}
         isActive={i - 1 === state.currentPage}
-        link={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: i - 1}}}
+        link={{pathname: '/contacts', query: {tag: props.tag, limit: state.pageLimit, currentPage: i - 1, removeDupes: props.removeDupes}}}
         />);
     }
+    // console.log(contacts);
+    console.log(state.currentPage);
 
     return (
       <Centering>
@@ -184,17 +186,20 @@ class ContactTags extends Component {
             />}
           </div>
         </Dialog>
-        <div className='row' style={styles.container}>
-          <div className='large-12 medium-12 small-12 columns'>
+        <div className='row vertical-center' style={styles.container}>
+          <div className='large-8 medium-6 small-12 columns'>
             <span style={styles.text}>Contact Tag: {props.tag}</span>
           {props.isReceiving &&
             <FontIcon color={grey500} className='fa fa-spin fa-spinner'/>}
+          </div>
+          <div className='large-4 medium-6 small-12 columns'>
+            <span className='text' style={{margin: '0 5px', float: 'right', color: grey700}}>Selected {state.selected.length} out of {total} showing result(s)</span>
           </div>
         </div>
         <div className='row' style={{margin: '10px 0'}} >
           <div className='large-6 medium-6 small-12 columns' >
             <Checkbox iconStyle={{fill: blue500}} onCheck={this.onSelectAll} label='Select All' />
-            <Checkbox checked={props.removeDupes} iconStyle={{fill: blue500}} onCheck={this.onRemoveDuplicateEmails} label='Remove Duplicate Emails' />
+            <Checkbox checked={props.removeDupes} iconStyle={{fill: blue500}} onCheck={this.onRemoveDuplicateEmails} label='Bundle Duplicate Emails' />
           </div>
           <div className='columns'>
             <RaisedButton
@@ -212,12 +217,9 @@ class ContactTags extends Component {
           </div>
         </div>
         <div className='row' style={{margin: '10px 0'}} >
-          <div className='large-3 columns'>
-            <span className='text' style={{margin: '0 5px'}}>Selected {state.selected.length} out of {total} result(s)</span>
-          </div>
           <div className='columns'>
             <div style={{float: 'right'}}>
-              <span className='text' style={{margin: '0 5px'}}>Showing</span>
+              <span className='text' style={{margin: '0 5px', color: grey800}}>Showing</span>
               <select style={{width: 60}} className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -226,7 +228,7 @@ class ContactTags extends Component {
                 <option value={100}>100</option>
                 <option value={200}>200</option>
               </select>
-              <span className='text' style={{margin: '0 5px'}} >results per page</span>
+              <span className='text' style={{margin: '0 5px', color: grey800}} >results per page</span>
             </div>
           </div>
         </div>
@@ -250,7 +252,7 @@ class ContactTags extends Component {
           />
         </div>
         ))}
-      {contacts.length === 0 &&
+      {props.rawContacts.length === 0 &&
         <div>None found</div>}
         <div className='vertical-center horizontal-center' style={{padding: '15px 10px', margin: '30px 10px'}} >
       {/*
