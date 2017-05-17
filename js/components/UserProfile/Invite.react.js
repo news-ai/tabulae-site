@@ -5,7 +5,7 @@ import {invite, getInviteCount} from './actions';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import isEmail from 'validator/lib/isEmail';
-import Snackbar from 'material-ui/Snackbar';
+import alertify from 'alertifyjs';
 
 class Invite extends Component {
   constructor(props) {
@@ -13,8 +13,6 @@ class Invite extends Component {
     this.state = {
       errorText: null,
       value: '',
-      snackbar: false,
-      msg: '',
     };
     this.onInvite = this._onInvite.bind(this);
   }
@@ -24,10 +22,16 @@ class Invite extends Component {
     let errorText = null;
     if (isEmail(email)) {
       this.props.onInvite(email)
-      .then(res => {
-        if (res) this.setState({msg: `Whee, invite sent to ${email}`, snackbar: true});
-        else this.setState({msg: 'Something went wrong. Let us know and we can help you resolve this issue.', snackbar: true});
-      });
+      .then(
+        res => {
+          alertify.alert('Success', `Whee, invite sent to ${email}`);
+        },
+        err => {
+          console.log('inside');
+          console.log(err.message);
+          alertify.alert('Failure', `Something went wrong. You sent an invite to this email before`);
+        }
+      );
     } else errorText = 'Not an Email';
     this.setState({errorText, value: ''});
   }
@@ -50,11 +54,6 @@ class Invite extends Component {
           primary
           />
         </div>
-        <Snackbar
-        onRequestClose={_ => this.setState({snackbar: false})}
-        open={state.snackbar}
-        message={state.msg}
-        autoHideDuration={4000}/>
       </div>);
   }
 }

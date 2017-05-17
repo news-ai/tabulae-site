@@ -51,20 +51,17 @@ import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
 import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
 import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from 'components/Tags/TagsContainer.react';
-import debounce from 'lodash/debounce';
 
 import {
   generateTableFieldsmap,
   measureSpanSize,
-  escapeHtml,
-  convertToCsvString,
   exportOperations,
   isNumber,
   _getter
 } from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
-import 'react-virtualized/styles.css'
+import 'react-virtualized/styles.css';
 import './Table.css';
 
 
@@ -76,8 +73,8 @@ alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject
 });
 
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-  });
+  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+});
 
 class ListTable extends Component {
   constructor(props) {
@@ -151,10 +148,10 @@ class ListTable extends Component {
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
     this.resetSort = () => this.setState({
-        sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
-        onSort: false,
-        sortedIds: [],
-      });
+      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+      onSort: false,
+      sortedIds: [],
+    });
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
   }
 
@@ -169,15 +166,13 @@ class ListTable extends Component {
       this.fetchOperations(this.props).then(_ => this.checkEmailDupes());
     }
     else this.fetchOperations(this.props);
-  }
 
-  componentDidMount() {
     setTimeout(this.setGridHeight, 1500);
     if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
     }
-    
+
     if (this.state.columnWidths === null || this.state.columnWidths !== this.props.fieldsmap.length) {
       let columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
@@ -197,7 +192,7 @@ class ListTable extends Component {
             } else {
               content = contact[fieldObj.value];
             }
-            const size = measureSpanSize(content, '16px Source Sans Pro')
+            const size = measureSpanSize(content, '16px Source Sans Pro');
             if (size.width > max) max = size.width;
           });
           columnWidths[i] = max;
@@ -213,9 +208,7 @@ class ListTable extends Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
-    return true;
+  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -233,7 +226,7 @@ class ListTable extends Component {
     }
 
     this.setGridHeight();
-  
+
     if (this.state.sortPositions === null) {
       const sortPositions = nextProps.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
@@ -275,7 +268,7 @@ class ListTable extends Component {
         this._HeaderGrid.recomputeGridSize();
         this._DataGrid.recomputeGridSize();
       }
-    })
+    });
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) {
@@ -283,6 +276,12 @@ class ListTable extends Component {
       }
     }
   }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
+    return true;
+  }
+
 
   componentWillUnmount() {
     window.onresize = undefined;
@@ -329,12 +328,12 @@ class ListTable extends Component {
     this.setState(
       {columnWidths, dragPositions, dragged: true},
       _ => {
-      if (this._HeaderGrid && this._DataGrid) {
-        this.setColumnStorage(columnWidths);
-        this._HeaderGrid.recomputeGridSize();
-        this._DataGrid.recomputeGridSize();
-      }
-    });
+        if (this._HeaderGrid && this._DataGrid) {
+          this.setColumnStorage(columnWidths);
+          this._HeaderGrid.recomputeGridSize();
+          this._DataGrid.recomputeGridSize();
+        }
+      });
   }
 
   _onCheck(e, contactId, contacts, {columnIndex, rowIndex, key, style}) {
@@ -360,7 +359,6 @@ class ListTable extends Component {
     }
   }
 
-  
   _onCheckSelected(contactId) {
     const checked = this.state.selected.some(id => id === contactId);
     const selected = !checked ?
