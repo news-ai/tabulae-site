@@ -127,7 +127,7 @@ class CampaignContainer extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    campaigns: state.campaignStatsReducer.received.map(id => state.campaignStatsReducer[id]),
+    campaigns: state.campaignStatsReducer.received.map(id => state.campaignStatsReducer[id]).filter(campaign => campaign.show),
     hasNext: state.campaignStatsReducer.offset !== null,
     isReceiving: state.campaignStatsReducer.isReceiving,
   };
