@@ -98,11 +98,7 @@ class ScheduledEmailItem extends Component {
             </div>
           </div>
         </div>
-        <Dialog
-        open={this.state.isPreviewOpen}
-        onRequestClose={this.onPreviewClose}
-        autoScrollBodyContent
-        >
+        <Dialog open={this.state.isPreviewOpen} onRequestClose={this.onPreviewClose} autoScrollBodyContent >
           <StaticEmailContent {...this.props} />
         </Dialog>
         <div className='row' style={styles.analytics}>
@@ -169,12 +165,6 @@ const styles = {
   },
   sentLabel: {
     marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'
-  },
-  bouncedReason: {
-    color: deepOrange900
-  },
-  bouncedLabel: {
-    color: deepOrange700, fontSize: '0.8em'
   },
   tagContainer: {
     padding: 3

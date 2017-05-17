@@ -298,7 +298,7 @@ const mapStateToProps = (state, props) => {
   if (filter) {
     hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
-      id => filterQuery && filterQuery.received.some(emailId => emailId === id));
+      id => filterQuery && filterQuery.received && filterQuery.received.some(emailId => emailId === id));
   }
   // console.log(validators);
 
