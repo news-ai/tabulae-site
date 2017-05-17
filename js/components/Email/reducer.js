@@ -142,6 +142,7 @@ function stagingReducer(state = initialState.stagingReducer, action) {
         filterQuery: assignToEmpty(state.filterQuery, {
           received: action.ids,
           hitThreshold: action.hitThreshold,
+          total: action.total
         })});
     default:
       return state;

@@ -116,6 +116,9 @@ export class AnalyticsItem extends Component {
         <div className='row' style={styles.analytics}>
           <div className='small-12 medium-8 large-8 columns truncate-ellipsis' style={styles.toContainer}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText} >{subject || '(No Subject)'}</span>
+          </div>
+        {(!delivered || bouncedreason) &&
+          <div className='small-12 medium-12 large-12 columns'>
           {!delivered &&
             <div style={styles.errorText}>
               <span>Something went wrong on our end. Let us know!</span>
@@ -123,7 +126,7 @@ export class AnalyticsItem extends Component {
             </div>}
           {bouncedreason &&
             <p style={styles.bouncedReason}>{bouncedreason}</p>}
-          </div>
+          </div>}
           <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
           {(!bounced && delivered) && !isScrolling &&
             <OpenAnalyticsHOC emailId={id} count={opened}>
@@ -139,7 +142,7 @@ export class AnalyticsItem extends Component {
             </LinkAnalyticsHOC>}
           </div>
         {bounced &&
-          <div className='small-12 large-6 columns left'>
+          <div className='small-12 medium-12 large-12 columns'>
             <span style={styles.bouncedLabel}>email bounced</span>
           </div>}
         </div>
@@ -188,10 +191,11 @@ const styles = {
     marginRight: 10, fontSize: '0.9em', float: 'right', color: 'gray'
   },
   bouncedReason: {
-    color: deepOrange900
+    color: deepOrange900,
   },
   bouncedLabel: {
-    color: deepOrange700, fontSize: '0.8em'
+    color: deepOrange700,
+    fontSize: '0.8em'
   },
   tagContainer: {
     padding: 3

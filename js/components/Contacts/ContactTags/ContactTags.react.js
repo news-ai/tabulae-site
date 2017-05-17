@@ -18,11 +18,6 @@ import BucketContacts from './BucketContacts.react';
 
 import {blue500, blue600, blue800, grey50, grey500, grey700, grey800} from 'material-ui/styles/colors';
 
-const styles = {
-  container: {marginTop: 20, marginBottom: 10},
-  text: {fontSize: '2em', marginRight: '10px'}
-};
-
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
   alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
 });
@@ -58,39 +53,14 @@ class ContactTags extends Component {
       currentlyShowingContacts: [],
     };
     this.onSelect = this._onSelect.bind(this);
-    this.onSelectAll = (e, isChecked) => {
-      const contacts = this.props.removeDupes ? this.state.currentlyShowingContacts : this.props.rawContacts.map(contact => contact.id);
-      this.setState({selected: isChecked ? contacts : []});
-    };
-    this.onRemoveDuplicateEmails = (e, isChecked) => {
-      this.props.fetchAllContactsByTag(this.props.tag);
-      this.props.router.push({
-        pathname: '/contacts',
-        query: {
-          tag: this.props.tag,
-          limit: this.state.pageLimit,
-          currentPage: 0,
-          removeDupes: isChecked
-        },
-      });
-    };
-    this.onCopySelectedToNew = _ => alertify.promisifyPrompt(
-      'New List',
-      `What would you like to name the list?`,
-      ''
-      ).then(newListName => this.props.copyToNewList(this.state.selected, newListName || `untitled_copied_from_tag_${this.props.tag}`));
+    this.onSelectAll = this._onSelectAll.bind(this);
+    this.onRemoveDuplicateEmails = this._onRemoveDuplicateEmails.bind(this);
+    this.onCopySelectedToNew = this._onCopySelectedToNew.bind(this);
     this.onRequestClose = _ => this.setState({listValue: false, listDialogOpen: false});
     this.onRequestOpen = _ => this.setState({listDialogOpen: true});
-    this.onSubmit = _ => {
-      this.state.listValue.map(({value}) => this.props.copyContactsToList(this.state.selected, value));
-      this.setState({listValue: [], listDialogOpen: false});
-    };
-    this.handlePageLimitChange = e => {
-      this.props.router.push({
-        pathname: '/contacts',
-        query: {tag: this.props.tag, limit: e.target.value, currentPage: 0, removeDupes: this.props.removeDupes}
-      });
-    };
+    this.onSubmit = this._onSubmit.bind(this);
+    this.handlePageLimitChange = this._handlePageLimitChange.bind(this);
+    this.onSwitchingContact = this._onSwitchingContact.bind(this);
   }
 
   componentWillMount() {
@@ -127,6 +97,44 @@ class ContactTags extends Component {
     }
   }
 
+  _onSwitchingContact(prevId, nextId) {
+    this.setState({currentlyShowingContacts: this.state.currentlyShowingContacts.map(id => id === prevId ? nextId : id)});
+  }
+
+  _handlePageLimitChange(e) {
+    this.props.router.push({
+      pathname: '/contacts',
+      query: {tag: this.props.tag, limit: e.target.value, currentPage: 0, removeDupes: this.props.removeDupes}
+    });
+  }
+
+  _onSubmit() {
+    this.state.listValue.map(({value}) => this.props.copyContactsToList(this.state.selected, value));
+    this.setState({listValue: [], listDialogOpen: false});
+  }
+
+  _onCopySelectedToNew() {
+    alertify.promisifyPrompt(
+      'New List',
+      `What would you like to name the list?`,
+      ''
+      )
+    .then(newListName => this.props.copyToNewList(this.state.selected, newListName || `untitled_copied_from_tag_${this.props.tag}`));
+  }
+
+  _onRemoveDuplicateEmails(e, isChecked) {
+    this.props.fetchAllContactsByTag(this.props.tag);
+    this.props.router.push({
+      pathname: '/contacts',
+      query: {
+        tag: this.props.tag,
+        limit: this.state.pageLimit,
+        currentPage: 0,
+        removeDupes: isChecked
+      },
+    });
+  }
+
   _onSelect(contactId) {
     let newSelected = [];
     let seen = false;
@@ -140,6 +148,11 @@ class ContactTags extends Component {
     });
     if (!seen) newSelected.push(contactId);
     this.setState({selected: newSelected});
+  }
+
+  _onSelectAll(e, isChecked) {
+    const contacts = this.props.removeDupes ? this.state.currentlyShowingContacts : this.props.rawContacts.map(contact => contact.id);
+    this.setState({selected: isChecked ? contacts : []});
   }
 
   render() {
@@ -174,7 +187,7 @@ class ContactTags extends Component {
     return (
       <Centering>
         <Dialog actions={actions} open={state.listDialogOpen} onRequestClose={this.onRequestClose}>
-          <div style={{height: 400}}>
+          <div style={styles.dialog.container}>
             <p>Select the List(s) to Copy these selected contacts to:</p>
           {props.lists &&
             <Select
@@ -193,43 +206,31 @@ class ContactTags extends Component {
             <FontIcon color={grey500} className='fa fa-spin fa-spinner'/>}
           </div>
           <div className='large-4 medium-6 small-12 columns'>
-            <span className='text' style={{margin: '0 5px', float: 'right', color: grey700}}>Selected {state.selected.length} out of {total} showing result(s)</span>
+            <span className='text' style={styles.selectLabel}>Selected {state.selected.length} out of {total} showing result(s)</span>
           </div>
         </div>
-        <div className='row' style={{margin: '10px 0'}} >
+        <div className='row' style={styles.controls.container} >
           <div className='large-6 medium-6 small-12 columns' >
-            <Checkbox iconStyle={{fill: blue500}} onCheck={this.onSelectAll} label='Select All' />
-            <Checkbox checked={props.removeDupes} iconStyle={{fill: blue500}} onCheck={this.onRemoveDuplicateEmails} label='Bundle Duplicate Emails' />
+            <Checkbox iconStyle={styles.controls.checkbox} onCheck={this.onSelectAll} label='Select All' />
+            <Checkbox iconStyle={styles.controls.checkbox} checked={props.removeDupes} onCheck={this.onRemoveDuplicateEmails} label='Bundle Duplicate Emails' />
           </div>
           <div className='columns'>
-            <RaisedButton
-            disabled={state.selected.length === 0}
-            style={{margin: '0 5px', float: 'right'}}
-            onClick={this.onCopySelectedToNew}
-            label='Copy to New List'
-            />
-            <RaisedButton
-            disabled={state.selected.length === 0}
-            style={{margin: '0 5px', float: 'right'}}
-            onClick={this.onRequestOpen}
-            label='Copy to Existing List'
-            />
+            <RaisedButton disabled={state.selected.length === 0} style={styles.copy.btn} onClick={this.onCopySelectedToNew} label='Copy to New List' />
+            <RaisedButton disabled={state.selected.length === 0} style={styles.copy.btn} onClick={this.onRequestOpen} label='Copy to Existing List' />
           </div>
         </div>
-        <div className='row' style={{margin: '10px 0'}} >
-          <div className='columns'>
-            <div style={{float: 'right'}}>
-              <span className='text' style={{margin: '0 5px', color: grey800}}>Showing</span>
-              <select style={{width: 60}} className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-                <option value={200}>200</option>
-              </select>
-              <span className='text' style={{margin: '0 5px', color: grey800}} >results per page</span>
-            </div>
+        <div className='row' style={styles.pageLimit.container} >
+          <div className='columns right'>
+            <span className='text' style={styles.pageLimit.label}>Showing</span>
+            <select style={styles.pageLimit.select} className='clearfix' value={state.pageLimit} onChange={this.handlePageLimitChange}>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+            <span className='text' style={styles.pageLimit.label} >results per page</span>
           </div>
         </div>
       {props.removeDupes ?
@@ -239,28 +240,45 @@ class ContactTags extends Component {
         contacts={bucket || []}
         selected={state.selected}
         onSelect={this.onSelect}
-        onSwitchingContact={(prevId, nextId) => this.setState({currentlyShowingContacts: state.currentlyShowingContacts.map(id => id === prevId ? nextId : id)})}
+        onSwitchingContact={this.onSwitchingContact}
         />)
        : contacts.map((contact, index) => (
-        <div key={contact.id} style={{margin: '10px 5px'}} >
-          <ContactItemContainer
-          key={contact.id}
-          index={index}
-          checked={state.selected.some(id => id === contact.id)}
-          onSelect={this.onSelect}
-          {...contact}
-          />
+        <div key={contact.id} style={styles.contactItemContainer} >
+          <ContactItemContainer key={contact.id} index={index} checked={state.selected.some(id => id === contact.id)} onSelect={this.onSelect} {...contact} />
         </div>
         ))}
       {props.rawContacts.length === 0 &&
         <div>None found</div>}
-        <div className='vertical-center horizontal-center' style={{padding: '15px 10px', margin: '30px 10px'}} >
+        <div className='vertical-center horizontal-center' style={styles.pagesContainer} >
           {pages}
         </div>
       </Centering>
       );
   }
 }
+
+const styles = {
+  pagesContainer: {padding: '15px 10px', margin: '30px 10px'},
+  contactItemContainer: {margin: '10px 5px'},
+  pageLimit: {
+    label: {margin: '0 5px', color: grey800},
+    container: {margin: '10px 0'},
+    select: {width: 60}
+  },
+  copy: {
+    btn: {margin: '0 5px', float: 'right'}
+  },
+  controls: {
+    checkbox: {fill: blue500},
+    container: {margin: '10px 0'}
+  },
+  selectLabel: {margin: '0 5px', float: 'right', color: grey700},
+  dialog: {
+    container: {height: 400},
+  },
+  container: {marginTop: 20, marginBottom: 10},
+  text: {fontSize: '2em', marginRight: '10px'}
+};
 
 const mapStateToProps = (state, props) => {
   const tag = props.router.location.query.tag;

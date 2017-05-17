@@ -30,7 +30,7 @@ const blockStyles = {
   }
 };
 
-const greenRoundedStyle = {
+const tooltipStyles = {
   content: {
   },
   tooltip: {
@@ -42,14 +42,18 @@ const greenRoundedStyle = {
 };
 
 
-const Block = ({title, value, hint}) => {
+const Block = ({title, value, hint, linkQuery, query}) => {
+  let span = <span style={blockStyles.indicator}>{value}</span>;
+  if (linkQuery) {
+    span = <Link to={{pathname: '/emailstats/all', query: Object.assign({}, query, linkQuery)}} >{span}</Link>;
+  }
   return (
     <div style={blockStyles.block}>
-      <Tooltip content={hint} styles={greenRoundedStyle}>
+      <Tooltip content={hint} styles={tooltipStyles}>
         <span style={blockStyles.span}>{title}</span>
       </Tooltip>
       <div style={blockStyles.number}>
-      <span style={blockStyles.indicator}>{value}</span>
+        {span}
       </div>
     </div>);
 };
@@ -72,16 +76,16 @@ const Campaign = ({
   if (baseSubject) query.baseSubject = baseSubject;
   else query.subject = subject;
   return (
-    <Paper className='row' zDepth={1} style={{margin: 10, padding: 10}}>
+    <Paper className='row' zDepth={1} style={styles.container}>
       <div className='large-12 medium-12 small-12 columns'>
-        <span className='smalltext' style={{color: grey800}}>Created: {date}</span>
+        <span className='smalltext' style={styles.span}>Created: {date}</span>
       </div>
       <div className='large-5 medium-12 small-12 columns'>
-      {subject || <span style={{color: grey800}}>(No Subject)</span>}
+      {subject || <span style={styles.span}>(No Subject)</span>}
       </div>
       <div className='large-2 medium-4 small-4 columns'>
-        <Block hint='Total number of email opens' value={opens} title='Total Opens'/>
-        <Block hint='Total number of clicks on embeded links' value={clicks} title='Total Clicks'/>
+        <Block hint='Total number of email opens' value={opens} title='Total Opens' query={query} linkQuery={{filter: 'open'}} />
+        <Block hint='Total number of clicks on embeded links' value={clicks} title='Total Clicks' query={query} linkQuery={{filter: 'click'}} />
       </div>
       <div className='large-2 medium-4 small-4 columns'>
         <Block hint='Total number of people who opened' value={uniqueOpens} title='Unique Opens'/>
@@ -94,7 +98,7 @@ const Campaign = ({
       </div>
     */}
       <div className='large-2 medium-4 small-4 columns'>
-        <Block hint='How many emails did not reach recepients' value={bounces} title='Bounces'/>
+        <Block hint='How many emails did not reach recepients' value={bounces} title='Bounces' query={query} linkQuery={{filter: 'bounce'}} />
       </div>
       <div className='large-offset-9 medium-offset-8 small-offset-6 columns'>
         <div className='right'>
@@ -105,6 +109,11 @@ const Campaign = ({
       </div>
     </Paper>
   );
+};
+
+const styles = {
+  span: {color: grey800},
+  container: {margin: 10, padding: 10}
 };
 
 const mapStateToProps = (state, props) => {

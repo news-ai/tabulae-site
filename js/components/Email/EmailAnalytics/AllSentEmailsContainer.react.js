@@ -4,14 +4,15 @@ import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {actions as stagingActions} from 'components/Email';
-import {lightBlue50, grey500, grey700, grey800} from 'material-ui/styles/colors';
+import {lightBlue50, grey100, grey500, grey700, grey800} from 'material-ui/styles/colors';
 import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
 import FontIcon from 'material-ui/FontIcon';
+import Checkbox from 'material-ui/Checkbox';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
-import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup, ToolbarTitle} from 'material-ui/Toolbar';
 
 const DATEFORMAT = 'YYYY-MM-DD';
 const DEFAULT_DATE = '0001-01-01T00:00:00Z';
@@ -28,7 +29,9 @@ class AllSentEmailsContainer extends Component {
     this.state = {
       filterListValue: this.props.listId || 0,
       filterDateValue: date,
+      filterTypeValue: this.props.filter || 'none',
     };
+    this.handleTypeChange = this._handleTypeChange.bind(this);
     this.handleListChange = this._handleListChange.bind(this);
     this.handleDateChange = this._handleDateChange.bind(this);
     this.onDateCancel = this._onDateCancel.bind(this);
@@ -61,6 +64,22 @@ class AllSentEmailsContainer extends Component {
     if (nextProps.baseSubject !== this.props.baseSubject) {
       nextProps.fetchEmails();
     }
+
+    if (nextProps.filter !== this.props.filter) {
+      nextProps.fetchEmails();
+    }
+  }
+
+  _handleTypeChange(e, index, filterTypeValue) {
+    let query = Object.assign({}, this.props.location.query);
+    if (index === 0) {
+      delete query.filter;
+    } else {
+      query.filter = filterTypeValue;
+    }
+    window.Intercom('trackEvent', 'filter_emails_by_type', {type: filterTypeValue});
+    this.props.router.push({pathname: `/emailstats/all`, query});
+    this.setState({filterTypeValue});
   }
 
   _handleListChange(e, index, filterListValue) {
@@ -105,7 +124,7 @@ class AllSentEmailsContainer extends Component {
     const state = this.state;
     const filterLists = props.lists || [];
     const selectable = [
-      <MenuItem key={0} value={0} primaryText='------- Filter By List -------' />]
+      <MenuItem key={0} value={0} primaryText='------- By List -------' />]
       .concat(filterLists.map((list, i) =>
         <MenuItem key={i + 1} value={list.id} primaryText={list.name}/>
         ));
@@ -117,10 +136,23 @@ class AllSentEmailsContainer extends Component {
       {props.lists &&
         <Toolbar style={styles.toolbar}>
           <ToolbarGroup firstChild>
+            <ToolbarTitle style={styles.toolbarTitle} text='Filters' />
+            <DropDownMenu
+            value={state.filterTypeValue}
+            onChange={this.handleTypeChange}
+            labelStyle={styles.typeDropdown.labelStyle}
+            style={styles.typeDropdown.dropdown}
+            >
+              <MenuItem value='none' primaryText='--- By Type ---' />
+              <MenuItem value='open' primaryText='Open' />
+              <MenuItem value='bounce' primaryText='Bounce' />
+              <MenuItem value='click' primaryText='Click' />
+            </DropDownMenu>
             <DropDownMenu
             value={state.filterListValue}
             onChange={this.handleListChange}
-            labelStyle={styles.dropdown.labelStyle}
+            labelStyle={styles.listDropdown.labelStyle}
+            style={styles.listDropdown.dropdown}
             >
             {selectable}
             </DropDownMenu>
@@ -129,7 +161,7 @@ class AllSentEmailsContainer extends Component {
             onChange={this.handleDateChange}
             shouldDisableDate={this.shouldDisableDate}
             firstDayOfWeek={1}
-            autoOk hintText='Filter by Day Created' container='inline'
+            autoOk hintText='By Day Created' container='inline'
             style={styles.datepicker.style}
             textFieldStyle={styles.datepicker.textFieldStyle}
             hideCalendarDate
@@ -147,7 +179,7 @@ class AllSentEmailsContainer extends Component {
 
       {(props.subject || props.baseSubject) &&
         <div className='vertical-center' style={styles.subjectContainer}>
-          <span className='text'>Campaign:</span>
+          <span className='text' style={styles.subjectLabel}>Campaign:</span>
           <span style={styles.subject}>{props.subject || props.baseSubject}</span>
           <FontIcon
           className='fa fa-times pointer'
@@ -176,19 +208,37 @@ const styles = {
     // border: `1px solid ${lightBlue200}`,
     backgroundColor: lightBlue50,
   },
-  dropdown: {
+  toolbarTitle: {marginLeft: 15},
+  listDropdown: {
     labelStyle: {
       color: grey700,
+    },
+    dropdown: {margin: 0}
+  },
+  typeDropdown: {
+    labelStyle: {
+      color: grey700,
+    },
+    dropdown: {
+      margin: 0
     }
   },
   smallIcon: {fontSize: '0.9em'},
-  subject: {color: grey800, margin: '0 10px'},
-  subjectContainer: {height: 40},
+  subject: {
+    color: grey800,
+    margin: '0 10px',
+  },
+  subjectLabel: {
+    color: grey500,
+  },
+  subjectContainer: {
+    height: 40,
+  },
   emaillist: {
     containter: {margin: '10px 0'}
   },
   datepicker: {
-    style: {selectColor: 'blue', width: 200},
+    style: {selectColor: 'blue', width: 200, marginLeft: 15},
     textFieldStyle: {color: grey800}
   }
 };
@@ -198,6 +248,7 @@ const mapStateToProps = (state, props) => {
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
   const baseSubject = props.router.location.query.baseSubject;
+  const filter = props.router.location.query.filter;
   let hasNext = true;
   let validators = [];
   if (listId === 0) {
@@ -212,36 +263,30 @@ const mapStateToProps = (state, props) => {
       id => state.stagingReducer[id].delivered && !state.stagingReducer[id].archived && state.stagingReducer[id].listid === listId
       );
   }
-
+  const filterQuery = state.stagingReducer.filterQuery;
   if (subject || baseSubject) {
-    hasNext = !state.stagingReducer.filterQuery.hitThreshold;
+    hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
       id => {
-        // console.log('has subject');
-        // console.log(subject);
-        // console.log(state.stagingReducer[id].baseSubject);
-        // console.log(state.stagingReducer[id].subject);
-        // console.log(state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject);
         if (baseSubject) return state.stagingReducer[id].baseSubject === baseSubject;
         return state.stagingReducer[id].subject === subject;
       });
   }
 
   if (date) {
-    hasNext = !state.stagingReducer.filterQuery.hitThreshold;
+    hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
       id => {
         const email = state.stagingReducer[id];
-        // let sendat = email.sendat;
-        // if (sendat === DEFAULT_DATE) sendat = email.created;
         const datestring = moment.utc(email.created).format(DATEFORMAT);
-        // console.log('has date');
-        // console.log(email.created);
-        // console.log(datestring);
-        // console.log(date);
-        // console.log(datestring === date);
         return datestring === date;
       });
+  }
+
+  if (filter) {
+    hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
+    validators.push(
+      id => filterQuery && filterQuery.received && filterQuery.received.some(emailId => emailId === id));
   }
   // console.log(validators);
 
@@ -255,6 +300,7 @@ const mapStateToProps = (state, props) => {
     date,
     emails,
     listId,
+    filter,
     subject,
     baseSubject,
     isReceiving: state.stagingReducer.isReceiving,
@@ -269,16 +315,20 @@ const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.router.location.query.listId, 10) || 0;
   const date = props.router.location.query.date;
   const subject = props.router.location.query.subject;
+  const filter = props.router.location.query.filter;
   const baseSubject = props.router.location.query.baseSubject;
 
   let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
+  // TODO: the one below chunks requests at 150, use it if users are hitting fetchMore button a lot
+  // let fetchEmails = _ => dispatch(stagingActions.fetchSentThresholdEmails());
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
-  if (date || subject || baseSubject) {
+  if (date || subject || baseSubject || filter) {
     let query = {date};
     if (baseSubject) query.baseSubject = baseSubject;
     else query.subject = subject;
+    if (filter) query.filter = filter;
     fetchEmails = _ => dispatch(stagingActions.fetchFilterQueryEmails(query));
   }
 
