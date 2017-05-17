@@ -268,11 +268,6 @@ const mapStateToProps = (state, props) => {
     hasNext = filterQuery.received ? filterQuery.received.length !== filterQuery.total : true;
     validators.push(
       id => {
-        // console.log('has subject');
-        // console.log(subject);
-        // console.log(state.stagingReducer[id].baseSubject);
-        // console.log(state.stagingReducer[id].subject);
-        // console.log(state.stagingReducer[id].baseSubject === subject || state.stagingReducer[id].subject === subject);
         if (baseSubject) return state.stagingReducer[id].baseSubject === baseSubject;
         return state.stagingReducer[id].subject === subject;
       });
@@ -283,14 +278,7 @@ const mapStateToProps = (state, props) => {
     validators.push(
       id => {
         const email = state.stagingReducer[id];
-        // let sendat = email.sendat;
-        // if (sendat === DEFAULT_DATE) sendat = email.created;
         const datestring = moment.utc(email.created).format(DATEFORMAT);
-        // console.log('has date');
-        // console.log(email.created);
-        // console.log(datestring);
-        // console.log(date);
-        // console.log(datestring === date);
         return datestring === date;
       });
   }
@@ -330,8 +318,9 @@ const mapDispatchToProps = (dispatch, props) => {
   const filter = props.router.location.query.filter;
   const baseSubject = props.router.location.query.baseSubject;
 
-  // let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
-  let fetchEmails = _ => dispatch(stagingActions.fetchSentThresholdEmails());
+  let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
+  // TODO: the one below chunks requests at 150, use it if users are hitting fetchMore button a lot
+  // let fetchEmails = _ => dispatch(stagingActions.fetchSentThresholdEmails());
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }

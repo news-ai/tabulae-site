@@ -242,7 +242,10 @@ class EmailsList extends Component {
           <IconButton
           tooltip='Load More'
           tooltipPosition='top-center'
-          onClick={props.fetchEmails}
+          onClick={_ => {
+            window.Intercom('trackEvent', 'load_more_emails');
+            props.fetchEmails();
+          }}
           iconClassName='fa fa-chevron-down'
           iconStyle={styles.baseIcon}
           />
