@@ -69,9 +69,11 @@ class UserProfile extends Component {
             <div className='row horizontal-center'>
               <div className='large-8 medium-8 small-12 columns'>
                 <InviteSteps/>
-                <div className='horizontal-center'>
+                {
+                /*<div className='horizontal-center'>
                   <span className='smalltext'>{state.count} friends signed up</span>
-                </div>
+                </div>*/
+                }
                 <div className='horizontal-center' style={{margin: '20px 0'}}>
                   <Invite className='vertical-center'/>
                 </div>

@@ -43,7 +43,7 @@ class Invite extends Component {
         errorText={state.errorText}
         hintText='Email'
         />
-        <div>
+        <div style={{margin: '5px 0'}} >
           <RaisedButton
           label='Invite a friend'
           onClick={this.onInvite}
