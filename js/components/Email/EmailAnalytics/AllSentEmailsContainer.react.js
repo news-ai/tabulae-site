@@ -330,7 +330,8 @@ const mapDispatchToProps = (dispatch, props) => {
   const filter = props.router.location.query.filter;
   const baseSubject = props.router.location.query.baseSubject;
 
-  let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
+  // let fetchEmails = _ => dispatch(stagingActions.fetchSentEmails());
+  let fetchEmails = _ => dispatch(stagingActions.fetchSentThresholdEmails());
   if (listId > 0) {
     fetchEmails = _ => dispatch(stagingActions.fetchListEmails(listId));
   }
