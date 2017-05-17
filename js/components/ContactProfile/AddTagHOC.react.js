@@ -59,6 +59,7 @@ class AddTagHOC extends Component {
 
   _onSubmit() {
     const tags = this.state.tags.map(tag => tag.text);
+    window.Intercom('trackEvent', 'add_contact_tag', {tags: JSON.stringify(tags)});
     this.props.submitTags(tags).then(_ => this.setState({open: false}));
   }
 

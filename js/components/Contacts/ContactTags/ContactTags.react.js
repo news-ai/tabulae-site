@@ -360,12 +360,12 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchContactsByTag: _ => dispatch(contactTagActions.fetchContactsByTag(tag)),
     fetchAllContactsByTag: _ => dispatch(contactTagActions.fetchAllContactsByTag(tag)),
     copyToNewList: (contacts, name) => {
-      window.Intercom('trackEvent', 'copy_some_contacts_to_new');
+      window.Intercom('trackEvent', 'copy_some_contacts_to_new_from_tag');
       return dispatch(listActions.createEmptyList(name))
       .then(response => copyContactsToList(contacts, response.data.id));
     },
     copyContactsToList: (contacts, listid) => {
-      window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
+      window.Intercom('trackEvent', 'copy_some_contacts_to_existing_from_tag');
       return copyContactsToList(contacts, listid);
     },
     resetTagContacts: _ => dispatch({type: 'TAG_CONTACTS_RESET', tag}),
