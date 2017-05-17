@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {getInviteCount} from './actions';
 
-import {cyan500, blueGrey900, pink600} from 'material-ui/styles/colors';
+import {grey700, blueGrey900, pink600} from 'material-ui/styles/colors';
 import Avatar from 'material-ui/Avatar';
 import Invite from './Invite.react';
 
@@ -22,7 +22,7 @@ const InviteSteps = props => <div style={{
   padding: 30,
   textAlign: 'center'
 }}>
-  <span style={{color: blueGrey900, fontSize: '1.5em'}} >For every friend invited that becomes a paid user, you get a <span style={{color: pink600}} >free month</span> added to your account!</span>
+  <span style={{color: grey700, fontSize: '1.5em'}} >For every friend invited that becomes a paid user, you get a <span style={{color: pink600}} >free month</span> added to your account</span>
 </div>;
 
 
@@ -67,7 +67,7 @@ class UserProfile extends Component {
           </TabPane>
           <TabPane placeholder={<span>PLACEHOLDER</span>} tab='Invite' key='3'>
             <div className='row horizontal-center'>
-              <div className='large-8 medium-8 small-12 columns'>
+              <div className='large-8 medium-8 small-12 columns' style={{margin: '20px 0'}} >
                 <InviteSteps/>
                 {
                 /*<div className='horizontal-center'>
