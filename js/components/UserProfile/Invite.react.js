@@ -27,9 +27,8 @@ class Invite extends Component {
           alertify.alert('Success', `Whee, invite sent to ${email}`);
         },
         err => {
-          console.log('inside');
           console.log(err.message);
-          alertify.alert('Failure', `Something went wrong. You sent an invite to this email before`);
+          alertify.alert('Failure', `Something went wrong. Perhaps you sent an invite to this email before or the owner of this email already has an account.`);
         }
       );
     } else errorText = 'Not an Email';
