@@ -243,7 +243,7 @@ class ContactTags extends Component {
         onSwitchingContact={this.onSwitchingContact}
         />)
        : contacts.map((contact, index) => (
-        <div key={contact.id} style={styles.contactItemContainer} >
+        <div key={`${contact.id}- ${index}`} style={styles.contactItemContainer} >
           <ContactItemContainer key={contact.id} index={index} checked={state.selected.some(id => id === contact.id)} onSelect={this.onSelect} {...contact} />
         </div>
         ))}
