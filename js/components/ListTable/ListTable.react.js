@@ -125,7 +125,7 @@ class ListTable extends Component {
         console.log(e);
         return undefined;
       }
-    }
+    };
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -433,7 +433,6 @@ class ListTable extends Component {
             />);
           break;
         case 'profile':
-          const state = this.state;
           contentBody = (
               <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
                 <div
