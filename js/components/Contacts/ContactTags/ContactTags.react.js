@@ -277,7 +277,7 @@ const styles = {
     container: {height: 400},
   },
   container: {marginTop: 20, marginBottom: 10},
-  text: {fontSize: '2em', marginRight: '10px'}
+  text: {fontSize: '2em', marginRight: 10}
 };
 
 const mapStateToProps = (state, props) => {

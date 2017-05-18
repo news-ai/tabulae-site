@@ -14,6 +14,7 @@ import Textarea from 'react-textarea-autosize';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.react';
 import ValidationHOC from 'components/ValidationHOC';
+import {WithContext as ReactTags} from 'react-tag-input';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -50,11 +51,15 @@ class AddContactHOC extends Component {
       employerAutocompleteList: [],
       rssfeedsTextarea: '',
       addPublicationPanelOpen: false,
+      tags: []
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
+    this.handleAddition = this._handleAddition.bind(this);
+    this.handleDelete = this._handleDelete.bind(this);
+    this.handleDrag = this._handleDrag.bind(this);
   }
 
   _onSubmit() {
@@ -75,6 +80,10 @@ class AddContactHOC extends Component {
     if (pub1input && this.props.publicationReducer[pub1input]) {
       const pubId = this.props.publicationReducer[pub1input];
       contactBody.employers = [pubId];
+    }
+
+    if (this.state.tags.length > 0) {
+      contactBody.tags = this.state.tags.map(tag => tag.text);
     }
 
     this.props.addContacts([contactBody])
@@ -115,6 +124,37 @@ class AddContactHOC extends Component {
     if (feeds.length === 0) return;
     this.props.addFeeds(id, feeds);
   }
+
+  _handleDelete(i) {
+    this.setState({
+      tags: this.state.tags.filter((tag, index) => index !== i)
+    });
+  }
+
+  _handleAddition(tag) {
+    if (this.state.tags.some(cTag => cTag.text === tag)) return;
+    this.setState({
+      tags: [
+        ...this.state.tags,
+        {
+          id: this.state.tags.length + 1,
+          text: tag
+        }
+      ]
+    });
+  }
+
+  _handleDrag(tag, currPos, newPos) {
+    const tags = [ ...this.state.tags ];
+
+    // mutate array
+    tags.splice(currPos, 1);
+    tags.splice(newPos, 0, tag);
+
+    // re-render
+    this.setState({tags});
+  }
+
 
   render() {
     const props = this.props;
@@ -273,6 +313,18 @@ class AddContactHOC extends Component {
                 bubbleUpValue={pub1input => this.setState({pub1input})}
                 />
               </Collapse>
+            </div>
+            <div className='large-12 medium-12 small-12 columns vertical-center'>
+              <span>Tags</span>
+              <div style={{margin: '10px 15px'}} >
+                <ReactTags
+                tags={state.tags}
+                placeholder='Hit Enter after input'
+                handleDelete={this.handleDelete}
+                handleAddition={this.handleAddition}
+                handleDrag={this.handleDrag}
+                />
+              </div>
             </div>
             <div className='panel' style={{
               backgroundColor: yellow50,

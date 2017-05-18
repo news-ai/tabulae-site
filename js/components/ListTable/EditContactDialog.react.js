@@ -16,7 +16,7 @@ import {WithContext as ReactTags} from 'react-tag-input';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
-import {fromJS, is} from 'immutable';
+import {fromJS} from 'immutable';
 import {grey400} from 'material-ui/styles/colors';
 import find from 'lodash/find';
 
@@ -329,7 +329,7 @@ class EditContactDialog extends Component {
               />
             </Collapse>
           </div>
-          <div className={columnClassname}>
+          <div className='large-12 medium-12 small-12 columns vertical-center'>
             <span>Tags</span>
             <div style={{margin: '10px 15px'}} >
               <ReactTags
