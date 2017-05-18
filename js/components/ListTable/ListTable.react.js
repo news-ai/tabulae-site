@@ -17,25 +17,19 @@ import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
 import {tour} from './tour';
 
-import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
-import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import Checkbox from 'material-ui/Checkbox';
-import {blue100, blue200, blue300, grey500, grey400, grey300, grey700, blue400} from 'material-ui/styles/colors';
-import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
+import {blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
+import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
-import ValidationHOC from 'components/ValidationHOC';
 
-import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
@@ -51,6 +45,7 @@ import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
 import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
 import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from 'components/Tags/TagsContainer.react';
+import EditContactDialog from './EditContactDialog.react';
 
 import {
   generateTableFieldsmap,
@@ -101,6 +96,8 @@ class ListTable extends Component {
       scrollToRow: undefined,
       currentSearchIndex: 0,
       isDeleting: false,
+      showEditPanel: false,
+      currentEditContactId: undefined,
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -467,15 +464,12 @@ class ListTable extends Component {
               </Link>
               );
           contentBody2 = !this.props.listData.readonly &&
-            <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
-              {({onRequestOpen}) => (
-              <FontIcon
-              onClick={onRequestOpen}
-              className='fa fa-edit pointer'
-              style={{fontSize: '0.9em'}}
-              color={blue300}
-              />)}
-            </EditContactHOC>;
+          <FontIcon
+          onClick={_ => this.setState({currentEditContactId: rowData.id, showEditPanel: true})}
+          className='fa fa-edit pointer'
+          style={{fontSize: '0.9em'}}
+          color={blue300}
+          />;
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -487,8 +481,9 @@ class ListTable extends Component {
     return (
       <div className={className} key={key} style={style}>
       {contentBody}{contentBody2}
-      </div>);
-    }
+      </div>
+      );
+  }
 
   _fetchOperations(props) {
     if (
@@ -664,6 +659,12 @@ class ListTable extends Component {
             />
           </Link>
         </div>
+        <EditContactDialog
+        listId={props.listId}
+        contactId={state.currentEditContactId}
+        open={state.showEditPanel}
+        onClose={_ => this.setState({showEditPanel: false})}
+        />
         {this.showProfileTooltip &&
           <PanelOverlayHOC
           onMouseEnter={_ => {
@@ -672,7 +673,7 @@ class ListTable extends Component {
           }}
           onMouseLeave={_ => {
             this.showProfileTooltip = false;
-            this.onTooltipPanel =  false;
+            this.onTooltipPanel = false;
             this.forceUpdate();
           }}
           profileX={state.profileX}
@@ -848,8 +849,7 @@ class ListTable extends Component {
                 </AnalyzeSelectedTwitterHOC>)}
               </AnalyzeSelectedInstagramHOC>)}
            </ScatterPlotHOC>
-          </div>
-        }
+          </div>}
         </div>
       {state.isEmailPanelOpen &&
         <EmailPanel

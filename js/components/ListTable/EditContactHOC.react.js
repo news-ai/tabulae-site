@@ -1,3 +1,4 @@
+// DEPRECIATED
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
