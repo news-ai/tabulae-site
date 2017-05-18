@@ -23,7 +23,9 @@ class AddTagHOC extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.tags !== nextProps.tags) {
-      this.setState({tags: nextProps.tags === null ? [] : nextProps.tags.map((tag, i) => ({id: i, text: tag}))});
+      this.setState({
+        tags: nextProps.tags === null ? [] : nextProps.tags.map((tag, i) => ({id: i, text: tag})),
+      });
     }
   }
 
