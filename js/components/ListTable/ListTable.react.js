@@ -434,9 +434,11 @@ class ListTable extends Component {
         case 'profile':
           contentBody = (
               <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
-                <div
-                className='pointer'
-                style={{padding: '0 1px', marginRight: 15}}
+                <FontIcon
+                id='profile_hop'
+                className='fa fa-arrow-right'
+                color={blue300}
+                style={{fontSize: '0.9em', padding: '0 1px', marginRight: 15}}
                 onMouseEnter={e => {
                   this.showProfileTooltip = true;
                   this.setState({
@@ -451,21 +453,14 @@ class ListTable extends Component {
                     this.forceUpdate();
                   }, 80);
                 }}
-                >
-                  <FontIcon
-                  id='profile_hop'
-                  className='fa fa-arrow-right'
-                  style={{fontSize: '0.9em'}}
-                  color={blue300}
-                  />
-                </div>
+                />
               </Link>
               );
           contentBody2 = !this.props.listData.readonly &&
           <FontIcon
           onClick={_ => this.setState({currentEditContactId: rowData.id, showEditPanel: true})}
           className='fa fa-edit pointer'
-          style={{fontSize: '0.9em'}}
+          style={{fontSize: '0.9em', padding: '0 1px',}}
           color={blue300}
           />;
           break;

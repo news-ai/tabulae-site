@@ -12,6 +12,7 @@ import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.react';
+import {WithContext as ReactTags} from 'react-tag-input';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -36,8 +37,8 @@ function removeDupe(list) {
 
 const _getter = contact => {
   if (!contact) return;
-  const {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, location} = contact;
-  return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, location};
+  const {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, location, tags} = contact;
+  return {firstname, lastname, email, twitter, instagram, linkedin, phonenumber, blog, notes, website, location, tags};
 };
 
 const _getPublicationName = (contact, reducer) => {
@@ -62,12 +63,16 @@ class EditContactDialog extends Component {
       pub1input: this.props.contact ? _getPublicationName(this.props.contact, this.props.publicationReducer) : '',
       employerAutocompleteList: [],
       addPublicationPanelOpen: false,
+      tags: this.props.contact ? this.props.contact.tags : [],
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
     this.updateAutoInput = this._updateAutoInput.bind(this);
+    this.handleAddition = this._handleAddition.bind(this);
+    this.handleDelete = this._handleDelete.bind(this);
+    this.handleDrag = this._handleDrag.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,6 +82,7 @@ class EditContactDialog extends Component {
         contactBody: _getter(nextProps.contact),
         immutableContactBody,
         pub1input: _getPublicationName(nextProps.contact, nextProps.publicationReducer),
+        tags: nextProps.contact.tags === null ? [] : nextProps.contact.tags.map((tag, i) => ({id: i, text: tag})),
       });
     }
 
@@ -96,7 +102,9 @@ class EditContactDialog extends Component {
     if (this.state.pub1input && pubId) {
       contactBody.employers = this.props.contact.employers === null ? [pubId] : [pubId, ...this.props.contact.employers.filter((id, i) => i > 0)];
     }
+    const tags = this.state.tags.map(tag => tag.text);
     contactBody.listid = this.props.listId;
+    contactBody.tags = tags;
     this.props.patchContact(this.props.contact.id, contactBody)
     .then(_ => this.props.onClose());
   }
@@ -136,6 +144,37 @@ class EditContactDialog extends Component {
       }));
     });
   }
+
+  _handleDelete(i) {
+    this.setState({
+      tags: this.state.tags.filter((tag, index) => index !== i)
+    });
+  }
+
+  _handleAddition(tag) {
+    if (this.state.tags.some(cTag => cTag.text === tag)) return;
+    this.setState({
+      tags: [
+        ...this.state.tags,
+        {
+          id: this.state.tags.length + 1,
+          text: tag
+        }
+      ]
+    });
+  }
+
+  _handleDrag(tag, currPos, newPos) {
+    const tags = [ ...this.state.tags ];
+
+    // mutate array
+    tags.splice(currPos, 1);
+    tags.splice(newPos, 0, tag);
+
+    // re-render
+    this.setState({tags});
+  }
+
 
   render() {
     const props = this.props;
@@ -289,6 +328,18 @@ class EditContactDialog extends Component {
               bubbleUpValue={pub1input => this.setState({pub1input})}
               />
             </Collapse>
+          </div>
+          <div className={columnClassname}>
+            <span>Tags</span>
+            <div style={{margin: '10px 15px'}} >
+              <ReactTags
+              tags={state.tags}
+              placeholder='Hit Enter after input'
+              handleDelete={this.handleDelete}
+              handleAddition={this.handleAddition}
+              handleDrag={this.handleDrag}
+              />
+            </div>
           </div>
         </div>}
       </Dialog>
