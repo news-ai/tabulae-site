@@ -67,10 +67,6 @@ export default function processInlineStylesAndEntities({
   });
 
 
-  // DO SPECIAL THINGS TO FIX
-
-  // console.log(tagInsertMap);
-
   /*
    * FIX INVALID TAG NESTING ADJUSTMENT
    */
@@ -104,7 +100,7 @@ export default function processInlineStylesAndEntities({
           let i = tagStack.indexOf(toOpeningTag(tag));
           let earlyClosers = tagStack.splice(0, i + 1);
 
-          //get rid of actual tag
+          // get rid of actual tag
           earlyClosers.pop();
 
           // close tag, add tag to reopen stack
@@ -124,16 +120,14 @@ export default function processInlineStylesAndEntities({
     }
   });
 
-  // process combinable inline styles
-  // console.log(sortedInlineStyleRanges);
-
+  // process combinable inline styles into html-valid string
   if (sortedInlineStyleRanges.length > 0) {
     const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
     let itree = new IntervalTree(lastRange.offset + lastRange.length);
     sortedInlineStyleRanges.map(range => {
       let tag = combinableInlineTagMap[range.style];
       if (!tag) return;
-      itree.add(range.offset, range.offset + range.length, `${range.style}-${Math.random().toString().slice(2,11)}`);
+      itree.add(range.offset, range.offset + range.length, `${range.style}-${Math.random().toString().slice(2, 11)}`);
     });
 
     let cuts = new Set();
@@ -144,10 +138,8 @@ export default function processInlineStylesAndEntities({
     });
     const sortedCuts = [...cuts].sort((a, b) => a - b);
 
-    // console.log(sortedCuts);
     let currCut;
     let nextCut;
-    // console.log('check out the cuts');
     for (let i = 0; i < sortedCuts.length - 1; i++) {
       currCut = sortedCuts[i];
       nextCut = sortedCuts[i + 1];
@@ -164,11 +156,6 @@ export default function processInlineStylesAndEntities({
         tagInsertMap[nextCut] = [];
       }
       tagInsertMap[nextCut].unshift(`</span>`);
-
-      // console.log(currCut);
-      // console.log(nextCut);
-      // console.log(results);
-      // console.log('-------');
     }
   }
 
@@ -202,13 +189,15 @@ export default function processInlineStylesAndEntities({
 
   sortedEntityRanges.forEach(function(range) {
     if (!range) return;
-    let entity = entityMap[range.key];
-    let tag = entityTagMap[entity.type];
-    if (!tag) return;
+    const entity = entityMap[range.key];
+    const tagObj = entityTagMap[entity.type];
+    if (!tagObj) return;
     const data = entityDataConversionMap[entity.type] ? entityDataConversionMap[entity.type](entity.data) : entity.data;
+    // get corresponding tags depending on available data
+    const tag = tagObj.process(data);
 
-    let compiledTag0 = template(tag[0])(data);
-    let compiledTag1 = template(tag[1])(data);
+    const compiledTag0 = template(tag[0])(data);
+    const compiledTag1 = template(tag[1])(data);
 
     if (!tagInsertMap[range.offset]) {
       tagInsertMap[range.offset] = [];

@@ -24,7 +24,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import {blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
+import {teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
 import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
@@ -44,6 +44,7 @@ import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
 import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
 import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from 'components/Tags/TagsContainer.react';
+import Tag from 'components/Tags/Tag.react';
 import EditContactDialog from './EditContactDialog.react';
 
 import {
@@ -405,6 +406,7 @@ class ListTable extends Component {
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
     let content = _getter(contacts[rowIndex], fieldObj) || '';
+    // switch row to different color classname if it is search result
     let className = classNames(
       'vertical-center',
       'cell',
@@ -425,9 +427,9 @@ class ListTable extends Component {
           const isChecked = this.state.selected.some(id => id === rowData.id);
           contentBody = (
             <FontIcon
-            onClick={(e) => this.onCheck(e, rowData.id, contacts, cellProps)}
+            onClick={e => this.onCheck(e, rowData.id, contacts, cellProps)}
             color={blue200}
-            style={{fontSize: '0.9em'}}
+            style={styles.profileIcon}
             className={isChecked ? 'fa fa-square pointer' : 'fa fa-square-o pointer'}
             />);
           break;
@@ -438,7 +440,7 @@ class ListTable extends Component {
                 id='profile_hop'
                 className='fa fa-arrow-right'
                 color={blue300}
-                style={{fontSize: '0.9em', padding: '0 1px', marginRight: 15}}
+                style={styles.profileIcon}
                 onMouseEnter={e => {
                   this.showProfileTooltip = true;
                   this.setState({
@@ -460,9 +462,23 @@ class ListTable extends Component {
           <FontIcon
           onClick={_ => this.setState({currentEditContactId: rowData.id, showEditPanel: true})}
           className='fa fa-edit pointer'
-          style={{fontSize: '0.9em', padding: '0 1px',}}
+          style={styles.profileIcon}
           color={blue300}
           />;
+          break;
+        case 'tags':
+          contentBody = content
+          .slice(0, 3)
+          .map((tag, i) =>
+            <Tag
+            key={`${tag}-${i}`}
+            hideDelete
+            whiteLabel
+            text={tag}
+            color={teal400}
+            borderColor={teal900}
+            link={`/contacts?tag=${tag}`}
+            />);
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -940,7 +956,8 @@ const styles = {
   },
   iconBtn: {
     color: grey500
-  }
+  },
+  profileIcon: {fontSize: '0.9em', padding: '0 1px', margin: '0 5px'},
 };
 
 const mapStateToProps = (state, props) => {
