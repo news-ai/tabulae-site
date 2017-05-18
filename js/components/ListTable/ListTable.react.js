@@ -37,7 +37,6 @@ import CopyToHOC from './CopyToHOC';
 import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
-import EditContactHOC from './EditContactHOC.react';
 import EditMultipleContactsHOC from './EditMultipleContactsHOC.react';
 import PanelOverlayHOC from './PanelOverlayHOC.react';
 import EmptyListStatement from './EmptyListStatement.react';
