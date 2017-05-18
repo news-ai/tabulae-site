@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {getInviteCount} from './actions';
 
-import {cyan500, blueGrey900} from 'material-ui/styles/colors';
+import {grey700, blueGrey900, pink600} from 'material-ui/styles/colors';
 import Avatar from 'material-ui/Avatar';
 import Invite from './Invite.react';
 
@@ -19,20 +19,10 @@ const InviteSteps = props => <div style={{
   display: 'flex',
   justifyContent: 'space-around',
   margin: '20px 0',
-  padding: 30
+  padding: 30,
+  textAlign: 'center'
 }}>
-  <div>
-    <Avatar backgroundColor={cyan500} size={30}><strong>1</strong></Avatar>
-    <span style={{color: blueGrey900, margin: '0 5px'}}>Invite friends</span>
-  </div>
-  <div>
-    <Avatar backgroundColor={cyan500} size={30}><strong>2</strong></Avatar>
-    <span style={{color: blueGrey900, margin: '0 5px'}}>5 friends set up accounts</span>
-  </div>
-  <div>
-    <Avatar backgroundColor={cyan500} size={30}><strong>3</strong></Avatar>
-    <span style={{color: blueGrey900, margin: '0 5px'}}>You get 1 month FREE. Yay!</span>
-  </div>
+  <span style={{color: grey700, fontSize: '1.5em'}} >For every friend invited that becomes a paid user, you get a <span style={{color: pink600}} >free month</span> added to your account</span>
 </div>;
 
 
@@ -77,11 +67,13 @@ class UserProfile extends Component {
           </TabPane>
           <TabPane placeholder={<span>PLACEHOLDER</span>} tab='Invite' key='3'>
             <div className='row horizontal-center'>
-              <div className='large-8 medium-8 small-12 columns'>
+              <div className='large-8 medium-8 small-12 columns' style={{margin: '20px 0'}} >
                 <InviteSteps/>
-                <div className='horizontal-center'>
-                  <span style={{fontSize: '0.8em'}}>{5 - state.count} friends away from a free month</span>
-                </div>
+                {
+                /*<div className='horizontal-center'>
+                  <span className='smalltext'>{state.count} friends signed up</span>
+                </div>*/
+                }
                 <div className='horizontal-center' style={{margin: '20px 0'}}>
                   <Invite className='vertical-center'/>
                 </div>

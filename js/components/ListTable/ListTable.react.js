@@ -17,25 +17,19 @@ import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
 import {tour} from './tour';
 
-import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import IconMenu from 'material-ui/IconMenu';
-import Popover from 'material-ui/Popover';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import Checkbox from 'material-ui/Checkbox';
-import {blue100, blue200, blue300, grey500, grey400, grey300, grey700, blue400} from 'material-ui/styles/colors';
-import {AutoSizer, Grid, ScrollSync, WindowScroller} from 'react-virtualized'
+import {blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
+import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
-import ValidationHOC from 'components/ValidationHOC';
 
-import MixedFeed from '../ContactProfile/MixedFeed/MixedFeed.react';
 import {EmailPanel} from '../Email';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
@@ -43,7 +37,6 @@ import CopyToHOC from './CopyToHOC';
 import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
-import EditContactHOC from './EditContactHOC.react';
 import EditMultipleContactsHOC from './EditMultipleContactsHOC.react';
 import PanelOverlayHOC from './PanelOverlayHOC.react';
 import EmptyListStatement from './EmptyListStatement.react';
@@ -51,20 +44,18 @@ import AnalyzeSelectedTwitterHOC from './AnalyzeSelectedTwitterHOC.react';
 import AnalyzeSelectedInstagramHOC from './AnalyzeSelectedInstagramHOC.react';
 import ScatterPlotHOC from './ScatterPlotHOC.react';
 import Tags from 'components/Tags/TagsContainer.react';
-import debounce from 'lodash/debounce';
+import EditContactDialog from './EditContactDialog.react';
 
 import {
   generateTableFieldsmap,
   measureSpanSize,
-  escapeHtml,
-  convertToCsvString,
   exportOperations,
   isNumber,
   _getter
 } from './helpers';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
-import 'react-virtualized/styles.css'
+import 'react-virtualized/styles.css';
 import './Table.css';
 
 
@@ -76,8 +67,8 @@ alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject
 });
 
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-  });
+  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+});
 
 class ListTable extends Component {
   constructor(props) {
@@ -104,6 +95,8 @@ class ListTable extends Component {
       scrollToRow: undefined,
       currentSearchIndex: 0,
       isDeleting: false,
+      showEditPanel: false,
+      currentEditContactId: undefined,
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -131,7 +124,7 @@ class ListTable extends Component {
         console.log(e);
         return undefined;
       }
-    }
+    };
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onSearchClick = this._onSearchClick.bind(this);
@@ -151,10 +144,10 @@ class ListTable extends Component {
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
     this.resetSort = () => this.setState({
-        sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
-        onSort: false,
-        sortedIds: [],
-      });
+      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+      onSort: false,
+      sortedIds: [],
+    });
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
   }
 
@@ -169,15 +162,13 @@ class ListTable extends Component {
       this.fetchOperations(this.props).then(_ => this.checkEmailDupes());
     }
     else this.fetchOperations(this.props);
-  }
 
-  componentDidMount() {
     setTimeout(this.setGridHeight, 1500);
     if (this.state.sortPositions === null) {
       const sortPositions = this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
     }
-    
+
     if (this.state.columnWidths === null || this.state.columnWidths !== this.props.fieldsmap.length) {
       let columnWidths = this.props.fieldsmap.map((fieldObj, i) => {
         const name = fieldObj.name;
@@ -197,7 +188,7 @@ class ListTable extends Component {
             } else {
               content = contact[fieldObj.value];
             }
-            const size = measureSpanSize(content, '16px Source Sans Pro')
+            const size = measureSpanSize(content, '16px Source Sans Pro');
             if (size.width > max) max = size.width;
           });
           columnWidths[i] = max;
@@ -213,9 +204,7 @@ class ListTable extends Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
-    return true;
+  componentDidMount() {
   }
 
   componentWillReceiveProps(nextProps) {
@@ -233,7 +222,7 @@ class ListTable extends Component {
     }
 
     this.setGridHeight();
-  
+
     if (this.state.sortPositions === null) {
       const sortPositions = nextProps.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2);
       this.setState({sortPositions});
@@ -275,7 +264,7 @@ class ListTable extends Component {
         this._HeaderGrid.recomputeGridSize();
         this._DataGrid.recomputeGridSize();
       }
-    })
+    });
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) {
@@ -283,6 +272,12 @@ class ListTable extends Component {
       }
     }
   }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
+    return true;
+  }
+
 
   componentWillUnmount() {
     window.onresize = undefined;
@@ -329,12 +324,12 @@ class ListTable extends Component {
     this.setState(
       {columnWidths, dragPositions, dragged: true},
       _ => {
-      if (this._HeaderGrid && this._DataGrid) {
-        this.setColumnStorage(columnWidths);
-        this._HeaderGrid.recomputeGridSize();
-        this._DataGrid.recomputeGridSize();
-      }
-    });
+        if (this._HeaderGrid && this._DataGrid) {
+          this.setColumnStorage(columnWidths);
+          this._HeaderGrid.recomputeGridSize();
+          this._DataGrid.recomputeGridSize();
+        }
+      });
   }
 
   _onCheck(e, contactId, contacts, {columnIndex, rowIndex, key, style}) {
@@ -360,7 +355,6 @@ class ListTable extends Component {
     }
   }
 
-  
   _onCheckSelected(contactId) {
     const checked = this.state.selected.some(id => id === contactId);
     const selected = !checked ?
@@ -438,7 +432,6 @@ class ListTable extends Component {
             />);
           break;
         case 'profile':
-          const state = this.state;
           contentBody = (
               <Link to={`/tables/${this.props.listId}/${rowData.id}`}>
                 <div
@@ -469,15 +462,12 @@ class ListTable extends Component {
               </Link>
               );
           contentBody2 = !this.props.listData.readonly &&
-            <EditContactHOC listId={this.props.listId} contactId={rowData.id}>
-              {({onRequestOpen}) => (
-              <FontIcon
-              onClick={onRequestOpen}
-              className='fa fa-edit pointer'
-              style={{fontSize: '0.9em'}}
-              color={blue300}
-              />)}
-            </EditContactHOC>;
+          <FontIcon
+          onClick={_ => this.setState({currentEditContactId: rowData.id, showEditPanel: true})}
+          className='fa fa-edit pointer'
+          style={{fontSize: '0.9em'}}
+          color={blue300}
+          />;
           break;
         default:
           contentBody = <span>{content}</span>;
@@ -489,8 +479,9 @@ class ListTable extends Component {
     return (
       <div className={className} key={key} style={style}>
       {contentBody}{contentBody2}
-      </div>);
-    }
+      </div>
+      );
+  }
 
   _fetchOperations(props) {
     if (
@@ -666,6 +657,12 @@ class ListTable extends Component {
             />
           </Link>
         </div>
+        <EditContactDialog
+        listId={props.listId}
+        contactId={state.currentEditContactId}
+        open={state.showEditPanel}
+        onClose={_ => this.setState({showEditPanel: false})}
+        />
         {this.showProfileTooltip &&
           <PanelOverlayHOC
           onMouseEnter={_ => {
@@ -674,7 +671,7 @@ class ListTable extends Component {
           }}
           onMouseLeave={_ => {
             this.showProfileTooltip = false;
-            this.onTooltipPanel =  false;
+            this.onTooltipPanel = false;
             this.forceUpdate();
           }}
           profileX={state.profileX}
@@ -850,8 +847,7 @@ class ListTable extends Component {
                 </AnalyzeSelectedTwitterHOC>)}
               </AnalyzeSelectedInstagramHOC>)}
            </ScatterPlotHOC>
-          </div>
-        }
+          </div>}
         </div>
       {state.isEmailPanelOpen &&
         <EmailPanel
@@ -912,7 +908,7 @@ class ListTable extends Component {
               }
               return wid + 10;
             }}
-            overscanRowCount={0}
+            overscanRowCount={10}
             height={state.leftoverHeight || 500}
             width={state.screenWidth}
             rowCount={props.received.length}

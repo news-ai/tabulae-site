@@ -4,11 +4,14 @@ export function invite(email) {
   return dispatch => {
     dispatch({type: 'INVITE', email});
     return api.post(`/invites`, {email})
-    .then(response => true)
-    .catch(err => {
-      console.log(err);
-      return false;
-    });
+    .then(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.log(error);
+        return Promise.reject(error);
+      });
   };
 }
 
