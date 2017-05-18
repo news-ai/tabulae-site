@@ -42,6 +42,8 @@ class BucketContacts extends Component {
   }
 }
 
-const styles = {container: '15px 5px'};
+const styles = {
+  container: {margin: '15px 5px'}
+};
 
 export default BucketContacts;

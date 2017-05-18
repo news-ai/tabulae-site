@@ -3,7 +3,7 @@ import Link from 'react-router/lib/Link';
 
 const styles = {
   container: {marginTop: 20},
-  text: {fontSize: '2em', marginRight: '10px'}
+  text: {fontSize: '2em', marginRight: 10}
 };
 
 function ListManagerTitle({title, backRouteTitle, route, iconName}) {
