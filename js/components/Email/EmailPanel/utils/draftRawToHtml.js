@@ -67,17 +67,6 @@ let combinableInlineTagMap = {
   'Nunito': ['font-family:Nunito;', 'span'],
 }
 
-// let entityTagMap = {
-//   'LINK': ['<a href="<%= url %>" target="_blank">', '</a>'],
-//   'IMAGE': [
-//     `<div style="text-align:<%= align %>">
-//       <a href="<%= imageLink %>" target="_blank">
-//         <img src="<%= src %>">`,
-//         `</img>
-//       </a>
-//     </div>`],
-// };
-
 let entityTagMap = {
   'LINK': {
     process: data => ['<a href="<%= url %>" target="_blank">', '</a>'],
