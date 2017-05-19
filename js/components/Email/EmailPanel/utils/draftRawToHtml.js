@@ -68,15 +68,36 @@ let combinableInlineTagMap = {
 }
 
 let entityTagMap = {
-  'LINK': ['<a href="<%= url %>" target="_blank">', '</a>'],
-  'IMAGE': [
-    `<div style="text-align:<%= align %>">
-      <a href="<%= imageLink %>" target="_blank">
+  'LINK': {
+    process: data => ['<a href="<%= url %>" target="_blank">', '</a>'],
+  },
+  'IMAGE': {
+    default: [
+      `<div style="text-align:<%= align %>">
         <img src="<%= src %>">`,
         `</img>
-      </a>
-    </div>`],
-};
+      </div>`
+    ],
+    process: data => {
+      if (data.imageLink && data.imageLink !== '#') {
+        return [
+        `<div style="text-align:<%= align %>">
+            <a href="<%= imageLink %>" target="_blank">
+              <img src="<%= src %>">`,
+              `</img>
+            </a>
+          </div>`];
+      } else {
+        return [
+        `<div style="text-align:<%= align %>">
+            <img src="<%= src %>">`,
+            `</img>
+          </div>`
+        ];
+      }
+    } 
+  }
+}
 
 let nestedTagMap = {
   'ordered-list-item': ['<ol>', '</ol>'],

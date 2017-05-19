@@ -194,6 +194,22 @@ export function transformFieldsmap(fieldsmap) {
           }),
           strategy: contact => contact.publication_name_1
         };
+      case 'tags':
+        return {
+          customfield: false,
+          name: 'Tags',
+          value: 'tags',
+          hidden: find(fieldsmap, fObj => fObj.value === 'tags').hidden,
+          sortEnabled: false,
+          hideCheckbox: false,
+          checkboxStrategy: (fMap, checked) => fMap.map(fObj => {
+            if (fObj.value === 'tags') {
+              return Object.assign({}, fObj, {hidden: checked});
+            }
+            return fObj;
+          }),
+          strategy: contact => contact.tags === null ? [] : contact.tags
+        };
       // case 'pastemployers':
       //   return {
       //     customfield: false,
