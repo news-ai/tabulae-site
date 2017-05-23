@@ -81,6 +81,7 @@ class EditContactDialog extends Component {
       this.setState({
         contactBody: _getter(nextProps.contact),
         immutableContactBody,
+        customfields: nextProps.contact.customfields,
         pub1input: _getPublicationName(nextProps.contact, nextProps.publicationReducer),
         tags: nextProps.contact.tags === null ? [] : nextProps.contact.tags.map((tag, i) => ({id: i, text: tag})),
       });
