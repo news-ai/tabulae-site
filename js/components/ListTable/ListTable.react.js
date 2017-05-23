@@ -466,8 +466,13 @@ class ListTable extends Component {
           color={blue300}
           />;
           break;
+        default:
+          contentBody = <span>{content}</span>;
+      }
+    } else {
+      switch (fieldObj.value) {
         case 'tags':
-          contentBody = content
+          contentBody = content ? content
           .slice(0, 3)
           .map((tag, i) =>
             <Tag
@@ -478,13 +483,11 @@ class ListTable extends Component {
             color={teal400}
             borderColor={teal900}
             link={`/contacts?tag=${tag}`}
-            />);
+            />) : '';
           break;
         default:
           contentBody = <span>{content}</span>;
       }
-    } else {
-      contentBody = <span>{content}</span>;
     }
 
     return (

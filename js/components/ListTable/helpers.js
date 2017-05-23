@@ -259,6 +259,15 @@ export function generateTableFieldsmap(listData) {
       tableOnly: true,
       hideCheckbox: true,
     },
+    // HIDE THIS PART AFTER
+    // {
+    //   name: 'Tags',
+    //   hidden: false,
+    //   value: 'tags',
+    //   customfield: false,
+    //   tableOnly: false,
+    //   hideCheckbox: true,
+    // },
     ...replacedNameMap.map(fieldObj => Object.assign({}, fieldObj, {sortEnabled: true})),
     instagramLikesToComments(listData),
     instagramLikesToPosts(listData),
