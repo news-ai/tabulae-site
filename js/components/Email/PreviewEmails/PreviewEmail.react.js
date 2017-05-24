@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {grey800} from 'material-ui/styles/colors';
 import * as stagingActions from '../actions';
 import FontIcon from 'material-ui/FontIcon';
+import {_getter} from 'components/ListTable/helpers';
 
 const styles = {
   contentBox: {
@@ -43,6 +44,25 @@ const PauseOverlay = ({message}: {message: string}) => (
     </div>
   </div>);
 
+function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
+  if (html === null || html.length === 0) return {html: '', numMatches: 0};
+  let newHtml = html;
+  let matchCount = {};
+  fieldsmap.map(fieldObj => {
+    let value = '';
+    const replaceValue = _getter(contact, fieldObj);
+    if (replaceValue) value = replaceValue;
+    const regexValue = new RegExp('\{' + fieldObj.name + '\}', 'g');
+    // count num custom vars used
+    const matches = newHtml.match(regexValue);
+    if (matches !== null) matchCount[fieldObj.name] = matches.length;
+    newHtml = newHtml.replace(regexValue, value);
+  });
+  const numMatches = Object.keys(matchCount).length;
+  if (numMatches > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
+  return {html: newHtml, numMatches};
+}
+
 class PreviewEmail extends Component {
   constructor(props) {
     super(props);
@@ -78,11 +98,16 @@ class PreviewEmail extends Component {
   _onSave() {
     const props = this.props;
     const state = this.state;
+    let subject = state.subject || props.subject;
+    let body = state.body || props.body;
+    subject = replaceAll(subject, props.contact, props.fieldsmap).html;
+    body = replaceAll(body, props.contact, props.fieldsmap).html;
+
     let emailObj = {
       listid: props.listid,
       to: props.to,
-      subject: state.subject,
-      body: state.body,
+      subject: subject,
+      body: body,
       contactid: props.id,
       templateid: props.templateid,
       cc: props.cc,

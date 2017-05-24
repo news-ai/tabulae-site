@@ -7,6 +7,7 @@ import TextField from 'material-ui/TextField';
 import {grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
+import find from 'lodash/find';
 
 const fuseOptions = {
   threshold: 0.6,
@@ -115,6 +116,8 @@ class PreviewEmails extends Component {
         </div>
         {previewEmails.map((email, i) =>
           <PreviewEmail
+          contact={find(props.contacts, contact => contact.id === email.contactId)}
+          fieldsmap={props.fieldsmap}
           turnOnDraft={_ => {
             window.Intercom('trackEvent', 'use_preview_draft');
             this.setState({numberDraftEmails: state.numberDraftEmails + 1});

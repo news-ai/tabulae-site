@@ -540,6 +540,8 @@ class EmailPanel extends Component {
           ref='preview'
           title='Preview'>
             <PreviewEmails
+            contacts={props.selectedContacts}
+            fieldsmap={state.fieldsmap}
             listId={props.listId}
             sendLater={props.scheduledtime !== null}
             isReceiving={props.isReceiving}
