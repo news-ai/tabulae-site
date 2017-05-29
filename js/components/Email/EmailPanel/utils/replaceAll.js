@@ -12,8 +12,6 @@ export default function replaceAll(html: string, contact: Object, fieldsmap: Arr
     // count num custom vars used
     const matches = newHtml.match(regexValue);
     if (matches !== null) {
-      console.log(matches);
-      console.log(value);
       if (!value) emptyFields.push(fieldObj.name);
       matchCount[fieldObj.name] = matches.length;
     }
