@@ -101,43 +101,6 @@ const PauseOverlay = ({message}: {message: string}) => (
     <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/></div>
   </div>);
 
-function getGeneratedHtmlEmails(selectedContacts, subject, body) {
-  let emptyFields = [];
-  const contactEmails = selectedContacts.reduce((acc, contact, i) => {
-    if (contact && contact !== null) {
-      const bodyObj = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
-      const subjectObj = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
-
-      let emailObj = {
-        listid: this.props.listId,
-        to: contact.email,
-        subject: subjectObj.html,
-        body: bodyObj.html,
-        contactid: contact.id,
-        templateid: this.state.currentTemplateId,
-        cc: this.props.cc.map(item => item.text),
-        bcc: this.props.bcc.map(item => item.text),
-        fromemail: this.props.from,
-      };
-      if (this.props.scheduledtime !== null) {
-        emailObj.sendat = this.props.scheduledtime;
-      }
-      if (subjectObj.numMatches > 0) {
-        emailObj.baseSubject = subject;
-      }
-      if (bodyObj.emptyFields || subjectObj.emptyFields) {
-        emptyFields = [...emptyFields, {
-          email: contact.email,
-          fields: [...bodyObj.emptyFields, ...subjectObj.emptyFields]
-        }];
-      }
-      acc.push(emailObj);
-    }
-    return acc;
-  }, []);
-  return {contactEmails, emptyFields};
-}
-
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
@@ -164,6 +127,7 @@ class EmailPanel extends Component {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
       this.setState({subject});
     };
+    this.getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this.sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
@@ -283,6 +247,47 @@ class EmailPanel extends Component {
     }, 1000);
   }
 
+  _getGeneratedHtmlEmails(selectedContacts, subject, body) {
+    let emptyFields = [];
+    const contactEmails = selectedContacts.reduce((acc, contact, i) => {
+      if (contact && contact !== null) {
+        const bodyObj = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
+        const subjectObj = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
+
+        let emailObj = {
+          listid: this.props.listId,
+          to: contact.email,
+          subject: subjectObj.html,
+          body: bodyObj.html,
+          contactid: contact.id,
+          templateid: this.state.currentTemplateId,
+          cc: this.props.cc.map(item => item.text),
+          bcc: this.props.bcc.map(item => item.text),
+          fromemail: this.props.from,
+        };
+        if (this.props.scheduledtime !== null) {
+          emailObj.sendat = this.props.scheduledtime;
+        }
+        if (subjectObj.numMatches > 0) {
+          emailObj.baseSubject = subject;
+        }
+        const fields = [...bodyObj.emptyFields, ...subjectObj.emptyFields];
+        if (fields.length > 0) {
+          emptyFields = [
+          ...emptyFields,
+          {
+            email: contact.email,
+            fields: fields
+          }
+          ];
+        }
+        acc.push(emailObj);
+      }
+      return acc;
+    }, []);
+    return {contactEmails, emptyFields};
+  }
+
 
   _sendGeneratedEmails(contactEmails) {
     this.props.postEmails(contactEmails)
@@ -338,14 +343,8 @@ class EmailPanel extends Component {
       if (contact.email !== null && contact.email.length > 0 && isEmail(contact.email)) validEmailContacts.push(contact);
       else invalidEmailContacts.push(contact);
     });
-    const {contactEmails, emptyFields} = getGeneratedHtmlEmails(validEmailContacts, subject, body);
+    const {contactEmails, emptyFields} = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
 
-    // if (emptyFields.length > 0) {
-    //   alertify.promisifyConfirm(
-    //     `Empty properties found. Are you sure you want to continue?`,
-    //     `Found ${emptyFields.length} contacts with empty selected property: ${emptyFields.map(({email, fields}) => `${email}:[${fields.join(', ')}]`).join(', ')}`
-    //     )
-    // }
     const validators = [
     {
       validate: _ => emptyFields.length > 0,
@@ -378,6 +377,7 @@ class EmailPanel extends Component {
     .then(_ =>
       new Promise((resolve, reject) => {
         if (emptyFields.length > 0) {
+          console.log(emptyFields);
           alertify.confirm(
             `Empty properties found. Are you sure you want to continue?`,
             `Found ${emptyFields.length} contacts with empty selected property: ${emptyFields.map(({email, fields}) => `${email}:[${fields.join(', ')}]`).join(', ')}`,
@@ -393,8 +393,8 @@ class EmailPanel extends Component {
       new Promise((resolve, reject) => {
         if (invalidEmailContacts.length > 0) {
           alertify.confirm(
-            `Invalid Email Addresses Found. Would you like to ignore these and continue with valid emails?`,
-            `Found ${invalidEmailContacts.length} email(s) with invalid format: ${invalidEmailContacts.map(contact => contact.email).join(',')}.`,
+            `Invalid Email Addresses Found`,
+            `Would you like to ignore these and continue with valid emails? Found ${invalidEmailContacts.length} email(s) with invalid format: ${invalidEmailContacts.map(contact => contact.email).join(',')}.`,
             resolve,
             reject
             );
@@ -419,59 +419,12 @@ class EmailPanel extends Component {
     )
     .then(_ => {
       console.log('SENDING EMAILS');
+      if (contactEmails.length > 0) this.sendGeneratedEmails(contactEmails);
     })
     .catch(_ => {
       console.log('CANCELLED');
     });
 
-
-
-    // if (invalidEmailContacts.length > 0) {
-    //   alertify.confirm(
-    //     `Invalid Email Addresses Found`,
-    //     `Found ${invalidEmailContacts.length} email(s) with invalid format: ${invalidEmailContacts.map(contact => contact.email).join(',')}. Would you like to ignore these and continue with valid emails?`,
-    //     () => this.sendGeneratedEmails(contactEmails),
-    //     () => {}
-    //     );
-    //   return;
-    // }
-
-    // if (selectedContacts.some(contact => contact.email.length === 0 || contact.email === null)) {
-    //   alertify.alert(
-    //     `Contact Selection Warning`,
-    //     `You selected contacts without email field filled. We will skip emailing the following contacts:\n${
-    //       selectedContacts
-    //       .filter(contact => contact.email.length === 0 || contact.email === null)
-    //       .map(contact => `${contact.firstname} ${contact.lastname}`)
-    //       .join(', ')
-    //     }`, function() {});
-    //   if (contactEmails.length === 0) {
-    //     alertify.alert(
-    //       `Contact Selection Warning`,
-    //       `All contacts selected had no email fields.`
-    //       , function() {});
-    //     return;
-    //   }
-    // }
-
-    // if (subject.length === 0 || body.length === 0) {
-    //   const warningType = subject.length === 0 ? `subject` : `body`;
-    //   alertify
-    //   .confirm(
-    //     `Empty Field Warning`,
-    //     `Your ${warningType} is empty. Are you sure you want to send this email?`,
-    //     _ => this.sendGeneratedEmails(contactEmails), // on OK
-    //     _ => { } // on Cancel
-    //   );
-    // } else {
-    //   if (selectedContacts.length > 400) {
-    //     alertify.alert(
-    //       'Processing',
-    //       `Sending >400 emails might take a minute to process. Please be patient while we generate Preview of those emails.`,
-    //       function() {});
-    //   }
-    //   this.sendGeneratedEmails(contactEmails);
-    // }
   }
 
   _onClose() {

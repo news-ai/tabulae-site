@@ -1,6 +1,6 @@
 import {_getter} from 'components/ListTable/helpers';
 export default function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
-  if (html === null || html.length === 0) return {html: '', numMatches: 0};
+  if (html === null || html.length === 0) return {html: '', numMatches: 0, emptyFields: []};
   let newHtml = html;
   let matchCount = {};
   let emptyFields = [];
