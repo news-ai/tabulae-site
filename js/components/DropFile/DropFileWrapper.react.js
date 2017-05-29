@@ -115,7 +115,6 @@ class DropFileWrapper extends Component {
   _onDrop(files) {
     if (files.length > 0) {
       const file = files[files.length - 1];
-      console.log(file.name);
       const fileExtensionArray = file.name.split('.');
       const fileExtension = fileExtensionArray[fileExtensionArray.length - 1];
       if (fileExtension === 'xlsx') {
