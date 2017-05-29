@@ -82,6 +82,7 @@ class DropFileWrapper extends Component {
     };
     this.onDrop = this._onDrop.bind(this);
     this.onUploadClick = this._onUploadClick.bind(this);
+    this.onFileClose = _ => this.setState({file: null, isFileDropped: false, value: this.props.defaultValue});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -117,7 +118,11 @@ class DropFileWrapper extends Component {
       const fileExtensionArray = file.name.split('.');
       const fileExtension = fileExtensionArray[fileExtensionArray.length - 1];
       if (fileExtension === 'xlsx') {
-        this.setState({file, isFileDropped: true});
+        this.setState({
+          file,
+          isFileDropped: true,
+          value: fileExtensionArray[0],
+        });
       } else {
         alertify.alert('File Dropped', `File dropped but not of accepted file types. We only accept .xlsx file format. You dropped a .${fileExtension} file.`, function() {});
       }
@@ -147,10 +152,7 @@ class DropFileWrapper extends Component {
           <div style={{height: 180}}>
           {state.isFileDropped ?
             <div className='row vertical-center' style={{margin: '20px 0'}}>
-              <FileDroppedIndicator
-              file={state.file}
-              onClose={_ => this.setState({file: null, isFileDropped: false})}
-              />
+              <FileDroppedIndicator file={state.file} onClose={this.onFileClose} />
             </div>
             : <Dropzone
               accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel'
@@ -214,7 +216,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(withRouter(DropFileWrapper));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(DropFileWrapper));
