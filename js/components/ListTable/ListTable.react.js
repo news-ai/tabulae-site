@@ -562,7 +562,7 @@ class ListTable extends Component {
   _onRemoveContacts() {
     const selected = this.state.selected;
     if (selected.length === 0) return;
-    alertify.promisifyConfirm('Delete Contacts', `This action cannot be reversed. Are you you want to delete ${selected.length} contact(s).`)
+    alertify.promisifyConfirm('Delete Contacts', `This action cannot be reversed. Are you sure you want to delete ${selected.length} contact(s).`)
     .then(
       _ => {
         const newListContacts = difference(this.props.listData.contacts, selected);
