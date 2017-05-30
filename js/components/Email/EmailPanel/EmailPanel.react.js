@@ -345,34 +345,6 @@ class EmailPanel extends Component {
     });
     const {contactEmails, emptyFields} = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
 
-    // const validators = [
-    // {
-    //   validate: _ => emptyFields.length > 0,
-    //   title: `Empty properties found. Are you sure you want to continue?`,
-    //   message: `Found ${emptyFields.length} contacts with empty selected property: ${emptyFields.map(({email, fields}) => `${email}:[${fields.join(', ')}]`).join(', ')}`
-    // },
-    // {
-    //   validate: _ => invalidEmailContacts.length > 0,
-    //   title: `Invalid Email Addresses Found. Would you like to ignore these and continue with valid emails?`,
-    //   message: `Found ${invalidEmailContacts.length} email(s) with invalid format: ${invalidEmailContacts.map(contact => contact.email).join(',')}.`,
-    // },
-    // {
-    //   validate: _ => subject.length === 0,
-    //   title: `Empty Field Warning`,
-    //   message: `Your subject is empty. Are you sure you want to send this email?`,
-    // },
-    // {
-    //   validate: _ => body.length === 0,
-    //   title: `Empty Field Warning`,
-    //   message: `Your subject is empty. Are you sure you want to send this email?`,
-    // },
-    // // {
-    // //   validate: _ => selectedContacts.length > 400,
-    // //   title: 'Processing',
-    // //   message: `Sending >400 emails might take a minute to process. Please be patient while we generate Preview of those emails.`,
-    // // }
-    // ];
-
     Promise.resolve()
     .then(_ =>
       new Promise((resolve, reject) => {
