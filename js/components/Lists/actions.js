@@ -221,13 +221,14 @@ export function patchList({listId, name, contacts, fieldsmap, tags, client}) {
   };
 }
 
-export function createEmptyList(name) {
+export function createEmptyList(name, fieldsmap) {
   return dispatch => {
-    const listBody = {
+    let listBody = {
       name,
-      contacts: []
+      contacts: [],
     };
-    dispatch({type: 'LIST_CREATE_EMPTY'});
+    if (fieldsmap) listBody.fieldsmap = fieldsmap;
+    dispatch({type: 'LIST_CREATE_EMPTY', listBody});
     return api.post(`/lists`, listBody)
     .then(response => response)
     .catch(message => console.log(message));
