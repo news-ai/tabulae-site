@@ -9,6 +9,7 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
 import {yellow50} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 
@@ -39,11 +40,20 @@ class CopyToHOC extends Component {
 
   _onNewSheetSubmit() {
     const val = this.refs.copyToHOC_newSheetName.input.value;
-    let name;
-    if (val.length > 0) name = val;
-    else name = `${this.props.list.name} (Copy)`;
+    const includeCustom = this.includeCustomCheckbox.checked;
+    let listname = val.length > 0 ? val : `${this.props.list.name} (Copy)`;
     const contacts = this.props.selectedContacts.map(contact => contact.id);
-    this.props.copyToNewList(contacts, name);
+    if (includeCustom) {
+      this.props.copyToNewList(
+        contacts,
+        listname,
+        this.props.list.fieldsmap
+        .filter(field => field.customfield && !field.readonly)
+        .map(({name, value, customfield, hidden}) => ({name, value, customfield, hidden}))
+        );
+    } else {
+      this.props.copyToNewList(contacts, listname);
+    }
     window.Intercom('trackEvent', 'copy_to_new_sheet');
   }
 
@@ -69,15 +79,12 @@ class CopyToHOC extends Component {
         onRequestClose={_ => this.setState({open: false})}
         >
           <div className='row'>
-            <div
-            className='panel large-12 medium-12 small-12 columns'
-            style={styles.panel}
-            >
+            <div className='panel large-12 medium-12 small-12 columns' style={styles.panel} >
               <span className='smalltext'>
               The bigger the migration, the slower it is! Don't navigate from the page during migration.
               </span>
             </div>
-            <strong>Method 1: Copy a Couple Contacts to an Existing/New List</strong>
+            <strong>Method 1: Copy Selected Contacts to an Existing/New List</strong>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
               <span className='bold' style={{marginRight: 8}}>Selected Contacts</span>
             {props.selected.length === 0 &&
@@ -110,23 +117,31 @@ class CopyToHOC extends Component {
             <div className='large-12 medium-12 small-12 columns'>
               <span>Or, copy to a a brand new list:</span>
             </div>
-            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 30}}>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10}}>
               <div className='vertical-center'>
-                <span style={{marginRight: 10, fontSize: '0.9em'}}>New List Name</span>
+                <span className='text' style={{marginRight: 10}}>New List Name</span>
                 <TextField
                 id='copyToHOC_newSheetName'
                 ref='copyToHOC_newSheetName'
                 placeholder={`${props.list.name} (Copy) (default name)`}
                 />
-                <RaisedButton
-                primary
-                style={{marginLeft: 10}}
-                disabled={state.value.length > 0 || !props.selectedContacts}
-                label='Copy to New List'
-                onClick={this.onNewSheetSubmit}
-                icon={state.value.length === 0 && props.selectedContacts && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
-                />
               </div>
+            </div>
+            <div className='large-12 medium-12 small-12 columns horizontal-center'>
+              <div className='vertical-center'>
+                <span className='smalltext' style={{marginRight: 10}}>Include Custom Properties</span>
+                <input defaultChecked ref={ref => this.includeCustomCheckbox = ref} type='checkbox' />
+              </div>
+            </div>
+            <div className='large-12 medium-12 small-12 columns horizontal-center' style={{margin: '20px 0'}} >
+              <RaisedButton
+              primary
+              style={{marginLeft: 10}}
+              disabled={state.value.length > 0 || !props.selectedContacts}
+              label='Copy to New List'
+              onClick={this.onNewSheetSubmit}
+              icon={state.value.length === 0 && props.selectedContacts && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
+              />
             </div>
             <strong>Method 2: Copy the Whole List</strong>
             <div className='large-12 medium-12 small-12 columns horizontal-center' style={{marginTop: 10, marginBottom: 30}}>
@@ -186,9 +201,9 @@ const mapDispatchToProps = (dispatch, props) => {
   };
   return {
     fetchLists: _ => dispatch(listActions.fetchLists()),
-    copyToNewList: (contacts, name) => {
+    copyToNewList: (contacts, name, fieldsmap) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
-      return dispatch(listActions.createEmptyList(name))
+      return dispatch(listActions.createEmptyList(name, fieldsmap))
       .then(response => copyContactsToList(contacts, response.data.id));
     },
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
