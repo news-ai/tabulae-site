@@ -147,6 +147,8 @@ class AllSentEmailsContainer extends Component {
               <MenuItem value='open' primaryText='Open' />
               <MenuItem value='bounce' primaryText='Bounce' />
               <MenuItem value='click' primaryText='Click' />
+              <MenuItem value='unopen' primaryText='Unopen' />
+              <MenuItem value='unclick' primaryText='Unclick' />
             </DropDownMenu>
             <DropDownMenu
             value={state.filterListValue}
