@@ -85,8 +85,8 @@ class App extends Component {
         user_id: nextProps.person.id
       });
       if (!window.isDev) {
-        if (Raven.isSetup()) Raven.setUserContext({email: nextProps.person.email, id: nextProps.person.id});
-        else Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
+        Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
+        Raven.setUserContext({email: nextProps.person.email, id: nextProps.person.id});
       }
 
       if (nextProps.firstTimeUser) {
