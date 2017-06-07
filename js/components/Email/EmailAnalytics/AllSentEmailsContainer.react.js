@@ -9,7 +9,6 @@ import {actions as listActions} from 'components/Lists';
 import withRouter from 'react-router/lib/withRouter';
 import DatePicker from 'material-ui/DatePicker';
 import FontIcon from 'material-ui/FontIcon';
-import Checkbox from 'material-ui/Checkbox';
 import moment from 'moment';
 import PlainEmailsList from './EmailStats/PlainEmailsList.react';
 import {Toolbar, ToolbarGroup, ToolbarTitle} from 'material-ui/Toolbar';

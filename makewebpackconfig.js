@@ -4,6 +4,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 // var AppCachePlugin = require('appcache-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CompressionPlugin = require('compression-webpack-plugin');
+// var SentryPlugin = require('webpack-sentry-plugin');
 
 module.exports = function(options) {
   var entry, plugins, cssLoaders;
@@ -29,7 +30,7 @@ module.exports = function(options) {
         sequences: true,
         booleans: true,
         compress: { warnings: false },
-        sourcemap: false,
+        sourcemap: true,
         // comments: false,
         // sourceMap: true,
         // minimize: false,
@@ -67,7 +68,20 @@ module.exports = function(options) {
         test: /\.js$|\.css$|\.html$/,
         threshold: 10240,
         minRatio: 0
+      }),
+      /*
+      new SentryPlugin({
+        // Sentry options are required
+        organisation: 'julie-pan',
+        project: 'tabulae-site',
+        apiKey: process.env.SENTRY_API_KEY,
+        
+        // Release version name/hash is required
+        release: function() {
+          return process.env.CIRCLE_SHA1
+        }
       })
+       */
     ];
   } else {
     entry = [
@@ -90,7 +104,7 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: 'eval-cheap-module-source-map',
+    devtool: options.prod ? 'cheap-module-source-map' : 'eval-cheap-module-source-map',
     // devtool: 'source-map',
     entry: entry,
     output: { // Compile into js/build.js
