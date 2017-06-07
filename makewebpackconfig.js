@@ -69,6 +69,9 @@ module.exports = function(options) {
         threshold: 10240,
         minRatio: 0
       }),
+      new webpack.SourceMapDevToolPlugin({
+        filename: '[file].map'
+      })
       /*
       new SentryPlugin({
         // Sentry options are required
@@ -111,6 +114,7 @@ module.exports = function(options) {
       path: path.resolve(__dirname, 'build'),
       filename: options.prod ? 'js/bundle.[hash].js' : 'js/bundle.js',
       publicPath: '/',
+      // devtoolModuleFilenameTemplate: '[absolute-resource-path]'
     },
     module: {
       loaders: [
