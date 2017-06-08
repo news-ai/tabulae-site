@@ -107,13 +107,14 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: options.prod ? 'cheap-module-source-map' : 'eval-cheap-module-source-map',
+    devtool: options.prod ? 'inline-source-map' : 'eval-cheap-module-source-map',
     // devtool: 'source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
       filename: options.prod ? 'js/bundle.[hash].js' : 'js/bundle.js',
       publicPath: '/',
+      sourceMapFilename: "[name].js.map",
       // devtoolModuleFilenameTemplate: '[absolute-resource-path]'
     },
     module: {
