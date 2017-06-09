@@ -17,21 +17,25 @@ import {actions as attachmentActions} from 'components/Email/EmailAttachment';
 import Paper from 'material-ui/Paper';
 import {actions as listActions} from 'components/Lists';
 import get from 'lodash/get';
+import EditContactDialog from 'components/ListTable/EditContactDialog.react';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import moment from 'moment-timezone';
 
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 const DEFAULT_DATESTRING = '0001-01-01T00:00:00Z';
 
-
 export class AnalyticsItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isPreviewOpen: false,
+      showEditPanel: false,
     };
     this.onPreviewOpen = this._onPreviewOpen.bind(this);
     this.onPreviewClose = _ => this.setState({isPreviewOpen: false});
+    this.onEditContactOpen = _ => this.setState({showEditPanel: true});
+    this.onEditContactClose = _ => this.setState({showEditPanel: false});
   }
 
   componentWillMount() {
@@ -55,7 +59,6 @@ export class AnalyticsItem extends Component {
       bouncedreason,
       delivered,
       listid,
-      listname,
       updated,
       attachments,
       sendat,
@@ -65,7 +68,9 @@ export class AnalyticsItem extends Component {
       archiveEmail,
       archived,
       contact,
-      contactId
+      contactId,
+      list,
+      deleted
     } = this.props;
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
@@ -74,6 +79,9 @@ export class AnalyticsItem extends Component {
     const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
     const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
+
+    let listNameString = list ? list.name : `(Archived) ${listid}`;
+
     return (
       <Paper zDepth={1} className='clearfix' style={wrapperStyle}>
         <div className='row'>
@@ -82,7 +90,7 @@ export class AnalyticsItem extends Component {
             <div>
               <span style={styles.sentFrom}>Sent from List</span>
               <span style={styles.linkContainerSpan}>
-                <Link to={`/tables/${listid}`}>{listname || `(Archived) ${listid}`}</Link>
+                <Link to={`/tables/${listid}`}>{listNameString}</Link>
               </span>
             {attachments !== null &&
               <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip'/>}
@@ -143,7 +151,15 @@ export class AnalyticsItem extends Component {
           </div>
         {bounced &&
           <div className='small-12 medium-12 large-12 columns'>
-            <span style={styles.bouncedLabel}>email bounced</span>
+          {deleted ?
+            <span className='right' style={styles.bouncedLabel} >Contact Deleted from List</span> :
+            <RaisedButton className='right' onClick={this.onEditContactOpen} label='Edit Contact' />}
+            <EditContactDialog
+            listId={listid}
+            contactId={contactId}
+            open={state.showEditPanel}
+            onClose={this.onEditContactClose}
+            />
           </div>}
         </div>
       </Paper>
@@ -157,7 +173,7 @@ const styles = {
     alignItems: 'center'
   },
   wrapper: {
-    padding: 12,
+    padding: '10px 15px',
     margin: 5,
     marginBottom: 10,
   },
@@ -195,7 +211,8 @@ const styles = {
   },
   bouncedLabel: {
     color: deepOrange700,
-    fontSize: '0.8em'
+    fontSize: '0.9em',
+    margin: '0 20px'
   },
   tagContainer: {
     padding: 3
@@ -205,10 +222,12 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
+  const list = state.listReducer[props.listid];
   return {
-    listname: state.listReducer[props.listid] ? state.listReducer[props.listid].name : undefined,
+    list,
     isFetchingList: get(state, `isFetchingReducer.lists[${props.listid}].isReceiving`, false),
     contact: state.contactReducer[props.contactId],
+    deleted: list ? !list.contacts.some(id => id === props.contactId) : false,
   };
 };
 
@@ -228,7 +247,7 @@ const mergeProps = (sProps, dProps, props) => {
     ...dProps,
     ...props,
     fetchList: _ => {
-      if (!sProps.isFetchingList && !sProps.listname) {
+      if (!sProps.isFetchingList && !sProps.list) {
         // only fetch if it is not currently fetching
         dProps.startFetch();
         dProps.fetchList()

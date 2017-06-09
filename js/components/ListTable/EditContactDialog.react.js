@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as contactActions} from 'components/Contacts';
-// import {actions as listActions} from 'components/Lists';
+import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 
 import Dialog from 'material-ui/Dialog';
@@ -19,6 +19,7 @@ import isURL from 'validator/lib/isURL';
 import {fromJS} from 'immutable';
 import {grey400} from 'material-ui/styles/colors';
 import find from 'lodash/find';
+import alertify from 'alertifyjs';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -52,6 +53,10 @@ const _getPublicationName = (contact, reducer) => {
 
 const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
 
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
 class EditContactDialog extends Component {
   constructor(props) {
     super(props);
@@ -63,7 +68,7 @@ class EditContactDialog extends Component {
       pub1input: this.props.contact ? _getPublicationName(this.props.contact, this.props.publicationReducer) : '',
       employerAutocompleteList: [],
       addPublicationPanelOpen: false,
-      tags: this.props.contact ? this.props.contact.tags : [],
+      tags: this.props.contact && this.props.contact.tags !== null ? this.props.contact.tags : [],
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
@@ -73,6 +78,7 @@ class EditContactDialog extends Component {
     this.handleAddition = this._handleAddition.bind(this);
     this.handleDelete = this._handleDelete.bind(this);
     this.handleDrag = this._handleDrag.bind(this);
+    this.onRemoveContact = this._onRemoveContact.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -146,6 +152,24 @@ class EditContactDialog extends Component {
     });
   }
 
+  _onRemoveContact() {
+    alertify.promisifyConfirm('Delete Contact', `This action cannot be reversed. Are you sure you want to delete?`)
+    .then(
+      _ => {
+        const newListContacts = this.props.list.contacts.filter(id => id !== this.props.contactId);
+        this.props.deleteContacts([this.props.contactId]);
+        this.setState({isDeleting: true});
+        this.props.patchList({
+          listId: this.props.listId,
+          contacts: newListContacts,
+          name: this.props.list.name,
+        })
+        .then(_ => this.setState({isDeleting: false}, this.props.onClose));
+      },
+      _ => {}
+      );
+  }
+
   _handleDelete(i) {
     this.setState({
       tags: this.state.tags.filter((tag, index) => index !== i)
@@ -184,12 +208,16 @@ class EditContactDialog extends Component {
       <FlatButton label='Cancel' onClick={props.onClose} />,
       <FlatButton primary label='Submit' onClick={this.onSubmit} />
     ];
+
     return (
       <Dialog autoScrollBodyContent modal actions={actions} open={props.open} title='Edit Contact' onRequestClose={props.onClose}>
       {props.isReceiving &&
         <FontIcon className={'fa fa-spinner fa-spin'}/>}
       {props.contactId &&
         <div className='row' style={{marginTop: 20}}>
+          <div className='large-12 medium-12 small-12 columns right'>
+            <div className='button' onClick={this.onRemoveContact}>Remove Contact from List</div>
+          </div>
           <div className={columnClassname}>
             <span style={{whiteSpace: 'nowrap'}}>First Name</span>
             <TextField
@@ -367,6 +395,8 @@ const mapDispatchToProps = (dispatch, props) => {
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
     fetchFeeds: _ => dispatch(feedActions.fetchContactFeeds(props.contactId)),
     requestPublication: () => dispatch(publicationActions.requestPublication()),
+    deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
+    patchList: listObj => dispatch(listActions.patchList(listObj)),
   };
 };
 
