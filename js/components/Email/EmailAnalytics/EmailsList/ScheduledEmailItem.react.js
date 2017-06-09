@@ -133,7 +133,7 @@ const styles = {
     alignItems: 'center'
   },
   wrapper: {
-    padding: 12,
+    padding: 20,
     margin: 5,
     marginBottom: 10,
   },
