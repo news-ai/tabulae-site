@@ -802,7 +802,7 @@ class ListTable extends Component {
                 this.setState({searchValue});
               }
             }}
-            floatingLabelText={state.isSearchOn ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
+            floatingLabelText={state.isSearchOn && props.listData.searchResults ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
             floatingLabelFixed={state.isSearchOn}
             defaultValue={props.searchQuery || ''}
             errorText={state.errorText}
