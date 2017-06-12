@@ -69,9 +69,6 @@ module.exports = function(options) {
         threshold: 10240,
         minRatio: 0
       }),
-      new webpack.SourceMapDevToolPlugin({
-        filename: '[file].map'
-      })
       /*
       new SentryPlugin({
         // Sentry options are required
