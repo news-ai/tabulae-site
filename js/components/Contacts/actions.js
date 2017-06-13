@@ -229,17 +229,53 @@ export function fetchManyContacts(listId, amount) {
   };
 }
 
-export function searchListContacts(listId, query) {
-  return (dispatch, getState) => {
-    dispatch({ type: LIST_CONTACTS_SEARCH_REQUEST, listId, query});
-    return api.get(`/lists/${listId}/contacts?q="${query}"&limit=50&offset=0`)
+const flattenResponses = responses => {
+  return responses.reduce((acc, response) => {
+    let ids = acc.ids;
+    let contacts = acc.contacts;
+    const res = normalize(response, {
+      data: arrayOf(contactSchema),
+      included: arrayOf(publicationSchema)
+    });
+    ids = [...ids, ...res.result.data];
+    contacts = Object.assign({}, contacts, res.entities.contacts);
+    return {ids, contacts};
+  }, {ids: [], contacts: {}});
+};
+
+function fetchSearchListContacts(listId, query) {
+  const LIMIT = 50;
+  return dispatch => {
+    dispatch({type: LIST_CONTACTS_SEARCH_REQUEST, listId, query});
+    return api.get(`/lists/${listId}/contacts?q="${query}"&limit=${LIMIT}&offset=0`)
     .then(response => {
+      const total = response.summary.total;
+      // need to fetch rest of search results
+      if (total > response.data.length) {
+        // build array of offsets
+        const offsets = Array.from({length: Math.floor(total / LIMIT)}, (v, i) => i + LIMIT);
+        const promises = offsets.map(offset => api.get(`/lists/${listId}/contacts?q="${query}"&limit=${LIMIT}&offset=${offset}`));
+        return Promise.all(promises)
+        .then(responses => {
+          // include first result
+          return flattenResponses([response, ...responses]);
+        });
+      }
       const res = normalize(response, {
         data: arrayOf(contactSchema),
         included: arrayOf(publicationSchema)
       });
-      const ids = res.result.data;
-      const contacts = res.entities.contacts;
+      return {ids: res.result.data, contacts: res.entities.contacts};
+    })
+    .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
+  };
+}
+
+export function searchListContacts(listId, query) {
+  return (dispatch, getState) => {
+    // do one fetch first to determine total to fetch
+    return dispatch(fetchSearchListContacts(listId, query))
+    .then(({ids, contacts}) => {
       ids.map(id => {
         if (contacts[id].customfields && contacts[id].customfields !== null) {
           contacts[id].customfields.map(field => {
@@ -252,8 +288,7 @@ export function searchListContacts(listId, query) {
       dispatch({type: LIST_CONTACTS_SEARCH_RECEIVED, ids, contactsWithEmployers, listId});
       // dispatch(receiveContacts(res.entities.contacts, res.result.data));
       return {searchContactMap: contactsWithEmployers, ids};
-    })
-    .catch(message => dispatch({type: LIST_CONTACTS_SEARCH_FAIL, message}));
+    });
   };
 }
 
