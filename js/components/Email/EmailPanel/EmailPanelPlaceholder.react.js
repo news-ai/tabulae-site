@@ -489,24 +489,17 @@ class EmailPanel extends Component {
         </div>
       {
         state.isPreveiwOpen &&
-        <div>
-          <IconButton
-          onClick={_ => this.setState({isPreveiwOpen: false})}
-          iconClassName='fa fa-arrow-left'
-          tooltip='Back to Editor'
-          tooltipPosition='bottom-right'
-          />
-          <PreviewEmails
-          contacts={props.selectedContacts}
-          fieldsmap={state.fieldsmap}
-          listId={props.listId}
-          sendLater={props.scheduledtime !== null}
-          isReceiving={props.isReceiving}
-          previewEmails={props.previewEmails}
-          onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-          onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-          />
-        </div>
+        <PreviewEmails
+        onBack={_ => this.setState({isPreveiwOpen: false})}
+        contacts={props.selectedContacts}
+        fieldsmap={state.fieldsmap}
+        listId={props.listId}
+        sendLater={props.scheduledtime !== null}
+        isReceiving={props.isReceiving}
+        previewEmails={props.previewEmails}
+        onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+        onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+        />
       }
       </div>
     );

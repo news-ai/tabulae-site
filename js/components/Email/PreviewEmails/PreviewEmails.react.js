@@ -4,6 +4,7 @@ import PreviewEmail from './PreviewEmail.react';
 import Waiting from 'components/Waiting';
 import Fuse from 'fuse.js';
 import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
 import {grey700} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
@@ -58,10 +59,13 @@ class PreviewEmails extends Component {
     const props = this.props;
     const {sendLater, isReceiving, onSendEmailClick} = this.props;
 
-    const previewEmails = state.searchOn ? state.results : this.props.previewEmails;
+    const previewEmails = state.searchOn ? state.results : props.previewEmails;
+    const searchOn = state.searchValue.length > 0;
 
     let sendAllButtonLabel = sendLater ? 'Schedule All Emails' : 'Send All';
     if (state.numberDraftEmails > 0) sendAllButtonLabel = 'Draft in Progess';
+    else if (searchOn) sendAllButtonLabel = 'Search in Progress';
+    else if (previewEmails.length === 0) sendAllButtonLabel = 'Done';
 
 
     let renderNode;
@@ -70,26 +74,13 @@ class PreviewEmails extends Component {
         <div>
           An error occurred with generating previews of the emails.
         </div>);
-    } else if (previewEmails.length === 0) {
-      renderNode = <span>All done.</span>;
+    // } else if (previewEmails.length === 0) {
+    //   renderNode = <span>All done.</span>;
     } else {
       renderNode = (
       <div>
         <div className='vertical-center' style={{margin: '10px 0'}}>
           <div>
-            <RaisedButton
-            disabled={state.numberDraftEmails > 0 || props.isReceiving}
-            label={sendAllButtonLabel}
-            primary
-            icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
-            labelStyle={{textTransform: 'none'}}
-            onClick={_ => {
-              window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: sendLater});
-              props.onSendAllEmailsClick(previewEmails.map(email => email.id));
-            }}
-            />
-          </div>
-          <div className='right'>
             <TextField
             id='preview_searchValue'
             disabled={state.numberDraftEmails > 0}
@@ -134,10 +125,35 @@ class PreviewEmails extends Component {
       </div>
       );
     }
+
     return (
-      <div style={{padding: 10}}>
-        <Waiting style={{position: 'absolute', right: 15, top: 15}} isReceiving={isReceiving} text='Generating emails' textStyle={{marginTop: '20px', fontSize: '0.9em'}}/>
-        {renderNode}
+      <div>
+        <div className='vertical-center' style={{margin: '5px 20px'}} >
+          <div>
+            <IconButton
+            onClick={props.onBack}
+            iconClassName='fa fa-arrow-left'
+            tooltip='Back to Editor'
+            tooltipPosition='bottom-right'
+            />
+          </div>
+          <div className='right'>
+            <RaisedButton
+            disabled={state.numberDraftEmails > 0 || props.isReceiving || previewEmails.length === 0 || searchOn}
+            label={sendAllButtonLabel}
+            primary
+            icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
+            labelStyle={{textTransform: 'none'}}
+            onClick={_ => {
+              window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: sendLater});
+              props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+            }}
+            />
+          </div>
+        </div>
+        <div style={{padding: 10}} >
+          {renderNode}
+        </div>
       </div>);
   }
 }
