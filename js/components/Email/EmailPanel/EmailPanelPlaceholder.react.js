@@ -445,9 +445,13 @@ class EmailPanel extends Component {
           padding: '0 10px',
           position: 'fixed',
           bottom: 3,
-          display: 'flex'
+          display: 'block',
+          width: 760
+          // alignItems: 'center',
+          // justifyContent: 'space-around'
         }} >
           <SelectField
+          className='left'
           style={{overflowX: 'hidden'}}
           value={state.currentTemplateId}
           onChange={this.handleTemplateValueChange}
@@ -456,6 +460,7 @@ class EmailPanel extends Component {
           {templateMenuItems}
           </SelectField>
           <IconMenu
+          className='left'
           iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
           anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
           targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
@@ -472,7 +477,7 @@ class EmailPanel extends Component {
             primaryText='Delete Template'
             />
           </IconMenu>
-          <DatePickerHOC>
+          <DatePickerHOC className='left'>
           {({onRequestOpen}) =>
             <IconButton
             iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
@@ -482,7 +487,7 @@ class EmailPanel extends Component {
             tooltipPosition='top-right'
             />}
           </DatePickerHOC>
-          <AddCCPanelHOC listId={props.listId}>
+          <AddCCPanelHOC className='left' listId={props.listId}>
           {({onRequestOpen}) =>
             <IconButton
             iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
@@ -520,6 +525,7 @@ const styles = {
     // display: 'flex',
     // alignItems: 'center',
     // justifyContent: 'center'
+    display: 'block'
   },
   emailPanelPosition: {
     zIndex: 300,
