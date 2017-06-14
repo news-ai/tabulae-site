@@ -247,7 +247,7 @@ class EmailPanel extends Component {
   _sendGeneratedEmails(contactEmails) {
     this.props.postEmails(contactEmails)
     .then(
-      _ => this.refs.preview.show(),
+      _ => this.setState({isPreveiwOpen: true}),
       err => {
         alertify.alert(err.toString());
       });
@@ -395,10 +395,10 @@ class EmailPanel extends Component {
 
     return (
       <div style={styles.emailPanelOuterPosition}>
-        <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
-          <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
-        </ReactTooltip>
-        <div style={styles.emailPanelPosition}>
+        <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
+          <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
+            <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
+          </ReactTooltip>
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.'/>}
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
@@ -496,27 +496,28 @@ class EmailPanel extends Component {
               </div>
             </BasicHtmlEditor>
           </div>
-          <SkyLight
-          overlayStyles={skylightStyles.overlay}
-          dialogStyles={skylightStyles.dialog}
-          hideOnOverlayClicked
-          afterOpen={_ => this.setState({isPreveiwOpen: true})}
-          afterClose={_ => this.setState({isPreveiwOpen: false})}
-          ref='preview'
-          title='Preview'
-          >
-            <PreviewEmails
-            contacts={props.selectedContacts}
-            fieldsmap={state.fieldsmap}
-            listId={props.listId}
-            sendLater={props.scheduledtime !== null}
-            isReceiving={props.isReceiving}
-            previewEmails={props.previewEmails}
-            onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-            onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-            />
-          </SkyLight>
         </div>
+      {
+        state.isPreveiwOpen &&
+        <div>
+          <IconButton
+          onClick={_ => this.setState({isPreveiwOpen: false})}
+          iconClassName='fa fa-arrow-left'
+          tooltip='Back to Editor'
+          tooltipPosition='bottom-right'
+          />
+          <PreviewEmails
+          contacts={props.selectedContacts}
+          fieldsmap={state.fieldsmap}
+          listId={props.listId}
+          sendLater={props.scheduledtime !== null}
+          isReceiving={props.isReceiving}
+          previewEmails={props.previewEmails}
+          onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+          onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+          />
+        </div>
+      }
       </div>
     );
   }
