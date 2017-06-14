@@ -37,7 +37,7 @@ import isEmail from 'validator/lib/isEmail';
 import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
-import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {grey50, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from './utils/replaceAll';
 
@@ -403,7 +403,7 @@ class EmailPanel extends Component {
           <PauseOverlay message='Image is loading.'/>}
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
           <div className='vertical-center' style={{margin: '5px 20px'}} >
-            <span className='text'>Emails are sent from: </span>
+            <span style={{color: grey700, marginRight: 10}} className='text'>Emails are sent from: </span>
             {
             // <span className='text' style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
             }
@@ -436,7 +436,6 @@ class EmailPanel extends Component {
             onBodyChange={this.updateBodyHtml}
             onSubjectChange={this.onSubjectChange}
             debounce={500}
-            person={props.person}
             >
               <div style={{backgroundColor: '#ffffff'}} className='vertical-center'>
                 <SelectField

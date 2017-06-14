@@ -968,6 +968,7 @@ const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRende
 
 const mapStateToProps = (state, props) => {
   return {
+    person: state.personReducer.person,
     files: state.emailAttachmentReducer.attached,
     templateChanged: state.emailDraftReducer.templateChanged,
     savedEditorState: state.emailDraftReducer.editorState,

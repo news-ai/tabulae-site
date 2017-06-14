@@ -14,21 +14,20 @@ class SwitchEmailDropDown extends Component {
     this.onChange = this._onChange.bind(this);
   }
 
-  _onChange(e, i, value) {
+  _onChange(e) {
     window.Intercom('trackEvent', 'switch_email');
-    this.props.setFromEmail(value);
+    this.props.setFromEmail(e.target.value);
   }
 
   render() {
     const props = this.props;
     const state = this.state;
-    const emails = props.emails.map((email, i) => <MenuItem key={`switch-email-${i}`} value={email} primaryText={email}/>);
+    const emails = props.emails.map((email, i) => <option style={{fontSize: '0.9em'}} key={`switch-email-${i}`} value={email}>{email}</option>);
     const disableSwitching = props.person.gmail || props.person.outlook || props.person.externalemail;
     return (
-        <DropDownMenu labelStyle={{fontSize: '0.9em'}} disabled={disableSwitching} value={props.from} onChange={this.onChange} >
-          {emails}
-        </DropDownMenu>
-      );
+      <select style={styles.select} disabled={disableSwitching} value={props.from} onChange={this.onChange} >
+        {emails}
+      </select>);
   }
 }
 
@@ -36,6 +35,14 @@ const styles = {
   warningText: {color: grey500},
   warningContainer: {margin: 10},
   description: {margin: 10, padding: 10, backgroundColor: yellow50},
+  select: {
+    height: 'auto',
+    width: 'auto',
+    padding: 'auto',
+    appearance: 'menulist',
+    MozAppearance: 'menulist',
+    WebkitAppearance: 'menulist',
+  },
 };
 
 const mapStateToProps = (state, props) => {
