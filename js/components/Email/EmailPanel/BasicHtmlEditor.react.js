@@ -212,7 +212,6 @@ class BasicHtmlEditor extends Component {
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
     this.manageLink = this._manageLink.bind(this);
-    this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
     this.handleImage = this._handleImage.bind(this);
@@ -874,8 +873,7 @@ class BasicHtmlEditor extends Component {
           onClick={this.onInsertPropertyClick}
           />
         </div>
-      {state.isStyleBlockOpen &&
-        <Paper zDepth={1} className='vertical-center' style={controlsStyle}>
+        <Paper zDepth={1} className='horizontal-center vertical-center' style={controlsStyle}>
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -913,19 +911,12 @@ class BasicHtmlEditor extends Component {
           tooltip='Insert Property'
           tooltipPosition='top-right'
           />
-        </Paper>}
+        </Paper>
         <div className='vertical-center' style={{
           position: 'absolute',
           bottom: 3,
           width: props.width,
         }}>
-        <div style={styles.styleBlockIconContainer}>
-          <FontIcon
-          className={`fa fa-angle-double-${state.isStyleBlockOpen ? 'up' : 'down'} pointer`}
-          style={{color: state.isStyleBlockOpen ? blue700 : grey700}}
-          onClick={this.onCheck}
-          />
-        </div>
         {props.children}
       </div>
     </div>
@@ -934,7 +925,7 @@ class BasicHtmlEditor extends Component {
 }
 
 const styles = {
-  styleBlockIconContainer: {padding: 3, marginRight: 10},
+  // styleBlockIconContainer: {padding: 3, marginRight: 10},
   insertPropertyIcon: {
     iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey800},
     style: {width: 28, height: 28, padding: 6}

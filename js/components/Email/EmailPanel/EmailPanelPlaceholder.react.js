@@ -460,10 +460,11 @@ class EmailPanel extends Component {
                   <MenuItem
                   onClick={this.onDeleteTemplate}
                   disabled={state.currentTemplateId ? false : true}
-                  primaryText='Delete Template' />
+                  primaryText='Delete Template'
+                  />
                 </IconMenu>
                 <DatePickerHOC>
-                  {({onRequestOpen}) =>
+                {({onRequestOpen}) =>
                   <IconButton
                   iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
                   onClick={onRequestOpen}
@@ -482,16 +483,6 @@ class EmailPanel extends Component {
                   tooltipPosition='top-right'
                   />}
                 </AddCCPanelHOC>
-                <SwitchEmailHOC listId={props.listId}>
-                {({onRequestOpen}) =>
-                  <IconButton
-                  iconStyle={{color: grey800}}
-                  iconClassName='fa fa-users'
-                  onClick={onRequestOpen}
-                  tooltip='Switch Email'
-                  tooltipPosition='top-right'
-                  />}
-                </SwitchEmailHOC>
               </div>
             </BasicHtmlEditor>
           </div>
@@ -535,7 +526,7 @@ const styles = {
   },
   emailPanel: {
     height: 600,
-    width: 700,
+    width: 760,
   },
   sendButtonPosition: {
     // position: 'absolute',

@@ -1,11 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import MenuItem from 'material-ui/MenuItem';
-import DropDownMenu from 'material-ui/DropDownMenu';
 import get from 'lodash/get';
-import {yellow50, grey500} from 'material-ui/styles/colors';
-import Link from 'react-router/lib/Link';
-import FlatButton from 'material-ui/FlatButton';
+import {yellow50, grey500, grey800} from 'material-ui/styles/colors';
 
 class SwitchEmailDropDown extends Component {
   constructor(props) {
@@ -22,7 +18,7 @@ class SwitchEmailDropDown extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    const emails = props.emails.map((email, i) => <option style={{fontSize: '0.9em'}} key={`switch-email-${i}`} value={email}>{email}</option>);
+    const emails = props.emails.map((email, i) => <option style={{fontSize: '0.9em', color: grey800}} key={`switch-email-${i}`} value={email}>{email}</option>);
     const disableSwitching = props.person.gmail || props.person.outlook || props.person.externalemail;
     return (
       <select style={styles.select} disabled={disableSwitching} value={props.from} onChange={this.onChange} >
