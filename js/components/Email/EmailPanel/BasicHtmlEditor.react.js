@@ -912,13 +912,6 @@ class BasicHtmlEditor extends Component {
           tooltipPosition='top-right'
           />
         </Paper>
-        <div className='vertical-center' style={{
-          position: 'absolute',
-          bottom: 3,
-          width: props.width,
-        }}>
-        {props.children}
-      </div>
     </div>
     );
   }

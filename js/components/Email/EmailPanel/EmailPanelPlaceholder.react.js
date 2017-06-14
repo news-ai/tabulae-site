@@ -18,6 +18,7 @@ import './ReactTagsStyle.css';
 import ReactTooltip from 'react-tooltip'
 import PreviewEmails from '../PreviewEmails';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -436,55 +437,63 @@ class EmailPanel extends Component {
             onBodyChange={this.updateBodyHtml}
             onSubjectChange={this.onSubjectChange}
             debounce={500}
-            >
-              <div style={{backgroundColor: '#ffffff'}} className='vertical-center'>
-                <SelectField
-                style={{overflowX: 'hidden'}}
-                value={state.currentTemplateId}
-                onChange={this.handleTemplateValueChange}
-                maxHeight={200}
-                >
-                {templateMenuItems}
-                </SelectField>
-                <IconMenu
-                iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
-                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                >
-                  <MenuItem
-                  disabled={state.currentTemplateId ? false : true}
-                  onClick={this.onSaveCurrentTemplateClick}
-                  primaryText='Save Text to Existing Template'
-                  />
-                  <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
-                  <MenuItem
-                  onClick={this.onDeleteTemplate}
-                  disabled={state.currentTemplateId ? false : true}
-                  primaryText='Delete Template'
-                  />
-                </IconMenu>
-                <DatePickerHOC>
-                {({onRequestOpen}) =>
-                  <IconButton
-                  iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
-                  onClick={onRequestOpen}
-                  iconClassName='fa fa-calendar'
-                  tooltip='Schedule & Send Later'
-                  tooltipPosition='top-right'
-                  />}
-                </DatePickerHOC>
-                <AddCCPanelHOC listId={props.listId}>
-                {({onRequestOpen}) =>
-                  <IconButton
-                  iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
-                  iconClassName='fa fa-user-plus'
-                  onClick={onRequestOpen}
-                  tooltip='CC/BCC'
-                  tooltipPosition='top-right'
-                  />}
-                </AddCCPanelHOC>
-              </div>
-            </BasicHtmlEditor>
+            />
+          </div>
+        </div>
+        <div style={{
+          backgroundColor: '#ffffff',
+          padding: '0 10px',
+          position: 'fixed',
+          bottom: 3,
+          display: 'flex'
+        }} >
+          <SelectField
+          style={{overflowX: 'hidden'}}
+          value={state.currentTemplateId}
+          onChange={this.handleTemplateValueChange}
+          maxHeight={200}
+          >
+          {templateMenuItems}
+          </SelectField>
+          <IconMenu
+          iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
+          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          >
+            <MenuItem
+            disabled={state.currentTemplateId ? false : true}
+            onClick={this.onSaveCurrentTemplateClick}
+            primaryText='Save Text to Existing Template'
+            />
+            <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+            <MenuItem
+            onClick={this.onDeleteTemplate}
+            disabled={state.currentTemplateId ? false : true}
+            primaryText='Delete Template'
+            />
+          </IconMenu>
+          <DatePickerHOC>
+          {({onRequestOpen}) =>
+            <IconButton
+            iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
+            onClick={onRequestOpen}
+            iconClassName='fa fa-calendar'
+            tooltip='Schedule & Send Later'
+            tooltipPosition='top-right'
+            />}
+          </DatePickerHOC>
+          <AddCCPanelHOC listId={props.listId}>
+          {({onRequestOpen}) =>
+            <IconButton
+            iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
+            iconClassName='fa fa-user-plus'
+            onClick={onRequestOpen}
+            tooltip='CC/BCC'
+            tooltipPosition='top-right'
+            />}
+          </AddCCPanelHOC>
+          <div className='right' >
+            <FlatButton label='Close' onClick={props.onClose} />
           </div>
         </div>
       {
