@@ -38,7 +38,7 @@ import isEmail from 'validator/lib/isEmail';
 import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
-import {grey50, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {blueGrey50, grey50, grey600, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from './utils/replaceAll';
 
@@ -51,10 +51,12 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
     alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
   });
 
-const PauseOverlay = ({message}) => (
-  <div style={Object.assign({}, emailPanelWrapper, emailPanelPauseOverlay)}>
+const PauseOverlay = ({message, width, height}) => (
+  <div style={Object.assign({}, {width, height}, emailPanelPauseOverlay)}>
     <div style={{margin: 0}}>
-    <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/></div>
+      <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span>
+      <FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/>
+    </div>
   </div>);
 
 class EmailPanel extends Component {
@@ -394,21 +396,25 @@ class EmailPanel extends Component {
       primaryText={template.name.length > 0 ? template.name : template.subject}
       />)) : null;
 
+    const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
+
     return (
       <div>
         <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
             <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
           </ReactTooltip>
-        {!state.isPreveiwOpen && props.isImageReceiving &&
-          <PauseOverlay message='Image is loading.'/>}
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
-          <div className='vertical-center' style={{margin: '5px 20px'}} >
-            <span style={{color: grey700, marginRight: 10}} className='text'>Emails are sent from: </span>
-            {
-            // <span className='text' style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
-            }
+          <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50, zIndex: 500}} >
+            <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
+            <div
+            onClick={props.onAttachmentPanelOpen}
+            className='pointer'
+            style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
+            >
+              <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: grey700}}>File{props.files.length > 1 && 's'} Attached</a>
+            </div>
           {props.isImageReceiving &&
             <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
             <RaisedButton
@@ -420,14 +426,9 @@ class EmailPanel extends Component {
             icon={<FontIcon color='white' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
             />
           </div>
-          <div className='RichEditor-root' style={styles.emailPanel}>
-            <div
-            onClick={props.onAttachmentPanelOpen}
-            className='pointer'
-            style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
-            >
-              <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: 'darkgray'}}>File{props.files.length > 1 && 's'} Attached</a>
-            </div>
+        {!state.isPreveiwOpen && props.isImageReceiving &&
+          <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
+          <div className='RichEditor-root' style={emailPanelStyle}>
             <BasicHtmlEditor
             listId={props.listId}
             fieldsmap={state.fieldsmap}
@@ -440,14 +441,15 @@ class EmailPanel extends Component {
             />
           </div>
         </div>
-        <div style={{width: '100%', borderBottom: '1px solid darkgray'}} ></div>
         <div style={{
           backgroundColor: '#ffffff',
           padding: '0 10px',
           position: 'fixed',
           bottom: 3,
           display: state.isPreveiwOpen ? 'none' : 'block',
-          width: '100%'
+          width: '100%',
+          // borderTop: '1px solid darkgray',
+          backgroundColor: blueGrey50,
           // alignItems: 'center',
           // justifyContent: 'space-around'
         }} >
@@ -499,8 +501,8 @@ class EmailPanel extends Component {
             />}
           </AddCCPanelHOC>
         </div>
-        <div style={{position: 'fixed', bottom: 3, right: 5}} >
-          <FlatButton label='Close' onClick={props.onClose} />
+        <div style={{position: 'fixed', bottom: 5, right: 5, zIndex: 500, backgroundColor: blueGrey50}} >
+          <FlatButton labelStyle={{textTransform: 'none'}} label='Hide Panel' onClick={props.onClose} />
         </div>
       {
         state.isPreveiwOpen &&
@@ -524,34 +526,12 @@ class EmailPanel extends Component {
 }
 
 const styles = {
-  emailPanelOuterPosition: {
-    // display: 'flex',
-    // alignItems: 'center',
-    // justifyContent: 'center'
-    // display: 'block'
-  },
-  emailPanelPosition: {
-    zIndex: 300,
-    // position: 'fixed',
-    // bottom: 0,
-  },
-  emailPanel: {
-    height: 600,
-    width: 760,
-    padding: '0 10px'
-  },
-  sendButtonPosition: {
-    // position: 'absolute',
-    // bottom: 10,
-    // right: 10
-  },
   smallIcon: {
     margin: '0 3px', fontSize: '14px', float: 'right'
   },
   attachTooltip: {
     zIndex: 500,
-    float: 'right',
-    margin: '0 8px',
+    margin: '0 15px'
   },
 };
 

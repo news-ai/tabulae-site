@@ -835,83 +835,87 @@ class BasicHtmlEditor extends Component {
             }}/>)}
           </Menu>
         </Popover>
-        <Subject
-        width={props.width}
-        onSubjectChange={props.onSubjectChange}
-        subjectHtml={props.subjectHtml}
-        fieldsmap={props.fieldsmap}
-        />
-        <div style={styles.editorContainer}>
-          <div className={className} onClick={this.focus}>
-            <Editor
-            blockStyleFn={getBlockStyle}
-            blockRendererFn={
-              mediaBlockRenderer({
-                getEditorState: this.getEditorState,
-                onChange: this.onChange,
-                propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
-              })}
-            blockRenderMap={extendedBlockRenderMap}
-            customStyleMap={styleMap}
-            editorState={editorState}
-            handleKeyCommand={this.handleKeyCommand}
-            handleReturn={this.handleReturn}
-            handlePastedText={this.handlePastedText}
-            handleDroppedFiles={this.handleDroppedFiles}
-            handleBeforeInput={this.handleBeforeInput}
-            handleDrop={this.handleDrop}
-            onChange={this.onChange}
-            placeholder={placeholder}
-            ref='editor'
-            spellCheck
+        <div>
+          <Subject
+          width={props.width}
+          onSubjectChange={props.onSubjectChange}
+          subjectHtml={props.subjectHtml}
+          fieldsmap={props.fieldsmap}
+          />
+          <div style={styles.editorContainer}>
+            <div className={className} onClick={this.focus}>
+              <Editor
+              blockStyleFn={getBlockStyle}
+              blockRendererFn={
+                mediaBlockRenderer({
+                  getEditorState: this.getEditorState,
+                  onChange: this.onChange,
+                  propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
+                })}
+              blockRenderMap={extendedBlockRenderMap}
+              customStyleMap={styleMap}
+              editorState={editorState}
+              handleKeyCommand={this.handleKeyCommand}
+              handleReturn={this.handleReturn}
+              handlePastedText={this.handlePastedText}
+              handleDroppedFiles={this.handleDroppedFiles}
+              handleBeforeInput={this.handleBeforeInput}
+              handleDrop={this.handleDrop}
+              onChange={this.onChange}
+              placeholder={placeholder}
+              ref='editor'
+              spellCheck
+              />
+            </div>
+            <RaisedButton
+            style={styles.insertPropertyBtn.style}
+            label='Insert Property'
+            labelStyle={styles.insertPropertyBtn.labelStyle}
+            onClick={this.onInsertPropertyClick}
             />
           </div>
-          <RaisedButton
-          style={styles.insertPropertyBtn.style}
-          label='Insert Property'
-          labelStyle={styles.insertPropertyBtn.labelStyle}
-          onClick={this.onInsertPropertyClick}
-          />
         </div>
-        <Paper zDepth={1} style={controlsStyle}>
-          <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
-          inlineStyles={INLINE_STYLES}
-          />
-          <EntityControls
-          editorState={editorState}
-          entityControls={this.ENTITY_CONTROLS}
-          />
-          <ExternalControls
-          editorState={editorState}
-          externalControls={this.EXTERNAL_CONTROLS}
-          active={props.files.length > 0}
-          />
-          <PositionStyleControls
-          editorState={editorState}
-          blockTypes={POSITION_TYPES}
-          onToggle={this.toggleBlockType}
-          />
-          <FontSizeControls
-          editorState={editorState}
-          onToggle={this.onFontSizeToggle}
-          inlineStyles={FONTSIZE_TYPES}
-          />
-          <TypefaceControls
-          editorState={editorState}
-          onToggle={this.onTypefaceToggle}
-          inlineStyles={TYPEFACE_TYPES}
-          />
-          <IconButton
-          iconStyle={styles.insertPropertyIcon.iconStyle}
-          style={styles.insertPropertyIcon.style}
-          iconClassName='fa fa-plus pointer'
-          onClick={this.onVariableMenuOpen}
-          tooltip='Insert Property'
-          tooltipPosition='top-right'
-          />
-        </Paper>
+        <div className='horizontal-center' >
+          <Paper zDepth={1} style={controlsStyle}>
+            <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={INLINE_STYLES}
+            />
+            <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+            />
+            <ExternalControls
+            editorState={editorState}
+            externalControls={this.EXTERNAL_CONTROLS}
+            active={props.files.length > 0}
+            />
+            <PositionStyleControls
+            editorState={editorState}
+            blockTypes={POSITION_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+            <FontSizeControls
+            editorState={editorState}
+            onToggle={this.onFontSizeToggle}
+            inlineStyles={FONTSIZE_TYPES}
+            />
+            <TypefaceControls
+            editorState={editorState}
+            onToggle={this.onTypefaceToggle}
+            inlineStyles={TYPEFACE_TYPES}
+            />
+            <IconButton
+            iconStyle={styles.insertPropertyIcon.iconStyle}
+            style={styles.insertPropertyIcon.style}
+            iconClassName='fa fa-plus pointer'
+            onClick={this.onVariableMenuOpen}
+            tooltip='Insert Property'
+            tooltipPosition='top-right'
+            />
+          </Paper>
+        </div>
       </div>
     );
   }
@@ -950,7 +954,7 @@ const controlsStyle = {
   justifyContent: 'center',
   height: 40,
   zIndex: 200,
-  bottom: 60,
+  bottom: 80,
   backgroundColor: '#ffffff',
 };
 

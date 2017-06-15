@@ -5,7 +5,7 @@ import Waiting from 'components/Waiting';
 import Fuse from 'fuse.js';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
-import {grey700} from 'material-ui/styles/colors';
+import {grey700, blueGrey50} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import {connect} from 'react-redux';
 import find from 'lodash/find';
@@ -79,7 +79,7 @@ class PreviewEmails extends Component {
     } else {
       renderNode = (
       <div>
-        <div className='vertical-center' style={{margin: '10px 0'}}>
+        <div className='vertical-center' style={{marginBottom: 10}}>
           <div>
             <TextField
             id='preview_searchValue'
@@ -90,19 +90,17 @@ class PreviewEmails extends Component {
             onChange={this.onChange}
             />
           </div>
+          <span className='smalltext right' style={{color: grey700}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
         </div>
-        <div className='vertical-center'>
-          <span className='smalltext' style={{color: grey700}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
-        </div>
-        <div style={{margin: '8px 0'}}>
-          <span className='text'>Attachments:</span>
+        <div style={{margin: '8px 0 15px 0'}}>
+          <span className='text' style={{marginLeft: 10}} >Attachments:</span>
       {props.attachments.length > 0 ? props.attachments.map(file =>
           <span key={file.name} style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>{file.name}</span>) : <span style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>None</span>}
           <div className='vertical-center'>
           {props.attachmentIsReceiving &&
-            <span className='smalltext' style={{color: grey700}}>Attaching files...</span>}
+            <span className='smalltext' style={{color: grey700, marginLeft: 15}}>Attaching files...</span>}
           {props.finishedAttaching &&
-            <span className='smalltext' style={{color: grey700}}>Succesfully attached.</span>}
+            <span className='smalltext' style={{color: grey700, marginLeft: 15}}>Succesfully attached.</span>}
           </div>
         </div>
         {previewEmails.map((email, i) =>
@@ -128,7 +126,7 @@ class PreviewEmails extends Component {
 
     return (
       <div>
-        <div className='vertical-center' style={{margin: '5px 20px'}} >
+        <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50}} >
           <div>
             <IconButton
             onClick={props.onBack}

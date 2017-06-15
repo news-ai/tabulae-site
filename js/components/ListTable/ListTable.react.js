@@ -875,7 +875,7 @@ class ListTable extends Component {
         onChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
         >
           <EmailPanelPlaceholder
-          width={700}
+          width={800}
           selected={state.selected}
           fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
           listId={props.listId}
