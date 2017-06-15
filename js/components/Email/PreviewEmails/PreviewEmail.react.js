@@ -18,7 +18,7 @@ const styles = {
   },
   bounced: {color: 'red'},
   btnLabel: {textTransform: 'none'},
-  btnContainer: {margin: '10px 0'},
+  btnContainer: {margin: '30px 10px 10px 10px'},
   topButtonContainer: {position: 'absolute', right: 10, top: 10}
 };
 

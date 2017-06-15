@@ -31,6 +31,8 @@ import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
 
 import {EmailPanel} from '../Email';
+import EmailPanelPlaceholder from 'components/Email/EmailPanel/EmailPanelPlaceholder.react';
+import Drawer from 'react-motion-drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
@@ -98,6 +100,7 @@ class ListTable extends Component {
       isDeleting: false,
       showEditPanel: false,
       currentEditContactId: undefined,
+      showEmailPanel: true,
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -145,11 +148,12 @@ class ListTable extends Component {
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
     this.resetSort = () => this.setState({
-      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ? 0 : 2),
       onSort: false,
       sortedIds: [],
     });
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
+    this.forceEmailPanelRemount = _ => this.setState({showEmailPanel: false}, _ => this.setState({showEmailPanel: true}));
   }
 
   componentWillMount() {
@@ -863,14 +867,36 @@ class ListTable extends Component {
            </ScatterPlotHOC>
           </div>}
         </div>
-      {state.isEmailPanelOpen &&
-        <EmailPanel
-        person={props.person}
-        selected={state.selected}
-        fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
-        listId={props.listId}
-        onClose={_ => this.setState({isEmailPanelOpen: false})}
-        />}
+        <Drawer
+        right
+        zIndex={300}
+        width={800}
+        noTouchClose
+        drawerStyle={{backgroundColor: 'white'}}
+        open={state.isEmailPanelOpen}
+        onChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
+        >
+        {state.showEmailPanel &&
+          <EmailPanelPlaceholder
+          width={800}
+          selected={state.selected}
+          fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
+          listId={props.listId}
+          onClose={_ => this.setState({isEmailPanelOpen: false})}
+          onReset={this.forceEmailPanelRemount}
+          />
+        }
+        </Drawer>
+      {
+        // state.isEmailPanelOpen &&
+        // <EmailPanel
+        // person={props.person}
+        // selected={state.selected}
+        // fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
+        // listId={props.listId}
+        // onClose={_ => this.setState({isEmailPanelOpen: false})}
+        // />
+      }
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='row vertical-center' style={{margin: '10px 0'}}>
           <Tags listId={props.listId}/>

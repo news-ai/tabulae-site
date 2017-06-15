@@ -31,7 +31,7 @@ class FileWrapper extends Component {
       </div>
       {props.files.length > 0 && (
         <div>
-          <h4>Attached {props.files.length} files...</h4>
+          <h4>Attached {props.files.length} file(s)...</h4>
           <div className='row'>
           {props.files.map((file, i) =>
             <AttachmentPreview

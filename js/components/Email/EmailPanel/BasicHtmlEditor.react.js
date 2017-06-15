@@ -179,7 +179,6 @@ class BasicHtmlEditor extends Component {
       bodyHtml: this.props.bodyHtml || null,
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
-      isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
@@ -212,7 +211,6 @@ class BasicHtmlEditor extends Component {
     this.addLink = this._addLink.bind(this);
     this.removeLink = this._removeLink.bind(this);
     this.manageLink = this._manageLink.bind(this);
-    this.onCheck = _ => this.setState({isStyleBlockOpen: !this.state.isStyleBlockOpen});
     this.handlePastedText = this._handlePastedText.bind(this);
     this.handleDroppedFiles = this._handleDroppedFiles.bind(this);
     this.handleImage = this._handleImage.bind(this);
@@ -818,6 +816,7 @@ class BasicHtmlEditor extends Component {
             <RaisedButton label='Upload from File' onClick={this.onImageDropzoneOpen}/>
           </div>
         </Dialog>
+
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={styles.dropzone} onDrop={this.onImageUploadClicked}/>
         <Popover
         open={state.variableMenuOpen}
@@ -836,105 +835,94 @@ class BasicHtmlEditor extends Component {
             }}/>)}
           </Menu>
         </Popover>
-        <Subject
-        width={props.width}
-        onSubjectChange={props.onSubjectChange}
-        subjectHtml={props.subjectHtml}
-        fieldsmap={props.fieldsmap}
-        />
-        <div style={styles.editorContainer}>
-          <div className={className} onClick={this.focus}>
-            <Editor
-            blockStyleFn={getBlockStyle}
-            blockRendererFn={
-              mediaBlockRenderer({
-                getEditorState: this.getEditorState,
-                onChange: this.onChange,
-                propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
-              })}
-            blockRenderMap={extendedBlockRenderMap}
-            customStyleMap={styleMap}
-            editorState={editorState}
-            handleKeyCommand={this.handleKeyCommand}
-            handleReturn={this.handleReturn}
-            handlePastedText={this.handlePastedText}
-            handleDroppedFiles={this.handleDroppedFiles}
-            handleBeforeInput={this.handleBeforeInput}
-            handleDrop={this.handleDrop}
-            onChange={this.onChange}
-            placeholder={placeholder}
-            ref='editor'
-            spellCheck
+        <div>
+          <Subject
+          width={props.width}
+          onSubjectChange={props.onSubjectChange}
+          subjectHtml={props.subjectHtml}
+          fieldsmap={props.fieldsmap}
+          />
+          <div style={styles.editorContainer}>
+            <div className={className} onClick={this.focus}>
+              <Editor
+              blockStyleFn={getBlockStyle}
+              blockRendererFn={
+                mediaBlockRenderer({
+                  getEditorState: this.getEditorState,
+                  onChange: this.onChange,
+                  propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
+                })}
+              blockRenderMap={extendedBlockRenderMap}
+              customStyleMap={styleMap}
+              editorState={editorState}
+              handleKeyCommand={this.handleKeyCommand}
+              handleReturn={this.handleReturn}
+              handlePastedText={this.handlePastedText}
+              handleDroppedFiles={this.handleDroppedFiles}
+              handleBeforeInput={this.handleBeforeInput}
+              handleDrop={this.handleDrop}
+              onChange={this.onChange}
+              placeholder={placeholder}
+              ref='editor'
+              spellCheck
+              />
+            </div>
+            <RaisedButton
+            style={styles.insertPropertyBtn.style}
+            label='Insert Property'
+            labelStyle={styles.insertPropertyBtn.labelStyle}
+            onClick={this.onInsertPropertyClick}
             />
           </div>
-          <RaisedButton
-          style={styles.insertPropertyBtn.style}
-          label='Insert Property'
-          labelStyle={styles.insertPropertyBtn.labelStyle}
-          onClick={this.onInsertPropertyClick}
-          />
         </div>
-      {state.isStyleBlockOpen &&
-        <Paper zDepth={1} className='vertical-center' style={controlsStyle}>
-          <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
-          inlineStyles={INLINE_STYLES}
-          />
-          <EntityControls
-          editorState={editorState}
-          entityControls={this.ENTITY_CONTROLS}
-          />
-          <ExternalControls
-          editorState={editorState}
-          externalControls={this.EXTERNAL_CONTROLS}
-          active={props.files.length > 0}
-          />
-          <PositionStyleControls
-          editorState={editorState}
-          blockTypes={POSITION_TYPES}
-          onToggle={this.toggleBlockType}
-          />
-          <FontSizeControls
-          editorState={editorState}
-          onToggle={this.onFontSizeToggle}
-          inlineStyles={FONTSIZE_TYPES}
-          />
-          <TypefaceControls
-          editorState={editorState}
-          onToggle={this.onTypefaceToggle}
-          inlineStyles={TYPEFACE_TYPES}
-          />
-          <IconButton
-          iconStyle={styles.insertPropertyIcon.iconStyle}
-          style={styles.insertPropertyIcon.style}
-          iconClassName='fa fa-plus pointer'
-          onClick={this.onVariableMenuOpen}
-          tooltip='Insert Property'
-          tooltipPosition='top-right'
-          />
-        </Paper>}
-        <div className='vertical-center' style={{
-          position: 'absolute',
-          bottom: 3,
-          width: props.width,
-        }}>
-        <div style={styles.styleBlockIconContainer}>
-          <FontIcon
-          className={`fa fa-angle-double-${state.isStyleBlockOpen ? 'up' : 'down'} pointer`}
-          style={{color: state.isStyleBlockOpen ? blue700 : grey700}}
-          onClick={this.onCheck}
-          />
+        <div className='horizontal-center' >
+          <Paper zDepth={1} style={controlsStyle}>
+            <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={INLINE_STYLES}
+            />
+            <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+            />
+            <ExternalControls
+            editorState={editorState}
+            externalControls={this.EXTERNAL_CONTROLS}
+            active={props.files.length > 0}
+            />
+            <PositionStyleControls
+            editorState={editorState}
+            blockTypes={POSITION_TYPES}
+            onToggle={this.toggleBlockType}
+            />
+            <FontSizeControls
+            editorState={editorState}
+            onToggle={this.onFontSizeToggle}
+            inlineStyles={FONTSIZE_TYPES}
+            />
+            <TypefaceControls
+            editorState={editorState}
+            onToggle={this.onTypefaceToggle}
+            inlineStyles={TYPEFACE_TYPES}
+            />
+            <IconButton
+            iconStyle={styles.insertPropertyIcon.iconStyle}
+            style={styles.insertPropertyIcon.style}
+            iconClassName='fa fa-plus pointer'
+            onClick={this.onVariableMenuOpen}
+            tooltip='Insert Property'
+            tooltipPosition='top-right'
+            />
+          </Paper>
         </div>
-        {props.children}
       </div>
-    </div>
     );
   }
 }
 
 const styles = {
-  styleBlockIconContainer: {padding: 3, marginRight: 10},
+  // styleBlockIconContainer: {padding: 3, marginRight: 10},
   insertPropertyIcon: {
     iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey800},
     style: {width: 28, height: 28, padding: 6}
@@ -943,7 +931,10 @@ const styles = {
     labelStyle: {textTransform: 'none'},
     style: {margin: 10}
   },
-  editorContainer: {height: 460, overflowY: 'scroll'},
+  editorContainer: {
+    height: 550,
+    overflowY: 'scroll'
+  },
   anchorOrigin: {horizontal: 'left', vertical: 'bottom'},
   targetOrigin: {horizontal: 'left', vertical: 'top'},
   dropzone: {display: 'none'},
@@ -958,9 +949,12 @@ const imgPanelStyles = {
 
 const controlsStyle = {
   position: 'fixed',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   height: 40,
   zIndex: 200,
-  bottom: 60,
+  bottom: 80,
   backgroundColor: '#ffffff',
 };
 
@@ -968,6 +962,7 @@ const extendedBlockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(blockRende
 
 const mapStateToProps = (state, props) => {
   return {
+    person: state.personReducer.person,
     files: state.emailAttachmentReducer.attached,
     templateChanged: state.emailDraftReducer.templateChanged,
     savedEditorState: state.emailDraftReducer.editorState,

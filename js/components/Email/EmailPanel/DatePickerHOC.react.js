@@ -132,7 +132,7 @@ class DatePickerHOC extends Component {
     const m = moment(state.date);
 
     return (
-      <div>
+      <div className={props.className} >
         <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
         title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
           <div className='horizontal-center' style={{margin: '20px 0'}}>
