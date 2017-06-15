@@ -100,6 +100,7 @@ class ListTable extends Component {
       isDeleting: false,
       showEditPanel: false,
       currentEditContactId: undefined,
+      showEmailPanel: true,
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -147,11 +148,12 @@ class ListTable extends Component {
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
     this.resetSort = () => this.setState({
-      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ? 0 : 2),
       onSort: false,
       sortedIds: [],
     });
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
+    this.forceEmailPanelRemount = _ => this.setState({showEmailPanel: false}, _ => this.setState({showEmailPanel: true}));
   }
 
   componentWillMount() {
@@ -874,13 +876,16 @@ class ListTable extends Component {
         open={state.isEmailPanelOpen}
         onChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
         >
+        {state.showEmailPanel &&
           <EmailPanelPlaceholder
           width={800}
           selected={state.selected}
           fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
           listId={props.listId}
           onClose={_ => this.setState({isEmailPanelOpen: false})}
+          onReset={this.forceEmailPanelRemount}
           />
+        }
         </Drawer>
       {
         // state.isEmailPanelOpen &&

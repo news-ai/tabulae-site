@@ -59,6 +59,19 @@ const PauseOverlay = ({message, width, height}) => (
     </div>
   </div>);
 
+const getInitialState = () => ({
+    subject: '',
+    fieldsmap: [],
+    currentTemplateId: 0,
+    bodyEditorState: null,
+    bodyHtml: '',
+    body: '',
+    subjectHtml: null,
+    minimized: false,
+    isPreveiwOpen: false,
+    dirty: false,
+});
+
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
@@ -90,7 +103,7 @@ class EmailPanel extends Component {
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
-    // this.onClose = this._onClose.bind(this);
+    this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
 
@@ -370,18 +383,18 @@ class EmailPanel extends Component {
 
   }
 
-  // _onClose() {
-  //   if (this.state.dirty) {
-  //     alertify.promisifyConfirm(
-  //       'Are you sure?',
-  //       'Closing the editor will cause your subject/body to be discarded.',
-  //       )
-  //     .then(this.props.onClose)
-  //     .catch(err => {});
-  //   } else {
-  //     this.props.onClose();
-  //   }
-  // }
+  _onClearClick() {
+    if (this.state.dirty) {
+      alertify.promisifyConfirm(
+        'Are you sure?',
+        'Resetting the editor will cause your subject/body to be discarded.',
+        )
+      .then(this.props.onReset)
+      .catch(err => {});
+    } else {
+      this.props.onReset();
+    }
+  }
 
   render() {
     const state = this.state;
@@ -408,6 +421,7 @@ class EmailPanel extends Component {
           <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50, zIndex: 500}} >
             <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
+            <FlatButton style={{margin: '0 5px'}} label='Reset Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
             <div
             onClick={props.onAttachmentPanelOpen}
             className='pointer'
@@ -533,12 +547,6 @@ const styles = {
     zIndex: 500,
     margin: '0 15px'
   },
-};
-
-const emailPanelWrapper = {
-  height: styles.emailPanel.height,
-  width: styles.emailPanel.width,
-  zIndex: 200,
 };
 
 const emailPanelPauseOverlay = {
