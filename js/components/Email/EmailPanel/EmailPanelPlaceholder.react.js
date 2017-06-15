@@ -421,7 +421,7 @@ class EmailPanel extends Component {
           <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50, zIndex: 500}} >
             <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
-            <FlatButton style={{margin: '0 5px'}} label='Reset Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
+            <FlatButton style={{margin: '0 5px'}} label='Clear Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
             <div
             onClick={props.onAttachmentPanelOpen}
             className='pointer'
