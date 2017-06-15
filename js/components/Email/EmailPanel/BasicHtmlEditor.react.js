@@ -783,8 +783,6 @@ class BasicHtmlEditor extends Component {
       }
     }
 
-    // console.log(convertToRaw(this.state.editorState.getCurrentContent()));
-
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={this.onImagePanelOpen}/>]}

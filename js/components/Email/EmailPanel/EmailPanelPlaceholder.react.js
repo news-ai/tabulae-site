@@ -412,16 +412,19 @@ class EmailPanel extends Component {
     const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
 
     return (
-      <div>
+      <div style={{overflowX: 'hidden'}} >
         <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
             <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
           </ReactTooltip>
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
+
           <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50, zIndex: 500}} >
             <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
-            <FlatButton style={{margin: '0 5px'}} label='Clear Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
+            <div style={{margin: '0 5px'}}>
+              <FlatButton label='Clear Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
+            </div>
             <div
             onClick={props.onAttachmentPanelOpen}
             className='pointer'
@@ -431,17 +434,20 @@ class EmailPanel extends Component {
             </div>
           {props.isImageReceiving &&
             <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
-            <RaisedButton
-            backgroundColor={lightBlue500}
-            labelColor='white'
-            onClick={this.onEmailSendClick}
-            label='Preview'
-            className='right'
-            icon={<FontIcon color='white' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
-            />
+            <div className='right'>
+              <RaisedButton
+              backgroundColor={lightBlue500}
+              labelColor='white'
+              onClick={this.onEmailSendClick}
+              label='Preview'
+              icon={<FontIcon color='white' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
+              />
+            </div>
           </div>
+
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
+
           <div className='RichEditor-root' style={emailPanelStyle}>
             <BasicHtmlEditor
             listId={props.listId}
@@ -545,7 +551,7 @@ const styles = {
   },
   attachTooltip: {
     zIndex: 500,
-    margin: '0 15px'
+    margin: '0 15px',
   },
 };
 
