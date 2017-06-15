@@ -10,7 +10,7 @@ export default function PositionStyleControls(props) {
     .getType();
 
   return (
-    <div className='RichEditor-controls'>
+    <div className='RichEditor-controls vertical-center'>
       {blockTypes.map(type =>
         <StyleButton
         key={`position-${type.label}`}

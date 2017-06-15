@@ -6,7 +6,7 @@ export default function InlineStyleControls(props) {
   var currentStyle = props.editorState.getCurrentInlineStyle();
 
   return (
-    <div className='RichEditor-controls'>
+    <div className='RichEditor-controls vertical-center'>
       {inlineStyles.map(type =>
         <StyleButton
         key={type.label}

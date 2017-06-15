@@ -873,7 +873,12 @@ class BasicHtmlEditor extends Component {
             />
           </div>
         </div>
-        <div className='horizontal-center' >
+        <div className='horizontal-center' style={{
+          width: '100%',
+          position: 'fixed',
+          zIndex: 200,
+          bottom: 80,
+        }} >
           <Paper zDepth={1} style={controlsStyle}>
             <InlineStyleControls
             editorState={editorState}
@@ -947,13 +952,9 @@ const imgPanelStyles = {
 };
 
 const controlsStyle = {
-  position: 'fixed',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
   height: 40,
-  zIndex: 200,
-  bottom: 80,
   backgroundColor: '#ffffff',
 };
 
