@@ -413,13 +413,13 @@ class EmailPanel extends Component {
 
     return (
       <div style={{overflowX: 'hidden'}} >
-        <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
-          <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
-            <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
-          </ReactTooltip>
+        <div style={{
+          zIndex: 300,
+          display: state.isPreveiwOpen ? 'none' : 'block',
+      }}>
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
 
-          <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50, zIndex: 500}} >
+          <div className='vertical-center' style={{zIndex: 500, padding: '5px 20px', backgroundColor: blueGrey50, position: 'fixed', top: 0, width: '100%'}} >
             <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
             <div style={{margin: '0 5px'}}>
@@ -430,11 +430,11 @@ class EmailPanel extends Component {
             className='pointer'
             style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
             >
-              <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: grey700}}>File{props.files.length > 1 && 's'} Attached</a>
+              <span style={{fontSize: '0.8em', color: grey700}}>File{props.files.length > 1 && 's'} Attached</span>
             </div>
           {props.isImageReceiving &&
             <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
-            <div className='right'>
+            <div className='right' style={{margin: '0 auto'}} >
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='white'
@@ -447,7 +447,6 @@ class EmailPanel extends Component {
 
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
-
           <div className='RichEditor-root' style={emailPanelStyle}>
             <BasicHtmlEditor
             listId={props.listId}
@@ -463,11 +462,12 @@ class EmailPanel extends Component {
         </div>
         <div style={{
           backgroundColor: '#ffffff',
-          padding: '0 10px',
+          padding: '3px 10px',
           position: 'fixed',
-          bottom: 3,
+          bottom: 0,
           display: state.isPreveiwOpen ? 'none' : 'block',
           width: '100%',
+          zIndex: 500,
           // borderTop: '1px solid darkgray',
           backgroundColor: blueGrey50,
           // alignItems: 'center',
@@ -557,6 +557,7 @@ const styles = {
 
 const emailPanelPauseOverlay = {
   backgroundColor: grey800,
+  borderSizing: 'border-box',
   zIndex: 300,
   position: 'absolute',
   opacity: 0.7,

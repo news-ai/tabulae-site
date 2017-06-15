@@ -969,14 +969,6 @@ const styles = {
       marginTop: 40,
     },
   },
-  emailPanel: {
-    position: 'fixed',
-    bottom: 0,
-    right: 0,
-    zIndex: 100,
-    height: 500,
-    width: 600,
-  },
   loading: {
     zIndex: 200,
     top: 80,

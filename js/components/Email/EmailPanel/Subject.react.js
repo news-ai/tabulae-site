@@ -119,7 +119,7 @@ class Subject extends Component {
     const state = this.state;
     const props = this.props;
     return (
-      <div style={{marginTop: 10, borderBottom: `1px solid ${grey300}`}} className='vertical-center' >
+      <div style={{borderBottom: `1px solid ${grey300}`}} className='vertical-center' >
         <div
         className='subject-draft-container'
         style={{

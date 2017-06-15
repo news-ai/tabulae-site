@@ -833,7 +833,7 @@ class BasicHtmlEditor extends Component {
             }}/>)}
           </Menu>
         </Popover>
-        <div>
+        <div style={{marginTop: 70}} >
           <Subject
           width={props.width}
           onSubjectChange={props.onSubjectChange}
@@ -930,8 +930,9 @@ const styles = {
     style: {margin: 10}
   },
   editorContainer: {
-    height: 550,
-    overflowY: 'scroll'
+    height: '100%',
+    marginBottom: 150,
+    overflowY: 'scroll',
   },
   anchorOrigin: {horizontal: 'left', vertical: 'bottom'},
   targetOrigin: {horizontal: 'left', vertical: 'top'},
