@@ -13,11 +13,11 @@
 
 .RichEditor-root {
   background: #fff;
-  border: 1px solid #ddd;
-  font-family: 'Arial', sans-serif;
+/*  border: 1px solid #ddd;
+*/  font-family: 'Arial', sans-serif;
   font-size: 14px;
-  padding: 15px;
-}
+/*  padding: 15px;
+*/}
 
 .RichEditor-editor {
   cursor: text;

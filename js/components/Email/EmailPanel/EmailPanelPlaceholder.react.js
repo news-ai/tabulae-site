@@ -395,7 +395,7 @@ class EmailPanel extends Component {
       />)) : null;
 
     return (
-      <div style={styles.emailPanelOuterPosition}>
+      <div>
         <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
             <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
@@ -440,13 +440,14 @@ class EmailPanel extends Component {
             />
           </div>
         </div>
+        <div style={{width: '100%', borderBottom: '1px solid darkgray'}} ></div>
         <div style={{
           backgroundColor: '#ffffff',
           padding: '0 10px',
           position: 'fixed',
           bottom: 3,
-          display: 'block',
-          width: 760
+          display: state.isPreveiwOpen ? 'none' : 'block',
+          width: '100%'
           // alignItems: 'center',
           // justifyContent: 'space-around'
         }} >
@@ -497,23 +498,25 @@ class EmailPanel extends Component {
             tooltipPosition='top-right'
             />}
           </AddCCPanelHOC>
-          <div className='right' >
-            <FlatButton label='Close' onClick={props.onClose} />
-          </div>
+        </div>
+        <div style={{position: 'fixed', bottom: 3, right: 5}} >
+          <FlatButton label='Close' onClick={props.onClose} />
         </div>
       {
         state.isPreveiwOpen &&
-        <PreviewEmails
-        onBack={_ => this.setState({isPreveiwOpen: false})}
-        contacts={props.selectedContacts}
-        fieldsmap={state.fieldsmap}
-        listId={props.listId}
-        sendLater={props.scheduledtime !== null}
-        isReceiving={props.isReceiving}
-        previewEmails={props.previewEmails}
-        onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-        onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-        />
+        <div style={{marginBottom: 20}} >
+          <PreviewEmails
+          onBack={_ => this.setState({isPreveiwOpen: false})}
+          contacts={props.selectedContacts}
+          fieldsmap={state.fieldsmap}
+          listId={props.listId}
+          sendLater={props.scheduledtime !== null}
+          isReceiving={props.isReceiving}
+          previewEmails={props.previewEmails}
+          onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+          onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+          />
+        </div>
       }
       </div>
     );
@@ -525,7 +528,7 @@ const styles = {
     // display: 'flex',
     // alignItems: 'center',
     // justifyContent: 'center'
-    display: 'block'
+    // display: 'block'
   },
   emailPanelPosition: {
     zIndex: 300,
@@ -535,6 +538,7 @@ const styles = {
   emailPanel: {
     height: 600,
     width: 760,
+    padding: '0 10px'
   },
   sendButtonPosition: {
     // position: 'absolute',

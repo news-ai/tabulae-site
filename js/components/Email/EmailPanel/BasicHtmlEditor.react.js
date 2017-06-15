@@ -179,7 +179,6 @@ class BasicHtmlEditor extends Component {
       bodyHtml: this.props.bodyHtml || null,
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
-      isStyleBlockOpen: true,
       styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
@@ -817,6 +816,7 @@ class BasicHtmlEditor extends Component {
             <RaisedButton label='Upload from File' onClick={this.onImageDropzoneOpen}/>
           </div>
         </Dialog>
+
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={styles.dropzone} onDrop={this.onImageUploadClicked}/>
         <Popover
         open={state.variableMenuOpen}
@@ -873,7 +873,7 @@ class BasicHtmlEditor extends Component {
           onClick={this.onInsertPropertyClick}
           />
         </div>
-        <Paper zDepth={1} className='horizontal-center vertical-center' style={controlsStyle}>
+        <Paper zDepth={1} style={controlsStyle}>
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -912,7 +912,7 @@ class BasicHtmlEditor extends Component {
           tooltipPosition='top-right'
           />
         </Paper>
-    </div>
+      </div>
     );
   }
 }
@@ -927,7 +927,10 @@ const styles = {
     labelStyle: {textTransform: 'none'},
     style: {margin: 10}
   },
-  editorContainer: {height: 460, overflowY: 'scroll'},
+  editorContainer: {
+    height: 550,
+    overflowY: 'scroll'
+  },
   anchorOrigin: {horizontal: 'left', vertical: 'bottom'},
   targetOrigin: {horizontal: 'left', vertical: 'top'},
   dropzone: {display: 'none'},
@@ -942,6 +945,9 @@ const imgPanelStyles = {
 
 const controlsStyle = {
   position: 'fixed',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   height: 40,
   zIndex: 200,
   bottom: 60,
