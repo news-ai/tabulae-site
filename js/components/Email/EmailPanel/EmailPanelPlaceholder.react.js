@@ -412,11 +412,8 @@ class EmailPanel extends Component {
     const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
 
     return (
-      <div style={{overflowX: 'hidden'}} >
-        <div style={{
-          zIndex: 300,
-          display: state.isPreveiwOpen ? 'none' : 'block',
-      }}>
+      <div style={{overflowX: 'hidden', height: '100%'}} >
+        <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
 
           <div className='vertical-center' style={{zIndex: 500, padding: '5px 20px', backgroundColor: blueGrey50, position: 'fixed', top: 0, width: '100%'}} >
@@ -521,13 +518,11 @@ class EmailPanel extends Component {
             />}
           </AddCCPanelHOC>
         </div>
-        <div style={{position: 'fixed', bottom: 5, right: 5, zIndex: 500, backgroundColor: blueGrey50}} >
-          <FlatButton labelStyle={{textTransform: 'none'}} label='Hide Panel' onClick={props.onClose} />
-        </div>
       {
         state.isPreveiwOpen &&
-        <div style={{marginBottom: 20}} >
+        <div style={{marginBottom: 20, zIndex: 300}} >
           <PreviewEmails
+          onClose={props.onClose}
           onBack={_ => this.setState({isPreveiwOpen: false})}
           contacts={props.selectedContacts}
           fieldsmap={state.fieldsmap}
@@ -540,6 +535,9 @@ class EmailPanel extends Component {
           />
         </div>
       }
+        <div style={{position: 'fixed', bottom: 5, right: 5, zIndex: 500, backgroundColor: blueGrey50}} >
+          <FlatButton labelStyle={{textTransform: 'none'}} label='Hide Panel' onClick={props.onClose} />
+        </div>
       </div>
     );
   }
