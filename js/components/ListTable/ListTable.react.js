@@ -31,7 +31,7 @@ import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
 import Paper from 'material-ui/Paper';
 
-import EmailPanelPlaceholder from 'components/Email/EmailPanel/EmailPanelPlaceholder.react';
+import EmailPanel from 'components/Email/EmailPanel/EmailPanel.react';
 import Drawer from 'material-ui/Drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
@@ -395,11 +395,14 @@ class ListTable extends Component {
     }
     let customSpan;
     if (value === 'selected') {
-      customSpan = <span className='pointer' onClick={_ =>
-        this.setState({
-          selected: this.state.selected.length === this.props.listData.contacts.length ?
-          [] : this.props.listData.contacts.slice()
-        })} style={{whiteSpace: 'nowrap'}}>{content}</span>;
+      const checked = this.state.selected.length === this.props.listData.contacts.length;
+      customSpan = (
+        <input
+        type='checkbox'
+        className='pointer'
+        checked={checked}
+        onClick={_ => this.setState({selected: checked ? [] : this.props.listData.contacts.slice()})}
+        />);
     }
 
     return (
@@ -898,7 +901,7 @@ class ListTable extends Component {
         onRequestChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
         >
         {state.showEmailPanel &&
-          <EmailPanelPlaceholder
+          <EmailPanel
           width={800}
           selected={state.selected}
           fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}

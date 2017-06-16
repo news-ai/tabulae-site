@@ -74,8 +74,11 @@ class PreviewEmails extends Component {
         <div>
           An error occurred with generating previews of the emails.
         </div>);
-    // } else if (previewEmails.length === 0) {
-    //   renderNode = <span>All done.</span>;
+    } else if (previewEmails.length === 0) {
+      renderNode = (
+        <div className='horizontal-center vertical-center' style={{height: '100%', width: '100%'}}>
+          <span>All done.</span>
+        </div>);
     } else {
       renderNode = (
       <div>
@@ -149,7 +152,7 @@ class PreviewEmails extends Component {
             />
           </div>
         </div>
-        <div style={{padding: 10}} >
+        <div style={{padding: 10, marginBottom: 40}} >
           {renderNode}
         </div>
       </div>);
