@@ -434,7 +434,7 @@ class EmailPanel extends Component {
             </div>
           {props.isImageReceiving &&
             <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
-            <div className='right' style={{margin: '0 auto'}} >
+            <div style={{position: 'fixed', right: 10}} >
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='white'

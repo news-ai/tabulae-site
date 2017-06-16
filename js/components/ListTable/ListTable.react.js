@@ -30,9 +30,8 @@ import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
 
-import {EmailPanel} from '../Email';
 import EmailPanelPlaceholder from 'components/Email/EmailPanel/EmailPanelPlaceholder.react';
-import Drawer from 'react-motion-drawer';
+import Drawer from 'material-ui/Drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
@@ -868,13 +867,13 @@ class ListTable extends Component {
           </div>}
         </div>
         <Drawer
-        right
-        zIndex={300}
+        openSecondary
+        docked={false}
+        containerStyle={{zIndex: 400, backgroundColor: 'white'}}
+        overlayStyle={{zIndex: 300}}
         width={800}
-        noTouchClose
-        drawerStyle={{backgroundColor: 'white'}}
         open={state.isEmailPanelOpen}
-        onChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
+        onRequestChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
         >
         {state.showEmailPanel &&
           <EmailPanelPlaceholder
@@ -887,16 +886,6 @@ class ListTable extends Component {
           />
         }
         </Drawer>
-      {
-        // state.isEmailPanelOpen &&
-        // <EmailPanel
-        // person={props.person}
-        // selected={state.selected}
-        // fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
-        // listId={props.listId}
-        // onClose={_ => this.setState({isEmailPanelOpen: false})}
-        // />
-      }
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='row vertical-center' style={{margin: '10px 0'}}>
           <Tags listId={props.listId}/>
