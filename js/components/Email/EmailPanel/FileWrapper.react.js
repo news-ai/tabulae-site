@@ -21,30 +21,33 @@ class FileWrapper extends Component {
   render() {
     const props = this.props;
     return (
-    <Dialog actions={[<FlatButton label='Close' onClick={props.onRequestClose}/>]}
-    title='File Upload' autoScrollBodyContent
-    open={props.open || false} onRequestClose={props.onRequestClose}>
-      <div style={{margin: 10}} className='horizontal-center'>
-        <Dropzone maxSize={5000000} onDrop={this.onDrop}>
-          <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>
-        </Dropzone>
-      </div>
-      {props.files.length > 0 && (
-        <div>
-          <h4>Attached {props.files.length} files...</h4>
-          <div className='row'>
-          {props.files.map((file, i) =>
-            <AttachmentPreview
-            onRemoveClick={_ => props.setAttachments(props.files.filter((f, fi) => fi !== i))}
-            key={`file-${i}`}
-            name={file.name}
-            preview={file.preview}
-            size={file.size}
-            maxLength={17}
-            />)}
-          </div>
-        </div>)}
-    </Dialog>);
+      <Dialog
+      actions={[<FlatButton label='Close' onClick={props.onRequestClose}/>]}
+      title='File Upload' autoScrollBodyContent
+      open={props.open || false} onRequestClose={props.onRequestClose}
+      >
+        <div style={{margin: 10}} className='horizontal-center'>
+          <Dropzone maxSize={5000000} onDrop={this.onDrop}>
+            <div style={{margin: 10}}>Try dropping some files here, or click to select some files.</div>
+          </Dropzone>
+        </div>
+        {props.files.length > 0 && (
+          <div>
+            <h4>Attached {props.files.length} file(s)...</h4>
+            <div className='row'>
+            {props.files.map((file, i) =>
+              <AttachmentPreview
+              onRemoveClick={_ => props.setAttachments(props.files.filter((f, fi) => fi !== i))}
+              key={`file-${i}`}
+              name={file.name}
+              preview={file.preview}
+              size={file.size}
+              maxLength={17}
+              />)}
+            </div>
+          </div>)}
+      </Dialog>
+      );
   }
 }
 

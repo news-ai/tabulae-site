@@ -5,7 +5,7 @@ export default function ExternalControls(props) {
   let {externalControls} = props;
 
   return (
-    <div className='RichEditor-controls' style={{display: 'flex'}}>
+    <div className='RichEditor-controls vertical-center'>
       {externalControls.map(type => {
         const active = type.isActive();
         return (

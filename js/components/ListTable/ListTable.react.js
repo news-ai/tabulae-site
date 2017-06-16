@@ -24,13 +24,15 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import {teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
+import {grey50, teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
 import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
 import LinearProgress from 'material-ui/LinearProgress';
+import Paper from 'material-ui/Paper';
 
-import {EmailPanel} from '../Email';
+import EmailPanelPlaceholder from 'components/Email/EmailPanel/EmailPanelPlaceholder.react';
+import Drawer from 'material-ui/Drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
@@ -98,22 +100,38 @@ class ListTable extends Component {
       isDeleting: false,
       showEditPanel: false,
       currentEditContactId: undefined,
+      showEmailPanel: true,
     };
 
     // store outside of state to update synchronously for PanelOverlay
     this.showProfileTooltip = false;
     this.onTooltipPanel = false;
+    this.onShowEmailClick = _ => props.person.emailconfirmed ?
+      this.setState({isEmailPanelOpen: true}) :
+      alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {});
 
     if (this.props.listData) {
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
     }
+    this.onSearchClick = e => {
+      const searchValue = this.refs.searchValue.input.value;
+      if (searchValue.length === 0) {
+        this.props.router.push(`/tables/${props.listId}`);
+        this.onSearchClearClick();
+      } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
+        this.getNextSearchResult();
+      } else {
+        this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
+        this.setState({searchValue});
+      }
+    };
 
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
       const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
       this.setGridHeight();
       this.setState({screenWidth, screenHeight});
-    }
+    };
     this.setColumnStorage = columnWidths => localStorage.setItem(this.props.listId, JSON.stringify({columnWidths}));
     this.getColumnStorage = _ => {
       try {
@@ -128,11 +146,10 @@ class ListTable extends Component {
     };
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
     this.fetchOperations = this._fetchOperations.bind(this);
-    this.onSearchClick = this._onSearchClick.bind(this);
     this.onCheckSelected = this._onCheckSelected.bind(this);
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
-    this.onSearchClick = this._onSearchClick.bind(this);
+    this.onSearch = this._onSearch.bind(this);
     this.getNextSearchResult = this._getNextSearchResult.bind(this);
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
@@ -145,11 +162,12 @@ class ListTable extends Component {
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
     this.setGridHeight = this._setGridHeight.bind(this);
     this.resetSort = () => this.setState({
-      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
+      sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ? 0 : 2),
       onSort: false,
       sortedIds: [],
     });
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
+    this.forceEmailPanelRemount = _ => this.setState({showEmailPanel: false}, _ => this.setState({showEmailPanel: true}));
   }
 
   componentWillMount() {
@@ -157,7 +175,7 @@ class ListTable extends Component {
     let columnWidths = this.getColumnStorage();
     if (columnWidths) this.setState({columnWidths});
     if (this.props.searchQuery) {
-      this.fetchOperations(this.props).then(_ => this.onSearchClick(this.props.searchQuery));
+      this.fetchOperations(this.props).then(_ => this.onSearch(this.props.searchQuery));
     }
     else if (this.props.location.query.justCreated == 'true') {
       this.fetchOperations(this.props).then(_ => this.checkEmailDupes());
@@ -269,7 +287,7 @@ class ListTable extends Component {
 
     if (nextProps.searchQuery !== this.props.searchQuery) {
       if (nextProps.searchQuery) {
-        this.onSearchClick(nextProps.searchQuery);
+        this.onSearch(nextProps.searchQuery);
       }
     }
   }
@@ -586,7 +604,7 @@ class ListTable extends Component {
       );
   }
 
-  _onSearchClick(searchValue) {
+  _onSearch(searchValue) {
     const props = this.props;
     if (searchValue !== this.state.searchValue) {
       this.setState({searchValue});
@@ -707,13 +725,11 @@ class ListTable extends Component {
           </div>
           <div className='large-4 medium-4 columns vertical-center'>
             <IconButton
-            tooltip='Email'
+            tooltip='Show Email'
             tooltipPosition='top-left'
             iconClassName='fa fa-envelope'
             iconStyle={styles.iconBtn}
-            onClick={_ => props.person.emailconfirmed ?
-              this.setState({isEmailPanelOpen: true}) :
-              alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {})}
+            onClick={this.onShowEmailClick}
             disabled={state.isEmailPanelOpen || props.listData.readonly}
             />
             <IconButton
@@ -816,12 +832,12 @@ class ListTable extends Component {
             onClick={e => {
               const searchValue = this.refs.searchValue.input.value;
               if (searchValue.length === 0) {
-                props.router.push(`/tables/${props.listId}`);
+                this.props.router.push(`/tables/${props.listId}`);
                 this.onSearchClearClick();
-              } else if (state.isSearchOn && searchValue === state.searchValue && props.listData.searchResults.length > 0) {
+              } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
                 this.getNextSearchResult();
               } else {
-                props.router.push(`/tables/${props.listId}?search=${searchValue}`);
+                this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
                 this.setState({searchValue});
               }
             }}
@@ -863,14 +879,35 @@ class ListTable extends Component {
            </ScatterPlotHOC>
           </div>}
         </div>
-      {state.isEmailPanelOpen &&
-        <EmailPanel
-        person={props.person}
-        selected={state.selected}
-        fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
-        listId={props.listId}
-        onClose={_ => this.setState({isEmailPanelOpen: false})}
-        />}
+      {!state.isEmailPanelOpen &&
+        <Paper
+        className='vertical-center pointer'
+        zDepth={2}
+        style={styles.emailPanelDragHandle}
+        onClick={this.onShowEmailClick}
+        >
+          <FontIcon color={grey400} hoverColor={grey500} className='fa fa-chevron-left' />
+        </Paper>}
+        <Drawer
+        openSecondary
+        docked={false}
+        containerStyle={{zIndex: 400, backgroundColor: '#ffffff'}}
+        overlayStyle={{zIndex: 300}}
+        width={800}
+        open={state.isEmailPanelOpen}
+        onRequestChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
+        >
+        {state.showEmailPanel &&
+          <EmailPanelPlaceholder
+          width={800}
+          selected={state.selected}
+          fieldsmap={props.fieldsmap.filter(fieldObj => !fieldObj.hideCheckbox)}
+          listId={props.listId}
+          onClose={_ => this.setState({isEmailPanelOpen: false})}
+          onReset={this.forceEmailPanelRemount}
+          />
+        }
+        </Drawer>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='row vertical-center' style={{margin: '10px 0'}}>
           <Tags listId={props.listId}/>
@@ -938,18 +975,19 @@ class ListTable extends Component {
 }
 
 const styles = {
+  emailPanelDragHandle: {
+    zIndex: 400,
+    position: 'fixed',
+    right: 0,
+    top: '35%',
+    height: '15%',
+    padding: '0 5px',
+    backgroundColor: grey50
+  },
   nameBlock: {
     parent: {
       marginTop: 40,
     },
-  },
-  emailPanel: {
-    position: 'fixed',
-    bottom: 0,
-    right: 0,
-    zIndex: 100,
-    height: 500,
-    width: 600,
   },
   loading: {
     zIndex: 200,

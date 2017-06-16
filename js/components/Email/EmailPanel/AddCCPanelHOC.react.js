@@ -20,7 +20,7 @@ class AddCCPanelHOC extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div>
+      <div className={props.className} >
         <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
         open={state.open} onRequestClose={this.onRequestClose}>
           <div className='panel' style={styles.warningPanel}>
