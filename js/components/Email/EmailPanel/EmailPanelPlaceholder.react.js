@@ -437,10 +437,10 @@ class EmailPanel extends Component {
             <div style={{position: 'fixed', right: 10}} >
               <RaisedButton
               backgroundColor={lightBlue500}
-              labelColor='white'
+              labelColor='#ffffff'
               onClick={this.onEmailSendClick}
               label='Preview'
-              icon={<FontIcon color='white' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
+              icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
               />
             </div>
           </div>
