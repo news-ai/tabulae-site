@@ -18,6 +18,7 @@ import './ReactTagsStyle.css';
 import ReactTooltip from 'react-tooltip'
 import PreviewEmails from '../PreviewEmails';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
@@ -29,7 +30,7 @@ import BasicHtmlEditor from './BasicHtmlEditor.react';
 import DatePickerHOC from './DatePickerHOC.react';
 import AddCCPanelHOC from './AddCCPanelHOC.react';
 import SwitchEmailHOC from './SwitchEmailHOC.react';
-import MinimizedView from './MinimizedView.react';
+import SwitchEmailDropDown from './SwitchEmailDropDown.react';
 import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
@@ -37,55 +38,10 @@ import isEmail from 'validator/lib/isEmail';
 import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
-import {grey50, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {blueGrey50, grey50, grey600, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from './utils/replaceAll';
 
-const styles = {
-  emailPanelOuterPosition: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  emailPanelPosition: {
-    zIndex: 300,
-    position: 'fixed',
-    bottom: 0,
-  },
-  emailPanel: {
-    height: 600,
-    width: 700,
-  },
-  sendButtonPosition: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10
-  },
-  smallIcon: {
-    margin: '0 3px', fontSize: '14px', float: 'right'
-  },
-  attachTooltip: {
-    zIndex: 500,
-    float: 'right',
-    margin: '0 8px',
-  },
-};
-
-const emailPanelWrapper = {
-  height: styles.emailPanel.height,
-  width: styles.emailPanel.width,
-  zIndex: 200,
-};
-
-const emailPanelPauseOverlay = {
-  backgroundColor: grey800,
-  zIndex: 300,
-  position: 'absolute',
-  opacity: 0.7,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
   alertify.confirm(title, description, resolve, reject);
@@ -95,11 +51,26 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
     alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
   });
 
-const PauseOverlay = ({message}: {message: string}) => (
-  <div style={Object.assign({}, emailPanelWrapper, emailPanelPauseOverlay)}>
+const PauseOverlay = ({message, width, height}) => (
+  <div style={Object.assign({}, {width, height}, emailPanelPauseOverlay)}>
     <div style={{margin: 0}}>
-    <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/></div>
+      <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span>
+      <FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/>
+    </div>
   </div>);
+
+const getInitialState = () => ({
+    subject: '',
+    fieldsmap: [],
+    currentTemplateId: 0,
+    bodyEditorState: null,
+    bodyHtml: '',
+    body: '',
+    subjectHtml: null,
+    minimized: false,
+    isPreveiwOpen: false,
+    dirty: false,
+});
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -116,7 +87,7 @@ class EmailPanel extends Component {
       isPreveiwOpen: false,
       dirty: false,
     };
-    this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
+    // this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = (html, rawContentState) => {
       this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
       this.props.saveEditorState(rawContentState);
@@ -132,7 +103,7 @@ class EmailPanel extends Component {
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this._onSaveCurrentTemplateClick.bind(this);
     this.onDeleteTemplate = this._onArchiveTemplate.bind(this);
-    this.onClose = this._onClose.bind(this);
+    this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
 
@@ -194,7 +165,8 @@ class EmailPanel extends Component {
       '',
       'Name of new Email Template',
       '',
-      ).then(
+      )
+    .then(
       name => {
         this.props.createTemplate(
           name,
@@ -292,7 +264,7 @@ class EmailPanel extends Component {
   _sendGeneratedEmails(contactEmails) {
     this.props.postEmails(contactEmails)
     .then(
-      _ => this.refs.preview.show(),
+      _ => this.setState({isPreveiwOpen: true}),
       err => {
         alertify.alert(err.toString());
       });
@@ -412,16 +384,16 @@ class EmailPanel extends Component {
 
   }
 
-  _onClose() {
+  _onClearClick() {
     if (this.state.dirty) {
       alertify.promisifyConfirm(
         'Are you sure?',
-        'Closing the editor will cause your subject/body to be discarded.',
+        'Resetting the editor will cause your subject/body to be discarded.',
         )
-      .then(this.props.onClose)
+      .then(this.props.onReset)
       .catch(err => {});
     } else {
-      this.props.onClose();
+      this.props.onReset();
     }
   }
 
@@ -438,140 +410,160 @@ class EmailPanel extends Component {
       primaryText={template.name.length > 0 ? template.name : template.subject}
       />)) : null;
 
+    const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
+
     return (
-      <div style={styles.emailPanelOuterPosition}>
-        <ReactTooltip id='attachmentsTip' place='top' effect='solid'>
-          <div>{props.files.map(file => <div key={file.name} className='vertical-center'>{file.name}</div>)}</div> 
-        </ReactTooltip>
-        <div style={styles.emailPanelPosition}>
-        {!state.isPreveiwOpen && props.isImageReceiving &&
-          <PauseOverlay message='Image is loading.'/>}
-        {state.minimized &&
-          <MinimizedView toggleMinimize={this.toggleMinimize}/>}
+      <div style={{overflowX: 'hidden', height: '100%'}} >
+        <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
-          <Paper style={Object.assign({}, emailPanelWrapper, {display: state.minimized ? 'none' : 'block'})} zDepth={2}>
-            <div className='RichEditor-root' style={styles.emailPanel}>
-              <div>
-                <FontIcon style={styles.smallIcon} color='lightgray' hoverColor='gray' onClick={this.onClose} className='fa fa-times pointer'/>
-                <FontIcon style={styles.smallIcon} color='lightgray' hoverColor='gray' onClick={this.toggleMinimize} className='fa fa-minus pointer'/>
-                <div
-                onClick={props.onAttachmentPanelOpen}
-                className='pointer'
-                style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
-                >
-                  <a data-tip data-for='attachmentsTip' style={{fontSize: '0.8em', color: 'darkgray'}}>File{props.files.length > 1 && 's'} Attached</a>
-                </div>
-              </div>
-              <div className='vertical-center'>
-                <span className='text'>Emails are sent from: </span>
-                <span className='text' style={{backgroundColor: props.from !== props.person.email && blue50, margin: '0 3px', padding: '0 3px'}}>{props.from}</span>
-              {props.isImageReceiving &&
-                <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
-              </div>
-              <BasicHtmlEditor
-              listId={props.listId}
-              fieldsmap={state.fieldsmap}
-              width={styles.emailPanel.width}
-              bodyHtml={state.bodyHtml}
-              subjectHtml={state.subjectHtml}
-              onBodyChange={this.updateBodyHtml}
-              onSubjectChange={this.onSubjectChange}
-              debounce={500}
-              person={props.person}
-              >
-                <div style={{backgroundColor: '#ffffff'}} className='vertical-center'>
-                  <SelectField
-                  style={{overflowX: 'hidden'}}
-                  value={state.currentTemplateId}
-                  onChange={this.handleTemplateValueChange}
-                  maxHeight={200}
-                  >
-                  {templateMenuItems}
-                  </SelectField>
-                  <IconMenu
-                  iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
-                  anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                  targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                  >
-                    <MenuItem
-                    disabled={state.currentTemplateId ? false : true}
-                    onClick={this.onSaveCurrentTemplateClick}
-                    primaryText='Save Text to Existing Template'
-                    />
-                    <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
-                    <MenuItem
-                    onClick={this.onDeleteTemplate}
-                    disabled={state.currentTemplateId ? false : true}
-                    primaryText='Delete Template' />
-                  </IconMenu>
-                  <DatePickerHOC>
-                    {({onRequestOpen}) =>
-                    <IconButton
-                    iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
-                    onClick={onRequestOpen}
-                    iconClassName='fa fa-calendar'
-                    tooltip='Schedule & Send Later'
-                    tooltipPosition='top-right'
-                    />}
-                  </DatePickerHOC>
-                  <AddCCPanelHOC listId={props.listId}>
-                  {({onRequestOpen}) =>
-                    <IconButton
-                    iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
-                    iconClassName='fa fa-user-plus'
-                    onClick={onRequestOpen}
-                    tooltip='CC/BCC'
-                    tooltipPosition='top-right'
-                    />}
-                  </AddCCPanelHOC>
-                  <SwitchEmailHOC listId={props.listId}>
-                  {({onRequestOpen}) =>
-                    <IconButton
-                    iconStyle={{color: grey800}}
-                    iconClassName='fa fa-users'
-                    onClick={onRequestOpen}
-                    tooltip='Switch Email'
-                    tooltipPosition='top-right'
-                    />}
-                  </SwitchEmailHOC>
-                </div>
-                <div style={{position: 'absolute', right: 20, bottom: 3, zIndex: 300}}>
-                  <IconButton
-                  iconClassName={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}
-                  onClick={this.onEmailSendClick}
-                  tooltip='Preview then Send'
-                  tooltipPosition='top-left'
-                  iconStyle={{color: '#ffffff'}}
-                  style={{backgroundColor: lightBlue500}}
-                  />
-                </div>
-              </BasicHtmlEditor>
+
+          <div className='vertical-center' style={{zIndex: 500, padding: '5px 20px', backgroundColor: blueGrey50, position: 'fixed', top: 0, width: '100%'}} >
+            <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
+            <SwitchEmailDropDown listId={props.listId} />
+            <div style={{margin: '0 5px'}}>
+              <FlatButton label='Clear Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
             </div>
-          </Paper>
-          <SkyLight
-          overlayStyles={skylightStyles.overlay}
-          dialogStyles={skylightStyles.dialog}
-          hideOnOverlayClicked
-          afterOpen={_ => this.setState({isPreveiwOpen: true})}
-          afterClose={_ => this.setState({isPreveiwOpen: false})}
-          ref='preview'
-          title='Preview'>
-            <PreviewEmails
-            contacts={props.selectedContacts}
-            fieldsmap={state.fieldsmap}
+            <div
+            onClick={props.onAttachmentPanelOpen}
+            className='pointer'
+            style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
+            >
+              <span style={{fontSize: '0.8em', color: grey700}}>File{props.files.length > 1 && 's'} Attached</span>
+            </div>
+          {props.isImageReceiving &&
+            <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
+            <div style={{position: 'fixed', right: 10}} >
+              <RaisedButton
+              backgroundColor={lightBlue500}
+              labelColor='#ffffff'
+              onClick={this.onEmailSendClick}
+              label='Preview'
+              icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
+              />
+            </div>
+          </div>
+
+        {!state.isPreveiwOpen && props.isImageReceiving &&
+          <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
+          <div className='RichEditor-root' style={emailPanelStyle}>
+            <BasicHtmlEditor
             listId={props.listId}
-            sendLater={props.scheduledtime !== null}
-            isReceiving={props.isReceiving}
-            previewEmails={props.previewEmails}
-            onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-            onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+            fieldsmap={state.fieldsmap}
+            width={props.width}
+            bodyHtml={state.bodyHtml}
+            subjectHtml={state.subjectHtml}
+            onBodyChange={this.updateBodyHtml}
+            onSubjectChange={this.onSubjectChange}
+            debounce={500}
             />
-          </SkyLight>
+          </div>
+        </div>
+        <div style={{
+          backgroundColor: '#ffffff',
+          padding: '3px 10px',
+          position: 'fixed',
+          bottom: 0,
+          display: state.isPreveiwOpen ? 'none' : 'block',
+          width: '100%',
+          zIndex: 500,
+          // borderTop: '1px solid darkgray',
+          backgroundColor: blueGrey50,
+          // alignItems: 'center',
+          // justifyContent: 'space-around'
+        }} >
+          <SelectField
+          className='left'
+          style={{overflowX: 'hidden'}}
+          value={state.currentTemplateId}
+          onChange={this.handleTemplateValueChange}
+          maxHeight={200}
+          >
+          {templateMenuItems}
+          </SelectField>
+          <IconMenu
+          className='left'
+          iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
+          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          >
+            <MenuItem
+            disabled={state.currentTemplateId ? false : true}
+            onClick={this.onSaveCurrentTemplateClick}
+            primaryText='Save Text to Existing Template'
+            />
+            <MenuItem onClick={this.onSaveNewTemplateClick} primaryText='Save Text as New Template' />
+            <MenuItem
+            onClick={this.onDeleteTemplate}
+            disabled={state.currentTemplateId ? false : true}
+            primaryText='Delete Template'
+            />
+          </IconMenu>
+          <DatePickerHOC className='left'>
+          {({onRequestOpen}) =>
+            <IconButton
+            iconStyle={{color: props.scheduledtime === null ? grey800 : blue400}}
+            onClick={onRequestOpen}
+            iconClassName='fa fa-calendar'
+            tooltip='Schedule & Send Later'
+            tooltipPosition='top-right'
+            />}
+          </DatePickerHOC>
+          <AddCCPanelHOC className='left' listId={props.listId}>
+          {({onRequestOpen}) =>
+            <IconButton
+            iconStyle={{color: props.cc.length > 0 || props.bcc.length > 0 ? blue400 : grey800}}
+            iconClassName='fa fa-user-plus'
+            onClick={onRequestOpen}
+            tooltip='CC/BCC'
+            tooltipPosition='top-right'
+            />}
+          </AddCCPanelHOC>
+        </div>
+      {
+        state.isPreveiwOpen &&
+        <div style={{marginBottom: 20, zIndex: 300}} >
+          <PreviewEmails
+          onClose={props.onClose}
+          onBack={_ => this.setState({isPreveiwOpen: false})}
+          contacts={props.selectedContacts}
+          fieldsmap={state.fieldsmap}
+          listId={props.listId}
+          sendLater={props.scheduledtime !== null}
+          isReceiving={props.isReceiving}
+          previewEmails={props.previewEmails}
+          onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+          onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
+          />
+        </div>
+      }
+        <div style={{position: 'fixed', bottom: 5, right: 5, zIndex: 500, backgroundColor: blueGrey50}} >
+          <FlatButton labelStyle={{textTransform: 'none'}} label='Hide Panel' onClick={props.onClose} />
         </div>
       </div>
     );
   }
 }
+
+const styles = {
+  smallIcon: {
+    margin: '0 3px', fontSize: '14px', float: 'right'
+  },
+  attachTooltip: {
+    zIndex: 500,
+    margin: '0 15px',
+  },
+};
+
+const emailPanelPauseOverlay = {
+  backgroundColor: grey800,
+  borderSizing: 'border-box',
+  zIndex: 300,
+  position: 'absolute',
+  opacity: 0.7,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 
 const mapStateToProps = (state, props) => {
   const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
@@ -616,7 +608,7 @@ const mapDispatchToProps = (dispatch, props) => {
     clearUTCTime: _ => dispatch({type: 'CLEAR_SCHEDULE_TIME'}),
     postBatchEmails: emails => dispatch(stagingActions.bulkSendStagingEmails(emails)),
     postBatchEmailsWithAttachments: emails => dispatch(stagingActions.postBatchEmailsWithAttachments(emails)),
-    initializeEmailDraft: _ => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email: props.person.email}),
+    startEmailDraft: email => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email}),
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
@@ -628,14 +620,11 @@ const mapDispatchToProps = (dispatch, props) => {
 const mergeProps = (sProps, dProps, oProps) => {
   return {
     postEmails: emails => sProps.attachedfiles.length > 0 ? dProps.postBatchEmailsWithAttachments(emails) : dProps.postBatchEmails(emails),
+    initializeEmailDraft: _ => dProps.startEmailDraft(sProps.person.email),
     ...sProps,
     ...dProps,
     ...oProps,
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-  mergeProps
-)(EmailPanel);
+export default connect( mapStateToProps, mapDispatchToProps, mergeProps )(EmailPanel);
