@@ -8,9 +8,14 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {grey400, grey700, yellow50} from 'material-ui/styles/colors';
-import {SortableContainer, SortableHandle, SortableElement, arrayMove} from 'react-sortable-hoc';
 import find from 'lodash/find';
 import {reformatFieldsmap} from './helpers';
+import {
+  SortableContainer,
+  SortableHandle,
+  SortableElement,
+  arrayMove
+} from 'react-sortable-hoc';
 
 import './react_sortable_hoc.css';
 
@@ -31,14 +36,14 @@ const Column = ({name, value, customfield, tableOnly, hidden, readonly, internal
         <Checkbox disabled={internal || hideCheckbox} checked={hidden} onCheck={(e, checked) => onCheck(e, checked, value)} />
       </div>
       <div className='large-4 medium-5 small-12 columns'>
-        <span style={{fontSize: '0.9em'}}>{name}</span>
+        <span className='text'>{name}</span>
       </div>
       <div className='large-2 medium-3 small-12 columns'>
-        <span style={{fontSize: '0.9em'}}>{typeLabel}</span>
+        <span className='text'>{typeLabel}</span>
       </div>
       <div className='large-4 medium-2 small-12 columns' style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
         {customfield && !readonly && <i className='fa fa-trash hoverable-icon' aria-hidden='true' onClick={_ => onRemove(value)} />}
-        {description && <span style={{fontSize: '0.8em'}}>{description}</span>}
+        {description && <span className='smalltext'>{description}</span>}
       </div>
     </div>
     );

@@ -113,7 +113,7 @@ const entityDataConversionMap = {
   }
 };
 
-export default function(raw): string {
+export default function(raw) {
   let html = '';
   let nestLevel = [];
   let lastIndex = raw.blocks.length - 1;
