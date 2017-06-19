@@ -9,13 +9,15 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {grey400, grey700, yellow50} from 'material-ui/styles/colors';
 import find from 'lodash/find';
-import {reformatFieldsmap} from './helpers';
+import {reformatFieldsmap} from 'components/ListTable/helpers';
 import {
   SortableContainer,
   SortableHandle,
   SortableElement,
   arrayMove
 } from 'react-sortable-hoc';
+
+import DragApp from './DragApp.react';
 
 import './react_sortable_hoc.css';
 
@@ -144,7 +146,8 @@ class AddOrHideColumns extends Component {
       return;
     }
     const prevFieldsmap = reformatFieldsmap(this.state.items);
-    const fieldsmap = [...prevFieldsmap, {
+    const fieldsmap = [
+    ...prevFieldsmap, {
       name: value,
       value: value.toLowerCase().split(' ').join('_'),
       customfield: true,
@@ -191,10 +194,11 @@ class AddOrHideColumns extends Component {
         <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Show/Hide Columns' onRequestClose={_ => this.setState({open: false})}>
           <div style={{marginTop: 20}}>
             <div style={{margin: '20px 0'}}>
-              <span style={{fontSize: '0.9em'}}>
+              <span className='text'>
                 Use the drag handle icon <i style={{margin: '0 3px'}} className='fa fa-bars' aria-hidden='true'/> to reorder the order of you columns. Activate or de-activate default columns. Create or delete custom columns that you can use as template variable in emails.
               </span>
             </div>
+
             <div className='panel' style={{
               backgroundColor: yellow50,
               margin: 10,
@@ -205,6 +209,8 @@ class AddOrHideColumns extends Component {
               activating <strong>Instagram Likes</strong> and <strong>Instagram Comments</strong> also activates <strong>Likes-to-Comments ratio</strong>.
               </span>
             </div>
+            {
+              /*
             {props.isReceiving && <FontIcon className={'fa fa-spinner fa-spin'} />}
             {props.fieldsmap !== null && state.items !== null &&
               <SortableList
@@ -230,11 +236,14 @@ class AddOrHideColumns extends Component {
               onClick={this.onAddColumn}
               />
             </div>
+               */
+            }
+            <div style={{margin: '30px 0'}} >
+              <DragApp listId={props.listId} />
+            </div>
           </div>
         </Dialog>
-        {props.children({
-          onRequestOpen: _ => this.setState({open: true})
-        })}
+        {props.children({onRequestOpen: _ => this.setState({open: true})})}
       </div>
       );
   }
