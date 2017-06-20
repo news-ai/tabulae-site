@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import flow from 'lodash/flow';
-import {grey500} from 'material-ui/styles/colors';
+import {grey600} from 'material-ui/styles/colors';
 
 const style = {
 	border: '1px solid lightgray',
@@ -30,7 +30,7 @@ class Card extends Component {
         {card.customfield && !card.readonly &&
         	<i onClick={_ => removeCard(index)} className='right fa fa-trash hoverable-icon' aria-hidden='true' />}
 				<span className='vertical-center'>{card.name}</span>
-				<span style={{color: grey500}} className='smalltext vertical-center'>{typeLabel}</span>
+				<span style={{color: grey600}} className='smalltext vertical-center'>{typeLabel}</span>
 				<span className='smalltext vertical-center'>{card.description}</span>
 			</div>
 		));

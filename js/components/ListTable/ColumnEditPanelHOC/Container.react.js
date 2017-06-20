@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import Card from './Card.react';
 import { DropTarget } from 'react-dnd';
 import FontIcon from 'material-ui/FontIcon';
-import {grey500, green50, green100, lightBlue50} from 'material-ui/styles/colors';
+import {grey400, grey500, green50, green100, lightBlue50} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
@@ -85,7 +85,7 @@ class Container extends Component {
 		const { className, title, canDrop, isOver, connectDropTarget } = this.props;
 		const isActive = canDrop && isOver;
 
-		const backgroundColor = isActive ? green100 : '#fff';
+		const backgroundColor = isActive ? green100 : lightBlue50;
 
 		return connectDropTarget(
 			<div className={className} style={{...style, backgroundColor}}>
@@ -116,7 +116,7 @@ class Container extends Component {
 }
 
 const style = {
-	border: '1px solid lightgray',
+	border: `1px solid ${grey400}`,
 };
 
 const cardStyle = {
