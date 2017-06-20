@@ -29,7 +29,7 @@ class Card extends Component {
 			<div style={{ ...style, opacity }}>
         {card.customfield && !card.readonly &&
         	<i onClick={_ => removeCard(index)} className='right fa fa-trash hoverable-icon' aria-hidden='true' />}
-				<span className='vertical-center'>{card.name}</span>
+				<span style={{fontWeight: 'bold', fontSize: '0.9em'}} className='vertical-center'>{card.name}</span>
 				<span style={{color: grey600}} className='smalltext vertical-center'>{typeLabel}</span>
 				<span className='smalltext vertical-center'>{card.description}</span>
 			</div>
