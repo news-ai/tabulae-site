@@ -35,14 +35,16 @@ class App extends Component {
 		this.state = {
 			hiddenList,
 			showList,
-			open: false
+			open: false,
+			isUpdating: false,
+			dirty: false,
 		};
 		this.updateList = this.updateList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 	}
 
 	updateList(list, containerType) {
-		this.setState({[containerType]: list});
+		this.setState({[containerType]: list, dirty: true});
 	}
 
   onSubmit() {
@@ -52,22 +54,24 @@ class App extends Component {
       name: this.props.list.name,
       fieldsmap
     };
-    this.props.patchList(listBody);
-    this.setState({open: false});
+    this.setState({isUpdating: true});
+    this.props.patchList(listBody)
+    .then(_ => this.setState({isUpdating: false, open: false}))
   }
 
 	render() {
 		const state = this.state;
     const actions = [
       <FlatButton
-        label='Cancel'
         primary
+        label='Cancel'
+        disabled={state.isUpdating}
         onTouchTap={_ => this.setState({open: false})}
       />,
       <FlatButton
-        label='Submit'
         primary
-        keyboardFocused
+        label={state.isUpdating ? 'Updating...' : 'Submit'}
+        disabled={state.isUpdating || !state.dirty}
         onTouchTap={this.onSubmit}
       />,
     ];
@@ -88,7 +92,7 @@ class App extends Component {
             margin: 10,
             padding: 10
           }}>
-            <span style={{fontSize: '0.8em'}}>
+            <span className='smalltext'>
             There is a number of auto-generated columns that are activated when certain columns are not hidden. For example,
             activating <strong>Instagram Likes</strong> and <strong>Instagram Comments</strong> also activates <strong>Likes-to-Comments ratio</strong>.
             </span>

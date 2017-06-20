@@ -64,7 +64,7 @@ class Container extends Component {
 	}
 
 	addNewCard() {
-		alertify.promisifyPrompt('Add New Card', 'Name new card', '')
+		alertify.promisifyPrompt('Add New Column', 'Name new custom column', '')
 			.then(value => {
     		if (this.state.cards.some(fieldObj => fieldObj.name === value || fieldObj.value === value)) {
     			alertify.alert('Duplicate Warning', `${value} as column name is already taken.`);
