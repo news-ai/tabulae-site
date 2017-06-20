@@ -3,7 +3,7 @@ import update from 'immutability-helper';
 import Card from './Card.react';
 import { DropTarget } from 'react-dnd';
 import FontIcon from 'material-ui/FontIcon';
-import {grey500} from 'material-ui/styles/colors';
+import {grey500, green50, green100, lightBlue50} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
@@ -84,16 +84,12 @@ class Container extends Component {
 		const { cards } = this.state;
 		const { className, title, canDrop, isOver, connectDropTarget } = this.props;
 		const isActive = canDrop && isOver;
-		const style = {
-			border: '1px dashed gray'
-		};
 
-		const backgroundColor = isActive ? 'lightgreen' : '#FFF';
-		// console.log(cards);
+		const backgroundColor = isActive ? green100 : '#fff';
 
 		return connectDropTarget(
 			<div className={className} style={{...style, backgroundColor}}>
-				<div className='vertical-center'>
+				<div style={{margin: '10px 0'}} className='vertical-center'>
 					<span style={{fontSize: '1.1em'}} >{title}</span>
 				</div>
 				{cards.map((card, i) => {
@@ -111,7 +107,7 @@ class Container extends Component {
 				<div style={cardStyle}>
 					<div className='vertical-center'>
 						<FontIcon className='fa fa-plus' color={grey500} />
-						<span style={{margin: '0 10px'}} onClick={this.addNewCard}>Add Card</span>
+						<span style={{margin: '0 10px'}} onClick={this.addNewCard}>Add Column</span>
 					</div>
 				</div>
 			</div>
@@ -119,11 +115,15 @@ class Container extends Component {
   }
 }
 
+const style = {
+	border: '1px solid lightgray',
+};
+
 const cardStyle = {
 	border: '1px dashed gray',
 	padding: '0.5rem 1rem',
 	margin: '.5rem',
-	backgroundColor: 'white',
+	backgroundColor: green50,
 	cursor: 'pointer',
 };
 

@@ -5,7 +5,8 @@ import flow from 'lodash/flow';
 import {grey500} from 'material-ui/styles/colors';
 
 const style = {
-	border: '1px dashed gray',
+	border: '1px solid lightgray',
+	borderRadius: '0.3em',
 	padding: '0.5rem 1rem',
 	margin: '.5rem',
 	backgroundColor: 'white',
@@ -30,7 +31,7 @@ class Card extends Component {
         	<i onClick={_ => removeCard(index)} className='right fa fa-trash hoverable-icon' aria-hidden='true' />}
 				<span className='vertical-center'>{card.name}</span>
 				<span style={{color: grey500}} className='smalltext vertical-center'>{typeLabel}</span>
-				<p className='smalltext'>{card.description}</p>
+				<span className='smalltext vertical-center'>{card.description}</span>
 			</div>
 		));
 	}
