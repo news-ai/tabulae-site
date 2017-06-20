@@ -36,7 +36,7 @@ import Drawer from 'material-ui/Drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
-import ColumnEditPanelHOC from 'components/ListTable/ColumnEditPanelHOC/DragApp.react';
+import ColumnEditPanelHOC from 'components/ListTable/ColumnEditPanelHOC/ColumnEditPanelHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
 import EditMultipleContactsHOC from './EditMultipleContactsHOC.react';
