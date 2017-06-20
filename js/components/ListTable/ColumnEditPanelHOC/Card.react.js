@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import flow from 'lodash/flow';
+import {grey500} from 'material-ui/styles/colors';
 
 const style = {
 	border: '1px dashed gray',
@@ -14,12 +15,21 @@ const style = {
 class Card extends Component {
 
 	render() {
-		const { card, isDragging, connectDragSource, connectDropTarget } = this.props;
+		const { card, isDragging, connectDragSource, connectDropTarget, removeCard, index } = this.props;
 		const opacity = isDragging ? 0 : 1;
+
+	  let typeLabel = 'Editable';
+	  if (card.tableOnly) typeLabel = 'Table Only';
+	  if (card.customfield) typeLabel = 'Custom';
+	  if (card.internal) typeLabel = 'Internal';
+	  if (card.readonly) typeLabel = 'Read Only';
 
 		return connectDragSource(connectDropTarget(
 			<div style={{ ...style, opacity }}>
-				<span>{card.name}</span>
+        {card.customfield && !card.readonly &&
+        	<i onClick={_ => removeCard(index)} className='right fa fa-trash hoverable-icon' aria-hidden='true' />}
+				<span className='vertical-center'>{card.name}</span>
+				<span style={{color: grey500}} className='smalltext vertical-center'>{typeLabel}</span>
 				<p className='smalltext'>{card.description}</p>
 			</div>
 		));
@@ -100,7 +110,6 @@ const cardTarget = {
 export default flow(
 	DropTarget('CARD', cardTarget, connect => ({
 		connectDropTarget: connect.dropTarget(),
-		isOver: monitor.isOver()
 	})),
 	DragSource('CARD', cardSource, (connect, monitor) => ({
 		connectDragSource: connect.dragSource(),

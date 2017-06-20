@@ -238,9 +238,13 @@ class AddOrHideColumns extends Component {
             </div>
                */
             }
+            {
+              /*
             <div style={{margin: '30px 0'}} >
               <DragApp listId={props.listId} />
             </div>
+               */
+            }
           </div>
         </Dialog>
         {props.children({onRequestOpen: _ => this.setState({open: true})})}

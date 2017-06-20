@@ -2,80 +2,135 @@ import React, { Component } from 'react';
 import update from 'immutability-helper';
 import Card from './Card.react';
 import { DropTarget } from 'react-dnd';
+import FontIcon from 'material-ui/FontIcon';
+import {grey500} from 'material-ui/styles/colors';
+import alertify from 'alertifyjs';
+
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+});
 
 class Container extends Component {
 	constructor(props) {
 		super(props);		
 		this.state = { cards: props.list };
+		this.addNewCard = this.addNewCard.bind(this);
+		this.pushCard = this.pushCard.bind(this);
+		this.removeCard = this.removeCard.bind(this);
+		this.moveCard = this.moveCard.bind(this);
 	}
 
 	pushCard(card) {
-		this.setState(update(this.state, {
+		const {updateList, containerType} = this.props;
+		const newCard = Object.assign({}, card, {hidden: containerType === 'hiddenList'});
+		const newState = update(this.state, {
 			cards: {
-				$push: [ card ]
+				$push: [newCard]
 			}
-		}));
+		});
+		this.setState(newState, _ => updateList(newState.cards, containerType));
 	}
 
 	removeCard(index) {		
-		this.setState(update(this.state, {
+		const {updateList, containerType} = this.props;
+		const newState = update(this.state, {
 			cards: {
 				$splice: [
 					[index, 1]
 				]
 			}
-		}));
+		});
+		this.setState(newState, _ => updateList(newState.cards, containerType));
 	}
 
 	moveCard(dragIndex, hoverIndex) {
-		const { cards } = this.state;		
+		const {updateList, containerType} = this.props;
+		const {cards} = this.state;		
 		const dragCard = cards[dragIndex];
-
-		this.setState(update(this.state, {
+		const newState = update(this.state, {
 			cards: {
 				$splice: [
 					[dragIndex, 1],
 					[hoverIndex, 0, dragCard]
 				]
 			}
-		}));
+		});
+
+		this.setState(newState, _ => updateList(newState.cards, containerType));
+	}
+
+	addNewCard() {
+		alertify.promisifyPrompt('Add New Card', 'Name new card', '')
+			.then(value => {
+    		if (this.state.cards.some(fieldObj => fieldObj.name === value || fieldObj.value === value)) {
+    			alertify.alert('Duplicate Warning', `${value} as column name is already taken.`);
+    		} else {
+					const card = {
+			      name: value,
+			      value: value.toLowerCase().split(' ').join('_'),
+			      customfield: true,
+			      hidden: this.props.containerType === 'hiddenList' ? true : false
+					};
+					this.pushCard(card);
+    		}
+			});
 	}
 
 	render() {
 		const { cards } = this.state;
-		const { title, canDrop, isOver, connectDropTarget } = this.props;
+		const { className, title, canDrop, isOver, connectDropTarget } = this.props;
 		const isActive = canDrop && isOver;
 		const style = {
-			width: 300,
 			border: '1px dashed gray'
 		};
 
 		const backgroundColor = isActive ? 'lightgreen' : '#FFF';
-		console.log(cards);
+		// console.log(cards);
 
 		return connectDropTarget(
-			<div style={{...style, backgroundColor}}>
-				<h5>{title}</h5>
+			<div className={className} style={{...style, backgroundColor}}>
+				<div className='vertical-center'>
+					<span style={{fontSize: '1.1em'}} >{title}</span>
+				</div>
 				{cards.map((card, i) => {
 					return (
 						<Card 
-							key={card.value}
-							index={i}
-							listId={this.props.id}
-							card={card}														
-							removeCard={this.removeCard.bind(this)}
-							moveCard={this.moveCard.bind(this)} />
+						key={card.value}
+						index={i}
+						listId={this.props.id}
+						card={card}														
+						removeCard={this.removeCard}
+						moveCard={this.moveCard}
+						/>
 					);
 				})}
+				<div style={cardStyle}>
+					<div className='vertical-center'>
+						<FontIcon className='fa fa-plus' color={grey500} />
+						<span style={{margin: '0 10px'}} onClick={this.addNewCard}>Add Card</span>
+					</div>
+				</div>
 			</div>
 		);
   }
 }
 
+const cardStyle = {
+	border: '1px dashed gray',
+	padding: '0.5rem 1rem',
+	margin: '.5rem',
+	backgroundColor: 'white',
+	cursor: 'pointer',
+};
+
 const cardTarget = {
 	hover(targetProps, monitor) {
 		  const sourceProps = monitor.getItem();
-		  console.log(targetProps);
+		  // console.log(targetProps);
 
 	},
 	drop(props, monitor, component) {

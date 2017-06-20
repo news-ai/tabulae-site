@@ -1,60 +1,127 @@
 import React, { Component } from 'react';
 import { DragDropContext } from 'react-dnd';
+import {actions as listActions} from 'components/Lists';
 import HTML5Backend from 'react-dnd-html5-backend';
 import Container from './Container.react';
 import {connect} from 'react-redux';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import {
   generateTableFieldsmap,
   measureSpanSize,
   exportOperations,
   isNumber,
-  _getter
+  _getter,
+  reformatFieldsmap
 } from 'components/ListTable/helpers';
+import alertify from 'alertifyjs';
+
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+});
 
 class App extends Component {
 	constructor(props) {
 		super(props);		
-		const hiddenList = this.props.fieldsmap.filter(field => field.hidden);
-		const showList = this.props.fieldsmap.filter(field => !field.hidden);
+		const hiddenList = this.props.fieldsmap.filter(field => field.hidden && !field.tableOnly);
+		const showList = this.props.fieldsmap.filter(field => !field.hidden && !field.tableOnly);
 		this.state = {
 			hiddenList,
-			showList
+			showList,
+			open: false
 		};
+		this.updateList = this.updateList.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
 	}
+
+	updateList(list, containerType) {
+		this.setState({[containerType]: list});
+	}
+
+  onSubmit() {
+    const fieldsmap = reformatFieldsmap([...this.state.showList, ...this.state.hiddenList]);
+    const listBody = {
+      listId: this.props.listId,
+      name: this.props.list.name,
+      fieldsmap
+    };
+    this.props.patchList(listBody);
+    this.setState({open: false});
+  }
 
 	render() {
 		const state = this.state;
+    const actions = [
+      <FlatButton
+        label='Cancel'
+        primary
+        onTouchTap={_ => this.setState({open: false})}
+      />,
+      <FlatButton
+        label='Submit'
+        primary
+        keyboardFocused
+        onTouchTap={this.onSubmit}
+      />,
+    ];
 
-		console.log(this.props.fieldsmap);
+		// console.log(this.props.fieldsmap);
 
 		return (
-			<div style={{...style}}>
-				<Container id={1} title='Hidden' list={state.hiddenList} />
-				<Container id={2} title='Show' list={state.showList} />
+			<div>
+        <Dialog autoScrollBodyContent modal actions={actions} open={state.open} title='Show/Hide Columns' onRequestClose={_ => this.setState({open: false})}>
+					<div className='row' style={{...style}}>
+						<Container
+						containerType='hiddenList'
+						updateList={this.updateList}
+						className='large-4 medium-6 small-12 columns'
+						id={1}
+						title='Hidden Columns'
+						list={state.hiddenList}
+						/>
+						<Container
+						containerType='showList'
+						className='large-8 medium-6 small-12 columns'
+						updateList={this.updateList}
+						id={2}
+						title='Show Columns'
+						list={state.showList}
+						/>
+					</div>
+        </Dialog>
+	      {this.props.children({onRequestOpen: _ => this.setState({open: true})})}
 			</div>
 		);
 	}
 }
 
 const style = {
-	display: 'flex',
-	justifyContent: 'space-around',
+	// display: 'flex',
+	// justifyContent: 'space-around',
 	paddingTop: '20px'
 };
 
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
-  const listData = state.listReducer[listId];
+  const list = state.listReducer[listId];
 
-  const rawFieldsmap = generateTableFieldsmap(listData);
+  const rawFieldsmap = generateTableFieldsmap(list);
   return {
   	fieldsmap: rawFieldsmap,
+  	list: list
   }
 };
 
 const mapDispatchToProps = (dispatch, props) => {
-	return {};
+	return {
+    patchList: listObj => dispatch(listActions.patchList(listObj)),
+	};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(App));
