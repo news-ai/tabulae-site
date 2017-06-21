@@ -86,19 +86,20 @@ class AddContactHOC extends Component {
     if (this.state.tags.length > 0) {
       contactBody.tags = this.state.tags.map(tag => tag.text);
     }
+    console.log(contactBody);
 
-    this.props.addContacts([contactBody])
-    .then(contacts => {
-      const ids = contacts.map(contact => contact.id);
-      ids.map(id => this.handleRSSTextarea(id));
-      const listBody = {
-        listId: list.id,
-        name: list.name,
-        contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
-      };
-      this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
-    });
+    // this.props.addContacts([contactBody])
+    // .then(contacts => {
+    //   const ids = contacts.map(contact => contact.id);
+    //   ids.map(id => this.handleRSSTextarea(id));
+    //   const listBody = {
+    //     listId: list.id,
+    //     name: list.name,
+    //     contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
+    //   };
+    //   this.props.patchList(listBody);
+    //   this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
+    // });
   }
 
   _onChange(name, value, validator) {

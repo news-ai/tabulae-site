@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import isEmail from 'validator/lib/isEmail';
-import ValidationHOC from 'components/ValidationHOC';
 import {grey500, cyan500} from 'material-ui/styles/colors';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
+
 import {actions as loginActions} from 'components/Login';
+import ValidationHOC from 'components/ValidationHOC';
 
 class AddMultipleEmails extends Component {
   constructor(props) {
@@ -28,7 +29,8 @@ class AddMultipleEmails extends Component {
     if (props.ontrial) floatingLabelText = 'Upgrade to Pro plan to add emails';
     return (
       <div className='vertical-center'>
-      {props.leftover > 0 &&
+      {
+        props.leftover > 0 &&
         <ValidationHOC rules={[{validator: isEmail, errorMessage: 'Not a valid email.'}]}>
         {({onValueChange, errorMessage}) => (
           <TextField
@@ -44,9 +46,10 @@ class AddMultipleEmails extends Component {
             this.setState({value: e.target.value});
           }}
           />)}
-        </ValidationHOC>}
-        {props.leftover === 0 &&
-          <span style={{color: grey500}}>Max'd out the number of external emails. Please upgrade or remove emails to add another.</span>}
+        </ValidationHOC>
+      }
+      {props.leftover === 0 &&
+        <span style={{color: grey500}}>Max'd out the number of external emails. Please upgrade or remove emails to add another.</span>}
         <IconButton
         tooltip='Add Email'
         tooltipPosition='top-center'
@@ -55,7 +58,8 @@ class AddMultipleEmails extends Component {
         iconClassName='fa fa-chevron-right'
         onClick={this.onAddEmailClick}
         />
-      </div>);
+      </div>
+      );
   }
 }
 
@@ -81,4 +85,3 @@ const mapDispatchToProps = (dispatch, props) => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddMultipleEmails);
-

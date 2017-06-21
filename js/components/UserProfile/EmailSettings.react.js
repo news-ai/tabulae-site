@@ -2,21 +2,17 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {fromJS, is} from 'immutable';
 import {grey500, grey800} from 'material-ui/styles/colors';
+import Toggle from 'material-ui/Toggle';
+import Paper from 'material-ui/Paper';
+import FlatButton from 'material-ui/FlatButton';
+
 import EmailSignature from './EmailSignature.react';
 import ConnectToThirdPartyEmailService from './ConnectToThirdPartyEmailService.react';
-import Toggle from 'material-ui/Toggle';
-import FlatButton from 'material-ui/FlatButton';
 import SMTPSettings from './SMTPSettings.react';
 import AddMultipleEmails from './AddMultipleEmails.react';
 import EmailItem from './EmailItem.react';
-import Paper from 'material-ui/Paper';
 
 import {actions as loginActions} from 'components/Login';
-
-const inputHeight = {
-  height: 45,
-  margin: '5px 0'
-};
 
 const spanStyle = {
   color: grey500,
@@ -181,6 +177,8 @@ class EmailSettings extends Component {
             </div>
           </div>
         </Panel>
+        {
+          /*
         <Panel className='row' title='Add Multiple Emails'>
           <span className='smalltext'>You can add multiple emails to switch when you send your emails. This feature is not supported with Gmail/Outlook/SMTP integrations.</span>
           <div className='vertical-center' style={styles.item}>
@@ -203,10 +201,12 @@ class EmailSettings extends Component {
             </div>
           </div>}
         </Panel>
+           */
+        }
         <Panel className='row' title='Email Signature'>
           <span className='smalltext'>If you added multiple emails, you can assign different signature to each one.</span>
           <div style={{height: 500}}>
-            <EmailSignature/>
+            <EmailSignature />
           </div>
         </Panel>
       </div>

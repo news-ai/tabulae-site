@@ -28,6 +28,7 @@ class ValidationHOC extends Component {
   }
 
   render() {
+
     return this.props.children({
       errorMessage: this.state.showErrorMessage ? this.state.errorMessage : '',
       onValueChange: this.validateChildValue,

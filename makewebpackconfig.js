@@ -27,22 +27,22 @@ module.exports = function(options) {
     });
     plugins = [
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new webpack.optimize.UglifyJsPlugin({
-        mangle: true,
-        unused: true,
-        dead_code: true,
-        drop_debugger: true,
-        evaludate: true,
-        drop_console: true,
-        sequences: true,
-        booleans: true,
-        compress: { warnings: false },
-        sourcemap: true,
-        // comments: false,
-        // sourceMap: true,
-        // minimize: false,
-        exclude: [/\.min\.js$/gi]
-      }),
+      // new webpack.optimize.UglifyJsPlugin({
+      //   mangle: true,
+      //   unused: true,
+      //   dead_code: true,
+      //   drop_debugger: true,
+      //   evaludate: true,
+      //   drop_console: true,
+      //   sequences: true,
+      //   booleans: true,
+      //   compress: { warnings: false },
+      //   sourcemap: true,
+      //   // comments: false,
+      //   // sourceMap: true,
+      //   // minimize: false,
+      //   exclude: [/\.min\.js$/gi]
+      // }),
       new HtmlWebpackPlugin({
         template: 'index.html',
         minify: {
@@ -63,17 +63,18 @@ module.exports = function(options) {
       new ExtractTextPlugin('css/main.css'),
       new webpack.DefinePlugin({
         'process.env': {
-          NODE_ENV: JSON.stringify('production')
+          // NODE_ENV: JSON.stringify('production')
+          NODE_ENV: JSON.stringify('development')
         }
       }),
-      new webpack.optimize.AggressiveMergingPlugin(),
-      new CompressionPlugin({
-        asset: '[path].gz[query]',
-        algorithm: 'gzip',
-        test: /\.js$|\.css$|\.html$/,
-        threshold: 10240,
-        minRatio: 0
-      }),
+      // new webpack.optimize.AggressiveMergingPlugin(),
+      // new CompressionPlugin({
+      //   asset: '[path].gz[query]',
+      //   algorithm: 'gzip',
+      //   test: /\.js$|\.css$|\.html$/,
+      //   threshold: 10240,
+      //   minRatio: 0
+      // }),
     ];
   } else {
     entry = [
@@ -101,7 +102,7 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: options.prod ? 'inline-source-map' : 'eval-cheap-module-source-map',
+    devtool: options.prod ? 'source-map' : 'eval-cheap-module-source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
