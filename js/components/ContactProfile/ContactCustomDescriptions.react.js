@@ -3,7 +3,7 @@ import {grey700} from 'material-ui/styles/colors';
 import ContactDescriptor from './ContactDescriptor.react';
 import find from 'lodash/find';
 
-function ContactCustomDescriptions({contact, patchContact, list}) {
+const ContactCustomDescriptions = ({contact, patchContact, list}) => {
   return (
     <div id='contact_profile_custom_hop' style={{marginTop: 10, marginBottom: 20, marginLeft: 8}}>
       <span style={{fontSize: '1.1em'}}>Custom Fields</span>
@@ -39,6 +39,6 @@ function ContactCustomDescriptions({contact, patchContact, list}) {
         }) : <span style={{fontSize: '0.9em', color: grey700}}>There are no custom fields. You can generate them as custom columns in Sheet.</span>}
       </div>
     </div>);
-}
+};
 
 export default ContactCustomDescriptions;

@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
-import Textarea from 'react-textarea-autosize';
+// import Textarea from 'react-textarea-autosize';
+import TextareaAutosize from 'react-autosize-textarea';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import {actions as loginActions} from 'components/Login';
@@ -48,7 +49,8 @@ class Feedback extends Component {
                 <span>Feedback:</span>
               </div>
               <div className='vertical-center'>
-                <Textarea
+                <TextareaAutosize
+                style={{minHeight: 30}}
                 placeholder='What did you liked or disliked about your experience? Leave us a note here.'
                 maxRows={5}
                 value={state.text}

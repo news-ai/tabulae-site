@@ -12,7 +12,7 @@ class ContactEmployerDescriptor extends Component {
   render() {
     const props = this.props;
     const contactEmployers = props.contact[props.which].filter(id => id !== props.employer.id);
-    const contactBody = {};
+    let contactBody = {};
     contactBody[props.which] = contactEmployers;
     return (
       <div className={props.className} style={props.style}>

@@ -10,7 +10,8 @@ import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import AutoComplete from 'material-ui/AutoComplete';
-import Textarea from 'react-textarea-autosize';
+// import Textarea from 'react-textarea-autosize';
+import TextareaAutosize from 'react-autosize-textarea';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.react';
 import ValidationHOC from 'components/ValidationHOC';
@@ -342,7 +343,7 @@ class AddContactHOC extends Component {
             <div className='large-12 medium-12 small-12 columns'>
               <span style={{whiteSpace: 'nowrap'}}>RSS Feeds</span>
               <span className='smalltext' style={{whiteSpace: 'nowrap'}}> * Separate feeds with a new line</span>
-              <Textarea
+              <TextareaAutosize
               value={state.rssfeedsTextarea}
               maxRows={10}
               onChange={e => this.setState({rssfeedsTextarea: e.target.value})}

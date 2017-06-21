@@ -6,21 +6,22 @@ import {actions as listActions} from 'components/Lists';
 import {actions as publicationActions} from 'components/Publications';
 import {actions as loginActions} from 'components/Login';
 import {actions as contactActions} from 'components/Contacts';
-import {actions as feedActions} from './RSSFeed';
-import * as headlineActions from './Headlines/actions';
+import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
+import {actions as headlineActions} from 'components/ContactProfile/Headlines';
 import * as joyrideActions from 'components/Joyride/actions';
 import {teal400, teal900, grey700, grey500} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
-import {tour} from './tour';
+import tour from './tour';
 
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
-import Textarea from 'react-textarea-autosize';
+// import Textarea from 'react-textarea-autosize';
+import TextareaAutosize from 'react-autosize-textarea';
 import RaisedButton from 'material-ui/RaisedButton';
-import AddEmployerHOC from './ContactPublications/AddEmployerHOC.react';
 
+import AddEmployerHOC from './ContactPublications/AddEmployerHOC.react';
 import TweetFeed from './Tweets/TweetFeed.react';
 import MixedFeed from './MixedFeed/MixedFeedContainer.react';
 import Headlines from './Headlines/Headlines.react';
@@ -36,9 +37,10 @@ import Tabs, {TabPane} from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
 import ScrollableInkTabBar from 'rc-tabs/lib/ScrollableInkTabBar';
 import 'rc-tabs/assets/index.css';
-
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const Placeholder = props => <div style={{height: 700}}><span>Placeholder</span></div>;
+const None = _ => <span className='text' style={{marginLeft: 10, color: grey700}} >None Added</span>;
 
 class ContactProfile extends Component {
   constructor(props) {
@@ -146,8 +148,12 @@ class ContactProfile extends Component {
           </Dialog>
         }
         <div className='large-9 medium-12 small-12 columns'>
-          {props.contact && (
+          {
+          props.contact && (
             <div className='row' style={styles.contact.container}>
+            {
+
+            }
               <ContactProfileDescriptions className='large-6 medium-12 small-12 columns' list={props.list} contact={props.contact} {...props}/>
               <div className='large-6 medium-12 small-12 columns'>
                 <div className='row'>
@@ -155,7 +161,7 @@ class ContactProfile extends Component {
                     <span style={styles.header}>Notes</span>
                   </div>
                   <div className='large-12 medium-12 small-12 columns'>
-                    <Textarea value={state.notes} maxRows={7} onChange={this.onTextAreaChange} onBlur={this.onTextAreaBlur} />
+                    <TextareaAutosize value={state.notes} maxRows={7} onChange={this.onTextAreaChange} onBlur={this.onTextAreaBlur} />
                     <span style={styles.saveIndicator}>{props.contact.notes !== state.notes ? 'Unsaved' : 'Saved'}</span>
                   </div>
                 </div>
@@ -209,7 +215,7 @@ class ContactProfile extends Component {
                   <div>
                 {props.pastemployers &&
                   props.pastemployers.map((employer, i) =>
-                    <ContactEmployerDescriptor style={styles.contactemployer} key={i} employer={employer} which='pastemployers' contact={props.contact}/>)}
+                    <ContactEmployerDescriptor style={styles.contactemployer} key={i} employer={employer} which='pastemployers' contact={props.contact} />)}
                   {(props.pastemployers.length === 0 || !props.pastemployers) &&
                     <None/>}
                   </div>
@@ -245,7 +251,8 @@ class ContactProfile extends Component {
                 </div>
               </div>
             </div>
-            )}
+            )
+            }
           <div className='large-12 columns' style={styles.feedContainer}>
             <FeedsController {...props}/>
             <Tabs
@@ -317,7 +324,6 @@ class ContactProfile extends Component {
   }
 }
 
-const None = _ => <span className='text' style={{marginLeft: 10, color: grey700}} >None Added</span>;
 
 function mapStateToProps(state, props) {
   const listId = parseInt(props.params.listId, 10);
@@ -387,7 +393,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(withRouter(ContactProfile));
+export default connect( mapStateToProps, mapDispatchToProps )(withRouter(ContactProfile));
