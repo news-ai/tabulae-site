@@ -1,2 +1,2 @@
-import ContactProfile from './ContactProfile.react';
+import ContactProfile from './ContactProfile.jsx';
 export default ContactProfile;

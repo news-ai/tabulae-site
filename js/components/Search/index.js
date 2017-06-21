@@ -1,2 +1,2 @@
-import SearchBar from './SearchBar.react';
+import SearchBar from './SearchBar.jsx';
 export default SearchBar;

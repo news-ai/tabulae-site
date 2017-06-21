@@ -113,7 +113,7 @@ module.exports = function(options) {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.(js|jsx)$/,
           use: 'babel-loader',
           exclude: path.join(__dirname, '/node_modules/')
         },

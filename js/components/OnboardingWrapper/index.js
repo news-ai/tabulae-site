@@ -1,2 +1,2 @@
-import OnboardingWrapper from './OnboardingWrapper.react';
+import OnboardingWrapper from './OnboardingWrapper.jsx';
 export default OnboardingWrapper;

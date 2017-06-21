@@ -1,4 +1,4 @@
-import Login from './Login.react';
+import Login from './Login.jsx';
 import * as loginActions from './actions';
 
 export default Login;

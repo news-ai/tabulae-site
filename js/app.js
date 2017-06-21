@@ -41,33 +41,33 @@ import configureStore from './configureStore';
 
 // Import the pages
 import NotFound from './components/NotFound';
-import App from './components/App.react';
-import ListManagerContainer from './components/Lists/ListManagerContainer.react';
-import TagListsContainer from './components/Lists/TagListsContainer.react';
-import ArchiveContainer from './components/Lists/ArchiveContainer.react';
-import PublicListsContainer from './components/Lists/PublicListsContainer.react';
-import TeamListsContainer from './components/Lists/TeamListsContainer.react';
+import App from './components/App.jsx';
+import ListManagerContainer from './components/Lists/ListManagerContainer.jsx';
+import TagListsContainer from './components/Lists/TagListsContainer.jsx';
+import ArchiveContainer from './components/Lists/ArchiveContainer.jsx';
+import PublicListsContainer from './components/Lists/PublicListsContainer.jsx';
+import TeamListsContainer from './components/Lists/TeamListsContainer.jsx';
 import SearchBar from './components/Search';
 
-import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsContainer.react';
-import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.react';
-import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSentEmailsContainer.react';
-import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.react';
-import SearchSentEmails from './components/Email/EmailAnalytics/SearchSentEmails.react';
-import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.react';
-import EmailStatsContainer from './components/Email/EmailAnalytics/EmailStats/EmailStatsContainer.react';
-import CampaignContainer from './components/Email/EmailAnalytics/CampaignContainer.react';
+import SentEmailsContainer from './components/Email/EmailAnalytics/SentEmailsContainer.jsx';
+import AllSentEmailsContainer from './components/Email/EmailAnalytics/AllSentEmailsContainer.jsx';
+import TrashSentEmailsContainer from './components/Email/EmailAnalytics/TrashSentEmailsContainer.jsx';
+import ListSentEmailsContainer from './components/Email/EmailAnalytics/ListSentEmailsContainer.jsx';
+import SearchSentEmails from './components/Email/EmailAnalytics/SearchSentEmails.jsx';
+import ScheduledEmails from './components/Email/EmailAnalytics/ScheduledEmails.jsx';
+import EmailStatsContainer from './components/Email/EmailAnalytics/EmailStats/EmailStatsContainer.jsx';
+import CampaignContainer from './components/Email/EmailAnalytics/CampaignContainer.jsx';
 
 import ContactProfile from './components/ContactProfile';
 import ListTable from './components/ListTable';
-import ListFetchingContainer from './components/ListTable/ListFetchingContainer.react';
+import ListFetchingContainer from './components/ListTable/ListFetchingContainer.jsx';
 import UserProfile from './components/UserProfile';
 import ListFeed from './components/ListFeed';
-import HeaderNaming from './components/HeaderNaming/HeaderNaming.react';
-import ClientDirectories from './components/ClientDirectories/ClientDirectories.react';
-import ClientDirectory from './components/ClientDirectories/ClientDirectory.react';
-import Publication from './components/Publications/Publication.react';
-import ContactTags from './components/Contacts/ContactTags/ContactTags.react';
+import HeaderNaming from './components/HeaderNaming/HeaderNaming.jsx';
+import ClientDirectories from './components/ClientDirectories/ClientDirectories.jsx';
+import ClientDirectory from './components/ClientDirectories/ClientDirectory.jsx';
+import Publication from './components/Publications/Publication.jsx';
+import ContactTags from './components/Contacts/ContactTags/ContactTags.jsx';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';

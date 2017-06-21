@@ -1,3 +1,3 @@
-import EmailsList from './EmailsList.react';
+import EmailsList from './EmailsList.jsx';
 
 export default EmailsList;

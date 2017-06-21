@@ -1,3 +1,3 @@
-import Lists from './Lists.react';
+import Lists from './Lists.jsx';
 
 export default Lists;

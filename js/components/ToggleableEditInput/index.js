@@ -1,6 +1,6 @@
 import React from 'react';
-import ToggleableEditInput from './ToggleableEditInput.react';
-import ToggleableEditInputHOC from './ToggleableEditInputHOC.react';
+import ToggleableEditInput from './ToggleableEditInput.jsx';
+import ToggleableEditInputHOC from './ToggleableEditInputHOC.jsx';
 
 const ControlledInput = (props) => {
   return (

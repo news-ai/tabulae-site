@@ -86,7 +86,7 @@
     "babel-plugin-transform-react-inline-elements": "6.3.13",
     "babel-plugin-transform-react-remove-prop-types": "0.1.0",
     "babel-polyfill": "^6.16.0",
-    "babel-preset-es2015": "^6.0.0",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.0.0",
     "babel-preset-react-hmre": "1.0.1",
     "babel-preset-stage-2": "^6.0.0",
@@ -146,16 +146,6 @@
     "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors",
     "serve": "cross-env NODE_ENV=production node server.prod.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2"
-  },
-  "babel": {
-    "env": {
-      "production": {
-        "plugins": [
-          "transform-react-constant-elements",
-          "transform-react-inline-elements"
-        ]
-      }
-    }
   },
   "jest": {
     "moduleDirectories": [
