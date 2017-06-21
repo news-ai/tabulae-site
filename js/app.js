@@ -8,9 +8,9 @@
  */
 
 // Load the ServiceWorker, the Cache polyfill, the manifest.json file and the .htaccess file
-// import 'file-loader?name=[name].[ext]!../serviceworker.js';
-// import 'file-loader?name=[name].[ext]!../manifest.json';
-// import 'file-loader?name=[name].[ext]!../.htaccess';
+import 'file?name=[name].[ext]!../serviceworker.js';
+import 'file?name=[name].[ext]!../manifest.json';
+import 'file?name=[name].[ext]!../.htaccess';
 
 // Check for ServiceWorker support before trying to install it
 // if (!window.isDev) {
