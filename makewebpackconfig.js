@@ -17,7 +17,14 @@ module.exports = function(options) {
       path.resolve(__dirname, 'js/config.prod.js'),
       path.resolve(__dirname, 'js/app.js')
     ];
-    cssLoaders = ExtractTextPlugin.extract('style-loader', ['css-loader', 'postcss-loader', 'sass-loader']);
+    cssLoaders = ExtractTextPlugin.extract({
+      fallback: 'style-loader',
+      use: [
+        { loader: 'css-loader', query: {sourceMap: true, importLoaders: 1} },
+        { loader: 'postcss-loader' },
+        { loader: 'sass-loader' }
+      ]
+    });
     plugins = [
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new webpack.optimize.UglifyJsPlugin({
@@ -60,8 +67,6 @@ module.exports = function(options) {
         }
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
-      new webpack.optimize.OccurenceOrderPlugin(),
-      new webpack.optimize.DedupePlugin(),
       new CompressionPlugin({
         asset: '[path].gz[query]',
         algorithm: 'gzip',
@@ -69,19 +74,6 @@ module.exports = function(options) {
         threshold: 10240,
         minRatio: 0
       }),
-      /*
-      new SentryPlugin({
-        // Sentry options are required
-        organisation: 'julie-pan',
-        project: 'tabulae-site',
-        apiKey: process.env.SENTRY_API_KEY,
-        
-        // Release version name/hash is required
-        release: function() {
-          return process.env.CIRCLE_SHA1
-        }
-      })
-       */
     ];
   } else {
     entry = [
@@ -91,7 +83,12 @@ module.exports = function(options) {
       path.resolve(__dirname, 'js/config.dev.js'),
       path.resolve(__dirname, 'js/app.js')
     ];
-    cssLoaders = 'style-loader!css-loader!postcss-loader!sass-loader';
+    cssLoaders = [
+      'style-loader',
+      { loader: 'css-loader' },
+      { loader: 'postcss-loader' },
+      { loader: 'sass-loader' }
+    ];
     plugins = [
       new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
@@ -105,37 +102,37 @@ module.exports = function(options) {
   return {
     bail: true,
     devtool: options.prod ? 'inline-source-map' : 'eval-cheap-module-source-map',
-    // devtool: 'source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
       filename: options.prod ? 'js/bundle.[hash].js' : 'js/bundle.js',
       publicPath: '/',
-      sourceMapFilename: "[name].js.map",
-      // devtoolModuleFilenameTemplate: '[absolute-resource-path]'
+      sourceMapFilename: '[name].js.map'
     },
     module: {
-      loaders: [
+      rules: [
         {
-          test: /\.js$/, // Transform all .js files required somewhere within an entry point...
-          loader: 'babel', // ...with the specified loaders...
-          exclude: path.join(__dirname, '/node_modules/') // ...except for the node_modules folder.
+          test: /\.js$/,
+          use: 'babel-loader',
+          exclude: path.join(__dirname, '/node_modules/')
         },
         {
           test: /\.css$/,
-          loader: cssLoaders
+          use: cssLoaders
         },
         {
           test: /\.jpe?g$|\.gif$|\.png$/i,
-          loader: 'url-loader?limit=10000'
-        },
-        {
-          include: /\.json$/, loaders: ['json-loader']
+          use: [
+            {
+              loader: 'url-loader',
+              options: {limit: 10000}
+            }
+          ]
         }
       ]
     },
     resolve: {
-      extensions: ['', '.json', '.jsx', '.js'],
+      extensions: ['.json', '.jsx', '.js'],
       alias: {
         'node_modules': __dirname + '/node_modules',
         'img': __dirname + '/img',
@@ -147,26 +144,6 @@ module.exports = function(options) {
       }
     },
     plugins: plugins,
-    postcss: function() {
-      return [
-        require('postcss-import')({ // Import all the css files...
-          glob: true,
-          onImport: function(files) {
-            files.forEach(this.addDependency); // ...and add dependecies from the main.css files to the other css files...
-          }.bind(this) // ...so they get hot–reloaded when something changes...
-        }),
-        require('postcss-simple-vars')(), // ...then replace the variables...
-        require('postcss-focus')(), // ...add a :focus to ever :hover...
-        require('autoprefixer')({ // ...and add vendor prefixes...
-          browsers: ['last 2 versions', 'IE > 8'] // ...supporting the last 2 major browser versions and IE 8 and up...
-        }),
-        require('postcss-reporter')({ // This plugin makes sure we get warnings in the console
-          clearMessages: true
-        })
-      ];
-    },
     target: 'web', // Make web variables accessible to webpack, e.g. window
-    stats: false, // Don't show stats in the console
-    progress: true,
   };
 };

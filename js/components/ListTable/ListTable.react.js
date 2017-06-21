@@ -36,7 +36,7 @@ import Drawer from 'material-ui/Drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
-import AddOrRemoveColumnHOC from './AddOrRemoveColumnHOC.react';
+import ColumnEditPanelHOC from 'components/ListTable/ColumnEditPanelHOC/ColumnEditPanelHOC.react';
 import AddContactHOC from './AddContactHOC.react';
 import AddTagDialogHOC from './AddTagDialogHOC.react';
 import EditMultipleContactsHOC from './EditMultipleContactsHOC.react';
@@ -753,7 +753,7 @@ class ListTable extends Component {
               onClick={onRequestOpen}
               />)}
             </CopyToHOC>
-            <AddOrRemoveColumnHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
+            <ColumnEditPanelHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
             {({onRequestOpen}) => (
               <IconButton
               iconStyle={styles.iconBtn}
@@ -764,7 +764,7 @@ class ListTable extends Component {
               iconClassName='fa fa-table'
               onClick={onRequestOpen}
               />)}
-            </AddOrRemoveColumnHOC>
+            </ColumnEditPanelHOC>
             <AddContactHOC contacts={props.contacts} listId={props.listId}>
             {({onRequestOpen}) => (
               <IconButton
