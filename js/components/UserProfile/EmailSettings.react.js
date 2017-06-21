@@ -177,11 +177,9 @@ class EmailSettings extends Component {
             </div>
           </div>
         </Panel>
-        {
-          /*
-        <Panel className='row' title='Add Multiple Emails'>
+        <Panel title='Add Multiple Emails'>
           <span className='smalltext'>You can add multiple emails to switch when you send your emails. This feature is not supported with Gmail/Outlook/SMTP integrations.</span>
-          <div className='vertical-center' style={styles.item}>
+          <div className='row vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>Add Emails</span>
             </div>
@@ -190,7 +188,7 @@ class EmailSettings extends Component {
             </div>
           </div>
         {props.person.sendgridemails !== null && !NoAccess &&
-          <div className='vertical-center' style={styles.item}>
+          <div className='row vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>Connected</span>
             </div>
@@ -201,8 +199,6 @@ class EmailSettings extends Component {
             </div>
           </div>}
         </Panel>
-           */
-        }
         <Panel className='row' title='Email Signature'>
           <span className='smalltext'>If you added multiple emails, you can assign different signature to each one.</span>
           <div style={{height: 500}}>
