@@ -150,9 +150,9 @@ class EmailSettings extends Component {
             </div>
           </div>
         </Panel>
-        <Panel className='row' title='Integrations'>
+        <Panel title='Integrations'>
           <span className='smalltext'>By default, we use a 3rd-party email service provider Sendgrid to deliver your emails. If you would like for us to deliver your emails through a different service, then you can enable those integrations here.</span>
-          <div className='vertical-center' style={styles.item}>
+          <div className='row vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>Gmail</span>
             </div>
@@ -160,7 +160,7 @@ class EmailSettings extends Component {
             {googleNode}
             </div>
           </div>
-          <div className='vertical-center' style={styles.item}>
+          <div className='row vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>Outlook</span>
             </div>
@@ -168,7 +168,7 @@ class EmailSettings extends Component {
             {outlookNode}
             </div>
           </div>
-          <div className='vertical-center' style={styles.item}>
+          <div className='row vertical-center' style={styles.item}>
             <div className={spanCssClass}>
               <span style={spanStyle}>SMTP Server</span>
             </div>
