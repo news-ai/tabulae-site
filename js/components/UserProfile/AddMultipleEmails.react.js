@@ -29,7 +29,6 @@ class AddMultipleEmails extends Component {
     if (props.ontrial) floatingLabelText = 'Upgrade to Pro plan to add emails';
     return (
       <div className='vertical-center'>
-      {
         props.leftover > 0 &&
         <ValidationHOC rules={[{validator: isEmail, errorMessage: 'Not a valid email.'}]}>
         {({onValueChange, errorMessage}) => (
@@ -47,7 +46,6 @@ class AddMultipleEmails extends Component {
           }}
           />)}
         </ValidationHOC>
-      }
       {props.leftover === 0 &&
         <span style={{color: grey500}}>Max'd out the number of external emails. Please upgrade or remove emails to add another.</span>}
         <IconButton
