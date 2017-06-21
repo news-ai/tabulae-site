@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as stagingActions from '../Email/actions';
+import {actions as stagingActions} from 'components/Email';
 import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 
 class ContactEmails extends Component {

@@ -92,9 +92,7 @@ class AddTagHOC extends Component {
           handleDrag={this.handleDrag}
           />
         </Dialog>
-        {props.children({
-          onRequestOpen: this.onRequestOpen
-        })}
+        {props.children({onRequestOpen: this.onRequestOpen})}
       </div>);
   }
 }

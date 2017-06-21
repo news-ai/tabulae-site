@@ -1,4 +1,4 @@
-export const tour = {
+const tour = {
   id: 'profile-hopscotch',
   steps: [
     {
@@ -27,3 +27,5 @@ export const tour = {
     },
   ]
 };
+
+export default tour;

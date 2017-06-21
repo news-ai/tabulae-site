@@ -2,7 +2,7 @@ import React from 'react';
 import ToggleableEditInput from './ToggleableEditInput.react';
 import ToggleableEditInputHOC from './ToggleableEditInputHOC.react';
 
-function ControlledInput(props) {
+const ControlledInput = (props) => {
   return (
     <ToggleableEditInputHOC {...props}>
       {({onToggleTitleEdit, isTitleEditing, name, onUpdateName}) =>
@@ -18,7 +18,8 @@ function ControlledInput(props) {
         maxTextLength={props.maxTextLength}
         onKeyDown={props.onKeyDown}
         />}
-    </ToggleableEditInputHOC>);
-}
+    </ToggleableEditInputHOC>
+    );
+};
 
 export {ToggleableEditInput, ToggleableEditInputHOC, ControlledInput};

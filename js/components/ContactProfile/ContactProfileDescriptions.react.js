@@ -1,14 +1,15 @@
 import React from 'react';
+import IconButton from 'material-ui/IconButton';
 
 import {grey700} from 'material-ui/styles/colors';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
+
 import ContactDescriptor from './ContactDescriptor.react';
-import IconButton from 'material-ui/IconButton';
 import ContactCustomDescriptions from './ContactCustomDescriptions.react';
 import TwitterProfile from './SocialProfiles/Twitter/TwitterProfile.react';
 import InstagramProfile from './SocialProfiles/Instagram/InstagramProfile.react';
-import {ControlledInput} from '../ToggleableEditInput';
+import {ControlledInput} from 'components/ToggleableEditInput';
 
 const styles = {
   smallIcon: {
@@ -57,7 +58,7 @@ const WrappedInstagram = props => {
 
 const contactDescriptorClassname = 'large-12 medium-8 small-12 columns';
 
-function ContactProfileDescriptions({contact, patchContact, className, list}) {
+const ContactProfileDescriptions = ({contact, patchContact, className, list}) => {
   let instagramErrorText = null;
   if (contact.instagraminvalid) instagramErrorText = 'Invalid Instagram handle';
   else if (contact.instagramprivate) instagramErrorText = 'Instagram is private';
@@ -129,10 +130,7 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
         window.Intercom('trackEvent', 'add_contact_instagram');
         patchContact(contact.id, {instagram: value});
       }}
-      extraIcons={contact.instagram && [
-        <WrappedInstagram key={0} contactId={contact.id} />
-        ]}
-      />
+      extraIcons={contact.instagram && [<WrappedInstagram key={0} contactId={contact.id} />]} />
       <ContactDescriptor
       disabled={contact.readonly}
       iconClassName='fa fa-linkedin'
@@ -150,6 +148,6 @@ function ContactProfileDescriptions({contact, patchContact, className, list}) {
       />
       <ContactCustomDescriptions contact={contact} patchContact={patchContact} list={list} />
     </div>);
-}
+};
 
 export default ContactProfileDescriptions;
