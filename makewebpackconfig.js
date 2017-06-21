@@ -20,7 +20,7 @@ module.exports = function(options) {
     cssLoaders = ExtractTextPlugin.extract({
       fallback: 'style-loader',
       use: [
-        { loader: 'css-loader', query: {sourceMap: true, importLoaders: 1} },
+        { loader: 'css-loader', options: {sourceMap: true, importLoaders: 1} },
         { loader: 'postcss-loader' },
         { loader: 'sass-loader' }
       ]
