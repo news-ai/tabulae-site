@@ -556,7 +556,7 @@ class EmailPanel extends Component {
             maxHeight={200}
             options={options}
             optionRenderer={NameOptionRenderer}
-            optionHeight={({option}) => option.type === 'header' ? 25 : 35}
+            optionHeight={({option}) => option.type === 'header' ? 35 : 35}
             onChange={this.handleTemplateChange}
             value={state.currentTemplateId}
             />
