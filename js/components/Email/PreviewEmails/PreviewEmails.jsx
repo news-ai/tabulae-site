@@ -134,7 +134,9 @@ class PreviewEmails extends Component {
             onChange={this.onChange}
             />
           </div>
-          <span className='smalltext right' style={{color: grey700}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
+          <span className='smalltext right' style={{color: grey700}}>
+            Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails
+          </span>
         </div>
         <div style={styles.attachmentContainer}>
           <span className='text' style={{marginLeft: 10}} >Attachments:</span>

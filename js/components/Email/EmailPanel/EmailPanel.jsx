@@ -12,32 +12,39 @@ import {actions as stagingActions} from 'components/Email';
 import {actions as templateActions} from 'components/Email/Template';
 import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
-import './ReactTagsStyle.css';
-
-import ReactTooltip from 'react-tooltip'
-import PreviewEmails from '../PreviewEmails';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
-import MenuItem from 'material-ui/MenuItem';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import FileWrapper from './FileWrapper.jsx';
-import IconMenu from 'material-ui/IconMenu';
-import SelectField from 'material-ui/SelectField';
-import Paper from 'material-ui/Paper';
-import BasicHtmlEditor from './BasicHtmlEditor.jsx';
-import DatePickerHOC from './DatePickerHOC.jsx';
-import AddCCPanelHOC from './AddCCPanelHOC.jsx';
-import SwitchEmailHOC from './SwitchEmailHOC.jsx';
-import SwitchEmailDropDown from './SwitchEmailDropDown.jsx';
-import FontIcon from 'material-ui/FontIcon';
 import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
 import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
+import VirtualizedSelect from 'react-virtualized-select';
+import ReactTooltip from 'react-tooltip'
+import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
+import MenuItem from 'material-ui/MenuItem';
+import DropDownMenu from 'material-ui/DropDownMenu';
+import IconMenu from 'material-ui/IconMenu';
+import SelectField from 'material-ui/SelectField';
+import Paper from 'material-ui/Paper';
+import FontIcon from 'material-ui/FontIcon';
+
+import PreviewEmails from '../PreviewEmails';
+import FileWrapper from './FileWrapper.jsx';
+import BasicHtmlEditor from './BasicHtmlEditor.jsx';
+import DatePickerHOC from './DatePickerHOC.jsx';
+import AddCCPanelHOC from './AddCCPanelHOC.jsx';
+import SwitchEmailHOC from './SwitchEmailHOC.jsx';
+import SwitchEmailDropDown from './SwitchEmailDropDown.jsx';
+import PauseOverlay from './PauseOverlay.jsx';
+
+import 'react-select/dist/react-select.css';
+import 'react-virtualized/styles.css';
+import 'react-virtualized-select/styles.css';
+import './react-select-hack.css';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import './ReactTagsStyle.css';
 import {blueGrey50, grey50, grey600, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from './utils/replaceAll';
@@ -51,13 +58,42 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
     alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
   });
 
-const PauseOverlay = ({message, width, height}) => (
-  <div style={Object.assign({}, {width, height}, emailPanelPauseOverlay)}>
-    <div style={{margin: 0}}>
-      <span style={{color: '#ffffff', fontSize: '1.3em'}}>Image is loading</span>
-      <FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/>
-    </div>
-  </div>);
+function NameOptionRenderer ({ focusedOption, focusedOptionIndex, focusOption, key, labelKey, option, optionIndex, options, selectValue, style, valueArray }) {
+  const classNames = ['nameOption'];
+
+  if (option.type === 'header') {
+    classNames.push('nameHeader');
+
+    return (
+      <div
+        className={classNames.join(' ')}
+        key={key}
+        style={style}
+      >
+        {option.label}
+      </div>
+    )
+  } else {
+    if (option === focusedOption) {
+      classNames.push('nameOptionFocused');
+    }
+    if (valueArray.indexOf(option) >= 0) {
+      classNames.push('nameOptionSelected');
+    }
+
+    return (
+      <div
+        className={classNames.join(' ')}
+        key={key}
+        onClick={() => selectValue(option)}
+        onMouseOver={() => focusOption(option)}
+        style={style}
+      >
+        {option.label}
+      </div>
+    )
+  }
+}
 
 const getInitialState = () => ({
     subject: '',
@@ -92,7 +128,8 @@ class EmailPanel extends Component {
       this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
       this.props.saveEditorState(rawContentState);
     };
-    this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
+    this.handleTemplateChange = this.handleTemplateChange.bind(this);
+    // this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -194,9 +231,10 @@ class EmailPanel extends Component {
     setTimeout(_ => this.setState({dirty: false}), 10);
   }
 
-  _handleTemplateValueChange(event, index, value) {
-    if (value !== 0) {
-      const template = find(this.props.templates, tmp => value === tmp.id);
+  handleTemplateChange(obj) {
+    const templateId = obj !== null ? obj.value : null;
+    if (templateId !== null) {
+      const template = find(this.props.templates, tmp => templateId === tmp.id);
       const subjectHtml = template.subject;
       const bodyHtml = template.body;
       if (isJSON(template.body)) {
@@ -211,13 +249,38 @@ class EmailPanel extends Component {
     } else {
       this.setState({bodyHtml: '', subjectHtml: ''});
     }
-    this.setState({currentTemplateId: value});
+    this.setState({currentTemplateId: templateId});
     this.props.turnOnTemplateChange();
     setTimeout(_ => {
       this.changeEmailSignature(this.props.emailsignature)
       this.setState({dirty: false});
     }, 1000);
   }
+
+  // _handleTemplateValueChange(event, index, value) {
+  //   if (value !== 0) {
+  //     const template = find(this.props.templates, tmp => value === tmp.id);
+  //     const subjectHtml = template.subject;
+  //     const bodyHtml = template.body;
+  //     if (isJSON(template.body)) {
+  //       const templateJSON = JSON.parse(template.body);
+  //       this.setState({bodyEditorState: templateJSON.data});
+  //       this.props.saveEditorState(templateJSON.data);
+  //       this.setState({subjectHtml});
+  //     } else {
+  //       this.props.setBodyHtml(bodyHtml);
+  //       this.setState({bodyHtml, subjectHtml});
+  //     }
+  //   } else {
+  //     this.setState({bodyHtml: '', subjectHtml: ''});
+  //   }
+  //   this.setState({currentTemplateId: value});
+  //   this.props.turnOnTemplateChange();
+  //   setTimeout(_ => {
+  //     this.changeEmailSignature(this.props.emailsignature)
+  //     this.setState({dirty: false});
+  //   }, 1000);
+  // }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
     let emptyFields = [];
@@ -401,12 +464,33 @@ class EmailPanel extends Component {
   render() {
     const state = this.state;
     const props = this.props;
-    // add this button to fetch all staged emails for debugging purposes
-    const templateMenuItems = props.templates.length > 0 ?
-    [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>]
-    .concat(props.templates.map((template, i) =>
-      <MenuItem value={template.id} key={i} primaryText={template.name.length > 0 ? template.name : template.subject} />)
-    ) : null;
+
+    let options = [];
+    if (props.templates.length > 0) {
+      const {recent, saved} = props.templates
+      .reduce(({recent, saved}, template) => {
+        if (isJSON(template.body) && JSON.parse(template.body).date) {
+          recent = [...recent, {
+            label: template.name.length > 0 ? template.name : template.subject,
+            value: template.id,
+            type: 'name'
+          }];
+        } else {
+          saved = [...saved, {
+            label: template.name.length > 0 ? template.name : template.subject,
+            value: template.id,
+            type: 'name'
+          }];
+        }
+        return {recent, saved};
+      }, {recent: [], saved: []});
+      options = [
+        {label: 'Recently Sent Emails', type: 'header'},
+        ...recent,
+        {label: 'Saved Templates', type: 'header'},
+        ...saved
+      ]
+    }
 
     const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
 
@@ -415,7 +499,7 @@ class EmailPanel extends Component {
         <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
           <div className='vertical-center' style={styles.topbarContainer} >
-            <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
+            <span style={styles.sentFromText} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
             <div style={styles.clearEditorBtn}>
               <FlatButton label='Clear Editor' labelStyle={styles.textTransformNone} onClick={this.onClearClick} />
@@ -460,23 +544,32 @@ class EmailPanel extends Component {
           padding: '3px 10px',
           position: 'fixed',
           bottom: 0,
-          display: state.isPreveiwOpen ? 'none' : 'block',
+          display: state.isPreveiwOpen ? 'none' : 'flex',
           width: '100%',
           zIndex: 500,
           backgroundColor: blueGrey50,
         }} >
-          <SelectField
-          className='left'
-          style={{overflowX: 'hidden'}}
-          value={state.currentTemplateId}
-          onChange={this.handleTemplateValueChange}
-          maxHeight={200}
-          >
-          {templateMenuItems}
-          </SelectField>
+          <div className='select-up' style={{width: 300}} >
+            <VirtualizedSelect
+            labelKey='label'
+            valueKey='value'
+            maxHeight={200}
+            options={options}
+            optionRenderer={NameOptionRenderer}
+            optionHeight={({ option }) => option.type === 'header' ? 25 : 35}
+            onChange={this.handleTemplateChange}
+            value={state.currentTemplateId}
+            />
+          </div>
           <IconMenu
           className='left'
-          iconButtonElement={<IconButton iconStyle={{color: grey800}} tooltipPosition='top-right' tooltip='Templates' iconClassName='fa fa-cogs'/>}
+          iconButtonElement={
+            <IconButton
+            iconStyle={{color: grey800}}
+            tooltipPosition='top-right'
+            tooltip='Templates'
+            iconClassName='fa fa-cogs'
+            />}
           anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
           targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
           >
@@ -570,17 +663,7 @@ const styles = {
   },
   previewContainer: {marginBottom: 20, zIndex: 300},
   textTransformNone: {textTransform: 'none'},
-};
-
-const emailPanelPauseOverlay = {
-  backgroundColor: grey800,
-  borderSizing: 'border-box',
-  zIndex: 300,
-  position: 'absolute',
-  opacity: 0.7,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  sentFromText: {color: grey800, marginRight: 10},
 };
 
 const mapStateToProps = (state, props) => {
