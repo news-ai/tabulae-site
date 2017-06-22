@@ -62,6 +62,7 @@ class PreviewEmails extends Component {
     const previewEmails = this.state.searchOn ? this.state.results : this.props.previewEmails;
     window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
     this.props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+    this.handleRecentTemplates();
   }
 
   handleRecentTemplates() {
@@ -71,21 +72,28 @@ class PreviewEmails extends Component {
     const templateName = `Sent on ${rightNow}`;
 
     const templates = this.props.templates
-    .filter(template => template.date)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+    .reduce((acc, template) => {
+      if (isJSON(template.body)) {
+        if (JSON.parse(template.body).date) {
+          acc.push(template);
+        }
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => new Date(JSON.parse(b.body).date) - new Date(JSON.parse(a.body).date));
 
-    if (templates.length === 5) {
+    if (templates.length > 5) {
       // remove oldest recent template
-      const lastTemplate = templates[templates.length - 1];
-      this.props.toggleArchiveTemplate(lastTemplate.id);
+      const extraTemplates = templates.filter((tmp, i) => i > 4);
+      extraTemplates.map(template => this.props.toggleArchiveTemplate(template.id));
     }
 
     // save current email contentState
-    this.props.createTemplate(
-      templateName,
-      previewEmails[0].subject,
-      JSON.stringify({type: 'DraftEditorState', date: rightNow, data: this.props.savedContentState})
-      );
+    // this.props.createTemplate(
+    //   templateName,
+    //   previewEmails[0].subject,
+    //   JSON.stringify({type: 'DraftEditorState', date: rightNow, data: this.props.savedContentState})
+    //   );
   }
 
   render() {
@@ -201,7 +209,9 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
-  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
+  const templates = state.templateReducer.received
+  .map(id => state.templateReducer[id])
+  .filter(template => !template.archived);
   return {
     emailDidInvalidate: state.stagingReducer.didInvalidate,
     attachmentDidInvalidate: state.emailAttachmentReducer.didInvalidate,
@@ -220,4 +230,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps)(PreviewEmails);
+export default connect(mapStateToProps, mapDispatchToProps)(PreviewEmails);

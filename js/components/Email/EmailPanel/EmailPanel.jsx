@@ -376,16 +376,6 @@ class EmailPanel extends Component {
     )
     .then(_ => {
       console.log('SENDING EMAILS');
-      // COOOOOOOOOLLLLLLLLLL
-
-/*
-      this.props.createTemplate(
-        name,
-        this.state.subject,
-        JSON.stringify({type: 'DraftEditorState', date: new Date(), data: this.state.bodyEditorState})
-        )
-*/
-
 
       if (contactEmails.length > 0) this.sendGeneratedEmails(contactEmails);
     })
@@ -594,9 +584,9 @@ const emailPanelPauseOverlay = {
 };
 
 const mapStateToProps = (state, props) => {
-  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived && !template.date);
+  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
   const person = state.personReducer.person;
-  let fromEmail = get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email;
+  let fromEmail = get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email
   if (person.outlook) fromEmail = person.outlookusername;
   let emailsignature;
   if (fromEmail === person.email) emailsignature = person.emailsignature || null;
