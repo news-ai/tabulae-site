@@ -1,18 +1,18 @@
-.ReactTags__tags {
+.jsxTags__tags {
   max-height: 100px;
   overflow-x: scroll;
   overflow-y: scroll;
 }
 
-.ReactTags__tagInput {
+.jsxTags__tagInput {
   display: inline-block;
 }
 
-.ReactTags__tagInput input {
+.jsxTags__tagInput input {
   font-size: 12px;
 }
 
-div.ReactTags__selected span.ReactTags__tag {
+div.jsxTags__selected span.jsxTags__tag {
   border: 1px solid #ddd;
   background: #eee;
   font-size: 12px;
@@ -22,7 +22,7 @@ div.ReactTags__selected span.ReactTags__tag {
   border-radius: 2px;
 }
 
-div.ReactTags__selected a.ReactTags__remove {
+div.jsxTags__selected a.jsxTags__remove {
   color: #aaa;
   margin-left: 5px;
 }

@@ -1,4 +1,4 @@
-import CopyToHOC from './CopyToHOC.react';
+import CopyToHOC from './CopyToHOC.jsx';
 import * as copyActions from './actions';
 
 export default CopyToHOC;

@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'components/Email/EmailPanel/Image/Image.react';
+import Image from 'components/Email/EmailPanel/Image/Image.jsx';
 import Immutable from 'immutable';
 import {
   convertToRaw,

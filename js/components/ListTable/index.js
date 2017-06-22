@@ -1,2 +1,2 @@
-import ListTable from './ListTable.react';
+import ListTable from './ListTable.jsx';
 export default ListTable;

@@ -1,3 +1,3 @@
-import ValidationHOC from './ValidationHOC.react';
+import ValidationHOC from './ValidationHOC.jsx';
 
 export default ValidationHOC;

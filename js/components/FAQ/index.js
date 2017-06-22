@@ -1,2 +1,2 @@
-import FAQ from './FAQ.react';
+import FAQ from './FAQ.jsx';
 export default FAQ;

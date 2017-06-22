@@ -1,2 +1,2 @@
-import NotFound from './NotFound.react';
+import NotFound from './NotFound.jsx';
 export default NotFound;

@@ -1,2 +1,2 @@
-import InfiniteScroll from './InfiniteScroll.react';
+import InfiniteScroll from './InfiniteScroll.jsx';
 export default InfiniteScroll;
