@@ -62,6 +62,7 @@
     "react-textarea-autosize": "^5.0.6",
     "react-tooltip": "^3.2.7",
     "react-virtualized": "^8.11.4",
+    "react-virtualized-select": "^3.0.1",
     "recharts": "^0.22.0",
     "redux": "^3.6.0",
     "redux-thunk": "^1.0.3",
@@ -129,6 +130,7 @@
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
     "webpack": "^3.0.0",
+    "webpack-bundle-analyzer": "^2.8.2",
     "webpack-dev-server": "^2.5.0",
     "webpack-sentry-plugin": "^1.9.2"
   },

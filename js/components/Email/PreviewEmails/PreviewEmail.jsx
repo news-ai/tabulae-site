@@ -141,14 +141,14 @@ class PreviewEmail extends Component {
     return (
       <div style={styles.contentBox}>
         <div style={styles.topButtonContainer}>
-          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={this.onEditSaveClick}/>
+          <RaisedButton label={state.onEditMode ? 'Save' : 'Edit'} onClick={this.onEditSaveClick} />
         {state.onEditMode &&
-          <RaisedButton label='Cancel' onClick={this.onCancel}/>}
+          <RaisedButton label='Cancel' onClick={this.onCancel} />}
         </div>
         {state.onEditMode ?
           <div>
           {props.isImageReceiving &&
-            <PauseOverlay message='Image is Loading...'/>}
+            <PauseOverlay message='Image is Loading...' />}
             <GeneralEditor
             width={600}
             onEditMode={state.onEditMode}
