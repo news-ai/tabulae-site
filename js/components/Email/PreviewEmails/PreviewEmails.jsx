@@ -69,7 +69,13 @@ class PreviewEmails extends Component {
     // save current email contentState and remove oldest one
     const previewEmails = this.props.previewEmails;
     const rightNow = new Date();
-    const templateName = `Sent on ${rightNow}`;
+    const year = rightNow.getFullYear();
+    const month = rightNow.getMonth() + 1;
+    const date1 = rightNow.getDate();
+    const hour = rightNow.getHours();
+    const minutes = rightNow.getMinutes();
+    const seconds = rightNow.getSeconds();
+    const templateName = `Sent on ${month}-${date1}-${year} ${hour}:${minutes}`;
 
     const templates = this.props.templates
     .reduce((acc, template) => {
@@ -89,11 +95,11 @@ class PreviewEmails extends Component {
     }
 
     // save current email contentState
-    // this.props.createTemplate(
-    //   templateName,
-    //   previewEmails[0].subject,
-    //   JSON.stringify({type: 'DraftEditorState', date: rightNow, data: this.props.savedContentState})
-    //   );
+    this.props.createTemplate(
+      templateName,
+      previewEmails[0].subject,
+      JSON.stringify({type: 'DraftEditorState', date: rightNow, data: this.props.savedContentState})
+      );
   }
 
   render() {
