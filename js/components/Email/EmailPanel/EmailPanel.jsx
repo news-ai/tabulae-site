@@ -164,14 +164,14 @@ class EmailPanel extends Component {
     alertify.promisifyPrompt(
       '',
       'Name of new Email Template',
-      '',
+      ''
       )
     .then(
       name => {
         this.props.createTemplate(
           name,
           this.state.subject,
-          JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
+          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState})
           )
         .then(currentTemplateId => {
           this.setState({currentTemplateId}, _ => {
@@ -376,6 +376,17 @@ class EmailPanel extends Component {
     )
     .then(_ => {
       console.log('SENDING EMAILS');
+      // COOOOOOOOOLLLLLLLLLL
+
+/*
+      this.props.createTemplate(
+        name,
+        this.state.subject,
+        JSON.stringify({type: 'DraftEditorState', date: new Date(), data: this.state.bodyEditorState})
+        )
+*/
+
+
       if (contactEmails.length > 0) this.sendGeneratedEmails(contactEmails);
     })
     .catch(_ => {
@@ -404,34 +415,30 @@ class EmailPanel extends Component {
     const templateMenuItems = props.templates.length > 0 ?
     [<MenuItem value={0} key={-1} primaryText='[Select from Templates]'/>]
     .concat(props.templates.map((template, i) =>
-      <MenuItem
-      value={template.id}
-      key={i}
-      primaryText={template.name.length > 0 ? template.name : template.subject}
-      />)) : null;
+      <MenuItem value={template.id} key={i} primaryText={template.name.length > 0 ? template.name : template.subject} />)
+    ) : null;
 
     const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
 
     return (
-      <div style={{overflowX: 'hidden', height: '100%'}} >
+      <div style={styles.container} >
         <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
-
-          <div className='vertical-center' style={{zIndex: 500, padding: '5px 20px', backgroundColor: blueGrey50, position: 'fixed', top: 0, width: '100%'}} >
+          <div className='vertical-center' style={styles.topbarContainer} >
             <span style={{color: grey800, marginRight: 10}} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
-            <div style={{margin: '0 5px'}}>
-              <FlatButton label='Clear Editor' labelStyle={{textTransform: 'none'}} onClick={this.onClearClick} />
+            <div style={styles.clearEditorBtn}>
+              <FlatButton label='Clear Editor' labelStyle={styles.textTransformNone} onClick={this.onClearClick} />
             </div>
             <div
             onClick={props.onAttachmentPanelOpen}
             className='pointer'
             style={Object.assign({}, styles.attachTooltip, {display: (props.files && props.files.length > 0) ? 'block' : 'none'})}
             >
-              <span style={{fontSize: '0.8em', color: grey700}}>File{props.files.length > 1 && 's'} Attached</span>
+              <span className='smalltext' style={{color: grey700}}>File{props.files.length > 1 && 's'} Attached</span>
             </div>
           {props.isImageReceiving &&
-            <FontIcon style={{margin: '0 3px', fontSize: '14px'}} color={grey800} className='fa fa-spin fa-spinner'/>}
+            <FontIcon style={styles.imageLoading} color={grey800} className='fa fa-spin fa-spinner'/>}
             <div style={{position: 'fixed', right: 10}} >
               <RaisedButton
               backgroundColor={lightBlue500}
@@ -466,10 +473,7 @@ class EmailPanel extends Component {
           display: state.isPreveiwOpen ? 'none' : 'block',
           width: '100%',
           zIndex: 500,
-          // borderTop: '1px solid darkgray',
           backgroundColor: blueGrey50,
-          // alignItems: 'center',
-          // justifyContent: 'space-around'
         }} >
           <SelectField
           className='left'
@@ -521,7 +525,7 @@ class EmailPanel extends Component {
         </div>
       {
         state.isPreveiwOpen &&
-        <div style={{marginBottom: 20, zIndex: 300}} >
+        <div style={styles.previewContainer} >
           <PreviewEmails
           onClose={props.onClose}
           onBack={_ => this.setState({isPreveiwOpen: false})}
@@ -536,8 +540,8 @@ class EmailPanel extends Component {
           />
         </div>
       }
-        <div style={{position: 'fixed', bottom: 5, right: 5, zIndex: 500, backgroundColor: blueGrey50}} >
-          <FlatButton labelStyle={{textTransform: 'none'}} label='Hide Panel' onClick={props.onClose} />
+        <div style={styles.hidePanelBtn} >
+          <FlatButton labelStyle={styles.textTransformNone} label='Hide Panel' onClick={props.onClose} />
         </div>
       </div>
     );
@@ -545,6 +549,9 @@ class EmailPanel extends Component {
 }
 
 const styles = {
+  container: {
+    overflowX: 'hidden', height: '100%'
+  },
   smallIcon: {
     margin: '0 3px', fontSize: '14px', float: 'right'
   },
@@ -552,6 +559,27 @@ const styles = {
     zIndex: 500,
     margin: '0 15px',
   },
+  imageLoading: {margin: '0 3px', fontSize: '14px'},
+  topbarContainer: {
+    zIndex: 500,
+    padding: '5px 20px',
+    backgroundColor: blueGrey50,
+    position: 'fixed',
+    top: 0,
+    width: '100%'
+  },
+  hidePanelBtn: {
+    position: 'fixed',
+    bottom: 5,
+    right: 5,
+    zIndex: 500,
+    backgroundColor: blueGrey50
+  },
+  clearEditorBtn: {
+    margin: '0 5px'
+  },
+  previewContainer: {marginBottom: 20, zIndex: 300},
+  textTransformNone: {textTransform: 'none'},
 };
 
 const emailPanelPauseOverlay = {
@@ -566,7 +594,7 @@ const emailPanelPauseOverlay = {
 };
 
 const mapStateToProps = (state, props) => {
-  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
+  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived && !template.date);
   const person = state.personReducer.person;
   let fromEmail = get(state, `emailDraftReducer[${props.listId}].from`) || state.personReducer.person.email;
   if (person.outlook) fromEmail = person.outlookusername;

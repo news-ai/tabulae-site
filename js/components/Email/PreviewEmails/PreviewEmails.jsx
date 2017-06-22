@@ -1,14 +1,16 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import RaisedButton from 'material-ui/RaisedButton';
-import PreviewEmail from './PreviewEmail.jsx';
-import Waiting from 'components/Waiting';
-import Fuse from 'fuse.js';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import {grey700, blueGrey50} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
-import {connect} from 'react-redux';
+import Fuse from 'fuse.js';
 import find from 'lodash/find';
+import isJSON from 'validator/lib/isJSON';
+
+import {actions as templateActions} from 'components/Email/Template';
+import PreviewEmail from './PreviewEmail.jsx';
 
 const fuseOptions = {
   threshold: 0.6,
@@ -39,11 +41,13 @@ class PreviewEmails extends Component {
       searchValue: '',
       searchOn: false,
     };
-    this.onChange = this._onChange.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.onSendAllEmails = this.onSendAllEmails.bind(this);
+    this.handleRecentTemplates = this.handleRecentTemplates.bind(this);
     this.fuse = new Fuse(this.props.previewEmails, fuseOptions);
   }
 
-  _onChange(e) {
+  onChange(e) {
     const value = e.target.value;
     this.setState({searchValue: value});
     if (value.length > 0) {
@@ -52,6 +56,36 @@ class PreviewEmails extends Component {
     } else {
       this.setState({searchOn: false});
     }
+  }
+
+  onSendAllEmails() {
+    const previewEmails = this.state.searchOn ? this.state.results : this.props.previewEmails;
+    window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
+    this.props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+  }
+
+  handleRecentTemplates() {
+    // save current email contentState and remove oldest one
+    const previewEmails = this.props.previewEmails;
+    const rightNow = new Date();
+    const templateName = `Sent on ${rightNow}`;
+
+    const templates = this.props.templates
+    .filter(template => template.date)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (templates.length === 5) {
+      // remove oldest recent template
+      const lastTemplate = templates[templates.length - 1];
+      this.props.toggleArchiveTemplate(lastTemplate.id);
+    }
+
+    // save current email contentState
+    this.props.createTemplate(
+      templateName,
+      previewEmails[0].subject,
+      JSON.stringify({type: 'DraftEditorState', date: rightNow, data: this.props.savedContentState})
+      );
   }
 
   render() {
@@ -67,16 +101,15 @@ class PreviewEmails extends Component {
     else if (searchOn) sendAllButtonLabel = 'Search in Progress';
     else if (previewEmails.length === 0) sendAllButtonLabel = 'Done';
 
-
     let renderNode;
     if (props.emailDidInvalidate) {
       renderNode = (
-        <div>
+        <div className='horizontal-center vertical-center' style={styles.fillScreen} >
           An error occurred with generating previews of the emails.
         </div>);
     } else if (previewEmails.length === 0) {
       renderNode = (
-        <div className='horizontal-center vertical-center' style={{height: '100%', width: '100%'}}>
+        <div className='horizontal-center vertical-center' style={styles.fillScreen}>
           <span>All done.</span>
         </div>);
     } else {
@@ -95,15 +128,16 @@ class PreviewEmails extends Component {
           </div>
           <span className='smalltext right' style={{color: grey700}}>Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails</span>
         </div>
-        <div style={{margin: '8px 0 15px 0'}}>
+        <div style={styles.attachmentContainer}>
           <span className='text' style={{marginLeft: 10}} >Attachments:</span>
-      {props.attachments.length > 0 ? props.attachments.map(file =>
-          <span key={file.name} style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>{file.name}</span>) : <span style={{color: grey700, fontSize: '0.8em', margin: '0 3px'}}>None</span>}
+      {props.attachments.length > 0 ?
+        props.attachments.map(file =>
+          <span key={file.name} className='smalltext' style={styles.attachmentText}>{file.name}</span>) : <span className='smalltext' style={styles.attachmentText}>None</span>}
           <div className='vertical-center'>
           {props.attachmentIsReceiving &&
-            <span className='smalltext' style={{color: grey700, marginLeft: 15}}>Attaching files...</span>}
+            <span className='smalltext' style={styles.loadingText}>Attaching files...</span>}
           {props.finishedAttaching &&
-            <span className='smalltext' style={{color: grey700, marginLeft: 15}}>Succesfully attached.</span>}
+            <span className='smalltext' style={styles.loadingText}>Succesfully attached.</span>}
           </div>
         </div>
         {previewEmails.map((email, i) =>
@@ -129,7 +163,7 @@ class PreviewEmails extends Component {
 
     return (
       <div>
-        <div className='vertical-center' style={{padding: '5px 20px', backgroundColor: blueGrey50}} >
+        <div className='vertical-center' style={styles.topbarContainer} >
           <div>
             <IconButton
             onClick={props.onBack}
@@ -144,28 +178,45 @@ class PreviewEmails extends Component {
             label={sendAllButtonLabel}
             primary
             icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
-            labelStyle={{textTransform: 'none'}}
-            onClick={_ => {
-              window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: sendLater});
-              props.onSendAllEmailsClick(previewEmails.map(email => email.id));
-            }}
+            labelStyle={styles.textTransformNone}
+            onClick={this.onSendAllEmails}
             />
           </div>
         </div>
-        <div style={{padding: 10, marginBottom: 40}} >
+        <div style={styles.bodyContainer} >
           {renderNode}
         </div>
       </div>);
   }
 }
 
+const styles = {
+  loadingText: {color: grey700, marginLeft: 15},
+  attachmentText: {color: grey700, margin: '0 3px'},
+  textTransformNone: {textTransform: 'none'},
+  topbarContainer: {padding: '5px 20px', backgroundColor: blueGrey50},
+  bodyContainer: {padding: 10, marginBottom: 40},
+  fillScreen: {height: '100%', width: '100%'},
+  attachmentContainer: {margin: '8px 0 15px 0'},
+};
+
 const mapStateToProps = (state, props) => {
+  const templates = state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived);
   return {
     emailDidInvalidate: state.stagingReducer.didInvalidate,
     attachmentDidInvalidate: state.emailAttachmentReducer.didInvalidate,
     attachmentIsReceiving: state.emailAttachmentReducer.isReceiving,
     attachments: state.emailAttachmentReducer.attached,
-    finishedAttaching: state.emailAttachmentReducer.finished
+    finishedAttaching: state.emailAttachmentReducer.finished,
+    savedContentState: state.emailDraftReducer.editorState,
+    templates: templates,
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {
+    createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
+    toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
   };
 };
 

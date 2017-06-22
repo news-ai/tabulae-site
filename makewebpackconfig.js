@@ -4,6 +4,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 // var AppCachePlugin = require('appcache-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CompressionPlugin = require('compression-webpack-plugin');
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // var SentryPlugin = require('webpack-sentry-plugin');
 
 module.exports = function(options) {
@@ -64,7 +65,6 @@ module.exports = function(options) {
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('production')
-          // NODE_ENV: JSON.stringify('development')
         }
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
@@ -75,6 +75,7 @@ module.exports = function(options) {
         threshold: 10240,
         minRatio: 0
       }),
+      // new BundleAnalyzerPlugin()
     ];
   } else {
     entry = [
