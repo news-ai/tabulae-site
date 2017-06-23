@@ -6,62 +6,30 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 import FlatButton from 'material-ui/FlatButton';
+import timezones from './timezones';
 
 import moment from 'moment-timezone';
 import 'node_modules/react-datepicker/dist/react-datepicker.css';
 
 const FORMAT = 'dddd, MMMM D, YYYY';
+import alertify from 'alertifyjs';
 
 const hours = [];
 for (let i = 0; i < 24; i++) {
-  hours.push(<MenuItem value={i} key={`hour-${i}`} primaryText={`${i}`} />);
+  const text = i < 10 ? `0${i}` : `${i}`;
+  hours.push(<MenuItem value={i} key={`hour-${i}`} primaryText={text} />);
 }
 
 const minutes = [];
 for (let i = 0; i < 60; i++) {
-  minutes.push(<MenuItem value={i} key={`minute-${i}`} primaryText={`${i}`} />);
+  const text = i < 10 ? `0${i}` : `${i}`;
+  minutes.push(<MenuItem value={i} key={`minute-${i}`} primaryText={text} />);
 }
 
 const DATE_FORMAT = 'YYYY-MM-DD HH:mm';
-const UTC_ZONE = 'Europe/London';
 
-const TIMEZONE_NAMES = [
-  {offset: -12.0, text: 'Pacific/Kwajalein'},
-  {offset: -11.0, text: 'Pacific/Samoa'},
-  {offset: -10.0, text: 'Pacific/Honolulu'},
-  {offset: -9.0, text: 'America/Anchorage'},
-  {offset: -8.0, text: 'America/Los_Angeles'},
-  {offset: -7.0, text: 'America/Denver'},
-  {offset: -6.0, text: 'America/Chicago'},
-  {offset: -5.0, text: 'America/New_York'},
-  {offset: -4.0, text: 'Canada/Atlantic'},
-  {offset: -3.5, text: 'Canada/Newfoundland'},
-  {offset: -3.0, text: 'America/Buenos_Aires'},
-  {offset: -2.0, text: 'America/Noronha'},
-  {offset: -1.0, text: 'Atlantic/Azores'},
-  {offset: 0.0, text: 'Europe/London'},
-  {offset: 1.0, text: 'Europe/Brussels'},
-  {offset: 2.0, text: 'Europe/Copenhagen'},
-  {offset: 3.0, text: 'Europe/Moscow'},
-  {offset: 3.5, text: 'Asia/Tehran'},
-  {offset: 4.0, text: 'Asia/Dubai'},
-  {offset: 4.5, text: 'Asia/Kabul'},
-  {offset: 5.0, text: 'Asia/Ashkhabad'},
-  {offset: 5.5, text: 'Asia/Calcutta'},
-  {offset: 5.75, text: 'Asia/Katmandu'},
-  {offset: 6.0, text: 'Asia/Thimbu'},
-  {offset: 6.5, text: 'Asia/Rangoon'},
-  {offset: 7.0, text: 'Asia/Bangkok'},
-  {offset: 8.0, text: 'Asia/Taipei'},
-  {offset: 9.0, text: 'Asia/Tokyo'},
-  {offset: 9.5, text: 'Australia/Darwin'},
-  {offset: 10.0, text: 'Australia/Victoria'},
-  {offset: 11.0, text: 'Asia/Magadan'},
-  {offset: 12.0, text: 'Pacific/Auckland'}
-];
-
-const timezones = TIMEZONE_NAMES
-.map((timezone, i) => <MenuItem value={timezone.text} key={`timezone-${i}`} primaryText={timezone.text}/>);
+const timezoneMenuItems = Object.keys(timezones)
+.map((timezone, i) => <MenuItem value={timezones[timezone]} key={`timezone-${i}`} primaryText={timezone}/>);
 
 class DatePickerHOC extends Component {
   constructor(props) {
@@ -74,7 +42,7 @@ class DatePickerHOC extends Component {
       hour: rightNow.hours(),
       minute: rightNow.minutes(),
       toggled: false,
-      timezone: TIMEZONE_NAMES[7].text,
+      timezone: moment.tz.guess(),
     };
     this.onToggle = this._onToggle.bind(this);
     this.onRequestOpen = this._onRequestOpen.bind(this);
@@ -85,11 +53,25 @@ class DatePickerHOC extends Component {
   }
 
   _onToggle(e, toggled) {
-    const state = this.state;
     if (!toggled) this.props.clearUTCTime();
-    const date = moment(state.date).minutes(state.minute).hour(state.hour);
-    if (date < moment()) {
-      alert(`Can't select date that is earlier than right now. Please pick another time.`);
+    const now = moment();
+    console.log(this.state.date);
+
+    const date = this.state.date;
+    const datestring = date.format(DATE_FORMAT);
+    const localtime = moment.tz(datestring, this.state.timezone);
+
+    if (localtime < now) {
+      alertify.alert(
+        `Selected Time Passed`,
+        `<span>
+        You selected <span style="color:red">${localtime.format(DATE_FORMAT)}</span>,
+        but it is currently <span style="color:red">${now.tz(this.state.timezone).format(DATE_FORMAT)}</span> in <span style="color:green">${this.state.timezone}</span>.
+        </span><br/>
+        <span>
+        Please pick another time.
+        </span>`
+        );
     } else {
       this.setState({toggled});
     }
@@ -136,19 +118,17 @@ class DatePickerHOC extends Component {
         <Dialog actions={[<FlatButton label='Close' onClick={this.onRequestClose}/>]}
         title='Schedule for Later' autoScrollBodyContent open={state.open} onRequestClose={this.onRequestClose}>
           <div className='horizontal-center' style={{margin: '20px 0'}}>
-            <DatePicker
-            inline
-            onChange={date => this.setState({date})}
-            selected={state.date}
-            />
+            <DatePicker inline onChange={date => this.setState({date})} selected={state.date} />
           </div>
           <div className='horizontal-center'>
             <div className='vertical-center'>
-             {m.isValid() && <span style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
+             {m.isValid() &&
+              <span className='text' style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
             </div>
           </div>
           <div className='horizontal-center'>
-            <div className='vertical-center' style={{margin: '5px 0'}}>
+            <div className='vertical-center'>
+              <span>Time</span>
               <DropDownMenu maxHeight={200} value={state.hour} onChange={(e, i, hour) => this.setState({date: state.date.hours(hour), hour})}>
                 {hours}
               </DropDownMenu> : 
@@ -158,15 +138,20 @@ class DatePickerHOC extends Component {
             </div>
           </div>
           <div className='horizontal-center'>
-            <div>
-              <div className='vertical-center'>
-                <span>Timezone Selection: </span>
-                <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
-                  {timezones}
-                </DropDownMenu>
-              </div>
-              <Toggle style={{margin: '10px 0'}} onToggle={this.onToggle} toggled={state.toggled} label='Schedule to send at this time'/>
+            <div className='vertical-center'>
+              <span>Timezone</span>
+              <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
+                {timezoneMenuItems}
+              </DropDownMenu>
             </div>
+          </div>
+          <div className='horizontal-center'>
+            <div className='vertical-center'>
+              <span className='smalltext' style={{marginTop: 10}}>*US timezones will automatically adjust with Daylight Saving</span>
+            </div>
+          </div>
+          <div className='horizontal-center' >
+            <Toggle style={{marginTop: 20, width: '50%'}} onToggle={this.onToggle} toggled={state.toggled} label='Schedule to send at this time'/>
           </div>
         </Dialog>
       {props.children({onRequestOpen: this.onRequestOpen})}
