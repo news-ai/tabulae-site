@@ -16,12 +16,14 @@ import alertify from 'alertifyjs';
 
 const hours = [];
 for (let i = 0; i < 24; i++) {
-  hours.push(<MenuItem value={i} key={`hour-${i}`} primaryText={`${i}`} />);
+  const text = i < 10 ? `0${i}` : `${i}`;
+  hours.push(<MenuItem value={i} key={`hour-${i}`} primaryText={text} />);
 }
 
 const minutes = [];
 for (let i = 0; i < 60; i++) {
-  minutes.push(<MenuItem value={i} key={`minute-${i}`} primaryText={`${i}`} />);
+  const text = i < 10 ? `0${i}` : `${i}`;
+  minutes.push(<MenuItem value={i} key={`minute-${i}`} primaryText={text} />);
 }
 
 const DATE_FORMAT = 'YYYY-MM-DD HH:mm';
@@ -119,11 +121,13 @@ class DatePickerHOC extends Component {
           </div>
           <div className='horizontal-center'>
             <div className='vertical-center'>
-             {m.isValid() && <span style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
+             {m.isValid() &&
+              <span className='text' style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
             </div>
           </div>
           <div className='horizontal-center'>
-            <div className='vertical-center' style={{margin: '5px 0'}}>
+            <div className='vertical-center'>
+              <span>Time</span>
               <DropDownMenu maxHeight={200} value={state.hour} onChange={(e, i, hour) => this.setState({date: state.date.hours(hour), hour})}>
                 {hours}
               </DropDownMenu> : 
@@ -135,12 +139,12 @@ class DatePickerHOC extends Component {
           <div className='horizontal-center'>
             <div>
               <div className='vertical-center'>
-                <span>Timezone Selection: </span>
+                <span>Timezone</span>
                 <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
                   {timezoneMenuItems}
                 </DropDownMenu>
               </div>
-              <Toggle style={{margin: '10px 0'}} onToggle={this.onToggle} toggled={state.toggled} label='Schedule to send at this time'/>
+              <Toggle style={{margin: '20px 0'}} onToggle={this.onToggle} toggled={state.toggled} label='Schedule to send at this time'/>
             </div>
           </div>
         </Dialog>
