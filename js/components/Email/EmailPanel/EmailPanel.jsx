@@ -18,6 +18,8 @@ import isEmail from 'validator/lib/isEmail';
 import isEmpty from 'lodash/isEmpty';
 import isJSON from 'validator/lib/isJSON';
 
+import Select from 'react-select';
+
 import VirtualizedSelect from 'react-virtualized-select';
 import ReactTooltip from 'react-tooltip'
 import RaisedButton from 'material-ui/RaisedButton';
@@ -58,37 +60,21 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
     alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
   });
 
-function NameOptionRenderer ({ focusedOption, focusedOptionIndex, focusOption, key, labelKey, option, optionIndex, options, selectValue, style, valueArray }) {
+function NameOptionRenderer (option) {
   const classNames = ['nameOption'];
 
   if (option.type === 'header') {
     classNames.push('nameHeader');
 
     return (
-      <div
-        className={classNames.join(' ')}
-        key={key}
-        style={style}
-      >
+      <div className={classNames.join(' ')} >
         {option.label}
       </div>
     )
   } else {
-    if (option === focusedOption) {
-      classNames.push('nameOptionFocused');
-    }
-    if (valueArray.indexOf(option) >= 0) {
-      classNames.push('nameOptionSelected');
-    }
 
     return (
-      <div
-        className={classNames.join(' ')}
-        key={key}
-        onClick={() => selectValue(option)}
-        onMouseOver={() => focusOption(option)}
-        style={style}
-      >
+      <div className={classNames.join(' ')} >
         {option.label}
       </div>
     )
@@ -485,9 +471,9 @@ class EmailPanel extends Component {
         return {recent, saved};
       }, {recent: [], saved: []});
       options = [
-        {label: 'Recently Sent Emails', type: 'header'},
+        {label: 'Recently Sent Emails', type: 'header', disabled: true},
         ...recent,
-        {label: 'Saved Templates', type: 'header'},
+        {label: 'Saved Templates', type: 'header', disabled: true},
         ...saved
       ]
     }
@@ -549,14 +535,13 @@ class EmailPanel extends Component {
           zIndex: 500,
           backgroundColor: blueGrey50,
         }} >
-          <div className='select-up' style={{width: 300}} >
-            <VirtualizedSelect
+          <div className='select-up' style={{width: 350}} >
+            <Select
             labelKey='label'
             valueKey='value'
             maxHeight={200}
             options={options}
             optionRenderer={NameOptionRenderer}
-            optionHeight={({option}) => option.type === 'header' ? 35 : 35}
             onChange={this.handleTemplateChange}
             value={state.currentTemplateId}
             />
