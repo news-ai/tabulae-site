@@ -55,6 +55,7 @@ class DatePickerHOC extends Component {
   _onToggle(e, toggled) {
     if (!toggled) this.props.clearUTCTime();
     const now = moment();
+    console.log(this.state.date);
 
     const date = this.state.date;
     const datestring = date.format(DATE_FORMAT);
@@ -137,15 +138,20 @@ class DatePickerHOC extends Component {
             </div>
           </div>
           <div className='horizontal-center'>
-            <div>
-              <div className='vertical-center'>
-                <span>Timezone</span>
-                <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
-                  {timezoneMenuItems}
-                </DropDownMenu>
-              </div>
-              <Toggle style={{margin: '20px 0'}} onToggle={this.onToggle} toggled={state.toggled} label='Schedule to send at this time'/>
+            <div className='vertical-center'>
+              <span>Timezone</span>
+              <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
+                {timezoneMenuItems}
+              </DropDownMenu>
             </div>
+          </div>
+          <div className='horizontal-center'>
+            <div className='vertical-center'>
+              <span className='smalltext' style={{marginTop: 10}}>*US timezones will automatically adjust with Daylight Saving</span>
+            </div>
+          </div>
+          <div className='horizontal-center' >
+            <Toggle style={{marginTop: 20, width: '50%'}} onToggle={this.onToggle} toggled={state.toggled} label='Schedule to send at this time'/>
           </div>
         </Dialog>
       {props.children({onRequestOpen: this.onRequestOpen})}
