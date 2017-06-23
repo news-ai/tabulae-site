@@ -10,7 +10,7 @@ import FlatButton from 'material-ui/FlatButton';
 import moment from 'moment-timezone';
 import 'node_modules/react-datepicker/dist/react-datepicker.css';
 
-const FORMAT = 'dddd, MMMM';
+const FORMAT = 'dddd, MMMM D, YYYY';
 
 const hours = [];
 for (let i = 0; i < 24; i++) {
@@ -143,16 +143,22 @@ class DatePickerHOC extends Component {
             />
           </div>
           <div className='horizontal-center'>
+            <div className='vertical-center'>
+             {m.isValid() && <span style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
+            </div>
+          </div>
+          <div className='horizontal-center'>
+            <div className='vertical-center' style={{margin: '5px 0'}}>
+              <DropDownMenu maxHeight={200} value={state.hour} onChange={(e, i, hour) => this.setState({date: state.date.hours(hour), hour})}>
+                {hours}
+              </DropDownMenu> : 
+              <DropDownMenu maxHeight={200} value={state.minute} onChange={(e, i, minute) => this.setState({date: state.date.minutes(minute), minute})}>
+                {minutes}
+              </DropDownMenu>
+            </div>
+          </div>
+          <div className='horizontal-center'>
             <div>
-              <div className='vertical-center' style={{margin: '5px 0'}}>
-               {m.isValid() && <span style={{margin: '0 5px'}}>{m.format(FORMAT)}</span>}
-                <DropDownMenu maxHeight={200} value={state.hour} onChange={(e, i, hour) => this.setState({date: state.date.hours(hour), hour})}>
-                  {hours}
-                </DropDownMenu> : 
-                <DropDownMenu maxHeight={200} value={state.minute} onChange={(e, i, minute) => this.setState({date: state.date.minutes(minute), minute})}>
-                  {minutes}
-                </DropDownMenu>
-              </div>
               <div className='vertical-center'>
                 <span>Timezone Selection: </span>
                 <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
