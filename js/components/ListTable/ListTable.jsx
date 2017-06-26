@@ -426,14 +426,15 @@ class ListTable extends Component {
     const {columnIndex, rowIndex, key, style} = cellProps;
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
+    const contact = contacts[rowIndex];
     let content = _getter(contacts[rowIndex], fieldObj) || '';
     // switch row to different color classname if it is search result
     let className = classNames(
       'vertical-center',
       'cell',
-      {evenRow: !contacts[rowIndex].isSearchResult && rowIndex % 2 === 0},
-      {oddRow: !contacts[rowIndex].isSearchResult && rowIndex % 2 === 0},
-      {findresult: contacts[rowIndex].isSearchResult}
+      {evenRow: contact && !contact.isSearchResult && rowIndex % 2 === 0},
+      {oddRow: contact && !contact.isSearchResult && rowIndex % 2 === 0},
+      {findresult: contact && contacts[rowIndex].isSearchResult}
       );
 
     let contentBody;
