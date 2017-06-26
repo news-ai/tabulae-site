@@ -75,6 +75,15 @@ module.exports = function(options) {
         threshold: 10240,
         minRatio: 0
       }),
+      // new SentryPlugin({
+      //   organisation: 'juliepan',
+      //   project: 'tabulae-site',
+      //   apiKey: process.env.SENTRY_API_KEY,
+      //   // Release version name/hash is required
+      //   release: function() {
+      //     return process.env.CIRCLE_SHA1
+      //   }
+      // })
       // new BundleAnalyzerPlugin()
     ];
   } else {
@@ -103,7 +112,7 @@ module.exports = function(options) {
 
   return {
     bail: true,
-    devtool: options.prod ? 'inline-source-map' : 'eval-cheap-module-source-map',
+    devtool: options.prod ? 'hidden-source-map' : 'eval-cheap-module-source-map',
     entry: entry,
     output: { // Compile into js/build.js
       path: path.resolve(__dirname, 'build'),
