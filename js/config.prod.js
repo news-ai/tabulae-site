@@ -1,1 +1,1 @@
-window.isDev = false;
+process.env.NODE_ENV === 'development' = false;

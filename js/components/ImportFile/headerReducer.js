@@ -3,7 +3,7 @@ import {initialState} from '../../reducers/initialState';
 import {assignToEmpty} from '../../utils/assign';
 
 function headerReducer(state = initialState.headerReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let obj;
   switch (action.type) {
@@ -18,7 +18,7 @@ function headerReducer(state = initialState.headerReducer, action) {
       obj[action.listId] = action.headers;
       return obj;
     case headerConstant.REQUEST_FAIL:
-      if (!window.isDev) {
+      if (process.env.NODE_ENV === 'production') {
         window.Intercom('trackEvent', 'headers_upload_error');
         Raven.captureException(action.error);
       }

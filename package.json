@@ -146,6 +146,7 @@
     "test:watch": "node --harmony_proxies node_modules/.bin/jest --watch",
     "test:coverage": "node --harmony_proxies node_modules/.bin/jest --coverage",
     "start": "cross-env NODE_ENV=development node server.dev.js",
+    "deploy-sourcemap": "sentry-cli releases files $CIRCLE_SHA1 upload-sourcemaps ./build/main.js.map",
     "build": "npm run test && cross-env NODE_ENV=production webpack --config webpack.prod.config.js --progress --colors",
     "serve": "cross-env NODE_ENV=production node server.prod.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2"

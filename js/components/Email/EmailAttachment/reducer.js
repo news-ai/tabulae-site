@@ -2,7 +2,7 @@ import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
 function emailAttachmentReducer(state = initialState.emailAttachmentReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
   switch (action.type) {
     case 'SET_ATTACHMENTS':
       return assignToEmpty(state, {attached: action.files});

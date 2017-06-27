@@ -13,7 +13,7 @@ import {initialState} from 'reducers/initialState';
 
 
 function listReducer(state = initialState.listReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let unarchivedLists = [];
   let archivedLists = [];

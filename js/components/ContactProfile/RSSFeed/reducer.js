@@ -3,7 +3,7 @@ import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
 function feedReducer(state = initialState.feedReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let obj;
   switch (action.type) {

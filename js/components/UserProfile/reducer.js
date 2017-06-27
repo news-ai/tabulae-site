@@ -2,7 +2,7 @@ import {initialState} from '../../reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
 function smtpReducer(state = initialState.smtpReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
   let obj;
   switch (action.type) {
     case 'VERTIFY_SMTP_EMAIL':

@@ -76,7 +76,7 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
-      const appId = window.isDev ? 'eh8247hf' : 'ur8dbk9e';
+      const appId = process.env.NODE_ENV === 'development' ? 'eh8247hf' : 'ur8dbk9e';
       intercomSetup({
         app_id: appId,
         email: nextProps.person.email,
@@ -84,7 +84,7 @@ class App extends Component {
         custom_launcher_selector: '#custom_intercom_launcher',
         user_id: nextProps.person.id
       });
-      if (!window.isDev) {
+      if (process.env.NODE_ENV === 'production') {
         Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
         Raven.setUserContext({email: nextProps.person.email, id: nextProps.person.id});
       }

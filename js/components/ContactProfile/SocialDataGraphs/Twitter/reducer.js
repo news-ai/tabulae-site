@@ -3,7 +3,7 @@ import {initialState} from '../../../../reducers/initialState';
 import {assignToEmpty} from '../../../../utils/assign';
 
 function twitterDataReducer(state = initialState.twitterDataReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let obj;
   let oldContact, filteredData;

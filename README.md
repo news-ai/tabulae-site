@@ -1,5 +1,5 @@
 # tabulae-site
-remember to upload sourcemap to Sentry after merge to production:
+Remember to upload sourcemap to Sentry after merge to production:
 
 
 ```
