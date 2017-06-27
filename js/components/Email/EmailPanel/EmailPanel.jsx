@@ -515,6 +515,7 @@ class EmailPanel extends Component {
             valueKey='value'
             maxHeight={200}
             options={options}
+            placeholder='Select Email Template'
             optionRenderer={NameOptionRenderer}
             onChange={this.handleTemplateChange}
             value={state.currentTemplateId}
