@@ -109,13 +109,11 @@ class EmailPanel extends Component {
       isPreveiwOpen: false,
       dirty: false,
     };
-    // this.toggleMinimize = _ => this.setState({minimized: !this.state.minimized});
     this.updateBodyHtml = (html, rawContentState) => {
       this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
       this.props.saveEditorState(rawContentState);
     };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
-    // this.handleTemplateValueChange = this._handleTemplateValueChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -243,31 +241,6 @@ class EmailPanel extends Component {
     }, 1000);
   }
 
-  // _handleTemplateValueChange(event, index, value) {
-  //   if (value !== 0) {
-  //     const template = find(this.props.templates, tmp => value === tmp.id);
-  //     const subjectHtml = template.subject;
-  //     const bodyHtml = template.body;
-  //     if (isJSON(template.body)) {
-  //       const templateJSON = JSON.parse(template.body);
-  //       this.setState({bodyEditorState: templateJSON.data});
-  //       this.props.saveEditorState(templateJSON.data);
-  //       this.setState({subjectHtml});
-  //     } else {
-  //       this.props.setBodyHtml(bodyHtml);
-  //       this.setState({bodyHtml, subjectHtml});
-  //     }
-  //   } else {
-  //     this.setState({bodyHtml: '', subjectHtml: ''});
-  //   }
-  //   this.setState({currentTemplateId: value});
-  //   this.props.turnOnTemplateChange();
-  //   setTimeout(_ => {
-  //     this.changeEmailSignature(this.props.emailsignature)
-  //     this.setState({dirty: false});
-  //   }, 1000);
-  // }
-
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
     let emptyFields = [];
     const contactEmails = selectedContacts.reduce((acc, contact, i) => {
@@ -365,6 +338,7 @@ class EmailPanel extends Component {
       else invalidEmailContacts.push(contact);
     });
     const {contactEmails, emptyFields} = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
+    console.log(emptyFields);
 
     Promise.resolve()
     .then(_ =>
@@ -541,6 +515,7 @@ class EmailPanel extends Component {
             valueKey='value'
             maxHeight={200}
             options={options}
+            placeholder='Select Email Template'
             optionRenderer={NameOptionRenderer}
             onChange={this.handleTemplateChange}
             value={state.currentTemplateId}
