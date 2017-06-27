@@ -9,7 +9,7 @@ import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
 function contactReducer(state = initialState.contactReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
   let obj;
   switch (action.type) {
     case contactConstant.MANUALLY_SET_ISRECEIVING_ON:

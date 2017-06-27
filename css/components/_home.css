@@ -164,3 +164,17 @@ input {
 .hovergray:hover {
   background-color: #FAFAFA;
 }
+
+.ReactTags__selected .ReactTags__tag {
+  background-color: #EEEEEE;
+  border-radius: 5%;
+  border-bottom: 1px solid #BDBDBD;
+  border-right: 1px solid #BDBDBD;
+  font-size: 0.9em;
+  padding: 3px 5px;
+  margin-right: 5px;
+}
+
+.ReactTags__selected .ReactTags__remove {
+  margin-left: 3px;
+}

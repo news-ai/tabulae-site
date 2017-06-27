@@ -7,7 +7,7 @@ import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
 function publicationProfileReducer(state = initialState.publicationProfileReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let obj;
   switch (action.type) {

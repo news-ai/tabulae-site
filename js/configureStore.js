@@ -6,7 +6,7 @@ import rootReducer from './reducers/rootReducer';
 
 export default function configureStore() {
 	const loggerMiddleware = createLogger();
-	const createStoreWithMiddleware = (window.isDev) ?
+	const createStoreWithMiddleware = (process.env.NODE_ENV === 'development') ?
 	  applyMiddleware(
       thunk,
       loggerMiddleware

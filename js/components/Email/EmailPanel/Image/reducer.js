@@ -3,7 +3,7 @@ import {assignToEmpty} from 'utils/assign';
 import {imgConstant} from './constants';
 
 function emailImageReducer(state = initialState.emailImageReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let obj;
   switch (action.type) {

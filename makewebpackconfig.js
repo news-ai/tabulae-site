@@ -14,8 +14,6 @@ module.exports = function(options) {
   if (options.prod) {
     entry = [
       'babel-polyfill',
-      path.resolve(__dirname, 'js/config.shared.js'),
-      path.resolve(__dirname, 'js/config.prod.js'),
       path.resolve(__dirname, 'js/app.js')
     ];
     cssLoaders = ExtractTextPlugin.extract({
@@ -64,7 +62,8 @@ module.exports = function(options) {
       new ExtractTextPlugin('css/main.css'),
       new webpack.DefinePlugin({
         'process.env': {
-          NODE_ENV: JSON.stringify('production')
+          NODE_ENV: JSON.stringify('production'),
+          CIRCLE_SHA1: JSON.stringify(process.env.CIRCLE_SHA1)
         }
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
@@ -75,23 +74,12 @@ module.exports = function(options) {
         threshold: 10240,
         minRatio: 0
       }),
-      // new SentryPlugin({
-      //   organisation: 'juliepan',
-      //   project: 'tabulae-site',
-      //   apiKey: process.env.SENTRY_API_KEY,
-      //   // Release version name/hash is required
-      //   release: function() {
-      //     return process.env.CIRCLE_SHA1
-      //   }
-      // })
       // new BundleAnalyzerPlugin()
     ];
   } else {
     entry = [
       'webpack-dev-server/client?http://localhost:3000',
       'webpack/hot/only-dev-server',
-      path.resolve(__dirname, 'js/config.shared.js'),
-      path.resolve(__dirname, 'js/config.dev.js'),
       path.resolve(__dirname, 'js/app.js')
     ];
     cssLoaders = [
@@ -106,7 +94,12 @@ module.exports = function(options) {
         template: 'index.html',
         inject: true,
         favicon: 'favicon.ico',
-      })
+      }),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('development'),
+        }
+      }),
     ];
   }
 

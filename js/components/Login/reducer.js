@@ -7,7 +7,7 @@ import {initialState} from 'reducers/initialState';
 import {assignToEmpty} from 'utils/assign';
 
 function personReducer(state=initialState.personReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
   switch (action.type) {
     case loginConstant.REQUEST:
       return assignToEmpty(state, {isReceiving: true});

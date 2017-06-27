@@ -6,7 +6,7 @@ const IS_FETCHING_DONE = 'IS_FETCHING_DONE';
 
 
 function isFetchingReducer(state = initialState.isFetchingReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
   let obj;
   switch (action.type) {
     case IS_FETCHING:

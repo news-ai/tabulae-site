@@ -13,7 +13,7 @@
 // import 'file-loader?name=[name].[ext]!../.htaccess';
 
 // Check for ServiceWorker support before trying to install it
-// if (!window.isDev) {
+// if (process.env.NODE_ENV === 'production') {
 //   if ('serviceWorker' in navigator) {
 //     navigator.serviceWorker.register('/serviceworker.js')
 //     .then(
@@ -78,13 +78,20 @@ import '../css/main.css';
 
 const store = configureStore();
 
-window.TABULAE_API_BASE = window.isDev ? `https://dev-dot-newsai-1166.appspot.com/api` : `https://tabulae.newsai.org/api`;
-window.TABULAE_HOME = window.isDev ? `https://tabulae-dev.newsai.co` : `https://tabulae.newsai.co`;
+window.TABULAE_API_BASE = process.env.NODE_ENV === 'development' ? `https://dev-dot-newsai-1166.appspot.com/api` : `https://tabulae.newsai.org/api`;
+window.TABULAE_HOME = process.env.NODE_ENV === 'development' ? `https://tabulae-dev.newsai.co` : `https://tabulae.newsai.co`;
 
 
 // third-party services setups
-if (!window.isDev) Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
-
+if (process.env.NODE_ENV === 'production') {
+  Raven.config(
+    'https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317',
+    {
+      // release: process.env.CIRCLE_SHA1,
+      environment: 'production'
+    }
+    ).install();
+}
 
 // Make reducers hot reloadable, see http://stackoverflow.com/questions/34243684/make-redux-reducers-and-other-non-components-hot-loadable
 if (module.hot) {

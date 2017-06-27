@@ -9,7 +9,7 @@ import {initialState} from '../../reducers/initialState';
 import {assignToEmpty} from '../../utils/assign';
 
 function fileReducer(state = initialState.fileReducer, action) {
-  if (window.isDev) Object.freeze(state);
+  if (process.env.NODE_ENV === 'development') Object.freeze(state);
 
   let obj;
   switch (action.type) {
@@ -26,7 +26,7 @@ function fileReducer(state = initialState.fileReducer, action) {
         didInvalidate: true,
         error: action.error
       });
-      if (!window.isDev) window.Intercom('trackEvent', 'file_upload_error', {error: JSON.stringify(action.error)});
+      if (process.env.NODE_ENV === 'production') window.Intercom('trackEvent', 'file_upload_error', {error: JSON.stringify(action.error)});
       return obj;
     case fileConstant.RECEIVE:
       obj = assignToEmpty(state, {});

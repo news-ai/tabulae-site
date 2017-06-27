@@ -108,7 +108,7 @@ export function fetchPerson() {
     return api.get('/users/me')
     .then(response => dispatch(receiveLogin(response.data)))
     .catch(message => {
-      if (window.isDev) console.log(message);
+      if (process.env.NODE_ENV === 'development') console.log(message);
     });
   };
 }
@@ -120,7 +120,7 @@ export function fetchUser(userId) {
     return api.get(`/users/${userId}`)
     .then(response => dispatch({type: 'RECEIVE_USER', user: response.data}))
     .catch(message => {
-      if (window.isDev) console.log(message);
+      if (process.env.NODE_ENV === 'development') console.log(message);
     });
   };
 }
@@ -140,7 +140,7 @@ export function patchPerson(personBody) {
     return api.patch(`/users/me`, personBody)
     .then(response => dispatch(receiveLogin(response.data)))
     .catch(message => {
-      if (window.isDev) console.log(message);
+      if (process.env.NODE_ENV === 'development') console.log(message);
     });
   };
 }
