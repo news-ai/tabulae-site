@@ -87,7 +87,7 @@ if (process.env.NODE_ENV === 'production') {
   Raven.config(
     'https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317',
     {
-      // release: process.env.CIRCLE_SHA1,
+      release: '0.0.1',
       environment: 'production'
     }
     ).install();
