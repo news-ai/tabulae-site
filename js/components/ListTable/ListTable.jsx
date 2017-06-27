@@ -114,7 +114,7 @@ class ListTable extends Component {
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
     }
     this.onSearchClick = e => {
-      const searchValue = this.refs.searchValue.input.value;
+      const searchValue = this.searchValue.input.value;
       if (searchValue.length === 0) {
         this.props.router.push(`/tables/${props.listId}`);
         this.onSearchClearClick();
@@ -661,8 +661,9 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    console.log(props.querySelected);
     return (
-      <div style={{marginTop: 10}}>
+      <div style={styles.container}>
         {
           props.firstTimeUser &&
           <Dialog open={state.firsttime} modal onRequestClose={_ => this.setState({firsttime: false})}>
@@ -813,11 +814,11 @@ class ListTable extends Component {
           <div className='large-4 columns vertical-center'>
             <TextField
             id='search-input'
-            ref='searchValue'
+            ref={ref => this.searchValue = ref}
             hintText='Search...'
             onKeyDown={e => {
               if (e.key === 'Enter') {
-                const searchValue = this.refs.searchValue.input.value;
+                const searchValue = this.searchValue.input.value;
                 props.router.push(`/tables/${props.listId}?search=${searchValue}`);
                 this.setState({searchValue});
               }
@@ -834,7 +835,7 @@ class ListTable extends Component {
             tooltipPosition='top-center'
             style={{marginLeft: 5}}
             onClick={e => {
-              const searchValue = this.refs.searchValue.input.value;
+              const searchValue = this.searchValue.input.value;
               if (searchValue.length === 0) {
                 this.props.router.push(`/tables/${props.listId}`);
                 this.onSearchClearClick();
@@ -895,8 +896,8 @@ class ListTable extends Component {
         <Drawer
         openSecondary
         docked={false}
-        containerStyle={{zIndex: 400, backgroundColor: '#ffffff'}}
-        overlayStyle={{zIndex: 300}}
+        containerStyle={styles.drawer.container}
+        overlayStyle={styles.drawer.overlay}
         width={800}
         open={state.isEmailPanelOpen}
         onRequestChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
@@ -979,6 +980,11 @@ class ListTable extends Component {
 }
 
 const styles = {
+  drawer: {
+    container: {zIndex: 400, backgroundColor: '#ffffff'},
+    overlay: {zIndex: 300}
+  },
+  container: {marginTop: 10},
   emailPanelDragHandle: {
     zIndex: 400,
     position: 'fixed',
@@ -1032,6 +1038,8 @@ const mapStateToProps = (state, props) => {
 
   const rawFieldsmap = generateTableFieldsmap(listData);
 
+  const querySelected = props.location.query.selected ? props.location.query.selected.split(',') : undefined;
+
   return {
     received,
     searchQuery,
@@ -1047,6 +1055,7 @@ const mapStateToProps = (state, props) => {
     firstTimeUser: state.personReducer.firstTimeUser,
     contactReducer: state.contactReducer,
     listDidInvalidate: state.listReducer.didInvalidate,
+    querySelected
   };
 };
 

@@ -425,6 +425,8 @@ export function fetchListEmails(listId) {
 }
 
 export function fetchSearchSentEmails(query) {
+  if (query.baseSubject) query.baseSubject = encodeURIComponent(query.baseSubject);
+  if (query.subject) query.subject = encodeURIComponent(query.subject);
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     let OFFSET = 0;
@@ -538,6 +540,8 @@ export function fetchSpecificDayEmails(day) {
 // -------------------------------------------------
 
 function createQueryUrl(query) {
+  if (query.baseSubject) query.baseSubject = encodeURIComponent(query.baseSubject);
+  if (query.subject) query.subject = encodeURIComponent(query.subject);
   let keys = Object.keys(query);
   if (keys.some(key => key === 'subject')) {
     keys = [...keys.filter(key => key !== 'subject'), 'subject'];
