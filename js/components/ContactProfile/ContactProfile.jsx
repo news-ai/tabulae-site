@@ -74,7 +74,7 @@ class ContactProfile extends Component {
     .then(_ => {
       const {contact} = this.props;
       window.Intercom('trackEvent', 'checking_contact_profile', {contactId: contact.id});
-      mixpanel.track(checking_contact_profile', {contactId: contact.id});
+      mixpanel.track('checking_contact_profile', {contactId: contact.id});
       this.setState({notes: contact.notes});
     });
     this.props.fetchContactFeeds(this.props.contactId);
