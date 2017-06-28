@@ -72,7 +72,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-    mixpanel.track('test first event');
   }
 
   componentWillReceiveProps(nextProps) {
