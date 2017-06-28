@@ -49,6 +49,7 @@ class DatePickerHOC extends Component {
     this.onRequestClose = this._onRequestClose.bind(this);
     this.onTimezoneChange = (e, i, timezone) => {
       window.Intercom('trackEvent', 'timezone_switch', {timezone});
+      mixpanel.track('timezone_switch', {timezone});
       this.setState({timezone});
     };
   }

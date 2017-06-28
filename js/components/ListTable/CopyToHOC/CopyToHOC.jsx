@@ -36,6 +36,7 @@ class CopyToHOC extends Component {
     const contacts = this.props.selectedContacts.map(contact => contact.id);
     selectedLists.map(list => this.props.copyContactsToList(contacts, list.id));
     window.Intercom('trackEvent', 'copy_to_existing_sheet');
+    mixpanel.track('copy_to_existing_sheet');
   }
 
   _onNewSheetSubmit() {
@@ -55,6 +56,7 @@ class CopyToHOC extends Component {
       this.props.copyToNewList(contacts, listname);
     }
     window.Intercom('trackEvent', 'copy_to_new_sheet');
+    mixpanel.track('copy_to_new_sheet');
   }
 
   _onWholeSheetCopy() {
@@ -64,6 +66,7 @@ class CopyToHOC extends Component {
     else name = `${this.props.list.name} (Copy)`;
     this.props.copyEntireList(this.props.list.id, name);
     window.Intercom('trackEvent', 'copy_whole_sheet');
+    mixpanel.track('copy_whole_sheet');
   }
 
   render() {
@@ -196,6 +199,7 @@ const mapDispatchToProps = (dispatch, props) => {
     .catch(err => {
       console.log(err);
       window.Intercom('trackEvent', 'copy_error', {error: err.toString()});
+      mixpanel.track('copy_error', {error: err.toString()});
       alertify.alert('Error', 'An error occured. Copy unavailable at this moment.');
     });
   };
@@ -203,16 +207,19 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchLists: _ => dispatch(listActions.fetchLists()),
     copyToNewList: (contacts, name, fieldsmap) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
+      mixpanel.track('copy_some_contacts_to_new');
       return dispatch(listActions.createEmptyList(name, fieldsmap))
       .then(response => copyContactsToList(contacts, response.data.id));
     },
     copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
     .then(_ => {
       window.Intercom('trackEvent', 'copy_all_contacts_to_new');
+      mixpanel.track('copy_all_contacts_to_new');
       alertify.notify('Copy completed!', 'custom', 2, function(){});
     }),
     copyContactsToList: (contacts, listid) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
+      mixpanel.track('copy_some_contacts_to_existing');
       return copyContactsToList(contacts, listid);
     },
   };

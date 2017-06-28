@@ -35,6 +35,7 @@ class InstagramProfile extends Component {
     if (prevState.open === false && this.state.open === true) {
       // onRequestOpen hit
       window.Intercom('trackEvent', 'check_instagram_stats');
+      mixpanel.track('check_instagram_stats');
       if (!this.props.profile) this.props.fetchInstagram();
     }
   }

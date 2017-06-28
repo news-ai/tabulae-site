@@ -93,6 +93,8 @@ if (process.env.NODE_ENV === 'production') {
     ).install();
 }
 
+mixpanel.init(process.env.MIXPANEL_TOKEN);
+
 // Make reducers hot reloadable, see http://stackoverflow.com/questions/34243684/make-redux-reducers-and-other-non-components-hot-loadable
 if (module.hot) {
   module.hot.accept('./reducers/rootReducer', () => {

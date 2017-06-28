@@ -103,7 +103,15 @@ const Campaign = ({
       <div className='large-offset-9 medium-offset-8 small-offset-6 columns'>
         <div className='right'>
           <Link to={{pathname: '/emailstats/all', query}}>
-            <FlatButton primary label='See Emails' icon={<FontIcon className='fa fa-chevron-right'/>} onClick={_ => window.Intercom('trackEvent', 'check_campaign_emails')} />
+            <FlatButton
+            primary
+            label='See Emails'
+            icon={<FontIcon className='fa fa-chevron-right'/>}
+            onClick={_ => {
+              window.Intercom('trackEvent', 'check_campaign_emails');
+              mixpanel.track('check_campaign_emails');
+            }}
+            />
           </Link>
         </div>
       </div>

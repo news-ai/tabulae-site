@@ -20,6 +20,7 @@ function headerReducer(state = initialState.headerReducer, action) {
     case headerConstant.REQUEST_FAIL:
       if (process.env.NODE_ENV === 'production') {
         window.Intercom('trackEvent', 'headers_upload_error');
+        mixpanel.track('headers_upload_error');
         Raven.captureException(action.error);
       }
       return assignToEmpty(state, {

@@ -244,6 +244,7 @@ class EmailsList extends Component {
           tooltipPosition='top-center'
           onClick={_ => {
             window.Intercom('trackEvent', 'load_more_emails');
+            mixpanel.track('load_more_emails');
             props.fetchEmails();
           }}
           iconClassName='fa fa-chevron-down'

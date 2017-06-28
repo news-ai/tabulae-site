@@ -61,6 +61,7 @@ class PreviewEmails extends Component {
   onSendAllEmails() {
     const previewEmails = this.state.searchOn ? this.state.results : this.props.previewEmails;
     window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
+    mixpanel.track('sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
     this.props.onSendAllEmailsClick(previewEmails.map(email => email.id));
     this.handleRecentTemplates();
   }
@@ -162,6 +163,7 @@ class PreviewEmails extends Component {
           fieldsmap={props.fieldsmap}
           turnOnDraft={_ => {
             window.Intercom('trackEvent', 'use_preview_draft');
+            mixpanel.track('use_preview_draft');
             this.setState({numberDraftEmails: state.numberDraftEmails + 1});
           }}
           turnOffDraft={_ => this.setState({numberDraftEmails: state.numberDraftEmails - 1})}
@@ -170,6 +172,7 @@ class PreviewEmails extends Component {
           {...email}
           onSendEmailClick={_ => {
             window.Intercom('trackEvent', 'sent_email', {numSentEmails: 1, scheduled: sendLater});
+            mixpanel.track('sent_email', {numSentEmails: 1, scheduled: sendLater});
             onSendEmailClick(email.id);
           }}
           />)}

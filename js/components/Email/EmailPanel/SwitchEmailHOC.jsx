@@ -21,6 +21,7 @@ class SwitchEmailHOC extends Component {
 
   _onChange(e, i, value) {
     window.Intercom('trackEvent', 'switch_email');
+    mixpanel.track('switch_email');
     this.props.setFromEmail(value);
   }
 

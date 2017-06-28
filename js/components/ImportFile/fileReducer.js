@@ -26,7 +26,10 @@ function fileReducer(state = initialState.fileReducer, action) {
         didInvalidate: true,
         error: action.error
       });
-      if (process.env.NODE_ENV === 'production') window.Intercom('trackEvent', 'file_upload_error', {error: JSON.stringify(action.error)});
+      if (process.env.NODE_ENV === 'production') {
+        window.Intercom('trackEvent', 'file_upload_error', {error: JSON.stringify(action.error)});
+        mixpanel.track('file_upload_error', {error: JSON.stringify(action.error)});
+      }
       return obj;
     case fileConstant.RECEIVE:
       obj = assignToEmpty(state, {});
