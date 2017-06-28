@@ -47,6 +47,10 @@ class DatePickerHOC extends Component {
     this.onToggle = this._onToggle.bind(this);
     this.onRequestOpen = this._onRequestOpen.bind(this);
     this.onRequestClose = this._onRequestClose.bind(this);
+    this.onTimezoneChange = (e, i, timezone) => {
+      window.Intercom('trackEvent', 'timezone_switch', {timezone});
+      this.setState({timezone});
+    };
   }
 
   componentDidUpdate(prevState) {
@@ -140,7 +144,7 @@ class DatePickerHOC extends Component {
           <div className='horizontal-center'>
             <div className='vertical-center'>
               <span>Timezone</span>
-              <DropDownMenu maxHeight={200} value={state.timezone} onChange={(e, i, timezone) => this.setState({timezone})}>
+              <DropDownMenu maxHeight={200} value={state.timezone} onChange={this.onTimezoneChange}>
                 {timezoneMenuItems}
               </DropDownMenu>
             </div>
