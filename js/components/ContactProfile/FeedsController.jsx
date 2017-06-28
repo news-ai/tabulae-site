@@ -27,6 +27,7 @@ class FeedsController extends Component {
     props.addFeed(props.contactId, props.listId, this.state.feedUrl);
     this.togglePanel();
     window.Intercom('trackEvent', 'add_feed');
+    mixpanel.track('add_feed');
     window.location.reload();
   }
 

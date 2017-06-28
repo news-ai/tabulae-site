@@ -38,6 +38,7 @@ class TwitterProfile extends Component {
     if (prevState.open === false && this.state.open === true) {
       // onRequestOpen hit
       window.Intercom('trackEvent', 'check_twitter_stats');
+      mixpanel.track('check_twitter_stats');
       if (!this.props.profile) this.props.fetchTwitter();
     }
   }

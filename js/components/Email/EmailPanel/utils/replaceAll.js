@@ -20,7 +20,10 @@ export default function replaceAll(html, contact, fieldsmap) {
     if (expectedMatches !== null) expectedMatches = expectedMatches.filter(match => match !== `{${fieldObj.name}}`);
   });
   const numMatches = Object.keys(matchCount).length;
-  if (numMatches > 0) window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length});
+  if (numMatches > 0) {
+    window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length});
+    mixpanel.track('num_custom_variables', {num_custom_variables: Object.keys(matchCount).length});
+  }
   if (expectedMatches !== null && expectedMatches.length > 0) emptyFields = [...emptyFields, ...expectedMatches];
   return {html: newHtml, numMatches, emptyFields};
 }

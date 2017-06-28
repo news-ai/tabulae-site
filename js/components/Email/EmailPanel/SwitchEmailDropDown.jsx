@@ -12,6 +12,7 @@ class SwitchEmailDropDown extends Component {
 
   _onChange(e) {
     window.Intercom('trackEvent', 'switch_email');
+    mixpanel.track('switch_email');
     this.props.setFromEmail(e.target.value);
   }
 

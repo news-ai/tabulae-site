@@ -525,6 +525,7 @@ class ListTable extends Component {
       props.received.length < props.listData.contacts.length
       ) {
       window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
+      mixpanel.track('opened_sheet', {listId: props.listData.id});
       return props.loadAllContacts(props.listId);
     }
     return Promise.resolve(true);
@@ -578,6 +579,7 @@ class ListTable extends Component {
 
   _onExportClick() {
     window.Intercom('trackEvent', 'on_export_click');
+    mixpanel.track('on_export_click');
     exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name);
   }
 
@@ -614,6 +616,7 @@ class ListTable extends Component {
       this.setState({searchValue});
     }
     window.Intercom('trackEvent', 'listtable_search');
+    mixpanel.track('listtable_search');
     props.searchListContacts(props.listId, searchValue)
     .then(({searchContactMap, ids}) => {
       // find where first search result is in the list

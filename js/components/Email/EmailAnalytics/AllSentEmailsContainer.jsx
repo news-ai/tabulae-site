@@ -77,6 +77,7 @@ class AllSentEmailsContainer extends Component {
       query.filter = filterTypeValue;
     }
     window.Intercom('trackEvent', 'filter_emails_by_type', {type: filterTypeValue});
+    mixpanel.track('filter_emails_by_type', {type: filterTypeValue});
     this.props.router.push({pathname: `/emailstats/all`, query});
     this.setState({filterTypeValue});
   }
@@ -90,6 +91,7 @@ class AllSentEmailsContainer extends Component {
       query.listId = filterListValue;
     }
     window.Intercom('trackEvent', 'filter_emails_by_list');
+    mixpanel.track('filter_emails_by_list');
     this.props.router.push({pathname: `/emailstats/all`, query});
     this.setState({filterListValue});
   }
@@ -100,6 +102,7 @@ class AllSentEmailsContainer extends Component {
     this.props.fetchSpecificDayEmails(queryDate);
     query.date = queryDate;
     window.Intercom('trackEvent', 'filter_emails_by_date');
+    mixpanel.track('filter_emails_by_date');
     this.props.router.push({pathname: `/emailstats/all`, query});
     this.setState({filterDateValue});
   }

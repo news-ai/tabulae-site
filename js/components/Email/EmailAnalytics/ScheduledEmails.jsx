@@ -55,6 +55,7 @@ const mergeProps = (sProps, dProps, props) => {
         'Canceling all scheduled emails is not reversible. This action might take a short while. Are you sure?',
         () => {
           window.Intercom('trackEvent', 'cancel_all_emails');
+          mixpanel.track('cancel_all_emails');
           dProps.onCancelAll();
         },
         () => {}

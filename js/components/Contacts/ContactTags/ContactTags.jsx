@@ -65,6 +65,7 @@ class ContactTags extends Component {
 
   componentWillMount() {
     window.Intercom('trackEvent', 'access_contact_tag', {tag: this.props.tag});
+    mixpanel.track('access_contact_tag', {tag: this.props.tag});
     this.props.resetTagContacts();
     if (this.props.tag) this.props.fetchContactsByTag();
     this.props.fetchLists();
@@ -351,6 +352,7 @@ const mapDispatchToProps = (dispatch, props) => {
     .catch(err => {
       console.log(err);
       window.Intercom('trackEvent', 'copy_error', {error: err.toString()});
+      mixpanel.track('copy_error', {error: err.toString()});
       alertify.alert('Error', 'An error occured. Copy unavailable at this moment.');
     });
   };
@@ -361,11 +363,13 @@ const mapDispatchToProps = (dispatch, props) => {
     fetchAllContactsByTag: _ => dispatch(contactTagActions.fetchAllContactsByTag(tag)),
     copyToNewList: (contacts, name) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new_from_tag');
+      mixpanel.track('copy_some_contacts_to_new_from_tag');
       return dispatch(listActions.createEmptyList(name))
       .then(response => copyContactsToList(contacts, response.data.id));
     },
     copyContactsToList: (contacts, listid) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_existing_from_tag');
+      mixpanel.track('copy_some_contacts_to_existing_from_tag');
       return copyContactsToList(contacts, listid);
     },
     resetTagContacts: _ => dispatch({type: 'TAG_CONTACTS_RESET', tag}),

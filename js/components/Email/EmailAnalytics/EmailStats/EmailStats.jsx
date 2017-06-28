@@ -80,6 +80,7 @@ class EmailStats extends Component {
 
     new Promise((resolve, reject) => {
       window.Intercom('trackEvent', 'get_older_stats', {limit: this.state.currentLimit});
+      mixpanel.track('get_older_stats', {limit: this.state.currentLimit});
       if (this.props.doneLoading) resolve(true); // no more stats available for loading
       else this.fetchEmailStats().then(resolve, reject);
     })

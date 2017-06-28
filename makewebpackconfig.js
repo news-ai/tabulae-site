@@ -63,8 +63,9 @@ module.exports = function(options) {
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('production'),
-          CIRCLE_SHA1: JSON.stringify(process.env.CIRCLE_SHA1)
-        }
+          CIRCLE_SHA1: JSON.stringify(process.env.CIRCLE_SHA1),
+          MIXPANEL_TOKEN: JSON.stringify('f723102b5c5ab2931d4ec00b84f1d166')
+        },
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
       new CompressionPlugin({
@@ -98,7 +99,8 @@ module.exports = function(options) {
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('development'),
-        }
+          MIXPANEL_TOKEN: JSON.stringify('1246b6942fbd12b5bc7839a7a77f0330')
+        },
       }),
     ];
   }

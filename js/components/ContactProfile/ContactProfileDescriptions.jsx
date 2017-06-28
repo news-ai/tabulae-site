@@ -113,6 +113,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
       contentTitle='Twitter'
       onBlur={(value) => {
         window.Intercom('trackEvent', 'add_contact_twitter');
+        mixpanel.track('add_contact_twitter');
         patchContact(contact.id, {twitter: value});
       }}
       extraIcons={contact.twitter && [
@@ -128,6 +129,7 @@ const ContactProfileDescriptions = ({contact, patchContact, className, list}) =>
       contentTitle='Instagram'
       onBlur={(value) => {
         window.Intercom('trackEvent', 'add_contact_instagram');
+        mixpanel.track('add_contact_instagram');
         patchContact(contact.id, {instagram: value});
       }}
       extraIcons={contact.instagram && [<WrappedInstagram key={0} contactId={contact.id} />]} />

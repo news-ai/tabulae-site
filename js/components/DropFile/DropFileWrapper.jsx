@@ -94,6 +94,7 @@ class DropFileWrapper extends Component {
 
   _onUploadClick() {
     window.Intercom('trackEvent', 'uploaded_sheet');
+    mixpanel.track('uploaded_sheet');
     // create empty list first then upload file to populare the list
     this.setState({clicked: true});
     this.props.createEmptyList(this.state.value)
