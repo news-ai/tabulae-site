@@ -14,8 +14,8 @@ deployment:
   staging:
     branch: dev
     commands:
-      - ssh $SSHU "source ~/.profile && cd $DEVDIR && git pull origin dev && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/npm install && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/npm run build && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/pm2 restart server.dev"
+      - ssh $SSHU "source ~/.profile && cd $DEVDIR && git pull origin dev && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/npm install && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/npm run build && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/pm2 restart server.dev"
   production:
     branch: master
     commands:
-      - ssh $SSHU "source ~/.profile && cd $DIR && git pull origin master && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/npm install && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/npm run build && /home/abhiagarwal/.nvm/versions/node/v5.10.1/bin/pm2 restart server.prod"
+      - ssh $SSHU "source ~/.profile && cd $DIR && git pull origin master && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/npm install && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/npm run build && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/pm2 restart server.prod"

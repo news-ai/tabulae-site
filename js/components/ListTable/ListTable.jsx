@@ -118,7 +118,12 @@ class ListTable extends Component {
       if (searchValue.length === 0) {
         this.props.router.push(`/tables/${props.listId}`);
         this.onSearchClearClick();
-      } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
+      } else if (
+        this.state.isSearchOn &&
+        searchValue === this.state.searchValue &&
+        this.props.listData.searchResults &&
+        this.props.listData.searchResults.length > 0
+        ) {
         this.getNextSearchResult();
       } else {
         this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
@@ -127,8 +132,8 @@ class ListTable extends Component {
     };
 
     window.onresize = _ => {
-      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
-      const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+      const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
       this.setGridHeight();
       this.setState({screenWidth, screenHeight});
     };
@@ -525,7 +530,7 @@ class ListTable extends Component {
       props.received.length < props.listData.contacts.length
       ) {
       window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
-      mixpanel.track('opened_sheet', {listId: props.listData.id});
+      mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
       return props.loadAllContacts(props.listId);
     }
     return Promise.resolve(true);
@@ -616,7 +621,6 @@ class ListTable extends Component {
       this.setState({searchValue});
     }
     window.Intercom('trackEvent', 'listtable_search');
-    mixpanel.track('listtable_search');
     props.searchListContacts(props.listId, searchValue)
     .then(({searchContactMap, ids}) => {
       // find where first search result is in the list
@@ -629,6 +633,7 @@ class ListTable extends Component {
           }
         }
       }
+      mixpanel.track('listtable_search', {num_results: ids.length, list_size: props.listData.contacts.length});
       this.setState({
         isSearchOn: true,
         currentSearchIndex: 0,
@@ -664,7 +669,6 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.querySelected);
     return (
       <div style={styles.container}>
         {
@@ -929,7 +933,7 @@ class ListTable extends Component {
         </div>
       {props.received.length > 0 && state.columnWidths !== null &&
         <ScrollSync>
-        {({clientHeight, clientWidth, onScroll, scrollHeight, scrollLeft, scrollTop, scrollWidth}) =>
+        {({onScroll, scrollLeft}) =>
           <div>
             <div id='HeaderGridContainerId' className='HeaderGridContainer'>
               <Grid

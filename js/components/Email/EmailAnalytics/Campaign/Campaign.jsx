@@ -6,7 +6,7 @@ import Link from 'react-router/lib/Link';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
-import {grey800, blue800} from 'material-ui/styles/colors';
+import {grey800, blue800, grey600} from 'material-ui/styles/colors';
 
 const blockStyles = {
   span: {
@@ -78,7 +78,7 @@ const Campaign = ({
   return (
     <Paper className='row' zDepth={1} style={styles.container}>
       <div className='large-12 medium-12 small-12 columns'>
-        <span className='smalltext' style={styles.span}>Created: {date}</span>
+        <span className='smalltext' style={styles.date}>Created: {date}</span>
       </div>
       <div className='large-5 medium-12 small-12 columns'>
       {subject || <span style={styles.span}>(No Subject)</span>}
@@ -121,7 +121,8 @@ const Campaign = ({
 
 const styles = {
   span: {color: grey800},
-  container: {margin: 10, padding: 10}
+  container: {margin: 10, padding: 10},
+  date: {color: grey600}
 };
 
 const mapStateToProps = (state, props) => {
