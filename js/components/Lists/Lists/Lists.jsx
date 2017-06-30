@@ -14,26 +14,22 @@ const styles = {
   listitemContainer: {marginBottom: 50, marginTop: 50}
 };
 
-function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle, tooltip}) {
+function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemIcon, backRoute, backRouteTitle, tooltip, extraIconButtons}) {
   return (
     <div>
       <Waiting isReceiving={isReceiving} style={loading} />
-       <ListsTitle
-        title={title}
-        route={backRoute}
-        iconName='fa fa-angle-right fa-fw'
-        backRouteTitle={backRouteTitle}
-        />
+       <ListsTitle title={title} route={backRoute} iconName='fa fa-angle-right fa-fw' backRouteTitle={backRouteTitle} />
       <div style={styles.listitemContainer}>
        {lists.length === 0 && <span>{statementIfEmpty}</span>}
         {
           lists.map( (list, i) =>
           <ListItem
+          key={i}
           list={list}
           onToggle={onToggle}
           iconName={listItemIcon}
-          key={i}
           tooltip={tooltip}
+          extraIconButtons={extraIconButtons}
           />)
         }
       </div>
