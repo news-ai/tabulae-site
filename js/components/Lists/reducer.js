@@ -22,6 +22,12 @@ function listReducer(state = initialState.listReducer, action) {
   let teamLists = [];
   let obj;
   switch (action.type) {
+    case 'DELETE_LIST_COMPLETE':
+      obj = assignToEmpty(state, {
+        received: state.received.filter(id => id !== action.listId),
+        archivedLists: state.archivedLists.filter(id => id !== action.listId)
+      });
+      return obj;
     case 'CLEAR_LIST_REDUCER':
       obj = assignToEmpty(initialState.listReducer, {});
       return obj;

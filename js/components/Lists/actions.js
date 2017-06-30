@@ -79,6 +79,18 @@ function requestListFail(message) {
   };
 }
 
+export function deleteList(listId) {
+  return dispatch => {
+    dispatch({type: 'DELETE_LIST_INITIATE', listId});
+    return api.deleteRequest(`/lists/${listId}`)
+    .then(response => {
+      console.log(response);
+      return dispatch({type: 'DELETE_LIST_COMPLETE', listId});
+    })
+    .catch( message => dispatch(requestListFail(message)));
+  };
+}
+
 export function fetchList(listId) {
   return (dispatch, getState) => {
     dispatch(requestList(listId));

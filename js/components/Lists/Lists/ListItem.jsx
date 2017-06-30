@@ -30,7 +30,7 @@ const styles = {
   text: {fontSize: '0.8em', fontColor: grey500},
 };
 
-function ListItem({list, onToggle, iconName, tooltip, router, nameString, person, isArchiving}) {
+function ListItem({list, onToggle, iconName, tooltip, router, nameString, person, isArchiving, extraIconButtons}) {
   const updatedDate = new Date(list.updated);
   const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
@@ -80,6 +80,7 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
           onClick={_ => onToggle(list.id)}
           tooltipPosition='top-left'
           />}
+        {extraIconButtons}
       </div>
     </div>
     );

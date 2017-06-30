@@ -2,8 +2,32 @@ import React, {Component} from 'react';
 import {actions as listActions} from 'components/Lists';
 import {connect} from 'react-redux';
 
-import Lists from './Lists';
+import ListItem from './Lists/ListItem.jsx';
+import ListsTitle from './Lists/ListsTitle.jsx';
+import Waiting from 'components/Waiting';
 import InfiniteScroll from 'components/InfiniteScroll';
+import IconButton from 'material-ui/IconButton';
+import {grey700} from 'material-ui/styles/colors';
+
+const styles = {
+  smallIcon: {
+    fontSize: 16,
+    color: grey700
+  },
+  small: {
+    width: 36,
+    height: 36,
+    padding: 2,
+  },
+  listitemContainer: {marginBottom: 50, marginTop: 50}
+};
+
+const loading = {
+  zIndex: 160,
+  top: 80,
+  right: 10,
+  position: 'fixed'
+};
 
 class ArchiveContainer extends Component {
   constructor(props) {
@@ -15,17 +39,45 @@ class ArchiveContainer extends Component {
   }
 
   render() {
+    const {isReceiving, backRoute, backRouteTitle, title, lists, statementIfEmpty, onToggle, deleteList, listItemIcon, tooltip} = this.props;
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
         <div className='row' style={{marginTop: 10}}>
           <div className='large-offset-1 large-10 columns'>
-          <Lists {...this.props} />
+           <div>
+            <Waiting isReceiving={isReceiving} style={loading} />
+              <ListsTitle title={title} route={backRoute} iconName='fa fa-angle-right fa-fw' backRouteTitle={backRouteTitle} />
+              <div style={styles.listitemContainer}>
+              {lists.length === 0 && <span>{statementIfEmpty}</span>}
+              {
+                lists.map((list, i) =>
+                <ListItem
+                key={i}
+                list={list}
+                onToggle={onToggle}
+                iconName={listItemIcon}
+                tooltip={tooltip}
+                extraIconButtons={
+                  <IconButton
+                  iconClassName='fa fa-trash'
+                  iconStyle={styles.smallIcon}
+                  style={styles.small}
+                  tooltip='Permanent Delete'
+                  onClick={_ => deleteList(list.id)}
+                  />
+                }
+                />
+                )
+              }
+              </div>
+            </div>
           </div>
         </div>
       </InfiniteScroll>
       );
   }
 }
+
 
 const mapStateToProps = state => {
   const lists = state.listReducer.archivedLists.map(id => state.listReducer[id]);
@@ -49,11 +101,9 @@ const mapDispatchToProps = dispatch => {
       .then(_ => dispatch(listActions.fetchLists()))
       .then(_ =>dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: listId, fetchType: 'isArchiving'}));
     },
-    fetchLists: _ => dispatch(listActions.fetchArchivedLists())
+    fetchLists: _ => dispatch(listActions.fetchArchivedLists()),
+    deleteList: listId => dispatch(listActions.deleteList(listId)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(ArchiveContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(ArchiveContainer);
