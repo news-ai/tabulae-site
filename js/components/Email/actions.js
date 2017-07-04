@@ -424,17 +424,15 @@ export function fetchListEmails(listId) {
   };
 }
 
-export function fetchSearchSentEmails(query) {
-  if (query.baseSubject) query.baseSubject = encodeURIComponent(query.baseSubject);
-  if (query.subject) query.subject = encodeURIComponent(query.subject);
+export function fetchSearchSentEmails(queryString) {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     let OFFSET = 0;
     const isReceiving = getState().stagingReducer.isReceiving;
     if (OFFSET === null || isReceiving) return;
     if (!OFFSET) OFFSET = 0;
-    dispatch({type: REQUEST_MULTIPLE_EMAILS, query});
-    return api.get(`/emails/search?q="${query}"`)
+    dispatch({type: REQUEST_MULTIPLE_EMAILS, query: queryString});
+    return api.get(`/emails/search?q="${queryString}"`)
     .then(response => {
       const contactOnly = response.included.filter(item => item.type === 'contacts');
       response.contacts = contactOnly;
@@ -448,7 +446,7 @@ export function fetchSearchSentEmails(query) {
         emails: res.entities.emails,
         ids: res.result.data,
       });
-      return dispatch({type: 'RECEIVE_SEARCH_SENT_EMAILS', ids: res.result.data, query});
+      return dispatch({type: 'RECEIVE_SEARCH_SENT_EMAILS', ids: res.result.data, query: queryString});
     })
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
   };
