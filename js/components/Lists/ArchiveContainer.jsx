@@ -32,6 +32,7 @@ const loading = {
 class ArchiveContainer extends Component {
   constructor(props) {
     super(props);
+    this.state = {isDeleting: false};
   }
 
   componentDidMount() {
@@ -59,11 +60,15 @@ class ArchiveContainer extends Component {
                 tooltip={tooltip}
                 extraIconButtons={
                   <IconButton
-                  iconClassName='fa fa-trash'
+                  iconClassName={this.state.isDeleting === list.id ? 'fa fa-spinner fa-spin' : 'fa fa-trash'}
                   iconStyle={styles.smallIcon}
                   style={styles.small}
                   tooltip='Permanent Delete'
-                  onClick={_ => deleteList(list.id)}
+                  onClick={_ => {
+                    this.setState({isDeleting: list.id});
+                    deleteList(list.id)
+                    .then(_ => this.setState({isDeleting: false}));
+                  }}
                   />
                 }
                 />
