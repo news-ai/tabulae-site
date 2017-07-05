@@ -21,7 +21,7 @@ export function fetchSearch(query) {
   if (query.length === 0) return;
   return (dispatch, getState) => {
     if (getState().searchReducer.isReceiving) return;
-    if (query !== getState().searchReducer.query) dispatch(clearSearchCache());
+    if (query !== getState().searchReducer.query) dispatch({type: SEARCH_CLEAR_CACHE});
     const OFFSET = getState().searchReducer.offset;
     if (OFFSET === null) return;
     dispatch({type: searchConstant.REQUEST_MULTIPLE, query});
