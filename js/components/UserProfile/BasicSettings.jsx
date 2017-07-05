@@ -4,6 +4,7 @@ import {ToggleableEditInputHOC, ToggleableEditInput} from '../ToggleableEditInpu
 import {fromJS, is} from 'immutable';
 import {grey500} from 'material-ui/styles/colors';
 import RaisedButton from 'material-ui/RaisedButton';
+import Toggle from 'material-ui/Toggle';
 
 import {actions as loginActions} from 'components/Login';
 
@@ -43,8 +44,25 @@ class BasicSettings extends Component {
     this.state = {
       immuperson: fromJS(this.props.person),
       newPerson: fromJS(this.props.person),
+      notifySubscribed: false
     };
+    // this.onToggle = this.onToggle.bind(this);
+    // this.onSubscribe = this.onSubscribe.bind(this);
+    // this.onUnsubscribe = this.onUnsubscribe.bind(this);
   }
+
+  // componentWillMount() {
+  //   navigator.serviceWorker.ready.then(swRegistration => {
+  //     swRegistration.pushManager.getSubscription()
+  //     .then(subscription => {
+  //       const isSubscribed = !(subscription === null);
+  //       console.log('subscription');
+  //       console.log(isSubscribed);
+  //       this.setState({notifySubscribed: isSubscribed});
+  //     });
+  //     window.swRegistration = swRegistration;
+  //   });
+  // }
 
   componentWillUnmount() {
     if (!is(this.state.immuperson, this.state.newPerson)) {
@@ -58,6 +76,38 @@ class BasicSettings extends Component {
       this.props.patchPerson(person);
     }
   }
+
+  // onToggle(e, isToggled) {
+  //   if (isToggled) this.onSubscribe();
+  //   else this.onUnsubscribe();
+  // }
+
+  // onSubscribe() {
+  //   window.swRegistration.pushManager
+  //   .subscribe({userVisibleOnly: true})
+  //   .then(subscription => {
+  //     console.log(subscription);
+  //     this.setState({notifySubscribed: true});
+  //   })
+  //   .catch(e => {
+  //     console.log('Push Notify subscription denied by user');
+  //   });
+  // }
+
+  // onUnsubscribe() {
+  //   window.swRegistration.pushManager.getSubscription()
+  //   .then(subscription => {
+  //     if (!subscription) {
+  //       this.setState({notifySubscribed: false});
+  //     }
+  //     subscription.unsubscribe()
+  //     .then(_ => this.setState({notifySubscribed: false}));
+  //   })
+  //   .then(e => {
+  //     console.log('failed to subscribe');
+  //   });
+  // }
+
 
   render() {
     const {person} = this.props;
@@ -105,6 +155,16 @@ class BasicSettings extends Component {
                 />}
             </div>
           </div>
+        {/*
+          <div className='row vertical-center' style={inputHeight}>
+            <div className='large-4 medium-5 columns'>
+              <span style={spanStyle}>Browser Notifications</span>
+            </div>
+            <div className='large-6 medium-7 columns'>
+              <Toggle toggled={state.notifySubscribed} onToggle={this.onToggle} />
+            </div>
+          </div>
+        */}
         </div>
       </div>
       );

@@ -6,13 +6,14 @@
     "alertifyjs": "^1.10.0",
     "axios": "^0.9.1",
     "classnames": "^2.2.5",
-    "draft-convert": "^1.4.3",
+    "draft-convert": "^1.4.7",
     "draft-js": "^0.10.0",
     "es6-promise": "^4.0.5",
     "fontfaceobserver": "^1.5.1",
     "fuse.js": "^2.6.2",
     "fuzzy": "^0.1.1",
     "hopscotch": "^0.2.6",
+    "ifvisible.js": "^1.0.6",
     "immutability-helper": "^2.2.2",
     "immutable": "^3.8.1",
     "install": "^0.8.1",
@@ -25,7 +26,6 @@
     "moment": "^2.14.1",
     "moment-timezone": "^0.5.9",
     "normalizr": "^2.2.1",
-    "npm": "^3.10.6",
     "numbro": "^1.9.3",
     "object-assign": "^4.1.0",
     "pikaday": "^1.4.0",
@@ -70,8 +70,7 @@
     "regression": "^1.2.1",
     "sanitize-html": "^1.14.1",
     "tlds": "^1.157.0",
-    "validator": "^5.5.0",
-    "zeroclipboard": "^2.2.0"
+    "validator": "^5.5.0"
   },
   "devDependencies": {
     "appcache-webpack-plugin": "^1.2.0",

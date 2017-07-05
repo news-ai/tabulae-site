@@ -13,11 +13,14 @@
 // import 'file-loader?name=[name].[ext]!../.htaccess';
 
 // Check for ServiceWorker support before trying to install it
-// if (process.env.NODE_ENV === 'production') {
-//   if ('serviceWorker' in navigator) {
+// if (process.env.NODE_ENV === 'development') {
+//   if ('serviceWorker' in navigator && 'PushManager' in window) {
 //     navigator.serviceWorker.register('/serviceworker.js')
 //     .then(
-//       registration => console.log('ServiceWorker registration successful with scope: ', registration.scope),
+//       registration => {
+//         console.log('ServiceWorker registration successful with scope: ', registration.scope);
+//         window.swRegistration = registration;
+//       },
 //       err => console.log('ServiceWorker registration failed: ', err)
 //     ).catch(err => {
 //       // Registration failed
