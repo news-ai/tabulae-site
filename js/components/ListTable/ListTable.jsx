@@ -36,7 +36,7 @@ import Drawer from 'material-ui/Drawer';
 import {ControlledInput} from '../ToggleableEditInput';
 import Waiting from '../Waiting';
 import CopyToHOC from './CopyToHOC';
-import ColumnEditPanelHOC from 'components/ListTable/ColumnEditPanelHOC/ColumnEditPanelHOC.jsx';
+import ColumnEditPanel from 'components/ListTable/ColumnEditPanel/ColumnEditPanel.jsx';
 import AddContactHOC from './AddContactHOC.jsx';
 import AddTagDialogHOC from './AddTagDialogHOC.jsx';
 import EditMultipleContactsHOC from './EditMultipleContactsHOC.jsx';
@@ -98,9 +98,10 @@ class ListTable extends Component {
       scrollToRow: undefined,
       currentSearchIndex: 0,
       isDeleting: false,
-      showEditPanel: false,
+      showContactEditPanel: false,
       currentEditContactId: undefined,
       showEmailPanel: true,
+      showColumnEditPanel: false,
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -487,7 +488,7 @@ class ListTable extends Component {
               );
           contentBody2 = !this.props.listData.readonly &&
           <FontIcon
-          onClick={_ => this.setState({currentEditContactId: rowData.id, showEditPanel: true})}
+          onClick={_ => this.setState({currentEditContactId: rowData.id, showContactEditPanel: true})}
           className='fa fa-edit pointer'
           style={styles.profileIcon}
           color={blue300}
@@ -704,8 +705,8 @@ class ListTable extends Component {
         <EditContactDialog
         listId={props.listId}
         contactId={state.currentEditContactId}
-        open={state.showEditPanel}
-        onClose={_ => this.setState({showEditPanel: false})}
+        open={state.showContactEditPanel}
+        onClose={_ => this.setState({showContactEditPanel: false})}
         />
         {this.showProfileTooltip &&
           <PanelOverlayHOC
@@ -762,18 +763,16 @@ class ListTable extends Component {
               onClick={onRequestOpen}
               />)}
             </CopyToHOC>
-            <ColumnEditPanelHOC listId={props.listId} fieldsmap={props.rawFieldsmap}>
-            {({onRequestOpen}) => (
-              <IconButton
-              iconStyle={styles.iconBtn}
-              id='add_remove_columns_hop'
-              disabled={props.listData.readonly}
-              tooltip='Show/Hide columns'
-              tooltipPosition='top-left'
-              iconClassName='fa fa-table'
-              onClick={onRequestOpen}
-              />)}
-            </ColumnEditPanelHOC>
+            <IconButton
+            iconStyle={styles.iconBtn}
+            id='add_remove_columns_hop'
+            disabled={props.listData.readonly}
+            tooltip='Show/Hide columns'
+            tooltipPosition='top-left'
+            iconClassName='fa fa-table'
+            onClick={_ => this.setState({showColumnEditPanel: true})}
+            />
+            <ColumnEditPanel onRequestClose={_ => this.setState({showColumnEditPanel: false})} open={state.showColumnEditPanel} listId={props.listId} />
             <AddContactHOC contacts={props.contacts} listId={props.listId}>
             {({onRequestOpen}) => (
               <IconButton

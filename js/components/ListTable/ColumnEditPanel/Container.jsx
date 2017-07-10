@@ -24,6 +24,12 @@ class Container extends Component {
 		this.moveCard = this.moveCard.bind(this);
 	}
 
+	componentWillReceiveProps(nextProps) {
+		if (this.props.list !== nextProps.list) {
+			this.setState({cards: nextProps.list});
+		}
+	}
+
 	pushCard(card) {
 		const {updateList, containerType} = this.props;
 		const newCard = Object.assign({}, card, {hidden: containerType === 'hiddenList'});
@@ -129,8 +135,8 @@ const cardStyle = {
 
 const cardTarget = {
 	hover(targetProps, monitor) {
-		  const sourceProps = monitor.getItem();
-		  // console.log(targetProps);
+		const sourceProps = monitor.getItem();
+		// console.log(targetProps);
 
 	},
 	drop(props, monitor, component) {

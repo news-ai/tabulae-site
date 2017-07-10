@@ -111,9 +111,7 @@ export function fetchLists() {
     dispatch(requestLists());
     return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(listSchema),
-      });
+      const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
       return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset));
     })
@@ -129,9 +127,7 @@ export function fetchPublicLists() {
     dispatch(requestLists());
     return api.get(`/lists/public?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(listSchema),
-      });
+      const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
       return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
@@ -175,9 +171,7 @@ export function fetchTagLists(tagQuery) {
     dispatch(requestLists());
     return api.get(`/lists?q=tag:${tagQuery}&limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(listSchema),
-      });
+      const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
       return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,
@@ -200,9 +194,7 @@ export function fetchArchivedLists() {
     dispatch(requestLists());
     return api.get(`/lists/archived?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
     .then(response => {
-      const res = normalize(response, {
-        data: arrayOf(listSchema),
-      });
+      const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
       return dispatch({
         type: listConstant.RECEIVE_MULTIPLE,

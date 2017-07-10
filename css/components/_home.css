@@ -184,3 +184,7 @@ input {
 .ReactTags__selected .ReactTags__remove {
   margin-left: 3px;
 }
+
+.Select.is-open {
+  z-index: 100;
+}
