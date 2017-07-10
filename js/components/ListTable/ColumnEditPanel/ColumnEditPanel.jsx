@@ -20,7 +20,7 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
   alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
 });
 
-class ColumnEditPanelHOC extends Component {
+class ColumnEditPanel extends Component {
   constructor(props) {
     super(props);
     const hiddenList = this.props.fieldsmap.filter(field => field.hidden && !field.tableOnly);
@@ -164,4 +164,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(ColumnEditPanelHOC));
+export default connect(mapStateToProps, mapDispatchToProps)(DragDropContext(HTML5Backend)(ColumnEditPanel));

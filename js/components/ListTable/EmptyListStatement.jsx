@@ -7,7 +7,7 @@ const EmptyListStatement = ({className, style}) => (
       <ul>
         <li>"Add Contact" icon on top to add ONE contact</li>
         <li>Go back to Home and "Upload from Existing" Excel sheet</li>
-        <li>Want to use same columns as a previous list? Use "Apply Presets" by clicking on <i className='fa fa-table' /> icon</li>
+        <li>Want to use same columns as an another list? Use "Apply Presets" by clicking on <i className='fa fa-table' /> icon</li>
       </ul>
     </div>
   </div>);
