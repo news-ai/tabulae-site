@@ -93,9 +93,11 @@ class CopyToHOC extends Component {
             {props.selected.length === 0 &&
               <span>none selected</span>}
               {props.selectedContacts &&
-                <span>{props.selectedContacts
-                .map(contact => contact.firstname || contact.lastname || contact.email)
-                .join(', ')}</span>}
+                <span>{
+                  props.selectedContacts
+                  .map(contact => contact.firstname || contact.lastname || contact.email || contact.id)
+                  .join(', ')
+              }</span>}
             </div>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
               <p>Select the List(s) to Copy these selected contacts to:</p>

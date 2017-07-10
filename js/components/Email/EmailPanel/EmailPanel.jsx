@@ -20,7 +20,6 @@ import isJSON from 'validator/lib/isJSON';
 
 import Select from 'react-select';
 
-import VirtualizedSelect from 'react-virtualized-select';
 import ReactTooltip from 'react-tooltip'
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -43,7 +42,6 @@ import PauseOverlay from './PauseOverlay.jsx';
 
 import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
-import 'react-virtualized-select/styles.css';
 import './react-select-hack.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
@@ -127,6 +125,7 @@ class EmailPanel extends Component {
     this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
+    this.onSendTestEmail = this.onSendTestEmail.bind(this);
 
     // cleanups
     this.onEmailSendClick = _ => this.checkEmailDupes().then(this.onPreviewEmailsClick);
@@ -338,7 +337,6 @@ class EmailPanel extends Component {
       else invalidEmailContacts.push(contact);
     });
     const {contactEmails, emptyFields} = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
-    console.log(emptyFields);
 
     Promise.resolve()
     .then(_ =>
@@ -405,7 +403,47 @@ class EmailPanel extends Component {
     .catch(_ => {
       console.log('CANCELLED');
     });
+  }
 
+  onSendTestEmail() {
+    // const {subject, body} = this.state;
+    // const email = this.props.person.email;
+    // let newHtml = html;
+
+    // this.state.fieldsmap.map(fieldObj => {
+    //   let value = '';
+    //   const replaceValue = _getter(contact, fieldObj);
+    //   if (replaceValue) value = replaceValue;
+    //   const regexValue = new RegExp('\{' + fieldObj.name + '\}', 'g');
+    //   // count num custom vars used
+    //   const matches = newHtml.match(regexValue);
+    //   if (matches !== null) {
+    //     if (!value) emptyFields.push(fieldObj.name);
+    //     matchCount[fieldObj.name] = matches.length;
+    //   }
+    //   newHtml = newHtml.replace(regexValue, value);
+    //   if (expectedMatches !== null) expectedMatches = expectedMatches.filter(match => match !== `{${fieldObj.name}}`);
+    // });
+
+    // const bodyObj = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
+    // const subjectObj = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
+    // let emailObj = {
+    //   listid: this.props.listId,
+    //   to: contact.email,
+    //   subject: subjectObj.html,
+    //   body: bodyObj.html,
+    //   contactid: contact.id,
+    //   templateid: this.state.currentTemplateId,
+    //   cc: this.props.cc.map(item => item.text),
+    //   bcc: this.props.bcc.map(item => item.text),
+    //   fromemail: this.props.from,
+    // };
+    // if (this.props.scheduledtime !== null) {
+    //   emailObj.sendat = this.props.scheduledtime;
+    // }
+    // if (subjectObj.numMatches > 0) {
+    //   emailObj.baseSubject = subject;
+    // }
   }
 
   _onClearClick() {
@@ -473,7 +511,13 @@ class EmailPanel extends Component {
             </div>
           {props.isImageReceiving &&
             <FontIcon style={styles.imageLoading} color={grey800} className='fa fa-spin fa-spinner'/>}
-            <div style={{position: 'fixed', right: 10}} >
+            <div className='vertical-center' style={{position: 'fixed', right: 10}} >
+            {
+              /*
+              <IconButton style={{marginRight: 10}} iconClassName='fa fa-user-circle' tooltip='Send Test Email to Self' tooltipPosition='bottom-center' />
+              
+               */
+            }
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
