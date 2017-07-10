@@ -9,8 +9,11 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
+import {generateTableFieldsmap, reformatFieldsmap} from 'components/ListTable/helpers';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
 
-import {grey500, lightBlue50, lightBlue300, red800} from 'material-ui/styles/colors';
+import {grey500, grey600, lightBlue50, lightBlue300, red800} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
@@ -36,12 +39,15 @@ class HeaderNaming extends Component {
     this.state = {
       order: [],
       options: defaultSelectableOptions,
+      seleted: undefined,
+      isLoading: false
     };
     this.rowRenderer = this._rowRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
     this.onMenuChange = this._onMenuChange.bind(this);
     this.onSubmit = this._onSubmit.bind(this);
     this.onAddCustom = this._onAddCustom.bind(this);
+    this.onListPresetSelect = this.onListPresetSelect.bind(this);
   }
 
   componentWillMount() {
@@ -159,7 +165,10 @@ class HeaderNaming extends Component {
     const order = this.state.order.map(name => name || 'ignore_column');
     this.props.onAddHeaders(order)
     .then(_ => {
-      if (!this.props.didInvalidate) setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}?justCreated=true`), 5000);
+      if (!this.props.didInvalidate) {
+        this.setState({isLoading: true});
+        setTimeout(_ => this.props.router.push(`/tables/${this.props.listId}?justCreated=true`), 2000);
+      }
     });
   }
 
@@ -180,12 +189,25 @@ class HeaderNaming extends Component {
       _ => {});
   }
 
+  onListPresetSelect(list) {
+    if (!list) {
+      this.setState({selected: undefined});
+      return;
+    }
+    const fieldsmap = generateTableFieldsmap(list)
+    .filter(field => field.customfield && !field.readonly && !this.state.options.some(option => option.value === field.value))
+    .map(field => ({value: field.value, label: field.name, selected: false}));
+    const options = [...this.state.options, ...fieldsmap];
+    this.setState({options, selected: list}, _ => this._headernames.recomputeGridSize());
+  }
+
   render() {
     const props = this.props;
     const state = this.state;
     return (
       <div className='horizontal-center' style={styles.container}>
-      {props.isReceiving && <span>LOADING ...</span>}
+    {props.isReceiving &&
+      <span>LOADING ...</span>}
       {props.headers &&
         <div style={styles.headerContainer}>
           <div className='panel radius' style={styles.panel}>
@@ -194,6 +216,10 @@ class HeaderNaming extends Component {
             Look through each column we pulled from your file and map it to Tabulae properties we have.
             Tabulae will start to aggregate feeds from each contact's social fields once its connected. <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>
             </span>
+          </div>
+          <div style={styles.preset.container} >
+            <span style={styles.preset.label} >Add Existing List Properties to Dropdown</span>
+            <Select labelKey='name' value={state.selected} options={this.props.lists} onChange={this.onListPresetSelect} />
           </div>
           <div>
             <FlatButton
@@ -239,8 +265,8 @@ class HeaderNaming extends Component {
               />}
             label='Submit'
             onClick={this.onSubmit} />
-          {props.isProcessWaiting &&
-            <span>Please be patient. This may take from a few seconds to a few minutes depending on file size.</span>}
+          {(props.isProcessWaiting || state.isLoading) &&
+            <span className='text' style={styles.waiting} >Uploading... This may take from a few seconds to a few minutes depending on file size.</span>}
           {props.didInvalidate &&
             <div>
               <span style={styles.errorText}>Something went wrong while processing property headers.
@@ -272,17 +298,25 @@ const styles = {
     backgroundColor: lightBlue50, padding: 20, margin: 10
   },
   headerContainer: {width: 750},
+  preset: {
+    container: {margin: 10},
+    label: {color: grey600}
+  },
+  waiting: {color: grey600}
 };
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
+  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+
   return {
     listId,
     isProcessWaiting: state.fileReducer.isProcessWaiting,
     isReceiving: state.headerReducer.isReceiving,
     headers: state.headerReducer[listId],
     didInvalidate: state.headerReducer.didInvalidate,
-    error: state.headerReducer.error
+    error: state.headerReducer.error,
+    lists
   };
 };
 

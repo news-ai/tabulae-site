@@ -183,6 +183,7 @@ const styles = {
 
 const mapStateToProps = (state, props) => {
   const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+  
   return {
     lists,
     list: state.listReducer[props.listId],

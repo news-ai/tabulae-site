@@ -144,8 +144,7 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
-  const lists = state.listReducer.lists
-  .reduce((acc, id) => state.listReducer[id].createdby === state.personReducer.person.id ? [...acc, state.listReducer[id]] : acc, []);
+  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
   const listId = props.listId;
   const list = state.listReducer[listId];
 
