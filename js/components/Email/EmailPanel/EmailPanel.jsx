@@ -225,6 +225,10 @@ class EmailPanel extends Component {
         this.setState({bodyEditorState: templateJSON.data});
         this.props.saveEditorState(templateJSON.data);
         this.setState({subjectHtml});
+        if (templateJSON.date) {
+          window.Intercom('trackEvent', 'use_prev_email_template', {date: templateJSON.date});
+          mixpanel.track('use_prev_email_template', {date: templateJSON.date});
+        }
       } else {
         this.props.setBodyHtml(bodyHtml);
         this.setState({bodyHtml, subjectHtml});
