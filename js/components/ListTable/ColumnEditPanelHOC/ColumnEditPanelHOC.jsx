@@ -8,7 +8,9 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {yellow50, grey600} from 'material-ui/styles/colors';
 import {generateTableFieldsmap, reformatFieldsmap} from 'components/ListTable/helpers';
+import Select from 'react-select';
 import alertify from 'alertifyjs';
+import 'react-select/dist/react-select.css';
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
   alertify.confirm(title, description, resolve, reject);
@@ -26,14 +28,18 @@ class ColumnEditPanelHOC extends Component {
     this.state = {
       hiddenList,
       showList,
-      open: false,
       isUpdating: false,
       dirty: false,
     };
-    this.updateList = this.updateList.bind(this);
+    this.onUpdateList = this.onUpdateList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.onRequestOpen = _ => this.setState({open: true});
-    this.onRequestClose = _ => this.setState({open: false});
+    this.onListPresetSelect = this.onListPresetSelect.bind(this);
+  }
+
+  componentWillMount() {
+    if (!this.props.lists || this.props.lists.length === 0) {
+      this.props.fetchLists();
+    }
   }
 
   onSubmit() {
@@ -45,17 +51,24 @@ class ColumnEditPanelHOC extends Component {
     };
     this.setState({isUpdating: true});
     this.props.patchList(listBody)
-    .then(_ => this.setState({isUpdating: false, open: false}));
+    .then(_ => this.setState({isUpdating: false}, this.props.onRequestClose));
   }
 
-  updateList(list, containerType) {
+  onUpdateList(list, containerType) {
     this.setState({[containerType]: list, dirty: true});
+  }
+
+  onListPresetSelect(list) {
+    const fieldsmap = generateTableFieldsmap(list);
+    const hiddenList = fieldsmap.filter(field => field.hidden && !field.tableOnly);
+    const showList = fieldsmap.filter(field => !field.hidden && !field.tableOnly);
+    this.setState({showList, hiddenList, dirty: true});
   }
 
   render() {
     const state = this.state;
     const actions = [
-      <FlatButton primary label='Cancel' disabled={state.isUpdating} onTouchTap={this.onRequestClose} />,
+      <FlatButton primary label='Cancel' disabled={state.isUpdating} onTouchTap={this.props.onRequestClose} />,
       <FlatButton primary label={state.isUpdating ? 'Updating...' : 'Submit'} disabled={state.isUpdating || !state.dirty} onTouchTap={this.onSubmit} />,
     ];
 
@@ -66,9 +79,9 @@ class ColumnEditPanelHOC extends Component {
         <Dialog
         autoScrollBodyContent modal
         actions={actions}
-        open={state.open}
+        open={this.props.open}
         title='Column Settings'
-        onRequestClose={this.onRequestClose}
+        onRequestClose={this.props.onRequestClose}
         >
           <div style={styles.instructionContainer}>
             <span className='text'>
@@ -77,22 +90,25 @@ class ColumnEditPanelHOC extends Component {
               You can also create custom columns that you can use as template variable in emails.
             </span>
           </div>
-          <div className='panel' le={styles.panel}>
+          <div className='panel' style={styles.panel}>
             <span className='smalltext'>
             There is a number of auto-generated columns that are activated when certain columns are not hidden. For example,
             activating <strong>Instagram Likes</strong> and <strong>Instagram Comments</strong> also activates <strong>Likes-to-Comments ratio</strong>.
             </span>
           </div>
-        {/*
           <div style={styles.instructionContainer} >
             <span style={{fontSize: '1.5em', color: grey600}} >Apply Presets</span>
-            <span>Use properties from a previously created list</span>
+            <span className='text'>Use properties from a previously created list</span>
+            <Select
+            labelKey='name'
+            options={this.props.lists}
+            onChange={this.onListPresetSelect}
+            />
           </div>
-        */}
           <div className='row' style={styles.columnsContainer}>
             <Container
             containerType='hiddenList'
-            updateList={this.updateList}
+            updateList={this.onUpdateList}
             className='large-4 medium-6 small-12 columns'
             id={1}
             title='Hidden Columns'
@@ -101,14 +117,13 @@ class ColumnEditPanelHOC extends Component {
             <Container
             containerType='showList'
             className='large-8 medium-6 small-12 columns'
-            updateList={this.updateList}
+            updateList={this.onUpdateList}
             id={2}
             title='Showing Columns'
             list={state.showList}
             />
           </div>
         </Dialog>
-        {this.props.children({onRequestOpen: this.onRequestOpen})}
       </div>
     );
   }
@@ -125,19 +140,23 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
+  const lists = state.listReducer.lists
+  .reduce((acc, id) => state.listReducer[id].createdby === state.personReducer.person.id ? [...acc, state.listReducer[id]] : acc, []);
   const listId = props.listId;
   const list = state.listReducer[listId];
 
   const rawFieldsmap = generateTableFieldsmap(list);
   return {
     fieldsmap: rawFieldsmap,
-    list: list
+    list: list,
+    lists,
   };
 };
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     patchList: listObj => dispatch(listActions.patchList(listObj)),
+    fetchLists: _ => dispatch(listActions.fetchLists()),
   };
 };
 
