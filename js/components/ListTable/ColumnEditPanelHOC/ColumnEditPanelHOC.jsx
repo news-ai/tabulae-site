@@ -99,7 +99,7 @@ class ColumnEditPanelHOC extends Component {
             </span>
           </div>
           <div style={styles.instructionContainer} >
-            <span style={styles.preset.label} >Apply List Presets - </span>
+            <span style={styles.preset.label} >Apply Presets - </span>
             <span className='text'>Use properties from a previously created list</span>
             <div style={styles.preset.dropdown} >
               <Select labelKey='name' value={state.selected} options={this.props.lists} onChange={this.onListPresetSelect} />
