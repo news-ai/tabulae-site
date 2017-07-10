@@ -30,6 +30,7 @@ class ColumnEditPanelHOC extends Component {
       showList,
       isUpdating: false,
       dirty: false,
+      selected: this.props.list
     };
     this.onUpdateList = this.onUpdateList.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -59,10 +60,11 @@ class ColumnEditPanelHOC extends Component {
   }
 
   onListPresetSelect(list) {
+    if (!list) list = this.props.list;
     const fieldsmap = generateTableFieldsmap(list);
     const hiddenList = fieldsmap.filter(field => field.hidden && !field.tableOnly);
     const showList = fieldsmap.filter(field => !field.hidden && !field.tableOnly);
-    this.setState({showList, hiddenList, dirty: true});
+    this.setState({showList, hiddenList, selected: list, dirty: true});
   }
 
   render() {
@@ -97,13 +99,11 @@ class ColumnEditPanelHOC extends Component {
             </span>
           </div>
           <div style={styles.instructionContainer} >
-            <span style={{fontSize: '1.5em', color: grey600}} >Apply Presets</span>
+            <span style={styles.preset.label} >Apply List Presets - </span>
             <span className='text'>Use properties from a previously created list</span>
-            <Select
-            labelKey='name'
-            options={this.props.lists}
-            onChange={this.onListPresetSelect}
-            />
+            <div style={styles.preset.dropdown} >
+              <Select labelKey='name' value={state.selected} options={this.props.lists} onChange={this.onListPresetSelect} />
+            </div>
           </div>
           <div className='row' style={styles.columnsContainer}>
             <Container
@@ -132,6 +132,10 @@ class ColumnEditPanelHOC extends Component {
 const styles = {
   instructionContainer: {margin: '20px 0'},
   columnsContainer: {paddingTop: 20},
+  preset: {
+    label: {fontSize: '1.2em', color: grey600},
+    dropdown: {margin: 10}
+  },
   panel: {
     backgroundColor: yellow50,
     margin: 10,
