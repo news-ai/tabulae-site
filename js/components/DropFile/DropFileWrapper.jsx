@@ -178,10 +178,10 @@ class DropFileWrapper extends Component {
     let renderNode;
     if (!state.isFileSubmitted) {
       renderNode = (
-        <div style={{margin: '0 30px'}}>
+        <div style={styles.mainContainer}>
           <div className='row vertical-center'>
             <div className='large-2 medium-3 small-12 columns'>
-              <span style={{color: grey500}}>List Name</span>
+              <span style={styles.label}>List Name</span>
             </div>
             <div className='large-10 medium-9 small-12 columns'>
               <TextField
@@ -194,7 +194,7 @@ class DropFileWrapper extends Component {
           </div>
           <div className='row vertical-center'>
             <div className='large-2 medium-3 small-12 columns'>
-              <span style={{color: grey500}}>Client</span>
+              <span style={styles.label}>Client</span>
             </div>
             <div className='large-10 medium-9 small-12 columns'>
               <TextField fullWidth id='clientname' ref='clientname' placeholder='(optional)' />
@@ -202,7 +202,7 @@ class DropFileWrapper extends Component {
           </div>
           <div className='row vertical-center'>
             <div className='large-2 medium-3 small-12 columns'>
-              <span style={{color: grey500}}>Tags</span>
+              <span style={styles.label}>Tags</span>
             </div>
             <div className='large-10 medium-9 small-12 columns'>
               <ReactTags
@@ -214,9 +214,9 @@ class DropFileWrapper extends Component {
               />
             </div>
           </div>
-          <div style={{height: 180, minWidth: 500}}>
+          <div style={styles.dropzoneContainer}>
           {state.isFileDropped ?
-            <div className='row horizontal-center vertical-center' style={{margin: '20px 0'}}>
+            <div className='row horizontal-center vertical-center' style={styles.details}>
               <FileDroppedIndicator file={state.file} onClose={this.onFileClose} />
             </div>
             : <Dropzone
@@ -231,22 +231,22 @@ class DropFileWrapper extends Component {
           <div className='vertical-center horizontal-center'>
             <RaisedButton
             primary
-            disabled={state.clicked || state.file === null}
             label='Upload'
+            disabled={state.clicked || state.file === null}
             onClick={this.onUploadClick}
             />
           </div>
-          <div className='vertical-center horizontal-center' style={{margin: '20px 0'}}>
+          <div className='vertical-center horizontal-center' style={styles.details}>
             <span>For more details, you may refer to <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>.</span>
           </div>
         </div>
         );
     } else {
       renderNode = (
-        <div className='horizontal-center' style={{marginTop: 30}}>
+        <div className='horizontal-center' style={styles.waiting.container}>
           <Waiting
           isReceiving={props.isReceiving || props.headerIsReceiving}
-          textStyle={{marginTop: 20}}
+          textStyle={styles.waiting.textStyle}
           text='Waiting for Columns to be processed...'
           />
         </div>
@@ -258,6 +258,17 @@ class DropFileWrapper extends Component {
     return renderNode
   }
 }
+
+const styles = {
+  waiting: {
+    textStyle: {marginTop: 20},
+    container: {marginTop: 30}
+  },
+  details: {margin: '20px 0'},
+  dropzoneContainer: {height: 180, minWidth: 500},
+  mainContainer: {margin: '0 30px'},
+  label: {color: grey500}
+};
 
 const mapStateToProps = (state, props) => {
   return {
