@@ -7,6 +7,7 @@ import {actions as listActions} from 'components/Lists';
 import {actions as fileActions} from 'components/ImportFile';
 import Dropzone from 'react-dropzone';
 import FontIcon from 'material-ui/FontIcon';
+import {WithContext as ReactTags} from 'react-tag-input';
 
 import Waiting from '../Waiting';
 import {grey500, grey800} from 'material-ui/styles/colors';
@@ -78,11 +79,16 @@ class DropFileWrapper extends Component {
       isFileDropped: false,
       isFileSubmitted: false,
       file: null,
-      clicked: false
+      clicked: false,
+      tags: [],
     };
     this.onDrop = this._onDrop.bind(this);
     this.onUploadClick = this._onUploadClick.bind(this);
     this.onFileClose = _ => this.setState({file: null, isFileDropped: false, value: this.props.defaultValue});
+    this.handleAddition = this._handleAddition.bind(this);
+    this.handleDelete = this._handleDelete.bind(this);
+    this.handleDrag = this._handleDrag.bind(this);
+    this.onNameChange = e => this.setState({value: e.target.value});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -92,12 +98,46 @@ class DropFileWrapper extends Component {
     this.props.resetError();
   }
 
+  _handleDelete(i) {
+    this.setState({
+      tags: this.state.tags.filter((tag, index) => index !== i)
+    });
+  }
+
+  _handleAddition(tag) {
+    if (this.state.tags.some(cTag => cTag.text === tag)) return;
+    this.setState({
+      tags: [
+        ...this.state.tags,
+        {
+          id: this.state.tags.length + 1,
+          text: tag
+        }
+      ]
+    });
+  }
+
+  _handleDrag(tag, currPos, newPos) {
+    const tags = [ ...this.state.tags ];
+
+    // mutate array
+    tags.splice(currPos, 1);
+    tags.splice(newPos, 0, tag);
+
+    // re-render
+    this.setState({tags});
+  }
+
   _onUploadClick() {
     window.Intercom('trackEvent', 'uploaded_sheet');
     mixpanel.track('uploaded_sheet');
     // create empty list first then upload file to populare the list
     this.setState({clicked: true});
-    this.props.createEmptyList(this.state.value)
+    let listObj = {name: this.state.value};
+    if (this.state.tags.length > 0) listObj.tags = this.state.tags.map(tag => tag.text);
+    const client = this.refs.clientname.getValue();
+    if (client) listObj.client = client;
+    this.props.createEmptyListObject(listObj)
     .then(response => {
       this.setState({listId: response.data.id});
       return response.data.id;
@@ -138,21 +178,45 @@ class DropFileWrapper extends Component {
     let renderNode;
     if (!state.isFileSubmitted) {
       renderNode = (
-        <div>
-          <div className='row'>
-            <span>Give the uploaded list a name.</span>
+        <div style={{margin: '0 30px'}}>
+          <div className='row vertical-center'>
+            <div className='large-2 medium-3 small-12 columns'>
+              <span style={{color: grey500}}>List Name</span>
+            </div>
+            <div className='large-10 medium-9 small-12 columns'>
+              <TextField
+              fullWidth
+              id='filedrop-textfield'
+              value={state.value}
+              onChange={this.onNameChange}
+              />
+            </div>
           </div>
-          <div className='row'>
-            <TextField
-            id='filedrop-textfield'
-            fullWidth
-            value={state.value}
-            onChange={e => this.setState({value: e.target.value})}
-            />
+          <div className='row vertical-center'>
+            <div className='large-2 medium-3 small-12 columns'>
+              <span style={{color: grey500}}>Client</span>
+            </div>
+            <div className='large-10 medium-9 small-12 columns'>
+              <TextField fullWidth id='clientname' ref='clientname' placeholder='(optional)' />
+            </div>
           </div>
-          <div style={{height: 180}}>
+          <div className='row vertical-center'>
+            <div className='large-2 medium-3 small-12 columns'>
+              <span style={{color: grey500}}>Tags</span>
+            </div>
+            <div className='large-10 medium-9 small-12 columns'>
+              <ReactTags
+              tags={state.tags}
+              placeholder='Hit Enter after input tag (Optional)'
+              handleDelete={this.handleDelete}
+              handleAddition={this.handleAddition}
+              handleDrag={this.handleDrag}
+              />
+            </div>
+          </div>
+          <div style={{height: 180, minWidth: 500}}>
           {state.isFileDropped ?
-            <div className='row vertical-center' style={{margin: '20px 0'}}>
+            <div className='row horizontal-center vertical-center' style={{margin: '20px 0'}}>
               <FileDroppedIndicator file={state.file} onClose={this.onFileClose} />
             </div>
             : <Dropzone
@@ -179,21 +243,19 @@ class DropFileWrapper extends Component {
         );
     } else {
       renderNode = (
-        <div>
+        <div className='horizontal-center' style={{marginTop: 30}}>
           <Waiting
           isReceiving={props.isReceiving || props.headerIsReceiving}
           textStyle={{marginTop: 20}}
           text='Waiting for Columns to be processed...'
           />
-        </div>);
+        </div>
+        );
     }
     if (props.didInvalidate) {
       return <FileDroppedError error={props.error}/>;
     }
-    return (
-      <div className='horizontal-center' style={{marginTop: 40}}>
-        {renderNode}
-      </div>);
+    return renderNode
   }
 }
 
@@ -211,6 +273,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch, props) => {
   return {
     createEmptyList: listname => dispatch(listActions.createEmptyList(listname)),
+    createEmptyListObject: listObj => dispatch(listActions.createEmptyListObject(listObj)),
     uploadFile: (listId, file) => dispatch(fileActions.uploadFile(listId, file)),
     fetchHeaders: listId => dispatch(fileActions.fetchHeaders(listId)),
     resetError: _ => dispatch({type: 'RESET_FILE_REDUCER_ERROR'})
