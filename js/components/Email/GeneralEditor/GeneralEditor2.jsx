@@ -22,7 +22,6 @@ import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap} from 'components/Email/EmailPanel/utils/renderers';
-import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -615,7 +614,7 @@ class GeneralEditor extends React.Component {
     if (this.state.currentDragTarget) {
       const blockKey = this.state.currentDragTarget;
       const atomicBlock = this.state.editorState.getCurrentContent().getBlockForKey(this.state.currentDragTarget);
-      const newEditorState = moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
+      const newEditorState = AtomicBlockUtils.moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
       this.onChange(newEditorState);
       return true;
     }

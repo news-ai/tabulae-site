@@ -30,7 +30,6 @@ import {
   typefaceMap,
   fontsizeMap
 } from 'components/Email/EmailPanel/utils/renderers';
-import moveAtomicBlock from 'components/Email/EmailPanel/utils/moveAtomicBlock';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -223,7 +222,6 @@ class BasicHtmlEditor extends Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
-    // this.applyOverwriteEntity = this._applyOverwriteEntity.bind(this);
     this.stripOverwriteStyle = this._stripOverwriteStyle.bind(this);
     this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
 
@@ -255,7 +253,6 @@ class BasicHtmlEditor extends Component {
         // email signature should append to existing content
         let oldContent = this.state.editorState.getCurrentContent();
         oldContent = this.stripOverwriteStyle(oldContent, nextProps.templateEntityType);
-        // newContent = this.applyOverwriteEntity(newContent, nextProps.templateEntityType);
         const blocks = newContent.getBlockMap();
         const newContentSelection = SelectionState
           .createEmpty()
@@ -307,23 +304,6 @@ class BasicHtmlEditor extends Component {
     // Now select all stripped blocks and insert overwriteEntityType
     return ContentState.createFromBlockArray(truncatedBlocks);
   }
-
-  // _applyOverwriteEntity(contentState, overwriteEntityType) {
-  //   const content = contentState.createEntity(overwriteEntityType, 'MUTABLE');
-  //   const entityKey = content.getLastCreatedEntityKey();
-  //   if (overwriteEntityType) {
-  //     const blocks = contentState.getBlockMap();
-  //     const selection = SelectionState
-  //     .createEmpty()
-  //     .merge({
-  //       anchorKey: blocks.first().getKey(),
-  //       anchorOffset: 0,
-  //       focusKey: blocks.last().getKey(),
-  //       focusOffset: blocks.last().getLength()
-  //     });
-  //     return Modifier.applyEntity(contentState, selection, entityKey);
-  //   }
-  // }
 
   _removeWhiteSpace(editorState) {
     // // HACK: remove empty character in empty block to have paragraph breaks
@@ -725,7 +705,7 @@ class BasicHtmlEditor extends Component {
     if (this.state.currentDragTarget) {
       const blockKey = this.state.currentDragTarget;
       const atomicBlock = this.state.editorState.getCurrentContent().getBlockForKey(this.state.currentDragTarget);
-      const newEditorState = moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
+      const newEditorState = AtomicBlockUtils.moveAtomicBlock(this.state.editorState, atomicBlock, dropSelection);
       this.onChange(newEditorState);
       return true;
     }
