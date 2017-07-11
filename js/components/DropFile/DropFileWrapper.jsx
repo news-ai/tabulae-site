@@ -13,27 +13,6 @@ import Waiting from '../Waiting';
 import {grey500, grey800} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 
-const styles = {
-  dropzone: {
-    default: {
-      borderWidth: 2,
-      borderColor: 'black',
-      borderStyle: 'dashed',
-      borderRadius: 4,
-      margin: 30,
-      padding: 30,
-      transition: 'all 0.4s',
-    },
-    active: {
-      borderStyle: 'solid',
-      borderColor: '#4FC47F'
-    },
-    reject: {
-      borderStyle: 'solid',
-      borderColor: '#DD3A0A'
-    }
-  },
-};
 
 const FileDroppedIndicator = ({file, onClose}) => {
   return (
@@ -260,6 +239,25 @@ class DropFileWrapper extends Component {
 }
 
 const styles = {
+  dropzone: {
+    default: {
+      borderWidth: 2,
+      borderColor: 'black',
+      borderStyle: 'dashed',
+      borderRadius: 4,
+      margin: 30,
+      padding: 30,
+      transition: 'all 0.4s',
+    },
+    active: {
+      borderStyle: 'solid',
+      borderColor: '#4FC47F'
+    },
+    reject: {
+      borderStyle: 'solid',
+      borderColor: '#DD3A0A'
+    }
+  },
   waiting: {
     textStyle: {marginTop: 20},
     container: {marginTop: 30}
