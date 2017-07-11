@@ -113,9 +113,15 @@ class DropFileWrapper extends Component {
     // create empty list first then upload file to populare the list
     this.setState({clicked: true});
     let listObj = {name: this.state.value};
-    if (this.state.tags.length > 0) listObj.tags = this.state.tags.map(tag => tag.text);
+    if (this.state.tags.length > 0) {
+      listObj.tags = this.state.tags.map(tag => tag.text);
+      mixpanel.track('add_list_tag');
+    }
     const client = this.refs.clientname.getValue();
-    if (client) listObj.client = client;
+    if (client) {
+      listObj.client = client;
+      mixpanel.track('add_list_client');
+    }
     this.props.createEmptyListObject(listObj)
     .then(response => {
       this.setState({listId: response.data.id});
