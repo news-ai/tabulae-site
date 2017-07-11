@@ -17,7 +17,7 @@ import alertify from 'alertifyjs';
 const FileDroppedIndicator = ({file, onClose}) => {
   return (
       <div className='row vertical-center' style={{margin: '20px 0'}}>
-        <span style={{marginRight: 20}}>{file.name} -- {file.size} bytes</span>
+        <span style={{marginRight: 20}}>{file.name} ---- {file.size} bytes</span>
         <FontIcon
         color={grey800}
         hoverColor={grey500}
@@ -176,7 +176,7 @@ class DropFileWrapper extends Component {
               <span style={styles.label}>Client</span>
             </div>
             <div className='large-10 medium-9 small-12 columns'>
-              <TextField fullWidth id='clientname' ref='clientname' placeholder='(optional)' />
+              <TextField fullWidth id='clientname' ref='clientname' placeholder='(Optional)' />
             </div>
           </div>
           <div className='row vertical-center'>
@@ -186,7 +186,7 @@ class DropFileWrapper extends Component {
             <div className='large-10 medium-9 small-12 columns'>
               <ReactTags
               tags={state.tags}
-              placeholder='Hit Enter after input tag (Optional)'
+              placeholder='Hit Enter after to add tag (Optional)'
               handleDelete={this.handleDelete}
               handleAddition={this.handleAddition}
               handleDrag={this.handleDrag}
