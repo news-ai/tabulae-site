@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';
-// import {skylightStyles} from 'constants/StyleConstants';
-// import SkyLight from 'react-skylight';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 

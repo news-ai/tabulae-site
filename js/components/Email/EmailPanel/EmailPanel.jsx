@@ -1,7 +1,6 @@
 // @flow
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import SkyLight from 'react-skylight';
 import {actions as feedActions} from 'components/ContactProfile/RSSFeed';
 import {actions as contactActions} from 'components/Contacts';
 import {actions as listActions} from 'components/Lists';
@@ -10,7 +9,6 @@ import {actions as fileActions} from 'components/ImportFile';
 import {actions as loginActions} from 'components/Login';
 import {actions as stagingActions} from 'components/Email';
 import {actions as templateActions} from 'components/Email/Template';
-import {skylightStyles} from 'constants/StyleConstants';
 import alertify from 'alertifyjs';
 import get from 'lodash/get';
 import find from 'lodash/find';
