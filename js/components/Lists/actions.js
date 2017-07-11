@@ -239,6 +239,22 @@ export function createEmptyList(name, fieldsmap) {
   };
 }
 
+export function createEmptyListObject({name, fieldsmap, tags, client}) {
+  return dispatch => {
+    let listBody = {
+      name,
+      contacts: [],
+    };
+    if (tags) listBody.tags = tags;
+    if (client) listBody.client = client;
+    if (fieldsmap) listBody.fieldsmap = fieldsmap;
+    dispatch({type: 'LIST_CREATE_EMPTY', listBody});
+    return api.post(`/lists`, listBody)
+    .then(response => response)
+    .catch(message => console.log(message));
+  };
+}
+
 export function archiveListToggle(listId) {
   return (dispatch, getState) => {
     dispatch({ type: ARCHIVE_LIST, listId});

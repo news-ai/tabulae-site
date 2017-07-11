@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
 import {connect} from 'react-redux';
-import {skylightStyles} from 'constants/StyleConstants';
-import SkyLight from 'react-skylight';
 import RaisedButton from 'material-ui/RaisedButton';
+import Dialog from 'material-ui/Dialog';
 
 import Lists from './Lists';
 import InfiniteScroll from 'components/InfiniteScroll';
@@ -19,8 +18,12 @@ import {tour} from './tour';
 class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
-    this.onUploadFromExistingClick = _ => this.refs.input.show();
+    this.state = {
+      open: false
+    };
     this.onUploadFromNewClick = _ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`);
+    this.onRequestClose = _ => this.setState({open: false});
+    this.onRequestOpen = _ => this.setState({open: true});
   }
 
   componentDidMount() {
@@ -40,13 +43,9 @@ class ListManagerContainer extends Component {
   render() {
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
-        <SkyLight
-        ref='input'
-        overlayStyles={skylightStyles.overlay}
-        dialogStyles={skylightStyles.dialog}
-        title='Import File'>
+        <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
-        </SkyLight>
+        </Dialog>
         <div className='large-offset-1 large-10 columns'>
           <div style={styles.buttonContainer}>
             <RaisedButton
@@ -61,7 +60,7 @@ class ListManagerContainer extends Component {
             className='right'
             style={styles.uploadBtn}
             label='Upload from Existing'
-            onClick={this.onUploadFromExistingClick}
+            onClick={this.onRequestOpen}
             labelStyle={styles.uploadBtnLabel}
             icon={<i style={styles.icon} className='fa fa-plus' aria-hidden='true' />}
             />
