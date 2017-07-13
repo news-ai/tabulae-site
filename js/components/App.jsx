@@ -87,10 +87,9 @@ class App extends Component {
       if (process.env.NODE_ENV === 'production') {
         Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
         Raven.setUserContext({email: nextProps.person.email, id: nextProps.person.id});
-        delighted.survey({
-          email: nextProps.person.email,
-          name: nextProps.person.name,
-        });
+        delighted.survey({email: nextProps.person.email,name: nextProps.person.name});
+        mixpanel.person.set({email: nextProps.person.email, name: nextProps.person.name});
+        mixpanel.identify(nextProps.person.id);
       }
 
       if (nextProps.firstTimeUser) {

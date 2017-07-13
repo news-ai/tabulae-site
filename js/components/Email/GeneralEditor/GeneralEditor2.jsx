@@ -85,13 +85,6 @@ class GeneralEditor extends React.Component {
     ];
 
     this.EXTERNAL_CONTROLS = [
-      // {
-      //   label: 'Attachments',
-      //   onToggle: this.props.onAttachmentPanelOpen,
-      //   icon: 'fa fa-paperclip',
-      //   isActive: _ => this.props.files.length > 0,
-      //   tooltip: 'Attach File'
-      // },
       {
         label: 'Image Upload',
         onToggle: _ => this.setState({imagePanelOpen: true}),
