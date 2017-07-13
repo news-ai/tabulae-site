@@ -77,20 +77,20 @@ class App extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
       const appId = process.env.NODE_ENV === 'development' ? 'eh8247hf' : 'ur8dbk9e';
+      const person = nextProps.person;
       intercomSetup({
         app_id: appId,
-        email: nextProps.person.email,
-        name: `${nextProps.person.firstname} ${nextProps.person.lastname}`,
+        email: person.email,
+        name: `${person.firstname} ${person.lastname}`,
         custom_launcher_selector: '#custom_intercom_launcher',
-        user_id: nextProps.person.id
+        user_id: person.id
       });
       if (process.env.NODE_ENV === 'production') {
         Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
-        Raven.setUserContext({email: nextProps.person.email, id: nextProps.person.id});
-        delighted.survey({
-          email: nextProps.person.email,
-          name: nextProps.person.name,
-        });
+        Raven.setUserContext({email: person.email, id: person.id});
+        delighted.survey({email: person.email, name: `${person.firstname} ${person.lastname}`});
+        mixpanel.people.set({email: person.email, name: `${person.firstname} ${person.lastname}`});
+        mixpanel.identify(person.id);
       }
 
       if (nextProps.firstTimeUser) {
