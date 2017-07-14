@@ -42,9 +42,10 @@ import {blue700, grey700, grey800} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 
-import Subject from 'components/Email/EmailPanel/Subject.jsx';
 import Link from 'components/Email/EmailPanel/components/Link';
+import Property from 'components/Email/EmailPanel/components/Property';
 import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.jsx';
+import Subject from 'components/Email/EmailPanel/Subject.jsx';
 import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
 import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeControls';
@@ -81,6 +82,10 @@ class BasicHtmlEditor extends Component {
         component: Link
       },
       {
+        strategy: findEntities.bind(null, 'PROPERTY'),
+        component: Property
+      },
+      {
         strategy: curlyStrategy,
         component: CurlySpan
       }
@@ -103,7 +108,7 @@ class BasicHtmlEditor extends Component {
         onToggle: _ => this.setState({imagePanelOpen: true}),
         icon: 'fa fa-camera',
         isActive: _ => false,
-      }
+      },
     ];
 
     this.CONVERT_CONFIGS = {
@@ -198,7 +203,7 @@ class BasicHtmlEditor extends Component {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
       // console.log(raw);
-      // console.log(html);
+      console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -224,6 +229,7 @@ class BasicHtmlEditor extends Component {
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
     this.stripOverwriteStyle = this._stripOverwriteStyle.bind(this);
     this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
+    this.onInsertProperty = this.onInsertProperty.bind(this);
 
     // cleanups
     this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
@@ -282,6 +288,21 @@ class BasicHtmlEditor extends Component {
 
   componentWillUnmount() {
     this.props.clearAttachments();
+  }
+
+  onInsertProperty(propertyType) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    const contentStateWithEntity = editorState.getCurrentContent().createEntity('PROPERTY', 'IMMUTABLE', {property: propertyType});
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+
+    const newEditorState = EditorState.push(
+      editorState,
+      Modifier.insertText(contentStateWithEntity, selection, propertyType, undefined, entityKey),
+      'insert-fragment'
+      );
+    this.onChange(newEditorState);
+    this.setState({variableMenuOpen: false});
   }
 
   _stripOverwriteStyle(contentState, overwriteStyle) {
@@ -652,7 +673,6 @@ class BasicHtmlEditor extends Component {
 
   _handleImage(url) {
     const {editorState} = this.state;
-    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
     const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
       src: url,
       size: '100%',
@@ -807,10 +827,7 @@ class BasicHtmlEditor extends Component {
           {props.fieldsmap
             .filter(field => !field.hidden)
             .map((field, i) =>
-            <MenuItem key={i} primaryText={field.name} onClick={_ => {
-              this.insertText(field.name);
-              this.setState({variableMenuOpen: false});
-            }}/>)}
+            <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)}/>)}
           </Menu>
         </Popover>
         <div style={{marginTop: 70}} >
@@ -853,12 +870,7 @@ class BasicHtmlEditor extends Component {
             />
           </div>
         </div>
-        <div className='horizontal-center' style={{
-          width: '100%',
-          position: 'fixed',
-          zIndex: 200,
-          bottom: 80,
-        }} >
+        <div className='horizontal-center' style={styles.controlsContainer} >
           <Paper zDepth={1} style={controlsStyle}>
             <InlineStyleControls
             editorState={editorState}
@@ -922,6 +934,12 @@ const styles = {
   anchorOrigin: {horizontal: 'left', vertical: 'bottom'},
   targetOrigin: {horizontal: 'left', vertical: 'top'},
   dropzone: {display: 'none'},
+  controlsContainer: {
+    width: '100%',
+    position: 'fixed',
+    zIndex: 200,
+    bottom: 80,
+  }
 };
 
 const imgPanelStyles = {
