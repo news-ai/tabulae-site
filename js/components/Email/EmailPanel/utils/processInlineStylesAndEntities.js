@@ -136,7 +136,7 @@ export default function processInlineStylesAndEntities({
       cuts.add(range.offset);
       cuts.add(range.offset + range.length);
     });
-    const sortedCuts = [...cuts].sort((a, b) => a - b);
+    const sortedCuts = Array.from(cuts).sort((a, b) => a - b);
 
     let currCut;
     let nextCut;
