@@ -111,10 +111,7 @@ class EmailPanel extends Component {
     };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
-    this.onSubjectChange = (editorState) => {
-      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      this.setState({subject});
-    };
+    this.onSubjectChange = this.onSubjectChange.bind(this);
     this.getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this.sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
@@ -154,6 +151,28 @@ class EmailPanel extends Component {
   componentWillUnmount() {
     this.props.clearUTCTime();
     this.props.initializeEmailDraft();
+  }
+
+  onSubjectChange(editorState) {
+    const subjectContent = editorState.getCurrentContent();
+    const subjectBlock = editorState.getCurrentContent().getBlocksAsArray()[0];
+    const subject = subjectBlock.getText();
+    let mutatingSubject = '';
+    let lastOffset = 0;
+    subjectBlock.findEntityRanges(
+      (character) => {
+        const entityKey = character.getEntity();
+        if (entityKey === null) return false;
+        return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'PROPERTY');
+      },
+      (start, end) => {
+        const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();
+        mutatingSubject += (subject.slice(lastOffset, start) + `<%= ${property} %>`);
+        lastOffset = end;
+      });
+    mutatingSubject += subject.slice(lastOffset, subject.length);
+
+    this.setState({subject: mutatingSubject});
   }
 
   _changeEmailSignature(emailsignature) {

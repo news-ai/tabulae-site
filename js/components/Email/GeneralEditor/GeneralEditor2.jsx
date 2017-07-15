@@ -30,6 +30,7 @@ import FlatButton from 'material-ui/FlatButton';
 
 import Subject from 'components/Email/EmailPanel/Subject.jsx';
 import Link from 'components/Email/EmailPanel/components/Link';
+import Property from 'components/Email/EmailPanel/components/Property';
 import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.jsx';
 import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
@@ -70,6 +71,10 @@ const decorator = new CompositeDecorator([
   {
     strategy: findEntities.bind(null, 'LINK'),
     component: Link
+  },
+  {
+    strategy: findEntities.bind(null, 'PROPERTY'),
+    component: Property
   },
   {
     strategy: curlyStrategy,

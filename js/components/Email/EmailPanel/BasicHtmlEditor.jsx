@@ -203,11 +203,10 @@ class BasicHtmlEditor extends Component {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);
       // console.log(raw);
-      console.log(html);
+      // console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
-    this.insertText = this._insertText.bind(this);
     this.handleKeyCommand = this._handleKeyCommand.bind(this);
     this.toggleBlockType = this._toggleBlockType.bind(this);
     this.toggleInlineStyle = this._toggleInlineStyle.bind(this);
@@ -293,6 +292,10 @@ class BasicHtmlEditor extends Component {
   onInsertProperty(propertyType) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
+    if (!selection.isCollapsed()) {
+      alertify.alert('Editor Warning', 'The editor cursor must be focused and not highlighted to insert property.');
+      return;
+    }
     const contentStateWithEntity = editorState.getCurrentContent().createEntity('PROPERTY', 'IMMUTABLE', {property: propertyType});
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
 
@@ -365,7 +368,8 @@ class BasicHtmlEditor extends Component {
           }
           return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'IMAGE');
         },
-        (start, end) => {});
+        (start, end) => {}
+        );
     });
 
     // SECOND PASS TO REMOVE ORPHANED NON-ATOMIC BLOCKS WITH IMG ENTITIES
@@ -481,15 +485,6 @@ class BasicHtmlEditor extends Component {
     let handled = 'not-handled';
     if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
     return handled;
-  }
-
-  _insertText(replaceText) {
-    const {editorState} = this.state;
-    const content = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const newContent = Modifier.insertText(content, selection, '{' + replaceText + '}');
-    const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
-    this.onChange(newEditorState);
   }
 
   _handleReturn(e) {
