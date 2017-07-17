@@ -45,7 +45,7 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
 import {blueGrey50, grey50, grey600, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
-import replaceAll from './utils/replaceAll';
+import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
@@ -120,7 +120,6 @@ class EmailPanel extends Component {
     this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
-    this.onSendTestEmail = this.onSendTestEmail.bind(this);
 
     // cleanups
     this.onEmailSendClick = _ => this.checkEmailDupes().then(this.onPreviewEmailsClick);
@@ -284,7 +283,7 @@ class EmailPanel extends Component {
         if (this.props.scheduledtime !== null) {
           emailObj.sendat = this.props.scheduledtime;
         }
-        if (subjectObj.numMatches > 0) {
+        if (subjectObj.numPropertiesUsed > 0) {
           emailObj.baseSubject = subject;
         }
         const fields = [...bodyObj.emptyFields, ...subjectObj.emptyFields];
@@ -426,47 +425,6 @@ class EmailPanel extends Component {
     .catch(_ => {
       console.log('CANCELLED');
     });
-  }
-
-  onSendTestEmail() {
-    // const {subject, body} = this.state;
-    // const email = this.props.person.email;
-    // let newHtml = html;
-
-    // this.state.fieldsmap.map(fieldObj => {
-    //   let value = '';
-    //   const replaceValue = _getter(contact, fieldObj);
-    //   if (replaceValue) value = replaceValue;
-    //   const regexValue = new RegExp('\{' + fieldObj.name + '\}', 'g');
-    //   // count num custom vars used
-    //   const matches = newHtml.match(regexValue);
-    //   if (matches !== null) {
-    //     if (!value) emptyFields.push(fieldObj.name);
-    //     matchCount[fieldObj.name] = matches.length;
-    //   }
-    //   newHtml = newHtml.replace(regexValue, value);
-    //   if (expectedMatches !== null) expectedMatches = expectedMatches.filter(match => match !== `{${fieldObj.name}}`);
-    // });
-
-    // const bodyObj = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
-    // const subjectObj = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
-    // let emailObj = {
-    //   listid: this.props.listId,
-    //   to: contact.email,
-    //   subject: subjectObj.html,
-    //   body: bodyObj.html,
-    //   contactid: contact.id,
-    //   templateid: this.state.currentTemplateId,
-    //   cc: this.props.cc.map(item => item.text),
-    //   bcc: this.props.bcc.map(item => item.text),
-    //   fromemail: this.props.from,
-    // };
-    // if (this.props.scheduledtime !== null) {
-    //   emailObj.sendat = this.props.scheduledtime;
-    // }
-    // if (subjectObj.numMatches > 0) {
-    //   emailObj.baseSubject = subject;
-    // }
   }
 
   _onClearClick() {

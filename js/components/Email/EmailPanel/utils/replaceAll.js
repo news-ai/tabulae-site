@@ -1,33 +1,43 @@
 import {_getter} from 'components/ListTable/helpers';
-import template from 'lodash/template';
 
-const reg= /(?:\{\{|<%=)(.+?)(?:%>|\}\})/g;
+/**
+ * Based on general-purpose HTML template and outputs specific HTML email with contact info based on custom properties
+ * @param  {String} html      general HTML template string
+ * @param  {Object} contact   Tabulae contact
+ * @param  {Array} fieldsmap  Tabulae List fieldsmap
+ * @return {Object}           html: generated HTML, numPropertiesUsed: # of custom properties used, emptyFields: properties used that do not exist on List
+ */
 export default function replaceAll(html, contact, fieldsmap) {
-  if (html === null || html.length === 0) return {html: '', numMatches: 0, emptyFields: []};
+  if (html === null || html.length === 0) return {html: '', numPropertiesUsed: 0, emptyFields: []};
   let newHtml = html;
   let matchCount = {};
   let emptyFields = [];
-  let expectedMatches = newHtml.match(reg);
+  // get total list of custom properties used
+  let expectedMatches = newHtml.match(/(?:\{\{|<%=)(.+?)(?:%>|\}\})/g);
+  if (expectedMatches === null) expectedMatches = [];
+  console.log(expectedMatches);
   fieldsmap.map(fieldObj => {
-    let value = '';
-    const replaceValue = _getter(contact, fieldObj);
-    if (replaceValue) value = replaceValue;
+    const value = _getter(contact, fieldObj) || '';
     const regexValue = new RegExp('<%= ' + fieldObj.name + ' %>', 'g');
-    // count num custom vars used
+    newHtml = newHtml.replace(regexValue, value);
+    // housekeeping step for generating useful errors
+    // count number of times each individual custom property is used
     const matches = newHtml.match(regexValue);
     if (matches !== null) {
+      // matched but custom property used in email is not available on this List
+      // track number of times each custom property is used in a dict
       if (!value) emptyFields.push(fieldObj.name);
       matchCount[fieldObj.name] = matches.length;
     }
-    newHtml = newHtml.replace(regexValue, value);
-    if (expectedMatches !== null) expectedMatches = expectedMatches.filter(match => match !== `{${fieldObj.name}}`);
+    // remove property from expected array since it has been processed
+    expectedMatches = expectedMatches.filter(match => match !== `<%= ${fieldObj.name} =>`);
   });
-  const numMatches = Object.keys(matchCount).length;
-  if (numMatches > 0) {
-    window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length});
-    mixpanel.track('num_custom_variables', {num_custom_variables: Object.keys(matchCount).length});
+  const numPropertiesUsed = Object.keys(matchCount).length;
+  if (numPropertiesUsed > 0) {
+    window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: numPropertiesUsed});
+    mixpanel.track('num_custom_variables', {num_custom_variables: numPropertiesUsed});
   }
-  if (expectedMatches !== null && expectedMatches.length > 0) emptyFields = [...emptyFields, ...expectedMatches];
-  return {html: newHtml, numMatches, emptyFields};
+  if (expectedMatches.length > 0) emptyFields = [...emptyFields, ...expectedMatches.map(match => match.slice(4, match.length - 3))];
+  return {html: newHtml, numPropertiesUsed, emptyFields};
 }
 
