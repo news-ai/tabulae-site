@@ -105,6 +105,7 @@ class EmailPanel extends Component {
       isPreveiwOpen: false,
       dirty: false,
     };
+    this.checkTrialMembership = this.checkTrialMembership.bind(this);
     this.updateBodyHtml = (html, rawContentState) => {
       this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
       this.props.saveEditorState(rawContentState);
@@ -126,7 +127,9 @@ class EmailPanel extends Component {
     this.onSendTestEmail = this.onSendTestEmail.bind(this);
 
     // cleanups
-    this.onEmailSendClick = _ => this.checkEmailDupes().then(this.onPreviewEmailsClick);
+    this.onEmailSendClick = _ => this.checkTrialMembership()
+    .then(this.checkEmailDupes)
+    .then(this.onPreviewEmailsClick);
   }
 
   componentWillMount() {
@@ -293,6 +296,23 @@ class EmailPanel extends Component {
       err => {
         alertify.alert(err.toString());
       });
+  }
+
+  checkTrialMembership() {
+    return new Promise((resolve, reject) => {
+      const {ontrial, selectedContacts, dailyEmailsAllowed, numEmailsSentToday} = this.props;
+      if (ontrial && selectedContacts.length + numEmailsSentToday > dailyEmailsAllowed) {
+        alertify.alert(
+          'Exceeding Trial Membership Limit',
+          `
+          You only have <span style='color:red'>${dailyEmailsAllowed - numEmailsSentToday < 0 ? 0 : dailyEmailsAllowed - numEmailsSentToday} emails left available</span> on your plan based on your daily email allowance on your current plan (${dailyEmailsAllowed} emails/day). <a href='https://tabulae.newsai.org/api/billing'>Upgrade your membership today.</a></span>
+          `
+          )
+        reject();
+      } else {
+        resolve(true);
+      }
+    })
   }
 
   _checkEmailDupes() {
@@ -525,13 +545,7 @@ class EmailPanel extends Component {
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
-              onClick={_ => {
-                if (props.ontrial) {
-                  alertify.alert('Unusual Activities Detected', 'We are experiencing unusual activities on our trial plan, so we are disabling the email feature while we resolve the situation. Sorry for the inconvenience. This will not affect out Pro Plan subscribers.');
-                } else {
-                  this.onEmailSendClick();
-                }
-              }}
+              onClick={this.onEmailSendClick}
               label='Preview'
               icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
               />
@@ -709,7 +723,9 @@ const mapStateToProps = (state, props) => {
     files: state.emailAttachmentReducer.attached,
     isAttachmentPanelOpen: state.emailDraftReducer.isAttachmentPanelOpen,
     emailsignature,
-    ontrial: state.personReducer.ontrial
+    ontrial: state.personReducer.ontrial,
+    dailyEmailsAllowed: state.personReducer.dailyEmailsAllowed,
+    numEmailsSentToday: state.personReducer.numEmailsSentToday,
   };
 };
 
