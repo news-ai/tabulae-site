@@ -31,7 +31,6 @@ import FlatButton from 'material-ui/FlatButton';
 import Subject from 'components/Email/EmailPanel/Subject.jsx';
 import Link from 'components/Email/EmailPanel/components/Link';
 import Property from 'components/Email/EmailPanel/components/Property';
-import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.jsx';
 import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
 import BlockStyleControls from 'components/Email/EmailPanel/components/BlockStyleControls';
@@ -46,7 +45,7 @@ import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ValidationHOC';
 
-import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
+import {findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
@@ -76,10 +75,6 @@ const decorator = new CompositeDecorator([
     strategy: findEntities.bind(null, 'PROPERTY'),
     component: Property
   },
-  {
-    strategy: curlyStrategy,
-    component: CurlySpan
-  }
 ]);
 
 class GeneralEditor extends React.Component {

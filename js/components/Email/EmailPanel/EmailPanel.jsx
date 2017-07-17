@@ -43,7 +43,7 @@ import 'react-virtualized/styles.css';
 import './react-select-hack.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
-import {blueGrey50, grey50, grey600, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {blueGrey50, grey50, grey600, grey700, grey800, red800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 
@@ -240,6 +240,38 @@ class EmailPanel extends Component {
       const bodyHtml = template.body;
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
+
+        // look for old property format and trigger warning for user to update
+        const triggerNewEntityFormatWarning = ({blocks, entityMap}) => {
+          const oldPropertyMap = blocks.reduce((acc, block) => {
+            let expectedMatches = block.text.match(/{([^}]+)}/g);
+            if (expectedMatches !== null) {
+              expectedMatches.map(match => acc[match] = acc[match] ? acc[match] + 1 : 1);
+            }
+            return acc;
+          }, {});
+          const oldProperties = Object.keys(oldPropertyMap);
+          if (oldProperties.length > 0) {
+            alertify.alert(
+              `Custom Property Update: ${oldProperties.length} Properties Found`,
+              `
+              <div>
+              We recently updated the custom properties system to use a new data format that is more accurate and your template may be outdated.
+              </div>
+              <div style='color:${red800}'>
+              Update your template by removing and re-adding custom properties and saving the template.
+              </div>
+              <div>
+              We found the following custom properties using the old data format:
+                <ul>
+                ${oldProperties.map(property => `<li>${property}</li>`).join('')}
+                </ul>
+              </div>`
+              );
+          }
+        };
+
+        triggerNewEntityFormatWarning(templateJSON.data);
         this.setState({bodyEditorState: templateJSON.data});
         this.props.saveEditorState(templateJSON.data);
         this.setState({subjectHtml});

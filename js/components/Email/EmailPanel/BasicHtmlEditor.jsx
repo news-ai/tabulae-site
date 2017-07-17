@@ -44,7 +44,6 @@ import FlatButton from 'material-ui/FlatButton';
 
 import Link from 'components/Email/EmailPanel/components/Link';
 import Property from 'components/Email/EmailPanel/components/Property';
-import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan.jsx';
 import Subject from 'components/Email/EmailPanel/Subject.jsx';
 import EntityControls from 'components/Email/EmailPanel/components/EntityControls';
 import InlineStyleControls from 'components/Email/EmailPanel/components/InlineStyleControls';
@@ -59,7 +58,7 @@ import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ValidationHOC';
 
-import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
+import {findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email by clicking on "Insert Property" or "+" icon. E.g. "Hi {First Name}! It was so good to see you at {Location} the other day...';
 
@@ -84,10 +83,6 @@ class BasicHtmlEditor extends Component {
       {
         strategy: findEntities.bind(null, 'PROPERTY'),
         component: Property
-      },
-      {
-        strategy: curlyStrategy,
-        component: CurlySpan
       }
     ]);
 
