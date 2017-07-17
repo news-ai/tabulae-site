@@ -34,7 +34,7 @@ export default function replaceAll(html, contact, fieldsmap) {
   });
   const numPropertiesUsed = Object.keys(matchCount).length;
   if (numPropertiesUsed > 0) {
-    window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: numPropertiesUsed});
+    // window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: numPropertiesUsed});
     mixpanel.track('num_custom_variables', {num_custom_variables: numPropertiesUsed});
   }
   if (expectedMatches.length > 0) emptyFields = [...emptyFields, ...expectedMatches.map(match => match.slice(4, match.length - 3))];

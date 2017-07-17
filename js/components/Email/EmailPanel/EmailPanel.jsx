@@ -201,7 +201,7 @@ class EmailPanel extends Component {
   _onSaveNewTemplateClick() {
     alertify.promisifyPrompt(
       '',
-      'Name of new Email Template',
+      'Name the New Email Template',
       ''
       )
     .then(
@@ -493,13 +493,7 @@ class EmailPanel extends Component {
             </div>
           {props.isImageReceiving &&
             <FontIcon style={styles.imageLoading} color={grey800} className='fa fa-spin fa-spinner'/>}
-            <div className='vertical-center' style={{position: 'fixed', right: 10}} >
-            {
-              /*
-              <IconButton style={{marginRight: 10}} iconClassName='fa fa-user-circle' tooltip='Send Test Email to Self' tooltipPosition='bottom-center' />
-              
-               */
-            }
+            <div className='vertical-center' style={styles.sendButtonContainer} >
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
@@ -536,9 +530,9 @@ class EmailPanel extends Component {
           padding: '3px 10px',
           position: 'fixed',
           bottom: 0,
-          display: state.isPreveiwOpen ? 'none' : 'flex',
           width: '100%',
           zIndex: 500,
+          display: state.isPreveiwOpen ? 'none' : 'flex',
           backgroundColor: blueGrey50,
         }} >
           <div className='select-up' style={{width: 350}} >
@@ -656,6 +650,7 @@ const styles = {
   previewContainer: {marginBottom: 20, zIndex: 300},
   textTransformNone: {textTransform: 'none'},
   sentFromText: {color: grey800, marginRight: 10},
+  sendButtonContainer: {position: 'fixed', right: 10},
 };
 
 const mapStateToProps = (state, props) => {
