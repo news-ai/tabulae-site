@@ -71,7 +71,6 @@
     "validator": "^5.5.0"
   },
   "devDependencies": {
-    "appcache-webpack-plugin": "^1.2.0",
     "autoprefixer": "^6.0.2",
     "babel": "^6.0.0",
     "babel-core": "^6.25.0",

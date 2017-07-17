@@ -129,6 +129,8 @@ class EmailPanel extends Component {
   componentWillMount() {
     this.props.fetchTemplates();
     this.props.initializeEmailDraft();
+    // figure out if trial user or not
+    this.props.getEmailMaxAllowance();
   }
 
   componentDidMount() {
@@ -542,7 +544,13 @@ class EmailPanel extends Component {
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
-              onClick={this.onEmailSendClick}
+              onClick={_ => {
+                if (props.ontrial) {
+                  alertify.alert('Unusual Activities Detected', 'We are experiencing unusual activities on our trial plan, so we are disabling the email feature while we resolve the situation. Sorry for the inconvenience. This will not affect out Pro Plan subscribers.');
+                } else {
+                  this.onEmailSendClick();
+                }
+              }}
               label='Preview'
               icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
               />
@@ -720,6 +728,7 @@ const mapStateToProps = (state, props) => {
     files: state.emailAttachmentReducer.attached,
     isAttachmentPanelOpen: state.emailDraftReducer.isAttachmentPanelOpen,
     emailsignature,
+    ontrial: state.personReducer.ontrial
   };
 };
 
@@ -739,7 +748,8 @@ const mapDispatchToProps = (dispatch, props) => {
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
     turnOnTemplateChange: (changeType, entityType) => dispatch({type: 'TEMPLATE_CHANGE_ON', changeType, entityType}),
-    setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml})
+    setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml}),
+    getEmailMaxAllowance: _ => dispatch(loginActions.getEmailMaxAllowance())
   };
 };
 
