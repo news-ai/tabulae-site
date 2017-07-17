@@ -105,6 +105,7 @@ class EmailPanel extends Component {
       isPreveiwOpen: false,
       dirty: false,
     };
+    this.checkMembershipLimit = this.checkMembershipLimit.bind(this);
     this.updateBodyHtml = (html, rawContentState) => {
       this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
       this.props.saveEditorState(rawContentState);
@@ -122,7 +123,9 @@ class EmailPanel extends Component {
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
 
     // cleanups
-    this.onEmailSendClick = _ => this.checkEmailDupes().then(this.onPreviewEmailsClick);
+    this.onEmailSendClick = _ => this.checkMembershipLimit()
+    .then(this.checkEmailDupes)
+    .then(this.onPreviewEmailsClick);
   }
 
   componentWillMount() {
@@ -346,6 +349,23 @@ class EmailPanel extends Component {
       });
   }
 
+  checkMembershipLimit() {
+    return new Promise((resolve, reject) => {
+      const {selectedContacts, dailyEmailsAllowed, numEmailsSentToday, membershipPlan} = this.props;
+      if (selectedContacts.length + numEmailsSentToday > dailyEmailsAllowed) {
+        alertify.alert(
+          `Exceeding Membership Limit: ${membershipPlan}`,
+          `
+          You only have <span style='color:red'>${dailyEmailsAllowed - numEmailsSentToday < 0 ? 0 : dailyEmailsAllowed - numEmailsSentToday} emails left available</span> on your plan based on your daily email allowance on your current plan (${dailyEmailsAllowed} emails/day). You have selected ${selectedContacts.length} contacts to email. <a href='https://tabulae.newsai.org/api/billing'>Upgrade your membership today.</a></span>
+          `
+          )
+        reject();
+      } else {
+        resolve(true);
+      }
+    })
+  }
+
   _checkEmailDupes() {
     return new Promise((resolve, reject) => {
       const {selectedContacts} = this.props;
@@ -529,13 +549,7 @@ class EmailPanel extends Component {
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
-              onClick={_ => {
-                if (props.ontrial) {
-                  alertify.alert('Unusual Activities Detected', 'We are experiencing unusual activities on our trial plan, so we are disabling the email feature while we resolve the situation. Sorry for the inconvenience. This will not affect out Pro Plan subscribers.');
-                } else {
-                  this.onEmailSendClick();
-                }
-              }}
+              onClick={this.onEmailSendClick}
               label='Preview'
               icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
               />
@@ -714,7 +728,10 @@ const mapStateToProps = (state, props) => {
     files: state.emailAttachmentReducer.attached,
     isAttachmentPanelOpen: state.emailDraftReducer.isAttachmentPanelOpen,
     emailsignature,
-    ontrial: state.personReducer.ontrial
+    ontrial: state.personReducer.ontrial,
+    dailyEmailsAllowed: state.personReducer.dailyEmailsAllowed,
+    numEmailsSentToday: state.personReducer.numEmailsSentToday,
+    membershipPlan: state.personReducer.membershipPlan,
   };
 };
 
