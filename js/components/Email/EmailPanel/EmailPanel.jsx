@@ -105,7 +105,7 @@ class EmailPanel extends Component {
       isPreveiwOpen: false,
       dirty: false,
     };
-    this.checkTrialMembership = this.checkTrialMembership.bind(this);
+    this.checkMembershipLimit = this.checkMembershipLimit.bind(this);
     this.updateBodyHtml = (html, rawContentState) => {
       this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
       this.props.saveEditorState(rawContentState);
@@ -127,7 +127,7 @@ class EmailPanel extends Component {
     this.onSendTestEmail = this.onSendTestEmail.bind(this);
 
     // cleanups
-    this.onEmailSendClick = _ => this.checkTrialMembership()
+    this.onEmailSendClick = _ => this.checkMembershipLimit()
     .then(this.checkEmailDupes)
     .then(this.onPreviewEmailsClick);
   }
@@ -298,14 +298,14 @@ class EmailPanel extends Component {
       });
   }
 
-  checkTrialMembership() {
+  checkMembershipLimit() {
     return new Promise((resolve, reject) => {
-      const {ontrial, selectedContacts, dailyEmailsAllowed, numEmailsSentToday} = this.props;
-      if (ontrial && selectedContacts.length + numEmailsSentToday > dailyEmailsAllowed) {
+      const {selectedContacts, dailyEmailsAllowed, numEmailsSentToday, membershipPlan} = this.props;
+      if (selectedContacts.length + numEmailsSentToday > dailyEmailsAllowed) {
         alertify.alert(
-          'Exceeding Trial Membership Limit',
+          `Exceeding Membership Limit: ${membershipPlan}`,
           `
-          You only have <span style='color:red'>${dailyEmailsAllowed - numEmailsSentToday < 0 ? 0 : dailyEmailsAllowed - numEmailsSentToday} emails left available</span> on your plan based on your daily email allowance on your current plan (${dailyEmailsAllowed} emails/day). <a href='https://tabulae.newsai.org/api/billing'>Upgrade your membership today.</a></span>
+          You only have <span style='color:red'>${dailyEmailsAllowed - numEmailsSentToday < 0 ? 0 : dailyEmailsAllowed - numEmailsSentToday} emails left available</span> on your plan based on your daily email allowance on your current plan (${dailyEmailsAllowed} emails/day). You have selected ${selectedContacts.length} contacts to email. <a href='https://tabulae.newsai.org/api/billing'>Upgrade your membership today.</a></span>
           `
           )
         reject();
@@ -726,6 +726,7 @@ const mapStateToProps = (state, props) => {
     ontrial: state.personReducer.ontrial,
     dailyEmailsAllowed: state.personReducer.dailyEmailsAllowed,
     numEmailsSentToday: state.personReducer.numEmailsSentToday,
+    membershipPlan: state.personReducer.membershipPlan,
   };
 };
 

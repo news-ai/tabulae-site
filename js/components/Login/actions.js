@@ -77,7 +77,8 @@ export function getEmailMaxAllowance() {
       allowance: response.data.emailaccounts,
       ontrial: response.data.ontrial,
       dailyEmailsAllowed: response.data.dailyemailsallowed,
-      numEmailsSentToday: response.data.emailssenttoday
+      numEmailsSentToday: response.data.emailssenttoday,
+      membershipPlan: response.data.planname
     }))
     .catch(err => console.log(err));
   };
