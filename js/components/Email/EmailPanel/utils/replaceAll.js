@@ -30,7 +30,7 @@ export default function replaceAll(html, contact, fieldsmap) {
       matchCount[fieldObj.name] = matches.length;
     }
     // remove property from expected array since it has been processed
-    expectedMatches = expectedMatches.filter(match => match !== `<%= ${fieldObj.name} =>`);
+    expectedMatches = expectedMatches.filter(match => match !== `<%= ${fieldObj.name} %>`);
   });
   const numPropertiesUsed = Object.keys(matchCount).length;
   if (numPropertiesUsed > 0) {

@@ -300,6 +300,7 @@ class EmailPanel extends Component {
       }
       return acc;
     }, []);
+
     return {contactEmails, emptyFields};
   }
 

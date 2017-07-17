@@ -87,7 +87,7 @@ class HeaderNaming extends Component {
       className='headersnaming-headercell vertical-center'
       key={key}
       style={style}>
-        <span style={{fontSize: '1.1em', fontWeight: 'bold', marginLeft: 15, color: grey500}}>{contentBody}</span>
+        <span style={styles.headerCell}>{contentBody}</span>
       </div>
       );
   }
@@ -100,10 +100,10 @@ class HeaderNaming extends Component {
     let contentBody;
     switch (columnIndex) {
       case 0:
-        contentBody = <span style={{marginLeft: 15}}>{rows[0]}</span>;
+        contentBody = <span style={styles.bodyCell}>{rows[0]}</span>;
         break;
       case 1:
-        contentBody = <span style={{fontSize: '0.9em', marginLeft: 15}}>{rows[1]}</span>;
+        contentBody = <span className='text' style={styles.bodyCell}>{rows[1]}</span>;
         break;
       case 2:
         contentBody = (
@@ -199,6 +199,7 @@ class HeaderNaming extends Component {
     .map(field => ({value: field.value, label: field.name, selected: false}));
     const options = [...this.state.options, ...fieldsmap];
     this.setState({options, selected: list}, _ => this._headernames.recomputeGridSize());
+    mixpanel.track('list_preset_on_upload');
   }
 
   render() {
@@ -302,7 +303,9 @@ const styles = {
     container: {margin: 10},
     label: {color: grey600}
   },
-  waiting: {color: grey600}
+  waiting: {color: grey600},
+  headerCell: {fontSize: '1.1em', fontWeight: 'bold', marginLeft: 15, color: grey500},
+  bodyCell: {marginLeft: 15},
 };
 
 const mapStateToProps = (state, props) => {
