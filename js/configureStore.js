@@ -3,7 +3,6 @@ import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 import rootReducer from './reducers/rootReducer';
 
-
 export default function configureStore() {
 	const loggerMiddleware = createLogger();
 	const createStoreWithMiddleware = (process.env.NODE_ENV === 'development') ?
@@ -11,6 +10,8 @@ export default function configureStore() {
       thunk,
       loggerMiddleware
       )(createStore) :
-	  applyMiddleware(thunk)(createStore);
+	  applyMiddleware(
+      thunk
+      )(createStore);
 	return createStoreWithMiddleware(rootReducer);
 };

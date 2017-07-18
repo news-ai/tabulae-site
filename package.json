@@ -64,6 +64,7 @@
     "react-virtualized-select": "^3.0.1",
     "recharts": "^0.22.0",
     "redux": "^3.6.0",
+    "redux-observable": "^0.14.1",
     "redux-thunk": "^1.0.3",
     "regression": "^1.2.1",
     "sanitize-html": "^1.14.1",
