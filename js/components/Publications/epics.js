@@ -8,7 +8,7 @@ export const searchPublicationsEpic = action$ =>
   action$.ofType('SEARCH_PUBLICATION_REQUEST')
   .map(action => action.query)
   .filter(q => !!q)
-  .debounceTime(750)
+  // .debounceTime(750)
   .switchMap(q =>
      api.get(`/publications?q="${q}"`)
     .then(response => normalize(response, {data: arrayOf(publicationSchema)})))

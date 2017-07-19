@@ -4,6 +4,7 @@ import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import MenuItem from 'material-ui/MenuItem';
 import Menu from 'material-ui/Menu';
 import debounce from 'lodash/debounce';
+import keycode from 'keycode';
 
 /*
 
@@ -22,9 +23,13 @@ class Autocomplete extends Component {
     super(props);
     this.state = {
       open: false,
-      anchorEl: undefined,
+      anchorEl: null,
       searchText: '',
+      focusTextField: true // only useful when using arrow to select option in popover
     };
+    this.close = this.close.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.handleRequestClose = _ => this.setState({open: false});
@@ -32,15 +37,49 @@ class Autocomplete extends Component {
     this.handleFocus = this.handleFocus.bind(this);
   }
 
+  close() {
+    this.setState({
+      open: false,
+      anchorEl: null,
+    });
+  }
+
+  handleMouseDown(event) {
+    // Keep the TextField focused
+    event.preventDefault();
+  }
+
+
+  handleKeyDown(event) {
+    switch (keycode(event)) {
+      case 'enter':
+        this.close();
+        break;
+      case 'esc':
+        this.close();
+        break;
+      case 'down':
+        event.preventDefault();
+        console.log('down');
+        this.setState({
+          open: true,
+          focusTextField: false,
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
   onChange(e, newValue) {
     e.preventDefault();
     this.setState({
       anchorEl: e.currentTarget,
       searchText: newValue,
-    }, debounce(_ => this.props.onInputUpdate(newValue), 300));
+    }, debounce(_ => this.props.onInputUpdate(newValue), 200));
     debounce(_ => {
-      if (this.state.searchText.length > 0) this.setState({open: true}, _ => this.handleFocus());
-    }, 500)();
+      if (this.state.searchText.length > 0) this.setState({open: true});
+    }, 300)();
   }
 
   onSelect(option) {
@@ -54,7 +93,7 @@ class Autocomplete extends Component {
   }
 
   handleFocus() {
-    // this.setState({open: true});
+    this.setState({focusTextField: true});
     // console.log('focus');
     this.searchTextField.focus();
   }
@@ -81,9 +120,9 @@ class Autocomplete extends Component {
         id='searchTextField'
         ref={ref => this.searchTextField = ref}
         autoComplete='off'
+        onKeyDown={this.handleKeyDown}
         onBlur={this.handleBlur}
         onFocus={this.handleFocus}
-        onKeyDown={this.props.handleKeyDown}
         floatingLabelText={this.props.floatingLabelText}
         hintText={this.props.hintText}
         fullWidth={this.props.fullWidth}
@@ -101,7 +140,13 @@ class Autocomplete extends Component {
         onRequestClose={this.handleRequestClose}
         animation={PopoverAnimationVertical}
         >
-          <Menu>
+          <Menu
+          desktop
+          disableAutoFocus={state.focusTextField}
+          initiallyKeyboardFocused
+          onMouseDown={this.handleMouseDown}
+          maxHeight={300}
+          >
             {menu}
           </Menu>
         </Popover>
