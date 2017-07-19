@@ -48,6 +48,97 @@ import {_getter} from 'components/ListTable/helpers';
 import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 
 
+
+import Draft, {
+  Editor,
+  EditorState,
+  ContentState,
+  SelectionState,
+  Entity,
+  RichUtils,
+  AtomicBlockUtils,
+  convertToRaw,
+  convertFromRaw,
+  CompositeDecorator,
+  Modifier,
+} from 'draft-js';
+
+  // look for old property format and trigger warning for user to update
+  const triggerNewEntityFormatWarning = rawContentState => new Promise((resolve, reject) => {
+          const {blocks} = rawContentState;
+          const CURLYREGEX = /{([^}]+)}/g;
+          const oldPropertyMap = blocks.reduce((acc, block) => {
+            let expectedMatches = block.text.match(CURLYREGEX);
+            if (expectedMatches !== null) {
+              expectedMatches.map(match => acc[match] = acc[match] ? acc[match] + 1 : 1);
+            }
+            return acc;
+          }, {});
+          const oldProperties = Object.keys(oldPropertyMap);
+          if (oldProperties.length > 0) {
+            alertify.confirm(
+              `Custom Property Update: ${oldProperties.length} Properties Found`,
+              `
+              <div>
+              We recently updated the custom properties system to use a new data format that is more accurate and your template may be outdated.
+              </div>
+              <div style='color:${red800}'>
+              We'd like to up your template automatically. Click OK to start conversion if the custom properties we detected are correct.
+              </div>
+              <div>
+              We found the following custom properties using the old data format:
+                <ul>
+                ${oldProperties.map(property => `<li>${property}</li>`).join('')}
+                </ul>
+              </div>`,
+              _ => {
+                let contentState = convertFromRaw(rawContentState);
+                let cleanedBlocks = [];
+                contentState.getBlockMap()
+                .filter(block => block.getLength() > 0)
+                .map(block => {
+                  let blockText = block.getText();
+                  let match = CURLYREGEX.exec(blockText);
+                  while (match !== null) {
+                    console.log(match);
+                    if (match[0].length > 0) {
+                      const propertyText = match[1];
+                      const start = match.index;
+                      const end = match.index + match[0].length;
+                      const selectionToReplace = SelectionState
+                      .createEmpty(block.getKey())
+                      .merge({
+                        focusKey: block.getKey(),
+                        focusOffset: start,
+                        anchorKey: block.getKey(),
+                        anchorOffset: end
+                      });
+                      // create and insert new entity
+                      contentState = contentState.createEntity('PROPERTY', 'IMMUTABLE', {property: propertyText});
+                      console.log(propertyText);
+                      console.log(selectionToReplace.serialize());
+                      console.log(block.getText(selectionToReplace.getStartOffset(), selectionToReplace.getEndOffset()));
+                      contentState = Modifier.replaceText(
+                        contentState,
+                        selectionToReplace,
+                        propertyText,
+                        null,
+                        contentState.getLastCreatedEntityKey()
+                        );
+                    }
+                    match = CURLYREGEX.exec(blockText);
+                  }
+                });
+                resolve(convertToRaw(contentState));
+              },
+              _ => {
+                // on cancel, return original rawContentState without replacing entities
+                resolve(rawContentState);
+              });
+          }
+        });
+
+
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
   alertify.confirm(title, description, resolve, reject);
 });
@@ -237,64 +328,45 @@ class EmailPanel extends Component {
 
   handleTemplateChange(obj) {
     const templateId = obj !== null ? obj.value : null;
+
+    const onPostTemplateProcessing = () => {
+      this.setState({currentTemplateId: templateId});
+      this.props.turnOnTemplateChange();
+      setTimeout(_ => {
+        this.changeEmailSignature(this.props.emailsignature)
+        this.setState({dirty: false});
+      }, 1000);
+    };
+
     if (templateId !== null) {
       const template = find(this.props.templates, tmp => templateId === tmp.id);
       const subjectHtml = template.subject;
       const bodyHtml = template.body;
+      this.setState({subjectHtml});
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
-
-        // look for old property format and trigger warning for user to update
-        const triggerNewEntityFormatWarning = ({blocks, entityMap}) => {
-          const oldPropertyMap = blocks.reduce((acc, block) => {
-            let expectedMatches = block.text.match(/{([^}]+)}/g);
-            if (expectedMatches !== null) {
-              expectedMatches.map(match => acc[match] = acc[match] ? acc[match] + 1 : 1);
-            }
-            return acc;
-          }, {});
-          const oldProperties = Object.keys(oldPropertyMap);
-          if (oldProperties.length > 0) {
-            alertify.alert(
-              `Custom Property Update: ${oldProperties.length} Properties Found`,
-              `
-              <div>
-              We recently updated the custom properties system to use a new data format that is more accurate and your template may be outdated.
-              </div>
-              <div style='color:${red800}'>
-              Update your template by removing and re-adding custom properties and saving the template.
-              </div>
-              <div>
-              We found the following custom properties using the old data format:
-                <ul>
-                ${oldProperties.map(property => `<li>${property}</li>`).join('')}
-                </ul>
-              </div>`
-              );
-          }
-        };
-
-        triggerNewEntityFormatWarning(templateJSON.data);
-        this.setState({bodyEditorState: templateJSON.data});
-        this.props.saveEditorState(templateJSON.data);
-        this.setState({subjectHtml});
         if (templateJSON.date) {
           window.Intercom('trackEvent', 'use_prev_email_template', {date: templateJSON.date});
           mixpanel.track('use_prev_email_template', {date: templateJSON.date});
         }
+
+        return triggerNewEntityFormatWarning(templateJSON.data)
+        .then(rawContentState => {
+          // triggerNewEntityFOrmatWarning returns templateJSON.data if denied
+          this.setState({bodyEditorState: rawContentState});
+          this.props.saveEditorState(rawContentState);
+          onPostTemplateProcessing();
+          return;
+        });
       } else {
+        // TODO: do normal detect warning without attempting to replace entities
         this.props.setBodyHtml(bodyHtml);
         this.setState({bodyHtml, subjectHtml});
       }
     } else {
       this.setState({bodyHtml: '', subjectHtml: ''});
     }
-    this.setState({currentTemplateId: templateId});
-    this.props.turnOnTemplateChange();
-    setTimeout(_ => {
-      this.changeEmailSignature(this.props.emailsignature)
-      this.setState({dirty: false});
-    }, 1000);
+    onPostTemplateProcessing();
   }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
