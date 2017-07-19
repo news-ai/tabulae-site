@@ -60,7 +60,6 @@ class Autocomplete extends Component {
         break;
       case 'down':
         event.preventDefault();
-        console.log('down');
         this.setState({
           open: true,
           focusTextField: false,
@@ -85,6 +84,7 @@ class Autocomplete extends Component {
   onSelect(option) {
     let getter = label => label;
     if (this.props.labelGetter) getter = this.props.labelGetter;
+    this.props.onOptionSelect(option);
     this.setState({searchText: getter(option), open: false});
   }
 
@@ -93,7 +93,7 @@ class Autocomplete extends Component {
   }
 
   handleFocus() {
-    this.setState({focusTextField: true});
+    this.setState({focusTextField: true, open: true});
     // console.log('focus');
     this.searchTextField.focus();
   }
@@ -145,7 +145,7 @@ class Autocomplete extends Component {
           disableAutoFocus={state.focusTextField}
           initiallyKeyboardFocused
           onMouseDown={this.handleMouseDown}
-          maxHeight={300}
+          maxHeight={200}
           >
             {menu}
           </Menu>
