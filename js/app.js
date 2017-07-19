@@ -102,7 +102,9 @@ mixpanel.init(process.env.MIXPANEL_TOKEN);
 if (module.hot) {
   module.hot.accept('./reducers/rootReducer', () => {
     const nextRootReducer = require('./reducers/rootReducer').default;
+    const nextRootEpic = require('./reducers/rootReducer').rootEpic;
     store.replaceReducer(nextRootReducer);
+    store.replaceEpic(nextRootEpic);
   });
 }
 

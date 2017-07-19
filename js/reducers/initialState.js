@@ -49,7 +49,8 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false,
     publicationMapByName: {},
-    received: []
+    received: [],
+    searchCache: []
   },
   fileReducer: {
     isReceiving: false,

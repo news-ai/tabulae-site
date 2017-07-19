@@ -13,6 +13,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.jsx';
 import {WithContext as ReactTags} from 'react-tag-input';
+import Autocomplete from './Autocomplete';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
@@ -66,9 +67,9 @@ class EditContactDialog extends Component {
       customfields: this.props.contact ? this.props.contact.customfields : [],
       rssfeedsTextarea: '',
       pub1input: this.props.contact ? _getPublicationName(this.props.contact, this.props.publicationReducer) : '',
-      employerAutocompleteList: [],
       addPublicationPanelOpen: false,
       tags: this.props.contact && this.props.contact.tags !== null ? this.props.contact.tags : [],
+      // publicationDataSource: []
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
@@ -98,6 +99,11 @@ class EditContactDialog extends Component {
         rssfeedsTextarea: nextProps.feeds ? nextProps.feeds.map(feed => feed.url).join('\n') : ''
       });
     }
+
+    // if (this.props.publicationAutocompleteCache !== nextProps.publicationAutocompleteCache) {
+    //   this.setState({publicationDataSource: nextProps.publicationAutocompleteCache});
+    // }
+
   }
 
   _onSubmit() {
@@ -142,14 +148,20 @@ class EditContactDialog extends Component {
     this.props.addFeeds(id, feeds);
   }
 
-  _updateAutoInput(val) {
-    if (val.length > 0) this.props.requestPublication();
-    this.setState({pub1input: val}, _ => {
-      this.props.searchPublications(this.state.pub1input)
-      .then(response => this.setState({
-        employerAutocompleteList: response,
-      }));
-    });
+  _updateAutoInput(val, dataSource, params) {
+    console.log(val);
+    console.log(dataSource);
+    console.log(params);
+    this.setState({pub1input: val});
+    this.props.searchPublicationEpic(val);
+
+    // if (val.length > 0) this.props.requestPublication();
+    // this.setState({pub1input: val}, _ => {
+    //   this.props.searchPublications(this.state.pub1input)
+    //   .then(response => this.setState({
+    //     employerAutocompleteList: response,
+    //   }));
+    // });
   }
 
   _onRemoveContact() {
@@ -335,22 +347,28 @@ class EditContactDialog extends Component {
           </div>))}
          <div className='large-12 medium-12 small-12 columns vertical-center'>
             <span style={{whiteSpace: 'nowrap'}}>Publication</span>
-            <AutoComplete
-            id='pub1input'
-            style={textfieldStyle}
-            filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
-            searchText={state.pub1input}
-            onUpdateInput={this.updateAutoInput}
-            onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
-            openOnFocus
-            dataSource={state.employerAutocompleteList}
-            />
+            <div style={textfieldStyle} >
+          {/*
+              <AutoComplete
+              id='pub1input'
+              searchText={state.pub1input}
+              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+              dataSource={props.publicationAutocompleteCache}
+              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
+              onUpdateInput={debounce(this.updateAutoInput, 750)}
+              />
+          */}
+              <Autocomplete
+              onInputUpdate={this.updateAutoInput}
+              options={props.publicationAutocompleteCache}
+              />
+            </div>
           {props.publicationIsReceiving &&
             <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>}
           </div>
           <div className='large-12 medium-12 small-12 columns vertical-center'>
           {state.pub1input.length > 0 && !props.publicationReducer[state.pub1input] && !props.publicationIsReceiving && !state.addPublicationPanelOpen &&
-            <div style={{fontSize: '0.9em'}}>No publication found. <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one?</span></div>}
+            <div className='text'>No publication found. <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one?</span></div>}
             <Collapse isOpened={state.addPublicationPanelOpen}>
               <PublicationFormStateful
               onHide={_ => this.setState({addPublicationPanelOpen: false})}
@@ -382,6 +400,7 @@ const mapStateToProps = (state, props) => {
     contact: props.contactId ? state.contactReducer[props.contactId] : undefined,
     list: state.listReducer[props.listId],
     publicationReducer: state.publicationReducer,
+    publicationAutocompleteCache: state.publicationReducer.searchCache.map(id => state.publicationReducer[id].name),
     feeds,
   };
 };
@@ -397,6 +416,7 @@ const mapDispatchToProps = (dispatch, props) => {
     requestPublication: () => dispatch(publicationActions.requestPublication()),
     deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
     patchList: listObj => dispatch(listActions.patchList(listObj)),
+    searchPublicationEpic: query => dispatch({type: 'SEARCH_PUBLICATION_REQUEST', query})
   };
 };
 

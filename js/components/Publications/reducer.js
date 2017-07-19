@@ -7,6 +7,12 @@ function publicationReducer(state = initialState.publicationReducer, action) {
 
   let obj;
   switch (action.type) {
+    case 'SEARCH_PUBLICATION_RECEIVE':
+      return assignToEmpty(state, {
+        searchCache: action.received,
+      });
+    case 'SEARCH_PUBLICATION_REQUEST':
+      return assignToEmpty(state, {isReceiving: true});
     case publicationConstant.REQUEST:
       obj = assignToEmpty(state, {});
       obj.isReceiving = true;
