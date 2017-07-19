@@ -149,11 +149,8 @@ class EditContactDialog extends Component {
   }
 
   _updateAutoInput(val, dataSource, params) {
-    console.log(val);
-    console.log(dataSource);
-    console.log(params);
-    this.setState({pub1input: val});
     this.props.searchPublicationEpic(val);
+    this.setState({pub1input: val});
 
     // if (val.length > 0) this.props.requestPublication();
     // this.setState({pub1input: val}, _ => {

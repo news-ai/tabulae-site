@@ -3,6 +3,7 @@ import TextField from 'material-ui/TextField';
 import Popover, {PopoverAnimationVertical} from 'material-ui/Popover';
 import MenuItem from 'material-ui/MenuItem';
 import Menu from 'material-ui/Menu';
+import debounce from 'lodash/debounce';
 
 /*
 
@@ -33,14 +34,13 @@ class Autocomplete extends Component {
 
   onChange(e, newValue) {
     e.preventDefault();
-    console.log(e);
-    console.log(newValue)
-    this.props.onInputUpdate(newValue);
     this.setState({
       anchorEl: e.currentTarget,
       searchText: newValue,
-      open: true
-    });
+    }, debounce(_ => this.props.onInputUpdate(newValue), 300));
+    debounce(_ => {
+      if (this.state.searchText.length > 0) this.setState({open: true}, _ => this.handleFocus());
+    }, 500)();
   }
 
   onSelect(option) {
@@ -54,7 +54,9 @@ class Autocomplete extends Component {
   }
 
   handleFocus() {
-    this.setState({open: true});
+    // this.setState({open: true});
+    // console.log('focus');
+    this.searchTextField.focus();
   }
 
   render() {
@@ -72,13 +74,12 @@ class Autocomplete extends Component {
     if (props.maxSearchResults) {
       menu = menu.filter((option, i) => i < props.maxSearchResults);
     }
-    console.log(state.open);
 
     return (
       <div>
         <TextField
         id='searchTextField'
-        ref='searchTextField'
+        ref={ref => this.searchTextField = ref}
         autoComplete='off'
         onBlur={this.handleBlur}
         onFocus={this.handleFocus}
