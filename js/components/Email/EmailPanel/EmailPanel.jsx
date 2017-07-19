@@ -100,7 +100,6 @@ import Draft, {
                   let blockText = block.getText();
                   let match = CURLYREGEX.exec(blockText);
                   while (match !== null) {
-                    console.log(match);
                     if (match[0].length > 0) {
                       const propertyText = match[1];
                       const start = match.index;
@@ -109,15 +108,12 @@ import Draft, {
                       .createEmpty(block.getKey())
                       .merge({
                         focusKey: block.getKey(),
-                        focusOffset: start,
+                        focusOffset: end,
                         anchorKey: block.getKey(),
-                        anchorOffset: end
+                        anchorOffset: start
                       });
                       // create and insert new entity
                       contentState = contentState.createEntity('PROPERTY', 'IMMUTABLE', {property: propertyText});
-                      console.log(propertyText);
-                      console.log(selectionToReplace.serialize());
-                      console.log(block.getText(selectionToReplace.getStartOffset(), selectionToReplace.getEndOffset()));
                       contentState = Modifier.replaceText(
                         contentState,
                         selectionToReplace,
