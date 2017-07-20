@@ -39,7 +39,7 @@ export function setupNotificationSocket() {
   return (dispatch, getState) => {
     dispatch({type: 'REQUEST_SOCKET_TOKEN'});
     socket.on('connect', _ => {
-      api.get('users/me/live-token')
+      api.get('/users/me/live-token')
       .then(response => {
         const token = response.data.token;
         const person = getState().personReducer.person;
@@ -64,8 +64,9 @@ export function setupNotificationSocket() {
 
         }
       } else {
-        msg.map(({data}) => {
-          dispatch({type: 'RECEIVE_NOTIFICATION', message: JSON.parse(data)})
+        console.log(msg);
+        msg.map(message => {
+          dispatch({type: 'RECEIVE_NOTIFICATION', message})
           // alertify.notify(data, 'custom', 5, function() {});
         });
       }

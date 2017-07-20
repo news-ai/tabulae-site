@@ -24,7 +24,7 @@ import Badge from 'material-ui/Badge';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-// import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
+import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
 import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
 
@@ -165,7 +165,7 @@ class App extends Component {
           <div className='small-6 medium-1 large-1 columns vertical-center'>
             <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
-          <div className='hide-for-small-only medium-4 large-8 columns vertical-center'>
+          <div className='hide-for-small-only medium-8 large-8 columns vertical-center'>
             <div>
               <span style={styles.breadcrumbText}>You are at: </span>
             </div>
@@ -182,12 +182,7 @@ class App extends Component {
               targetOrigin={{horizontal: 'right', vertical: 'top'}}
               onRequestClose={this.onNotificationPanelClose}
             >
-              <Menu>
-                <MenuItem primaryText="Refresh" />
-                <MenuItem primaryText="Help &amp; feedback" />
-                <MenuItem primaryText="Settings" />
-                <MenuItem primaryText="Sign out" />
-              </Menu>
+              <NotificationPanel />
             </Popover>
             <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
           </div>

@@ -24,7 +24,7 @@ export const setupThirdparty = (action$, store) =>
   action$.ofType(loginConstant.RECEIVE)
   .switchMap(({person}) => {
     intercomSetup({
-      app_id: appId,
+      app_id: process.env.NODE_ENV === 'development' ? 'eh8247hf' : 'ur8dbk9e',
       email: person.email,
       name: `${person.firstname} ${person.lastname}`,
       custom_launcher_selector: '#custom_intercom_launcher',
@@ -37,5 +37,5 @@ export const setupThirdparty = (action$, store) =>
       mixpanel.people.set({email: person.email, name: `${person.firstname} ${person.lastname}`});
       mixpanel.identify(person.id);
     }
-    return {type: 'SETUP_THIRDPARTY_SERVICES'};
+    return Observable.of({type: 'SETUP_THIRDPARTY_SERVICES'});
   })
