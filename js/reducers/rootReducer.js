@@ -34,6 +34,7 @@ import campaignStatsReducer from 'components/Email/EmailAnalytics/Campaign/reduc
 import contactTagReducer from 'components/Contacts/ContactTags/reducer';
 
 import {searchPublicationsEpic} from 'components/Publications/epics';
+import {fetchPerson, setupThirdparty} from 'components/Login/epics';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -70,7 +71,9 @@ const rootReducer = combineReducers({
 });
 
 export const rootEpic = combineEpics(
-  searchPublicationsEpic
+  searchPublicationsEpic,
+  fetchPerson,
+  setupThirdparty
   );
 
 export default rootReducer;

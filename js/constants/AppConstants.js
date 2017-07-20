@@ -15,5 +15,6 @@ export const commonTypes = [
   'MANUALLY_SET_ISRECEIVING_OFF',
   'ADD_REQUESTED',
   'ADD_RECEIVED',
-  'REDUCER_RESET'
+  'REDUCER_RESET',
+  'CANCELLED'
 ];

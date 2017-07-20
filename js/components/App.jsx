@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import intercomSetup from '../chat';
 
 import {actions as loginActions} from 'components/Login';
+import {loginConstant} from 'components/Login/constants';
 import {actions as notificationActions} from 'components/Notifications';
 import * as joyrideActions from './Joyride/actions';
 
@@ -13,13 +14,16 @@ import Breadcrumbs from 'react-breadcrumbs';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
-import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 // import Popover from 'material-ui/Popover/Popover';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FeedbackPanel from './Feedback/FeedbackPanel.jsx';
+import Badge from 'material-ui/Badge';
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
 // import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
 import {grey700, blue600, blue300} from 'material-ui/styles/colors';
 
@@ -53,6 +57,8 @@ class App extends Component {
       notificationPanelOpen: false,
       notificationAnchorEl: null
     };
+    this.onNotificationPanelOpen = e => this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+    this.onNotificationPanelClose = _ => this.setState({notificationPanelOpen: false});
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
     this.turnOnGeneralGuide = _ => {
@@ -76,28 +82,12 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
-      const appId = process.env.NODE_ENV === 'development' ? 'eh8247hf' : 'ur8dbk9e';
-      const person = nextProps.person;
-      intercomSetup({
-        app_id: appId,
-        email: person.email,
-        name: `${person.firstname} ${person.lastname}`,
-        custom_launcher_selector: '#custom_intercom_launcher',
-        user_id: person.id
-      });
-      if (process.env.NODE_ENV === 'production') {
-        Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
-        Raven.setUserContext({email: person.email, id: person.id});
-        delighted.survey({email: person.email, name: `${person.firstname} ${person.lastname}`});
-        mixpanel.people.set({email: person.email, name: `${person.firstname} ${person.lastname}`});
-        mixpanel.identify(person.id);
-      }
-
+      nextProps.setupNotificationSocket();
+     
       if (nextProps.firstTimeUser) {
         this.props.setFirstTimeUser();
         this.setState({firstTimeUser: true});
       }
-      this.props.fetchNotifications();
       this.setState({isLogin: true});
     }
     if (matchNoNavBar(nextProps.location.pathname) && nextProps.isLogin) {
@@ -154,7 +144,7 @@ class App extends Component {
                 <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down'/></p>
               </div>
             {state.feedbackPanelOpen &&
-              <FeedbackPanel/>}
+              <FeedbackPanel />}
             </div>
           </Dialog>
         }
@@ -169,6 +159,7 @@ class App extends Component {
           <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
           <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
           <a href='https://help.newsai.co' target='_blank'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
+          <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer}>Refer a Colleague</MenuItem></Link>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
@@ -176,22 +167,32 @@ class App extends Component {
           </div>
           <div className='hide-for-small-only medium-4 large-8 columns vertical-center'>
             <div>
-              <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
+              <span style={styles.breadcrumbText}>You are at: </span>
             </div>
             <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs routes={props.routes} params={props.params} separator=' > '/>
             </div>
           </div>
-          <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
-            <Link to='/settings'>
-              <RaisedButton label='Invite friends' labelColor='#ffffff' backgroundColor={blue300} labelStyle={styles.btnLabel}/>
-            </Link>
-          </div>
-          <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
+          <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
+            <IconButton onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+            <Popover
+              open={state.notificationPanelOpen}
+              anchorEl={state.notificationAnchorEl}
+              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+              targetOrigin={{horizontal: 'right', vertical: 'top'}}
+              onRequestClose={this.onNotificationPanelClose}
+            >
+              <Menu>
+                <MenuItem primaryText="Refresh" />
+                <MenuItem primaryText="Help &amp; feedback" />
+                <MenuItem primaryText="Settings" />
+                <MenuItem primaryText="Sign out" />
+              </Menu>
+            </Popover>
             <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
           </div>
         </div>
-        <div style={{height: 60}}></div>
+        <div style={styles.placeholderHeight}></div>
       </div>
       );
     return (
@@ -224,6 +225,8 @@ const styles = {
   },
   container: {width: '100%', height: '100%'},
   btnLabel: {textTransform: 'none'},
+  breadcrumbText: {color: 'gray', marginRight: 8},
+  placeholderHeight: {height: 60},
 };
 
 const mapStateToProps = (state, props) => {
@@ -239,12 +242,13 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getAuth: _ => dispatch(loginActions.fetchPerson()),
+    getAuth: _ => dispatch({type: loginConstant.REQUEST}),
     logoutClick: _ => dispatch(loginActions.logout()),
     setFirstTimeUser: _ => dispatch(loginActions.setFirstTimeUser()),
     fetchNotifications: _ => dispatch(notificationActions.fetchNotifications()),
     turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
+    setupNotificationSocket: _ => dispatch(notificationActions.setupNotificationSocket())
   };
 };
 

@@ -5,9 +5,10 @@ import {
   convertFromRaw,
   Modifier,
 } from 'draft-js';
+import alertify from 'alertifyjs';
 
 // look for old property format and trigger warning for user to update
-export default const triggerNewEntityFormatWarning = rawContentState => new Promise((resolve, reject) => {
+const triggerNewEntityFormatWarning = rawContentState => new Promise((resolve, reject) => {
         const {blocks} = rawContentState;
         const CURLYREGEX = /{([^}]+)}/g;
         const oldPropertyMap = blocks.reduce((acc, block) => {
@@ -76,3 +77,5 @@ export default const triggerNewEntityFormatWarning = rawContentState => new Prom
             });
         }
       });
+
+export default triggerNewEntityFormatWarning;
