@@ -6,7 +6,7 @@ import FontIcon from 'material-ui/FontIcon';
 import moment from 'moment-timezone';
 
 const styles = {
-  container: {padding: '8px 10px', borderBottom: `1px dotted ${grey300}`},
+  container: {padding: '3px 10px 8px 10px', borderBottom: `1px dotted ${grey300}`},
   text: {color: grey700}
 }
 
@@ -25,7 +25,7 @@ class EmailNotification extends Component {
     const fromNowDateString = m.fromNow();
 
     const style = {
-      resourceButton: {margin: '0 5px', color: grey700, padding: '1px 8px', border: `1px solid ${grey500}`, borderRadius: '1.1em'},
+      resourceButton: {margin: '0 5px', color: grey700, padding: '1px 8px', border: `1px solid ${grey300}`, borderRadius: '1.1em'},
       icon: {fontSize: '0.9em', marginRight: 5},
       link: {textDecoration: 'none'},
       datestring: {color: grey600}
@@ -37,7 +37,7 @@ class EmailNotification extends Component {
         <div className='vertical-center'>
           <span className='right smalltext' style={style.datestring} >{fromNowDateString}</span>
         </div>
-        <div className='vertical-center horizontal-center'>
+        <div className='vertical-center'>
           <span className='smalltext' style={styles.text}>
             <FontIcon color={blue500} style={style.icon} className={resourceAction === 'click' ? 'fa fa-mouse-pointer' : 'fa fa-envelope-open'} />
             <strong>{clickableToLabel}</strong> {`${resourceAction}ed`} on email from <strong>{data.subject}</strong>
