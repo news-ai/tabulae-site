@@ -51,8 +51,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(NotificationPanel);
+export default connect(mapStateToProps)(NotificationPanel);

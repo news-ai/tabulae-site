@@ -15,7 +15,6 @@ export default function replaceAll(html, contact, fieldsmap) {
   // get total list of custom properties used
   let expectedMatches = newHtml.match(/(?:\{\{|<%=)(.+?)(?:%>|\}\})/g);
   if (expectedMatches === null) expectedMatches = [];
-  console.log(expectedMatches);
   fieldsmap.map(fieldObj => {
     const value = _getter(contact, fieldObj) || '';
     const regexValue = new RegExp('<%= ' + fieldObj.name + ' %>', 'g');
