@@ -27,12 +27,15 @@ const NotificationPanel = ({notifications}) => {
   return (
     <div style={styles.container}>
     {
-      notifications.map((message, i) => {
+      notifications
+      .filter(message => message.resourceName === 'email')
+      .map((message, i) => {
         switch (message.resourceName) {
-          case 'email':
-            return <EmailNotification key={`message-${i}`} {...message} />
+          // case 'email':
+          //   return <EmailNotification key={`message-${i}`} {...message} />
           default:
-            return <Notification {...message} />
+            // return <Notification {...message} />
+            return <EmailNotification key={`message-${i}`} {...message} />
         }
       })
     }
