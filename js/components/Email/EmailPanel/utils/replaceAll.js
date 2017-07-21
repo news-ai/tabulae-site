@@ -18,7 +18,6 @@ export default function replaceAll(html, contact, fieldsmap) {
   fieldsmap.map(fieldObj => {
     const value = _getter(contact, fieldObj) || '';
     const regexValue = new RegExp('<%= ' + fieldObj.name + ' %>', 'g');
-    newHtml = newHtml.replace(regexValue, value);
     // housekeeping step for generating useful errors
     // count number of times each individual custom property is used
     const matches = newHtml.match(regexValue);
@@ -28,6 +27,7 @@ export default function replaceAll(html, contact, fieldsmap) {
       if (!value) emptyFields.push(fieldObj.name);
       matchCount[fieldObj.name] = matches.length;
     }
+    newHtml = newHtml.replace(regexValue, value);
     // remove property from expected array since it has been processed
     expectedMatches = expectedMatches.filter(match => match !== `<%= ${fieldObj.name} %>`);
   });

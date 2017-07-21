@@ -288,7 +288,7 @@ class BasicHtmlEditor extends Component {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
     if (!selection.isCollapsed()) {
-      alertify.alert('Editor Warning', 'The editor cursor must be focused and not highlighted to insert property.');
+      alertify.alert('Editor Warning', 'The editor cursor must be focused. Select a place in the editor where you would like to insert the property.');
       return;
     }
     const contentStateWithEntity = editorState.getCurrentContent().createEntity('PROPERTY', 'IMMUTABLE', {property: propertyType});
