@@ -16,6 +16,10 @@ const styles = {
     width: 350,
     minHeight: 30,
     maxHeight: 300
+  },
+  empty: {
+    container: {padding: 10},
+    text: {color: grey700}
   }
 };
 
@@ -34,8 +38,8 @@ const NotificationPanel = ({notifications}) => {
     }
 
     {notifications.length === 0 &&
-      <div className='vertical-center horizontal-center' style={{padding: 10}}>
-        <span className='smalltext' style={{color: grey700}}>No new notifications.</span>
+      <div className='vertical-center horizontal-center' style={styles.empty.container}>
+        <span className='smalltext' style={styles.empty.text}>No new notifications.</span>
       </div>}
     </div>
     );
