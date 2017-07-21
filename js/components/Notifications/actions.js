@@ -26,6 +26,7 @@ export function setupNotificationSocket() {
         dispatch({type: 'CONNECTED_TO_SOCKET'});
         socket.emit('auth', authDetails);
       })
+      .catch(err => dispatch({type: 'REQUEST_SOCKET_TOKEN_FAIL'}));
     });
 
     socket.on('message', msg => {
