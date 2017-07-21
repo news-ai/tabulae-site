@@ -65,6 +65,7 @@ class ColumnEditPanel extends Component {
     const hiddenList = fieldsmap.filter(field => field.hidden && !field.tableOnly);
     const showList = fieldsmap.filter(field => !field.hidden && !field.tableOnly);
     this.setState({showList, hiddenList, selected: list, dirty: true});
+    mixpanel.track('apply_list_preset_post_upload');
   }
 
   render() {

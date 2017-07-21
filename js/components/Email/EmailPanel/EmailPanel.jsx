@@ -43,10 +43,10 @@ import 'react-virtualized/styles.css';
 import './react-select-hack.css';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
-import {blueGrey50, grey50, grey600, grey700, grey800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
+import {blueGrey50, grey50, grey600, grey700, grey800, red800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
-import replaceAll from './utils/replaceAll';
-
+import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
+import triggerNewEntityFormatWarning from 'components/Email/EmailPanel/utils/triggerNewEntityFormatWarning';
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
   alertify.confirm(title, description, resolve, reject);
@@ -112,10 +112,7 @@ class EmailPanel extends Component {
     };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
-    this.onSubjectChange = (editorState) => {
-      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      this.setState({subject});
-    };
+    this.onSubjectChange = this.onSubjectChange.bind(this);
     this.getGeneratedHtmlEmails = this._getGeneratedHtmlEmails.bind(this);
     this.sendGeneratedEmails = this._sendGeneratedEmails.bind(this);
     this.onSaveNewTemplateClick = this._onSaveNewTemplateClick.bind(this);
@@ -124,7 +121,6 @@ class EmailPanel extends Component {
     this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
-    this.onSendTestEmail = this.onSendTestEmail.bind(this);
 
     // cleanups
     this.onEmailSendClick = _ => this.checkMembershipLimit()
@@ -161,6 +157,28 @@ class EmailPanel extends Component {
     this.props.initializeEmailDraft();
   }
 
+  onSubjectChange(editorState) {
+    const subjectContent = editorState.getCurrentContent();
+    const subjectBlock = editorState.getCurrentContent().getBlocksAsArray()[0];
+    const subject = subjectBlock.getText();
+    let mutatingSubject = '';
+    let lastOffset = 0;
+    subjectBlock.findEntityRanges(
+      (character) => {
+        const entityKey = character.getEntity();
+        if (entityKey === null) return false;
+        return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'PROPERTY');
+      },
+      (start, end) => {
+        const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();
+        mutatingSubject += (subject.slice(lastOffset, start) + `<%= ${property} %>`);
+        lastOffset = end;
+      });
+    mutatingSubject += subject.slice(lastOffset, subject.length);
+
+    this.setState({subject: mutatingSubject});
+  }
+
   _changeEmailSignature(emailsignature) {
     // check if want to replace
     if (emailsignature && emailsignature !== null) {
@@ -186,7 +204,7 @@ class EmailPanel extends Component {
   _onSaveNewTemplateClick() {
     alertify.promisifyPrompt(
       '',
-      'Name of new Email Template',
+      'Name the New Email Template',
       ''
       )
     .then(
@@ -219,32 +237,45 @@ class EmailPanel extends Component {
 
   handleTemplateChange(obj) {
     const templateId = obj !== null ? obj.value : null;
+
+    const onPostTemplateProcessing = () => {
+      this.setState({currentTemplateId: templateId});
+      this.props.turnOnTemplateChange();
+      setTimeout(_ => {
+        this.changeEmailSignature(this.props.emailsignature)
+        this.setState({dirty: false});
+      }, 1000);
+    };
+
     if (templateId !== null) {
       const template = find(this.props.templates, tmp => templateId === tmp.id);
       const subjectHtml = template.subject;
       const bodyHtml = template.body;
+      this.setState({subjectHtml});
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
-        this.setState({bodyEditorState: templateJSON.data});
-        this.props.saveEditorState(templateJSON.data);
-        this.setState({subjectHtml});
         if (templateJSON.date) {
           window.Intercom('trackEvent', 'use_prev_email_template', {date: templateJSON.date});
           mixpanel.track('use_prev_email_template', {date: templateJSON.date});
         }
+
+        return triggerNewEntityFormatWarning(templateJSON.data)
+        .then(rawContentState => {
+          // triggerNewEntityFOrmatWarning returns templateJSON.data if denied
+          this.setState({bodyEditorState: rawContentState});
+          this.props.saveEditorState(rawContentState);
+          onPostTemplateProcessing();
+          return;
+        });
       } else {
+        // TODO: do normal detect warning without attempting to replace entities
         this.props.setBodyHtml(bodyHtml);
         this.setState({bodyHtml, subjectHtml});
       }
     } else {
       this.setState({bodyHtml: '', subjectHtml: ''});
     }
-    this.setState({currentTemplateId: templateId});
-    this.props.turnOnTemplateChange();
-    setTimeout(_ => {
-      this.changeEmailSignature(this.props.emailsignature)
-      this.setState({dirty: false});
-    }, 1000);
+    onPostTemplateProcessing();
   }
 
   _getGeneratedHtmlEmails(selectedContacts, subject, body) {
@@ -268,7 +299,7 @@ class EmailPanel extends Component {
         if (this.props.scheduledtime !== null) {
           emailObj.sendat = this.props.scheduledtime;
         }
-        if (subjectObj.numMatches > 0) {
+        if (subjectObj.numPropertiesUsed > 0) {
           emailObj.baseSubject = subject;
         }
         const fields = [...bodyObj.emptyFields, ...subjectObj.emptyFields];
@@ -285,6 +316,7 @@ class EmailPanel extends Component {
       }
       return acc;
     }, []);
+
     return {contactEmails, emptyFields};
   }
 
@@ -429,47 +461,6 @@ class EmailPanel extends Component {
     });
   }
 
-  onSendTestEmail() {
-    // const {subject, body} = this.state;
-    // const email = this.props.person.email;
-    // let newHtml = html;
-
-    // this.state.fieldsmap.map(fieldObj => {
-    //   let value = '';
-    //   const replaceValue = _getter(contact, fieldObj);
-    //   if (replaceValue) value = replaceValue;
-    //   const regexValue = new RegExp('\{' + fieldObj.name + '\}', 'g');
-    //   // count num custom vars used
-    //   const matches = newHtml.match(regexValue);
-    //   if (matches !== null) {
-    //     if (!value) emptyFields.push(fieldObj.name);
-    //     matchCount[fieldObj.name] = matches.length;
-    //   }
-    //   newHtml = newHtml.replace(regexValue, value);
-    //   if (expectedMatches !== null) expectedMatches = expectedMatches.filter(match => match !== `{${fieldObj.name}}`);
-    // });
-
-    // const bodyObj = replaceAll(body, selectedContacts[i], this.state.fieldsmap);
-    // const subjectObj = replaceAll(subject, selectedContacts[i], this.state.fieldsmap);
-    // let emailObj = {
-    //   listid: this.props.listId,
-    //   to: contact.email,
-    //   subject: subjectObj.html,
-    //   body: bodyObj.html,
-    //   contactid: contact.id,
-    //   templateid: this.state.currentTemplateId,
-    //   cc: this.props.cc.map(item => item.text),
-    //   bcc: this.props.bcc.map(item => item.text),
-    //   fromemail: this.props.from,
-    // };
-    // if (this.props.scheduledtime !== null) {
-    //   emailObj.sendat = this.props.scheduledtime;
-    // }
-    // if (subjectObj.numMatches > 0) {
-    //   emailObj.baseSubject = subject;
-    // }
-  }
-
   _onClearClick() {
     if (this.state.dirty) {
       alertify.promisifyConfirm(
@@ -535,13 +526,7 @@ class EmailPanel extends Component {
             </div>
           {props.isImageReceiving &&
             <FontIcon style={styles.imageLoading} color={grey800} className='fa fa-spin fa-spinner'/>}
-            <div className='vertical-center' style={{position: 'fixed', right: 10}} >
-            {
-              /*
-              <IconButton style={{marginRight: 10}} iconClassName='fa fa-user-circle' tooltip='Send Test Email to Self' tooltipPosition='bottom-center' />
-              
-               */
-            }
+            <div className='vertical-center' style={styles.sendButtonContainer} >
               <RaisedButton
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
@@ -572,9 +557,9 @@ class EmailPanel extends Component {
           padding: '3px 10px',
           position: 'fixed',
           bottom: 0,
-          display: state.isPreveiwOpen ? 'none' : 'flex',
           width: '100%',
           zIndex: 500,
+          display: state.isPreveiwOpen ? 'none' : 'flex',
           backgroundColor: blueGrey50,
         }} >
           <div className='select-up' style={{width: 350}} >
@@ -692,6 +677,7 @@ const styles = {
   previewContainer: {marginBottom: 20, zIndex: 300},
   textTransformNone: {textTransform: 'none'},
   sentFromText: {color: grey800, marginRight: 10},
+  sendButtonContainer: {position: 'fixed', right: 10},
 };
 
 const mapStateToProps = (state, props) => {

@@ -1,4 +1,5 @@
 import {combineReducers} from 'redux';
+import { combineEpics } from 'redux-observable';
 
 import personReducer from 'components/Login/reducer';
 import contactReducer from 'components/Contacts/reducer';
@@ -31,6 +32,10 @@ import emailStatsReducer from 'components/Email/EmailAnalytics/EmailStats/reduce
 import isFetchingReducer from 'components/IsFetching/reducer';
 import campaignStatsReducer from 'components/Email/EmailAnalytics/Campaign/reducer';
 import contactTagReducer from 'components/Contacts/ContactTags/reducer';
+
+import {searchPublicationsEpic} from 'components/Publications/epics';
+import {fetchPerson, setupThirdparty} from 'components/Login/epics';
+import {fetchEmail} from 'components/Email/epics';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -65,5 +70,12 @@ const rootReducer = combineReducers({
   campaignStatsReducer,
   contactTagReducer
 });
+
+export const rootEpic = combineEpics(
+  searchPublicationsEpic,
+  fetchPerson,
+  setupThirdparty,
+  fetchEmail
+  );
 
 export default rootReducer;

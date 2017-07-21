@@ -68,6 +68,9 @@ let combinableInlineTagMap = {
 }
 
 let entityTagMap = {
+  'PROPERTY': {
+    process: data => [`<%= `, ' %>']
+  },
   'LINK': {
     process: data => ['<a href="<%= url %>" target="_blank">', '</a>'],
   },
@@ -104,6 +107,7 @@ let nestedTagMap = {
   'unordered-list-item': ['<ul>', '</ul>']
 };
 
+// transform entity data at html compile stage
 const entityDataConversionMap = {
   IMAGE: data => {
     const size = parseInt(data.size.slice(0, -1), 10) / 100;

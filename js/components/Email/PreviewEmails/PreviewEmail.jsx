@@ -7,6 +7,7 @@ import {grey800} from 'material-ui/styles/colors';
 import * as stagingActions from '../actions';
 import FontIcon from 'material-ui/FontIcon';
 import {_getter} from 'components/ListTable/helpers';
+import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 
 const styles = {
   contentBox: {
@@ -43,28 +44,6 @@ const PauseOverlay = ({message}: {message: string}) => (
       <span style={pauseOverlayStyle.text}>Image is loading</span><FontIcon style={{margin: '0 5px'}} color='#ffffff' className='fa fa-spin fa-spinner'/>
     </div>
   </div>);
-
-function replaceAll(html: string, contact: Object, fieldsmap: Array<Object>): string {
-  if (html === null || html.length === 0) return {html: '', numMatches: 0};
-  let newHtml = html;
-  let matchCount = {};
-  fieldsmap.map(fieldObj => {
-    let value = '';
-    const replaceValue = _getter(contact, fieldObj);
-    if (replaceValue) value = replaceValue;
-    const regexValue = new RegExp('\{' + fieldObj.name + '\}', 'g');
-    // count num custom vars used
-    const matches = newHtml.match(regexValue);
-    if (matches !== null) matchCount[fieldObj.name] = matches.length;
-    newHtml = newHtml.replace(regexValue, value);
-  });
-  const numMatches = Object.keys(matchCount).length;
-  if (numMatches > 0) {
-    window.Intercom('trackEvent', 'num_custom_variables', {num_custom_variables: Object.keys(matchCount).length})
-    mixpanel.track('num_custom_variables', {num_custom_variables: Object.keys(matchCount).length});
-  }
-  return {html: newHtml, numMatches};
-}
 
 class PreviewEmail extends Component {
   constructor(props) {

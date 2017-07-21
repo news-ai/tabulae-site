@@ -9,9 +9,9 @@ const templateSchema = new Schema('templates');
 export function createTemplate(name, subject, body) {
   let templateBody = {};
   if (name.length > 0) templateBody.name = name;
-  else templateBody.name = 'untitled template name';
+  else templateBody.name = 'Untitled Template';
   if (subject.length > 0) templateBody.subject = subject;
-  else templateBody.subject = 'untitled subject line';
+  else templateBody.subject = '(No Subject)';
   if (body) templateBody.body = body;
   else templateBody.body = '';
   return dispatch => {

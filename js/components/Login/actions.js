@@ -108,17 +108,18 @@ export function logout() {
   };
 }
 
-export function fetchPerson() {
-  return (dispatch, getState) => {
-    if (getState().personReducer.person) return;
-    dispatch(requestLogin());
-    return api.get('/users/me')
-    .then(response => dispatch(receiveLogin(response.data)))
-    .catch(message => {
-      if (process.env.NODE_ENV === 'development') console.log(message);
-    });
-  };
-}
+// OBSOLETE!! Moved to epics
+// export function fetchPerson() {
+//   return (dispatch, getState) => {
+//     if (getState().personReducer.person) return;
+//     dispatch(requestLogin());
+//     return api.get('/users/me')
+//     .then(response => dispatch(receiveLogin(response.data)))
+//     .catch(message => {
+//       if (process.env.NODE_ENV === 'development') console.log(message);
+//     });
+//   };
+// }
 
 export function fetchUser(userId) {
   return (dispatch, getState) => {

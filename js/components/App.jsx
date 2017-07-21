@@ -5,23 +5,27 @@ import {connect} from 'react-redux';
 import intercomSetup from '../chat';
 
 import {actions as loginActions} from 'components/Login';
+import {loginConstant} from 'components/Login/constants';
 import {actions as notificationActions} from 'components/Notifications';
 import * as joyrideActions from './Joyride/actions';
 
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
+import NotificationBadge  from 'react-notification-badge';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
-import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
-// import Popover from 'material-ui/Popover/Popover';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FeedbackPanel from './Feedback/FeedbackPanel.jsx';
-// import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
-import {grey700, blue600, blue300} from 'material-ui/styles/colors';
+import Badge from 'material-ui/Badge';
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
+import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
+import {grey700, grey500, blue600, blue300, red700} from 'material-ui/styles/colors';
 
 
 const navStyle = {
@@ -53,6 +57,11 @@ class App extends Component {
       notificationPanelOpen: false,
       notificationAnchorEl: null
     };
+    this.onNotificationPanelOpen = e => this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+    this.onNotificationPanelClose = _ => {
+      this.props.readReceiptNotification();
+      this.setState({notificationPanelOpen: false});
+    }
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
     this.turnOnGeneralGuide = _ => {
@@ -65,6 +74,7 @@ class App extends Component {
     };
     this.onSkipTour = _ => this.setState({firstTimeUser: false});
     this.onDrawerChange = isDrawerOpen => this.setState({isDrawerOpen});
+    this.goToBilling = _ => (window.location.href = 'https://tabulae.newsai.org/api/billing');
   }
 
   componentWillMount() {
@@ -76,28 +86,12 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
-      const appId = process.env.NODE_ENV === 'development' ? 'eh8247hf' : 'ur8dbk9e';
-      const person = nextProps.person;
-      intercomSetup({
-        app_id: appId,
-        email: person.email,
-        name: `${person.firstname} ${person.lastname}`,
-        custom_launcher_selector: '#custom_intercom_launcher',
-        user_id: person.id
-      });
-      if (process.env.NODE_ENV === 'production') {
-        Raven.config('https://c6c781f538ef4b6a952dc0ad3335cf61@sentry.io/100317').install();
-        Raven.setUserContext({email: person.email, id: person.id});
-        delighted.survey({email: person.email, name: `${person.firstname} ${person.lastname}`});
-        mixpanel.people.set({email: person.email, name: `${person.firstname} ${person.lastname}`});
-        mixpanel.identify(person.id);
-      }
-
+      nextProps.setupNotificationSocket();
+     
       if (nextProps.firstTimeUser) {
         this.props.setFirstTimeUser();
         this.setState({firstTimeUser: true});
       }
-      this.props.fetchNotifications();
       this.setState({isLogin: true});
     }
     if (matchNoNavBar(nextProps.location.pathname) && nextProps.isLogin) {
@@ -138,7 +132,7 @@ class App extends Component {
               <p>Your subscription is over. To re-subscribe please visit the our billing page.</p>
             </div>
             <div className='horizontal-center' style={styles.btn}>
-              <RaisedButton primary label='Go to Billing' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} />
+              <RaisedButton primary label='Go to Billing' onClick={this.goToBilling} />
             </div>
             <div className='horizontal-center' style={styles.btn}>
               <Link to='/settings'>
@@ -154,7 +148,7 @@ class App extends Component {
                 <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down'/></p>
               </div>
             {state.feedbackPanelOpen &&
-              <FeedbackPanel/>}
+              <FeedbackPanel />}
             </div>
           </Dialog>
         }
@@ -167,31 +161,41 @@ class App extends Component {
         {props.person.teamid > 0 &&
           <Link to='/team'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
           <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={this.goToBilling} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
           <a href='https://help.newsai.co' target='_blank'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
+          <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer}>Refer a Colleague</MenuItem></Link>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
-            <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
+            <IconButton iconStyle={styles.drawerIcon} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
-          <div className='hide-for-small-only medium-4 large-8 columns vertical-center'>
+          <div className='hide-for-small-only medium-8 large-8 columns vertical-center'>
             <div>
-              <span style={{color: 'gray', marginRight: 8}}>You are at: </span>
+              <span style={styles.breadcrumbText}>You are at: </span>
             </div>
             <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs routes={props.routes} params={props.params} separator=' > '/>
             </div>
           </div>
-          <div className='hide-for-small-only medium-4 large-2 columns vertical-center horizontal-center clearfix'>
-            <Link to='/settings'>
-              <RaisedButton label='Invite friends' labelColor='#ffffff' backgroundColor={blue300} labelStyle={styles.btnLabel}/>
-            </Link>
-          </div>
-          <div className='small-6 medium-1 large-1 columns vertical-center horizontal-center clearfix'>
-            <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
+          <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
+            <div>
+            {props.numUnreadNotification > 0 &&
+              <NotificationBadge count={props.numUnreadNotification} style={styles.notificationBadge} effect={[null, null, {top:'-5px'}, {top:'0px'}]} />}
+              <IconButton iconStyle={styles.notificationBell} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+            </div>
+            <Popover
+              open={state.notificationPanelOpen}
+              anchorEl={state.notificationAnchorEl}
+              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+              targetOrigin={{horizontal: 'right', vertical: 'top'}}
+              onRequestClose={this.onNotificationPanelClose}
+            >
+              <NotificationPanel />
+            </Popover>
+            <RaisedButton style={{marginLeft: 10}} label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
           </div>
         </div>
-        <div style={{height: 60}}></div>
+        <div style={styles.placeholderHeight}></div>
       </div>
       );
     return (
@@ -224,31 +228,36 @@ const styles = {
   },
   container: {width: '100%', height: '100%'},
   btnLabel: {textTransform: 'none'},
+  breadcrumbText: {color: 'gray', marginRight: 8},
+  placeholderHeight: {height: 60},
+  notificationBadge: {backgroundColor: blue300},
+  notificationBell: {color: grey500},
+  drawerIcon: {color: grey700}
 };
 
 const mapStateToProps = (state, props) => {
+  const notifications = state.notificationReducer.messages;
   return {
     data: state,
     isLogin: state.personReducer.person ? true : false,
     loginDidInvalidate: state.personReducer.didInvalidate,
     person: state.personReducer.person,
     firstTimeUser: props.location.query.firstTimeUser || state.personReducer.firstTimeUser,
-    notifications: state.notificationReducer.messages
+    numUnreadNotification: notifications ? notifications.reduce((total, message) => message.unread ? total + 1 : total, 0) : 0,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    getAuth: _ => dispatch(loginActions.fetchPerson()),
+    getAuth: _ => dispatch({type: loginConstant.REQUEST}),
     logoutClick: _ => dispatch(loginActions.logout()),
     setFirstTimeUser: _ => dispatch(loginActions.setFirstTimeUser()),
     fetchNotifications: _ => dispatch(notificationActions.fetchNotifications()),
     turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
+    setupNotificationSocket: _ => dispatch(notificationActions.setupNotificationSocket()),
+    readReceiptNotification: _ => dispatch({type: 'READ_NOTIFICATIONS'})
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(withRouter(App));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));

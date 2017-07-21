@@ -49,7 +49,8 @@ export const initialState = {
     isReceiving: false,
     didInvalidate: false,
     publicationMapByName: {},
-    received: []
+    received: [],
+    searchCache: []
   },
   fileReducer: {
     isReceiving: false,
@@ -152,7 +153,7 @@ export const initialState = {
     didInvalidate: false
   },
   notificationReducer: {
-    messages: []
+    messages: [],
   },
   emailStatsReducer: {
     isReceiving: false,

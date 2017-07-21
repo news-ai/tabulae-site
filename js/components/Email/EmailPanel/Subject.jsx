@@ -9,12 +9,14 @@ import {
 
 import Link from './components/Link';
 import CurlySpan from './components/CurlySpan.jsx';
+import Property from './components/Property';
 import {curlyStrategy, findEntities} from './utils/strategies';
 import {grey300, grey400, grey500} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
+import alertify from 'alertifyjs';
 
 const MAX_LENGTH = 255;
 
@@ -25,6 +27,10 @@ class Subject extends Component {
       {
         strategy: findEntities.bind(null, 'LINK'),
         component: Link
+      },
+      {
+        strategy: findEntities.bind(null, 'PROPERTY'),
+        component: Property
       },
       {
         strategy: curlyStrategy,
@@ -40,8 +46,9 @@ class Subject extends Component {
       variableMenuAnchorEl: null
     };
     this.truncateText = this._truncateText.bind(this);
-    this.insertText = this._insertText.bind(this);
     this.handlePastedText = this._handlePastedText.bind(this);
+    this.onInsertProperty = this.onInsertProperty.bind(this);
+    this.onPropertyIconClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
 
     this.onChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -65,6 +72,25 @@ class Subject extends Component {
       this.setState({subjectHtml: nextProps.subjectHtml});
       this.onChange(editorState);
     }
+  }
+
+  onInsertProperty(propertyType) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (!selection.isCollapsed()) {
+      alertify.alert('Editor Warning', 'The editor cursor must be focused and not highlighted to insert property.');
+      return;
+    }
+    const contentStateWithEntity = editorState.getCurrentContent().createEntity('PROPERTY', 'IMMUTABLE', {property: propertyType});
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+
+    const newEditorState = EditorState.push(
+      editorState,
+      Modifier.insertText(contentStateWithEntity, selection, propertyType, undefined, entityKey),
+      'insert-fragment'
+      );
+    this.onChange(newEditorState);
+    this.setState({variableMenuOpen: false});
   }
 
   _truncateText(editorState, charCount) {
@@ -97,15 +123,6 @@ class Subject extends Component {
     return editorState;
   }
 
-  _insertText(replaceText) {
-    const {editorState} = this.state;
-    const content = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const newContent = Modifier.insertText(content, selection, '{' + replaceText + '}');
-    const newEditorState = EditorState.push(editorState, newContent, 'insert-fragment');
-    this.onChange(newEditorState);
-  }
-
   _handlePastedText(text, html) {
     const newText = text.replace(/(\r\n|\n|\r)/gm, '').substring(0, 255);
     const editorState = this.state.editorState;
@@ -119,7 +136,7 @@ class Subject extends Component {
     const state = this.state;
     const props = this.props;
     return (
-      <div style={{borderBottom: `1px solid ${grey300}`}} className='vertical-center' >
+      <div style={styles.container} className='vertical-center' >
         <div
         className='subject-draft-container'
         style={{
@@ -139,10 +156,7 @@ class Subject extends Component {
           {props.fieldsmap
             .filter(field => !field.hidden)
             .map((field, i) =>
-            <MenuItem key={i} primaryText={field.name} onClick={_ => {
-              this.insertText(field.name);
-              this.setState({variableMenuOpen: false});
-            }} />)}
+            <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
           </Menu>
         </Popover>}
           <Editor
@@ -154,19 +168,28 @@ class Subject extends Component {
           />
         </div>
         <div className='vertical-center'>
-          <span style={{fontSize: '0.9em', color: grey500}}>{subjectLength}</span>
+          <span className='text' style={styles.lengthLabel}>{subjectLength}</span>
         {props.fieldsmap &&
           <IconButton
-          iconStyle={{width: 12, height: 12, fontSize: '12px', color: grey400}}
-          style={{width: 24, height: 24, padding: 6, marginLeft: 4}}
+          iconStyle={styles.icon.iconStyle}
+          style={styles.icon.style}
           iconClassName='fa fa-plus'
           tooltip='Insert Property to Subject'
           tooltipPosition='bottom-center'
-          onClick={e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget})}
+          onClick={this.onPropertyIconClick}
           />}
         </div>
       </div>
     );
+  }
+}
+
+const styles = {
+  container: {borderBottom: `1px solid ${grey300}`},
+  lengthLabel: {color: grey500},
+  icon: {
+    iconStyle: {width: 12, height: 12, fontSize: '12px', color: grey400},
+    style: {width: 24, height: 24, padding: 6, marginLeft: 4}
   }
 }
 
