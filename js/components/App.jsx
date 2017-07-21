@@ -11,6 +11,7 @@ import * as joyrideActions from './Joyride/actions';
 
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
+import NotificationBadge  from 'react-notification-badge';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
@@ -24,7 +25,7 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
-import {grey700, blue600, blue300, red700} from 'material-ui/styles/colors';
+import {grey700, grey500, blue600, blue300, red700} from 'material-ui/styles/colors';
 
 
 const navStyle = {
@@ -73,6 +74,7 @@ class App extends Component {
     };
     this.onSkipTour = _ => this.setState({firstTimeUser: false});
     this.onDrawerChange = isDrawerOpen => this.setState({isDrawerOpen});
+    this.goToBilling = _ => (window.location.href = 'https://tabulae.newsai.org/api/billing');
   }
 
   componentWillMount() {
@@ -130,7 +132,7 @@ class App extends Component {
               <p>Your subscription is over. To re-subscribe please visit the our billing page.</p>
             </div>
             <div className='horizontal-center' style={styles.btn}>
-              <RaisedButton primary label='Go to Billing' onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} />
+              <RaisedButton primary label='Go to Billing' onClick={this.goToBilling} />
             </div>
             <div className='horizontal-center' style={styles.btn}>
               <Link to='/settings'>
@@ -159,13 +161,13 @@ class App extends Component {
         {props.person.teamid > 0 &&
           <Link to='/team'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
           <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={_ => (window.location.href = 'https://tabulae.newsai.org/api/billing')} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
+          <MenuItem onTouchTap={this.closeDrawer} onClick={this.goToBilling} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
           <a href='https://help.newsai.co' target='_blank'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
           <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer}>Refer a Colleague</MenuItem></Link>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
-            <IconButton iconStyle={{color: grey700}} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
+            <IconButton iconStyle={styles.drawerIcon} onClick={this.toggleDrawer} iconClassName='fa fa-bars noprint' />
           </div>
           <div className='hide-for-small-only medium-8 large-8 columns vertical-center'>
             <div>
@@ -176,7 +178,11 @@ class App extends Component {
             </div>
           </div>
           <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
-            <IconButton iconStyle={{color: props.numUnreadNotification > 0 && red700}} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+            <div>
+            {props.numUnreadNotification > 0 &&
+              <NotificationBadge count={props.numUnreadNotification} style={styles.notificationBadge} effect={[null, null, {top:'-5px'}, {top:'0px'}]} />}
+              <IconButton iconStyle={styles.notificationBell} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+            </div>
             <Popover
               open={state.notificationPanelOpen}
               anchorEl={state.notificationAnchorEl}
@@ -224,6 +230,9 @@ const styles = {
   btnLabel: {textTransform: 'none'},
   breadcrumbText: {color: 'gray', marginRight: 8},
   placeholderHeight: {height: 60},
+  notificationBadge: {backgroundColor: blue300},
+  notificationBell: {color: grey500},
+  drawerIcon: {color: grey700}
 };
 
 const mapStateToProps = (state, props) => {

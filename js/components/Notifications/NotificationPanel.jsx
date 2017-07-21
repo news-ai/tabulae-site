@@ -10,15 +10,18 @@ const Notification = ({message}) => (
   </div>
   );
 
+const styles = {
+  container: {
+    backgroundColor: '#ffffff',
+    width: 350,
+    minHeight: 30,
+    maxHeight: 300
+  }
+};
+
 const NotificationPanel = ({notifications}) => {
-  console.log(notifications);
   return (
-    <div style={{
-      backgroundColor: '#ffffff',
-      width: 350,
-      minHeight: 30,
-      maxHeight: 300
-    }}>
+    <div style={styles.container}>
     {
       notifications.map((message, i) => {
         switch (message.resourceName) {
