@@ -154,7 +154,6 @@ export const initialState = {
   },
   notificationReducer: {
     messages: [],
-    unread: false
   },
   emailStatsReducer: {
     isReceiving: false,

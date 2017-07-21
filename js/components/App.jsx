@@ -56,11 +56,11 @@ class App extends Component {
       notificationPanelOpen: false,
       notificationAnchorEl: null
     };
-    this.onNotificationPanelOpen = e => {
+    this.onNotificationPanelOpen = e => this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+    this.onNotificationPanelClose = _ => {
       this.props.readReceiptNotification();
-      this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
-    };
-    this.onNotificationPanelClose = _ => this.setState({notificationPanelOpen: false});
+      this.setState({notificationPanelOpen: false});
+    }
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
     this.turnOnGeneralGuide = _ => {
@@ -176,7 +176,7 @@ class App extends Component {
             </div>
           </div>
           <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
-            <IconButton iconStyle={{color: props.unreadNotification && red700}} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+            <IconButton iconStyle={{color: props.numUnreadNotification > 0 && red700}} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
             <Popover
               open={state.notificationPanelOpen}
               anchorEl={state.notificationAnchorEl}
@@ -227,14 +227,14 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
+  const notifications = state.notificationReducer.messages;
   return {
     data: state,
     isLogin: state.personReducer.person ? true : false,
     loginDidInvalidate: state.personReducer.didInvalidate,
     person: state.personReducer.person,
     firstTimeUser: props.location.query.firstTimeUser || state.personReducer.firstTimeUser,
-    notifications: state.notificationReducer.messages,
-    unreadNotification: state.notificationReducer.unread
+    numUnreadNotification: notifications ? notifications.reduce((total, message) => message.unread ? total + 1 : total, 0) : 0,
   };
 };
 
