@@ -17,7 +17,6 @@ import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
-// import Popover from 'material-ui/Popover/Popover';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FeedbackPanel from './Feedback/FeedbackPanel.jsx';
 import Badge from 'material-ui/Badge';
@@ -25,7 +24,7 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import NotificationPanel from 'components/Notifications/NotificationPanel.jsx';
-import {grey700, blue600, blue300} from 'material-ui/styles/colors';
+import {grey700, blue600, blue300, red700} from 'material-ui/styles/colors';
 
 
 const navStyle = {
@@ -57,7 +56,10 @@ class App extends Component {
       notificationPanelOpen: false,
       notificationAnchorEl: null
     };
-    this.onNotificationPanelOpen = e => this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+    this.onNotificationPanelOpen = e => {
+      this.props.readReceiptNotification();
+      this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+    };
     this.onNotificationPanelClose = _ => this.setState({notificationPanelOpen: false});
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
@@ -174,7 +176,7 @@ class App extends Component {
             </div>
           </div>
           <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
-            <IconButton onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+            <IconButton iconStyle={{color: props.unreadNotification && red700}} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
             <Popover
               open={state.notificationPanelOpen}
               anchorEl={state.notificationAnchorEl}
@@ -184,7 +186,7 @@ class App extends Component {
             >
               <NotificationPanel />
             </Popover>
-            <RaisedButton className='left' label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
+            <RaisedButton style={{marginLeft: 5}} label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
           </div>
         </div>
         <div style={styles.placeholderHeight}></div>
@@ -231,7 +233,8 @@ const mapStateToProps = (state, props) => {
     loginDidInvalidate: state.personReducer.didInvalidate,
     person: state.personReducer.person,
     firstTimeUser: props.location.query.firstTimeUser || state.personReducer.firstTimeUser,
-    notifications: state.notificationReducer.messages
+    notifications: state.notificationReducer.messages,
+    unreadNotification: state.notificationReducer.unread
   };
 };
 
@@ -243,11 +246,9 @@ const mapDispatchToProps = dispatch => {
     fetchNotifications: _ => dispatch(notificationActions.fetchNotifications()),
     turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
-    setupNotificationSocket: _ => dispatch(notificationActions.setupNotificationSocket())
+    setupNotificationSocket: _ => dispatch(notificationActions.setupNotificationSocket()),
+    readReceiptNotification: _ => dispatch({type: 'READ_NOTIFICATIONS'})
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-  )(withRouter(App));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));

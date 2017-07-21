@@ -153,7 +153,8 @@ export const initialState = {
     didInvalidate: false
   },
   notificationReducer: {
-    messages: []
+    messages: [],
+    unread: false
   },
   emailStatsReducer: {
     isReceiving: false,

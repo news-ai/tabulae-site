@@ -19,14 +19,6 @@ import isEmpty from 'lodash/isEmpty';
 const emailSchema = new Schema('emails');
 const contactSchema = new Schema('contacts');
 import {actions as contactActions} from 'components/Contacts';
-// dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.data));
-// const listOnly = response.included.filter(item => item.type === 'lists');
-// const res = normalize(response, {
-//   data: arrayOf(contactSchema),
-//   lists: arrayOf(listSchema),
-//   publications: arrayOf(publicationSchema)
-// });
-// dispatch(listActions.receiveLists(res.entities.lists, res.result.lists, 0));
 
 export function archiveEmail(emailId) {
   return dispatch => {
