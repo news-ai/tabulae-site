@@ -38,7 +38,7 @@ export function setupNotificationSocket() {
 
         }
       } else {
-        console.log(msg);
+        // console.log(msg);
         msg.map(message => {
           dispatch({type: 'RECEIVE_NOTIFICATION', message})
           // alertify.notify(data, 'custom', 5, function() {});

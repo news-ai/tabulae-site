@@ -186,7 +186,7 @@ class App extends Component {
             >
               <NotificationPanel />
             </Popover>
-            <RaisedButton style={{marginLeft: 5}} label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
+            <RaisedButton style={{marginLeft: 10}} label='Logout' onClick={props.logoutClick} labelStyle={styles.btnLabel} />
           </div>
         </div>
         <div style={styles.placeholderHeight}></div>

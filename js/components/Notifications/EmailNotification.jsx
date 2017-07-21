@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {grey300, grey700} from 'material-ui/styles/colors';
+import {grey300, grey500, grey700, blue500} from 'material-ui/styles/colors';
 import Link from 'react-router/lib/Link';
 import FontIcon from 'material-ui/FontIcon';
 
 const styles = {
-  container: {padding: 10, borderBottom: `1px dotted ${grey300}`},
+  container: {padding: '8px 10px', borderBottom: `1px dotted ${grey300}`},
   text: {color: grey700}
 }
 
@@ -20,15 +20,19 @@ class EmailNotification extends Component {
 
   render() {
     const {resourceName, resourceId, resourceAction, data, email, isReceiving} = this.props;
+    const style = {margin: '0 5px', color: grey700, padding: '1px 8px', border: `1px solid ${grey500}`, borderRadius: '1.1em'};
     return (
       <div style={styles.container} >
         <div className='vertical-center horizontal-center'>
-          <span className='smalltext' style={styles.text}>{data.to} {`${resourceAction}ed`} on link from <strong>{data.subject}</strong></span>
+          <span className='smalltext' style={styles.text}>
+            <FontIcon color={blue500} style={{fontSize: '0.9em', marginRight: 5}} className={resourceAction === 'click' ? 'fa fa-mouse-pointer' : 'fa fa-envelope-open'} />
+            <strong>{data.to}</strong> {`${resourceAction}ed`} on email from <strong>{data.subject}</strong>
+          </span>
         </div>
-        {isReceiving || !email ? <FontIcon className='fa fa-spin fa-spinner' /> :
-          <div>
-            <span style={{margin: '0 5px'}} className='smalltext'>Clicked: {email.clicked}</span>
-            <span style={{margin: '0 5px'}} className='smalltext'>Opens: {email.opened}</span>
+        {isReceiving || !email ? <FontIcon color={grey500} className='fa fa-spin fa-spinner' /> :
+          <div className='vertical-center' style={{justifyContent: 'space-around', marginTop: 5}} >
+            <span style={style} className='smalltext'>Clicks: {email.clicked}</span>
+            <span style={style} className='smalltext'>Opens: {email.opened}</span>
           </div>}
       </div>
       );
