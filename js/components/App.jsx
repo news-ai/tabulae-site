@@ -86,7 +86,7 @@ class App extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isLogin && !this.state.isLogin && nextProps.person) {
-      nextProps.setupNotificationSocket();
+      // nextProps.setupNotificationSocket();
      
       if (nextProps.firstTimeUser) {
         this.props.setFirstTimeUser();

@@ -8,7 +8,7 @@ import 'node_modules/alertifyjs/build/css/alertify.min.css';
 alertify.set('notifier', 'position', 'top-right');
 
 
-const socket = io('https://live-1.newsai.org:443');
+export const socket = io('https://live-1.newsai.org:443');
 export function setupNotificationSocket() {
   return (dispatch, getState) => {
     dispatch({type: 'REQUEST_SOCKET_TOKEN'});
