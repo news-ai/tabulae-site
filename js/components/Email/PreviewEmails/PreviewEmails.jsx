@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import {grey700, blueGrey50} from 'material-ui/styles/colors';
@@ -8,6 +9,7 @@ import FontIcon from 'material-ui/FontIcon';
 import Fuse from 'fuse.js';
 import find from 'lodash/find';
 import isJSON from 'validator/lib/isJSON';
+import Link from 'react-router/lib/Link';
 
 import {actions as templateActions} from 'components/Email/Template';
 import {actions as stagingActions} from 'components/Email';
@@ -41,7 +43,6 @@ class PreviewEmails extends Component {
       numberDraftEmails: 0,
       searchValue: '',
       searchOn: false,
-      counter: 5
     };
     this.onChange = this.onChange.bind(this);
     this.onSendAllEmails = this.onSendAllEmails.bind(this);
@@ -53,12 +54,6 @@ class PreviewEmails extends Component {
       this.setState({numberDraftEmails: this.state.numberDraftEmails + 1});
     };
     this.turnOffDraft = _ => this.setState({numberDraftEmails: this.state.numberDraftEmails - 1});
-    this.startGoBackCounter = _ => {
-      setInterval(_ => {
-        if (this.state.counter === 0) this.props.onBack();
-        else this.setState({counter: this.state.counter - 1});
-      }, 1000);
-    }
   }
 
   onChange(e) {
@@ -76,8 +71,8 @@ class PreviewEmails extends Component {
     const previewEmails = this.state.searchOn ? this.state.results : this.props.previewEmails;
     window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
     mixpanel.track('sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
-    this.props.onSendAllEmailsClick(previewEmails.map(email => email.id))
-    .then(_ => this.startGoBackCounter());
+    this.props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+    // .then(_ => this.startGoBackCounter());
     this.handleRecentTemplates();
   }
 
@@ -139,9 +134,15 @@ class PreviewEmails extends Component {
         </div>);
     } else if (previewEmails.length === 0) {
       renderNode = (
-        <div className='horizontal-center vertical-center' style={styles.fillScreen}>
-          <span>All done. Redirecting back to email editor in {state.counter}... </span>
-        </div>);
+        <div style={styles.fillScreen} >
+          <div style={{margin: '20px 0'}} className='horizontal-center vertical-center'>
+            <div>Emails {sendLater ? 'scheduled' : 'sent'}.</div>
+          </div>
+          <div className='vertical-center horizontal-center'>
+            <span style={{color: grey700}} >Check back to <Link to='/emailstats'>Sent & Scheduled Emails</Link> in a while to see your campaign analytics.</span>
+          </div>
+        </div>
+        );
     } else {
       renderNode = (
       <div>
