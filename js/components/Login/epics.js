@@ -15,7 +15,7 @@ export const fetchPerson = action$ =>
   .switchMap(_ =>
     api.get('/users/me')
     .then(response => response.data)
-    .catch(error => Observable.of({type: loginConstant.REQUEST_FAIL, message: error}))
+    // .catch(error => Observable.of({type: loginConstant.REQUEST_FAIL, message: error}))
     )
   .takeUntil(action$.ofType(loginConstant.CANCELLED))
   .map(person => ({type: loginConstant.RECEIVE, person}));
