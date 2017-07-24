@@ -49,7 +49,6 @@ export const socketAuth = (action$, store) =>
   .switchMap(({person}) =>
     Observable.merge(
       Observable.of({type: 'REQUEST_SOCKET_TOKEN'}),
-      Observable.of({type: 'WHEEEEEEEE'}),
       Observable.fromPromise(
         api.get('/users/me/live-token')
         // mockPromise()
