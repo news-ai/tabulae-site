@@ -85,7 +85,6 @@ class ListTable extends Component {
       columnWidths: null,
       dragPositions: [],
       dragged: false,
-      isEmailPanelOpen: false,
       sortPositions: this.props.fieldsmap === null ? null : this.props.fieldsmap.map(fieldObj => fieldObj.sortEnabled ?  0 : 2),
       onSort: false,
       sortedIds: [],
@@ -100,7 +99,8 @@ class ListTable extends Component {
       isDeleting: false,
       showContactEditPanel: false,
       currentEditContactId: undefined,
-      showEmailPanel: true,
+      isEmailPanelOpen: false,
+      initializeEmailPanel: false,
       showColumnEditPanel: false,
     };
 
@@ -108,7 +108,7 @@ class ListTable extends Component {
     this.showProfileTooltip = false;
     this.onTooltipPanel = false;
     this.onShowEmailClick = _ => props.person.emailconfirmed ?
-      this.setState({isEmailPanelOpen: true}) :
+      this.setState({isEmailPanelOpen: true, initializeEmailPanel: true}) :
       alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {});
 
     if (this.props.listData) {
@@ -173,7 +173,7 @@ class ListTable extends Component {
       sortedIds: [],
     });
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
-    this.forceEmailPanelRemount = _ => this.setState({showEmailPanel: false}, _ => this.setState({showEmailPanel: true}));
+    this.forceEmailPanelRemount = _ => this.setState({initializeEmailPanel: false}, _ => this.setState({initializeEmailPanel: true}));
   }
 
   componentWillMount() {
@@ -841,7 +841,7 @@ class ListTable extends Component {
             tooltipPosition='top-center'
             style={{marginLeft: 5}}
             onClick={e => {
-              const searchValue = this.searchValue.input.value;
+              const searchValue = this.searchValue.getValue();
               if (searchValue.length === 0) {
                 this.props.router.push(`/tables/${props.listId}`);
                 this.onSearchClearClick();
@@ -864,7 +864,7 @@ class ListTable extends Component {
                <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
                 {twt => (
                   <IconMenu
-                  iconButtonElement={<IconButton tooltip='analyze selected'><FontIcon className='fa fa-line-chart'/></IconButton>}
+                  iconButtonElement={<IconButton tooltip='analyze selected' iconClassName='fa fa-line-chart' />}
                   anchorOrigin={{horizontal: 'left', vertical: 'top'}}
                   targetOrigin={{horizontal: 'left', vertical: 'top'}}
                   >
@@ -895,7 +895,7 @@ class ListTable extends Component {
         className='vertical-center pointer'
         zDepth={2}
         style={styles.emailPanelDragHandle}
-        onClick={this.onShowEmailClick}
+        onClick={_ => !props.listData.readonly ? this.onShowEmailClick() : null}
         >
           <FontIcon color={grey400} hoverColor={grey500} className='fa fa-chevron-left' />
         </Paper>}
@@ -908,7 +908,7 @@ class ListTable extends Component {
         open={state.isEmailPanelOpen}
         onRequestChange={isEmailPanelOpen => this.setState({isEmailPanelOpen})}
         >
-        {state.showEmailPanel &&
+        {state.initializeEmailPanel &&
           <EmailPanel
           width={800}
           selected={state.selected}

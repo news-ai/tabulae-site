@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import {grey700, blueGrey50} from 'material-ui/styles/colors';
@@ -8,8 +9,10 @@ import FontIcon from 'material-ui/FontIcon';
 import Fuse from 'fuse.js';
 import find from 'lodash/find';
 import isJSON from 'validator/lib/isJSON';
+import Link from 'react-router/lib/Link';
 
 import {actions as templateActions} from 'components/Email/Template';
+import {actions as stagingActions} from 'components/Email';
 import PreviewEmail from './PreviewEmail.jsx';
 
 const fuseOptions = {
@@ -45,6 +48,12 @@ class PreviewEmails extends Component {
     this.onSendAllEmails = this.onSendAllEmails.bind(this);
     this.handleRecentTemplates = this.handleRecentTemplates.bind(this);
     this.fuse = new Fuse(this.props.previewEmails, fuseOptions);
+    this.turnOnDraft = _ => {
+      window.Intercom('trackEvent', 'use_preview_draft');
+      mixpanel.track('use_preview_draft');
+      this.setState({numberDraftEmails: this.state.numberDraftEmails + 1});
+    };
+    this.turnOffDraft = _ => this.setState({numberDraftEmails: this.state.numberDraftEmails - 1});
   }
 
   onChange(e) {
@@ -63,6 +72,7 @@ class PreviewEmails extends Component {
     window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
     mixpanel.track('sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
     this.props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+    // .then(_ => this.startGoBackCounter());
     this.handleRecentTemplates();
   }
 
@@ -124,9 +134,15 @@ class PreviewEmails extends Component {
         </div>);
     } else if (previewEmails.length === 0) {
       renderNode = (
-        <div className='horizontal-center vertical-center' style={styles.fillScreen}>
-          <span>All done.</span>
-        </div>);
+        <div style={styles.fillScreen} >
+          <div style={{margin: '20px 0'}} className='horizontal-center vertical-center'>
+            <div>Emails {sendLater ? 'scheduled' : 'sent'}.</div>
+          </div>
+          <div className='vertical-center horizontal-center'>
+            <span style={{color: grey700}} >Check back to <Link to='/emailstats'>Sent & Scheduled Emails</Link> in a while to see your campaign analytics.</span>
+          </div>
+        </div>
+        );
     } else {
       renderNode = (
       <div>
@@ -159,22 +175,17 @@ class PreviewEmails extends Component {
         </div>
         {previewEmails.map((email, i) =>
           <PreviewEmail
-          contact={find(props.contacts, contact => contact.id === email.contactId)}
           fieldsmap={props.fieldsmap}
-          turnOnDraft={_ => {
-            window.Intercom('trackEvent', 'use_preview_draft');
-            mixpanel.track('use_preview_draft');
-            this.setState({numberDraftEmails: state.numberDraftEmails + 1});
-          }}
-          turnOffDraft={_ => this.setState({numberDraftEmails: state.numberDraftEmails - 1})}
+          turnOnDraft={this.turnOnDraft}
+          turnOffDraft={this.turnOffDraft}
           sendLater={sendLater}
           key={`preview-email-${i}`}
-          {...email}
           onSendEmailClick={_ => {
             window.Intercom('trackEvent', 'sent_email', {numSentEmails: 1, scheduled: sendLater});
             mixpanel.track('sent_email', {numSentEmails: 1, scheduled: sendLater});
             onSendEmailClick(email.id);
           }}
+          {...email}
           />)}
       </div>
       );
@@ -238,6 +249,8 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
     toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
+    onSendAllEmailsClick: ids => dispatch(stagingActions.bulkSendEmails(ids)),
+    onSendEmailClick: id => dispatch(stagingActions.sendEmail(id)),
   };
 };
 

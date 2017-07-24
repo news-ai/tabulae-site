@@ -36,6 +36,7 @@ import contactTagReducer from 'components/Contacts/ContactTags/reducer';
 import {searchPublicationsEpic} from 'components/Publications/epics';
 import {fetchPerson, setupThirdparty} from 'components/Login/epics';
 import {fetchEmail} from 'components/Email/epics';
+import {connectToSocket, socketAuth} from 'components/Notifications/epics';
 
 const rootReducer = combineReducers({
   personReducer,
@@ -75,7 +76,9 @@ export const rootEpic = combineEpics(
   searchPublicationsEpic,
   fetchPerson,
   setupThirdparty,
-  fetchEmail
+  fetchEmail,
+  connectToSocket,
+  socketAuth,
   );
 
 export default rootReducer;
