@@ -187,13 +187,6 @@ class BasicHtmlEditor extends Component {
 
     this.focus = () => this.refs.editor.focus();
     this.onChange = this._onChange.bind(this);
-    this.handleTouchTap = (event) => {
-      event.preventDefault();
-      this.setState({
-        variableMenuOpen: true,
-        variableMenuAnchorEl: event.currentTarget,
-      });
-    };
     function emitHTML(editorState) {
       let raw = convertToRaw(editorState.getCurrentContent());
       let html = draftRawToHtml(raw);

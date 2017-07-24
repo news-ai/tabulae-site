@@ -895,7 +895,7 @@ class ListTable extends Component {
         className='vertical-center pointer'
         zDepth={2}
         style={styles.emailPanelDragHandle}
-        onClick={this.onShowEmailClick}
+        onClick={_ => !props.listData.readonly ? this.onShowEmailClick() : null}
         >
           <FontIcon color={grey400} hoverColor={grey500} className='fa fa-chevron-left' />
         </Paper>}
