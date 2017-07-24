@@ -34,6 +34,9 @@ export const connectToSocket = (action$, store) =>
         msg.map(message => observable.next({type: 'RECEIVE_NOTIFICATION', message}));
       }
     });
+    socket.on('disconnect', function() {
+      console.log('disconnected:', socket.connected);
+    });
   }));
 
 // const mockPromise = _ => new Promise((resolve, reject) => {

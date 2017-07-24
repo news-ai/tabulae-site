@@ -255,7 +255,7 @@ const mapDispatchToProps = dispatch => {
     fetchNotifications: _ => dispatch(notificationActions.fetchNotifications()),
     turnOnUploadGuide: _ => dispatch(joyrideActions.turnOnUploadGuide()),
     turnOnGeneralGuide: _ => dispatch(joyrideActions.turnOnGeneralGuide()),
-    setupNotificationSocket: _ => dispatch(notificationActions.setupNotificationSocket()),
+    // setupNotificationSocket: _ => dispatch(notificationActions.setupNotificationSocket()),
     readReceiptNotification: _ => dispatch({type: 'READ_NOTIFICATIONS'})
   };
 };
