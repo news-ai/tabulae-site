@@ -631,8 +631,6 @@ class EmailPanel extends Component {
           sendLater={props.scheduledtime !== null}
           isReceiving={props.isReceiving}
           previewEmails={props.previewEmails}
-          onSendAllEmailsClick={ids => props.onBulkSendEmails(ids).then(_ => alertify.success(`${ids.length} emails ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
-          onSendEmailClick={id => props.onSendEmailClick(id).then(_ => alertify.success(`Email ${props.scheduledtime !== null ? 'scheduled' : 'sent'}.`))}
           />
         </div>
       }
@@ -718,7 +716,6 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onSendEmailClick: id => dispatch(stagingActions.sendEmail(id)),
     onBulkSendEmails: ids => dispatch(stagingActions.bulkSendEmails(ids)),
     onSaveCurrentTemplateClick: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),

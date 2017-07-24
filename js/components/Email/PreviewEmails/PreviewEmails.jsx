@@ -10,6 +10,7 @@ import find from 'lodash/find';
 import isJSON from 'validator/lib/isJSON';
 
 import {actions as templateActions} from 'components/Email/Template';
+import {actions as stagingActions} from 'components/Email';
 import PreviewEmail from './PreviewEmail.jsx';
 
 const fuseOptions = {
@@ -40,11 +41,24 @@ class PreviewEmails extends Component {
       numberDraftEmails: 0,
       searchValue: '',
       searchOn: false,
+      counter: 5
     };
     this.onChange = this.onChange.bind(this);
     this.onSendAllEmails = this.onSendAllEmails.bind(this);
     this.handleRecentTemplates = this.handleRecentTemplates.bind(this);
     this.fuse = new Fuse(this.props.previewEmails, fuseOptions);
+    this.turnOnDraft = _ => {
+      window.Intercom('trackEvent', 'use_preview_draft');
+      mixpanel.track('use_preview_draft');
+      this.setState({numberDraftEmails: this.state.numberDraftEmails + 1});
+    };
+    this.turnOffDraft = _ => this.setState({numberDraftEmails: this.state.numberDraftEmails - 1});
+    this.startGoBackCounter = _ => {
+      setInterval(_ => {
+        if (this.state.counter === 0) this.props.onBack();
+        else this.setState({counter: this.state.counter - 1});
+      }, 1000);
+    }
   }
 
   onChange(e) {
@@ -62,7 +76,8 @@ class PreviewEmails extends Component {
     const previewEmails = this.state.searchOn ? this.state.results : this.props.previewEmails;
     window.Intercom('trackEvent', 'sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
     mixpanel.track('sent_emails', {numSentEmails: previewEmails.length, scheduled: this.props.sendLater});
-    this.props.onSendAllEmailsClick(previewEmails.map(email => email.id));
+    this.props.onSendAllEmailsClick(previewEmails.map(email => email.id))
+    .then(_ => this.startGoBackCounter());
     this.handleRecentTemplates();
   }
 
@@ -125,7 +140,7 @@ class PreviewEmails extends Component {
     } else if (previewEmails.length === 0) {
       renderNode = (
         <div className='horizontal-center vertical-center' style={styles.fillScreen}>
-          <span>All done.</span>
+          <span>All done. Redirecting back to email editor in {state.counter}... </span>
         </div>);
     } else {
       renderNode = (
@@ -159,22 +174,17 @@ class PreviewEmails extends Component {
         </div>
         {previewEmails.map((email, i) =>
           <PreviewEmail
-          contact={find(props.contacts, contact => contact.id === email.contactId)}
           fieldsmap={props.fieldsmap}
-          turnOnDraft={_ => {
-            window.Intercom('trackEvent', 'use_preview_draft');
-            mixpanel.track('use_preview_draft');
-            this.setState({numberDraftEmails: state.numberDraftEmails + 1});
-          }}
-          turnOffDraft={_ => this.setState({numberDraftEmails: state.numberDraftEmails - 1})}
+          turnOnDraft={this.turnOnDraft}
+          turnOffDraft={this.turnOffDraft}
           sendLater={sendLater}
           key={`preview-email-${i}`}
-          {...email}
           onSendEmailClick={_ => {
             window.Intercom('trackEvent', 'sent_email', {numSentEmails: 1, scheduled: sendLater});
             mixpanel.track('sent_email', {numSentEmails: 1, scheduled: sendLater});
             onSendEmailClick(email.id);
           }}
+          {...email}
           />)}
       </div>
       );
@@ -238,6 +248,8 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
     toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
+    onSendAllEmailsClick: ids => dispatch(stagingActions.bulkSendEmails(ids)),
+    onSendEmailClick: id => dispatch(stagingActions.sendEmail(id)),
   };
 };
 

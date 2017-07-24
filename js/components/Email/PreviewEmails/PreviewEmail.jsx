@@ -161,6 +161,7 @@ const mapStateToProps = (state, props) => {
     person: state.personReducer.person,
     savedContentState: state.emailDraftReducer.editorState,
     isImageReceiving: state.emailImageReducer.isReceiving,
+    contact: state.contactReducer[props.contactId],
   };
 };
 
