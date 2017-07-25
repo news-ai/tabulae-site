@@ -76,6 +76,8 @@ const triggerNewEntityFormatWarning = rawContentState => new Promise((resolve, r
               // on cancel, return original rawContentState without replacing entities
               resolve(rawContentState);
             });
+        } else {
+          resolve(rawContentState);
         }
       });
 
