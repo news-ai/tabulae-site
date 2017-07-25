@@ -12,9 +12,16 @@ export const socket = io('https://live-1.newsai.org:443');
 export const connectToSocket = (action$, store) =>
   action$.ofType(loginConstant.RECEIVE)
   .switchMap(({person}) => Observable.create(observable => {
-    socket.on('connect', _ => observable.next({type: 'CONNECTED_TO_SOCKET', person}));
+    console.log('connecting to socket...');
+    socket.on('connect', _ => {
+      console.log('connect');
+      observable.next({type: 'CONNECTED_TO_SOCKET', person})
+    });
+    socket.on('connect_error', _ => {
+        console.log('connect error');
+    });
     socket.on('message', msg => {
-      // console.log(msg);
+      console.log('message');
       if (msg.type === 'auth') {
         if (msg.status === 'success') {
           // success, do nothing
