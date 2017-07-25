@@ -38,7 +38,7 @@ export const connectToSocket = (action$, store) =>
         });
         observable.error();
       }
-    }, 15000);
+    }, 5000);
 
     socket.on('message', msg => {
       console.log('message');
