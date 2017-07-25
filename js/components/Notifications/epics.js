@@ -7,14 +7,41 @@ import 'rxjs';
 import {Observable} from 'rxjs';
 import {normalize, Schema, arrayOf} from 'normalizr';
 
-export const socket = io('https://live-1.newsai.org:443');
+export let socket = io('https://live-1.newsai.org:443', {
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax : 5000,
+  reconnectionAttempts: 99999
+});
 
 export const connectToSocket = (action$, store) =>
   action$.ofType(loginConstant.RECEIVE)
   .switchMap(({person}) => Observable.create(observable => {
-    socket.on('connect', _ => observable.next({type: 'CONNECTED_TO_SOCKET', person}));
+    console.log('connecting to socket...');
+    let socketConnected = false;
+    socket.on('connect', _ => {
+      console.log('connect');
+      socketConnected = true;
+      observable.next({type: 'CONNECTED_TO_SOCKET', person})
+    });
+    // try connect again if unconnected
+    setTimeout(_ => {
+      console.log('check if connected');
+      console.log(socket.connected);
+      if (socket.connected) observable.next({type: 'CONNECTED_TO_SOCKET', person});
+      else {
+        socket = io('https://live-1.newsai.org:443', {
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax : 5000,
+          reconnectionAttempts: 99999
+        });
+        observable.error();
+      }
+    }, 5000);
+
     socket.on('message', msg => {
-      // console.log(msg);
+      console.log('message');
       if (msg.type === 'auth') {
         if (msg.status === 'success') {
           // success, do nothing
@@ -37,7 +64,18 @@ export const connectToSocket = (action$, store) =>
     socket.on('disconnect', function() {
       console.log('disconnected:', socket.connected);
     });
-  }));
+  })
+  .retryWhen(err => {
+    console.log('retry 5 times if hit socket connection error');
+    let retries = 0;
+    return err.delay(2000)
+      .map(error => {
+        if (retries++ === 5) throw error;
+        return error;
+      });
+    })
+  .catch(err => Observable.of({type: 'SOCKET_CONNECTION_NO_RESPONSE', message: err}))
+  );
 
 // const mockPromise = _ => new Promise((resolve, reject) => {
 //   console.log('hit promise');

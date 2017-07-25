@@ -5,6 +5,7 @@ import {
   convertFromRaw,
   Modifier,
 } from 'draft-js';
+import {red800} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
 
 // look for old property format and trigger warning for user to update
