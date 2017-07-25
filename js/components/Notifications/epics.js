@@ -18,10 +18,11 @@ export const connectToSocket = (action$, store) =>
       observable.next({type: 'CONNECTED_TO_SOCKET', person})
     });
     socket.on('connect_error', _ => {
-        console.log('connect error');
+      console.log('connect error');
     });
     socket.on('message', msg => {
       console.log('message');
+      console.log(msg);
       if (msg.type === 'auth') {
         if (msg.status === 'success') {
           // success, do nothing
