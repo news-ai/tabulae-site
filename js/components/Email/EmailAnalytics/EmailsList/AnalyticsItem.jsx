@@ -76,7 +76,7 @@ class AnalyticsItem extends Component {
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
     let sendAtDate = moment(sendat);
-    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.local().format(FORMAT);
+    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
     let createdDate = moment(created);
     const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
 
