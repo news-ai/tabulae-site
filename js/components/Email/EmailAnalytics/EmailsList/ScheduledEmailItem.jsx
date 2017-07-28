@@ -57,9 +57,9 @@ class ScheduledEmailItem extends Component {
     } = this.props;
     const state = this.state;
     const SUBTRING_LIMIT = 20;
-    let sendAtDate = moment.utc(sendat);
-    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.local().format(FORMAT);
-    let createdDate = moment.utc(created);
+    let sendAtDate = moment(sendat);
+    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
+    let createdDate = moment(created);
     const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
     // console.log(cancel);
     // console.log(id);
@@ -90,7 +90,7 @@ class ScheduledEmailItem extends Component {
           <div className='small-12 medium-6 large-6 columns'>
             <div className='row'>
               <div className='large-12 medium-12 small-12 columns'>
-                <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.local().format(FORMAT)}</span>
+                <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
               </div>
               <div className='large-12 medium-12 small-12 columns'>
                 <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>

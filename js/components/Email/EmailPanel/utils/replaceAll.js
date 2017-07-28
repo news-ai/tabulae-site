@@ -1,5 +1,4 @@
 import {_getter} from 'components/ListTable/helpers';
-import uniq from 'lodash/uniq';
 
 /**
  * Based on general-purpose HTML template and outputs specific HTML email with contact info based on custom properties
