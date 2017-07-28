@@ -10,6 +10,7 @@ import Fuse from 'fuse.js';
 import find from 'lodash/find';
 import isJSON from 'validator/lib/isJSON';
 import Link from 'react-router/lib/Link';
+import {lightBlue50, red800, red50} from 'material-ui/styles/colors';
 
 import {actions as templateActions} from 'components/Email/Template';
 import {actions as stagingActions} from 'components/Email';
@@ -207,7 +208,7 @@ class PreviewEmails extends Component {
             disabled={state.numberDraftEmails > 0 || props.isReceiving || previewEmails.length === 0 || searchOn}
             label={sendAllButtonLabel}
             primary
-            icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'}/>}
+            icon={<FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
             labelStyle={styles.textTransformNone}
             onClick={this.onSendAllEmails}
             />
