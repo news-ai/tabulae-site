@@ -75,9 +75,9 @@ class AnalyticsItem extends Component {
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
     const SUBTRING_LIMIT = 20;
-    let sendAtDate = moment(sendat);
-    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.tz(moment.tz.guess()).format(FORMAT);
-    let createdDate = moment(created);
+    let sendAtDate = moment.utc(sendat);
+    const sendAtDatestring = sendat === DEFAULT_DATESTRING ? 'IMMEDIATE' : sendAtDate.local().format(FORMAT);
+    let createdDate = moment.utc(created);
     const recepientString = contact ? `${contact.firstname} ${contact.lastname} <${to}>` : to;
 
     let listNameString = list ? list.name : `(Archived) ${listid}`;
@@ -109,7 +109,7 @@ class AnalyticsItem extends Component {
           <div className='small-12 medium-6 large-6 columns'>
             <div className='row'>
               <div className='large-12 medium-12 small-12 columns'>
-                <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.tz(moment.tz.guess()).format(FORMAT)}</span>
+                <span style={styles.sentLabel}><strong>Created at:</strong> {createdDate.local().format(FORMAT)}</span>
               </div>
               <div className='large-12 medium-12 small-12 columns'>
                 <span style={styles.sentLabel}><strong>Send at:</strong> {sendAtDatestring}</span>
