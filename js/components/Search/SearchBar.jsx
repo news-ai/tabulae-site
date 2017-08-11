@@ -71,6 +71,7 @@ class SearchBar extends Component {
       else if (props.results.length === 1) expectedResultsString = `1 result`;
       else expectedResultsString = `${props.results.length} results`;
     }
+    console.log(props.results);
     return (
       <InfiniteScroll onScrollBottom={this.onScrollBottom}>
         <div className='row horizontal-center' style={styles.topBar.container}>
@@ -89,7 +90,9 @@ class SearchBar extends Component {
             <Waiting isReceiving={props.isReceiving} style={styles.waiting} />
             <div className='large-12 columns' style={styles.resultContainer}>
             {props.results.map((contact, i) =>
-              <div key={`contactitem-${i}`} style={styles.contactContainer}><ContactItem {...contact} query={props.searchQuery}/></div>)}
+              <div key={`contactitem-${i}`} style={styles.contactContainer}>
+                <ContactItem {...contact} query={props.searchQuery}/>
+              </div>)}
             </div>
           </div>
         {state.isSearchReceived && props.results.length % 50 === 0 && props.results.length > 0 &&

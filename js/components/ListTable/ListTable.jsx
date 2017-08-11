@@ -670,9 +670,9 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    console.log(props.listData);
-    console.log(!!props.listData.contacts);
-    console.log(!!props.contacts);
+    // console.log(props.listData);
+    // console.log(!!props.listData.contacts);
+    // console.log(!!props.contacts);
     return (
       <div style={styles.container}>
         {

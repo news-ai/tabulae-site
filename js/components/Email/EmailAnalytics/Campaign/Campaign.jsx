@@ -93,12 +93,12 @@ const Campaign = ({
       </div>
       {/*
       <div className='large-2 medium-4 small-4 columns'>
-        <Block hint='' value={uniqueClicks} title='Unique Clicks'/>
         <Block hint='' value={`${uniqueClicksPercentage}%`} title='Unique Clicks Rate'/>
       </div>
     */}
       <div className='large-2 medium-4 small-4 columns'>
         <Block hint='How many emails did not reach recepients' value={bounces} title='Bounces' query={query} linkQuery={{filter: 'bounce'}} />
+        <Block hint='How many emails were delivered in this campaign' value={delivered} title='Total Delivered'/>
       </div>
       <div className='large-offset-9 medium-offset-8 small-offset-6 columns'>
         <div className='right'>
