@@ -57,11 +57,8 @@ class App extends Component {
       notificationPanelOpen: false,
       notificationAnchorEl: null
     };
-    this.onNotificationPanelOpen = e => this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
-    this.onNotificationPanelClose = _ => {
-      this.props.readReceiptNotification();
-      this.setState({notificationPanelOpen: false});
-    }
+    this.onNotificationPanelOpen = this.onNotificationPanelOpen.bind(this);
+    this.onNotificationPanelClose = this.onNotificationPanelClose.bind(this);
     this.toggleDrawer = _ => this.setState({isDrawerOpen: !this.state.isDrawerOpen});
     this.closeDrawer = _ => this.setState({isDrawerOpen: false});
     this.turnOnGeneralGuide = _ => {
@@ -99,6 +96,15 @@ class App extends Component {
     } else {
       this.setState({showNavBar: true});
     }
+  }
+
+  onNotificationPanelOpen(e) {
+    this.setState({notificationPanelOpen: true, notificationAnchorEl: e.currentTarget});
+  }
+
+  onNotificationPanelClose() {
+    if (this.props.numUnreadNotification > 0) this.props.readReceiptNotification();
+    this.setState({notificationPanelOpen: false});
   }
 
   render() {
@@ -180,7 +186,11 @@ class App extends Component {
           <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
             <div>
             {props.numUnreadNotification > 0 &&
-              <NotificationBadge count={props.numUnreadNotification} style={styles.notificationBadge} effect={[null, null, {top:'-5px'}, {top:'0px'}]} />}
+              <NotificationBadge
+              count={props.numUnreadNotification}
+              style={styles.notificationBadge}
+              effect={[null, null, {top:'-5px'}, {top:'0px'}]}
+              />}
               <IconButton iconStyle={styles.notificationBell} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
             </div>
             <Popover
