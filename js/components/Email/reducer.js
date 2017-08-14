@@ -48,6 +48,10 @@ function stagingReducer(state = initialState.stagingReducer, action) {
       return obj;
     case REQUEST_MULTIPLE_EMAILS:
       return assignToEmpty(state, {isReceiving: true});
+    case 'RECEIVE_SCHEDULED_EMAILS_TOTAL':
+      return assignToEmpty(state, {
+        scheduledTotal: action.total
+      });
     case RECEIVE_MULTIPLE_EMAILS:
       obj = assignToEmpty(state, action.emails);
       if (action.contactId) {

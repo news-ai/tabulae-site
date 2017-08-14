@@ -383,10 +383,11 @@ export function fetchScheduledEmails() {
       let newOffset = OFFSET + PAGE_LIMIT;
       if (response.data.length < PAGE_LIMIT) newOffset = null;
       dispatch({type: EMAIL_SET_OFFSET, scheduledOffset: newOffset});
+      dispatch({type: 'RECEIVE_SCHEDULED_EMAILS_TOTAL', total: response.summary.total});
       return dispatch({
         type: RECEIVE_MULTIPLE_EMAILS,
         emails: res.entities.emails,
-        ids: res.result.data
+        ids: res.result.data,
       });
     })
     .catch(message => dispatch({type: 'GET_SENT_EMAILS_FAIL', message}));
