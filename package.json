@@ -71,6 +71,7 @@
     "regression": "^1.2.1",
     "rxjs": "^5.4.2",
     "sanitize-html": "^1.14.1",
+    "styled-components": "^2.1.2",
     "tlds": "^1.157.0",
     "validator": "^5.5.0"
   },

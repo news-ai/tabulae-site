@@ -12,6 +12,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {generateTableFieldsmap, reformatFieldsmap} from 'components/ListTable/helpers';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import find from 'lodash/find';
 
 import {grey500, grey600, lightBlue50, lightBlue300, red800} from 'material-ui/styles/colors';
 import alertify from 'alertifyjs';
@@ -163,7 +164,12 @@ class HeaderNaming extends Component {
     window.Intercom('trackEvent', 'processed_sheet');
     mixpanel.track('processed_sheet');
     const order = this.state.order.map(name => name || 'ignore_column');
-    this.props.onAddHeaders(order)
+    const headernames = this.state.order.reduce((acc, value) => {
+      const headerOption = find(this.state.options, ['value', value]);
+      acc.push(headerOption ? headerOption.label : '');
+      return acc;
+    }, []);
+    this.props.onAddHeaders(order, headernames)
     .then(_ => {
       if (!this.props.didInvalidate) {
         this.setState({isLoading: true});
@@ -327,7 +333,7 @@ const mapDispatchToProps = (dispatch, props) => {
   const listId = parseInt(props.params.listId, 10);
   return {
     fetchHeaders: _ => dispatch(fileActions.fetchHeaders(listId)),
-    onAddHeaders: order => dispatch(fileActions.addHeaders(listId, order)),
+    onAddHeaders: (order, headernames) => dispatch(fileActions.addHeaders(listId, order, headernames)),
     onReducerReset: () => dispatch({type: 'HEADERS_REDUCER_RESET'})
   };
 };

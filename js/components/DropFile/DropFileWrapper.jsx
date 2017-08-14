@@ -222,7 +222,7 @@ class DropFileWrapper extends Component {
             />
           </div>
           <div className='vertical-center horizontal-center' style={styles.details}>
-            <span>For more details, you may refer to <a href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>.</span>
+            <span>For more details, you may refer to <a rel='noreferrer' href='https://help.newsai.co/tabulae-how-to/how-to-upload-a-media-list' target='_blank'>Upload Guide</a>.</span>
           </div>
         </div>
         );
