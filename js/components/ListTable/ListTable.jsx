@@ -670,6 +670,9 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
+    // console.log(props.listData);
+    // console.log(!!props.listData.contacts);
+    // console.log(!!props.contacts);
     return (
       <div style={styles.container}>
         {
@@ -924,13 +927,13 @@ class ListTable extends Component {
           <Tags listId={props.listId}/>
         </div>
         <div>
-        {props.listData.contacts === null &&
-          <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
         <div>
-        {props.listData.contacts && props.listData.contacts !== null && props.contacts &&
+        {!isEmpty(props.listData.contacts) && props.contacts &&
           <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
         </div>
-      {props.received.length > 0 && state.columnWidths !== null &&
+      {isEmpty(props.listData.contacts) &&
+        <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+      {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&
         <ScrollSync>
         {({onScroll, scrollLeft}) =>
           <div>

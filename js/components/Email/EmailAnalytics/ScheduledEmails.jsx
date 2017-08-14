@@ -5,12 +5,19 @@ import EmailsList from 'components/Email/EmailAnalytics/EmailsList';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import alertify from 'alertifyjs';
+import {grey700} from 'material-ui/styles/colors';
+
+const styles = {
+  span: {color: grey700}
+};
 
 const ScheduledEmails = props => {
   return (
     <div>
     {props.emails.length > 0 && props.emails.some(email => !email.cancel) &&
       <div className='vertical-center'>
+      {props.total &&
+        <span className='text' style={styles.span} >Total Scheduled: {props.total}</span>}
         <div className='right'>
           <RaisedButton
           onClick={props.onCancelAllScheduledEmailsClick}
@@ -36,6 +43,7 @@ const mapStateToProps = (state, props) => {
     emails,
     isReceiving: state.stagingReducer.isReceiving,
     hasNext: state.stagingReducer.scheduledOffset !== null,
+    total: state.stagingReducer.scheduledTotal
   };
 };
 

@@ -14,6 +14,15 @@ export let socket = io('https://live-1.newsai.org:443', {
   reconnectionAttempts: 99999
 });
 
+export const emitReadReceipt = action$ =>
+  action$.ofType('READ_NOTIFICATIONS')
+  .switchMap(() => {
+    console.log('EMIIIITTT');
+
+    socket.emit('notification', {notification: 'read'});
+    return [];
+  });
+
 export const connectToSocket = (action$, store) =>
   action$.ofType(loginConstant.RECEIVE)
   .switchMap(({person}) => Observable.create(observable => {
