@@ -37,12 +37,12 @@ export function fetchHeaders(listId) {
   };
 }
 
-export function addHeaders(listId, order) {
+export function addHeaders(listId, order, headernames) {
   return (dispatch, getState) => {
-    dispatch({type: headerConstant.CREATE_REQUEST, order});
+    dispatch({type: headerConstant.CREATE_REQUEST, order, headernames});
     dispatch({type: TURN_ON_PROCESS_WAIT, listId});
     const fileId = getState().fileReducer[listId].id;
-    return api.post(`/files/${fileId}/headers`, {order})
+    return api.post(`/files/${fileId}/headers`, {order, headernames})
     .then(
       response => {
         dispatch({type: headerConstant.CREATE_RECEIVED, response});
