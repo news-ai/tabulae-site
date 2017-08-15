@@ -580,6 +580,7 @@ class BasicHtmlEditor extends Component {
     let contentState;
 
     if (html) {
+      console.log(html);
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -589,6 +590,7 @@ class BasicHtmlEditor extends Component {
           a: ['href']
         }
       });
+      console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
