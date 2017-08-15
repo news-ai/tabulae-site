@@ -11,6 +11,7 @@ import find from 'lodash/find';
 import isJSON from 'validator/lib/isJSON';
 import Link from 'react-router/lib/Link';
 import {lightBlue50, red800, red50} from 'material-ui/styles/colors';
+import styled from 'styled-components';
 
 import {actions as templateActions} from 'components/Email/Template';
 import {actions as stagingActions} from 'components/Email';
@@ -44,6 +45,7 @@ class PreviewEmails extends Component {
       numberDraftEmails: 0,
       searchValue: '',
       searchOn: false,
+      page: 0
     };
     this.onChange = this.onChange.bind(this);
     this.onSendAllEmails = this.onSendAllEmails.bind(this);
@@ -127,12 +129,15 @@ class PreviewEmails extends Component {
     else if (searchOn) sendAllButtonLabel = 'Search in Progress';
     else if (previewEmails.length === 0) sendAllButtonLabel = 'Done';
 
+    const PAGE_LENGTH = 60;
+
     let renderNode;
     if (props.emailDidInvalidate) {
       renderNode = (
         <div className='horizontal-center vertical-center' style={styles.fillScreen} >
           An error occurred with generating previews of the emails.
-        </div>);
+        </div>
+        );
     } else if (previewEmails.length === 0) {
       renderNode = (
         <div style={styles.fillScreen} >
@@ -159,7 +164,7 @@ class PreviewEmails extends Component {
             />
           </div>
           <span className='smalltext right' style={{color: grey700}}>
-            Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails
+            Showing {state.searchOn ? `${previewEmails.length} out of ${this.props.previewEmails.length}` : previewEmails.length} emails. Max 60 emails/page.
           </span>
         </div>
         <div style={styles.attachmentContainer}>
@@ -174,7 +179,9 @@ class PreviewEmails extends Component {
             <span className='smalltext' style={styles.loadingText}>Succesfully attached.</span>}
           </div>
         </div>
-        {previewEmails.map((email, i) =>
+        {previewEmails
+          .filter((e, i) => state.page * PAGE_LENGTH <= i && i < (state.page + 1) * PAGE_LENGTH)
+          .map((email, i) =>
           <PreviewEmail
           fieldsmap={props.fieldsmap}
           turnOnDraft={this.turnOnDraft}
@@ -188,6 +195,14 @@ class PreviewEmails extends Component {
           }}
           {...email}
           />)}
+        <div style={{marginTop: 15}} >
+        {state.page > 0 &&
+          <FlatButton disabled={state.numberDraftEmails > 0} primary label='Prev' onClick={e => this.setState({page: state.page - 1})} />}
+        {(state.page + 1) * PAGE_LENGTH < previewEmails.length &&
+          <FlatButton disabled={state.numberDraftEmails > 0} primary label='Next' onClick={e => this.setState({page: state.page + 1})} />}
+        {state.numberDraftEmails > 0 &&
+          <span className='text'>Disabled while an editor is unsaved.</span>}
+        </div>
       </div>
       );
     }

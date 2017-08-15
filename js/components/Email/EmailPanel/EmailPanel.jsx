@@ -631,6 +631,7 @@ class EmailPanel extends Component {
           sendLater={props.scheduledtime !== null}
           isReceiving={props.isReceiving}
           previewEmails={props.previewEmails}
+          width={props.width - 20}
           />
         </div>
       }
