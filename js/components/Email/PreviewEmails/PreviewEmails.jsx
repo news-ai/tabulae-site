@@ -129,7 +129,7 @@ class PreviewEmails extends Component {
     else if (searchOn) sendAllButtonLabel = 'Search in Progress';
     else if (previewEmails.length === 0) sendAllButtonLabel = 'Done';
 
-    const PAGE_LENGTH = 2;
+    const PAGE_LENGTH = 60;
 
     let renderNode;
     if (props.emailDidInvalidate) {
