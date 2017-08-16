@@ -72,6 +72,7 @@ export const connectToSocket = (action$, store) =>
     });
     socket.on('disconnect', function() {
       console.log('disconnected:', socket.connected);
+      observable.next({type: 'CLEAR_NOTIFICATIONS'});
     });
   })
   .retryWhen(err => {

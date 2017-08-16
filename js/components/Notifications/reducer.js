@@ -12,6 +12,10 @@ function notificationReducer(state = initialState.notificationReducer, action) {
       return assignToEmpty(state, {
         messages: state.messages.map(message => assignToEmpty(message, {unread: false}))
       });
+    case 'CLEAR_NOTIFICATIONS':
+      return assignToEmpty(state, {
+        messages: []
+      });
     default:
       return state;
   }

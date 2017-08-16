@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {actions as loginActions} from 'components/Login';
-import GeneralEditor from 'components/Email/GeneralEditor/GeneralEditor2.jsx';
+import GeneralEditor from 'components/Email/GeneralEditor';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
