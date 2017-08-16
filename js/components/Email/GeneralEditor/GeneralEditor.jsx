@@ -777,7 +777,7 @@ class GeneralEditor extends React.Component {
             />
           </div>
         </div>
-      {props.controlsPosition && props.controlsPosition === 'bottom' &&
+      {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
         <Paper
         zDepth={1}
         className='row vertical-center clearfix'
