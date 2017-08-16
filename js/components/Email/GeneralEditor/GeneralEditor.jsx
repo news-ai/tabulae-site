@@ -700,7 +700,7 @@ class GeneralEditor extends React.Component {
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
       {props.controlsPosition === 'top' &&
-              <Paper
+        <Paper
         zDepth={1}
         className='row vertical-center clearfix'
         style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
