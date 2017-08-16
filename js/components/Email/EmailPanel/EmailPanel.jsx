@@ -47,6 +47,7 @@ import {blueGrey50, grey50, grey600, grey700, grey800, red800, blue400, lightBlu
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 import triggerNewEntityFormatWarning from 'components/Email/EmailPanel/utils/triggerNewEntityFormatWarning';
+import styled from 'styled-components';
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
   alertify.confirm(title, description, resolve, reject);
@@ -77,18 +78,26 @@ function NameOptionRenderer (option) {
   }
 }
 
-const getInitialState = () => ({
-    subject: '',
-    fieldsmap: [],
-    currentTemplateId: 0,
-    bodyEditorState: null,
-    bodyHtml: '',
-    body: '',
-    subjectHtml: null,
-    minimized: false,
-    isPreveiwOpen: false,
-    dirty: false,
-});
+const TemplateBar = styled.div`
+  padding: 3px 10px;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  z-index: 500;
+  display: ${props => props.isPreveiwOpen ? 'none' : 'flex'};
+  background-color: ${blueGrey50};
+`;
+
+const EditorShowingContainer = styled.div`
+  z-index: 300;
+  display: ${props => props.isPreveiwOpen ? 'none' : 'block'};
+`;
+
+const EditorContainer = styled.div.attrs({className: 'RichEditor-root'})`
+  width: ${props => props.width - 20}px;
+  height: 600px;
+  padding: 0 10px;
+`;
 
 class EmailPanel extends Component {
   constructor(props) {
@@ -509,8 +518,8 @@ class EmailPanel extends Component {
 
     return (
       <div style={styles.container} >
-        <div style={{zIndex: 300, display: state.isPreveiwOpen ? 'none' : 'block'}}>
-          <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose}/>
+        <EditorShowingContainer isPreveiwOpen={state.isPreveiwOpen} >
+          <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose} />
           <div className='vertical-center' style={styles.topbarContainer} >
             <span style={styles.sentFromText} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
@@ -536,10 +545,9 @@ class EmailPanel extends Component {
               />
             </div>
           </div>
-
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
-          <div className='RichEditor-root' style={emailPanelStyle}>
+          <EditorContainer width={props.width}>
             <BasicHtmlEditor
             listId={props.listId}
             fieldsmap={state.fieldsmap}
@@ -550,18 +558,9 @@ class EmailPanel extends Component {
             onSubjectChange={this.onSubjectChange}
             debounce={500}
             />
-          </div>
-        </div>
-        <div style={{
-          backgroundColor: '#ffffff',
-          padding: '3px 10px',
-          position: 'fixed',
-          bottom: 0,
-          width: '100%',
-          zIndex: 500,
-          display: state.isPreveiwOpen ? 'none' : 'flex',
-          backgroundColor: blueGrey50,
-        }} >
+          </EditorContainer>
+        </EditorShowingContainer>
+        <TemplateBar isPreveiwOpen={state.isPreveiwOpen} >
           <div className='select-up' style={{width: 350}} >
             <Select
             labelKey='label'
@@ -618,7 +617,7 @@ class EmailPanel extends Component {
             tooltipPosition='top-right'
             />}
           </AddCCPanelHOC>
-        </div>
+        </TemplateBar>
       {
         state.isPreveiwOpen &&
         <div style={styles.previewContainer} >

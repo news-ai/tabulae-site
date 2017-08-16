@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import StaticEmailContent from './StaticEmailContent.jsx';
 import RaisedButton from 'material-ui/RaisedButton';
-import GeneralEditor from '../GeneralEditor/GeneralEditor2.jsx';
+import GeneralEditor from 'components/Email/GeneralEditor';
 import {connect} from 'react-redux';
 import {grey800} from 'material-ui/styles/colors';
 import * as stagingActions from '../actions';

@@ -58,10 +58,9 @@ linkify
 .tlds(tlds)
 .set({fuzzyLink: false});
 
-const controlsStyle = {
+const defaultControlsStyle = {
   height: 40,
   zIndex: 200,
-  // overflow: 'hidden',
   paddingLeft: 10,
   paddingRight: 10,
   backgroundColor: '#ffffff',
@@ -700,6 +699,47 @@ class GeneralEditor extends React.Component {
           </div>
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+      {props.controlsPosition === 'top' &&
+              <Paper
+        zDepth={1}
+        className='row vertical-center clearfix'
+        style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
+        >
+          <InlineStyleControls
+          editorState={editorState}
+          onToggle={this.toggleInlineStyle}
+          inlineStyles={INLINE_STYLES}
+          />
+          <EntityControls
+          editorState={editorState}
+          entityControls={this.ENTITY_CONTROLS}
+          />
+          <ExternalControls
+          editorState={editorState}
+          externalControls={this.EXTERNAL_CONTROLS}
+          active={props.files.length > 0}
+          />
+          <PositionStyleControls
+          editorState={editorState}
+          blockTypes={POSITION_TYPES}
+          onToggle={this.toggleBlockType}
+          />
+          <FontSizeControls
+          editorState={editorState}
+          onToggle={this.onFontSizeToggle}
+          inlineStyles={FONTSIZE_TYPES}
+          />
+          <TypefaceControls
+          editorState={editorState}
+          onToggle={this.onTypefaceToggle}
+          inlineStyles={TYPEFACE_TYPES}
+          />
+          {/*<BlockStyleControls
+          editorState={editorState}
+          blockTypes={BLOCK_TYPES}
+          onToggle={this.toggleBlockType}
+          />*/}
+        </Paper>}
       {props.onSubjectChange &&
         <Subject
         width={props.width}
@@ -737,7 +777,12 @@ class GeneralEditor extends React.Component {
             />
           </div>
         </div>
-        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle}>
+      {props.controlsPosition && props.controlsPosition === 'bottom' &&
+        <Paper
+        zDepth={1}
+        className='row vertical-center clearfix'
+        style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
+        >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -772,8 +817,8 @@ class GeneralEditor extends React.Component {
           blockTypes={BLOCK_TYPES}
           onToggle={this.toggleBlockType}
           />*/}
-        </Paper>
-    </div>
+        </Paper>}
+      </div>
     );
   }
 }
