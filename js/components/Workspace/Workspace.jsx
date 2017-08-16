@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import GeneralEditor from 'components/Email/GeneralEditor';
+import RaisedButton from 'material-ui/RaisedButton';
 
 class Workspace extends Component {
   constructor(props) {
@@ -21,25 +22,29 @@ class Workspace extends Component {
   render() {
     const state = this.state;
     return (
-      <div>
-        <div className='horizontal-center' style={{padding: 20}} >
-          <div style={{border: '1px solid black'}} >
+      <div style={{border: '1px solid blue', display: 'flex', justifyContent: 'space-around', marginTop: 15}} >
+        <div style={{width: 100, height: 100, border: '1px solid green'}} >
+
+        </div>
+        <div style={{padding: 10, border: '1px solid red'}} >
+          <div style={{border: '1px solid black', padding: 15}} >
             <GeneralEditor
             onEditMode
-            allowReplacement
             width={600}
-            height={700}
+            height={530}
             debounce={500}
-            bodyContent={state.rawBodyContentState}
             rawBodyContentState={state.rawBodyContentState}
             subjectHtml={state.subject}
             controlsStyle={{zIndex: 0, marginBottom: 10}}
             controlsPosition='top'
             onBodyChange={this.updateBody}
             onSubjectChange={this.onSubjectChange}
-            placeholder='Enter email signature here...'
+            placeholder='Start building your template here'
             />
           </div>
+        </div>
+        <div>
+          <RaisedButton primary label='Save' />
         </div>
       </div>
     );
