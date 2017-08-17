@@ -4,7 +4,8 @@ import {
   EditorState,
   CompositeDecorator,
   ContentState,
-  Modifier
+  Modifier,
+  convertFromRaw
 } from 'draft-js';
 
 import Link from './components/Link';
@@ -17,6 +18,7 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import alertify from 'alertifyjs';
+import isJSON from 'validator/lib/isJSON';
 
 const MAX_LENGTH = 255;
 
@@ -40,7 +42,7 @@ class Subject extends Component {
 
     this.state = {
       editorState: EditorState.createEmpty(decorator),
-      subjectHtml: null,
+      subjectString: null,
       subjectLength: 0,
       variableMenuOpen: false,
       variableMenuAnchorEl: null
@@ -65,12 +67,24 @@ class Subject extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.subjectHtml !== this.state.subjectHtml) {
-      const content = ContentState.createFromText(nextProps.subjectHtml);
-      // const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-      const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-      this.setState({subjectHtml: nextProps.subjectHtml});
-      this.onChange(editorState);
+    let content, editorState;
+    if (!!nextProps.subjectHtml) {
+      if (nextProps.subjectHtml.entityMap && nextProps.subjectHtml.blocks) {
+        const subjectString = JSON.stringify(nextProps.subjectHtml);
+        if (subjectString !== this.state.subjectString) {
+          content = convertFromRaw(nextProps.subjectHtml);
+          this.setState({subjectString});
+          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+          this.onChange(editorState);
+        }
+      } else {
+        if (nextProps.subjectHtml !== this.state.subjectString) {
+          content = ContentState.createFromText(nextProps.subjectHtml);
+          this.setState({subjectString: nextProps.subjectHtml});
+          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+          this.onChange(editorState);
+        }
+      }
     }
   }
 

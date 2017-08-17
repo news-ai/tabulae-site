@@ -6,8 +6,10 @@ import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
 
-import {blueGrey100} from 'material-ui/styles/colors';
+import {blueGrey100, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -25,7 +27,10 @@ class Workspace extends Component {
       subject: '',
       rawBodyContentState: '',
       currentTemplateId: null,
-      bodyContent: ''
+      bodyContent: '',
+      open: false,
+      anchorEl: null,
+      useExisting: false
     }
     this.updateBody = (html, raw) => {
       // console.log(html);
@@ -36,20 +41,24 @@ class Workspace extends Component {
       this.setState({subject});
     };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
+    this.onTouchTap = e => {
+      e.preventDefault();
+      this.setState({open: true, anchorEl: e.currentTarget});
+    };
   }
 
   componentWillMount() {
     this.props.fetchTemplates();
   }
 
-  handleTemplateChange(e, i, value) {
+  handleTemplateChange(value) {
     const templateId = value || null;
     this.setState({currentTemplateId: value});
 
     if (!!templateId) {
       const template = find(this.props.templates, tmp => templateId === tmp.id);
       const subject = template.subject;
-      this.setState({subject});
+      this.setState({subject, useExisting: true});
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
         console.log(templateJSON.data);
@@ -64,38 +73,17 @@ class Workspace extends Component {
     const state = this.state;
     const props = this.props;
 
-    // let options = [];
-    // if (props.templates.length > 0) {
-    //   const {recent, saved} = props.templates
-    //   .reduce(({recent, saved}, template) => {
-    //     if (isJSON(template.body) && JSON.parse(template.body).date) {
-    //       recent = [...recent, {
-    //         label: template.name.length > 0 ? template.name : template.subject,
-    //         value: template.id,
-    //         type: 'name'
-    //       }];
-    //     } else {
-    //       saved = [...saved, {
-    //         label: template.name.length > 0 ? template.name : template.subject,
-    //         value: template.id,
-    //         type: 'name'
-    //       }];
-    //     }
-    //     return {recent, saved};
-    //   }, {recent: [], saved: []});
-    //   options = [
-    //     // {label: 'Recently Sent Emails', type: 'header', disabled: true},
-    //     // ...recent,
-    //     // {label: 'Saved Templates', type: 'header', disabled: true},
-    //     ...saved
-    //   ]
-    // }
     const options = [
       <MenuItem key='placeholder-option' value={null} primaryText='Select Old Templates' />,
     ...props.templates
     .filter((template) => !(isJSON(template.body) && JSON.parse(template.body).date))
     .map((template, i) =>
-      <MenuItem key={template.id} value={template.id} primaryText={template.name.length > 0 ? template.name : template.subject} />)
+      <MenuItem
+      key={template.id}
+      value={template.id}
+      primaryText={template.name.length > 0 ? template.name : template.subject}
+      onTouchTap={_ => this.handleTemplateChange(template.id)}
+      />)
     ]
     return (
       <div style={{
@@ -111,23 +99,55 @@ class Workspace extends Component {
           flexGrow: 1,
           padding: 10,
           border: '1px solid green',
+          // justifyContent: 'space-between'
         }} >
-          <ItemContainer />
-          <ItemContainer />
-          <ItemContainer />
-          <DropDownMenu value={state.currentTemplateId} onChange={this.handleTemplateChange} >
-          {options}
-          </DropDownMenu>
-          <RaisedButton primary label='Save' labelStyle={{textTransform: 'none'}} />
-          <RaisedButton primary label='Save New...' labelStyle={{textTransform: 'none'}} />
+          <div>
+            <ItemContainer />
+            <ItemContainer />
+            <RaisedButton
+            label='Load Existing'
+            style={{marginBottom: 5, width: '100%'}}
+            backgroundColor={blue500}
+            labelStyle={{textTransform: 'none', color: '#ffffff'}}
+            onTouchTap={this.onTouchTap}
+            />
+          </div>
+          <div style={{marginTop: 'auto'}} >
+            <RaisedButton
+            primary
+            style={{marginBottom: 5, width: '100%'}}
+            disabled={!state.useExisting}
+            label='Save'
+            labelStyle={{textTransform: 'none'}}
+            />
+            <RaisedButton
+            primary
+            style={{marginBottom: 5, width: '100%'}}
+            label='Save New...'
+            labelStyle={{textTransform: 'none'}}
+            />
+            </div>
+          <Popover
+          open={state.open}
+          anchorEl={state.anchorEl}
+          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          targetOrigin={{horizontal: 'left', vertical: 'top'}}
+          onRequestClose={_ => this.setState({open: false})}
+          >
+            <Menu desktop autoWidth={false} maxHeight={200} style={{width: '100%'}} >
+            {options}
+            </Menu>
+          </Popover>
         </div>
         <div style={{
           display: 'flex',
           flexGrow: 2,
           justifyContent: 'center',
-          padding: 15,
         }} >
-          <div style={{border: '1px solid black'}} >
+          <div style={{
+            border: '1px solid black',
+            padding: 15
+          }} >
             <GeneralEditor
             onEditMode
             allowReplacement

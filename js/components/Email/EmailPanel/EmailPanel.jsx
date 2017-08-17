@@ -37,6 +37,7 @@ import AddCCPanelHOC from './AddCCPanelHOC.jsx';
 import SwitchEmailHOC from './SwitchEmailHOC.jsx';
 import SwitchEmailDropDown from './SwitchEmailDropDown.jsx';
 import PauseOverlay from './PauseOverlay.jsx';
+import {convertToRaw, convertFromRaw} from 'draft-js';
 
 import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
@@ -103,13 +104,14 @@ class EmailPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      subjectContentState: null,
+      subjectHtml: null,
       subject: '',
       fieldsmap: [],
       currentTemplateId: 0,
       bodyEditorState: null,
       bodyHtml: '',
       body: '',
-      subjectHtml: null,
       minimized: false,
       isPreveiwOpen: false,
       dirty: false,
@@ -185,7 +187,7 @@ class EmailPanel extends Component {
       });
     mutatingSubject += subject.slice(lastOffset, subject.length);
 
-    this.setState({subject: mutatingSubject});
+    this.setState({subject: mutatingSubject, subjectContentState: convertToRaw(subjectContent)});
   }
 
   _changeEmailSignature(emailsignature) {
@@ -221,7 +223,7 @@ class EmailPanel extends Component {
         this.props.createTemplate(
           name,
           this.state.subject,
-          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState})
+          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
           )
         .then(currentTemplateId => {
           this.setState({currentTemplateId}, _ => {
@@ -239,7 +241,7 @@ class EmailPanel extends Component {
     this.props.onSaveCurrentTemplateClick(
       this.state.currentTemplateId,
       this.state.subject,
-      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
       );
     setTimeout(_ => this.setState({dirty: false}), 10);
   }
@@ -266,6 +268,10 @@ class EmailPanel extends Component {
         if (templateJSON.date) {
           window.Intercom('trackEvent', 'use_prev_email_template', {date: templateJSON.date});
           mixpanel.track('use_prev_email_template', {date: templateJSON.date});
+        }
+
+        if (templateJSON.subjectData) {
+          this.setState({subjectHtml: templateJSON.subjectData});
         }
 
         return triggerNewEntityFormatWarning(templateJSON.data)
