@@ -8,6 +8,8 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
+import FontIcon from 'material-ui/FontIcon';
+import Collapse from 'react-collapse';
 
 import {blueGrey100, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
@@ -24,17 +26,20 @@ class Workspace extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      subject: '',
-      rawBodyContentState: '',
+      subject: '', // original
+      mutatingSubject: '', // editted
+      subjectContentState: '', // current contentstate
+      body: '',
+      mutatingBody: '',
+      bodyContentState: '',
       currentTemplateId: null,
-      bodyContent: '',
       open: false,
       anchorEl: null,
       useExisting: false
     }
     this.updateBody = (html, raw) => {
       // console.log(html);
-      this.setState({body: html, rawBodyContentState: raw});
+      this.setState({body: html, bodyContentState: raw});
     };
     this.onSubjectChange = (editorState) => {
       const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
@@ -57,14 +62,14 @@ class Workspace extends Component {
 
     if (!!templateId) {
       const template = find(this.props.templates, tmp => templateId === tmp.id);
-      const subject = template.subject;
+      let subject = template.subject;
       this.setState({subject, useExisting: true});
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
         console.log(templateJSON.data);
-        this.setState({bodyContent: templateJSON.data});;
+        this.setState({body: templateJSON.data});;
       } else {
-        this.setState({bodyContent: template.body});
+        this.setState({body: template.body});
       }
     }
   }
@@ -109,8 +114,15 @@ class Workspace extends Component {
             style={{marginBottom: 5, width: '100%'}}
             backgroundColor={blue500}
             labelStyle={{textTransform: 'none', color: '#ffffff'}}
-            onTouchTap={this.onTouchTap}
+            labelPosition='right'
+            icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-minus-square-o' : 'fa fa-plus-square-o'} />}
+            onTouchTap={e => this.setState({open: !state.open})}
             />
+            <Collapse isOpened={state.open}>
+              <Menu desktop autoWidth={false} maxHeight={200} style={{width: '100%'}} >
+              {options}
+              </Menu>
+            </Collapse>
           </div>
           <div style={{marginTop: 'auto'}} >
             <RaisedButton
@@ -126,18 +138,7 @@ class Workspace extends Component {
             label='Save New...'
             labelStyle={{textTransform: 'none'}}
             />
-            </div>
-          <Popover
-          open={state.open}
-          anchorEl={state.anchorEl}
-          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-          targetOrigin={{horizontal: 'left', vertical: 'top'}}
-          onRequestClose={_ => this.setState({open: false})}
-          >
-            <Menu desktop autoWidth={false} maxHeight={200} style={{width: '100%'}} >
-            {options}
-            </Menu>
-          </Popover>
+          </div>
         </div>
         <div style={{
           display: 'flex',
@@ -154,8 +155,8 @@ class Workspace extends Component {
             width={600}
             height={530}
             debounce={500}
-            bodyContent={state.bodyContent}
-            rawBodyContentState={state.rawBodyContentState}
+            bodyContent={state.body}
+            rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
             controlsStyle={{zIndex: 0, marginBottom: 15}}
             controlsPosition='top'
