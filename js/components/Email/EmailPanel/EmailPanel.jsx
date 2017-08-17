@@ -168,9 +168,9 @@ class EmailPanel extends Component {
     this.props.initializeEmailDraft();
   }
 
-  onSubjectChange(editorState) {
-    const subjectContent = editorState.getCurrentContent();
-    const subjectBlock = editorState.getCurrentContent().getBlocksAsArray()[0];
+  onSubjectChange(contentState) {
+    const subjectContent = contentState;
+    const subjectBlock = contentState.getBlocksAsArray()[0];
     const subject = subjectBlock.getText();
     let mutatingSubject = '';
     let lastOffset = 0;
@@ -178,7 +178,7 @@ class EmailPanel extends Component {
       (character) => {
         const entityKey = character.getEntity();
         if (entityKey === null) return false;
-        return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'PROPERTY');
+        return (contentState.getEntity(entityKey).getType() === 'PROPERTY');
       },
       (start, end) => {
         const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();

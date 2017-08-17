@@ -53,16 +53,21 @@ class Subject extends Component {
     this.onInsertProperty = this.onInsertProperty.bind(this);
     this.onPropertyIconClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
 
+    function emitContent(editorState) {
+      this.props.onSubjectChange(editorState.getCurrentContent());
+    }
+    this.emitContent = debounce(emitContent, 500);
+
     this.onChange = (editorState) => {
-      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      const subjectLength = subject.length;
-      if (subject.length > MAX_LENGTH) {
-        const newEditorState = this.truncateText(editorState, MAX_LENGTH);
-        debounce(_ => this.props.onSubjectChange(newEditorState), 1000)
+      const previousContent = this.state.editorState.getCurrentContent();
+      // only emit html when content changes
+      if (previousContent !== editorState.getCurrentContent()) {
+        const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
+        const subjectLength = subject.length;
+        let newEditorState = editorState;
+        if (subject.length > MAX_LENGTH) newEditorState = this.truncateText(editorState, MAX_LENGTH);
         this.setState({editorState: newEditorState, subjectLength});
-      } else {
-        debounce(_ => this.props.onSubjectChange(editorState), 1000)
-        this.setState({editorState, subjectLength});
+        this.emitContent(newEditorState);
       }
     };
   }

@@ -10,7 +10,9 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import FontIcon from 'material-ui/FontIcon';
 import Collapse from 'react-collapse';
+import alertify from 'alertifyjs';
 
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import {blueGrey100, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
@@ -22,6 +24,15 @@ const ItemContainer = styled.div`
   background-color: ${blueGrey100};
   margin-bottom: 5px;
 `;
+
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+  });
+
 
 class Workspace extends Component {
   constructor(props) {
@@ -44,6 +55,17 @@ class Workspace extends Component {
     };
     this.onSubjectChange = this.onSubjectChange.bind(this);
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
+    this.onClearEditor = _ => this.setState({
+      subject: '', // original
+      mutatingSubject: '', // editted
+      subjectContentState: '', // current contentstate
+      body: '',
+      mutatingBody: '',
+      bodyContentState: '',
+      useExisting: false
+    });
+    this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
+    this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
   }
 
   componentWillMount() {
@@ -57,20 +79,20 @@ class Workspace extends Component {
     if (!!templateId) {
       const template = find(this.props.templates, tmp => templateId === tmp.id);
       let subject = template.subject;
-      this.setState({subject, useExisting: true});
+      this.setState({subject, mutatingSubject: subject, useExisting: true});
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
         if (templateJSON.subjectData) subject = templateJSON.subjectData;
-        this.setState({body: templateJSON.data, useExisting: true, subject});;
+        this.setState({body: templateJSON.data, subject});;
       } else {
-        this.setState({body: template.body, useExisting: true, subject});
+        this.setState({body: template.body});
       }
     }
   }
 
-  onSubjectChange(editorState) {
-    const subjectContent = editorState.getCurrentContent();
-    const subjectBlock = editorState.getCurrentContent().getBlocksAsArray()[0];
+  onSubjectChange(contentState) {
+    const subjectContent = contentState;
+    const subjectBlock = contentState.getBlocksAsArray()[0];
     const subject = subjectBlock.getText();
     let mutatingSubject = '';
     let lastOffset = 0;
@@ -78,7 +100,7 @@ class Workspace extends Component {
       (character) => {
         const entityKey = character.getEntity();
         if (entityKey === null) return false;
-        return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'PROPERTY');
+        return (contentState.getEntity(entityKey).getType() === 'PROPERTY');
       },
       (start, end) => {
         const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();
@@ -86,8 +108,37 @@ class Workspace extends Component {
         lastOffset = end;
       });
     mutatingSubject += subject.slice(lastOffset, subject.length);
+    const subjectContentState = convertToRaw(subjectContent);
+    console.log(subjectContentState)
 
-    this.setState({mutatingSubject, subjectContentState: convertToRaw(subjectContent)});
+    this.setState({mutatingSubject, subjectContentState});
+  }
+  
+  onSaveNewTemplateClick() {
+    alertify.promisifyPrompt(
+      '',
+      'Name the New Email Template',
+      ''
+      )
+    .then(
+      name => {
+        this.props.createTemplate(
+          name,
+          this.state.mutatingSubject,
+          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
+          )
+        .then(currentTemplateId => this.setState({currentTemplateId}));
+      },
+      _ => console.log('template saving cancelled')
+      );
+  }
+
+  onSaveCurrentTemplateClick() {
+    this.props.saveCurrentTemplate(
+      this.state.currentTemplateId,
+      this.state.mutatingSubject,
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
+      );
   }
 
   render() {
@@ -103,7 +154,10 @@ class Workspace extends Component {
       key={template.id}
       value={template.id}
       primaryText={template.name.length > 0 ? template.name : template.subject}
-      onTouchTap={_ => this.handleTemplateChange(template.id)}
+      onTouchTap={_ => {
+        this.handleTemplateChange(template.id);
+        this.setState({open: false});
+      }}
       />)
     ]
     return (
@@ -147,12 +201,21 @@ class Workspace extends Component {
             disabled={!state.useExisting}
             label='Save'
             labelStyle={{textTransform: 'none'}}
+            onTouchTap={this.onSaveCurrentTemplateClick}
             />
             <RaisedButton
             primary
             style={{marginBottom: 5, width: '100%'}}
             label='Save New...'
             labelStyle={{textTransform: 'none'}}
+            onTouchTap={this.onSaveNewTemplateClick}
+            />
+            <RaisedButton
+            secondary
+            style={{marginBottom: 5, width: '100%'}}
+            label='Clear Editor'
+            labelStyle={{textTransform: 'none'}}
+            onTouchTap={this.onClearEditor}
             />
           </div>
         </div>
@@ -193,5 +256,7 @@ export default connect(
   }),
   dispatch => ({
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),
+    saveCurrentTemplate: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
+    createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
   })
   )(Workspace);
