@@ -617,6 +617,7 @@ class GeneralEditor extends React.Component {
     }
     return false;
   }
+
   _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();

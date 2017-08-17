@@ -15,6 +15,7 @@ import {blueGrey100, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
+import {convertToRaw} from 'draft-js';
 
 const ItemContainer = styled.div`
   height: 40px;
@@ -41,15 +42,8 @@ class Workspace extends Component {
       // console.log(html);
       this.setState({body: html, bodyContentState: raw});
     };
-    this.onSubjectChange = (editorState) => {
-      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-      this.setState({subject});
-    };
+    this.onSubjectChange = this.onSubjectChange.bind(this);
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
-    this.onTouchTap = e => {
-      e.preventDefault();
-      this.setState({open: true, anchorEl: e.currentTarget});
-    };
   }
 
   componentWillMount() {
@@ -66,12 +60,34 @@ class Workspace extends Component {
       this.setState({subject, useExisting: true});
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
-        console.log(templateJSON.data);
-        this.setState({body: templateJSON.data});;
+        if (templateJSON.subjectData) subject = templateJSON.subjectData;
+        this.setState({body: templateJSON.data, useExisting: true, subject});;
       } else {
-        this.setState({body: template.body});
+        this.setState({body: template.body, useExisting: true, subject});
       }
     }
+  }
+
+  onSubjectChange(editorState) {
+    const subjectContent = editorState.getCurrentContent();
+    const subjectBlock = editorState.getCurrentContent().getBlocksAsArray()[0];
+    const subject = subjectBlock.getText();
+    let mutatingSubject = '';
+    let lastOffset = 0;
+    subjectBlock.findEntityRanges(
+      (character) => {
+        const entityKey = character.getEntity();
+        if (entityKey === null) return false;
+        return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'PROPERTY');
+      },
+      (start, end) => {
+        const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();
+        mutatingSubject += (subject.slice(lastOffset, start) + `<%= ${property} %>`);
+        lastOffset = end;
+      });
+    mutatingSubject += subject.slice(lastOffset, subject.length);
+
+    this.setState({mutatingSubject, subjectContentState: convertToRaw(subjectContent)});
   }
 
   render() {

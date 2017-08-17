@@ -19,6 +19,7 @@ import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import alertify from 'alertifyjs';
 import isJSON from 'validator/lib/isJSON';
+import debounce from 'lodash/debounce';
 
 const MAX_LENGTH = 255;
 
@@ -57,10 +58,10 @@ class Subject extends Component {
       const subjectLength = subject.length;
       if (subject.length > MAX_LENGTH) {
         const newEditorState = this.truncateText(editorState, MAX_LENGTH);
-        this.props.onSubjectChange(newEditorState);
+        debounce(_ => this.props.onSubjectChange(newEditorState), 1000)
         this.setState({editorState: newEditorState, subjectLength});
       } else {
-        this.props.onSubjectChange(editorState);
+        debounce(_ => this.props.onSubjectChange(editorState), 1000)
         this.setState({editorState, subjectLength});
       }
     };
