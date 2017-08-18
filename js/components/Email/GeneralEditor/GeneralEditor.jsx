@@ -47,6 +47,7 @@ import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ValidationHOC';
 
+import {grey300, grey400, grey500, grey600, grey700} from 'material-ui/styles/colors';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
@@ -65,6 +66,11 @@ const defaultControlsStyle = {
   paddingLeft: 10,
   paddingRight: 10,
   backgroundColor: '#ffffff',
+};
+
+const icon = {
+  iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey600},
+  style: {width: 28, height: 28, padding: 7}
 };
 
 const decorator = new CompositeDecorator([
@@ -759,11 +765,6 @@ class GeneralEditor extends React.Component {
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
           />
-          {/*<BlockStyleControls
-          editorState={editorState}
-          blockTypes={BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-          />*/}
         </Paper>}
       {props.onSubjectChange &&
         <Subject
@@ -778,17 +779,19 @@ class GeneralEditor extends React.Component {
           overflowY: 'scroll',
           width: props.width || 500
         }}>
+        {props.allowGeneralizedProperties &&
+          <div className='right'>
+            <IconButton
+            style={{position: 'fixed'}}
+            tooltip='Insert Property to Body'
+            tooltipPosition='bottom-center'
+            iconClassName='fa fa-plus-square-o'
+            iconStyle={icon.iconStyle}
+            style={icon.style}
+            onClick={this.onPropertyIconClick}
+            />
+          </div>}
           <div className={className} onClick={this.focus}>
-          {props.allowGeneralizedProperties &&
-            <div className='right'>
-              <IconButton
-              style={{position: 'fixed'}}
-              tooltip='Insert Property to Body'
-              tooltipPosition='bottom-center'
-              iconClassName='fa fa-plus-square-o'
-              onClick={this.onPropertyIconClick}
-              />
-            </div>}
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={

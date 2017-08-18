@@ -5,16 +5,14 @@ import GeneralEditor from 'components/Email/GeneralEditor';
 import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
-import Menu from 'material-ui/Menu';
 import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'alertifyjs';
 
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
-import {blueGrey100, blue500} from 'material-ui/styles/colors';
+import {blueGrey100, blue500, blueGrey400} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -33,6 +31,25 @@ alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject
 alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
     alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
   });
+
+const Menu = styled.ul`
+  margin-left: 0px;
+  padding-left: 0px;
+  max-height: 200px;
+  overflow: hidden;
+  overflow-y: scroll;
+`;
+
+const MenuItem = styled.li`
+  list-style: none;
+  width: 100%;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  &:hover {
+    background-color: ${blueGrey100};
+  }
+`;
 
 class Workspace extends Component {
   constructor(props) {
@@ -154,13 +171,14 @@ class Workspace extends Component {
     .map((template, i) =>
       <MenuItem
       key={template.id}
-      value={template.id}
-      primaryText={template.name.length > 0 ? template.name : template.subject}
-      onTouchTap={_ => {
+      onClick={_ => {
         this.handleTemplateChange(template.id);
         this.setState({open: false});
       }}
-      />);
+      >
+      {template.name.length > 0 ? template.name : template.subject}
+      </MenuItem>
+      );
     return (
       <div style={{
         // border: '1px solid blue',
@@ -190,7 +208,7 @@ class Workspace extends Component {
             onTouchTap={e => this.setState({open: !state.open})}
             />
             <Collapse isOpened={state.open}>
-              <Menu desktop autoWidth maxHeight={200} style={{width: '100%'}} >
+              <Menu>
               {options}
               </Menu>
             </Collapse>
@@ -226,7 +244,7 @@ class Workspace extends Component {
           justifyContent: 'center',
         }} >
           <div style={{
-            border: '1px solid black',
+            border: `5px solid ${blueGrey100}`,
             padding: 15
           }} >
             <GeneralEditor
