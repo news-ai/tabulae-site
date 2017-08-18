@@ -70,7 +70,7 @@ const defaultControlsStyle = {
 
 const icon = {
   iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey600},
-  style: {width: 28, height: 28, padding: 7}
+  style: {width: 28, height: 28, padding: 7, position: 'fixed'}
 };
 
 const decorator = new CompositeDecorator([
@@ -779,19 +779,18 @@ class GeneralEditor extends React.Component {
           overflowY: 'scroll',
           width: props.width || 500
         }}>
-        {props.allowGeneralizedProperties &&
-          <div className='right'>
-            <IconButton
-            style={{position: 'fixed'}}
-            tooltip='Insert Property to Body'
-            tooltipPosition='bottom-center'
-            iconClassName='fa fa-plus-square-o'
-            iconStyle={icon.iconStyle}
-            style={icon.style}
-            onClick={this.onPropertyIconClick}
-            />
-          </div>}
           <div className={className} onClick={this.focus}>
+          {props.allowGeneralizedProperties &&
+            <div className='right'>
+              <IconButton
+              tooltip='Insert Property to Body'
+              tooltipPosition='bottom-center'
+              iconClassName='fa fa-plus-square-o'
+              iconStyle={icon.iconStyle}
+              style={icon.style}
+              onClick={this.onPropertyIconClick}
+              />
+            </div>}
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={
