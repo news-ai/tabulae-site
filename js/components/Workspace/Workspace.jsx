@@ -22,6 +22,9 @@ const ItemContainer = styled.div`
   height: 40px;
   background-color: ${blueGrey100};
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
@@ -90,7 +93,8 @@ class Workspace extends Component {
       body: '',
       mutatingBody: '',
       bodyContentState: '',
-      useExisting: false
+      useExisting: false,
+      currentTemplateId: null
     });
   }
 
@@ -179,6 +183,7 @@ class Workspace extends Component {
       {template.name.length > 0 ? template.name : template.subject}
       </MenuItem>
       );
+    const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
     return (
       <div style={{
         // border: '1px solid blue',
@@ -192,12 +197,16 @@ class Workspace extends Component {
           flexDirection: 'column',
           flexGrow: 1,
           padding: 10,
+          flexBasis: 200,
+          maxWidth: 300
           // border: '1px solid green',
           // justifyContent: 'space-between'
         }} >
           <div>
-            <ItemContainer />
-            <ItemContainer />
+            <ItemContainer>
+            {!!state.currentTemplateId &&
+              <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
+            </ItemContainer>
             <RaisedButton
             label='Load Existing'
             style={{marginBottom: 5, width: '100%'}}
