@@ -34,7 +34,6 @@ alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((re
     alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
   });
 
-
 class Workspace extends Component {
   constructor(props) {
     super(props);
@@ -49,14 +48,25 @@ class Workspace extends Component {
       open: false,
       anchorEl: null,
       useExisting: false
-    }
-    this.updateBody = (html, raw) => {
-      // console.log(html);
-      this.setState({body: html, bodyContentState: raw});
     };
     this.onSubjectChange = this.onSubjectChange.bind(this);
+    this.onBodyChange = this.onBodyChange.bind(this);
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
-    this.onClearEditor = _ => this.setState({
+    this.onClearEditor = this.onClearEditor.bind(this);
+    this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
+    this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
+  }
+
+  componentWillMount() {
+    this.props.fetchTemplates();
+  }
+
+  onBodyChange(html, raw) {
+    this.setState({mutatingBody: html, bodyContentState: raw});
+  }
+
+  onClearEditor() {
+    this.setState({
       subject: '', // original
       mutatingSubject: '', // editted
       subjectContentState: '', // current contentstate
@@ -65,12 +75,6 @@ class Workspace extends Component {
       bodyContentState: '',
       useExisting: false
     });
-    this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
-    this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
-  }
-
-  componentWillMount() {
-    this.props.fetchTemplates();
   }
 
   handleTemplateChange(value) {
@@ -238,7 +242,7 @@ class Workspace extends Component {
             subjectParams={{allowGeneralizedProperties: true}}
             controlsStyle={{zIndex: 0, marginBottom: 15}}
             controlsPosition='top'
-            onBodyChange={this.updateBody}
+            onBodyChange={this.onBodyChange}
             onSubjectChange={this.onSubjectChange}
             placeholder='Start building your template here...'
             />
