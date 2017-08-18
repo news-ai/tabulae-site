@@ -9,6 +9,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import FontIcon from 'material-ui/FontIcon';
+import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'alertifyjs';
 
@@ -109,7 +110,6 @@ class Workspace extends Component {
       });
     mutatingSubject += subject.slice(lastOffset, subject.length);
     const subjectContentState = convertToRaw(subjectContent);
-    console.log(subjectContentState)
 
     this.setState({mutatingSubject, subjectContentState});
   }
@@ -145,9 +145,7 @@ class Workspace extends Component {
     const state = this.state;
     const props = this.props;
 
-    const options = [
-      <MenuItem key='placeholder-option' value={null} primaryText='Select Old Templates' />,
-    ...props.templates
+    const options = props.templates
     .filter((template) => !(isJSON(template.body) && JSON.parse(template.body).date))
     .map((template, i) =>
       <MenuItem
@@ -158,22 +156,21 @@ class Workspace extends Component {
         this.handleTemplateChange(template.id);
         this.setState({open: false});
       }}
-      />)
-    ]
+      />);
     return (
       <div style={{
-        border: '1px solid blue',
+        // border: '1px solid blue',
         display: 'flex',
         justifyContent: 'space-around',
         marginTop: 10
       }} >
-        <div style={{
+        <Paper zDepth={2} style={{
           display: 'flex',
           flex: 1,
           flexDirection: 'column',
           flexGrow: 1,
           padding: 10,
-          border: '1px solid green',
+          // border: '1px solid green',
           // justifyContent: 'space-between'
         }} >
           <div>
@@ -189,7 +186,7 @@ class Workspace extends Component {
             onTouchTap={e => this.setState({open: !state.open})}
             />
             <Collapse isOpened={state.open}>
-              <Menu desktop autoWidth={false} maxHeight={200} style={{width: '100%'}} >
+              <Menu desktop autoWidth maxHeight={200} style={{width: '100%'}} >
               {options}
               </Menu>
             </Collapse>
@@ -218,10 +215,10 @@ class Workspace extends Component {
             onTouchTap={this.onClearEditor}
             />
           </div>
-        </div>
+        </Paper>
         <div style={{
           display: 'flex',
-          flexGrow: 2,
+          flexGrow: 1,
           justifyContent: 'center',
         }} >
           <div style={{
@@ -231,17 +228,19 @@ class Workspace extends Component {
             <GeneralEditor
             onEditMode
             allowReplacement
+            allowGeneralizedProperties
             width={600}
             height={530}
             debounce={500}
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
+            subjectParams={{allowGeneralizedProperties: true}}
             controlsStyle={{zIndex: 0, marginBottom: 15}}
             controlsPosition='top'
             onBodyChange={this.updateBody}
             onSubjectChange={this.onSubjectChange}
-            placeholder='Start building your template here'
+            placeholder='Start building your template here...'
             />
           </div>
         </div>

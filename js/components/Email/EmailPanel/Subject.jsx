@@ -51,7 +51,12 @@ class Subject extends Component {
     this.truncateText = this._truncateText.bind(this);
     this.handlePastedText = this._handlePastedText.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
-    this.onPropertyIconClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
+    this.onPropertyIconClick = e => {
+      if (this.props.fieldsmap) this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
+      else alertify.prompt('Name the Property to be Inserted', '', '',
+        (evt, value) => this.onInsertProperty(value),
+        function() {});
+    };
 
     function emitContent(editorState) {
       this.props.onSubjectChange(editorState.getCurrentContent());
@@ -65,11 +70,33 @@ class Subject extends Component {
         const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
         const subjectLength = subject.length;
         let newEditorState = editorState;
-        if (subject.length > MAX_LENGTH) newEditorState = this.truncateText(editorState, MAX_LENGTH);
+        if (subjectLength > MAX_LENGTH) newEditorState = this.truncateText(editorState, MAX_LENGTH);
         this.setState({editorState: newEditorState, subjectLength});
         this.emitContent(newEditorState);
       }
     };
+  }
+
+  componentWillMount() {
+    let content, editorState;
+    if (!!this.props.subjectHtml) {
+      if (this.props.subjectHtml.entityMap && this.props.subjectHtml.blocks) {
+        const subjectString = JSON.stringify(this.props.subjectHtml);
+        if (subjectString !== this.state.subjectString) {
+          content = convertFromRaw(this.props.subjectHtml);
+          this.setState({subjectString});
+          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+          this.onChange(editorState);
+        }
+      } else {
+        if (this.props.subjectHtml !== this.state.subjectString) {
+          content = ContentState.createFromText(this.props.subjectHtml);
+          this.setState({subjectString: this.props.subjectHtml});
+          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+          this.onChange(editorState);
+        }
+      }
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -189,7 +216,7 @@ class Subject extends Component {
         </div>
         <div className='vertical-center'>
           <span className='text' style={styles.lengthLabel}>{subjectLength}</span>
-        {props.fieldsmap &&
+        {(props.fieldsmap || props.allowGeneralizedProperties) &&
           <IconButton
           iconStyle={styles.icon.iconStyle}
           style={styles.icon.style}
