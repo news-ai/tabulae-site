@@ -101,22 +101,20 @@ class Subject extends Component {
 
   componentWillReceiveProps(nextProps) {
     let content, editorState;
-    if (!!nextProps.subjectHtml) {
-      if (nextProps.subjectHtml.entityMap && nextProps.subjectHtml.blocks) {
-        const subjectString = JSON.stringify(nextProps.subjectHtml);
-        if (subjectString !== this.state.subjectString) {
-          content = convertFromRaw(nextProps.subjectHtml);
-          this.setState({subjectString});
-          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-          this.onChange(editorState);
-        }
-      } else {
-        if (nextProps.subjectHtml !== this.state.subjectString) {
-          content = ContentState.createFromText(nextProps.subjectHtml);
-          this.setState({subjectString: nextProps.subjectHtml});
-          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-          this.onChange(editorState);
-        }
+    if (nextProps.subjectHtml && nextProps.subjectHtml.entityMap && nextProps.subjectHtml.blocks) {
+      const subjectString = JSON.stringify(nextProps.subjectHtml);
+      if (subjectString !== this.state.subjectString) {
+        content = convertFromRaw(nextProps.subjectHtml);
+        this.setState({subjectString});
+        editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+        this.onChange(editorState);
+      }
+    } else {
+      if (nextProps.subjectHtml !== this.state.subjectString) {
+        content = ContentState.createFromText(nextProps.subjectHtml);
+        this.setState({subjectString: nextProps.subjectHtml});
+        editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+        this.onChange(editorState);
       }
     }
   }
