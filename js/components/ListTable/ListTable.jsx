@@ -24,7 +24,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import {grey50, teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
+import {grey50, teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700, grey800} from 'material-ui/styles/colors';
 import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
@@ -48,6 +48,7 @@ import ScatterPlotHOC from './ScatterPlotHOC.jsx';
 import Tags from 'components/Tags/TagsContainer.jsx';
 import Tag from 'components/Tags/Tag.jsx';
 import EditContactDialog from './EditContactDialog.jsx';
+import PlainIconButton from './PlainIconButton';
 
 import {
   generateTableFieldsmap,
@@ -60,7 +61,6 @@ import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import 'react-virtualized/styles.css';
 import './Table.css';
-
 
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
@@ -696,15 +696,6 @@ class ListTable extends Component {
             </div>
           </Dialog>
         }
-        <div className='vertical-center'>
-          <Link to={`/listfeeds/${props.listId}`}>
-            <FlatButton
-            labelStyle={{textTransform: 'none', color: grey400}}
-            icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
-            label='List Feed'
-            />
-          </Link>
-        </div>
         <EditContactDialog
         listId={props.listId}
         contactId={state.currentEditContactId}
@@ -727,7 +718,7 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-        <div className='row vertical-center' style={{margin: 5}}>
+        <div className='row vertical-center' style={{marginTop: 15}}>
           <div className='large-3 medium-4 columns vertical-center'>
             <div>
               <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
@@ -740,85 +731,66 @@ class ListTable extends Component {
             </div>
           </div>
           <div className='large-4 medium-4 columns vertical-center'>
-            <IconButton
-            tooltip='Show Email'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-envelope'
-            iconStyle={styles.iconBtn}
-            onClick={this.onShowEmailClick}
-            disabled={state.isEmailPanelOpen || props.listData.readonly}
-            />
-            <IconButton
-            tooltip='Export'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-download'
-            iconStyle={styles.iconBtn}
-            onClick={this.onExportClick}
-            />
+            <PlainIconButton label='Email' className='fa fa-envelope' onClick={this.onShowEmailClick} disabled={state.isEmailPanelOpen || props.listData.readonly} />
+            <PlainIconButton label='Export' className='fa fa-download' onClick={this.onExportClick} />
             <CopyToHOC listId={props.listId} selected={state.selected}>
             {({onRequestOpen}) => (
-              <IconButton
-              iconStyle={styles.iconBtn}
+              <PlainIconButton
               id='copy_contacts_hop'
-              tooltip='Copy to Another Table'
-              tooltipPosition='top-left'
-              iconClassName='fa fa-copy'
+              label='Copy'
+              className='fa fa-copy'
               onClick={onRequestOpen}
               />)}
             </CopyToHOC>
-            <IconButton
-            iconStyle={styles.iconBtn}
+            <PlainIconButton
             id='add_remove_columns_hop'
             disabled={props.listData.readonly}
-            tooltip='Show/Hide columns'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-table'
+            label='Organize'
+            className='fa fa-table'
             onClick={_ => this.setState({showColumnEditPanel: true})}
             />
             <ColumnEditPanel onRequestClose={_ => this.setState({showColumnEditPanel: false})} open={state.showColumnEditPanel} listId={props.listId} />
             <AddContactHOC contacts={props.contacts} listId={props.listId}>
             {({onRequestOpen}) => (
-              <IconButton
-              iconStyle={styles.iconBtn}
-              tooltip='Add New Contact'
+              <PlainIconButton
+              label='Add'
               id='add_contact_hop'
               disabled={props.listData.readonly}
-              tooltipPosition='top-left'
-              iconClassName='fa fa-plus'
+              className='fa fa-plus'
               onClick={onRequestOpen}
               />)}
             </AddContactHOC>
-            <IconButton
+            <PlainIconButton
             iconStyle={styles.iconBtn}
-            tooltip='Delete Contact'
-            tooltipPosition='top-left'
-            iconClassName={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
-            disabled={props.listData.readonly}
+            label='Delete'
+            className={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
+            disabled={props.listData.readonly || state.selected.length === 0}
             onClick={this.onRemoveContacts}
             />
             <AddTagDialogHOC listId={props.listId}>
               {({onRequestOpen}) =>
-              <IconButton
-              iconStyle={styles.iconBtn}
-              iconClassName='fa fa-tags'
-              onClick={onRequestOpen}
-              tooltip='Add Tag & Client'
-              tooltipPosition='top-right'
-              disabled={props.listData.readonly}
-              />}
+              <PlainIconButton className='fa fa-tags' onClick={onRequestOpen} label='Tag' disabled={props.listData.readonly} />}
             </AddTagDialogHOC>
           {state.selected.length > 1 &&
             <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
             {({onRequestOpen}) =>
-              <IconButton
-              iconStyle={styles.iconBtn}
-              iconClassName='fa fa-edit'
-              tooltip='Edit Multiple'
-              tooltipPosition='top-right'
+              <PlainIconButton
+              className='fa fa-edit'
+              tooltip='Edit'
               disabled={props.listData.readonly}
               onClick={onRequestOpen}
               />}
             </EditMultipleContactsHOC>}
+          {/*
+            <Link to={`/listfeeds/${props.listId}`}>
+              <IconButton
+              iconStyle={styles.iconBtn}
+              iconClassName='fa fa-arrow-right'
+              tooltipPosition='top-right'
+              tooltip='List Feed'
+              />
+            </Link>
+          */}
           </div>
           <div className='large-4 columns vertical-center'>
             <TextField
