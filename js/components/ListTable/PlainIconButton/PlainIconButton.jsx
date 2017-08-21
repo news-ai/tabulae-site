@@ -22,6 +22,7 @@ const PlainIconButtonContainer = styled.div`
 
 const PlainIconButtonLabel = styled.span`
   font-size: 0.7em;
+  white-space: nowrap;
   color: ${props => props.disabled ? grey500 : grey700};
 `;
 

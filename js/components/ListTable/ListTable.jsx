@@ -720,19 +720,22 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-        <div className='row vertical-center' style={{marginTop: 15}}>
-          <div className='large-3 medium-4 columns vertical-center'>
-            <div>
-              <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
-              <ControlledInput
-              async
-              disabled={props.listData.readonly}
-              name={props.listData.name}
-              onBlur={value => props.patchList({listId: props.listId, name: value})}
-              />
-            </div>
+
+        <Link style={{margin: '5px 15px'}} to={`/listfeeds/${props.listId}`}>
+          <i className='fa fa-arrow-right' />
+          <span className='text' style={{marginLeft: 10}} >List Feed</span>
+        </Link>
+        <div className='row' style={{marginTop: 5}}>
+          <div className='large-3 medium-4 columns' style={{flexDirection: 'column', float: 'left'}} >
+            <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
+            <ControlledInput
+            async
+            disabled={props.listData.readonly}
+            name={props.listData.name}
+            onBlur={value => props.patchList({listId: props.listId, name: value})}
+            />
           </div>
-          <div className='large-4 medium-4 columns vertical-center'>
+          <div className='large-4 medium-4 columns vertical-center' style={{marginTop: 15}} >
             <PlainIconButton label='Email' className='fa fa-envelope' onClick={this.onShowEmailClick} disabled={state.isEmailPanelOpen || props.listData.readonly} />
             <PlainIconButton label='Export' className='fa fa-download' onClick={this.onExportClick} />
             <CopyToHOC listId={props.listId} selected={state.selected}>
@@ -781,16 +784,6 @@ class ListTable extends Component {
               onClick={onRequestOpen}
               />}
             </EditMultipleContactsHOC>
-          {/*
-            <Link to={`/listfeeds/${props.listId}`}>
-              <IconButton
-              iconStyle={styles.iconBtn}
-              iconClassName='fa fa-arrow-right'
-              tooltipPosition='top-right'
-              tooltip='List Feed'
-              />
-            </Link>
-          */}
           </div>
           <div className='large-4 columns vertical-center'>
             <TextField
