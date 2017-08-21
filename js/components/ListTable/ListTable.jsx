@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import classNames from 'classnames';
+import styled from 'styled-components';
 
 import find from 'lodash/find';
 import difference from 'lodash/difference';
@@ -24,7 +25,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import {grey50, teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700, grey800} from 'material-ui/styles/colors';
+import {grey50, teal400, teal900, blue100, blue200, blue300, grey400, grey500, grey600, grey700, grey800} from 'material-ui/styles/colors';
 import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
@@ -65,6 +66,18 @@ const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
 
 const DEFAULT_PAGE_SIZE = 200;
+
+
+const PaginationHandle = styled.i.attrs({
+  className: props => props.className
+})`
+  margin: 0px 5px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  color: ${props => props.disabled ? grey400 : grey600};
+  &:hover {
+    color: ${props => props.disabled ? grey400 : grey800};
+  }
+`;
 
 class ListTable extends Component {
   constructor(props) {
@@ -883,16 +896,16 @@ class ListTable extends Component {
             <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
           </div>
           <div className='vertical-center'>
-            <i
-            style={{margin: '0 5px'}}
-            className='fa fa-chevron-left pointer'
-            onClick={e => this.setState({currentPage: state.currentPage - 1})}
+            <PaginationHandle
+            className='fa fa-chevron-left'
+            disabled={state.currentPage - 1 === 0}
+            onClick={e => state.currentPage - 1 > 0 && this.setState({currentPage: state.currentPage - 1})}
             />
-            <span className='text' style={{color: grey700}} >{state.currentPage} / {Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE)}</span>
-            <i
-            style={{margin: '0 5px'}}
-            className='fa fa-chevron-right pointer'
-            onClick={e => this.setState({currentPage: state.currentPage + 1})}
+            <span className='text' style={{color: grey700}} >{state.currentPage} / {Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE) || 1}</span>
+            <PaginationHandle
+            className='fa fa-chevron-right'
+            disabled={state.currentPage + 1 > Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE)}
+            onClick={e => state.currentPage + 1 <= Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE) && this.setState({currentPage: state.currentPage + 1})}
             />
           </div>
         </div>
