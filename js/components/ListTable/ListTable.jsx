@@ -135,6 +135,7 @@ class ListTable extends Component {
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearch = this._onSearch.bind(this);
+    this.onSearchKeyDown = this.onSearchKeyDown.bind(this);
     this.getNextSearchResult = this._getNextSearchResult.bind(this);
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
@@ -646,6 +647,14 @@ class ListTable extends Component {
     });
   }
 
+  onSearchKeyDown(e) {
+    if (e.key === 'Enter') {
+      const searchValue = this.searchValue.getValue();
+      this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
+      this.setState({searchValue});
+    }
+  }
+
   _getNextSearchResult() {
     const currentSearchIndex = (this.state.currentSearchIndex + 1) % this.props.listData.searchResults.length;
     let scrollToRow;
@@ -788,13 +797,7 @@ class ListTable extends Component {
             id='search-input'
             ref={ref => this.searchValue = ref}
             hintText='Search...'
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const searchValue = this.searchValue.input.value;
-                props.router.push(`/tables/${props.listId}?search=${searchValue}`);
-                this.setState({searchValue});
-              }
-            }}
+            onKeyDown={this.onSearchKeyDown}
             floatingLabelText={state.isSearchOn && props.listData.searchResults ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
             floatingLabelFixed={state.isSearchOn}
             defaultValue={props.searchQuery || ''}
