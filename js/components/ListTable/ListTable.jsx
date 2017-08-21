@@ -50,6 +50,7 @@ import Tags from 'components/Tags/TagsContainer.jsx';
 import Tag from 'components/Tags/Tag.jsx';
 import EditContactDialog from './EditContactDialog.jsx';
 import PlainIconButton from './PlainIconButton';
+import PaginateControls from './PaginateControls';
 
 import {
   generateTableFieldsmap,
@@ -64,20 +65,6 @@ import './Table.css';
 
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
-
-const DEFAULT_PAGE_SIZE = 200;
-
-
-const PaginationHandle = styled.i.attrs({
-  className: props => props.className
-})`
-  margin: 0px 5px;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  color: ${props => props.disabled ? grey400 : grey600};
-  &:hover {
-    color: ${props => props.disabled ? grey400 : grey800};
-  }
-`;
 
 class ListTable extends Component {
   constructor(props) {
@@ -423,7 +410,7 @@ class ListTable extends Component {
 
   _cellRenderer(cellProps) {
     const {columnIndex, rowIndex, key, style} = cellProps;
-    const rIndex = (this.state.currentPage - 1) * DEFAULT_PAGE_SIZE + rowIndex; // compute paginated actual index
+    const rIndex = (this.state.currentPage - 1) * this.state.pageSize + rowIndex; // compute paginated actual index
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
     const contact = contacts[rIndex];
@@ -892,22 +879,16 @@ class ListTable extends Component {
         </Drawer>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='vertical-center' style={{margin: '10px 0', justifyContent: 'space-between'}}>
-          <div className='vertical-center'>
-            <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
-          </div>
-          <div className='vertical-center'>
-            <PaginationHandle
-            className='fa fa-chevron-left'
-            disabled={state.currentPage - 1 === 0}
-            onClick={e => state.currentPage - 1 > 0 && this.setState({currentPage: state.currentPage - 1})}
-            />
-            <span className='text' style={{color: grey700}} >{state.currentPage} / {Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE) || 1}</span>
-            <PaginationHandle
-            className='fa fa-chevron-right'
-            disabled={state.currentPage + 1 > Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE)}
-            onClick={e => state.currentPage + 1 <= Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE) && this.setState({currentPage: state.currentPage + 1})}
-            />
-          </div>
+          <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
+          <PaginateControls
+          containerClassName='vertical-center'
+          currentPage={state.currentPage}
+          pageSize={state.pageSize}
+          onPageSizeChange={pageSize => this.setState({pageSize, currentPage: 1})} 
+          listLength={props.contacts.length}
+          onPrev={currentPage => this.setState({currentPage})}
+          onNext={currentPage => this.setState({currentPage})}
+          />
         </div>
         <div>
           <div>
@@ -959,7 +940,7 @@ class ListTable extends Component {
               overscanRowCount={10}
               height={state.leftoverHeight || 500}
               width={state.screenWidth}
-              rowCount={props.received.length > 200 ? 200 : props.received.length}
+              rowCount={props.received.length > state.pageSize ? state.pageSize : props.received.length}
               rowHeight={30}
               onScroll={onScroll}
               scrollToRow={state.scrollToRow}
