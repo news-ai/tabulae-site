@@ -95,7 +95,8 @@ class ListTable extends Component {
       isEmailPanelOpen: false,
       initializeEmailPanel: false,
       showColumnEditPanel: false,
-      currentPage: 1
+      currentPage: 1,
+      pageSize: 200
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -108,23 +109,7 @@ class ListTable extends Component {
     if (this.props.listData) {
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
     }
-    this.onSearchClick = e => {
-      const searchValue = this.searchValue.input.value;
-      if (searchValue.length === 0) {
-        this.props.router.push(`/tables/${props.listId}`);
-        this.onSearchClearClick();
-      } else if (
-        this.state.isSearchOn &&
-        searchValue === this.state.searchValue &&
-        this.props.listData.searchResults &&
-        this.props.listData.searchResults.length > 0
-        ) {
-        this.getNextSearchResult();
-      } else {
-        this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
-        this.setState({searchValue});
-      }
-    };
+    this.onSearchClick = this.onSearchClick.bind(this);
 
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -638,6 +623,19 @@ class ListTable extends Component {
     });
   }
 
+  onSearchClick(e) {
+    const searchValue = this.searchValue.getValue();
+    if (searchValue.length === 0) {
+      this.props.router.push(`/tables/${this.props.listId}`);
+      this.onSearchClearClick();
+    } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
+      this.getNextSearchResult();
+    } else {
+      this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
+      this.setState({searchValue});
+    }
+  }
+
   _onSearchClearClick() {
     this.props.router.push(`/tables/${this.props.listId}`);
     this.setState({
@@ -808,18 +806,7 @@ class ListTable extends Component {
             tooltip='Search'
             tooltipPosition='bottom-center'
             style={{marginLeft: 5}}
-            onClick={e => {
-              const searchValue = this.searchValue.getValue();
-              if (searchValue.length === 0) {
-                this.props.router.push(`/tables/${props.listId}`);
-                this.onSearchClearClick();
-              } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
-                this.getNextSearchResult();
-              } else {
-                this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
-                this.setState({searchValue});
-              }
-            }}
+            onClick={this.onSearchClick}
             />
           </div>
         {
@@ -895,13 +882,13 @@ class ListTable extends Component {
           <div className='vertical-center'>
             <i
             style={{margin: '0 5px'}}
-            className='fa fa-chevron-left'
+            className='fa fa-chevron-left pointer'
             onClick={e => this.setState({currentPage: state.currentPage - 1})}
             />
-            <span className='text'>{state.currentPage} / {Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE)}</span>
+            <span className='text' style={{color: grey700}} >{state.currentPage} / {Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE)}</span>
             <i
             style={{margin: '0 5px'}}
-            className='fa fa-chevron-right'
+            className='fa fa-chevron-right pointer'
             onClick={e => this.setState({currentPage: state.currentPage + 1})}
             />
           </div>
