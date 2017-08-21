@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import {grey500, grey700} from 'material-ui/styles/colors';
+import {grey300, grey400, grey500, grey700} from 'material-ui/styles/colors';
 
 const PlainFontIcon = styled.i.attrs({
   className: props => props.className
 })`
-  color: ${grey500};
+  color: ${props => props.disabled ? grey400 : grey500};
   font-size: 1.3em;
   margin: auto;
   &:hover {
-    color: ${grey700};
+    color: ${props => props.disabled ? grey500 : grey700};
   }
 `;
 
@@ -22,13 +22,13 @@ const PlainIconButtonContainer = styled.div`
 
 const PlainIconButtonLabel = styled.span`
   font-size: 0.7em;
-  color: ${grey700};
+  color: ${props => props.disabled ? grey500 : grey700};
 `;
 
 const PlainIconButton = ({label, onClick, disabled, className}) => (
   <PlainIconButtonContainer disabled={disabled} onClick={e => !disabled && onClick(e)}>
-    <PlainFontIcon className={className} />
-    <PlainIconButtonLabel>{label}</PlainIconButtonLabel>
+    <PlainFontIcon className={className} disabled={disabled} />
+    <PlainIconButtonLabel disabled={disabled} >{label}</PlainIconButtonLabel>
   </PlainIconButtonContainer>
   );
 

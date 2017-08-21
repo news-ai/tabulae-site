@@ -760,27 +760,25 @@ class ListTable extends Component {
               onClick={onRequestOpen}
               />)}
             </AddContactHOC>
+            <AddTagDialogHOC listId={props.listId}>
+              {({onRequestOpen}) =>
+              <PlainIconButton className='fa fa-tags' onClick={onRequestOpen} label='Tag' disabled={props.listData.readonly} />}
+            </AddTagDialogHOC>
             <PlainIconButton
-            iconStyle={styles.iconBtn}
             label='Delete'
             className={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
             disabled={props.listData.readonly || state.selected.length === 0}
             onClick={this.onRemoveContacts}
             />
-            <AddTagDialogHOC listId={props.listId}>
-              {({onRequestOpen}) =>
-              <PlainIconButton className='fa fa-tags' onClick={onRequestOpen} label='Tag' disabled={props.listData.readonly} />}
-            </AddTagDialogHOC>
-          {state.selected.length > 1 &&
             <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
             {({onRequestOpen}) =>
               <PlainIconButton
               className='fa fa-edit'
-              tooltip='Edit'
-              disabled={props.listData.readonly}
+              label='Edit'
+              disabled={props.listData.readonly || state.selected.length < 2}
               onClick={onRequestOpen}
               />}
-            </EditMultipleContactsHOC>}
+            </EditMultipleContactsHOC>
           {/*
             <Link to={`/listfeeds/${props.listId}`}>
               <IconButton
@@ -985,9 +983,6 @@ const styles = {
     top: 80,
     right: 10,
     position: 'fixed'
-  },
-  iconBtn: {
-    color: grey500
   },
   profileIcon: {fontSize: '0.9em', padding: '0 1px', margin: '0 5px'},
 };
