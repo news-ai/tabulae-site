@@ -410,7 +410,7 @@ class ListTable extends Component {
 
   _cellRenderer(cellProps) {
     const {columnIndex, rowIndex, key, style} = cellProps;
-    const rIndex = (this.state.currentPage - 1) * this.state.pageSize + rowIndex; // compute paginated actual index
+    const rIndex = this.state.pageSize !== -1 ? (this.state.currentPage - 1) * this.state.pageSize + rowIndex : rowIndex; // compute paginated actual index
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
     const contact = contacts[rIndex];
@@ -940,7 +940,7 @@ class ListTable extends Component {
               overscanRowCount={10}
               height={state.leftoverHeight || 500}
               width={state.screenWidth}
-              rowCount={props.received.length > state.pageSize ? state.pageSize : props.received.length}
+              rowCount={state.pageSize === -1 || props.received.length < state.pageSize ? props.received.length : state.pageSize}
               rowHeight={30}
               onScroll={onScroll}
               scrollToRow={state.scrollToRow}

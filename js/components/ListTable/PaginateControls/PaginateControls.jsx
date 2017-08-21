@@ -37,6 +37,8 @@ class PaginationLabelContainer extends Component {
   }
   render() {
     const {currentPage, listLength, pageSize, onPageSizeChange} = this.props;
+    let total = Math.floor(listLength / pageSize) || 1;
+    if (pageSize === -1) total = 1;
     return (
       <div>
         <Popover
@@ -50,9 +52,10 @@ class PaginationLabelContainer extends Component {
             <option value={50}>50</option>
             <option value={100}>100</option>
             <option value={200}>200</option>
+            <option value={-1}>Infinity</option>
           </PlainSelect>
         </Popover>
-        <PaginationLabel onClick={this.onRequestOpen} >{currentPage} / {Math.floor(listLength / pageSize) || 1}</PaginationLabel>
+        <PaginationLabel onClick={this.onRequestOpen} >{currentPage} / {total}</PaginationLabel>
       </div>
     );
   }
@@ -64,8 +67,8 @@ const PaginateControls = ({containerClassName, currentPage, pageSize, listLength
     <div className={containerClassName} >
       <PaginationHandle
       className='fa fa-chevron-left'
-      disabled={currentPage - 1 === 0}
-      onClick={e => currentPage - 1 > 0 && onPrev(currentPage - 1)}
+      disabled={currentPage - 1 === 0 || pageSize === -1}
+      onClick={e => pageSize !== -1 && currentPage - 1 > 0 && onPrev(currentPage - 1)}
       />
       <PaginationLabelContainer
       currentPage={currentPage}
@@ -75,8 +78,8 @@ const PaginateControls = ({containerClassName, currentPage, pageSize, listLength
       />
       <PaginationHandle
       className='fa fa-chevron-right'
-      disabled={currentPage + 1 > Math.floor(listLength / pageSize)}
-      onClick={e => currentPage + 1 <= Math.floor(listLength / pageSize) && onNext(currentPage + 1)}
+      disabled={currentPage + 1 > Math.floor(listLength / pageSize) || pageSize === -1}
+      onClick={e => pageSize !== -1 && currentPage + 1 <= Math.floor(listLength / pageSize) && onNext(currentPage + 1)}
       />
     </div>
     );
