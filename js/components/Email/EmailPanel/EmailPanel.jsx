@@ -9,7 +9,6 @@ import {actions as fileActions} from 'components/ImportFile';
 import {actions as loginActions} from 'components/Login';
 import {actions as stagingActions} from 'components/Email';
 import {actions as templateActions} from 'components/Email/Template';
-import alertify from 'alertifyjs';
 import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
@@ -42,21 +41,13 @@ import {convertToRaw, convertFromRaw} from 'draft-js';
 import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
 import './react-select-hack.css';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
 import {blueGrey50, grey50, grey600, grey700, grey800, red800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 import triggerNewEntityFormatWarning from 'components/Email/EmailPanel/utils/triggerNewEntityFormatWarning';
 import styled from 'styled-components';
-
-alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
-  alertify.confirm(title, description, resolve, reject);
-});
-
-alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-  });
+import alertify from 'utils/alertify';
 
 function NameOptionRenderer (option) {
   const classNames = ['nameOption'];

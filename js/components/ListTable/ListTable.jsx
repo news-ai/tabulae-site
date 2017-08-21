@@ -57,21 +57,14 @@ import {
   isNumber,
   _getter
 } from './helpers';
-import alertify from 'alertifyjs';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import alertify from 'utils/alertify';
 import 'react-virtualized/styles.css';
 import './Table.css';
 
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
 
-alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
-  alertify.confirm(title, description, resolve, reject);
-});
-
-alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-});
+const DEFAULT_PAGE_SIZE = 200;
 
 class ListTable extends Component {
   constructor(props) {
@@ -102,6 +95,7 @@ class ListTable extends Component {
       isEmailPanelOpen: false,
       initializeEmailPanel: false,
       showColumnEditPanel: false,
+      page: 1
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -893,25 +887,53 @@ class ListTable extends Component {
         }
         </Drawer>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        <div className='row vertical-center' style={{margin: '10px 0'}}>
-          <Tags listId={props.listId}/>
+        <div className='vertical-center' style={{margin: '10px 0', justifyContent: 'space-between'}}>
+          <div className='vertical-center'>
+            <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
+          </div>
+          <div className='vertical-center'>
+            <i style={{margin: '0 5px'}} className='fa fa-chevron-left' />
+            <i style={{margin: '0 5px'}} className='fa fa-chevron-right' />
+          </div>
         </div>
         <div>
-        <div>
-        {!isEmpty(props.listData.contacts) && props.contacts &&
-          <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
-        </div>
-      {isEmpty(props.listData.contacts) &&
-        <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
-      {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&
-        <ScrollSync>
-        {({onScroll, scrollLeft}) =>
           <div>
-            <div id='HeaderGridContainerId' className='HeaderGridContainer'>
+          {!isEmpty(props.listData.contacts) && props.contacts &&
+            <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
+          </div>
+        {isEmpty(props.listData.contacts) &&
+          <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+        {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&
+          <ScrollSync>
+          {({onScroll, scrollLeft}) =>
+            <div>
+              <div id='HeaderGridContainerId' className='HeaderGridContainer'>
+                <Grid
+                ref={ref => this.setHeaderGridRef(ref)}
+                className='HeaderGrid'
+                cellRenderer={this.headerRenderer}
+                columnCount={props.fieldsmap.length}
+                columnWidth={({index}) => {
+                  const wid = state.columnWidths[index];
+                  if (!wid) {
+                    this.clearColumnStorage();
+                    return 70;
+                  }
+                  return wid + 10;
+                }}
+                height={45}
+                autoContainerWidth
+                width={state.screenWidth}
+                rowCount={1}
+                rowHeight={32}
+                scrollLeft={scrollLeft}
+                overscanColumnCount={3}
+                />
+              </div>
               <Grid
-              ref={ref => this.setHeaderGridRef(ref)}
-              className='HeaderGrid'
-              cellRenderer={this.headerRenderer}
+              ref={ref => this.setDataGridRef(ref)}
+              className='BodyGrid'
+              cellRenderer={this.cellRenderer}
               columnCount={props.fieldsmap.length}
               columnWidth={({index}) => {
                 const wid = state.columnWidths[index];
@@ -921,40 +943,18 @@ class ListTable extends Component {
                 }
                 return wid + 10;
               }}
-              height={45}
-              autoContainerWidth
+              overscanRowCount={10}
+              height={state.leftoverHeight || 500}
               width={state.screenWidth}
-              rowCount={1}
-              rowHeight={32}
-              scrollLeft={scrollLeft}
-              overscanColumnCount={3}
+              rowCount={props.received.length}
+              rowHeight={30}
+              onScroll={onScroll}
+              scrollToRow={state.scrollToRow}
               />
-            </div>
-            <Grid
-            ref={ref => this.setDataGridRef(ref)}
-            className='BodyGrid'
-            cellRenderer={this.cellRenderer}
-            columnCount={props.fieldsmap.length}
-            columnWidth={({index}) => {
-              const wid = state.columnWidths[index];
-              if (!wid) {
-                this.clearColumnStorage();
-                return 70;
-              }
-              return wid + 10;
-            }}
-            overscanRowCount={10}
-            height={state.leftoverHeight || 500}
-            width={state.screenWidth}
-            rowCount={props.received.length}
-            rowHeight={30}
-            onScroll={onScroll}
-            scrollToRow={state.scrollToRow}
-            />
-          </div>}
-        </ScrollSync>}
-      </div>
-    </div>);
+            </div>}
+          </ScrollSync>}
+        </div>
+      </div>);
   }
 }
 

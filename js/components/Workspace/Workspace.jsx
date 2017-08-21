@@ -9,9 +9,7 @@ import Popover from 'material-ui/Popover';
 import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
-import alertify from 'alertifyjs';
-
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import alertify from 'utils/alertify';
 import {blueGrey100, blue500, blueGrey400} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
@@ -26,14 +24,6 @@ const ItemContainer = styled.div`
   align-items: center;
   justify-content: center;
 `;
-
-alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
-  alertify.confirm(title, description, resolve, reject);
-});
-
-alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-  });
 
 const Menu = styled.ul`
   margin-left: 0px;

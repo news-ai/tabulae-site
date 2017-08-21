@@ -17,7 +17,7 @@ const PlainIconButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  margin: 3px 5px;
+  margin: 3px 8px;
 `;
 
 const PlainIconButtonLabel = styled.span`
