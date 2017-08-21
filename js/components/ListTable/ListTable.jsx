@@ -95,7 +95,7 @@ class ListTable extends Component {
       isEmailPanelOpen: false,
       initializeEmailPanel: false,
       showColumnEditPanel: false,
-      page: 1
+      currentPage: 1
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -424,26 +424,27 @@ class ListTable extends Component {
 
   _cellRenderer(cellProps) {
     const {columnIndex, rowIndex, key, style} = cellProps;
+    const rIndex = (this.state.currentPage - 1) * DEFAULT_PAGE_SIZE + rowIndex; // compute paginated actual index
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
-    const contact = contacts[rowIndex];
-    let content = _getter(contacts[rowIndex], fieldObj) || '';
+    const contact = contacts[rIndex];
+    let content = _getter(contacts[rIndex], fieldObj) || '';
     // switch row to different color classname if it is search result
     let className = classNames(
       'vertical-center',
       'cell',
-      {evenRow: contact && !contact.isSearchResult && rowIndex % 2 === 0},
-      {oddRow: contact && !contact.isSearchResult && rowIndex % 2 === 0},
-      {findresult: contact && contacts[rowIndex].isSearchResult}
+      {evenRow: contact && !contact.isSearchResult && rIndex % 2 === 0},
+      {oddRow: contact && !contact.isSearchResult && rIndex % 2 === 0},
+      {findresult: contact && contacts[rIndex].isSearchResult}
       );
 
     let contentBody;
     let contentBody2 = null;
     if (fieldObj.tableOnly) {
-      const rowData = contacts[rowIndex];
+      const rowData = contacts[rIndex];
       switch (fieldObj.value) {
         case 'index':
-          contentBody = <span>{rowIndex + 1}</span>;
+          contentBody = <span>{rIndex + 1}</span>;
           break;
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
@@ -805,7 +806,7 @@ class ListTable extends Component {
             className='noprint'
             iconClassName='fa fa-search'
             tooltip='Search'
-            tooltipPosition='top-center'
+            tooltipPosition='bottom-center'
             style={{marginLeft: 5}}
             onClick={e => {
               const searchValue = this.searchValue.getValue();
@@ -892,8 +893,17 @@ class ListTable extends Component {
             <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
           </div>
           <div className='vertical-center'>
-            <i style={{margin: '0 5px'}} className='fa fa-chevron-left' />
-            <i style={{margin: '0 5px'}} className='fa fa-chevron-right' />
+            <i
+            style={{margin: '0 5px'}}
+            className='fa fa-chevron-left'
+            onClick={e => this.setState({currentPage: state.currentPage - 1})}
+            />
+            <span className='text'>{state.currentPage} / {Math.floor(props.contacts.length / DEFAULT_PAGE_SIZE)}</span>
+            <i
+            style={{margin: '0 5px'}}
+            className='fa fa-chevron-right'
+            onClick={e => this.setState({currentPage: state.currentPage + 1})}
+            />
           </div>
         </div>
         <div>
@@ -946,7 +956,7 @@ class ListTable extends Component {
               overscanRowCount={10}
               height={state.leftoverHeight || 500}
               width={state.screenWidth}
-              rowCount={props.received.length}
+              rowCount={props.received.length > 200 ? 200 : props.received.length}
               rowHeight={30}
               onScroll={onScroll}
               scrollToRow={state.scrollToRow}
