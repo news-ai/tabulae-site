@@ -92,7 +92,6 @@ const decorator = new CompositeDecorator([
 const BodyEditorContainer = styled.div`
   width: ${props => props.width ? props.width : 400}px;
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
-  overflow-y: ${props => props.height !== 'unlimited' && 'scroll'};
 `;
 
 class GeneralEditor extends React.Component {
@@ -705,7 +704,6 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
-    console.log(props.width);
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}

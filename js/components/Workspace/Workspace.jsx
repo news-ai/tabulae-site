@@ -202,91 +202,96 @@ class Workspace extends Component {
       );
     const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
     return (
-      <div style={{
-        // border: '1px solid blue',
-        display: 'flex',
-        justifyContent: 'space-around',
-        marginTop: 10
-      }} >
-        <FontIcon
-        onClick={_ => this.setState({showToolbar: !state.showToolbar})}
-        className={`pointer fa fa-angle-double-${state.showToolbar ? 'up' : 'down'} fa-2x`}
-        />
-        <Paper zDepth={2} style={{
-          display: state.showToolbar ? 'flex' : 'none',
-          flex: 1,
-          flexDirection: 'column',
-          flexGrow: 1,
-          padding: 10,
-          flexBasis: 200,
-          maxWidth: 300,
-          // border: '1px solid green',
-          textAlign: 'center'
-        }} >
-          <div>
-            <ItemContainer>
-            {!!state.currentTemplateId &&
-              <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
-            </ItemContainer>
-            <RaisedButton
-            label='Load Existing'
-            style={{marginBottom: 5, width: '100%'}}
-            backgroundColor={blue500}
-            labelStyle={{textTransform: 'none', color: '#ffffff'}}
-            labelPosition='after'
-            icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-minus-square-o' : 'fa fa-plus-square-o'} />}
-            onTouchTap={e => this.setState({open: !state.open})}
-            />
-            <Collapse isOpened={state.open}>
-              <Menu>
-              {options}
-              </Menu>
-            </Collapse>
-          </div>
-          <div style={{marginTop: 'auto'}} >
-            <RaisedButton
-            primary
-            style={{marginBottom: 5, width: '100%'}}
-            disabled={!state.useExisting}
-            label='Save'
-            labelStyle={{textTransform: 'none'}}
-            onTouchTap={this.onSaveCurrentTemplateClick}
-            />
-            <RaisedButton
-            primary
-            style={{marginBottom: 5, width: '100%'}}
-            label='Save New...'
-            labelStyle={{textTransform: 'none'}}
-            onTouchTap={this.onSaveNewTemplateClick}
-            />
-            <RaisedButton
-            secondary
-            style={{marginBottom: 5, width: '100%'}}
-            label='Clear Editor'
-            labelStyle={{textTransform: 'none'}}
-            onTouchTap={this.onClearEditor}
-            />
-          </div>
-        </Paper>
+      <div>
         <div style={{
+          backgroundColor: 'red',
+          padding: 5,
+          position: 'absolute',
+          right: 10,
+          zIndex: 200
+        }}>
+          <FontIcon
+          onClick={_ => this.setState({showToolbar: !state.showToolbar})}
+          className={`pointer fa fa-angle-double-${state.showToolbar ? 'up' : 'down'} fa-2x`}
+          />
+          <FontIcon className='fa fa-minus' style={{fontSize: '0.8em'}} />
+          <span className='smalltext' style={{margin: '0 10px'}} >100%</span>
+          <FontIcon className='fa fa-plus' style={{fontSize: '0.8em'}} />
+        </div>
+        <div style={{
+          // border: '1px solid blue',
           display: 'flex',
-          flexGrow: 1,
-          justifyContent: 'center',
+          // justifyContent: 'space-around',
+          marginTop: 10
         }} >
-          <div className='vertical-center' style={{
-            backgroundColor: 'red',
-            padding: 5,
-            position: 'absolute',
-            right: 10,
-            zIndex: 200
-          }}>
-            <FontIcon className='fa fa-minus' style={{fontSize: '0.8em'}} />
-            <span className='smalltext' style={{margin: '0 10px'}} >100%</span>
-            <FontIcon className='fa fa-plus' style={{fontSize: '0.8em'}} />
+          <div style={{
+            display: state.showToolbar ? 'flex' : 'none',
+            flexGrow: 1,
+            flexBasis: 200,
+            maxWidth: 300,
+            order: -1,
+            // backgroundColor: 'red',
+          }} >
+            <Paper zDepth={2} style={{
+              textAlign: 'center',
+              height: 600,
+              position: 'fixed',
+              display: 'flex',
+              flexDirection: 'column',
+            }} >
+              <div>
+                <ItemContainer>
+                {!!state.currentTemplateId &&
+                  <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
+                </ItemContainer>
+                <RaisedButton
+                label='Load Existing'
+                style={{marginBottom: 5, width: '100%'}}
+                backgroundColor={blue500}
+                labelStyle={{textTransform: 'none', color: '#ffffff'}}
+                labelPosition='after'
+                icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-minus-square-o' : 'fa fa-plus-square-o'} />}
+                onTouchTap={e => this.setState({open: !state.open})}
+                />
+                <Collapse isOpened={state.open}>
+                  <Menu>
+                  {options}
+                  </Menu>
+                </Collapse>
+              </div>
+              <div style={{marginTop: 'auto'}} >
+                <RaisedButton
+                primary
+                style={{marginBottom: 5, width: '100%'}}
+                disabled={!state.useExisting}
+                label='Save'
+                labelStyle={{textTransform: 'none'}}
+                onTouchTap={this.onSaveCurrentTemplateClick}
+                />
+                <RaisedButton
+                primary
+                style={{marginBottom: 5, width: '100%'}}
+                label='Save New...'
+                labelStyle={{textTransform: 'none'}}
+                onTouchTap={this.onSaveNewTemplateClick}
+                />
+                <RaisedButton
+                secondary
+                style={{marginBottom: 5, width: '100%'}}
+                label='Clear Editor'
+                labelStyle={{textTransform: 'none'}}
+                onTouchTap={this.onClearEditor}
+                />
+              </div>
+            </Paper>
           </div>
           <div style={{
-            padding: 15
+            display: 'flex',
+            flexGrow: 2,
+            justifyContent: 'center',
+            // backgroundColor: 'blue'
           }} >
+
             <GeneralEditor
             onEditMode
             allowReplacement
