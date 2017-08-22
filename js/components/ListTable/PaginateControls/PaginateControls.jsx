@@ -30,7 +30,6 @@ class PaginationLabelContainer extends Component {
     };
     this.handleRequestClose = e => this.setState({open: false});
     this.onRequestOpen = e => {
-      console.log('open');
       e.preventDefault();
       this.setState({open: true, anchorEl: e.currentTarget});
     };

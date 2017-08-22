@@ -48,6 +48,7 @@ class Subject extends Component {
       variableMenuOpen: false,
       variableMenuAnchorEl: null
     };
+    this.focus = () => this.refs.subjectEditor.focus();
     this.truncateText = this._truncateText.bind(this);
     this.handlePastedText = this._handlePastedText.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
@@ -188,28 +189,31 @@ class Subject extends Component {
           width: this.props.width,
           height: 32,
           overflowX: 'scroll',
-        }}>
-      {props.fieldsmap &&
-        <Popover
-        open={state.variableMenuOpen}
-        anchorEl={state.variableMenuAnchorEl}
-        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        }}
+        onClick={this.focus}
         >
-          <Menu desktop>
-          {props.fieldsmap
-            .filter(field => !field.hidden)
-            .map((field, i) =>
-            <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
-          </Menu>
-        </Popover>}
+        {props.fieldsmap &&
+          <Popover
+          open={state.variableMenuOpen}
+          anchorEl={state.variableMenuAnchorEl}
+          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+          targetOrigin={{horizontal: 'left', vertical: 'top'}}
+          onRequestClose={_ => this.setState({variableMenuOpen: false})}
+          >
+            <Menu desktop>
+            {props.fieldsmap
+              .filter(field => !field.hidden)
+              .map((field, i) =>
+              <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
+            </Menu>
+          </Popover>}
           <Editor
           editorState={editorState}
           onChange={this.onChange}
           handleReturn={e => 'handled'}
           placeholder='Subject...'
           handlePastedText={this.handlePastedText}
+          ref='subjectEditor'
           />
         </div>
         <div className='vertical-center'>

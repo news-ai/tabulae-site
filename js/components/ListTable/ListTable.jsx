@@ -615,11 +615,14 @@ class ListTable extends Component {
           }
         }
       }
+      const currentPage = this.state.pageSize === -1 ? 1 : Math.floor(scrollToFirstPosition / this.state.pageSize) + 1;
+      scrollToFirstPosition = this.state.pageSize === -1 ? scrollToFirstPosition : scrollToFirstPosition % this.state.pageSize;
       mixpanel.track('listtable_search', {num_results: ids.length, list_size: props.listData.contacts.length});
       this.setState({
         isSearchOn: true,
         currentSearchIndex: 0,
         scrollToRow: scrollToFirstPosition,
+        currentPage,
       });
     });
   }
@@ -666,7 +669,10 @@ class ListTable extends Component {
         }
       }
     }
-    this.setState({currentSearchIndex, scrollToRow});
+
+    const currentPage = this.state.pageSize === -1 ? 1 : Math.floor(scrollToRow / this.state.pageSize) + 1;
+    scrollToRow = this.state.pageSize === -1 ? scrollToRow : scrollToRow % this.state.pageSize;
+    this.setState({currentSearchIndex, scrollToRow, currentPage});
   }
 
   render() {
