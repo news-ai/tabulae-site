@@ -725,8 +725,8 @@ class ListTable extends Component {
           <i className='fa fa-arrow-right' />
           <span className='text' style={{marginLeft: 10}} >List Feed</span>
         </Link>
-        <div className='row' style={{marginTop: 5}}>
-          <div className='large-3 medium-4 columns' style={{flexDirection: 'column', float: 'left'}} >
+        <div className='vertical-center' style={{marginTop: 5, justifyContent: 'space-between', flexWrap: 'wrap'}}>
+          <div style={{display: 'flex', flexDirection: 'column', marginLeft: 15}} >
             <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
             <ControlledInput
             async
@@ -735,7 +735,7 @@ class ListTable extends Component {
             onBlur={value => props.patchList({listId: props.listId, name: value})}
             />
           </div>
-          <div className='large-4 medium-4 columns vertical-center' style={{marginTop: 15}} >
+          <div className='vertical-center' style={{marginTop: 15}} >
             <PlainIconButton label='Email' className='fa fa-envelope' onClick={this.onShowEmailClick} disabled={state.isEmailPanelOpen || props.listData.readonly} />
             <PlainIconButton label='Export' className='fa fa-download' onClick={this.onExportClick} />
             <CopyToHOC listId={props.listId} selected={state.selected}>
@@ -785,7 +785,7 @@ class ListTable extends Component {
               />}
             </EditMultipleContactsHOC>
           </div>
-          <div className='large-4 columns vertical-center'>
+          <div className='vertical-center' style={{marginTop: 15}} >
             <TextField
             id='search-input'
             ref={ref => this.searchValue = ref}
@@ -807,7 +807,7 @@ class ListTable extends Component {
           </div>
         {
           props.fieldsmap !== null &&
-          <div className='large-1 columns vertical-center'>
+          <div className='vertical-center'>
             <ScatterPlotHOC selected={state.selected} defaultYFieldname='instagramlikes' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
             {sc => (
               <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
@@ -815,7 +815,7 @@ class ListTable extends Component {
                <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
                 {twt => (
                   <IconMenu
-                  iconButtonElement={<IconButton tooltip='analyze selected' iconClassName='fa fa-line-chart' />}
+                  iconButtonElement={<PlainIconButton label='Analyze Selected' className='fa fa-line-chart' />}
                   anchorOrigin={{horizontal: 'left', vertical: 'top'}}
                   targetOrigin={{horizontal: 'left', vertical: 'top'}}
                   >
