@@ -10,7 +10,7 @@ import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'utils/alertify';
-import {blueGrey100, blue500, blueGrey400} from 'material-ui/styles/colors';
+import {blueGrey50, blueGrey100, blue500, blueGrey400} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -44,9 +44,20 @@ const MenuItem = styled.li`
   }
 `;
 
+const DEFAULT_PADDING = 65 + 100 + 40; //top bar height + utility bar height + padding
+const MIN_WIDTH = 600;
+const MAX_WIDTH = 900;
+const MIN_HEIGHT = 530;
 class Workspace extends Component {
   constructor(props) {
     super(props);
+
+    const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    let height = Math.floor(screenHeight - DEFAULT_PADDING);
+    if (height < MIN_HEIGHT) height = MIN_HEIGHT; // set some minimal height
+    console.log(screenWidth)
+    console.log(screenHeight);
     this.state = {
       subject: '', // original
       mutatingSubject: '', // editted
@@ -57,7 +68,11 @@ class Workspace extends Component {
       currentTemplateId: null,
       open: false,
       anchorEl: null,
-      useExisting: false
+      useExisting: false,
+      showToolbar: true,
+      width: 600,
+      height: height,
+      scale: 10
     };
     this.onSubjectChange = this.onSubjectChange.bind(this);
     this.onBodyChange = this.onBodyChange.bind(this);
@@ -65,10 +80,22 @@ class Workspace extends Component {
     this.onClearEditor = this.onClearEditor.bind(this);
     this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
+    this.onIncreaseScale = _ => this.setState({scale: this.state.scale + 1});
+    this.onDecreaseScale = _ => this.setState({scale: this.state.scale - 1});
+
+    // window.onresize = _ => {
+    //   const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    //   const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    //   this.setState({screenWidth, screenHeight});
+    // };
   }
 
   componentWillMount() {
     this.props.fetchTemplates();
+  }
+
+  componentWillUnmount() {
+    // window.onresize = undefined;
   }
 
   onBodyChange(html, raw) {
@@ -181,16 +208,20 @@ class Workspace extends Component {
         justifyContent: 'space-around',
         marginTop: 10
       }} >
+        <FontIcon
+        onClick={_ => this.setState({showToolbar: !state.showToolbar})}
+        className={`pointer fa fa-angle-double-${state.showToolbar ? 'up' : 'down'} fa-2x`}
+        />
         <Paper zDepth={2} style={{
-          display: 'flex',
+          display: state.showToolbar ? 'flex' : 'none',
           flex: 1,
           flexDirection: 'column',
           flexGrow: 1,
           padding: 10,
           flexBasis: 200,
-          maxWidth: 300
+          maxWidth: 300,
           // border: '1px solid green',
-          // justifyContent: 'space-between'
+          textAlign: 'center'
         }} >
           <div>
             <ItemContainer>
@@ -202,7 +233,7 @@ class Workspace extends Component {
             style={{marginBottom: 5, width: '100%'}}
             backgroundColor={blue500}
             labelStyle={{textTransform: 'none', color: '#ffffff'}}
-            labelPosition='right'
+            labelPosition='after'
             icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-minus-square-o' : 'fa fa-plus-square-o'} />}
             onTouchTap={e => this.setState({open: !state.open})}
             />
@@ -242,22 +273,33 @@ class Workspace extends Component {
           flexGrow: 1,
           justifyContent: 'center',
         }} >
+          <div className='vertical-center' style={{
+            backgroundColor: 'red',
+            padding: 5,
+            position: 'absolute',
+            right: 10,
+            zIndex: 200
+          }}>
+            <FontIcon className='fa fa-minus' style={{fontSize: '0.8em'}} />
+            <span className='smalltext' style={{margin: '0 10px'}} >100%</span>
+            <FontIcon className='fa fa-plus' style={{fontSize: '0.8em'}} />
+          </div>
           <div style={{
-            border: `5px solid ${blueGrey100}`,
             padding: 15
           }} >
             <GeneralEditor
             onEditMode
             allowReplacement
             allowGeneralizedProperties
+            allowToolbarDisappearOnBlur
             width={600}
-            height={530}
+            height='unlimited'
             debounce={500}
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
             subjectParams={{allowGeneralizedProperties: true}}
-            controlsStyle={{zIndex: 0, marginBottom: 15}}
+            controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
             onBodyChange={this.onBodyChange}
             onSubjectChange={this.onSubjectChange}

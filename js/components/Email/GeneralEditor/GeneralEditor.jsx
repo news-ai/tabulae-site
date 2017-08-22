@@ -49,6 +49,7 @@ import ValidationHOC from 'components/ValidationHOC';
 
 import {grey300, grey400, grey500, grey600, grey700} from 'material-ui/styles/colors';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
+import styled from 'styled-components';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
@@ -87,6 +88,12 @@ const decorator = new CompositeDecorator([
     component: CurlySpan
   }
 ]);
+
+const BodyEditorContainer = styled.div`
+  width: ${props => props.width ? props.width : 400}px;
+  height: ${props => props.height !== 'unlimited' && `${props.height}px`};
+  overflow-y: ${props => props.height !== 'unlimited' && 'scroll'};
+`;
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -698,6 +705,7 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    console.log(props.width);
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -734,7 +742,10 @@ class GeneralEditor extends React.Component {
         <Paper
         zDepth={1}
         className='row vertical-center clearfix'
-        style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
+        style={props.controlsStyle ? Object.assign({},
+          defaultControlsStyle,
+          props.controlsStyle,
+          {display: state.editorState.getSelection().getHasFocus() ? 'flex' : 'none'}): defaultControlsStyle}
         >
           <InlineStyleControls
           editorState={editorState}
@@ -774,11 +785,7 @@ class GeneralEditor extends React.Component {
         subjectHtml={props.subjectHtml}
         fieldsmap={props.fieldsmap}
         />}
-        <div style={{
-          height: props.height || 460,
-          overflowY: 'scroll',
-          width: props.width || 500
-        }}>
+        <BodyEditorContainer width={props.width} height={props.height} >
           <div className={className} onClick={this.focus}>
           {props.allowGeneralizedProperties &&
             <div className='right'>
@@ -814,7 +821,7 @@ class GeneralEditor extends React.Component {
             spellCheck
             />
           </div>
-        </div>
+        </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
         <Paper
         zDepth={1}
