@@ -162,7 +162,9 @@ class App extends Component {
           <Link to='/clients'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-folder'/>}>Client Directory</MenuItem></Link>
           <Link to='/search'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-search'/>}>Search</MenuItem></Link>
           <Link to='/emailstats'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-envelope'/>}>Sent & Scheduled Emails</MenuItem></Link>
+        {/*
           <Link to='/workspace'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-desktop'/>}>Workspace</MenuItem></Link>
+        */}
           <Link to='/public'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
         {props.person.teamid > 0 &&
           <Link to='/team'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}

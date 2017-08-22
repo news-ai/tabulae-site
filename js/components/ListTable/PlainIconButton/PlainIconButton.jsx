@@ -9,7 +9,7 @@ const PlainFontIcon = styled.i.attrs({
   font-size: 1.3em;
   margin: auto;
   &:hover {
-    color: ${props => props.disabled ? grey500 : grey700};
+    color: ${props => !props.disabled && grey700};
   }
 `;
 
