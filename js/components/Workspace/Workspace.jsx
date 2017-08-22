@@ -15,6 +15,7 @@ import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {convertToRaw} from 'draft-js';
+import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 
 const ItemContainer = styled.div`
   height: 40px;
@@ -44,6 +45,17 @@ const MenuItem = styled.li`
   }
 `;
 
+function createMarkUp(html) {
+  return { __html: html };
+}
+
+const fontSizes = [5, 6, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
+const generateFontSizeStyleMap = fonts => fonts.reduce((acc, font) => {
+  acc[`SIZE-${font}`] = ({fontSize: `${font + 4}pt`});
+  return acc;
+}, {});
+const customFontSizes = generateFontSizeStyleMap(fontSizes);
+
 const DEFAULT_PADDING = 65 + 100 + 40; //top bar height + utility bar height + padding
 const MIN_WIDTH = 600;
 const MAX_WIDTH = 900;
@@ -72,7 +84,7 @@ class Workspace extends Component {
       showToolbar: true,
       width: 600,
       height: height,
-      scale: 10
+      mode: 'writing'
     };
     this.onSubjectChange = this.onSubjectChange.bind(this);
     this.onBodyChange = this.onBodyChange.bind(this);
@@ -80,8 +92,6 @@ class Workspace extends Component {
     this.onClearEditor = this.onClearEditor.bind(this);
     this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
-    this.onIncreaseScale = _ => this.setState({scale: this.state.scale + 1});
-    this.onDecreaseScale = _ => this.setState({scale: this.state.scale - 1});
 
     // window.onresize = _ => {
     //   const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -218,9 +228,6 @@ class Workspace extends Component {
           onClick={_ => this.setState({showToolbar: !state.showToolbar})}
           className={`pointer fa fa-angle-double-${state.showToolbar ? 'up' : 'down'} fa-2x`}
           />
-          <FontIcon className='fa fa-minus' style={{fontSize: '0.8em'}} />
-          <span className='smalltext' style={{margin: '0 10px'}} >100%</span>
-          <FontIcon className='fa fa-plus' style={{fontSize: '0.8em'}} />
         </div>
         <div style={{
           // border: '1px solid blue',
@@ -231,8 +238,8 @@ class Workspace extends Component {
           <div style={{
             display: state.showToolbar ? 'flex' : 'none',
             flexGrow: 1,
-            flexBasis: 200,
-            maxWidth: 300,
+            flexBasis: 170,
+            maxWidth: 250,
             order: -1,
             // backgroundColor: 'red',
           }} >
@@ -244,6 +251,18 @@ class Workspace extends Component {
               flexDirection: 'column',
             }} >
               <div>
+                <div style={{display: 'flex'}} >
+                  <span
+                  onClick={_ => this.setState({mode: 'writing'})}
+                  className='text pointer'
+                  style={{flex: 1, padding: '3px 0', border: state.mode === 'writing' && '1px solid blue'}}
+                  >Writing Mode</span>
+                  <span
+                  onClick={_ => this.setState({mode: 'preview'})}
+                  className='text pointer'
+                  style={{flex: 1, padding: '3px 0', border: state.mode === 'preview' && '1px solid blue'}}
+                  >Preview</span>
+                </div>
                 <ItemContainer>
                 {!!state.currentTemplateId &&
                   <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
@@ -295,11 +314,13 @@ class Workspace extends Component {
             justifyContent: 'center',
             // backgroundColor: 'blue'
           }} >
-            <GeneralEditor
+          {state.mode === 'writing' &&
+           <GeneralEditor
             onEditMode
             allowReplacement
             allowGeneralizedProperties
             allowToolbarDisappearOnBlur
+            containerClassName='RichEditor-editor-workspace'
             width={600}
             height='unlimited'
             debounce={500}
@@ -312,7 +333,14 @@ class Workspace extends Component {
             onBodyChange={this.onBodyChange}
             onSubjectChange={this.onSubjectChange}
             placeholder='Start building your template here...'
-            />
+            extendStyleMap={customFontSizes}
+            />}
+          {state.mode === 'preview' &&
+            <div>
+              <div style={{width: state.width}} dangerouslySetInnerHTML={createMarkUp(state.mutatingSubject)} />
+              <div style={{width: state.width}} dangerouslySetInnerHTML={createMarkUp(state.mutatingBody)} />
+            </div>
+          }
           </div>
         </div>
       </div>

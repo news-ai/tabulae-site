@@ -15,6 +15,7 @@ export default function InlineStyleControls(props) {
         onToggle={props.onToggle}
         style={type.style}
         icon={type.icon}
+        tooltipPosition={props.tooltipPosition}
         />
       )}
     </div>

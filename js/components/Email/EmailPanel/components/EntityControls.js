@@ -37,6 +37,7 @@ export default function EntityControls(props) {
         label={type.label}
         onToggle={type.action}
         icon={type.icon}
+        tooltipPosition={props.tooltipPosition}
         />
       )}
     </div>

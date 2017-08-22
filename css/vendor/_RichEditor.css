@@ -24,6 +24,12 @@
   margin-top: 5px;
 }
 
+.RichEditor-editor-workspace {
+  cursor: text;
+  font-size: 14.5pt;
+  margin-top: 5px;
+}
+
 .public-DraftStyleDefault-block .public-DraftStyleDefault-ltr::-webkit-scrollbar {
   display: none;
 }

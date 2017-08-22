@@ -2,6 +2,7 @@
 import React from 'react';
 import debounce from 'lodash/debounce';
 import find from 'lodash/find';
+import cn from 'classnames';
 import {connect} from 'react-redux';
 import Draft, {
   Editor,
@@ -177,10 +178,14 @@ class GeneralEditor extends React.Component {
       styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
-      imageLink: ''
+      imageLink: '',
+      showToolbar: false
     };
 
-    this.focus = () => this.refs.editor.focus();
+    this.focus = () => {
+      this.refs.editor.focus();
+      this.setState({showToolbar: true});
+    }
     this.onChange = this._onChange.bind(this);
     this.handleTouchTap = (event) => {
       event.preventDefault();
@@ -697,15 +702,16 @@ class GeneralEditor extends React.Component {
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
-    let className = 'RichEditor-editor';
-    var contentState = editorState.getCurrentContent();
-    if (!contentState.hasText()) {
-      if (contentState.getBlockMap().first().getType() !== 'unstyled') {
-        className += ' RichEditor-hidePlaceholder';
-      }
-    }
+    const className = cn(props.containerClassName || 'RichEditor-editor', {
+      'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'});
+    let customStyleMap = styleMap;
+    if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
+
     let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
-    if (props.allowToolbarDisappearOnBlur) controlsStyle.display = state.editorState.getSelection().getHasFocus() ? 'flex' : 'none';
+    
+    const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
+    if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
+
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -739,35 +745,41 @@ class GeneralEditor extends React.Component {
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked} />
       {props.controlsPosition === 'top' &&
-        <Paper zDepth={1} className='vertical-center' style={controlsStyle} >
+        <Paper onClick={_ => console.log('paper')} zDepth={1} className='vertical-center' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
           inlineStyles={INLINE_STYLES}
+          tooltipPosition='bottom-center'
           />
           <EntityControls
           editorState={editorState}
           entityControls={this.ENTITY_CONTROLS}
+          tooltipPosition='bottom-center'
           />
           <ExternalControls
           editorState={editorState}
           externalControls={this.EXTERNAL_CONTROLS}
           active={props.files.length > 0}
+          tooltipPosition='bottom-center'
           />
           <PositionStyleControls
           editorState={editorState}
           blockTypes={POSITION_TYPES}
           onToggle={this.toggleBlockType}
+          tooltipPosition='bottom-center'
           />
           <FontSizeControls
           editorState={editorState}
           onToggle={this.onFontSizeToggle}
           inlineStyles={FONTSIZE_TYPES}
+          tooltipPosition='bottom-center'
           />
           <TypefaceControls
           editorState={editorState}
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
+          tooltipPosition='bottom-center'
           />
         </Paper>}
       {props.onSubjectChange &&
@@ -800,7 +812,7 @@ class GeneralEditor extends React.Component {
                 propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
               })}
             blockRenderMap={extendedBlockRenderMap}
-            customStyleMap={styleMap}
+            customStyleMap={customStyleMap}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}
@@ -810,13 +822,14 @@ class GeneralEditor extends React.Component {
             handleDrop={this.handleDrop}
             onChange={this.onChange}
             placeholder={props.placeholder || placeholder}
+            onBlur={_ => console.log('editor')}
             ref='editor'
             spellCheck
             />
           </div>
         </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
-        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
+        <Paper onClick={_ => this.setState({showToolbar: true})} zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
