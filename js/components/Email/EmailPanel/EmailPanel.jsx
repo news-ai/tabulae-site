@@ -9,6 +9,7 @@ import {actions as fileActions} from 'components/ImportFile';
 import {actions as loginActions} from 'components/Login';
 import {actions as stagingActions} from 'components/Email';
 import {actions as templateActions} from 'components/Email/Template';
+import alertify from 'alertifyjs';
 import get from 'lodash/get';
 import find from 'lodash/find';
 import isEmail from 'validator/lib/isEmail';
@@ -36,18 +37,25 @@ import AddCCPanelHOC from './AddCCPanelHOC.jsx';
 import SwitchEmailHOC from './SwitchEmailHOC.jsx';
 import SwitchEmailDropDown from './SwitchEmailDropDown.jsx';
 import PauseOverlay from './PauseOverlay.jsx';
-import {convertToRaw, convertFromRaw} from 'draft-js';
 
 import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
 import './react-select-hack.css';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 import './ReactTagsStyle.css';
 import {blueGrey50, grey50, grey600, grey700, grey800, red800, blue400, lightBlue500, blue50} from 'material-ui/styles/colors';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
 import triggerNewEntityFormatWarning from 'components/Email/EmailPanel/utils/triggerNewEntityFormatWarning';
 import styled from 'styled-components';
-import alertify from 'utils/alertify';
+
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+    alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+  });
 
 function NameOptionRenderer (option) {
   const classNames = ['nameOption'];
@@ -95,14 +103,13 @@ class EmailPanel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      subjectContentState: null,
-      subjectHtml: null,
       subject: '',
       fieldsmap: [],
       currentTemplateId: 0,
       bodyEditorState: null,
       bodyHtml: '',
       body: '',
+      subjectHtml: null,
       minimized: false,
       isPreveiwOpen: false,
       dirty: false,
@@ -159,9 +166,9 @@ class EmailPanel extends Component {
     this.props.initializeEmailDraft();
   }
 
-  onSubjectChange(contentState) {
-    const subjectContent = contentState;
-    const subjectBlock = contentState.getBlocksAsArray()[0];
+  onSubjectChange(editorState) {
+    const subjectContent = editorState.getCurrentContent();
+    const subjectBlock = editorState.getCurrentContent().getBlocksAsArray()[0];
     const subject = subjectBlock.getText();
     let mutatingSubject = '';
     let lastOffset = 0;
@@ -169,7 +176,7 @@ class EmailPanel extends Component {
       (character) => {
         const entityKey = character.getEntity();
         if (entityKey === null) return false;
-        return (contentState.getEntity(entityKey).getType() === 'PROPERTY');
+        return (editorState.getCurrentContent().getEntity(entityKey).getType() === 'PROPERTY');
       },
       (start, end) => {
         const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();
@@ -178,7 +185,7 @@ class EmailPanel extends Component {
       });
     mutatingSubject += subject.slice(lastOffset, subject.length);
 
-    this.setState({subject: mutatingSubject, subjectContentState: convertToRaw(subjectContent)});
+    this.setState({subject: mutatingSubject});
   }
 
   _changeEmailSignature(emailsignature) {
@@ -214,7 +221,7 @@ class EmailPanel extends Component {
         this.props.createTemplate(
           name,
           this.state.subject,
-          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
+          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState})
           )
         .then(currentTemplateId => {
           this.setState({currentTemplateId}, _ => {
@@ -232,7 +239,7 @@ class EmailPanel extends Component {
     this.props.onSaveCurrentTemplateClick(
       this.state.currentTemplateId,
       this.state.subject,
-      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState})
       );
     setTimeout(_ => this.setState({dirty: false}), 10);
   }
@@ -259,10 +266,6 @@ class EmailPanel extends Component {
         if (templateJSON.date) {
           window.Intercom('trackEvent', 'use_prev_email_template', {date: templateJSON.date});
           mixpanel.track('use_prev_email_template', {date: templateJSON.date});
-        }
-
-        if (templateJSON.subjectData) {
-          this.setState({subjectHtml: templateJSON.subjectData});
         }
 
         return triggerNewEntityFormatWarning(templateJSON.data)

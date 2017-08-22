@@ -4,8 +4,7 @@ import {
   EditorState,
   CompositeDecorator,
   ContentState,
-  Modifier,
-  convertFromRaw
+  Modifier
 } from 'draft-js';
 
 import Link from './components/Link';
@@ -18,8 +17,6 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import alertify from 'alertifyjs';
-import isJSON from 'validator/lib/isJSON';
-import debounce from 'lodash/debounce';
 
 const MAX_LENGTH = 255;
 
@@ -43,80 +40,37 @@ class Subject extends Component {
 
     this.state = {
       editorState: EditorState.createEmpty(decorator),
-      subjectString: null,
+      subjectHtml: null,
       subjectLength: 0,
       variableMenuOpen: false,
       variableMenuAnchorEl: null
     };
-    this.focus = () => this.refs.subjectEditor.focus();
     this.truncateText = this._truncateText.bind(this);
     this.handlePastedText = this._handlePastedText.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
-    this.onPropertyIconClick = e => {
-      if (this.props.fieldsmap) this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
-      else alertify.prompt('Name the Property to be Inserted', '', '',
-        (evt, value) => this.onInsertProperty(value),
-        function() {});
-    };
-
-    function emitContent(editorState) {
-      this.props.onSubjectChange(editorState.getCurrentContent());
-    }
-    this.emitContent = debounce(emitContent, 500);
+    this.onPropertyIconClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
 
     this.onChange = (editorState) => {
-      const previousContent = this.state.editorState.getCurrentContent();
-      // only emit html when content changes
-      if (previousContent !== editorState.getCurrentContent()) {
-        const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
-        const subjectLength = subject.length;
-        let newEditorState = editorState;
-        if (subjectLength > MAX_LENGTH) newEditorState = this.truncateText(editorState, MAX_LENGTH);
+      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
+      const subjectLength = subject.length;
+      if (subject.length > MAX_LENGTH) {
+        const newEditorState = this.truncateText(editorState, MAX_LENGTH);
+        this.props.onSubjectChange(newEditorState);
         this.setState({editorState: newEditorState, subjectLength});
-        this.emitContent(newEditorState);
+      } else {
+        this.props.onSubjectChange(editorState);
+        this.setState({editorState, subjectLength});
       }
     };
-  }
-
-  componentWillMount() {
-    let content, editorState;
-    if (!!this.props.subjectHtml) {
-      if (this.props.subjectHtml.entityMap && this.props.subjectHtml.blocks) {
-        const subjectString = JSON.stringify(this.props.subjectHtml);
-        if (subjectString !== this.state.subjectString) {
-          content = convertFromRaw(this.props.subjectHtml);
-          this.setState({subjectString});
-          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-          this.onChange(editorState);
-        }
-      } else {
-        if (this.props.subjectHtml !== this.state.subjectString) {
-          content = ContentState.createFromText(this.props.subjectHtml);
-          this.setState({subjectString: this.props.subjectHtml});
-          editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-          this.onChange(editorState);
-        }
-      }
-    }
   }
 
   componentWillReceiveProps(nextProps) {
-    let content, editorState;
-    if (nextProps.subjectHtml && nextProps.subjectHtml.entityMap && nextProps.subjectHtml.blocks) {
-      const subjectString = JSON.stringify(nextProps.subjectHtml);
-      if (subjectString !== this.state.subjectString) {
-        content = convertFromRaw(nextProps.subjectHtml);
-        this.setState({subjectString});
-        editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-        this.onChange(editorState);
-      }
-    } else {
-      if (nextProps.subjectHtml !== this.state.subjectString) {
-        content = ContentState.createFromText(nextProps.subjectHtml);
-        this.setState({subjectString: nextProps.subjectHtml});
-        editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
-        this.onChange(editorState);
-      }
+    if (nextProps.subjectHtml !== this.state.subjectHtml) {
+      const content = ContentState.createFromText(nextProps.subjectHtml);
+      // const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      const editorState = EditorState.push(this.state.editorState, content, 'insert-fragment');
+      this.setState({subjectHtml: nextProps.subjectHtml});
+      this.onChange(editorState);
     }
   }
 
@@ -189,36 +143,33 @@ class Subject extends Component {
           width: this.props.width,
           height: 32,
           overflowX: 'scroll',
-        }}
-        onClick={this.focus}
+        }}>
+      {props.fieldsmap &&
+        <Popover
+        open={state.variableMenuOpen}
+        anchorEl={state.variableMenuAnchorEl}
+        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+        onRequestClose={_ => this.setState({variableMenuOpen: false})}
         >
-        {props.fieldsmap &&
-          <Popover
-          open={state.variableMenuOpen}
-          anchorEl={state.variableMenuAnchorEl}
-          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-          targetOrigin={{horizontal: 'left', vertical: 'top'}}
-          onRequestClose={_ => this.setState({variableMenuOpen: false})}
-          >
-            <Menu desktop>
-            {props.fieldsmap
-              .filter(field => !field.hidden)
-              .map((field, i) =>
-              <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
-            </Menu>
-          </Popover>}
+          <Menu desktop>
+          {props.fieldsmap
+            .filter(field => !field.hidden)
+            .map((field, i) =>
+            <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
+          </Menu>
+        </Popover>}
           <Editor
           editorState={editorState}
           onChange={this.onChange}
           handleReturn={e => 'handled'}
           placeholder='Subject...'
           handlePastedText={this.handlePastedText}
-          ref='subjectEditor'
           />
         </div>
         <div className='vertical-center'>
           <span className='text' style={styles.lengthLabel}>{subjectLength}</span>
-        {(props.fieldsmap || props.allowGeneralizedProperties) &&
+        {props.fieldsmap &&
           <IconButton
           iconStyle={styles.icon.iconStyle}
           style={styles.icon.style}

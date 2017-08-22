@@ -4,7 +4,15 @@ import Card from './Card.jsx';
 import { DropTarget } from 'react-dnd';
 import FontIcon from 'material-ui/FontIcon';
 import {grey400, grey500, green50, green100, lightBlue50} from 'material-ui/styles/colors';
-import alertify from 'utils/alertify';
+import alertify from 'alertifyjs';
+
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
+
+alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
+  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
+});
 
 class Container extends Component {
 	constructor(props) {
