@@ -10,7 +10,7 @@ export default function FontSizeControls(props) {
   const currentStyle = props.editorState.getCurrentInlineStyle();
   const currentType = find(inlineStyles, type => currentStyle.has(type.style));
   const selection = props.editorState.getSelection();
-  let value = '14';
+  let value = '10.5';
   if (currentType) {
     value = currentType.label;
   }

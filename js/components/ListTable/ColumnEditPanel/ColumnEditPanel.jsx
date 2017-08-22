@@ -9,16 +9,8 @@ import FlatButton from 'material-ui/FlatButton';
 import {yellow50, grey600} from 'material-ui/styles/colors';
 import {generateTableFieldsmap, reformatFieldsmap} from 'components/ListTable/helpers';
 import Select from 'react-select';
-import alertify from 'alertifyjs';
+import alertify from 'utils/alertify';
 import 'react-select/dist/react-select.css';
-
-alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
-  alertify.confirm(title, description, resolve, reject);
-});
-
-alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-});
 
 class ColumnEditPanel extends Component {
   constructor(props) {
