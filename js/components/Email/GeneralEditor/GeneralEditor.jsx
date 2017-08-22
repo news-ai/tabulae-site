@@ -27,6 +27,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import Dropzone from 'react-dropzone';
 import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
 
 import CurlySpan from 'components/Email/EmailPanel/components/CurlySpan';
 import Subject from 'components/Email/EmailPanel/Subject.jsx';
@@ -46,6 +47,7 @@ import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ValidationHOC';
 
+import {grey300, grey400, grey500, grey600, grey700} from 'material-ui/styles/colors';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
@@ -64,6 +66,11 @@ const defaultControlsStyle = {
   paddingLeft: 10,
   paddingRight: 10,
   backgroundColor: '#ffffff',
+};
+
+const icon = {
+  iconStyle: {width: 14, height: 14, fontSize: '14px', color: grey600},
+  style: {width: 28, height: 28, padding: 7, position: 'fixed'}
 };
 
 const decorator = new CompositeDecorator([
@@ -206,6 +213,11 @@ class GeneralEditor extends React.Component {
     this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
     this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
+    this.onPropertyIconClick = e => {
+      alertify.prompt('Name the Property to be Inserted', '', '',
+        (evt, value) => this.onInsertProperty(value),
+        function() {});
+    };
   }
 
   componentWillMount() {
@@ -617,6 +629,7 @@ class GeneralEditor extends React.Component {
     }
     return false;
   }
+
   _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -651,6 +664,24 @@ class GeneralEditor extends React.Component {
     }
 
     this.onChange(nextEditorState, 'force-emit-html');
+  }
+
+  onInsertProperty(propertyType) {
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    if (!selection.isCollapsed()) {
+      alertify.alert('Editor Warning', 'The editor cursor must be focused and not highlighted to insert property.');
+      return;
+    }
+    const contentStateWithEntity = editorState.getCurrentContent().createEntity('PROPERTY', 'IMMUTABLE', {property: propertyType});
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+
+    const newEditorState = EditorState.push(
+      editorState,
+      Modifier.insertText(contentStateWithEntity, selection, propertyType, undefined, entityKey),
+      'insert-fragment'
+      );
+    this.onChange(newEditorState);
   }
 
   render() {
@@ -698,9 +729,9 @@ class GeneralEditor extends React.Component {
             <RaisedButton label='Upload from File' onClick={_ => this.imgDropzone.open()}/>
           </div>
         </Dialog>
-        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked}/>
+        <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked} />
       {props.controlsPosition === 'top' &&
-              <Paper
+        <Paper
         zDepth={1}
         className='row vertical-center clearfix'
         style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
@@ -734,14 +765,10 @@ class GeneralEditor extends React.Component {
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
           />
-          {/*<BlockStyleControls
-          editorState={editorState}
-          blockTypes={BLOCK_TYPES}
-          onToggle={this.toggleBlockType}
-          />*/}
         </Paper>}
       {props.onSubjectChange &&
         <Subject
+        {...props.subjectParams}
         width={props.width}
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
@@ -753,6 +780,17 @@ class GeneralEditor extends React.Component {
           width: props.width || 500
         }}>
           <div className={className} onClick={this.focus}>
+          {props.allowGeneralizedProperties &&
+            <div className='right'>
+              <IconButton
+              tooltip='Insert Property to Body'
+              tooltipPosition='bottom-center'
+              iconClassName='fa fa-plus-square-o'
+              iconStyle={icon.iconStyle}
+              style={icon.style}
+              onClick={this.onPropertyIconClick}
+              />
+            </div>}
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={

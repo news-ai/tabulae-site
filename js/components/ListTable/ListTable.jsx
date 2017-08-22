@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import withRouter from 'react-router/lib/withRouter';
 import Link from 'react-router/lib/Link';
 import classNames from 'classnames';
+import styled from 'styled-components';
 
 import find from 'lodash/find';
 import difference from 'lodash/difference';
@@ -24,7 +25,7 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import TextField from 'material-ui/TextField';
-import {grey50, teal400, teal900, blue100, blue200, blue300, grey500, grey400, grey700} from 'material-ui/styles/colors';
+import {grey50, teal400, teal900, blue100, blue200, blue300, grey400, grey500, grey600, grey700, grey800} from 'material-ui/styles/colors';
 import {Grid, ScrollSync} from 'react-virtualized';
 import Draggable from 'react-draggable';
 import Dialog from 'material-ui/Dialog';
@@ -48,6 +49,8 @@ import ScatterPlotHOC from './ScatterPlotHOC.jsx';
 import Tags from 'components/Tags/TagsContainer.jsx';
 import Tag from 'components/Tags/Tag.jsx';
 import EditContactDialog from './EditContactDialog.jsx';
+import PlainIconButton from './PlainIconButton';
+import PaginateControls from './PaginateControls';
 
 import {
   generateTableFieldsmap,
@@ -56,22 +59,12 @@ import {
   isNumber,
   _getter
 } from './helpers';
-import alertify from 'alertifyjs';
-import 'node_modules/alertifyjs/build/css/alertify.min.css';
+import alertify from 'utils/alertify';
 import 'react-virtualized/styles.css';
 import './Table.css';
 
-
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
-
-alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
-  alertify.confirm(title, description, resolve, reject);
-});
-
-alertify.promisifyPrompt = (title, description, defaultValue) => new Promise((resolve, reject) => {
-  alertify.prompt(title, description, defaultValue, (e, value) => resolve(value), reject);
-});
 
 class ListTable extends Component {
   constructor(props) {
@@ -102,6 +95,8 @@ class ListTable extends Component {
       isEmailPanelOpen: false,
       initializeEmailPanel: false,
       showColumnEditPanel: false,
+      currentPage: 1,
+      pageSize: 200
     };
 
     // store outside of state to update synchronously for PanelOverlay
@@ -114,23 +109,7 @@ class ListTable extends Component {
     if (this.props.listData) {
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
     }
-    this.onSearchClick = e => {
-      const searchValue = this.searchValue.input.value;
-      if (searchValue.length === 0) {
-        this.props.router.push(`/tables/${props.listId}`);
-        this.onSearchClearClick();
-      } else if (
-        this.state.isSearchOn &&
-        searchValue === this.state.searchValue &&
-        this.props.listData.searchResults &&
-        this.props.listData.searchResults.length > 0
-        ) {
-        this.getNextSearchResult();
-      } else {
-        this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
-        this.setState({searchValue});
-      }
-    };
+    this.onSearchClick = this.onSearchClick.bind(this);
 
     window.onresize = _ => {
       const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -156,6 +135,7 @@ class ListTable extends Component {
     this.onCheck = this._onCheck.bind(this);
     this.onSearchClearClick = this._onSearchClearClick.bind(this);
     this.onSearch = this._onSearch.bind(this);
+    this.onSearchKeyDown = this.onSearchKeyDown.bind(this);
     this.getNextSearchResult = this._getNextSearchResult.bind(this);
     this.cellRenderer = this._cellRenderer.bind(this);
     this.headerRenderer = this._headerRenderer.bind(this);
@@ -430,26 +410,27 @@ class ListTable extends Component {
 
   _cellRenderer(cellProps) {
     const {columnIndex, rowIndex, key, style} = cellProps;
+    const rIndex = this.state.pageSize !== -1 ? (this.state.currentPage - 1) * this.state.pageSize + rowIndex : rowIndex; // compute paginated actual index
     const fieldObj = this.props.fieldsmap[columnIndex];
     let contacts = this.state.onSort ? this.state.sortedIds.map(id => this.props.contactReducer[id]) : this.props.contacts;
-    const contact = contacts[rowIndex];
-    let content = _getter(contacts[rowIndex], fieldObj) || '';
+    const contact = contacts[rIndex];
+    let content = _getter(contacts[rIndex], fieldObj) || '';
     // switch row to different color classname if it is search result
     let className = classNames(
       'vertical-center',
       'cell',
-      {evenRow: contact && !contact.isSearchResult && rowIndex % 2 === 0},
-      {oddRow: contact && !contact.isSearchResult && rowIndex % 2 === 0},
-      {findresult: contact && contacts[rowIndex].isSearchResult}
+      {evenRow: contact && !contact.isSearchResult && rIndex % 2 === 0},
+      {oddRow: contact && !contact.isSearchResult && rIndex % 2 === 0},
+      {findresult: contact && contacts[rIndex].isSearchResult}
       );
 
     let contentBody;
     let contentBody2 = null;
     if (fieldObj.tableOnly) {
-      const rowData = contacts[rowIndex];
+      const rowData = contacts[rIndex];
       switch (fieldObj.value) {
         case 'index':
-          contentBody = <span>{rowIndex + 1}</span>;
+          contentBody = <span>{rIndex + 1}</span>;
           break;
         case 'selected':
           const isChecked = this.state.selected.some(id => id === rowData.id);
@@ -634,13 +615,29 @@ class ListTable extends Component {
           }
         }
       }
+      const currentPage = this.state.pageSize === -1 ? 1 : Math.floor(scrollToFirstPosition / this.state.pageSize) + 1;
+      scrollToFirstPosition = this.state.pageSize === -1 ? scrollToFirstPosition : scrollToFirstPosition % this.state.pageSize;
       mixpanel.track('listtable_search', {num_results: ids.length, list_size: props.listData.contacts.length});
       this.setState({
         isSearchOn: true,
         currentSearchIndex: 0,
         scrollToRow: scrollToFirstPosition,
+        currentPage,
       });
     });
+  }
+
+  onSearchClick(e) {
+    const searchValue = this.searchValue.getValue();
+    if (searchValue.length === 0) {
+      this.props.router.push(`/tables/${this.props.listId}`);
+      this.onSearchClearClick();
+    } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
+      this.getNextSearchResult();
+    } else {
+      this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
+      this.setState({searchValue});
+    }
   }
 
   _onSearchClearClick() {
@@ -651,6 +648,14 @@ class ListTable extends Component {
       isSearchOn: false,
       currentSearchIndex: 0
     });
+  }
+
+  onSearchKeyDown(e) {
+    if (e.key === 'Enter') {
+      const searchValue = this.searchValue.getValue();
+      this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
+      this.setState({searchValue});
+    }
   }
 
   _getNextSearchResult() {
@@ -664,7 +669,10 @@ class ListTable extends Component {
         }
       }
     }
-    this.setState({currentSearchIndex, scrollToRow});
+
+    const currentPage = this.state.pageSize === -1 ? 1 : Math.floor(scrollToRow / this.state.pageSize) + 1;
+    scrollToRow = this.state.pageSize === -1 ? scrollToRow : scrollToRow % this.state.pageSize;
+    this.setState({currentSearchIndex, scrollToRow, currentPage});
   }
 
   render() {
@@ -696,15 +704,6 @@ class ListTable extends Component {
             </div>
           </Dialog>
         }
-        <div className='vertical-center'>
-          <Link to={`/listfeeds/${props.listId}`}>
-            <FlatButton
-            labelStyle={{textTransform: 'none', color: grey400}}
-            icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
-            label='List Feed'
-            />
-          </Link>
-        </div>
         <EditContactDialog
         listId={props.listId}
         contactId={state.currentEditContactId}
@@ -727,111 +726,77 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-        <div className='row vertical-center' style={{margin: 5}}>
-          <div className='large-3 medium-4 columns vertical-center'>
-            <div>
-              <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
-              <ControlledInput
-              async
-              disabled={props.listData.readonly}
-              name={props.listData.name}
-              onBlur={value => props.patchList({listId: props.listId, name: value})}
-              />
-            </div>
+
+        <Link style={{margin: '5px 15px'}} to={`/listfeeds/${props.listId}`}>
+          <i className='fa fa-arrow-right' />
+          <span className='text' style={{marginLeft: 10}} >List Feed</span>
+        </Link>
+        <div className='vertical-center' style={{marginTop: 5, justifyContent: 'space-between', flexWrap: 'wrap'}}>
+          <div style={{display: 'flex', flexDirection: 'column', marginLeft: 15}} >
+            <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
+            <ControlledInput
+            async
+            disabled={props.listData.readonly}
+            name={props.listData.name}
+            onBlur={value => props.patchList({listId: props.listId, name: value})}
+            />
           </div>
-          <div className='large-4 medium-4 columns vertical-center'>
-            <IconButton
-            tooltip='Show Email'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-envelope'
-            iconStyle={styles.iconBtn}
-            onClick={this.onShowEmailClick}
-            disabled={state.isEmailPanelOpen || props.listData.readonly}
-            />
-            <IconButton
-            tooltip='Export'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-download'
-            iconStyle={styles.iconBtn}
-            onClick={this.onExportClick}
-            />
+          <div className='vertical-center' style={{marginTop: 15}} >
+            <PlainIconButton label='Email' className='fa fa-envelope' onClick={this.onShowEmailClick} disabled={state.isEmailPanelOpen || props.listData.readonly} />
+            <PlainIconButton label='Export' className='fa fa-download' onClick={this.onExportClick} />
             <CopyToHOC listId={props.listId} selected={state.selected}>
             {({onRequestOpen}) => (
-              <IconButton
-              iconStyle={styles.iconBtn}
+              <PlainIconButton
               id='copy_contacts_hop'
-              tooltip='Copy to Another Table'
-              tooltipPosition='top-left'
-              iconClassName='fa fa-copy'
+              label='Copy'
+              className='fa fa-copy'
               onClick={onRequestOpen}
               />)}
             </CopyToHOC>
-            <IconButton
-            iconStyle={styles.iconBtn}
+            <PlainIconButton
             id='add_remove_columns_hop'
             disabled={props.listData.readonly}
-            tooltip='Show/Hide columns'
-            tooltipPosition='top-left'
-            iconClassName='fa fa-table'
+            label='Organize'
+            className='fa fa-table'
             onClick={_ => this.setState({showColumnEditPanel: true})}
             />
             <ColumnEditPanel onRequestClose={_ => this.setState({showColumnEditPanel: false})} open={state.showColumnEditPanel} listId={props.listId} />
             <AddContactHOC contacts={props.contacts} listId={props.listId}>
             {({onRequestOpen}) => (
-              <IconButton
-              iconStyle={styles.iconBtn}
-              tooltip='Add New Contact'
+              <PlainIconButton
+              label='Add'
               id='add_contact_hop'
               disabled={props.listData.readonly}
-              tooltipPosition='top-left'
-              iconClassName='fa fa-plus'
+              className='fa fa-plus'
               onClick={onRequestOpen}
               />)}
             </AddContactHOC>
-            <IconButton
-            iconStyle={styles.iconBtn}
-            tooltip='Delete Contact'
-            tooltipPosition='top-left'
-            iconClassName={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
-            disabled={props.listData.readonly}
-            onClick={this.onRemoveContacts}
-            />
             <AddTagDialogHOC listId={props.listId}>
               {({onRequestOpen}) =>
-              <IconButton
-              iconStyle={styles.iconBtn}
-              iconClassName='fa fa-tags'
-              onClick={onRequestOpen}
-              tooltip='Add Tag & Client'
-              tooltipPosition='top-right'
-              disabled={props.listData.readonly}
-              />}
+              <PlainIconButton className='fa fa-tags' onClick={onRequestOpen} label='Tag' disabled={props.listData.readonly} />}
             </AddTagDialogHOC>
-          {state.selected.length > 1 &&
+            <PlainIconButton
+            label='Delete'
+            className={state.isDeleting ? 'fa fa-spin fa-spinner' : 'fa fa-trash'}
+            disabled={props.listData.readonly || state.selected.length === 0}
+            onClick={this.onRemoveContacts}
+            />
             <EditMultipleContactsHOC selected={state.selected} listId={props.listId}>
             {({onRequestOpen}) =>
-              <IconButton
-              iconStyle={styles.iconBtn}
-              iconClassName='fa fa-edit'
-              tooltip='Edit Multiple'
-              tooltipPosition='top-right'
-              disabled={props.listData.readonly}
+              <PlainIconButton
+              className='fa fa-edit'
+              label='Edit'
+              disabled={props.listData.readonly || state.selected.length < 2}
               onClick={onRequestOpen}
               />}
-            </EditMultipleContactsHOC>}
+            </EditMultipleContactsHOC>
           </div>
-          <div className='large-4 columns vertical-center'>
+          <div className='vertical-center' style={{marginTop: 15}} >
             <TextField
             id='search-input'
             ref={ref => this.searchValue = ref}
             hintText='Search...'
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const searchValue = this.searchValue.input.value;
-                props.router.push(`/tables/${props.listId}?search=${searchValue}`);
-                this.setState({searchValue});
-              }
-            }}
+            onKeyDown={this.onSearchKeyDown}
             floatingLabelText={state.isSearchOn && props.listData.searchResults ? `Found ${props.listData.searchResults.length} matches. ${props.listData.searchResults.length > 0 ? `Currently on ${state.currentSearchIndex+1}.` : ''}` : undefined}
             floatingLabelFixed={state.isSearchOn}
             defaultValue={props.searchQuery || ''}
@@ -841,25 +806,14 @@ class ListTable extends Component {
             className='noprint'
             iconClassName='fa fa-search'
             tooltip='Search'
-            tooltipPosition='top-center'
+            tooltipPosition='bottom-center'
             style={{marginLeft: 5}}
-            onClick={e => {
-              const searchValue = this.searchValue.getValue();
-              if (searchValue.length === 0) {
-                this.props.router.push(`/tables/${props.listId}`);
-                this.onSearchClearClick();
-              } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
-                this.getNextSearchResult();
-              } else {
-                this.props.router.push(`/tables/${this.props.listId}?search=${searchValue}`);
-                this.setState({searchValue});
-              }
-            }}
+            onClick={this.onSearchClick}
             />
           </div>
         {
           props.fieldsmap !== null &&
-          <div className='large-1 columns vertical-center'>
+          <div className='vertical-center'>
             <ScatterPlotHOC selected={state.selected} defaultYFieldname='instagramlikes' defaultXFieldname='instagramfollowers' listId={props.listId} fieldsmap={props.fieldsmap}>
             {sc => (
               <AnalyzeSelectedInstagramHOC selected={state.selected} listId={props.listId}>
@@ -867,7 +821,7 @@ class ListTable extends Component {
                <AnalyzeSelectedTwitterHOC selected={state.selected} listId={props.listId}>
                 {twt => (
                   <IconMenu
-                  iconButtonElement={<IconButton tooltip='analyze selected' iconClassName='fa fa-line-chart' />}
+                  iconButtonElement={<PlainIconButton label='Analyze Selected' className='fa fa-line-chart' />}
                   anchorOrigin={{horizontal: 'left', vertical: 'top'}}
                   targetOrigin={{horizontal: 'left', vertical: 'top'}}
                   >
@@ -923,25 +877,56 @@ class ListTable extends Component {
         }
         </Drawer>
         <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
-        <div className='row vertical-center' style={{margin: '10px 0'}}>
-          <Tags listId={props.listId}/>
+        <div className='vertical-center' style={{margin: '10px 0', justifyContent: 'space-between'}}>
+          <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
+          <PaginateControls
+          containerClassName='vertical-center'
+          currentPage={state.currentPage}
+          pageSize={state.pageSize}
+          onPageSizeChange={pageSize => this.setState({pageSize, currentPage: 1})} 
+          listLength={props.contacts.length}
+          onPrev={currentPage => this.setState({currentPage})}
+          onNext={currentPage => this.setState({currentPage})}
+          />
         </div>
         <div>
-        <div>
-        {!isEmpty(props.listData.contacts) && props.contacts &&
-          <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
-        </div>
-      {isEmpty(props.listData.contacts) &&
-        <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
-      {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&
-        <ScrollSync>
-        {({onScroll, scrollLeft}) =>
           <div>
-            <div id='HeaderGridContainerId' className='HeaderGridContainer'>
+          {!isEmpty(props.listData.contacts) && props.contacts &&
+            <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
+          </div>
+        {isEmpty(props.listData.contacts) &&
+          <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
+        {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&
+          <ScrollSync>
+          {({onScroll, scrollLeft}) =>
+            <div>
+              <div id='HeaderGridContainerId' className='HeaderGridContainer'>
+                <Grid
+                ref={ref => this.setHeaderGridRef(ref)}
+                className='HeaderGrid'
+                cellRenderer={this.headerRenderer}
+                columnCount={props.fieldsmap.length}
+                columnWidth={({index}) => {
+                  const wid = state.columnWidths[index];
+                  if (!wid) {
+                    this.clearColumnStorage();
+                    return 70;
+                  }
+                  return wid + 10;
+                }}
+                height={45}
+                autoContainerWidth
+                width={state.screenWidth}
+                rowCount={1}
+                rowHeight={32}
+                scrollLeft={scrollLeft}
+                overscanColumnCount={3}
+                />
+              </div>
               <Grid
-              ref={ref => this.setHeaderGridRef(ref)}
-              className='HeaderGrid'
-              cellRenderer={this.headerRenderer}
+              ref={ref => this.setDataGridRef(ref)}
+              className='BodyGrid'
+              cellRenderer={this.cellRenderer}
               columnCount={props.fieldsmap.length}
               columnWidth={({index}) => {
                 const wid = state.columnWidths[index];
@@ -951,40 +936,18 @@ class ListTable extends Component {
                 }
                 return wid + 10;
               }}
-              height={45}
-              autoContainerWidth
+              overscanRowCount={10}
+              height={state.leftoverHeight || 500}
               width={state.screenWidth}
-              rowCount={1}
-              rowHeight={32}
-              scrollLeft={scrollLeft}
-              overscanColumnCount={3}
+              rowCount={state.pageSize === -1 || props.received.length < state.pageSize ? props.received.length : state.pageSize}
+              rowHeight={30}
+              onScroll={onScroll}
+              scrollToRow={state.scrollToRow}
               />
-            </div>
-            <Grid
-            ref={ref => this.setDataGridRef(ref)}
-            className='BodyGrid'
-            cellRenderer={this.cellRenderer}
-            columnCount={props.fieldsmap.length}
-            columnWidth={({index}) => {
-              const wid = state.columnWidths[index];
-              if (!wid) {
-                this.clearColumnStorage();
-                return 70;
-              }
-              return wid + 10;
-            }}
-            overscanRowCount={10}
-            height={state.leftoverHeight || 500}
-            width={state.screenWidth}
-            rowCount={props.received.length}
-            rowHeight={30}
-            onScroll={onScroll}
-            scrollToRow={state.scrollToRow}
-            />
-          </div>}
-        </ScrollSync>}
-      </div>
-    </div>);
+            </div>}
+          </ScrollSync>}
+        </div>
+      </div>);
   }
 }
 
@@ -1013,9 +976,6 @@ const styles = {
     top: 80,
     right: 10,
     position: 'fixed'
-  },
-  iconBtn: {
-    color: grey500
   },
   profileIcon: {fontSize: '0.9em', padding: '0 1px', margin: '0 5px'},
 };
