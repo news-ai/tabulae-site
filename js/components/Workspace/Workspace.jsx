@@ -303,7 +303,7 @@ class Workspace extends Component {
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
-            subjectParams={{allowGeneralizedProperties: true}}
+            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 50}}}
             controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
             onBodyChange={this.onBodyChange}

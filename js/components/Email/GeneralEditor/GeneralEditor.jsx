@@ -704,6 +704,8 @@ class GeneralEditor extends React.Component {
         className += ' RichEditor-hidePlaceholder';
       }
     }
+    let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
+    if (props.allowToolbarDisappearOnBlur) controlsStyle.display = state.editorState.getSelection().getHasFocus() ? 'flex' : 'none';
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -737,14 +739,7 @@ class GeneralEditor extends React.Component {
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked} />
       {props.controlsPosition === 'top' &&
-        <Paper
-        zDepth={1}
-        className='row vertical-center clearfix'
-        style={props.controlsStyle ? Object.assign({},
-          defaultControlsStyle,
-          props.controlsStyle,
-          {display: state.editorState.getSelection().getHasFocus() ? 'flex' : 'none'}): defaultControlsStyle}
-        >
+        <Paper zDepth={1} className='vertical-center' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -821,11 +816,7 @@ class GeneralEditor extends React.Component {
           </div>
         </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
-        <Paper
-        zDepth={1}
-        className='row vertical-center clearfix'
-        style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
-        >
+        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
