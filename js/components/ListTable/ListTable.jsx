@@ -678,9 +678,12 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    // console.log(props.listData);
-    // console.log(!!props.listData.contacts);
-    // console.log(!!props.contacts);
+    // console.log(props.listData.contacts.length);
+
+    let total = Math.floor(props.received.length / this.state.pageSize);
+    if (props.received.length % this.state.pageSize !== 0) total += 1;
+    let rowCount = this.state.currentPage < total ? this.state.pageSize : props.received.length % this.state.pageSize;
+    if (this.state.pageSize === -1) rowCount = props.received.length;
     return (
       <div style={styles.container}>
         {
@@ -939,7 +942,7 @@ class ListTable extends Component {
               overscanRowCount={10}
               height={state.leftoverHeight || 500}
               width={state.screenWidth}
-              rowCount={state.pageSize === -1 || props.received.length < state.pageSize ? props.received.length : state.pageSize}
+              rowCount={rowCount}
               rowHeight={30}
               onScroll={onScroll}
               scrollToRow={state.scrollToRow}
