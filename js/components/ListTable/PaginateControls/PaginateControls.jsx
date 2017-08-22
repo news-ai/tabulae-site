@@ -50,6 +50,7 @@ class PaginationLabelContainer extends Component {
         onRequestClose={this.handleRequestClose}
         >
           <PlainSelect value={pageSize} onChange={e => onPageSizeChange(parseInt(e.target.value, 10))} >
+            <option value={5}>5</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
             <option value={200}>200</option>
