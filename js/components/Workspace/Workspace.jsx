@@ -104,14 +104,18 @@ class Workspace extends Component {
 
   onClearEditor() {
     this.setState({
-      subject: '', // original
+      subject: 'clear', // original
       mutatingSubject: '', // editted
       subjectContentState: '', // current contentstate
-      body: '',
+      body: 'clear',
       mutatingBody: '',
       bodyContentState: '',
       useExisting: false,
       currentTemplateId: null
+    },
+    _ => {
+      // Hack!! add something to editor then clearing it to triggle in componentWillReceiveProps
+      this.setState({subject: '', body: ''});
     });
   }
 
@@ -291,7 +295,6 @@ class Workspace extends Component {
             justifyContent: 'center',
             // backgroundColor: 'blue'
           }} >
-
             <GeneralEditor
             onEditMode
             allowReplacement
@@ -303,7 +306,7 @@ class Workspace extends Component {
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
-            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 50}}}
+            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 60}}}
             controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
             onBodyChange={this.onBodyChange}
