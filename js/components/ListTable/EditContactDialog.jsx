@@ -20,7 +20,7 @@ import isURL from 'validator/lib/isURL';
 import {fromJS} from 'immutable';
 import {grey400, blue700} from 'material-ui/styles/colors';
 import find from 'lodash/find';
-import alertify from 'utils/alertify';
+import alertify from 'alertifyjs';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -54,6 +54,9 @@ const _getPublicationName = (contact, reducer) => {
 
 const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
 
+alertify.promisifyConfirm = (title, description) => new Promise((resolve, reject) => {
+  alertify.confirm(title, description, resolve, reject);
+});
 
 class EditContactDialog extends Component {
   constructor(props) {

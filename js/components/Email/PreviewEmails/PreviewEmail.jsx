@@ -8,7 +8,6 @@ import * as stagingActions from '../actions';
 import FontIcon from 'material-ui/FontIcon';
 import {_getter} from 'components/ListTable/helpers';
 import replaceAll from 'components/Email/EmailPanel/utils/replaceAll';
-import {convertToRaw} from 'draft-js';
 
 const styles = {
   contentBox: {
@@ -50,18 +49,19 @@ class PreviewEmail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      subject: this.props.subject,
-      mutatingSubject: '', // editted
-      subjectContentState: '', // current contentstate
       bodyHtml: this.props.body,
       rawBodyContentState: undefined,
+      subjectHtml: this.props.subject,
       onEditMode: false
     };
     this.updateBodyHtml = (html, raw) => {
       // console.log(html);
       this.setState({body: html, rawBodyContentState: raw});
     };
-    this.onSubjectChange = this.onSubjectChange.bind(this);
+    this.onSubjectChange = (editorState) => {
+      const subject = editorState.getCurrentContent().getBlocksAsArray()[0].getText();
+      this.setState({subject});
+    };
     this.toggleEditMode = _ => this.setState({onEditMode: true});
     this.onSave = this._onSave.bind(this);
     this.onCancel = _ => {
@@ -72,39 +72,15 @@ class PreviewEmail extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.body !== nextProps.body || this.props.subject !== nextProps.subject) {
-      this.setState({bodyHtml: nextProps.body, subject: nextProps.subject});
+    if (this.props.body !== nextProps.body) {
+      this.setState({bodyHtml: nextProps.body, subjectHtml: nextProps.subject});
     }
-  }
-
-  onSubjectChange(contentState) {
-    const subjectContent = contentState;
-    const subjectBlock = contentState.getBlocksAsArray()[0];
-    const subject = subjectBlock.getText();
-    let mutatingSubject = '';
-    let lastOffset = 0;
-    subjectBlock.findEntityRanges(
-      (character) => {
-        const entityKey = character.getEntity();
-        if (entityKey === null) return false;
-        return (contentState.getEntity(entityKey).getType() === 'PROPERTY');
-      },
-      (start, end) => {
-        const {property} = subjectContent.getEntity(subjectBlock.getEntityAt(start)).getData();
-        mutatingSubject += (subject.slice(lastOffset, start) + `<%= ${property} %>`);
-        lastOffset = end;
-      });
-    mutatingSubject += subject.slice(lastOffset, subject.length);
-    const subjectContentState = convertToRaw(subjectContent);
-    console.log(mutatingSubject);
-
-    this.setState({mutatingSubject, subjectContentState});
   }
 
   _onSave() {
     const props = this.props;
     const state = this.state;
-    let subject = state.mutatingSubject || props.subject;
+    let subject = state.subject || props.subject;
     let body = state.body || props.body;
     subject = replaceAll(subject, props.contact, props.fieldsmap).html;
     body = replaceAll(body, props.contact, props.fieldsmap).html;
@@ -159,7 +135,7 @@ class PreviewEmail extends Component {
             width={600}
             onEditMode={state.onEditMode}
             rawBodyContentState={state.rawBodyContentState}
-            subjectHtml={state.subject}
+            subjectHtml={state.subjectHtml}
             onBodyChange={this.updateBodyHtml}
             onSubjectChange={this.onSubjectChange}
             debounce={500}
