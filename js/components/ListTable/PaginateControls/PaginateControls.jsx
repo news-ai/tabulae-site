@@ -36,8 +36,10 @@ class PaginationLabelContainer extends Component {
   }
   render() {
     const {currentPage, listLength, pageSize, onPageSizeChange} = this.props;
-    let total = Math.floor(listLength / pageSize) || 1;
+    let total = Math.floor(listLength / pageSize);
+    if (listLength % pageSize !== 0) total += 1;
     if (pageSize === -1) total = 1;
+
     return (
       <div>
         <Popover
@@ -62,6 +64,9 @@ class PaginationLabelContainer extends Component {
 
 
 const PaginateControls = ({containerClassName, currentPage, pageSize, listLength, onPrev, onNext, onPageSizeChange}) => {
+  let total = Math.floor(listLength / pageSize);
+  if (listLength % pageSize !== 0) total += 1;
+  if (pageSize === -1) total = 1;
   return (
     <div className={containerClassName} >
       <PaginationHandle
@@ -77,8 +82,8 @@ const PaginateControls = ({containerClassName, currentPage, pageSize, listLength
       />
       <PaginationHandle
       className='fa fa-chevron-right'
-      disabled={currentPage + 1 > Math.floor(listLength / pageSize) || pageSize === -1}
-      onClick={e => pageSize !== -1 && currentPage + 1 <= Math.floor(listLength / pageSize) && onNext(currentPage + 1)}
+      disabled={currentPage + 1 > total || pageSize === -1}
+      onClick={e => pageSize !== -1 && currentPage + 1 <= total && onNext(currentPage + 1)}
       />
     </div>
     );
