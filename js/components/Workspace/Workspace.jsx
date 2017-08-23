@@ -10,7 +10,7 @@ import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'utils/alertify';
-import {blueGrey50, blueGrey100, blue500, blueGrey400} from 'material-ui/styles/colors';
+import {blueGrey50, blueGrey100, blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -32,16 +32,34 @@ const Menu = styled.ul`
   max-height: 200px;
   overflow: hidden;
   overflow-y: scroll;
+  border-bottom: 1px solid lightgrey;
 `;
 
 const MenuItem = styled.li`
   list-style: none;
   width: 100%;
-  padding: 5px;
+  padding: 7px;
   cursor: pointer;
   font-size: 0.9em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   &:hover {
-    background-color: ${blueGrey100};
+    border: 3px solid ${blueGrey100};
+    padding: 4px;
+  }
+`;
+
+const RemoveButton = styled.i.attrs({
+  className: props => props.className
+})`
+  color: ${blueGrey400};
+  padding: 5px;
+  margin-right: 10px;
+  &:hover {
+    color: ${blueGrey800};
+    border: 1px solid ${blueGrey800};
+    padding: 4px;
   }
 `;
 
@@ -68,8 +86,8 @@ class Workspace extends Component {
     const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     let height = Math.floor(screenHeight - DEFAULT_PADDING);
     if (height < MIN_HEIGHT) height = MIN_HEIGHT; // set some minimal height
-    console.log(screenWidth)
-    console.log(screenHeight);
+    // console.log(screenWidth)
+    // console.log(screenHeight);
     this.state = {
       subject: '', // original
       mutatingSubject: '', // editted
@@ -92,6 +110,7 @@ class Workspace extends Component {
     this.onClearEditor = this.onClearEditor.bind(this);
     this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
+    this.onDeleteTemplateClick = this.onDeleteTemplateClick.bind(this);
 
     // window.onresize = _ => {
     //   const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -197,6 +216,10 @@ class Workspace extends Component {
       );
   }
 
+  onDeleteTemplateClick(templateId) {
+    this.props.toggleArchiveTemplate(templateId);
+  }
+
   render() {
     const state = this.state;
     const props = this.props;
@@ -204,14 +227,14 @@ class Workspace extends Component {
     const options = props.templates
     .filter((template) => !(isJSON(template.body) && JSON.parse(template.body).date))
     .map((template, i) =>
-      <MenuItem
-      key={template.id}
-      onClick={_ => {
-        this.handleTemplateChange(template.id);
-        this.setState({open: false});
-      }}
-      >
-      {template.name.length > 0 ? template.name : template.subject}
+      <MenuItem key={template.id}>
+        <span
+        onClick={_ => {
+          this.handleTemplateChange(template.id);
+          this.setState({open: false});
+        }}
+        >{template.name.length > 0 ? template.name : template.subject}</span>
+        <RemoveButton onClick={_ => this.onDeleteTemplateClick(template.id)} className='fa fa-times' />
       </MenuItem>
       );
     const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
@@ -369,5 +392,6 @@ export default connect(
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),
     saveCurrentTemplate: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
+    toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
   })
   )(Workspace);
