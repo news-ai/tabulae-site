@@ -96,20 +96,19 @@ class AddContactHOC extends Component {
     if (this.state.tags.length > 0) {
       contactBody.tags = this.state.tags.map(tag => tag.text);
     }
-    console.log(contactBody);
 
-    // this.props.addContacts([contactBody])
-    // .then(contacts => {
-    //   const ids = contacts.map(contact => contact.id);
-    //   ids.map(id => this.handleRSSTextarea(id));
-    //   const listBody = {
-    //     listId: list.id,
-    //     name: list.name,
-    //     contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
-    //   };
-    //   this.props.patchList(listBody);
-    //   this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
-    // });
+    this.props.addContacts([contactBody])
+    .then(contacts => {
+      const ids = contacts.map(contact => contact.id);
+      ids.map(id => this.handleRSSTextarea(id));
+      const listBody = {
+        listId: list.id,
+        name: list.name,
+        contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
+      };
+      this.props.patchList(listBody);
+      this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
+    });
   }
 
   _onChange(name, value, validator) {
@@ -318,11 +317,33 @@ class AddContactHOC extends Component {
             </div>))}
             <div className='large-12 medium-12 small-12 columns vertical-center'>
               <Label>Publication</Label>
-              <div style={{marginLeft: 10}} >
+            {/*
+              <div>
                 <Autocomplete
                 onInputUpdate={this.updateAutoInput}
                 options={props.publicationAutocompleteCache}
                 onOptionSelect={pub1input => this.setState({pub1input})}
+                />
+              </div>
+            */}
+            {/*
+              <AutoComplete
+              id='pub1input'
+              style={textfieldStyle}
+              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+              onUpdateInput={this.updateAutoInput}
+              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
+              openOnFocus
+              dataSource={state.employerAutocompleteList}
+              />
+            */}
+              <div style={{width: 200, marginLeft: 15}} >
+                <Select.Async
+                name='pub1input'
+                loadOptions={this.getPublicationOptions}
+                labelKey='value'
+                value={{value: state.pub1input}}
+                onChange={({value}) => this.setState({pub1input: value})}
                 />
               </div>
           {props.publicationIsReceiving &&
@@ -330,7 +351,13 @@ class AddContactHOC extends Component {
             </div>
             <div className='large-12 medium-12 small-12 columns vertical-center'>
             {!state.addPublicationPanelOpen &&
-              <div style={{fontSize: '0.8em', marginTop: 5, marginLeft: 5}}>Don't see a publication you need? <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one here.</span></div>}
+              <div style={{fontSize: '0.8em', marginTop: 5, marginLeft: 5}}>
+                <span>Don't see a publication you need? </span>
+                <span
+                className='pointer'
+                onClick={_ => this.setState({addPublicationPanelOpen: true})}
+                >Add one here.</span>
+                </div>}
               <Collapse isOpened={state.addPublicationPanelOpen}>
                 <PublicationFormStateful
                 onHide={_ => this.setState({addPublicationPanelOpen: false})}
