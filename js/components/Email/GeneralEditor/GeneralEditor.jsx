@@ -789,6 +789,7 @@ class GeneralEditor extends React.Component {
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
         fieldsmap={props.fieldsmap}
+        rawSubjectContentState={props.rawSubjectContentState}
         />}
         <BodyEditorContainer width={props.width} height={props.height} >
           <div className={className} onClick={this.focus}>

@@ -48,7 +48,9 @@ class Subject extends Component {
     ]);
 
     this.state = {
-      editorState: EditorState.createEmpty(decorator),
+      editorState: this.props.rawSubjectContentState ?
+      EditorState.createWithContent(convertFromRaw(this.props.rawSubjectContentState), decorator) :
+      EditorState.createEmpty(decorator),
       subjectString: null,
       subjectLength: 0,
       variableMenuOpen: false,

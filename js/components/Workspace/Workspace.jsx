@@ -251,8 +251,8 @@ class Workspace extends Component {
               flexDirection: 'column',
               order: 1
             }} >
-              <div style={{marginTop: 50}} >
-                <div style={{display: 'flex', marginBottom: 15}} >
+              <div style={{marginTop: 40}} >
+                <div style={{display: 'flex', marginBottom: 10}} >
                   <span
                   onClick={_ => this.setState({mode: 'writing'})}
                   className='smalltext pointer'
@@ -334,6 +334,7 @@ class Workspace extends Component {
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
+            rawSubjectContentState={state.subjectContentState}
             subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 60, marginBottom: 15}}}
             controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
