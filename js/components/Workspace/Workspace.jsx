@@ -10,7 +10,7 @@ import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'utils/alertify';
-import {blueGrey50, blueGrey100, blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
+import {blue50, blue200, blueGrey50, blueGrey100, blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -234,7 +234,7 @@ class Workspace extends Component {
           this.setState({open: false});
         }}
         >{template.name.length > 0 ? template.name : template.subject}</span>
-        <RemoveButton onClick={_ => this.onDeleteTemplateClick(template.id)} className='fa fa-times' />
+        <RemoveButton onClick={_ => this.onDeleteTemplateClick(template.id)} className='fa fa-trash' />
       </MenuItem>
       );
     const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
@@ -281,7 +281,8 @@ class Workspace extends Component {
                   className='smalltext pointer'
                   style={{
                     flex: 1,
-                    border: state.mode === 'writing' && '1px solid blue',
+                    backgroundColor: state.mode === 'writing' && blue50,
+                    border: state.mode === 'writing' && `1px solid ${blue200}`,
                     textAlign: 'center'
                   }}>Writing Mode</span>
                   <span
@@ -289,7 +290,8 @@ class Workspace extends Component {
                   className='smalltext pointer'
                   style={{
                     flex: 1,
-                    border: state.mode === 'preview' && '1px solid blue',
+                    backgroundColor: state.mode === 'preview' && blue50,
+                    border: state.mode === 'preview' && `1px solid ${blue200}`,
                     textAlign: 'center'
                   }}>Preview</span>
                 </div>
@@ -297,9 +299,9 @@ class Workspace extends Component {
                 label='Load Existing'
                 style={{marginBottom: 5, width: '100%'}}
                 backgroundColor={blue500}
-                labelStyle={{textTransform: 'none', color: '#ffffff'}}
-                labelPosition='after'
-                icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-minus-square-o' : 'fa fa-plus-square-o'} />}
+                labelColor='#ffffff'
+                labelStyle={{textTransform: 'none'}}
+                icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up'} />}
                 onTouchTap={e => this.setState({open: !state.open})}
                 />
                 <Collapse isOpened={state.open}>
@@ -314,7 +316,7 @@ class Workspace extends Component {
                   <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
                 </ItemContainer>
                 <RaisedButton
-                primary
+                backgroundColor={blue500}
                 style={{marginBottom: 5, width: '100%'}}
                 disabled={!state.useExisting}
                 label='Save'
@@ -322,9 +324,10 @@ class Workspace extends Component {
                 onTouchTap={this.onSaveCurrentTemplateClick}
                 />
                 <RaisedButton
-                primary
+                backgroundColor={blue500}
                 style={{marginBottom: 5, width: '100%'}}
                 label='Save New...'
+                labelColor='#ffffff'
                 labelStyle={{textTransform: 'none'}}
                 onTouchTap={this.onSaveNewTemplateClick}
                 />
@@ -332,6 +335,7 @@ class Workspace extends Component {
                 secondary
                 style={{marginBottom: 5, width: '100%'}}
                 label='Clear Editor'
+                labelColor='#ffffff'
                 labelStyle={{textTransform: 'none'}}
                 onTouchTap={this.onClearEditor}
                 />
