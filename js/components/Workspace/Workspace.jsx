@@ -218,55 +218,58 @@ class Workspace extends Component {
     return (
       <div>
         <div style={{
-          backgroundColor: 'red',
-          padding: 5,
-          position: 'absolute',
-          right: 10,
-          zIndex: 200
-        }}>
-          <FontIcon
-          onClick={_ => this.setState({showToolbar: !state.showToolbar})}
-          className={`pointer fa fa-angle-double-${state.showToolbar ? 'up' : 'down'} fa-2x`}
-          />
-        </div>
-        <div style={{
           // border: '1px solid blue',
           display: 'flex',
           // justifyContent: 'space-around',
-          marginTop: 10
-        }} >
+          paddingTop: 15
+        }}>
+          <div style={{padding: 5, zIndex: 200, order: -1, position: 'fixed'}}>
+            <i
+            onClick={_ => this.setState({showToolbar: !state.showToolbar})}
+            className={`pointer fa fa-angle-double-${state.showToolbar ? 'left' : 'right'}`}
+            />
+            <span
+            onClick={_ => this.setState({showToolbar: !state.showToolbar})}
+            className='smalltext pointer'
+            style={{marginLeft: 5, userSelect: 'none'}}
+            >{state.showToolbar ? 'Hide Tools' : 'Show Tools'}</span>
+          </div>
           <div style={{
             display: state.showToolbar ? 'flex' : 'none',
             flexGrow: 1,
             flexBasis: 170,
-            maxWidth: 250,
+            maxWidth: 200,
             order: -1,
-            // backgroundColor: 'red',
-          }} >
+            zIndex: 100
+          }}>
+          {state.showToolbar &&
             <Paper zDepth={2} style={{
-              textAlign: 'center',
+              // textAlign: 'center',
               height: 600,
               position: 'fixed',
               display: 'flex',
               flexDirection: 'column',
+              order: 1
             }} >
-              <div>
-                <div style={{display: 'flex'}} >
+              <div style={{marginTop: 50}} >
+                <div style={{display: 'flex', marginBottom: 15}} >
                   <span
                   onClick={_ => this.setState({mode: 'writing'})}
-                  className='text pointer'
-                  style={{flex: 1, padding: '3px 0', border: state.mode === 'writing' && '1px solid blue'}}
-                  >Writing Mode</span>
+                  className='smalltext pointer'
+                  style={{
+                    flex: 1,
+                    border: state.mode === 'writing' && '1px solid blue',
+                    textAlign: 'center'
+                  }}>Writing Mode</span>
                   <span
                   onClick={_ => this.setState({mode: 'preview'})}
-                  className='text pointer'
-                  style={{flex: 1, padding: '3px 0', border: state.mode === 'preview' && '1px solid blue'}}
-                  >Preview</span>
+                  className='smalltext pointer'
+                  style={{
+                    flex: 1,
+                    border: state.mode === 'preview' && '1px solid blue',
+                    textAlign: 'center'
+                  }}>Preview</span>
                 </div>
-                <ItemContainer>
-                {!!state.currentTemplateId &&
-                  <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
-                </ItemContainer>
                 <RaisedButton
                 label='Load Existing'
                 style={{marginBottom: 5, width: '100%'}}
@@ -283,6 +286,10 @@ class Workspace extends Component {
                 </Collapse>
               </div>
               <div style={{marginTop: 'auto'}} >
+                <ItemContainer>
+                {!!state.currentTemplateId &&
+                  <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
+                </ItemContainer>
                 <RaisedButton
                 primary
                 style={{marginBottom: 5, width: '100%'}}
@@ -306,13 +313,13 @@ class Workspace extends Component {
                 onTouchTap={this.onClearEditor}
                 />
               </div>
-            </Paper>
+            </Paper>}
           </div>
           <div style={{
             display: 'flex',
             flexGrow: 2,
             justifyContent: 'center',
-            // backgroundColor: 'blue'
+            order: 1,
           }} >
           {state.mode === 'writing' &&
            <GeneralEditor
@@ -327,7 +334,7 @@ class Workspace extends Component {
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
-            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 60}}}
+            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 60, marginBottom: 15}}}
             controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
             onBodyChange={this.onBodyChange}
@@ -336,11 +343,16 @@ class Workspace extends Component {
             extendStyleMap={customFontSizes}
             />}
           {state.mode === 'preview' &&
-            <div>
-              <div style={{width: state.width}} dangerouslySetInnerHTML={createMarkUp(state.mutatingSubject)} />
-              <div style={{width: state.width}} dangerouslySetInnerHTML={createMarkUp(state.mutatingBody)} />
-            </div>
-          }
+            <div style={{marginTop: 60}} >
+              <div
+              style={{width: state.width, borderBottom: '2px solid gray', paddingBottom: 10, marginBottom: 10}}
+              dangerouslySetInnerHTML={createMarkUp(state.mutatingSubject)}
+              />
+              <div
+              style={{width: state.width}}
+              dangerouslySetInnerHTML={createMarkUp(state.mutatingBody)}
+              />
+            </div>}
           </div>
         </div>
       </div>
