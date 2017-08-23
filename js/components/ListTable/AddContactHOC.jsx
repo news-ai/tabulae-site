@@ -9,17 +9,21 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import AutoComplete from 'material-ui/AutoComplete';
+// import AutoComplete from 'material-ui/AutoComplete';
+import Autocomplete from './Autocomplete';
 // import Textarea from 'react-textarea-autosize';
 import TextareaAutosize from 'react-autosize-textarea';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.jsx';
 import ValidationHOC from 'components/ValidationHOC';
+import Select from 'react-select';
 import {WithContext as ReactTags} from 'react-tag-input';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {yellow50, grey400} from 'material-ui/styles/colors';
+import styled from 'styled-components';
+import debounce from 'es6-promise-debounce';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -42,6 +46,11 @@ function createParser(url) {
   return parser;
 }
 
+const Label = styled.span`
+  white-space: nowrap;
+  font-size: 0.9em;
+`;
+
 class AddContactHOC extends Component {
   constructor(props) {
     super(props);
@@ -61,6 +70,7 @@ class AddContactHOC extends Component {
     this.handleAddition = this._handleAddition.bind(this);
     this.handleDelete = this._handleDelete.bind(this);
     this.handleDrag = this._handleDrag.bind(this);
+    this.getPublicationOptions = debounce(this.getPublicationOptions.bind(this), 750);
   }
 
   _onSubmit() {
@@ -86,19 +96,20 @@ class AddContactHOC extends Component {
     if (this.state.tags.length > 0) {
       contactBody.tags = this.state.tags.map(tag => tag.text);
     }
+    console.log(contactBody);
 
-    this.props.addContacts([contactBody])
-    .then(contacts => {
-      const ids = contacts.map(contact => contact.id);
-      ids.map(id => this.handleRSSTextarea(id));
-      const listBody = {
-        listId: list.id,
-        name: list.name,
-        contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
-      };
-      this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
-    });
+    // this.props.addContacts([contactBody])
+    // .then(contacts => {
+    //   const ids = contacts.map(contact => contact.id);
+    //   ids.map(id => this.handleRSSTextarea(id));
+    //   const listBody = {
+    //     listId: list.id,
+    //     name: list.name,
+    //     contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
+    //   };
+    //   this.props.patchList(listBody);
+    //   this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
+    // });
   }
 
   _onChange(name, value, validator) {
@@ -108,13 +119,27 @@ class AddContactHOC extends Component {
     });
   }
 
-  _updateAutoInput(val) {
-    if (val.length > 0) this.props.requestPublication();
-    this.setState({pub1input: val}, _ => {
-      this.props.searchPublications(this.state.pub1input)
-      .then(response => this.setState({
-        employerAutocompleteList: response,
-      }));
+  // _updateAutoInput(val) {
+  //   if (val.length > 0) this.props.requestPublication();
+  //   this.setState({pub1input: val}, _ => {
+  //     this.props.searchPublications(this.state.pub1input)
+  //     .then(response => this.setState({
+  //       employerAutocompleteList: response,
+  //     }));
+  //   });
+  // }
+
+  _updateAutoInput(val, dataSource, params) {
+    this.props.searchPublicationEpic(val);
+    this.setState({pub1input: val});
+  }
+
+  getPublicationOptions(value, cb) {
+    if (value.length > 0) this.props.requestPublication();
+    return this.props.searchPublications(value)
+    .then(response => {
+      // console.log(response);
+      cb(null, {options: response.map(name => ({value: name}))});
     });
   }
 
@@ -180,7 +205,7 @@ class AddContactHOC extends Component {
           <FontIcon className={'fa fa-spinner fa-spin'} />}
           <div className='row' style={{marginTop: 20}}>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span style={{whiteSpace: 'nowrap'}}>First Name</span>
+              <Label>First Name</Label>
               <TextField
               style={textfieldStyle}
               value={state.contactBody.firstname || ''}
@@ -189,7 +214,7 @@ class AddContactHOC extends Component {
               />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span style={{whiteSpace: 'nowrap'}}>Last Name</span>
+              <Label>Last Name</Label>
               <TextField
               style={textfieldStyle}
               value={state.contactBody.lastname || ''}
@@ -198,7 +223,7 @@ class AddContactHOC extends Component {
               />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Email</span>
+              <Label>Email</Label>
               <ValidationHOC rules={[{
                 validator: val => !props.contacts.some(({email}) => email === val),
                 errorMessage: 'Email already exists on this List.'
@@ -217,7 +242,7 @@ class AddContactHOC extends Component {
               </ValidationHOC>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Twitter</span>
+              <Label>Twitter</Label>
               <TextField
               hintText='adding will populate the feed'
               style={textfieldStyle}
@@ -239,7 +264,7 @@ class AddContactHOC extends Component {
               />
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Instagram</span>
+              <Label>Instagram</Label>
               <TextField
               hintText='adding will populate the feed'
               style={textfieldStyle}
@@ -261,27 +286,27 @@ class AddContactHOC extends Component {
                 )}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>LinkedIn</span>
+              <Label>LinkedIn</Label>
               <TextField style={textfieldStyle} value={state.contactBody.linkedin || ''} name='linkedin' onChange={e => this.onChange('linkedin', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Phone #</span>
+              <Label>Phone #</Label>
               <TextField style={textfieldStyle} value={state.contactBody.phonenumber || ''} name='phonenumber' onChange={e => this.onChange('phonenumber', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Location</span>
+              <Label>Location</Label>
               <TextField style={textfieldStyle} value={state.contactBody.location || ''} name='notes' onChange={e => this.onChange('location', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Blog</span>
+              <Label>Blog</Label>
               <TextField style={textfieldStyle} value={state.contactBody.blog || ''} name='blog' onChange={e => this.onChange('blog', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Website</span>
+              <Label>Website</Label>
               <TextField style={textfieldStyle} value={state.contactBody.website || ''} name='website' onChange={e => this.onChange('website', e.target.value)}/>
             </div>
             <div className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>Notes</span>
+              <Label>Notes</Label>
               <TextField style={textfieldStyle} value={state.contactBody.notes || ''} name='notes' onChange={e => this.onChange('notes', e.target.value)}/>
             </div>
         {props.list && props.list.fieldsmap !== null &&
@@ -289,25 +314,23 @@ class AddContactHOC extends Component {
           .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
           .map((fieldObj, i) => fieldObj.customfield && (
             <div key={i} className='large-6 medium-12 small-12 columns vertical-center'>
-              <span>{fieldObj.name}</span><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
+              <Label>{fieldObj.name}</Label><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
             </div>))}
             <div className='large-12 medium-12 small-12 columns vertical-center'>
-              <span style={{whiteSpace: 'nowrap'}}>Publication</span>
-              <AutoComplete
-              id='pub1input'
-              style={textfieldStyle}
-              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            {props.publicationIsReceiving &&
-              <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>}
+              <Label>Publication</Label>
+              <div style={{marginLeft: 10}} >
+                <Autocomplete
+                onInputUpdate={this.updateAutoInput}
+                options={props.publicationAutocompleteCache}
+                onOptionSelect={pub1input => this.setState({pub1input})}
+                />
+              </div>
+          {props.publicationIsReceiving &&
+              <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin' />}
             </div>
             <div className='large-12 medium-12 small-12 columns vertical-center'>
-            {state.pub1input.length > 0 && !props.publicationReducer[state.pub1input] && !props.publicationIsReceiving && !state.addPublicationPanelOpen &&
-              <div style={{fontSize: '0.9em'}}>No publication found. <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one?</span></div>}
+            {!state.addPublicationPanelOpen &&
+              <div style={{fontSize: '0.8em', marginTop: 5, marginLeft: 5}}>Don't see a publication you need? <span className='pointer' onClick={_ => this.setState({addPublicationPanelOpen: true})}>Add one here.</span></div>}
               <Collapse isOpened={state.addPublicationPanelOpen}>
                 <PublicationFormStateful
                 onHide={_ => this.setState({addPublicationPanelOpen: false})}
@@ -316,7 +339,7 @@ class AddContactHOC extends Component {
               </Collapse>
             </div>
             <div className='large-12 medium-12 small-12 columns vertical-center'>
-              <span>Tags</span>
+              <Label>Tags</Label>
               <div style={{margin: '10px 15px'}} >
                 <ReactTags
                 tags={state.tags}
@@ -327,7 +350,7 @@ class AddContactHOC extends Component {
                 />
               </div>
             </div>
-            <div className='panel' style={{
+            <div style={{
               backgroundColor: yellow50,
               margin: 10,
               padding: 10
@@ -361,6 +384,7 @@ const mapStateToProps = (state, props) => {
     list: state.listReducer[props.listId],
     publicationReducer: state.publicationReducer,
     publicationIsReceiving: state.publicationReducer.isReceiving,
+    publicationAutocompleteCache: state.publicationReducer.searchCache.map(id => state.publicationReducer[id].name),
   };
 };
 
@@ -372,6 +396,7 @@ const mapDispatchToProps = (dispatch, props) => {
     createPublicationThenPatchContact: (contactId, pubName, which) => dispatch(publicationActions.createPublicationThenPatchContact(contactId, pubName, which)),
     addFeeds: (contactId, feeds) => Promise.all(feeds.map(feed => dispatch(feedActions.addFeed(contactId, props.listId, feed)))),
     requestPublication: () => dispatch(publicationActions.requestPublication()),
+    searchPublicationEpic: query => dispatch({type: 'SEARCH_PUBLICATION_REQUEST', query})
   };
 };
 

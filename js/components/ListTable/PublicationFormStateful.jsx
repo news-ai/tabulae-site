@@ -26,11 +26,12 @@ class PublicationFormStateful extends Component {
         onClick={props.onHide}
         style={{
           right: 5,
-          fontSize: '0.9em',
+          fontSize: '0.7em',
           color: grey700,
-          position: 'absolute'
-        }}>Close</span>
-        <div className='vertical-center'>
+          position: 'absolute',
+          margin: 5
+        }}>CLOSE</span>
+        <div className='vertical-center' style={{marginTop: 5}} >
           <TextField
           hintStyle={{color: blue800}}
           underlineStyle={{color: blue800}}

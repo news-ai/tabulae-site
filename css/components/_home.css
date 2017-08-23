@@ -188,3 +188,8 @@ input {
 .Select.is-open {
   z-index: 100;
 }
+
+.Select-input > input {
+  color: black;
+}
+
