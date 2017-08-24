@@ -38,6 +38,7 @@ import {
 } from 'components/Email/EmailPanel/utils/renderers';
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
+import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtils/stripSelectedInlineTagBlocks';
 
 import Menu from 'material-ui/Menu';
@@ -71,14 +72,6 @@ import ValidationHOC from 'components/ValidationHOC';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email by clicking on "Insert Property" or "+" icon in Subject, Body, or Toolbar.';
-
-import linkifyIt from 'linkify-it';
-import tlds from 'tlds';
-
-const linkify = linkifyIt();
-linkify
-.tlds(tlds)
-.set({fuzzyLink: false});
 
 const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
 
@@ -226,8 +219,6 @@ class BasicHtmlEditor extends Component {
     this.handleDrop = this._handleDrop.bind(this);
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
-    this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
-    this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
 
     // cleanups
@@ -267,7 +258,12 @@ class BasicHtmlEditor extends Component {
             focusKey: blocks.last().getKey(),
             focusOffset: blocks.last().getLength()
           });
-        newContent = this.appendToCurrentContentState(oldContent, newContent);
+
+        // build newContentState with current ContentState and newContent to be appended
+        let mergedBlocks = [];
+        oldContent.getBlockMap().forEach(block => mergedBlocks.push(block));
+        newContent.getBlockMap().forEach(block => mergedBlocks.push(block));
+        newContent = ContentState.createFromBlockArray(mergedBlocks);
 
         // merge content to editorState first
         editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
@@ -306,33 +302,6 @@ class BasicHtmlEditor extends Component {
       );
     this.onChange(newEditorState);
     this.setState({variableMenuOpen: false});
-  }
-
-  _removeWhiteSpace(editorState) {
-    // // HACK: remove empty character in empty block to have paragraph breaks
-    let newEditorState = editorState;
-    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
-      let text = block.getText();
-      text = text.replace(/^\s+/, '').replace(/\s+$/, '');
-      if (text === '') {
-        // console.log('hit empty block');
-        const selection = SelectionState.createEmpty(block.getKey());
-        const newContent = Modifier.removeRange(
-          newEditorState.getCurrentContent(),
-          selection.merge({anchorOffset: 0, focusOffset: block.getText().length}),
-          'right'
-         );
-        newEditorState = EditorState.push(newEditorState, newContent, 'insert-fragment');
-      }
-    });
-    return newEditorState;
-  }
-
-  _appendToCurrentContentState(oldContent, newContent) {
-    let blocks = [];
-    oldContent.getBlockMap().forEach(block => blocks.push(block));
-    newContent.getBlockMap().forEach(block => blocks.push(block));
-    return ContentState.createFromBlockArray(blocks);
   }
 
   _cleanHTMLToContentState(html) {
@@ -505,12 +474,12 @@ class BasicHtmlEditor extends Component {
 
   _handlePastedText(text, html) {
     const {editorState} = this.state;
-    let newState;
     let blockMap;
     // let blockArray;
     let contentState;
 
     if (html) {
+      console.log('pasted', 'html');
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -523,73 +492,15 @@ class BasicHtmlEditor extends Component {
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
+      console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
 
-    // Linkify links within each block, save location of block/selection before paste
-    const prePasteSelection = editorState.getSelection();
-    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
-
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
-
-    // HACK: remove empty character in empty block to have paragraph breaks
-    newEditorState = this.removeWhiteSpace(newEditorState);
-
-    let inPasteRange = false;
-    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
-        // hit next block pre-paste, stop linkify
-        return false;
-      }
-      if (key === prePasteSelection.getStartKey() || inPasteRange) {
-        inPasteRange = true;
-        const links = linkify.match(block.get('text'));
-        if (typeof links !== 'undefined' && links !== null) {
-          for (let i = 0; i < links.length; i++) {
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = newEditorState.getSelection().merge({
-              anchorKey: block.getKey(),
-              anchorOffset: links[i].index,
-              focusKey: block.getKey(),
-              focusOffset: links[i].lastIndex
-            });
-            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = contentState.getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-            if (!hasEntityType) {
-              // insert entity if no entity exist
-              const entityKey = newEditorState
-              .getCurrentContent()
-              .createEntity('LINK', 'MUTABLE', {url: links[i].url})
-              .getLastCreatedEntityKey();
-              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
-            }
-          }
-        }
-      }
-    });
-
-    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
+    const newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);
-    return true;
+    return 'handled';
   }
 
   _handleImage(url) {

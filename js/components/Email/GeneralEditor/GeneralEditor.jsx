@@ -23,7 +23,9 @@ import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap} from 'components/Email/EmailPanel/utils/renderers';
+
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
+import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -54,14 +56,6 @@ import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/str
 import styled from 'styled-components';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
-
-import linkifyIt from 'linkify-it';
-import tlds from 'tlds';
-
-const linkify = linkifyIt();
-linkify
-.tlds(tlds)
-.set({fuzzyLink: false});
 
 const defaultControlsStyle = {
   height: 40,
@@ -320,76 +314,6 @@ class GeneralEditor extends React.Component {
     }
   }
 
-  _linkifyLastWord(insertChar = '') {
-    // check last words in a block and linkify if detect link
-    // insert special char after handling linkify case
-    let editorState = this.state.editorState;
-    let handled = 'not-handled';
-    if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
-      const selection = editorState.getSelection();
-      const focusKey = selection.getFocusKey();
-      const focusOffset = selection.getFocusOffset();
-      const block = editorState.getCurrentContent().getBlockForKey(focusKey);
-      const links = linkify.match(block.get('text'));
-      if (typeof links !== 'undefined' && links !== null) {
-        for (let i = 0; i < links.length; i++) {
-          if (links[i].lastIndex === focusOffset) {
-            // last right before space inserted
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = selection.merge({
-              anchorKey: block.getKey(),
-              anchorOffset: focusOffset - links[i].raw.length,
-              focusKey: block.getKey(),
-              focusOffset
-            });
-            editorState = EditorState.acceptSelection(editorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = editorState.getCurrentContent().getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-
-            if (!hasEntityType) {
-              // insert space
-              const content = editorState.getCurrentContent();
-              const newContent = Modifier.insertText(content, selection, insertChar);
-              editorState = EditorState.push(editorState, newContent, 'insert-fragment');
-
-              handled = 'handled';
-              // insert entity if no entity exist
-              const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
-
-              // move selection focus back to original spot
-              selectionState = selectionState.merge({
-                anchorKey: block.getKey(),
-                anchorOffset: focusOffset + 1, // add 1 for space in front of link
-                focusKey: block.getKey(),
-                focusOffset: focusOffset + 1
-              });
-              editorState = EditorState.acceptSelection(editorState, selectionState);
-              this.onChange(editorState);
-            }
-            break;
-          }
-        }
-      }
-    }
-    return handled;
-  }
-
   _handleBeforeInput(lastInsertedChar) {
     let handled = 'not-handled';
     if (lastInsertedChar === ' ') {
@@ -509,12 +433,12 @@ class GeneralEditor extends React.Component {
 
   _handlePastedText(text, html) {
     const {editorState} = this.state;
-    let newState;
     let blockMap;
     // let blockArray;
     let contentState;
 
     if (html) {
+      console.log('pasted', 'html');
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -527,66 +451,15 @@ class GeneralEditor extends React.Component {
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
+      console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
 
-    const prePasteSelection = editorState.getSelection();
-    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
-
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
-
-    let inPasteRange = false;
-    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
-        // hit next block pre-paste, stop linkify
-        return false;
-      }
-      if (key === prePasteSelection.getStartKey() || inPasteRange) {
-        inPasteRange = true;
-        const links = linkify.match(block.get('text'));
-        if (typeof links !== 'undefined' && links !== null) {
-          for (let i = 0; i < links.length; i++) {
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = newEditorState.getSelection().merge({
-              anchorKey: block.getKey(),
-              anchorOffset: links[i].index,
-              focusKey: block.getKey(),
-              focusOffset: links[i].lastIndex
-            });
-            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = contentState.getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-            if (!hasEntityType) {
-              // insert entity if no entity exist
-              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
-            }
-          }
-        }
-      }
-    });
-
-    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
+    const newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);
-    return true;
+    return 'handled';
   }
 
   _handleImage(url) {
