@@ -10,7 +10,7 @@ import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'utils/alertify';
-import {blue50, blue200, blueGrey50, blueGrey100, blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
+import {blue50, blue100, blue200, blueGrey50, blueGrey100, blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -60,6 +60,35 @@ const RemoveButton = styled.i.attrs({
     color: ${blueGrey800};
     border: 1px solid ${blueGrey800};
     padding: 4px;
+  }
+`;
+
+const MainSection = styled.div`
+  display: flex;
+  flex-grow: 2;
+  justify-content: center;
+  order: 1;
+`;
+
+const SideSection = styled.div`
+  display: ${props => props.show ? 'flex' : 'none'};
+  flex-grow: 1;
+  flex-basis: 170px;
+  max-width: 200px;
+  order: -1;
+  z-index: 100;
+`;
+
+
+const TabButton = styled.span`
+  flex: 1;
+  background-color: ${props => props.active && blue50};
+  border: ${props => props.active && `2px solid ${blue200}`};
+  text-align: center;
+  font-size: 0.8em;
+  cursor: pointer;
+  &:hover {
+    background-color: ${props => !props.active && blue50};
   }
 `;
 
@@ -246,7 +275,7 @@ class Workspace extends Component {
           // justifyContent: 'space-around',
           paddingTop: 15
         }}>
-          <div style={{padding: 5, zIndex: 200, order: -1, position: 'fixed'}}>
+          <div style={{padding: '5px 5px 5px 12px', zIndex: 200, order: -1, position: 'fixed'}}>
             <i
             onClick={_ => this.setState({showToolbar: !state.showToolbar})}
             className={`pointer fa fa-angle-double-${state.showToolbar ? 'left' : 'right'}`}
@@ -254,17 +283,10 @@ class Workspace extends Component {
             <span
             onClick={_ => this.setState({showToolbar: !state.showToolbar})}
             className='smalltext pointer'
-            style={{marginLeft: 5, userSelect: 'none'}}
+            style={{marginLeft: 5, userSelect: 'none', color: blueGrey800}}
             >{state.showToolbar ? 'Hide Tools' : 'Show Tools'}</span>
           </div>
-          <div style={{
-            display: state.showToolbar ? 'flex' : 'none',
-            flexGrow: 1,
-            flexBasis: 170,
-            maxWidth: 200,
-            order: -1,
-            zIndex: 100
-          }}>
+          <SideSection show={state.showToolbar} >
           {state.showToolbar &&
             <Paper zDepth={2} style={{
               // textAlign: 'center',
@@ -276,24 +298,8 @@ class Workspace extends Component {
             }} >
               <div style={{marginTop: 40}} >
                 <div style={{display: 'flex', marginBottom: 10}} >
-                  <span
-                  onClick={_ => this.setState({mode: 'writing'})}
-                  className='smalltext pointer'
-                  style={{
-                    flex: 1,
-                    backgroundColor: state.mode === 'writing' && blue50,
-                    border: state.mode === 'writing' && `1px solid ${blue200}`,
-                    textAlign: 'center'
-                  }}>Writing Mode</span>
-                  <span
-                  onClick={_ => this.setState({mode: 'preview'})}
-                  className='smalltext pointer'
-                  style={{
-                    flex: 1,
-                    backgroundColor: state.mode === 'preview' && blue50,
-                    border: state.mode === 'preview' && `1px solid ${blue200}`,
-                    textAlign: 'center'
-                  }}>Preview</span>
+                  <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
+                  <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>Preview</TabButton>
                 </div>
                 <RaisedButton
                 label='Load Existing'
@@ -341,13 +347,8 @@ class Workspace extends Component {
                 />
               </div>
             </Paper>}
-          </div>
-          <div style={{
-            display: 'flex',
-            flexGrow: 2,
-            justifyContent: 'center',
-            order: 1,
-          }} >
+          </SideSection>
+          <MainSection>
           {state.mode === 'writing' &&
            <GeneralEditor
             onEditMode
@@ -362,7 +363,7 @@ class Workspace extends Component {
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
             rawSubjectContentState={state.subjectContentState}
-            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 60, marginBottom: 15}}}
+            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 80, marginBottom: 15}}}
             controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
             onBodyChange={this.onBodyChange}
@@ -371,7 +372,7 @@ class Workspace extends Component {
             extendStyleMap={customFontSizes}
             />}
           {state.mode === 'preview' &&
-            <div style={{marginTop: 60}} >
+            <div style={{marginTop: 80}} >
               <div
               style={{width: state.width, borderBottom: '2px solid gray', paddingBottom: 10, marginBottom: 10}}
               dangerouslySetInnerHTML={createMarkUp(state.mutatingSubject)}
@@ -381,7 +382,7 @@ class Workspace extends Component {
               dangerouslySetInnerHTML={createMarkUp(state.mutatingBody)}
               />
             </div>}
-          </div>
+          </MainSection>
         </div>
       </div>
     );
