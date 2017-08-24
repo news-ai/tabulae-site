@@ -10,7 +10,8 @@ import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
 import alertify from 'utils/alertify';
-import {blue50, blue100, blue200, blueGrey50, blueGrey100, blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
+import {blue50, blue100, blue200, blueGrey50, blueGrey100,
+  blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import find from 'lodash/find';
 import styled from 'styled-components';
@@ -44,6 +45,7 @@ const MenuItem = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: ${props => props.current && blueGrey50};
   &:hover {
     border: 3px solid ${blueGrey100};
     padding: 4px;
@@ -256,9 +258,11 @@ class Workspace extends Component {
     const options = props.templates
     .filter((template) => !(isJSON(template.body) && JSON.parse(template.body).date))
     .map((template, i) =>
-      <MenuItem key={template.id}>
+      <MenuItem current={state.currentTemplateId === template.id} key={template.id}>
         <span
+        style={{width: '100%'}}
         onClick={_ => {
+          console.log('wha');
           this.handleTemplateChange(template.id);
           this.setState({open: false});
         }}
@@ -319,7 +323,7 @@ class Workspace extends Component {
               <div style={{marginTop: 'auto'}} >
                 <ItemContainer>
                 {!!state.currentTemplateId &&
-                  <span className='text'>{currentTemplate.name || currentTemplate.subject}</span>}
+                  <strong className='text'>{currentTemplate.name || currentTemplate.subject}</strong>}
                 </ItemContainer>
                 <RaisedButton
                 backgroundColor={blue500}
