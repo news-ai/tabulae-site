@@ -36,7 +36,9 @@ import {
   typefaceMap,
   fontsizeMap
 } from 'components/Email/EmailPanel/utils/renderers';
+
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
+import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtils/stripSelectedInlineTagBlocks';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -225,7 +227,6 @@ class BasicHtmlEditor extends Component {
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
-    this.stripOverwriteStyle = this._stripOverwriteStyle.bind(this);
     this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
 
@@ -256,7 +257,7 @@ class BasicHtmlEditor extends Component {
       if (nextProps.templateChangeType === 'append' && nextProps.templateEntityType) {
         // email signature should append to existing content
         let oldContent = this.state.editorState.getCurrentContent();
-        oldContent = this.stripOverwriteStyle(oldContent, nextProps.templateEntityType);
+        oldContent = stripSelectedInlineTagBlocks(oldContent, nextProps.templateEntityType);
         const blocks = newContent.getBlockMap();
         const newContentSelection = SelectionState
           .createEmpty()
@@ -305,27 +306,6 @@ class BasicHtmlEditor extends Component {
       );
     this.onChange(newEditorState);
     this.setState({variableMenuOpen: false});
-  }
-
-  _stripOverwriteStyle(contentState, overwriteStyle) {
-    // used to strip EMAIL_SIGNATURE inline style when switching emails
-    let truncatedBlocks = [];
-    const blocks = contentState.getBlockMap();
-    blocks.map(block => {
-      let hasStyle = false;
-      block.findStyleRanges(
-        (character) => {
-          if (character.hasStyle(overwriteStyle)) {
-            if (!hasStyle) hasStyle = true;
-          }
-          return character.hasStyle(overwriteStyle);
-        },
-        (start, end) => {}
-        );
-      if (!hasStyle) truncatedBlocks.push(block);
-    });
-    // Now select all stripped blocks and insert overwriteEntityType
-    return ContentState.createFromBlockArray(truncatedBlocks);
   }
 
   _removeWhiteSpace(editorState) {
