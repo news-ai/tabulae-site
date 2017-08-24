@@ -72,6 +72,7 @@ export default function processInlineStylesAndEntities({
    */
 
   var tagStack = [];
+  // console.log(tagInsertMap);
 
   Object.keys(tagInsertMap).forEach(key => {
     let newInsertMap = [];

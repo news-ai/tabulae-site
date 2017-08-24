@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
+import cn from 'classnames';
 import {connect} from 'react-redux';
 import Draft, {
   Editor,
@@ -21,7 +22,12 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, TYPEFACE_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import {
+  INLINE_STYLES,
+  TYPEFACE_TYPES,
+  POSITION_TYPES,
+  FONTSIZE_TYPES
+} from 'components/Email/EmailPanel/utils/typeConstants';
 import {
   mediaBlockRenderer,
   getBlockStyle,
@@ -30,6 +36,7 @@ import {
   typefaceMap,
   fontsizeMap
 } from 'components/Email/EmailPanel/utils/renderers';
+import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -213,7 +220,6 @@ class BasicHtmlEditor extends Component {
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
-    this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
@@ -331,7 +337,11 @@ class BasicHtmlEditor extends Component {
       if (text === '') {
         // console.log('hit empty block');
         const selection = SelectionState.createEmpty(block.getKey());
-        const newContent = Modifier.removeRange(newEditorState.getCurrentContent(), selection.merge({anchorOffset: 0, focusOffset: block.getText().length}), 'right');
+        const newContent = Modifier.removeRange(
+          newEditorState.getCurrentContent(),
+          selection.merge({anchorOffset: 0, focusOffset: block.getText().length}),
+          'right'
+         );
         newEditorState = EditorState.push(newEditorState, newContent, 'insert-fragment');
       }
     });
@@ -404,87 +414,28 @@ class BasicHtmlEditor extends Component {
     }
   }
 
-  _linkifyLastWord(insertChar = '') {
-    // check last words in a block and linkify if detect link
-    // insert special char after handling linkify case
-    let editorState = this.state.editorState;
+  _handleBeforeInput(lastInsertedChar) {
     let handled = 'not-handled';
-    if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
-      const selection = editorState.getSelection();
-      const focusKey = selection.getFocusKey();
-      const focusOffset = selection.getFocusOffset();
-      const block = editorState.getCurrentContent().getBlockForKey(focusKey);
-      const links = linkify.match(block.get('text'));
-      if (typeof links !== 'undefined' && links !== null) {
-        for (let i = 0; i < links.length; i++) {
-          if (links[i].lastIndex === focusOffset) {
-            // last right before space inserted
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = selection.merge({
-              anchorKey: block.getKey(),
-              anchorOffset: focusOffset - links[i].raw.length,
-              focusKey: block.getKey(),
-              focusOffset
-            });
-            editorState = EditorState.acceptSelection(editorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = editorState.getCurrentContent().getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-
-            if (!hasEntityType) {
-              // insert space
-              const content = editorState.getCurrentContent();
-              const newContent = Modifier.insertText(content, selection, insertChar);
-              editorState = EditorState.push(editorState, newContent, 'insert-fragment');
-
-              handled = 'handled';
-              // insert entity if no entity exist
-              const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
-
-              // move selection focus back to original spot
-              selectionState = selectionState.merge({
-                anchorKey: block.getKey(),
-                anchorOffset: focusOffset + 1, // add 1 for space in front of link
-                focusKey: block.getKey(),
-                focusOffset: focusOffset + 1
-              });
-              editorState = EditorState.acceptSelection(editorState, selectionState);
-              this.onChange(editorState);
-            }
-            break;
-          }
-        }
+    if (lastInsertedChar === ' ') {
+      const editorState = linkifyLastWord(' ', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        handled = 'handled';
       }
     }
     return handled;
   }
 
-  _handleBeforeInput(lastInsertedChar) {
-    let handled = 'not-handled';
-    if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
-    return handled;
-  }
-
   _handleReturn(e) {
+    let handled = 'not-handled';
     if (e.key === 'Enter') {
-      return this.linkifyLastWord('\n');
+      const editorState = linkifyLastWord('\n', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        return 'handled';
+      }
     }
-    return 'not-handled';
+    return handled;
   }
 
   _handleKeyCommand(command) {
@@ -644,14 +595,16 @@ class BasicHtmlEditor extends Component {
             }
             if (!hasEntityType) {
               // insert entity if no entity exist
-              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
+              const entityKey = newEditorState
+              .getCurrentContent()
+              .createEntity('LINK', 'MUTABLE', {url: links[i].url})
+              .getLastCreatedEntityKey();
               newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
             }
           }
         }
       }
     });
-
 
     newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
 
@@ -763,13 +716,11 @@ class BasicHtmlEditor extends Component {
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
-    let className = 'RichEditor-editor';
-    var contentState = editorState.getCurrentContent();
-    if (!contentState.hasText()) {
-      if (contentState.getBlockMap().first().getType() !== 'unstyled') {
-        className += ' RichEditor-hidePlaceholder';
-      }
-    }
+
+    const className = cn('RichEditor-editor', {
+      'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() &&
+      editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'
+    });
 
     return (
       <div>

@@ -23,6 +23,7 @@ import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap} from 'components/Email/EmailPanel/utils/renderers';
+import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -217,7 +218,6 @@ class GeneralEditor extends React.Component {
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
-    this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
     this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
@@ -392,7 +392,13 @@ class GeneralEditor extends React.Component {
 
   _handleBeforeInput(lastInsertedChar) {
     let handled = 'not-handled';
-    if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
+    if (lastInsertedChar === ' ') {
+      const editorState = linkifyLastWord(' ', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        handled = 'handled';
+      }
+    }
     return handled;
   }
 
@@ -406,10 +412,15 @@ class GeneralEditor extends React.Component {
   }
 
   _handleReturn(e) {
+    let handled = 'not-handled';
     if (e.key === 'Enter') {
-      return this.linkifyLastWord('\n');
+      const editorState = linkifyLastWord('\n', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        return 'handled';
+      }
     }
-    return 'not-handled';
+    return handled;
   }
 
   _handleKeyCommand(command) {

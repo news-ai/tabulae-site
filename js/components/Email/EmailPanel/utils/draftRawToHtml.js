@@ -25,7 +25,7 @@ let inlineTagMap = {
   'UNDERLINE': ['<u>','</u>'],
   'CODE': ['<code>','</code>'],
   'STRIKETHROUGH': ['<del>', '</del>'],
-  'default': ['<span>','</span>'],
+  'default': ['<span style="font-size:10.5pt;" >','</span>'],
 };
 
 
