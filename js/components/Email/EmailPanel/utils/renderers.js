@@ -179,5 +179,15 @@ const customBlocks = {
   }
 };
 
+export const customStyleFn = style => {
+  const styleNames = style.toJS();
+  return styleNames.reduce((styles, styleName) => {
+    if (styleName.startsWith('COLOR-')) {
+      styles.color = styleName.split('COLOR-')[1];
+    }
+    return styles;
+  }, {});
+}
+
 // Custom overrides for "code" style.
 export const styleMap = Object.assign({}, fontsizeMap, customBlocks, typefaceMap, specialMap);

@@ -21,7 +21,7 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap} from 'components/Email/EmailPanel/utils/renderers';
+import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap, customStyleFn} from 'components/Email/EmailPanel/utils/renderers';
 import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
@@ -92,17 +92,6 @@ const BodyEditorContainer = styled.div`
   width: ${props => props.width ? props.width : 400}px;
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
-
-const customStyleFn = style => {
-  const styleNames = style.toJS();
-  return styleNames.reduce((styles, styleName) => {
-    if (styleName.startsWith('COLOR-')) {
-      styles.color = styleName.split('COLOR-')[1];
-    }
-    return styles;
-  }, {});
-
-}
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -177,7 +166,7 @@ class GeneralEditor extends React.Component {
       let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       // console.log(raw);
-      console.log(html);
+      // console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -432,7 +421,7 @@ class GeneralEditor extends React.Component {
           a: ['href']
         }
       });
-      console.log(saneHtml);
+      // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
@@ -603,10 +592,6 @@ class GeneralEditor extends React.Component {
           onToggle={this.toggleBlockType}
           tooltipPosition='bottom-center'
           />
-          <ColorPicker
-          editorState={editorState}
-          onToggle={this.onColorToggle}
-          />
           <FontSizeControls
           editorState={editorState}
           onToggle={this.onFontSizeToggle}
@@ -618,6 +603,10 @@ class GeneralEditor extends React.Component {
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
           tooltipPosition='bottom-center'
+          />
+          <ColorPicker
+          editorState={editorState}
+          onToggle={this.onColorToggle}
           />
         </Paper>}
       {props.onSubjectChange &&
@@ -698,6 +687,10 @@ class GeneralEditor extends React.Component {
           editorState={editorState}
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
+          />
+          <ColorPicker
+          editorState={editorState}
+          onToggle={this.onColorToggle}
           />
           {/*<BlockStyleControls
           editorState={editorState}

@@ -4,14 +4,14 @@ import styled from 'styled-components';
 import Popover from 'material-ui/Popover';
 
 const Color = styled.div`
-  width: 28px;
-  height: 14px;
+  width: 24px;
+  height: 12px;
   border-radius: 2px;
   background: ${props => props.color ? props.color : 'black'};
 `;
 
 const Swatch = styled.div`
-  padding: 5px;
+  padding: 3px;
   background-color: #ffffff;
   border-radius: 1px;
   box-shadow: 0 0 0 1px rgba(0,0,0,.1);

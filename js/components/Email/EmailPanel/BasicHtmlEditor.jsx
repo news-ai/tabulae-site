@@ -33,7 +33,8 @@ import {
   blockRenderMap,
   styleMap,
   typefaceMap,
-  fontsizeMap
+  fontsizeMap,
+  customStyleFn
 } from 'components/Email/EmailPanel/utils/renderers';
 import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
 
@@ -64,6 +65,7 @@ import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeCon
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
+import ColorPicker from 'components/Email/EmailPanel/components/ColorPicker';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
@@ -193,8 +195,9 @@ class BasicHtmlEditor extends Component {
     this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
     this.onImageDropzoneOpen = _ => this.imgDropzone.open();
     this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
-    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, fontsizeMap), 'force-emit-html');
+    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, undefined, 'SIZE-'), 'force-emit-html');
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
+    this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -606,6 +609,7 @@ class BasicHtmlEditor extends Component {
                   propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
                 })}
               blockRenderMap={extendedBlockRenderMap}
+              customStyleFn={customStyleFn}
               customStyleMap={styleMap}
               editorState={editorState}
               handleKeyCommand={this.handleKeyCommand}
@@ -658,6 +662,10 @@ class BasicHtmlEditor extends Component {
             editorState={editorState}
             onToggle={this.onTypefaceToggle}
             inlineStyles={TYPEFACE_TYPES}
+            />
+            <ColorPicker
+            editorState={editorState}
+            onToggle={this.onColorToggle}
             />
             <IconButton
             iconStyle={styles.insertPropertyIcon.iconStyle}
