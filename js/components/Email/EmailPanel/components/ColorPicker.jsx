@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Popover from 'material-ui/Popover';
 
 const Color = styled.div`
-  width: 36px;
+  width: 28px;
   height: 14px;
   border-radius: 2px;
   background: ${props => props.color ? props.color : 'black'};

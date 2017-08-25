@@ -28,30 +28,23 @@ let inlineTagMap = {
   'default': ['<span style="font-size:10.5pt;" >','</span>'],
 };
 
+const match = (word, prefix) => word.substring(0, prefix.length) === prefix;
+
+const combinableInlineFn = style => {
+  const SIZE_PREFIX = 'SIZE-';
+  if (match(style, SIZE_PREFIX)) {
+    const size = style.split(SIZE_PREFIX)[1];
+    return [`font-size:${size}pt;`, 'span'];
+  }
+  const COLOR_PREFIX = 'COLOR-';
+  if (match(style, COLOR_PREFIX)) {
+    const color = style.split(COLOR_PREFIX)[1];
+    return [`color:${color};`, 'span'];
+  }
+  if (combinableInlineTagMap[style]) return combinableInlineTagMap[style];
+}
 
 let combinableInlineTagMap = {
-  'SIZE-5': ['font-size:5pt;', 'span'],
-  'SIZE-5.5': ['font-size:5.5pt">', 'span'],
-  'SIZE-6': ['font-size:6pt;', 'span'],
-  'SIZE-7.5': ['font-size:7.5pt;', 'span'],
-  'SIZE-8': ['font-size:8pt;', 'span'],
-  'SIZE-9': ['font-size:9pt;', 'span'],
-  'SIZE-10': ['font-size:10pt;', 'span'],
-  'SIZE-10.5': ['font-size:10.5pt;', 'span'],
-  'SIZE-11': ['font-size:11pt;', 'span'],
-  'SIZE-12': ['font-size:12pt;', 'span'],
-  'SIZE-14': ['font-size:14pt;', 'span'],
-  'SIZE-16': ['font-size:16pt;', 'span'],
-  'SIZE-18': ['font-size:18pt;', 'span'],
-  'SIZE-20': ['font-size:20pt;', 'span'],
-  'SIZE-22': ['font-size:22pt;', 'span'],
-  'SIZE-24': ['font-size:24pt;', 'span'],
-  'SIZE-26': ['font-size:26pt;', 'span'],
-  'SIZE-28': ['font-size:28pt;', 'span'],
-  'SIZE-36': ['font-size:36pt;', 'span'],
-  'SIZE-48': ['font-size:48pt;', 'span'],
-  'SIZE-72': ['font-size:72pt;', 'span'],
-
   'Arial': ['font-family:Arial, &#39;Helvetica Neue&#39;, Helvetica, sans-serif;', 'span'],
   'Helvetica': ['font-family:&#39;Helvetica Neue&#39;, Helvetica, Arial, sans-serif;', 'span'],
   'Times New Roman': ['font-family:&#39;Times New Roman&#39;, Times, serif;', 'span'],
@@ -143,10 +136,10 @@ export default function(raw) {
 
       html += blockTag ?
         blockTag[0] +
-          processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineTagMap, entityDataConversionMap}) +
+          processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap}) +
           blockTag[1] :
         blockTagMap['default'][0] +
-          processInlineStylesAndEntities({inlineTagMap, block, combinableInlineTagMap, entityDataConversionMap}) +
+          processInlineStylesAndEntities({inlineTagMap, block, combinableInlineFn, entityDataConversionMap}) +
           blockTagMap['default'][1];
     }
 
