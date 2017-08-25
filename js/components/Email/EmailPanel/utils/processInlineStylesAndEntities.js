@@ -12,7 +12,7 @@ export default function processInlineStylesAndEntities({
   entityMap,
   entityDataConversionMap,
   block,
-  combinableInlineTagMap,
+  combinableInlineFn
 }) {
   if (!block) {
     return '';
@@ -72,6 +72,7 @@ export default function processInlineStylesAndEntities({
    */
 
   var tagStack = [];
+  // console.log(tagInsertMap);
 
   Object.keys(tagInsertMap).forEach(key => {
     let newInsertMap = [];
@@ -125,7 +126,7 @@ export default function processInlineStylesAndEntities({
     const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
     let itree = new IntervalTree(lastRange.offset + lastRange.length);
     sortedInlineStyleRanges.map(range => {
-      let tag = combinableInlineTagMap[range.style];
+      let tag = combinableInlineFn(range.style);
       if (!tag) return;
       itree.add(range.offset, range.offset + range.length, `${range.style}-${Math.random().toString().slice(2, 11)}`);
     });
@@ -146,7 +147,7 @@ export default function processInlineStylesAndEntities({
       const results = itree.search((currCut + nextCut) / 2);
       const styles = results.map(result => result.id.substring(0, result.id.length - 10));
       // only allow span to be combinable for now
-      const styleString = styles.map(style => combinableInlineTagMap[style][0]).join('');
+      const styleString = styles.map(style => combinableInlineFn(style)[0]).join('');
       if (!tagInsertMap[currCut]) {
         tagInsertMap[currCut] = [];
       }

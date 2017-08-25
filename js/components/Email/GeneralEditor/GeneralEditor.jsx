@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import debounce from 'lodash/debounce';
-import find from 'lodash/find';
+import cn from 'classnames';
 import {connect} from 'react-redux';
 import Draft, {
   Editor,
@@ -21,7 +21,13 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
-import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap} from 'components/Email/EmailPanel/utils/renderers';
+import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap, customStyleFn} from 'components/Email/EmailPanel/utils/renderers';
+import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
+
+import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
+import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
+import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
+import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -40,6 +46,7 @@ import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeCon
 import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
+import ColorPicker from 'components/Email/EmailPanel/components/ColorPicker';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
@@ -49,16 +56,9 @@ import ValidationHOC from 'components/ValidationHOC';
 
 import {grey300, grey400, grey500, grey600, grey700} from 'material-ui/styles/colors';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
+import styled from 'styled-components';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
-
-import linkifyIt from 'linkify-it';
-import tlds from 'tlds';
-
-const linkify = linkifyIt();
-linkify
-.tlds(tlds)
-.set({fuzzyLink: false});
 
 const defaultControlsStyle = {
   height: 40,
@@ -88,6 +88,11 @@ const decorator = new CompositeDecorator([
   }
 ]);
 
+const BodyEditorContainer = styled.div`
+  width: ${props => props.width ? props.width : 400}px;
+  height: ${props => props.height !== 'unlimited' && `${props.height}px`};
+`;
+
 class GeneralEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -105,16 +110,8 @@ class GeneralEditor extends React.Component {
     ];
 
     this.CONVERT_CONFIGS = {
-      htmlToStyle: (nodeName, node, currentStyle) => {
-        if (nodeName === 'span') {
-          const fontSize = node.style.fontSize.substring(0, node.style.fontSize.length - 2);
-          const foundType = find(FONTSIZE_TYPES, type => type.label === fontSize);
-          if (foundType) return currentStyle.add(foundType.style);
-          return currentStyle;
-        } else {
-          return currentStyle;
-        }
-      },
+      htmlToStyle: htmlToStyle,
+      htmlToBlock: htmlToBlock,
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
           if (node.firstElementChild === null) {
@@ -136,29 +133,6 @@ class GeneralEditor extends React.Component {
           }
         }
       },
-      htmlToBlock: (nodeName, node) => {
-        if (nodeName === 'figure') {
-          return;
-        }
-        if (nodeName === 'p' || nodeName === 'div') {
-          if (node.style.textAlign === 'center') {
-            return {
-              type: 'center-align',
-              data: {}
-            };
-          } else if (node.style.textAlign === 'right') {
-            return {
-              type: 'right-align',
-              data: {}
-            };
-          } else if (node.style.textAlign === 'justify') {
-            return {
-              type: 'justify-align',
-              data: {}
-            };
-          }
-        }
-      },
     };
 
     this.state = {
@@ -171,10 +145,14 @@ class GeneralEditor extends React.Component {
       styleBlockAnchorEl: null,
       filePanelOpen: false,
       imagePanelOpen: false,
-      imageLink: ''
+      imageLink: '',
+      showToolbar: false
     };
 
-    this.focus = () => this.refs.editor.focus();
+    this.focus = () => {
+      this.refs.editor.focus();
+      this.setState({showToolbar: true});
+    }
     this.onChange = this._onChange.bind(this);
     this.handleTouchTap = (event) => {
       event.preventDefault();
@@ -184,7 +162,8 @@ class GeneralEditor extends React.Component {
       });
     };
     function emitHTML(editorState) {
-      let raw = convertToRaw(editorState.getCurrentContent());
+      const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
+      let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       // console.log(raw);
       // console.log(html);
@@ -206,12 +185,11 @@ class GeneralEditor extends React.Component {
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
-    this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
-    this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
-    this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
+    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, undefined, 'SIZE-'), 'force-emit-html');
+    this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
+    this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onPropertyIconClick = e => {
       alertify.prompt('Name the Property to be Inserted', '', '',
@@ -309,79 +287,15 @@ class GeneralEditor extends React.Component {
     }
   }
 
-  _linkifyLastWord(insertChar = '') {
-    // check last words in a block and linkify if detect link
-    // insert special char after handling linkify case
-    let editorState = this.state.editorState;
-    let handled = 'not-handled';
-    if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
-      const selection = editorState.getSelection();
-      const focusKey = selection.getFocusKey();
-      const focusOffset = selection.getFocusOffset();
-      const block = editorState.getCurrentContent().getBlockForKey(focusKey);
-      const links = linkify.match(block.get('text'));
-      if (typeof links !== 'undefined' && links !== null) {
-        for (let i = 0; i < links.length; i++) {
-          if (links[i].lastIndex === focusOffset) {
-            // last right before space inserted
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = selection.merge({
-              anchorKey: block.getKey(),
-              anchorOffset: focusOffset - links[i].raw.length,
-              focusKey: block.getKey(),
-              focusOffset
-            });
-            editorState = EditorState.acceptSelection(editorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = editorState.getCurrentContent().getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-
-            if (!hasEntityType) {
-              // insert space
-              const content = editorState.getCurrentContent();
-              const newContent = Modifier.insertText(content, selection, insertChar);
-              editorState = EditorState.push(editorState, newContent, 'insert-fragment');
-
-              handled = 'handled';
-              // insert entity if no entity exist
-              const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
-
-              // move selection focus back to original spot
-              selectionState = selectionState.merge({
-                anchorKey: block.getKey(),
-                anchorOffset: focusOffset + 1, // add 1 for space in front of link
-                focusKey: block.getKey(),
-                focusOffset: focusOffset + 1
-              });
-              editorState = EditorState.acceptSelection(editorState, selectionState);
-              this.onChange(editorState);
-            }
-            break;
-          }
-        }
-      }
-    }
-    return handled;
-  }
-
   _handleBeforeInput(lastInsertedChar) {
     let handled = 'not-handled';
-    if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
+    if (lastInsertedChar === ' ') {
+      const editorState = linkifyLastWord(' ', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        handled = 'handled';
+      }
+    }
     return handled;
   }
 
@@ -395,10 +309,15 @@ class GeneralEditor extends React.Component {
   }
 
   _handleReturn(e) {
+    let handled = 'not-handled';
     if (e.key === 'Enter') {
-      return this.linkifyLastWord('\n');
+      const editorState = linkifyLastWord('\n', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        return 'handled';
+      }
     }
-    return 'not-handled';
+    return handled;
   }
 
   _handleKeyCommand(command) {
@@ -487,12 +406,12 @@ class GeneralEditor extends React.Component {
 
   _handlePastedText(text, html) {
     const {editorState} = this.state;
-    let newState;
     let blockMap;
     // let blockArray;
     let contentState;
 
     if (html) {
+      console.log('pasted', 'html');
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -502,69 +421,19 @@ class GeneralEditor extends React.Component {
           a: ['href']
         }
       });
+      // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
+      console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
 
-    const prePasteSelection = editorState.getSelection();
-    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
-
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
-
-    let inPasteRange = false;
-    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
-        // hit next block pre-paste, stop linkify
-        return false;
-      }
-      if (key === prePasteSelection.getStartKey() || inPasteRange) {
-        inPasteRange = true;
-        const links = linkify.match(block.get('text'));
-        if (typeof links !== 'undefined' && links !== null) {
-          for (let i = 0; i < links.length; i++) {
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = newEditorState.getSelection().merge({
-              anchorKey: block.getKey(),
-              anchorOffset: links[i].index,
-              focusKey: block.getKey(),
-              focusOffset: links[i].lastIndex
-            });
-            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = contentState.getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-            if (!hasEntityType) {
-              // insert entity if no entity exist
-              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
-            }
-          }
-        }
-      }
-    });
-
-    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
+    const newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);
-    return true;
+    return 'handled';
   }
 
   _handleImage(url) {
@@ -630,42 +499,6 @@ class GeneralEditor extends React.Component {
     return false;
   }
 
-  _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
-    const {editorState} = this.state;
-    const selection = editorState.getSelection();
-
-    // Let's just allow one color at a time. Turn off all active colors.
-    const nextContentState = Object.keys(inlineStyleMap)
-      .reduce((contentState, inlineStyle) => {
-        return Modifier.removeInlineStyle(contentState, selection, inlineStyle);
-      }, editorState.getCurrentContent());
-
-    let nextEditorState = EditorState.push(
-      editorState,
-      nextContentState,
-      'change-inline-style'
-    );
-
-    const currentStyle = editorState.getCurrentInlineStyle();
-
-    // Unset style override for current color.
-    if (selection.isCollapsed()) {
-      nextEditorState = currentStyle.reduce((state, inlineStyle) => {
-        return RichUtils.toggleInlineStyle(state, inlineStyle);
-      }, nextEditorState);
-    }
-
-    // If the color is being toggled on, apply it.
-    if (!currentStyle.has(toggledStyle)) {
-      nextEditorState = RichUtils.toggleInlineStyle(
-        nextEditorState,
-        toggledStyle
-      );
-    }
-
-    this.onChange(nextEditorState, 'force-emit-html');
-  }
-
   onInsertProperty(propertyType) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -691,13 +524,16 @@ class GeneralEditor extends React.Component {
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
-    let className = 'RichEditor-editor';
-    var contentState = editorState.getCurrentContent();
-    if (!contentState.hasText()) {
-      if (contentState.getBlockMap().first().getType() !== 'unstyled') {
-        className += ' RichEditor-hidePlaceholder';
-      }
-    }
+    const className = cn(props.containerClassName || 'RichEditor-editor', {
+      'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'});
+    let customStyleMap = styleMap;
+    if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
+
+    let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
+    
+    const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
+    if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
+
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -731,39 +567,45 @@ class GeneralEditor extends React.Component {
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked} />
       {props.controlsPosition === 'top' &&
-        <Paper
-        zDepth={1}
-        className='row vertical-center clearfix'
-        style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
-        >
+        <Paper onClick={_ => console.log('paper')} zDepth={1} className='vertical-center' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
           inlineStyles={INLINE_STYLES}
+          tooltipPosition='bottom-center'
           />
           <EntityControls
           editorState={editorState}
           entityControls={this.ENTITY_CONTROLS}
+          tooltipPosition='bottom-center'
           />
           <ExternalControls
           editorState={editorState}
           externalControls={this.EXTERNAL_CONTROLS}
           active={props.files.length > 0}
+          tooltipPosition='bottom-center'
           />
           <PositionStyleControls
           editorState={editorState}
           blockTypes={POSITION_TYPES}
           onToggle={this.toggleBlockType}
+          tooltipPosition='bottom-center'
           />
           <FontSizeControls
           editorState={editorState}
           onToggle={this.onFontSizeToggle}
           inlineStyles={FONTSIZE_TYPES}
+          tooltipPosition='bottom-center'
           />
           <TypefaceControls
           editorState={editorState}
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
+          tooltipPosition='bottom-center'
+          />
+          <ColorPicker
+          editorState={editorState}
+          onToggle={this.onColorToggle}
           />
         </Paper>}
       {props.onSubjectChange &&
@@ -773,12 +615,9 @@ class GeneralEditor extends React.Component {
         onSubjectChange={props.onSubjectChange}
         subjectHtml={props.subjectHtml}
         fieldsmap={props.fieldsmap}
+        rawSubjectContentState={props.rawSubjectContentState}
         />}
-        <div style={{
-          height: props.height || 460,
-          overflowY: 'scroll',
-          width: props.width || 500
-        }}>
+        <BodyEditorContainer width={props.width} height={props.height} >
           <div className={className} onClick={this.focus}>
           {props.allowGeneralizedProperties &&
             <div className='right'>
@@ -800,7 +639,8 @@ class GeneralEditor extends React.Component {
                 propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
               })}
             blockRenderMap={extendedBlockRenderMap}
-            customStyleMap={styleMap}
+            customStyleMap={customStyleMap}
+            customStyleFn={customStyleFn}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}
@@ -810,17 +650,14 @@ class GeneralEditor extends React.Component {
             handleDrop={this.handleDrop}
             onChange={this.onChange}
             placeholder={props.placeholder || placeholder}
+            onBlur={_ => console.log('editor')}
             ref='editor'
             spellCheck
             />
           </div>
-        </div>
+        </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
-        <Paper
-        zDepth={1}
-        className='row vertical-center clearfix'
-        style={props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle}
-        >
+        <Paper onClick={_ => this.setState({showToolbar: true})} zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}
@@ -849,6 +686,10 @@ class GeneralEditor extends React.Component {
           editorState={editorState}
           onToggle={this.onTypefaceToggle}
           inlineStyles={TYPEFACE_TYPES}
+          />
+          <ColorPicker
+          editorState={editorState}
+          onToggle={this.onColorToggle}
           />
           {/*<BlockStyleControls
           editorState={editorState}

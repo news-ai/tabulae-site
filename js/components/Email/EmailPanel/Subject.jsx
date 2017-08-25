@@ -21,6 +21,12 @@ import alertify from 'alertifyjs';
 import isJSON from 'validator/lib/isJSON';
 import debounce from 'lodash/debounce';
 
+const padZeros = (n, p, c) => {
+  var pad_char = typeof c !== 'undefined' ? c : '0';
+  var pad = new Array(1 + p).join(pad_char);
+  return (pad + n).slice(-pad.length);
+};
+
 const MAX_LENGTH = 255;
 
 class Subject extends Component {
@@ -42,7 +48,9 @@ class Subject extends Component {
     ]);
 
     this.state = {
-      editorState: EditorState.createEmpty(decorator),
+      editorState: this.props.rawSubjectContentState ?
+      EditorState.createWithContent(convertFromRaw(this.props.rawSubjectContentState), decorator) :
+      EditorState.createEmpty(decorator),
       subjectString: null,
       subjectLength: 0,
       variableMenuOpen: false,
@@ -181,8 +189,9 @@ class Subject extends Component {
     const {editorState, subjectLength} = this.state;
     const state = this.state;
     const props = this.props;
+    const containerStyle = props.style ? Object.assign({}, styles.container, props.style) : styles.container;
     return (
-      <div style={styles.container} className='vertical-center' >
+      <div style={containerStyle} className='vertical-center' >
         <div
         className='subject-draft-container'
         style={{
@@ -217,7 +226,7 @@ class Subject extends Component {
           />
         </div>
         <div className='vertical-center'>
-          <span className='text' style={styles.lengthLabel}>{subjectLength}</span>
+          <span className='text' style={styles.lengthLabel}>{padZeros(subjectLength, 3)}</span>
         {(props.fieldsmap || props.allowGeneralizedProperties) &&
           <IconButton
           iconStyle={styles.icon.iconStyle}

@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
-import find from 'lodash/find';
+import cn from 'classnames';
 import {connect} from 'react-redux';
 import Draft, {
   Editor,
@@ -21,15 +21,28 @@ import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertFromHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
-import {INLINE_STYLES, TYPEFACE_TYPES, POSITION_TYPES, FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import {
+  INLINE_STYLES,
+  TYPEFACE_TYPES,
+  POSITION_TYPES,
+  FONTSIZE_TYPES
+} from 'components/Email/EmailPanel/utils/typeConstants';
 import {
   mediaBlockRenderer,
   getBlockStyle,
   blockRenderMap,
   styleMap,
   typefaceMap,
-  fontsizeMap
+  fontsizeMap,
+  customStyleFn
 } from 'components/Email/EmailPanel/utils/renderers';
+import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
+
+import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
+import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
+import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtils/stripSelectedInlineTagBlocks';
+import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
+import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -52,6 +65,7 @@ import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeCon
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
+import ColorPicker from 'components/Email/EmailPanel/components/ColorPicker';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
@@ -62,14 +76,6 @@ import ValidationHOC from 'components/ValidationHOC';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
 const placeholder = 'Tip: Use column names as variables in your template email by clicking on "Insert Property" or "+" icon in Subject, Body, or Toolbar.';
-
-import linkifyIt from 'linkify-it';
-import tlds from 'tlds';
-
-const linkify = linkifyIt();
-linkify
-.tlds(tlds)
-.set({fuzzyLink: false});
 
 const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
 
@@ -112,16 +118,8 @@ class BasicHtmlEditor extends Component {
     ];
 
     this.CONVERT_CONFIGS = {
-      htmlToStyle: (nodeName, node, currentStyle) => {
-        if (nodeName === 'span') {
-          const fontSize = node.style.fontSize.substring(0, node.style.fontSize.length - 2);
-          const foundType = find(FONTSIZE_TYPES, type => type.label === fontSize);
-          if (foundType) return currentStyle.add(foundType.style);
-          return currentStyle;
-        } else {
-          return currentStyle;
-        }
-      },
+      htmlToStyle: htmlToStyle,
+      htmlToBlock: htmlToBlock,
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
           if (node.firstElementChild === null) {
@@ -146,34 +144,6 @@ class BasicHtmlEditor extends Component {
           }
         }
       },
-      htmlToBlock: (nodeName, node) => {
-        if (nodeName === 'figure') {
-          return;
-        }
-        if (nodeName === 'p' || nodeName === 'div') {
-          if (node.style.textAlign === 'center') {
-            return {
-              type: 'center-align',
-              data: {}
-            };
-          } else if (node.style.textAlign === 'right') {
-            return {
-              type: 'right-align',
-              data: {}
-            };
-          } else if (node.style.textAlign === 'justify') {
-            return {
-              type: 'justify-align',
-              data: {}
-            };
-          } else {
-            return {
-              type: 'unstyled',
-              data: {}
-            };
-          }
-        }
-      },
     };
 
     this.state = {
@@ -193,7 +163,8 @@ class BasicHtmlEditor extends Component {
     this.focus = () => this.refs.editor.focus();
     this.onChange = this._onChange.bind(this);
     function emitHTML(editorState) {
-      let raw = convertToRaw(editorState.getCurrentContent());
+      const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
+      let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       // console.log(raw);
       // console.log(html);
@@ -213,14 +184,9 @@ class BasicHtmlEditor extends Component {
     this.onImageUploadClicked = this._onImageUploadClicked.bind(this);
     this.onOnlineImageUpload = this._onOnlineImageUpload.bind(this);
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
-    this.linkifyLastWord = this._linkifyLastWord.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
-    this.appendToCurrentContentState = this._appendToCurrentContentState.bind(this);
-    this.stripOverwriteStyle = this._stripOverwriteStyle.bind(this);
-    this.removeWhiteSpace = this._removeWhiteSpace.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
 
     // cleanups
@@ -229,8 +195,9 @@ class BasicHtmlEditor extends Component {
     this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
     this.onImageDropzoneOpen = _ => this.imgDropzone.open();
     this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
-    this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
-    this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
+    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, undefined, 'SIZE-'), 'force-emit-html');
+    this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
+    this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -250,7 +217,7 @@ class BasicHtmlEditor extends Component {
       if (nextProps.templateChangeType === 'append' && nextProps.templateEntityType) {
         // email signature should append to existing content
         let oldContent = this.state.editorState.getCurrentContent();
-        oldContent = this.stripOverwriteStyle(oldContent, nextProps.templateEntityType);
+        oldContent = stripSelectedInlineTagBlocks(oldContent, nextProps.templateEntityType);
         const blocks = newContent.getBlockMap();
         const newContentSelection = SelectionState
           .createEmpty()
@@ -260,7 +227,12 @@ class BasicHtmlEditor extends Component {
             focusKey: blocks.last().getKey(),
             focusOffset: blocks.last().getLength()
           });
-        newContent = this.appendToCurrentContentState(oldContent, newContent);
+
+        // build newContentState with current ContentState and newContent to be appended
+        let mergedBlocks = [];
+        oldContent.getBlockMap().forEach(block => mergedBlocks.push(block));
+        newContent.getBlockMap().forEach(block => mergedBlocks.push(block));
+        newContent = ContentState.createFromBlockArray(mergedBlocks);
 
         // merge content to editorState first
         editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
@@ -299,50 +271,6 @@ class BasicHtmlEditor extends Component {
       );
     this.onChange(newEditorState);
     this.setState({variableMenuOpen: false});
-  }
-
-  _stripOverwriteStyle(contentState, overwriteStyle) {
-    // used to strip EMAIL_SIGNATURE inline style when switching emails
-    let truncatedBlocks = [];
-    const blocks = contentState.getBlockMap();
-    blocks.map(block => {
-      let hasStyle = false;
-      block.findStyleRanges(
-        (character) => {
-          if (character.hasStyle(overwriteStyle)) {
-            if (!hasStyle) hasStyle = true;
-          }
-          return character.hasStyle(overwriteStyle);
-        },
-        (start, end) => {}
-        );
-      if (!hasStyle) truncatedBlocks.push(block);
-    });
-    // Now select all stripped blocks and insert overwriteEntityType
-    return ContentState.createFromBlockArray(truncatedBlocks);
-  }
-
-  _removeWhiteSpace(editorState) {
-    // // HACK: remove empty character in empty block to have paragraph breaks
-    let newEditorState = editorState;
-    newEditorState.getCurrentContent().getBlockMap().forEach(block => {
-      let text = block.getText();
-      text = text.replace(/^\s+/, '').replace(/\s+$/, '');
-      if (text === '') {
-        // console.log('hit empty block');
-        const selection = SelectionState.createEmpty(block.getKey());
-        const newContent = Modifier.removeRange(newEditorState.getCurrentContent(), selection.merge({anchorOffset: 0, focusOffset: block.getText().length}), 'right');
-        newEditorState = EditorState.push(newEditorState, newContent, 'insert-fragment');
-      }
-    });
-    return newEditorState;
-  }
-
-  _appendToCurrentContentState(oldContent, newContent) {
-    let blocks = [];
-    oldContent.getBlockMap().forEach(block => blocks.push(block));
-    newContent.getBlockMap().forEach(block => blocks.push(block));
-    return ContentState.createFromBlockArray(blocks);
   }
 
   _cleanHTMLToContentState(html) {
@@ -404,87 +332,28 @@ class BasicHtmlEditor extends Component {
     }
   }
 
-  _linkifyLastWord(insertChar = '') {
-    // check last words in a block and linkify if detect link
-    // insert special char after handling linkify case
-    let editorState = this.state.editorState;
+  _handleBeforeInput(lastInsertedChar) {
     let handled = 'not-handled';
-    if (editorState.getSelection().getHasFocus() && editorState.getSelection().isCollapsed()) {
-      const selection = editorState.getSelection();
-      const focusKey = selection.getFocusKey();
-      const focusOffset = selection.getFocusOffset();
-      const block = editorState.getCurrentContent().getBlockForKey(focusKey);
-      const links = linkify.match(block.get('text'));
-      if (typeof links !== 'undefined' && links !== null) {
-        for (let i = 0; i < links.length; i++) {
-          if (links[i].lastIndex === focusOffset) {
-            // last right before space inserted
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = selection.merge({
-              anchorKey: block.getKey(),
-              anchorOffset: focusOffset - links[i].raw.length,
-              focusKey: block.getKey(),
-              focusOffset
-            });
-            editorState = EditorState.acceptSelection(editorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = editorState.getCurrentContent().getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-
-            if (!hasEntityType) {
-              // insert space
-              const content = editorState.getCurrentContent();
-              const newContent = Modifier.insertText(content, selection, insertChar);
-              editorState = EditorState.push(editorState, newContent, 'insert-fragment');
-
-              handled = 'handled';
-              // insert entity if no entity exist
-              const entityKey = editorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              editorState = RichUtils.toggleLink(editorState, selectionState, entityKey);
-
-              // move selection focus back to original spot
-              selectionState = selectionState.merge({
-                anchorKey: block.getKey(),
-                anchorOffset: focusOffset + 1, // add 1 for space in front of link
-                focusKey: block.getKey(),
-                focusOffset: focusOffset + 1
-              });
-              editorState = EditorState.acceptSelection(editorState, selectionState);
-              this.onChange(editorState);
-            }
-            break;
-          }
-        }
+    if (lastInsertedChar === ' ') {
+      const editorState = linkifyLastWord(' ', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        handled = 'handled';
       }
     }
     return handled;
   }
 
-  _handleBeforeInput(lastInsertedChar) {
-    let handled = 'not-handled';
-    if (lastInsertedChar === ' ') handled = this.linkifyLastWord(' ');
-    return handled;
-  }
-
   _handleReturn(e) {
+    let handled = 'not-handled';
     if (e.key === 'Enter') {
-      return this.linkifyLastWord('\n');
+      const editorState = linkifyLastWord('\n', this.state.editorState);
+      if (editorState) {
+        this.onChange(editorState);
+        return 'handled';
+      }
     }
-    return 'not-handled';
+    return handled;
   }
 
   _handleKeyCommand(command) {
@@ -574,12 +443,12 @@ class BasicHtmlEditor extends Component {
 
   _handlePastedText(text, html) {
     const {editorState} = this.state;
-    let newState;
     let blockMap;
     // let blockArray;
     let contentState;
 
     if (html) {
+      console.log('pasted', 'html');
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -592,71 +461,15 @@ class BasicHtmlEditor extends Component {
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {
+      console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
       blockMap = contentState.blockMap;
     }
 
-    // Linkify links within each block, save location of block/selection before paste
-    const prePasteSelection = editorState.getSelection();
-    const prePasteNextBlock = editorState.getCurrentContent().getBlockAfter(prePasteSelection.getEndKey());
-
-    newState = Modifier.replaceWithFragment(editorState.getCurrentContent(), editorState.getSelection(), blockMap);
-    let newEditorState = EditorState.push(editorState, newState, 'insert-fragment');
-
-    // HACK: remove empty character in empty block to have paragraph breaks
-    newEditorState = this.removeWhiteSpace(newEditorState);
-
-    let inPasteRange = false;
-    newEditorState.getCurrentContent().getBlockMap().forEach((block, key) => {
-      if (prePasteNextBlock && key === prePasteNextBlock.getKey()) {
-        // hit next block pre-paste, stop linkify
-        return false;
-      }
-      if (key === prePasteSelection.getStartKey() || inPasteRange) {
-        inPasteRange = true;
-        const links = linkify.match(block.get('text'));
-        if (typeof links !== 'undefined' && links !== null) {
-          for (let i = 0; i < links.length; i++) {
-            let selectionState = SelectionState.createEmpty(block.getKey());
-            selectionState = newEditorState.getSelection().merge({
-              anchorKey: block.getKey(),
-              anchorOffset: links[i].index,
-              focusKey: block.getKey(),
-              focusOffset: links[i].lastIndex
-            });
-            newEditorState = EditorState.acceptSelection(newEditorState, selectionState);
-
-            // check if entity exists already
-            const startOffset = selectionState.getStartOffset();
-            const endOffset = selectionState.getEndOffset();
-
-            let linkKey;
-            let hasEntityType = false;
-            for (let j = startOffset; j < endOffset; j++) {
-              linkKey = block.getEntityAt(j);
-              if (linkKey !== null) {
-                const type = contentState.getEntity(linkKey).getType();
-                if (type === 'LINK') {
-                  hasEntityType = true;
-                  break;
-                }
-              }
-            }
-            if (!hasEntityType) {
-              // insert entity if no entity exist
-              const entityKey = newEditorState.getCurrentContent().createEntity('LINK', 'MUTABLE', {url: links[i].url}).getLastCreatedEntityKey();
-              newEditorState = RichUtils.toggleLink(newEditorState, selectionState, entityKey);
-            }
-          }
-        }
-      }
-    });
-
-
-    newEditorState = EditorState.forceSelection(newEditorState, prePasteSelection);
+    const newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);
-    return true;
+    return 'handled';
   }
 
   _handleImage(url) {
@@ -697,12 +510,10 @@ class BasicHtmlEditor extends Component {
   }
 
   _onOnlineImageUpload() {
-    const props = this.props;
-    const state = this.state;
-    if (isURL(state.imageLink)) {
-      props.saveImageData(state.imageLink);
+    if (isURL(this.state.imageLink)) {
+      this.props.saveImageData(this.state.imageLink);
       setTimeout(_ => {
-        const newEditorState = this.handleImage(state.imageLink);
+        const newEditorState = this.handleImage(this.state.imageLink);
         this.onChange(newEditorState, 'force-emit-html');
         this.setState({imageLink: ''});
       }, 50);
@@ -720,42 +531,6 @@ class BasicHtmlEditor extends Component {
     return false;
   }
 
-  _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
-    const {editorState} = this.state;
-    const selection = editorState.getSelection();
-
-    // Let's just allow one color at a time. Turn off all active colors.
-    const nextContentState = Object.keys(inlineStyleMap)
-      .reduce((contentState, inlineStyle) => {
-        return Modifier.removeInlineStyle(contentState, selection, inlineStyle);
-      }, editorState.getCurrentContent());
-
-    let nextEditorState = EditorState.push(
-      editorState,
-      nextContentState,
-      'change-inline-style'
-    );
-
-    const currentStyle = editorState.getCurrentInlineStyle();
-
-    // Unset style override for current color.
-    if (selection.isCollapsed()) {
-      nextEditorState = currentStyle.reduce((state, inlineStyle) => {
-        return RichUtils.toggleInlineStyle(state, inlineStyle);
-      }, nextEditorState);
-    }
-
-    // If the color is being toggled on, apply it.
-    if (!currentStyle.has(toggledStyle)) {
-      nextEditorState = RichUtils.toggleInlineStyle(
-        nextEditorState,
-        toggledStyle
-      );
-    }
-
-    this.onChange(nextEditorState, 'force-emit-html');
-  }
-
   render() {
     const {editorState} = this.state;
     const props = this.props;
@@ -763,13 +538,11 @@ class BasicHtmlEditor extends Component {
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
-    let className = 'RichEditor-editor';
-    var contentState = editorState.getCurrentContent();
-    if (!contentState.hasText()) {
-      if (contentState.getBlockMap().first().getType() !== 'unstyled') {
-        className += ' RichEditor-hidePlaceholder';
-      }
-    }
+
+    const className = cn('RichEditor-editor', {
+      'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() &&
+      editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'
+    });
 
     return (
       <div>
@@ -836,6 +609,7 @@ class BasicHtmlEditor extends Component {
                   propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
                 })}
               blockRenderMap={extendedBlockRenderMap}
+              customStyleFn={customStyleFn}
               customStyleMap={styleMap}
               editorState={editorState}
               handleKeyCommand={this.handleKeyCommand}
@@ -888,6 +662,10 @@ class BasicHtmlEditor extends Component {
             editorState={editorState}
             onToggle={this.onTypefaceToggle}
             inlineStyles={TYPEFACE_TYPES}
+            />
+            <ColorPicker
+            editorState={editorState}
+            onToggle={this.onColorToggle}
             />
             <IconButton
             iconStyle={styles.insertPropertyIcon.iconStyle}

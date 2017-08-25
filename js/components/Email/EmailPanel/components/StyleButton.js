@@ -6,6 +6,7 @@ const buttonStyle = {
   marginRight: 10
 };
 
+const style = { width: 28, height: 28, padding: 6 };
 export default class StyleButton extends React.Component {
   constructor() {
     super();
@@ -32,11 +33,11 @@ export default class StyleButton extends React.Component {
       renderNode = (
         <IconButton iconStyle={{ width: 14, height: 14, fontSize: '14px', color: color }}
                     hoveredStyle={{ color: hoverColor }}
-                    style={{ width: 28, height: 28, padding: 6 }}
+                    style={style}
                     iconClassName={props.icon}
                     onClick={onClick}
                     tooltip={props.label}
-                    tooltipPosition='top-right'/>);
+                    tooltipPosition={props.tooltipPosition || 'top-right'} />);
     } else {
       renderNode = (
         <span className={pointerClassName} style={buttonStyle} onMouseDown={onClick}>{props.label}</span>);
