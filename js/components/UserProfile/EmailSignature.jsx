@@ -36,7 +36,6 @@ class EmailSignature extends Component {
       this.setState({subject});
     };
     this.onSaveClick = this._onSaveClick.bind(this);
-    this.handlePastedText = this._handlePastedText.bind(this);
   }
 
   _handleChange(e, i, newEmail) {
