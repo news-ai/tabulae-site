@@ -44,7 +44,7 @@ let combinableInlineTagMap = {
   'SIZE-16': ['font-size:16pt;', 'span'],
   'SIZE-18': ['font-size:18pt;', 'span'],
   'SIZE-20': ['font-size:20pt;', 'span'],
-  'SIZE-22': ['font-size:202pt;', 'span'],
+  'SIZE-22': ['font-size:22pt;', 'span'],
   'SIZE-24': ['font-size:24pt;', 'span'],
   'SIZE-26': ['font-size:26pt;', 'span'],
   'SIZE-28': ['font-size:28pt;', 'span'],
