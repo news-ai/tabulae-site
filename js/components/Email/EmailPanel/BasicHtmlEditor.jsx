@@ -2,7 +2,6 @@
 import React, {Component} from 'react';
 import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
-import find from 'lodash/find';
 import cn from 'classnames';
 import {connect} from 'react-redux';
 import Draft, {
@@ -36,11 +35,13 @@ import {
   typefaceMap,
   fontsizeMap
 } from 'components/Email/EmailPanel/utils/renderers';
+import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtils/stripSelectedInlineTagBlocks';
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
+import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -115,16 +116,8 @@ class BasicHtmlEditor extends Component {
     ];
 
     this.CONVERT_CONFIGS = {
-      htmlToStyle: (nodeName, node, currentStyle) => {
-        if (nodeName === 'span') {
-          const fontSize = node.style.fontSize.substring(0, node.style.fontSize.length - 2);
-          const foundType = find(FONTSIZE_TYPES, type => type.label === fontSize);
-          if (foundType) return currentStyle.add(foundType.style);
-          return currentStyle;
-        } else {
-          return currentStyle;
-        }
-      },
+      htmlToStyle: htmlToStyle,
+      htmlToBlock: htmlToBlock,
       htmlToEntity: (nodeName, node) => {
         if (nodeName === 'a') {
           if (node.firstElementChild === null) {
@@ -146,34 +139,6 @@ class BasicHtmlEditor extends Component {
 
             this.props.saveImageData(src);
             return entityKey;
-          }
-        }
-      },
-      htmlToBlock: (nodeName, node) => {
-        if (nodeName === 'figure') {
-          return;
-        }
-        if (nodeName === 'p' || nodeName === 'div') {
-          if (node.style.textAlign === 'center') {
-            return {
-              type: 'center-align',
-              data: {}
-            };
-          } else if (node.style.textAlign === 'right') {
-            return {
-              type: 'right-align',
-              data: {}
-            };
-          } else if (node.style.textAlign === 'justify') {
-            return {
-              type: 'justify-align',
-              data: {}
-            };
-          } else {
-            return {
-              type: 'unstyled',
-              data: {}
-            };
           }
         }
       },
@@ -219,7 +184,6 @@ class BasicHtmlEditor extends Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.toggleSingleInlineStyle = this._toggleSingleInlineStyle.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
 
@@ -229,8 +193,8 @@ class BasicHtmlEditor extends Component {
     this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
     this.onImageDropzoneOpen = _ => this.imgDropzone.open();
     this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
-    this.onFontSizeToggle = newFontsize => this.toggleSingleInlineStyle(newFontsize, fontsizeMap);
-    this.onTypefaceToggle = newTypeface => this.toggleSingleInlineStyle(newTypeface, typefaceMap);
+    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, fontsizeMap), 'force-emit-html');
+    this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -562,42 +526,6 @@ class BasicHtmlEditor extends Component {
       return true;
     }
     return false;
-  }
-
-  _toggleSingleInlineStyle(toggledStyle, inlineStyleMap) {
-    const {editorState} = this.state;
-    const selection = editorState.getSelection();
-
-    // Let's just allow one color at a time. Turn off all active colors.
-    const nextContentState = Object.keys(inlineStyleMap)
-      .reduce((contentState, inlineStyle) => {
-        return Modifier.removeInlineStyle(contentState, selection, inlineStyle);
-      }, editorState.getCurrentContent());
-
-    let nextEditorState = EditorState.push(
-      editorState,
-      nextContentState,
-      'change-inline-style'
-    );
-
-    const currentStyle = editorState.getCurrentInlineStyle();
-
-    // Unset style override for current color.
-    if (selection.isCollapsed()) {
-      nextEditorState = currentStyle.reduce((state, inlineStyle) => {
-        return RichUtils.toggleInlineStyle(state, inlineStyle);
-      }, nextEditorState);
-    }
-
-    // If the color is being toggled on, apply it.
-    if (!currentStyle.has(toggledStyle)) {
-      nextEditorState = RichUtils.toggleInlineStyle(
-        nextEditorState,
-        toggledStyle
-      );
-    }
-
-    this.onChange(nextEditorState, 'force-emit-html');
   }
 
   render() {

@@ -9,6 +9,7 @@ import Popover from 'material-ui/Popover';
 import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
 import Collapse from 'react-collapse';
+import Slider from 'rc-slider';
 import alertify from 'utils/alertify';
 import {blue50, blue100, blue200, blueGrey50, blueGrey100,
   blue500, blueGrey400, blueGrey600, blueGrey800} from 'material-ui/styles/colors';
@@ -17,6 +18,7 @@ import find from 'lodash/find';
 import styled from 'styled-components';
 import {convertToRaw} from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
+import {FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 
 const ItemContainer = styled.div`
   height: 40px;
@@ -84,6 +86,7 @@ const SideSection = styled.div`
 
 const TabButton = styled.span`
   flex: 1;
+  padding: 5px 15px;
   background-color: ${props => props.active && blue50};
   border: ${props => props.active && `2px solid ${blue200}`};
   text-align: center;
@@ -94,26 +97,33 @@ const TabButton = styled.span`
   }
 `;
 
+const TopBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 15px 0 0 0;
+`;
+
 function createMarkUp(html) {
   return { __html: html };
 }
 
-const fontSizes = [5, 6, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
-const generateFontSizeStyleMap = fonts => fonts.reduce((acc, font) => {
-  acc[`SIZE-${font}`] = ({fontSize: `${font + 4}pt`});
-  return acc;
-}, {});
-const customFontSizes = generateFontSizeStyleMap(fontSizes);
+const customFontSizes = FONTSIZE_TYPES
+  .map(font => font.style)
+  .reduce((acc, font) => {
+    acc[`SIZE-${font}`] = ({fontSize: `${font + 4}pt`});
+    return acc;
+  }, {});
 
-const DEFAULT_PADDING = 65 + 100 + 40; //top bar height + utility bar height + padding
+const EDITOR_DISTANCE_FROM_TOP = 80;
+
+const DEFAULT_PADDING = 65 + 100 + 40; // top bar height + utility bar height + padding
 const MIN_WIDTH = 600;
-const MAX_WIDTH = 900;
 const MIN_HEIGHT = 530;
 class Workspace extends Component {
   constructor(props) {
     super(props);
 
-    const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
     const screenHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     let height = Math.floor(screenHeight - DEFAULT_PADDING);
     if (height < MIN_HEIGHT) height = MIN_HEIGHT; // set some minimal height
@@ -130,10 +140,11 @@ class Workspace extends Component {
       open: false,
       anchorEl: null,
       useExisting: false,
-      showToolbar: true,
+      showToolbar: false,
       width: 600,
       height: height,
-      mode: 'writing'
+      mode: 'writing',
+      screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 900),
     };
     this.onSubjectChange = this.onSubjectChange.bind(this);
     this.onBodyChange = this.onBodyChange.bind(this);
@@ -262,7 +273,6 @@ class Workspace extends Component {
         <span
         style={{width: '100%'}}
         onClick={_ => {
-          console.log('wha');
           this.handleTemplateChange(template.id);
           this.setState({open: false});
         }}
@@ -272,12 +282,17 @@ class Workspace extends Component {
       );
     const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
     return (
-      <div>
+      <div style={{display: 'flex', flexDirection: 'column'}} >
+        <TopBar>
+          <div style={{display: 'block'}} >
+            <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
+            <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>HTML Preview</TabButton>
+          </div>
+        </TopBar>
         <div style={{
           // border: '1px solid blue',
           display: 'flex',
           // justifyContent: 'space-around',
-          paddingTop: 15
         }}>
           <div style={{padding: '5px 5px 5px 12px', zIndex: 200, order: -1, position: 'fixed'}}>
             <i
@@ -301,10 +316,6 @@ class Workspace extends Component {
               order: 1
             }} >
               <div style={{marginTop: 40}} >
-                <div style={{display: 'flex', marginBottom: 10}} >
-                  <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
-                  <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>Preview</TabButton>
-                </div>
                 <RaisedButton
                 label='Load Existing'
                 style={{marginBottom: 5, width: '100%'}}
@@ -321,6 +332,11 @@ class Workspace extends Component {
                 </Collapse>
               </div>
               <div style={{marginTop: 'auto'}} >
+                <Slider
+                min={200} max={state.screenWidth} step={1}
+                onChange={width => this.setState({width})}
+                value={state.width}
+                />
                 <ItemContainer>
                 {!!state.currentTemplateId &&
                   <strong className='text'>{currentTemplate.name || currentTemplate.subject}</strong>}
@@ -330,7 +346,7 @@ class Workspace extends Component {
                 style={{marginBottom: 5, width: '100%'}}
                 disabled={!state.useExisting}
                 label='Save'
-                labelStyle={{textTransform: 'none'}}
+                labelStyle={styles.transformNone}
                 onTouchTap={this.onSaveCurrentTemplateClick}
                 />
                 <RaisedButton
@@ -338,7 +354,7 @@ class Workspace extends Component {
                 style={{marginBottom: 5, width: '100%'}}
                 label='Save New...'
                 labelColor='#ffffff'
-                labelStyle={{textTransform: 'none'}}
+                labelStyle={styles.transformNone}
                 onTouchTap={this.onSaveNewTemplateClick}
                 />
                 <RaisedButton
@@ -346,7 +362,7 @@ class Workspace extends Component {
                 style={{marginBottom: 5, width: '100%'}}
                 label='Clear Editor'
                 labelColor='#ffffff'
-                labelStyle={{textTransform: 'none'}}
+                labelStyle={styles.transformNone}
                 onTouchTap={this.onClearEditor}
                 />
               </div>
@@ -360,14 +376,14 @@ class Workspace extends Component {
             allowGeneralizedProperties
             allowToolbarDisappearOnBlur
             containerClassName='RichEditor-editor-workspace'
-            width={600}
+            width={state.width}
             height='unlimited'
             debounce={500}
             bodyContent={state.body}
             rawBodyContentState={state.bodyContentState}
             subjectHtml={state.subject}
             rawSubjectContentState={state.subjectContentState}
-            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: 80, marginBottom: 15}}}
+            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: EDITOR_DISTANCE_FROM_TOP, marginBottom: 15}}}
             controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
             controlsPosition='top'
             onBodyChange={this.onBodyChange}
@@ -376,7 +392,7 @@ class Workspace extends Component {
             extendStyleMap={customFontSizes}
             />}
           {state.mode === 'preview' &&
-            <div style={{marginTop: 80}} >
+            <div style={{marginTop: EDITOR_DISTANCE_FROM_TOP}} >
               <div
               style={{width: state.width, borderBottom: '2px solid gray', paddingBottom: 10, marginBottom: 10}}
               dangerouslySetInnerHTML={createMarkUp(state.mutatingSubject)}
@@ -392,6 +408,10 @@ class Workspace extends Component {
     );
   }
 }
+
+const styles = {
+  transformNone: {textTransform: 'none'},
+};
 
 export default connect(
   state => ({
