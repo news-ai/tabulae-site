@@ -26,6 +26,7 @@ import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
+import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -190,7 +191,8 @@ class GeneralEditor extends React.Component {
       });
     };
     function emitHTML(editorState) {
-      let raw = convertToRaw(editorState.getCurrentContent());
+      const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
+      let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       // console.log(raw);
       // console.log(html);

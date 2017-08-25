@@ -100,7 +100,7 @@ function createMarkUp(html) {
 
 const fontSizes = [5, 6, 7.5, 8, 9, 10, 10.5, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 const generateFontSizeStyleMap = fonts => fonts.reduce((acc, font) => {
-  acc[`SIZE-${font}`] = ({fontSize: `${font + 3}pt`});
+  acc[`SIZE-${font}`] = ({fontSize: `${font + 4}pt`});
   return acc;
 }, {});
 const customFontSizes = generateFontSizeStyleMap(fontSizes);
