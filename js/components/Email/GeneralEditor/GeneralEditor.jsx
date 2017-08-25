@@ -186,7 +186,7 @@ class GeneralEditor extends React.Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, undefined, 'SIZE_'), 'force-emit-html');
+    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, undefined, 'SIZE-'), 'force-emit-html');
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onPropertyIconClick = e => {
@@ -532,6 +532,9 @@ class GeneralEditor extends React.Component {
     
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
+
+    const currentStyle = editorState.getCurrentInlineStyle().toJS();
+    console.log(currentStyle);
 
     return (
       <div>

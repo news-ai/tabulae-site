@@ -6,11 +6,9 @@ function toggleSingleInlineStyle(editorState, toggledStyle, inlineStyleMap, PREF
 
   // Let's just allow one color at a time. Turn off all active colors.
   // get a list of active colors
-  console.log(currentStyle.toJS());
   const activeStyles = PREFIX_MATCH ?
     currentStyle.filter(val => val.substring(0, PREFIX_MATCH.length) === PREFIX_MATCH) :
     Object.keys(inlineStyleMap);
-  console.log(activeStyles.toJS());
 
   // turn off active colors
   const nextContentState = activeStyles
