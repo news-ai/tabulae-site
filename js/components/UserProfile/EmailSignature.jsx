@@ -7,6 +7,7 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import isJSON from 'validator/lib/isJSON';
 import {grey600} from 'material-ui/styles/colors';
+import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 
 class EmailSignature extends Component {
   constructor(props) {
@@ -35,6 +36,7 @@ class EmailSignature extends Component {
       this.setState({subject});
     };
     this.onSaveClick = this._onSaveClick.bind(this);
+    this.handlePastedText = this._handlePastedText.bind(this);
   }
 
   _handleChange(e, i, newEmail) {
@@ -68,7 +70,7 @@ class EmailSignature extends Component {
       emailsignature: oldPerson.emailsignature,
       emailsignatures: oldPerson.emailsignatures,
     };
-    console.log(this.state.rawBodyContentState);
+    // console.log(this.state.rawBodyContentState);
     const data = JSON.stringify({
       type: 'DraftEditorState',
       data: this.state.rawBodyContentState,

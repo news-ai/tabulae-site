@@ -40,6 +40,7 @@ import {
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtils/stripSelectedInlineTagBlocks';
+import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -195,7 +196,8 @@ class BasicHtmlEditor extends Component {
     this.focus = () => this.refs.editor.focus();
     this.onChange = this._onChange.bind(this);
     function emitHTML(editorState) {
-      let raw = convertToRaw(editorState.getCurrentContent());
+      const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
+      let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       // console.log(raw);
       // console.log(html);
@@ -541,12 +543,10 @@ class BasicHtmlEditor extends Component {
   }
 
   _onOnlineImageUpload() {
-    const props = this.props;
-    const state = this.state;
-    if (isURL(state.imageLink)) {
-      props.saveImageData(state.imageLink);
+    if (isURL(this.state.imageLink)) {
+      this.props.saveImageData(this.state.imageLink);
       setTimeout(_ => {
-        const newEditorState = this.handleImage(state.imageLink);
+        const newEditorState = this.handleImage(this.state.imageLink);
         this.onChange(newEditorState, 'force-emit-html');
         this.setState({imageLink: ''});
       }, 50);
