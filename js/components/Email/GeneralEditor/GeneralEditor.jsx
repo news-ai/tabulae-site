@@ -499,7 +499,6 @@ class GeneralEditor extends React.Component {
     return false;
   }
 
-
   onInsertProperty(propertyType) {
     const {editorState} = this.state;
     const selection = editorState.getSelection();

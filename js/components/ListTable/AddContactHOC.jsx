@@ -21,7 +21,7 @@ import {WithContext as ReactTags} from 'react-tag-input';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
-import {yellow50, grey400} from 'material-ui/styles/colors';
+import {yellow50, grey400, blue500} from 'material-ui/styles/colors';
 import styled from 'styled-components';
 import debounce from 'es6-promise-debounce';
 
@@ -107,7 +107,7 @@ class AddContactHOC extends Component {
         contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
       };
       this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}, rssfeedsTextarea: ''});
+      this.setState({open: false, contactBody: {}, rssfeedsTextarea: '', pub1input: null});
     });
   }
 
@@ -343,11 +343,10 @@ class AddContactHOC extends Component {
                 loadOptions={this.getPublicationOptions}
                 labelKey='value'
                 value={{value: state.pub1input}}
-                onChange={({value}) => this.setState({pub1input: value})}
+                onChange={obj => this.setState({pub1input: obj === null ? null : obj.value})}
+                isLoading={props.publicationIsReceiving}
                 />
               </div>
-          {props.publicationIsReceiving &&
-              <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin' />}
             </div>
             <div className='large-12 medium-12 small-12 columns vertical-center'>
             {!state.addPublicationPanelOpen &&
@@ -355,8 +354,9 @@ class AddContactHOC extends Component {
                 <span>Don't see a publication you need? </span>
                 <span
                 className='pointer'
+                style={{color: blue500}}
                 onClick={_ => this.setState({addPublicationPanelOpen: true})}
-                >Add one here.</span>
+                >Add one here</span>
                 </div>}
               <Collapse isOpened={state.addPublicationPanelOpen}>
                 <PublicationFormStateful
