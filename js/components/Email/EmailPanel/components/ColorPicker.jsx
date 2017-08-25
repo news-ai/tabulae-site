@@ -7,7 +7,7 @@ const Color = styled.div`
   width: 36px;
   height: 14px;
   border-radius: 2px;
-  background: ${props.color ? props.color : 'black'};
+  background: ${props => props.color ? props.color : 'black'};
 `;
 
 const Swatch = styled.div`
@@ -19,6 +19,7 @@ const Swatch = styled.div`
   cursor: pointer;
 `;
 
+const PREFIX_MATCH = 'COLOR-';
 class ColorPicker extends Component {
   constructor(props) {
     super(props);
@@ -34,17 +35,21 @@ class ColorPicker extends Component {
       });
     };
     this.handleRequestClose = e => this.setState({open: false});
-    this.onChange = color => this.props.onToggle(color.hex);
+    this.onChange = color => this.props.onToggle(`COLOR-${color.hex}`);
   }
 
   render() {
     const currentStyle = this.props.editorState.getCurrentInlineStyle();
-    console.log(currentStyle.values());
-    const color = 'black';
+    const color = currentStyle
+    .filter(val => val.substring(0, PREFIX_MATCH.length) === PREFIX_MATCH)
+    .reduce((acc, col) => {
+      if (col) acc = col;
+      return acc;
+    }, 'black');
     return (
       <div className='RichEditor-controls' style={{display: 'flex'}}>
         <Swatch onClick={this.handleTouchTap} >
-          <Color />
+          <Color color={color.split(PREFIX_MATCH)[1]} />
         </Swatch>
         <Popover
         open={this.state.open}

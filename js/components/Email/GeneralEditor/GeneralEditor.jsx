@@ -46,6 +46,7 @@ import FontSizeControls from 'components/Email/EmailPanel/components/FontSizeCon
 import TypefaceControls from 'components/Email/EmailPanel/components/TypefaceControls';
 import ExternalControls from 'components/Email/EmailPanel/components/ExternalControls';
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
+import ColorPicker from 'components/Email/EmailPanel/components/ColorPicker';
 import alertify from 'alertifyjs';
 import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
@@ -91,6 +92,17 @@ const BodyEditorContainer = styled.div`
   width: ${props => props.width ? props.width : 400}px;
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
+
+const customStyleFn = style => {
+  const styleNames = style.toJS();
+  return styleNames.reduce((styles, styleName) => {
+    if (styleName.startsWith('COLOR-')) {
+      styles.color = styleName.split('COLOR-')[1];
+    }
+    return styles;
+  }, {});
+
+}
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -188,6 +200,7 @@ class GeneralEditor extends React.Component {
     this.handleDrop = this._handleDrop.bind(this);
     this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, undefined, 'SIZE-'), 'force-emit-html');
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
+    this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onPropertyIconClick = e => {
       alertify.prompt('Name the Property to be Inserted', '', '',
@@ -533,9 +546,6 @@ class GeneralEditor extends React.Component {
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
 
-    const currentStyle = editorState.getCurrentInlineStyle().toJS();
-    console.log(currentStyle);
-
     return (
       <div>
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
@@ -593,6 +603,10 @@ class GeneralEditor extends React.Component {
           onToggle={this.toggleBlockType}
           tooltipPosition='bottom-center'
           />
+          <ColorPicker
+          editorState={editorState}
+          onToggle={this.onColorToggle}
+          />
           <FontSizeControls
           editorState={editorState}
           onToggle={this.onFontSizeToggle}
@@ -638,6 +652,7 @@ class GeneralEditor extends React.Component {
               })}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={customStyleMap}
+            customStyleFn={customStyleFn}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}
