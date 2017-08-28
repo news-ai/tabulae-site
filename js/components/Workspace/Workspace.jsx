@@ -4,6 +4,7 @@ import {actions as templateActions} from 'components/Email/Template';
 import GeneralEditor from 'components/Email/GeneralEditor';
 import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import Popover from 'material-ui/Popover';
 import FontIcon from 'material-ui/FontIcon';
@@ -101,7 +102,7 @@ const TabButton = styled.span`
 const TopBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 15px 0 0 0;
 `;
 
@@ -180,6 +181,12 @@ class Workspace extends Component {
   componentDidMount() {
     if (this.props.template) {
       this.handleTemplateChange(this.props.template.id);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.params.templateId !== nextProps.params.templateId && nextProps.params.templateId !== 'new-template') {
+      this.handleTemplateChange(nextProps.template.id);
     }
   }
 
@@ -322,17 +329,29 @@ class Workspace extends Component {
             </div>
           </div>
       */}
-          <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
-          <div style={{display: 'block', width: 150, marginRight: 10, marginLeft: 5}} > 
-            <Slider
-            min={200} max={state.screenWidth} step={1}
-            onChange={width => this.setState({width})}
-            value={state.width}
+          <div>
+            <FlatButton
+            secondary
+            style={{marginBottom: 5, width: '100%'}}
+            label='Clear Editor'
+            labelColor='#ffffff'
+            labelStyle={styles.transformNone}
+            onTouchTap={this.onClearEditor}
             />
           </div>
-          <div style={{display: 'block'}} >
-            <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
-            <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>HTML Preview</TabButton>
+          <div className='vertical-center'>
+            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
+            <div style={{display: 'block', width: 150, marginRight: 10, marginLeft: 5}} > 
+              <Slider
+              min={200} max={state.screenWidth} step={1}
+              onChange={width => this.setState({width})}
+              value={state.width}
+              />
+            </div>
+            <div style={{display: 'block'}} >
+              <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
+              <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>HTML Preview</TabButton>
+            </div>
           </div>
         </TopBar>
         <div style={{
@@ -389,14 +408,6 @@ class Workspace extends Component {
                 labelColor='#ffffff'
                 labelStyle={styles.transformNone}
                 onTouchTap={this.onSaveNewTemplateClick}
-                />
-                <RaisedButton
-                secondary
-                style={{marginBottom: 5, width: '100%'}}
-                label='Clear Editor'
-                labelColor='#ffffff'
-                labelStyle={styles.transformNone}
-                onTouchTap={this.onClearEditor}
                 />
               </div>
             </ToolbarPaper>}

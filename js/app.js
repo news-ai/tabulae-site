@@ -136,8 +136,8 @@ ReactDOM.render(
             <Route path='team' name='Team Lists' component={TeamListsContainer} />
             <Route path='settings' name='Settings' component={UserProfile} />
             <Route path='workspace' name='Workspace' component={TemplateManager} />
-            <Route path='workspace/:templateId' name='Workspace' component={Workspace} />
-            <Route path='workspace/new-template' name='Workspace' component={Workspace} />
+            <Route path='workspace/:templateId' staticName name='Saved Template' component={Workspace} />
+            <Route path='workspace/new-template' staticName name='New Template' component={Workspace} />
             <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
               <IndexRoute component={CampaignContainer}/>
               <Route path='all' name='All Sent Emails' component={AllSentEmailsContainer} />
