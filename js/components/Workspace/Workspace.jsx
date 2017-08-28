@@ -36,6 +36,7 @@ const Menu = styled.ul`
   overflow: hidden;
   overflow-y: scroll;
   border-bottom: 1px solid lightgrey;
+  width: 100%;
 `;
 
 const MenuItem = styled.li`
@@ -173,7 +174,13 @@ class Workspace extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchTemplates();
+    // this.props.fetchTemplates();
+  }
+
+  componentDidMount() {
+    if (this.props.template) {
+      this.handleTemplateChange(this.props.template.id);
+    }
   }
 
   componentWillUnmount() {
@@ -295,8 +302,28 @@ class Workspace extends Component {
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
         <TopBar>
-          <div style={{display: 'block', width: 150, margin: '0 10px'}} > 
-            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
+      {/*
+          <div>
+            <RaisedButton
+            label='Load Existing'
+            style={{marginBottom: 5, width: 200}}
+            backgroundColor={blue500}
+            labelColor='#ffffff'
+            labelStyle={{textTransform: 'none'}}
+            icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up'} />}
+            onTouchTap={e => this.setState({open: !state.open})}
+            />
+            <div style={{position: 'absolute', width: 200}} >
+              <Collapse isOpened={state.open}>
+                <Menu>
+                {options}
+                </Menu>
+              </Collapse>
+            </div>
+          </div>
+      */}
+          <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
+          <div style={{display: 'block', width: 150, marginRight: 10, marginLeft: 5}} > 
             <Slider
             min={200} max={state.screenWidth} step={1}
             onChange={width => this.setState({width})}
@@ -328,7 +355,7 @@ class Workspace extends Component {
               <div style={{marginTop: 40}} >
                 <RaisedButton
                 label='Load Existing'
-                style={{marginBottom: 5, width: '100%'}}
+                style={{marginBottom: 5, width: 250}}
                 backgroundColor={blue500}
                 labelColor='#ffffff'
                 labelStyle={{textTransform: 'none'}}
@@ -420,8 +447,9 @@ const styles = {
 };
 
 export default connect(
-  state => ({
-    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived)
+  (state, props) => ({
+    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived),
+    template: props.params.templateId !== 'new-template' && state.templateReducer[parseInt(props.params.templateId)],
   }),
   dispatch => ({
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),
