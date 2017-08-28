@@ -350,10 +350,10 @@ class AddContactHOC extends Component {
             </div>
             <div className='large-12 medium-12 small-12 columns vertical-center'>
             {!state.addPublicationPanelOpen &&
-              <div style={{fontSize: '0.8em', marginTop: 5, marginLeft: 5}}>
-                <span>Don't see a publication you need? </span>
+              <div style={{marginTop: 5, marginLeft: 5}}>
+                <span className='smalltext'>Don't see a publication you need? </span>
                 <span
-                className='pointer'
+                className='pointer smalltext'
                 style={{color: blue500}}
                 onClick={_ => this.setState({addPublicationPanelOpen: true})}
                 >Add one here</span>
