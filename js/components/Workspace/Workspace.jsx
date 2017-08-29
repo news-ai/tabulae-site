@@ -126,7 +126,10 @@ const customFontSizes = FONTSIZE_TYPES
   .map(font => font.style)
   .reduce((acc, font) => {
     const size = parseFloat(font.split('SIZE-')[1]);
-    acc[font] = ({fontSize: `${size + 4}pt`});
+    acc[font] = ({
+      fontSize: `${size + 4}pt`,
+      // lineHeight: 1.3
+    });
     return acc;
   }, {});
 
@@ -352,8 +355,8 @@ class Workspace extends Component {
             </div>}
           </div>
           <div className='vertical-center'>
-            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
-            <div style={{display: 'block', width: 150, marginRight: 10, marginLeft: 5}} > 
+            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`Width ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
+            <div style={{display: 'block', width: 120, marginRight: 10, marginLeft: 5}} > 
               <Slider
               min={200} max={state.screenWidth} step={1}
               onChange={width => this.setState({width})}

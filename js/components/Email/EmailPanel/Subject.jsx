@@ -189,33 +189,34 @@ class Subject extends Component {
     const {editorState, subjectLength} = this.state;
     const state = this.state;
     const props = this.props;
-    const containerStyle = props.style ? Object.assign({}, styles.container, props.style) : styles.container;
+    const containerStyle = props.style ?
+    Object.assign({}, styles.container, props.style, {width: this.props.width}) :
+    Object.assign({}, styles.container, { width: this.props.width,});
     return (
-      <div style={containerStyle} className='vertical-center' >
+      <div style={containerStyle}>
+      {props.fieldsmap &&
+        <Popover
+        open={state.variableMenuOpen}
+        anchorEl={state.variableMenuAnchorEl}
+        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+        onRequestClose={_ => this.setState({variableMenuOpen: false})}
+        >
+          <Menu desktop>
+          {props.fieldsmap
+            .filter(field => !field.hidden)
+            .map((field, i) =>
+            <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
+          </Menu>
+        </Popover>}
         <div
         className='subject-draft-container'
         style={{
-          width: this.props.width,
           height: 32,
           overflowX: 'scroll',
         }}
         onClick={this.focus}
         >
-        {props.fieldsmap &&
-          <Popover
-          open={state.variableMenuOpen}
-          anchorEl={state.variableMenuAnchorEl}
-          anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-          targetOrigin={{horizontal: 'left', vertical: 'top'}}
-          onRequestClose={_ => this.setState({variableMenuOpen: false})}
-          >
-            <Menu desktop>
-            {props.fieldsmap
-              .filter(field => !field.hidden)
-              .map((field, i) =>
-              <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)} />)}
-            </Menu>
-          </Popover>}
           <Editor
           editorState={editorState}
           onChange={this.onChange}
@@ -225,7 +226,7 @@ class Subject extends Component {
           ref='subjectEditor'
           />
         </div>
-        <div className='vertical-center'>
+        <div>
           <span className='text' style={styles.lengthLabel}>{padZeros(subjectLength, 3)}</span>
         {(props.fieldsmap || props.allowGeneralizedProperties) &&
           <IconButton
@@ -243,7 +244,12 @@ class Subject extends Component {
 }
 
 const styles = {
-  container: {borderBottom: `1px solid ${grey300}`},
+  container: {
+    borderBottom: `1px solid ${grey300}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
   lengthLabel: {color: grey500},
   icon: {
     iconStyle: {width: 12, height: 12, fontSize: '12px', color: grey400},

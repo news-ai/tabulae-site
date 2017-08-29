@@ -15,6 +15,7 @@ import Draft, {
   convertFromRaw,
   CompositeDecorator,
   Modifier,
+  getVisibleSelectionRect
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
@@ -93,6 +94,16 @@ const BodyEditorContainer = styled.div`
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
 
+const getSelectDOMRect = () => {
+  let rect = getVisibleSelectionRect(window);
+  if (rect === null) {
+    const node = window.getSelection().focusNode;
+    if (node === null) return null;
+    rect = node.getBoundingClientRect();
+  }
+  return {top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right} ;
+};
+
 class GeneralEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -147,7 +158,8 @@ class GeneralEditor extends React.Component {
       imagePanelOpen: false,
       imageLink: '',
       showToolbar: false,
-      onHoverToolbar: false
+      onHoverToolbar: false,
+      currentFocusPosition: null
     };
 
     this.focus = () => {
@@ -193,6 +205,7 @@ class GeneralEditor extends React.Component {
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onPropertyIconClick = e => {
+      console.log('hello');
       alertify.prompt('Name the Property to be Inserted', '', '',
         (evt, value) => this.onInsertProperty(value),
         function() {});
@@ -200,7 +213,13 @@ class GeneralEditor extends React.Component {
     this.onShowToolbar = e => {
       e.preventDefault();
       this.setState({showToolbar: true});
-    }
+    };
+    this.getPropertyIconLocation = _ => {
+      const currentFocusPosition = getSelectDOMRect();
+      if (currentFocusPosition !== null) this.setState({currentFocusPosition});
+    };
+
+    this.removePropertyLocation = _ => this.setState({currentFocusPosition: null});
   }
 
   componentWillMount() {
@@ -218,6 +237,10 @@ class GeneralEditor extends React.Component {
     }
   }
 
+  componentDidMount() {
+    window.addEventListener('scroll', this.getPropertyIconLocation);
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.bodyContent !== nextProps.bodyContent && this.props.allowReplacement) {
       let newContent;
@@ -232,6 +255,10 @@ class GeneralEditor extends React.Component {
       }
       this.onChange(editorState);
     }
+  }
+
+  componentDidUnMount() {
+    window.removeEventListener('scroll', this.getPropertyIconLocation);
   }
 
   _cleanHTMLToContentState(html) {
@@ -283,6 +310,7 @@ class GeneralEditor extends React.Component {
   _onChange(editorState, onChangeType) {
     let newEditorState = editorState;
     this.setState({editorState: newEditorState});
+    this.getPropertyIconLocation();
 
     let previousContent = this.state.editorState.getCurrentContent();
 
@@ -520,6 +548,7 @@ class GeneralEditor extends React.Component {
       'insert-fragment'
       );
     this.onChange(newEditorState);
+    setTimeout(_ => this.setState({currentFocusPosition: null}), 5);
   }
 
   render() {
@@ -529,8 +558,11 @@ class GeneralEditor extends React.Component {
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
-    const className = cn(props.containerClassName || 'RichEditor-editor', {
-      'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'});
+    const containerClassName = props.containerClassName || 'RichEditor-editor';
+    const className = cn(
+      containerClassName,
+      {'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'}
+      );
     let customStyleMap = styleMap;
     if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
 
@@ -631,18 +663,20 @@ class GeneralEditor extends React.Component {
         rawSubjectContentState={props.rawSubjectContentState}
         />}
         <BodyEditorContainer width={props.width} height={props.height} >
+        {props.allowGeneralizedProperties && state.currentFocusPosition !== null &&
+          <div style={{
+            position: 'fixed',
+            top: state.currentFocusPosition.top,
+            zIndex: 300
+          }} >
+            <IconButton
+            tooltip='Insert Property'
+            tooltipPosition='bottom-center'
+            iconClassName='fa fa-plus-square-o'
+            onClick={this.onPropertyIconClick}
+            />
+          </div>}
           <div className={className} onClick={this.focus}>
-          {props.allowGeneralizedProperties &&
-            <div className='right'>
-              <IconButton
-              tooltip='Insert Property to Body'
-              tooltipPosition='bottom-center'
-              iconClassName='fa fa-plus-square-o'
-              iconStyle={icon.iconStyle}
-              style={icon.style}
-              onClick={this.onPropertyIconClick}
-              />
-            </div>}
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={
@@ -664,6 +698,7 @@ class GeneralEditor extends React.Component {
             onChange={this.onChange}
             placeholder={props.placeholder || placeholder}
             onBlur={e => {
+              console.log('onblur');
               e.preventDefault();
                if (editorState.getSelection().isCollapsed() && !state.onHoverToolbar) this.setState({showToolbar: false});
             }}
