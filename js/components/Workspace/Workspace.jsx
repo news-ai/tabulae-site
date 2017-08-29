@@ -420,7 +420,16 @@ const styles = {
 export default connect(
   (state, props) => ({
     isLoading: state.templateReducer.isReceiving,
-    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived),
+    templates: state.templateReducer.received
+    .map(id => state.templateReducer[id])
+    .filter(template => !template.archived)
+    .reduce((saved, template) => {
+      if (isJSON(template.body) && JSON.parse(template.body).date) {
+      } else {
+        saved = [...saved, template];
+      }
+      return saved;
+    }, []),
     template: props.params.templateId !== 'new-template' && state.templateReducer[parseInt(props.params.templateId)],
   }),
   dispatch => ({

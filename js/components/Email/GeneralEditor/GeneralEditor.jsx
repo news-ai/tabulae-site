@@ -101,7 +101,7 @@ const getSelectDOMRect = () => {
     if (node === null) return null;
     rect = node.getBoundingClientRect();
   }
-  return {top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right} ;
+  return {top: rect.top - 18, bottom: rect.bottom, left: rect.left, right: rect.right} ;
 };
 
 class GeneralEditor extends React.Component {
@@ -238,7 +238,7 @@ class GeneralEditor extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('scroll', this.getPropertyIconLocation);
+    if (this.props.allowGeneralizedProperties) window.addEventListener('scroll', this.getPropertyIconLocation);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -258,7 +258,7 @@ class GeneralEditor extends React.Component {
   }
 
   componentDidUnMount() {
-    window.removeEventListener('scroll', this.getPropertyIconLocation);
+    if (this.props.allowGeneralizedProperties) window.removeEventListener('scroll', this.getPropertyIconLocation);
   }
 
   _cleanHTMLToContentState(html) {
@@ -571,8 +571,9 @@ class GeneralEditor extends React.Component {
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
 
+
     return (
-      <div>
+      <div ref={ref => this.outerContainer = ref} >
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
         autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
           <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
@@ -662,20 +663,20 @@ class GeneralEditor extends React.Component {
         fieldsmap={props.fieldsmap}
         rawSubjectContentState={props.rawSubjectContentState}
         />}
+      {props.allowGeneralizedProperties && state.currentFocusPosition !== null &&
+        <div style={{
+          position: 'fixed',
+          top: state.currentFocusPosition.top,
+          left: this.outerContainer.getBoundingClientRect().left - 50,
+        }} >
+          <IconButton
+          tooltip='Insert Property'
+          tooltipPosition='bottom-center'
+          iconClassName='fa fa-plus-square-o'
+          onClick={this.onPropertyIconClick}
+          />
+        </div>}
         <BodyEditorContainer width={props.width} height={props.height} >
-        {props.allowGeneralizedProperties && state.currentFocusPosition !== null &&
-          <div style={{
-            position: 'fixed',
-            top: state.currentFocusPosition.top,
-            zIndex: 300
-          }} >
-            <IconButton
-            tooltip='Insert Property'
-            tooltipPosition='bottom-center'
-            iconClassName='fa fa-plus-square-o'
-            onClick={this.onPropertyIconClick}
-            />
-          </div>}
           <div className={className} onClick={this.focus}>
             <Editor
             blockStyleFn={getBlockStyle}

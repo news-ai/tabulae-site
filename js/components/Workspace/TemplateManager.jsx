@@ -7,6 +7,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Link from 'react-router/lib/Link';
 import styled from 'styled-components';
 import {grey50, grey700, blue500} from 'material-ui/styles/colors';
+import isJSON from 'validator/lib/isJSON';
 
 const styles = {
   smallIcon: {
@@ -36,6 +37,7 @@ const ListItem = styled.div.attrs({
 
 const TemplateManager = props => {
   const {templates} = props;
+  console.log(templates);
   return (
     <div className='row horizontal-center'>
       <div className='large-10 medium-10 small-12 columns'>
@@ -93,7 +95,16 @@ class TemplateManagerContainer extends Component {
 
 export default connect(
   state => ({
-    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived)
+    templates: state.templateReducer.received
+    .map(id => state.templateReducer[id])
+    .filter(template => !template.archived)
+    .reduce((saved, template) => {
+      if (isJSON(template.body) && JSON.parse(template.body).date) {
+      } else {
+        saved = [...saved, template];
+      }
+      return saved;
+    }, []),
   }),
   dispatch => ({
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),
