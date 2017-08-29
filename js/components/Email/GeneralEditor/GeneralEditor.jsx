@@ -146,7 +146,8 @@ class GeneralEditor extends React.Component {
       filePanelOpen: false,
       imagePanelOpen: false,
       imageLink: '',
-      showToolbar: false
+      showToolbar: false,
+      onHoverToolbar: false
     };
 
     this.focus = () => {
@@ -196,6 +197,10 @@ class GeneralEditor extends React.Component {
         (evt, value) => this.onInsertProperty(value),
         function() {});
     };
+    this.onShowToolbar = e => {
+      e.preventDefault();
+      this.setState({showToolbar: true});
+    }
   }
 
   componentWillMount() {
@@ -567,47 +572,55 @@ class GeneralEditor extends React.Component {
         </Dialog>
         <Dropzone ref={(node) => (this.imgDropzone = node)} style={{display: 'none'}} onDrop={this.onImageUploadClicked} />
       {props.controlsPosition === 'top' &&
-        <Paper onClick={_ => console.log('paper')} zDepth={1} className='vertical-center' style={controlsStyle} >
-          <InlineStyleControls
-          editorState={editorState}
-          onToggle={this.toggleInlineStyle}
-          inlineStyles={INLINE_STYLES}
-          tooltipPosition='bottom-center'
-          />
-          <EntityControls
-          editorState={editorState}
-          entityControls={this.ENTITY_CONTROLS}
-          tooltipPosition='bottom-center'
-          />
-          <ExternalControls
-          editorState={editorState}
-          externalControls={this.EXTERNAL_CONTROLS}
-          active={props.files.length > 0}
-          tooltipPosition='bottom-center'
-          />
-          <PositionStyleControls
-          editorState={editorState}
-          blockTypes={POSITION_TYPES}
-          onToggle={this.toggleBlockType}
-          tooltipPosition='bottom-center'
-          />
-          <FontSizeControls
-          editorState={editorState}
-          onToggle={this.onFontSizeToggle}
-          inlineStyles={FONTSIZE_TYPES}
-          tooltipPosition='bottom-center'
-          />
-          <TypefaceControls
-          editorState={editorState}
-          onToggle={this.onTypefaceToggle}
-          inlineStyles={TYPEFACE_TYPES}
-          tooltipPosition='bottom-center'
-          />
-          <ColorPicker
-          editorState={editorState}
-          onToggle={this.onColorToggle}
-          />
-        </Paper>}
+        <div className='horizontal-center'>
+          <Paper
+          zDepth={1}
+          className='vertical-center'
+          style={controlsStyle}
+          onMouseEnter={e => this.setState({onHoverToolbar: true})}
+          onMouseLeave={e => this.setState({onHoverToolbar: false})}
+          >
+            <InlineStyleControls
+            editorState={editorState}
+            onToggle={this.toggleInlineStyle}
+            inlineStyles={INLINE_STYLES}
+            tooltipPosition='bottom-center'
+            />
+            <EntityControls
+            editorState={editorState}
+            entityControls={this.ENTITY_CONTROLS}
+            tooltipPosition='bottom-center'
+            />
+            <ExternalControls
+            editorState={editorState}
+            externalControls={this.EXTERNAL_CONTROLS}
+            active={props.files.length > 0}
+            tooltipPosition='bottom-center'
+            />
+            <PositionStyleControls
+            editorState={editorState}
+            blockTypes={POSITION_TYPES}
+            onToggle={this.toggleBlockType}
+            tooltipPosition='bottom-center'
+            />
+            <FontSizeControls
+            editorState={editorState}
+            onToggle={this.onFontSizeToggle}
+            inlineStyles={FONTSIZE_TYPES}
+            tooltipPosition='bottom-center'
+            />
+            <TypefaceControls
+            editorState={editorState}
+            onToggle={this.onTypefaceToggle}
+            inlineStyles={TYPEFACE_TYPES}
+            tooltipPosition='bottom-center'
+            />
+            <ColorPicker
+            editorState={editorState}
+            onToggle={this.onColorToggle}
+            />
+          </Paper>
+        </div>}
       {props.onSubjectChange &&
         <Subject
         {...props.subjectParams}
@@ -650,14 +663,17 @@ class GeneralEditor extends React.Component {
             handleDrop={this.handleDrop}
             onChange={this.onChange}
             placeholder={props.placeholder || placeholder}
-            onBlur={_ => console.log('editor')}
+            onBlur={e => {
+              e.preventDefault();
+               if (editorState.getSelection().isCollapsed() && !state.onHoverToolbar) this.setState({showToolbar: false});
+            }}
             ref='editor'
             spellCheck
             />
           </div>
         </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
-        <Paper onClick={_ => this.setState({showToolbar: true})} zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
+        <Paper onClick={this.onShowToolbar} zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}

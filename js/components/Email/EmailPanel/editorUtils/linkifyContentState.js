@@ -32,7 +32,7 @@ function _removeWhiteSpace(editorState) {
  * [handlePastedText description]
  * @param  {[type]} editorState  oldEditorState
  * @param  {[type]} contentState processed ContentState to add to oldEditorState
- * @return {[type]}              [description]
+ * @return {[type]} newEditorState              [description]
  */
 
 function linkifyContentState(editorState, contentState) {

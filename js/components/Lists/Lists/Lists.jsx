@@ -18,9 +18,10 @@ function Lists({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
   return (
     <div>
       <Waiting isReceiving={isReceiving} style={loading} />
-       <ListsTitle title={title} route={backRoute} iconName='fa fa-angle-right fa-fw' backRouteTitle={backRouteTitle} />
+      <ListsTitle title={title} route={backRoute} iconName='fa fa-angle-right fa-fw' backRouteTitle={backRouteTitle} />
       <div style={styles.listitemContainer}>
-       {lists.length === 0 && <span>{statementIfEmpty}</span>}
+       {lists.length === 0 &&
+        <span>{statementIfEmpty}</span>}
         {
           lists.map( (list, i) =>
           <ListItem

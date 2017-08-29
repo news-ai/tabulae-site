@@ -72,6 +72,7 @@ import ClientDirectory from './components/ClientDirectories/ClientDirectory.jsx'
 import Publication from './components/Publications/Publication.jsx';
 import ContactTags from './components/Contacts/ContactTags/ContactTags.jsx';
 import Workspace from './components/Workspace/Workspace.jsx';
+import TemplateManager from './components/Workspace/TemplateManager.jsx';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -134,7 +135,9 @@ ReactDOM.render(
             <Route path='public' name='Public Lists' component={PublicListsContainer} />
             <Route path='team' name='Team Lists' component={TeamListsContainer} />
             <Route path='settings' name='Settings' component={UserProfile} />
-            <Route path='workspace' name='Workspace' component={Workspace} />
+            <Route path='workspace' name='Workspace' component={TemplateManager} />
+            <Route path='workspace/:templateId' staticName name='Saved Template' component={Workspace} />
+            <Route path='workspace/new-template' staticName name='New Template' component={Workspace} />
             <Route path='emailstats' name='Sent & Scheduled Emails' component={SentEmailsContainer}>
               <IndexRoute component={CampaignContainer}/>
               <Route path='all' name='All Sent Emails' component={AllSentEmailsContainer} />

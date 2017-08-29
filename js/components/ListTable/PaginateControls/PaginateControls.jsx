@@ -24,15 +24,15 @@ export const PaginationLabel = styled.span`
 class PaginationLabelContainer extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      anchorEl: null,
-      open: false
-    };
-    this.handleRequestClose = e => this.setState({open: false});
-    this.onRequestOpen = e => {
-      e.preventDefault();
-      this.setState({open: true, anchorEl: e.currentTarget});
-    };
+    // this.state = {
+    //   anchorEl: null,
+    //   open: false
+    // };
+    // this.handleRequestClose = e => this.setState({open: false});
+    // this.onRequestOpen = e => {
+    //   e.preventDefault();
+    //   this.setState({open: true, anchorEl: e.currentTarget});
+    // };
   }
   render() {
     const {currentPage, listLength, pageSize, onPageSizeChange} = this.props;
@@ -42,6 +42,8 @@ class PaginationLabelContainer extends Component {
 
     return (
       <div>
+        {/*
+            <option value={5}>5</option>
         <Popover
         open={this.state.open}
         anchorEl={this.state.anchorEl}
@@ -49,18 +51,17 @@ class PaginationLabelContainer extends Component {
         targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
         onRequestClose={this.handleRequestClose}
         >
-          <PlainSelect value={pageSize} onChange={e => onPageSizeChange(parseInt(e.target.value, 10))} >
-        {/*
-            <option value={5}>5</option>
+        </Popover>
         */}
+        <PaginationLabel>
+          {currentPage} / {total} per <PlainSelect value={pageSize} onChange={e => onPageSizeChange(parseInt(e.target.value, 10))} >
             <option value={20}>20</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
             <option value={200}>200</option>
             <option value={-1}>Infinity</option>
           </PlainSelect>
-        </Popover>
-        <PaginationLabel onClick={this.onRequestOpen} >{currentPage} / {total}</PaginationLabel>
+        </PaginationLabel>
       </div>
     );
   }
@@ -72,7 +73,7 @@ const PaginateControls = ({containerClassName, currentPage, pageSize, listLength
   if (listLength % pageSize !== 0) total += 1;
   if (pageSize === -1) total = 1;
   return (
-    <div className={containerClassName} >
+    <div className={containerClassName} style={{marginRight: 15}} >
       <PaginationHandle
       className='fa fa-chevron-left'
       disabled={currentPage - 1 === 0 || pageSize === -1}

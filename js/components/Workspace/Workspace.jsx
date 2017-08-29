@@ -4,10 +4,11 @@ import {actions as templateActions} from 'components/Email/Template';
 import GeneralEditor from 'components/Email/GeneralEditor';
 import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import Popover from 'material-ui/Popover';
 import FontIcon from 'material-ui/FontIcon';
-import Paper from 'material-ui/Paper';
+import Paper from 'components/Paper';
 import Collapse from 'react-collapse';
 import Slider from 'rc-slider';
 import alertify from 'utils/alertify';
@@ -36,6 +37,7 @@ const Menu = styled.ul`
   overflow: hidden;
   overflow-y: scroll;
   border-bottom: 1px solid lightgrey;
+  width: 100%;
 `;
 
 const MenuItem = styled.li`
@@ -87,7 +89,7 @@ const SideSection = styled.div`
 const TabButton = styled.span`
   flex: 1;
   padding: 5px 15px;
-  background-color: ${props => props.active && blue50};
+  background-color: ${props => props.active ? blue50 : '#fff'};
   border: ${props => props.active && `2px solid ${blue200}`};
   text-align: center;
   font-size: 0.8em;
@@ -100,8 +102,18 @@ const TabButton = styled.span`
 const TopBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 15px 0 0 0;
+`;
+
+const ToolbarPaper = Paper.extend`
+  height: 600px;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  order: 1;
+  z-index: 600;
+  background-color: #fff;
 `;
 
 function createMarkUp(html) {
@@ -111,7 +123,8 @@ function createMarkUp(html) {
 const customFontSizes = FONTSIZE_TYPES
   .map(font => font.style)
   .reduce((acc, font) => {
-    acc[`SIZE-${font}`] = ({fontSize: `${font + 4}pt`});
+    const size = parseFloat(font.split('SIZE-')[1]);
+    acc[font] = ({fontSize: `${size + 4}pt`});
     return acc;
   }, {});
 
@@ -162,7 +175,19 @@ class Workspace extends Component {
   }
 
   componentWillMount() {
-    this.props.fetchTemplates();
+    // this.props.fetchTemplates();
+  }
+
+  componentDidMount() {
+    if (this.props.template) {
+      this.handleTemplateChange(this.props.template.id);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.params.templateId !== nextProps.params.templateId && nextProps.params.templateId !== 'new-template') {
+      this.handleTemplateChange(nextProps.template.id);
+    }
   }
 
   componentWillUnmount() {
@@ -284,90 +309,41 @@ class Workspace extends Component {
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
         <TopBar>
-          <div style={{display: 'block'}} >
-            <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
-            <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>HTML Preview</TabButton>
+          <div className='vertical-center'>
+            <FlatButton
+            secondary
+            style={{margin: '0 5px'}}
+            label='Clear Editor'
+            labelStyle={styles.transformNone}
+            onTouchTap={this.onClearEditor}
+            />
+            <FlatButton
+            primary
+            style={{margin: '0 5px'}}
+            disabled={!state.useExisting}
+            label='Save'
+            labelStyle={styles.transformNone}
+            onTouchTap={!!state.currentTemplateId ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
+            />
+          </div>
+          <div className='vertical-center'>
+            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
+            <div style={{display: 'block', width: 150, marginRight: 10, marginLeft: 5}} > 
+              <Slider
+              min={200} max={state.screenWidth} step={1}
+              onChange={width => this.setState({width})}
+              value={state.width}
+              />
+            </div>
+            <div style={{display: 'block'}} >
+              <TabButton active={state.mode === 'writing'} onClick={_ => this.setState({mode: 'writing'})}>Writing Mode</TabButton>
+              <TabButton active={state.mode === 'preview'} onClick={_ => this.setState({mode: 'preview'})}>HTML Preview</TabButton>
+            </div>
           </div>
         </TopBar>
         <div style={{
-          // border: '1px solid blue',
           display: 'flex',
-          // justifyContent: 'space-around',
         }}>
-          <div style={{padding: '5px 5px 5px 12px', zIndex: 200, order: -1, position: 'fixed'}}>
-            <i
-            onClick={_ => this.setState({showToolbar: !state.showToolbar})}
-            className={`pointer fa fa-angle-double-${state.showToolbar ? 'left' : 'right'}`}
-            />
-            <span
-            onClick={_ => this.setState({showToolbar: !state.showToolbar})}
-            className='smalltext pointer'
-            style={{marginLeft: 5, userSelect: 'none', color: blueGrey800}}
-            >{state.showToolbar ? 'Hide Tools' : 'Show Tools'}</span>
-          </div>
-          <SideSection show={state.showToolbar} >
-          {state.showToolbar &&
-            <Paper zDepth={2} style={{
-              // textAlign: 'center',
-              height: 600,
-              position: 'fixed',
-              display: 'flex',
-              flexDirection: 'column',
-              order: 1
-            }} >
-              <div style={{marginTop: 40}} >
-                <RaisedButton
-                label='Load Existing'
-                style={{marginBottom: 5, width: '100%'}}
-                backgroundColor={blue500}
-                labelColor='#ffffff'
-                labelStyle={{textTransform: 'none'}}
-                icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up'} />}
-                onTouchTap={e => this.setState({open: !state.open})}
-                />
-                <Collapse isOpened={state.open}>
-                  <Menu>
-                  {options}
-                  </Menu>
-                </Collapse>
-              </div>
-              <div style={{marginTop: 'auto'}} >
-                <Slider
-                min={200} max={state.screenWidth} step={1}
-                onChange={width => this.setState({width})}
-                value={state.width}
-                />
-                <ItemContainer>
-                {!!state.currentTemplateId &&
-                  <strong className='text'>{currentTemplate.name || currentTemplate.subject}</strong>}
-                </ItemContainer>
-                <RaisedButton
-                backgroundColor={blue500}
-                style={{marginBottom: 5, width: '100%'}}
-                disabled={!state.useExisting}
-                label='Save'
-                labelStyle={styles.transformNone}
-                onTouchTap={this.onSaveCurrentTemplateClick}
-                />
-                <RaisedButton
-                backgroundColor={blue500}
-                style={{marginBottom: 5, width: '100%'}}
-                label='Save New...'
-                labelColor='#ffffff'
-                labelStyle={styles.transformNone}
-                onTouchTap={this.onSaveNewTemplateClick}
-                />
-                <RaisedButton
-                secondary
-                style={{marginBottom: 5, width: '100%'}}
-                label='Clear Editor'
-                labelColor='#ffffff'
-                labelStyle={styles.transformNone}
-                onTouchTap={this.onClearEditor}
-                />
-              </div>
-            </Paper>}
-          </SideSection>
           <MainSection>
           {state.mode === 'writing' &&
            <GeneralEditor
@@ -414,8 +390,9 @@ const styles = {
 };
 
 export default connect(
-  state => ({
-    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived)
+  (state, props) => ({
+    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived),
+    template: props.params.templateId !== 'new-template' && state.templateReducer[parseInt(props.params.templateId)],
   }),
   dispatch => ({
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),

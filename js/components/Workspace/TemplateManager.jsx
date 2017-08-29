@@ -1,0 +1,104 @@
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {actions as templateActions} from 'components/Email/Template';
+import IconButton from 'material-ui/IconButton';
+import FontIcon from 'material-ui/FontIcon';
+import RaisedButton from 'material-ui/RaisedButton';
+import Link from 'react-router/lib/Link';
+import styled from 'styled-components';
+import {grey50, grey700, blue500} from 'material-ui/styles/colors';
+
+const styles = {
+  smallIcon: {
+    fontSize: 16,
+    color: grey700
+  },
+  small: {
+    width: 36,
+    height: 36,
+    padding: 2,
+  },
+};
+
+const ListItem = styled.div.attrs({
+  className: props => props.className
+})`
+  margin-bottom: 10px;
+  border-radius: 1.5em;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  &:hover {
+    background: ${grey50};
+  }
+`;
+
+const TemplateManager = props => {
+  const {templates} = props;
+  return (
+    <div className='row horizontal-center'>
+      <div className='large-10 medium-10 small-12 columns'>
+        <div className='row' style={{marginTop: 20}} >
+          <div className='large-9 medium-9 small-6 columns'>
+            <span style={{fontSize: '2em'}} >Template Manager</span>
+          </div>
+          <div className='large-3 medium-3 small-6 columns'>
+            <Link to='/workspace/new-template' >
+              <RaisedButton
+              label='New Template'
+              backgroundColor={blue500}
+              labelColor='#ffffff'
+              labelStyle={{textTransform: 'none'}}
+              icon={<FontIcon color='#ffffff' className='fa fa-edit' />}
+              />
+            </Link>
+          </div>
+        </div>
+        <div style={{marginBottom: 50, marginTop: 50}}>
+        {templates.map((template, i) => (
+          <ListItem className='row vertical-center'>
+            <div className='large-10 medium-10 small-12 columns'>
+              <Link to={`/workspace/${template.id}`} style={{textTransform: 'none'}} >
+              {template.name.length > 0 ? template.name : template.subject}
+              </Link>
+            </div>
+            <div className='large-2 medium-2 columns'>
+              <IconButton
+              iconClassName='fa fa-trash'
+              iconStyle={styles.smallIcon}
+              style={styles.small}
+              tooltip='Trash'
+              tooltipPosition='top-center'
+              onClick={_ => this.props.toggleArchiveTemplate(template.id)}
+              />
+            </div> 
+          </ListItem>
+          ))}
+        </div>
+      </div>
+    </div>
+    );
+};
+
+class TemplateManagerContainer extends Component {
+  componentWillMount() {
+    this.props.fetchTemplates();
+  }
+
+  render() {
+    return <TemplateManager {...this.props} />;
+  }
+}
+
+export default connect(
+  state => ({
+    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived)
+  }),
+  dispatch => ({
+    fetchTemplates: _ => dispatch(templateActions.getTemplates()),
+    saveCurrentTemplate: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
+    createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
+    toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
+  })
+  )(TemplateManagerContainer);
