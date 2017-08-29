@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import {actions as templateActions} from 'components/Email/Template';
+import withRouter from 'react-router/lib/withRouter';
 import GeneralEditor from 'components/Email/GeneralEditor';
 import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -20,6 +21,7 @@ import styled from 'styled-components';
 import {convertToRaw} from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
+import TextField from 'material-ui/TextField';
 
 const ItemContainer = styled.div`
   height: 40px;
@@ -103,7 +105,7 @@ const TopBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 15px 0 0 0;
+  margin-top: 10px;
 `;
 
 const ToolbarPaper = Paper.extend`
@@ -175,7 +177,7 @@ class Workspace extends Component {
   }
 
   componentWillMount() {
-    // this.props.fetchTemplates();
+    this.props.fetchTemplates();
   }
 
   componentDidMount() {
@@ -186,7 +188,12 @@ class Workspace extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.params.templateId !== nextProps.params.templateId && nextProps.params.templateId !== 'new-template') {
+      console.log(1);
       this.handleTemplateChange(nextProps.template.id);
+    }
+    if (nextProps.template && this.props.template !== nextProps.template) {
+      console.log(2);
+      this.handleTemplateChange(nextProps.template.id, nextProps.templates);
     }
   }
 
@@ -215,12 +222,12 @@ class Workspace extends Component {
     });
   }
 
-  handleTemplateChange(value) {
+  handleTemplateChange(value, templates=this.props.templates) {
     const templateId = value || null;
     this.setState({currentTemplateId: value});
 
     if (!!templateId) {
-      const template = find(this.props.templates, tmp => templateId === tmp.id);
+      const template = find(templates, tmp => templateId === tmp.id);
       let subject = template.subject;
       this.setState({subject, mutatingSubject: subject, useExisting: true});
       if (isJSON(template.body)) {
@@ -266,10 +273,10 @@ class Workspace extends Component {
       name => {
         this.props.createTemplate(
           name,
-          this.state.mutatingSubject,
+          this.state.mutatingSubject || this.state.subject,
           JSON.stringify({type: 'DraftEditorState', data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
           )
-        .then(currentTemplateId => this.setState({currentTemplateId}));
+        .then(currentTemplateId => this.setState({currentTemplateId}, _ => this.props.router.push(`/workspace/${currentTemplateId}`)));
       },
       _ => console.log('template saving cancelled')
       );
@@ -320,11 +327,29 @@ class Workspace extends Component {
             <FlatButton
             primary
             style={{margin: '0 5px'}}
-            disabled={!state.useExisting}
+            disabled={!state.bodyContentState || !state.subjectContentState}
             label='Save'
             labelStyle={styles.transformNone}
-            onTouchTap={!!state.currentTemplateId ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
+            onTouchTap={props.template ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
             />
+          {this.props.template &&
+            <div>
+              <TextField
+              floatingLabelFixed
+              name='template-name'
+              ref={ref => this.templateName = ref}
+              defaultValue={this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subject}
+              floatingLabelText='Template Name'
+              onBlur={e => {
+                const defaultName = this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subjectl
+                if (this.templateName.getValue() !== defaultName) {
+                  this.props.changeTemplateName(this.props.template.id, this.templateName.getValue());
+                }
+              }}
+              />
+            {this.props.isLoading &&
+              <i style={{color: blueGrey600}} className='fa fa-spin fa-spinner' />}
+            </div>}
           </div>
           <div className='vertical-center'>
             <span style={{fontSize: '0.7em', color: blueGrey800}} >{`WIDTH ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
@@ -391,13 +416,15 @@ const styles = {
 
 export default connect(
   (state, props) => ({
+    isLoading: state.templateReducer.isReceiving,
     templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived),
     template: props.params.templateId !== 'new-template' && state.templateReducer[parseInt(props.params.templateId)],
   }),
   dispatch => ({
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),
     saveCurrentTemplate: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
+    changeTemplateName: (id, name) => dispatch(templateActions.patchTemplateName(id, name)),
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
     toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
   })
-  )(Workspace);
+  )(withRouter(Workspace));

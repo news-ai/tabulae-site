@@ -33,7 +33,25 @@ export function patchTemplate(templateId, subject, body) {
   return (dispatch, getState) => {
     const currTemplate = getState().templateReducer[templateId];
     if (currTemplate.name) templateBody.name = currTemplate.name;
-    dispatch({type: 'PATCH_TEMPLATE', templateId});
+    dispatch({type: templateConstant.REQUEST, templateId});
+    return api.patch(`/templates/${templateId}`, templateBody)
+    .then(response => {
+      const res = normalize(response.data, templateSchema);
+      return dispatch({type: templateConstant.RECEIVE, template: res.entities.templates, id: res.result});
+    })
+    .catch(message => dispatch({type: 'PATCH_TEMPLATE_FAIL', message}));
+  };
+}
+
+export function patchTemplateName(templateId, name) {
+  return (dispatch, getState) => {
+    const currTemplate = getState().templateReducer[templateId];
+    const templateBody = {
+      name: name,
+      subject: currTemplate.subject,
+      body: currTemplate.body
+    };
+    dispatch({type: templateConstant.REQUEST, templateId});
     return api.patch(`/templates/${templateId}`, templateBody)
     .then(response => {
       const res = normalize(response.data, templateSchema);
