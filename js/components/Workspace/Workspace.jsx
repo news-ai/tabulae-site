@@ -309,34 +309,21 @@ class Workspace extends Component {
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
         <TopBar>
-      {/*
-          <div>
-            <RaisedButton
-            label='Load Existing'
-            style={{marginBottom: 5, width: 200}}
-            backgroundColor={blue500}
-            labelColor='#ffffff'
-            labelStyle={{textTransform: 'none'}}
-            icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up'} />}
-            onTouchTap={e => this.setState({open: !state.open})}
-            />
-            <div style={{position: 'absolute', width: 200}} >
-              <Collapse isOpened={state.open}>
-                <Menu>
-                {options}
-                </Menu>
-              </Collapse>
-            </div>
-          </div>
-      */}
-          <div>
+          <div className='vertical-center'>
             <FlatButton
             secondary
-            style={{marginBottom: 5, width: '100%'}}
+            style={{margin: '0 5px'}}
             label='Clear Editor'
-            labelColor='#ffffff'
             labelStyle={styles.transformNone}
             onTouchTap={this.onClearEditor}
+            />
+            <FlatButton
+            primary
+            style={{margin: '0 5px'}}
+            disabled={!state.useExisting}
+            label='Save'
+            labelStyle={styles.transformNone}
+            onTouchTap={!!state.currentTemplateId ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
             />
           </div>
           <div className='vertical-center'>
@@ -357,61 +344,6 @@ class Workspace extends Component {
         <div style={{
           display: 'flex',
         }}>
-          <div style={{padding: '5px 5px 5px 12px', zIndex: 200, order: -1, position: 'fixed'}}>
-            <i
-            onClick={_ => this.setState({showToolbar: !state.showToolbar})}
-            className={`pointer fa fa-angle-double-${state.showToolbar ? 'left' : 'right'}`}
-            />
-            <span
-            onClick={_ => this.setState({showToolbar: !state.showToolbar})}
-            className='smalltext pointer'
-            style={{marginLeft: 5, userSelect: 'none', color: blueGrey800}}
-            >{state.showToolbar ? 'Hide Tools' : 'Show Tools'}</span>
-          </div>
-          <SideSection show={state.showToolbar} >
-          {state.showToolbar &&
-            <ToolbarPaper zDepth={2} >
-              <div style={{marginTop: 40}} >
-                <RaisedButton
-                label='Load Existing'
-                style={{marginBottom: 5, width: 250}}
-                backgroundColor={blue500}
-                labelColor='#ffffff'
-                labelStyle={{textTransform: 'none'}}
-                icon={<FontIcon color='#ffffff' className={state.open ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up'} />}
-                onTouchTap={e => this.setState({open: !state.open})}
-                />
-                <Collapse isOpened={state.open}>
-                  <Menu>
-                  {options}
-                  </Menu>
-                </Collapse>
-              </div>
-              <div style={{marginTop: 'auto'}} >
-                <ItemContainer>
-                {!!state.currentTemplateId &&
-                  <strong className='text'>{currentTemplate.name || currentTemplate.subject}</strong>}
-                </ItemContainer>
-                <RaisedButton
-                backgroundColor={blue500}
-                style={{marginBottom: 5, width: '100%'}}
-                disabled={!state.useExisting}
-                labelColor='#ffffff'
-                label='Save'
-                labelStyle={styles.transformNone}
-                onTouchTap={this.onSaveCurrentTemplateClick}
-                />
-                <RaisedButton
-                backgroundColor={blue500}
-                style={{marginBottom: 5, width: '100%'}}
-                label='Save New...'
-                labelColor='#ffffff'
-                labelStyle={styles.transformNone}
-                onTouchTap={this.onSaveNewTemplateClick}
-                />
-              </div>
-            </ToolbarPaper>}
-          </SideSection>
           <MainSection>
           {state.mode === 'writing' &&
            <GeneralEditor
