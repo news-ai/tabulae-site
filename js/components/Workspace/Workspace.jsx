@@ -76,6 +76,7 @@ const MainSection = styled.div`
   flex-grow: 2;
   justify-content: center;
   order: 1;
+  padding-bottom: 40px;
 `;
 
 const SideSection = styled.div`
@@ -170,7 +171,6 @@ class Workspace extends Component {
     this.onClearEditor = this.onClearEditor.bind(this);
     this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
-    this.onDeleteTemplateClick = this.onDeleteTemplateClick.bind(this);
 
     // window.onresize = _ => {
     //   const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -291,28 +291,10 @@ class Workspace extends Component {
       );
   }
 
-  onDeleteTemplateClick(templateId) {
-    this.props.toggleArchiveTemplate(templateId);
-  }
-
   render() {
     const state = this.state;
     const props = this.props;
 
-    const options = props.templates
-    .filter((template) => !(isJSON(template.body) && JSON.parse(template.body).date))
-    .map((template, i) =>
-      <MenuItem current={state.currentTemplateId === template.id} key={template.id}>
-        <span
-        style={{width: '100%'}}
-        onClick={_ => {
-          this.handleTemplateChange(template.id);
-          this.setState({open: false});
-        }}
-        >{template.name.length > 0 ? template.name : template.subject}</span>
-        <RemoveButton onClick={_ => this.onDeleteTemplateClick(template.id)} className='fa fa-trash' />
-      </MenuItem>
-      );
     const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
@@ -425,6 +407,5 @@ export default connect(
     saveCurrentTemplate: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
     changeTemplateName: (id, name) => dispatch(templateActions.patchTemplateName(id, name)),
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),
-    toggleArchiveTemplate: templateId => dispatch(templateActions.toggleArchiveTemplate(templateId)),
   })
   )(withRouter(Workspace));

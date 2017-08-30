@@ -552,7 +552,7 @@ class GeneralEditor extends React.Component {
       Modifier.insertText(contentStateWithEntity, selection, propertyType, undefined, entityKey),
       'insert-fragment'
       );
-    this.onChange(newEditorState);
+    this.onChange(newEditorState, 'force-emit-html');
     setTimeout(_ => this.setState({currentFocusPosition: null}), 5);
   }
 
