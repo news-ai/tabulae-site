@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import get from 'lodash/get';
 import {yellow50, grey500, grey800} from 'material-ui/styles/colors';
+import PlainSelect from 'components/PlainSelect';
 
 class SwitchEmailDropDown extends Component {
   constructor(props) {
@@ -22,9 +23,9 @@ class SwitchEmailDropDown extends Component {
     const emails = props.emails.map((email, i) => <option style={{fontSize: '0.9em', color: grey800}} key={`switch-email-${i}`} value={email}>{email}</option>);
     const disableSwitching = props.person.gmail || props.person.outlook || props.person.externalemail;
     return (
-      <select style={styles.select} disabled={disableSwitching} value={props.from} onChange={this.onChange} >
+      <PlainSelect disabled={disableSwitching} value={props.from} onChange={this.onChange} >
         {emails}
-      </select>);
+      </PlainSelect>);
   }
 }
 

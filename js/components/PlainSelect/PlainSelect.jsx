@@ -3,10 +3,10 @@ import styled from 'styled-components';
 const PlainSelect = styled.select`
   height: auto;
   width: auto;
-  padding: auto;
+  padding: 3px;
   appearance: menulist;
-  MozAppearance: menulist;
-  WebkitAppearance: menulist;
+  -moz-appearance: menulist;
+  -webkit-appearance: menulist;
 `;
 
 export default PlainSelect;
