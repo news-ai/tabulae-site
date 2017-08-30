@@ -94,17 +94,7 @@ const BodyEditorContainer = styled.div`
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
 
-const getSelectDOMRect = () => {
-  let rect = getVisibleSelectionRect(window);
-  if (rect === null) {
-    const node = window.getSelection().focusNode;
-    if (node === null) return null;
-    const nodeAttribute = node.getAttribute('data-offset-key');
-    if (nodeAttribute === null) return null;
-    rect = node.getBoundingClientRect();
-  }
-  return {top: rect.top - 10, bottom: rect.bottom, left: rect.left, right: rect.right} ;
-};
+
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -206,6 +196,20 @@ class GeneralEditor extends React.Component {
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
+    this.getSelectDOMRect = () => {
+      let rect = getVisibleSelectionRect(window);
+      if (rect === null) {
+        const node = window.getSelection().focusNode;
+        if (node === null) return null;
+        const nodeAttribute = node.getAttribute('data-offset-key');
+        if (nodeAttribute === null) return null;
+        rect = node.getBoundingClientRect();
+      }
+      // prevent showing property icon for Subject
+      // TODO: use the same buttom to add property for Subject eventually
+      if (!this.state.editorState.getSelection().isCollapsed() || !this.state.editorState.getSelection().getHasFocus()) return null;
+      return {top: rect.top - 10, bottom: rect.bottom, left: rect.left, right: rect.right} ;
+    };
     this.onPropertyIconClick = e => {
       alertify.prompt('Name the Property to be Inserted', '', '',
         (evt, value) => this.onInsertProperty(value),
@@ -216,7 +220,7 @@ class GeneralEditor extends React.Component {
       this.setState({showToolbar: true});
     };
     this.getPropertyIconLocation = debounce(_ => {
-      const currentFocusPosition = getSelectDOMRect();
+      const currentFocusPosition = this.getSelectDOMRect();
       if (currentFocusPosition !== null) this.setState({currentFocusPosition});
     }, 5);
 
