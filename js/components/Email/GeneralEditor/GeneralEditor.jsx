@@ -262,7 +262,7 @@ class GeneralEditor extends React.Component {
     }
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     if (this.props.allowGeneralizedProperties) window.removeEventListener('scroll', this.getPropertyIconLocation);
   }
 

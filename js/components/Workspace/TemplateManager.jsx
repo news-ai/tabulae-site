@@ -8,6 +8,7 @@ import Link from 'react-router/lib/Link';
 import styled from 'styled-components';
 import {grey50, grey700, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
+import Workspace from './Workspace';
 
 const styles = {
   smallIcon: {
@@ -37,7 +38,6 @@ const ListItem = styled.div.attrs({
 
 const TemplateManager = props => {
   const {templates} = props;
-  console.log(templates);
   return (
     <div className='row horizontal-center'>
       <div className='large-10 medium-10 small-12 columns'>
@@ -89,6 +89,7 @@ class TemplateManagerContainer extends Component {
   }
 
   render() {
+    if (this.props.location.pathname === '/workspace/new-template' || this.props.params.templateId) return <Workspace {...this.props} />
     return <TemplateManager {...this.props} />;
   }
 }
