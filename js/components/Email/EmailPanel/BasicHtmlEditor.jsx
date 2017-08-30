@@ -82,10 +82,13 @@ const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
 class BasicHtmlEditor extends Component {
   constructor(props) {
     super(props);
-    const decorator = new CompositeDecorator([
+    this.decorator = new CompositeDecorator([
       {
         strategy: findEntities.bind(null, 'LINK'),
-        component: Link
+        component: Link,
+        props: {
+          updateEntityLink: newContentState => this.onChange(EditorState.push(this.state.editorState, newContentState, 'activate-entity-data'), 'force-emit-html')
+        }
       },
       {
         strategy: findEntities.bind(null, 'PROPERTY'),
@@ -148,8 +151,8 @@ class BasicHtmlEditor extends Component {
 
     this.state = {
       editorState: !isEmpty(this.props.bodyHtml) ?
-        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), decorator) :
-        EditorState.createEmpty(decorator),
+        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), this.decorator) :
+        EditorState.createEmpty(this.decorator),
       bodyHtml: this.props.bodyHtml || null,
       variableMenuOpen: false,
       variableMenuAnchorEl: null,

@@ -228,7 +228,7 @@ class Workspace extends Component {
     const templateId = value || null;
     this.setState({currentTemplateId: value});
 
-    if (!!templateId) {
+    if (!!templateId && !!templates) {
       const template = find(templates, tmp => templateId === tmp.id);
       let subject = template.subject;
       this.setState({subject, mutatingSubject: subject, useExisting: true});
@@ -354,28 +354,29 @@ class Workspace extends Component {
           display: 'flex',
         }}>
           <MainSection>
-          {state.mode === 'writing' &&
-           <GeneralEditor
-            onEditMode
-            allowReplacement
-            allowGeneralizedProperties
-            allowToolbarDisappearOnBlur
-            containerClassName='RichEditor-editor-workspace'
-            width={state.width}
-            height='unlimited'
-            debounce={500}
-            bodyContent={state.body}
-            rawBodyContentState={state.bodyContentState}
-            subjectHtml={state.subject}
-            rawSubjectContentState={state.subjectContentState}
-            subjectParams={{allowGeneralizedProperties: true, style: {marginTop: EDITOR_DISTANCE_FROM_TOP, marginBottom: 15}}}
-            controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
-            controlsPosition='top'
-            onBodyChange={this.onBodyChange}
-            onSubjectChange={this.onSubjectChange}
-            placeholder='Start building your template here...'
-            extendStyleMap={customFontSizes}
-            />}
+            <div style={{display: state.mode === 'writing' ? 'block' : 'none'}} >
+              <GeneralEditor
+              onEditMode
+              allowReplacement
+              allowGeneralizedProperties
+              allowToolbarDisappearOnBlur
+              containerClassName='RichEditor-editor-workspace'
+              width={state.width}
+              height='unlimited'
+              debounce={500}
+              bodyContent={state.body}
+              rawBodyContentState={state.bodyContentState}
+              subjectHtml={state.subject}
+              rawSubjectContentState={state.subjectContentState}
+              subjectParams={{allowGeneralizedProperties: true, style: {marginTop: EDITOR_DISTANCE_FROM_TOP, marginBottom: 15}}}
+              controlsStyle={{zIndex: 100, marginBottom: 15, position: 'fixed', backgroundColor: '#ffffff'}}
+              controlsPosition='top'
+              onBodyChange={this.onBodyChange}
+              onSubjectChange={this.onSubjectChange}
+              placeholder='Start building your template here...'
+              extendStyleMap={customFontSizes}
+              />
+            </div>
           {state.mode === 'preview' &&
             <div style={{marginTop: EDITOR_DISTANCE_FROM_TOP}} >
               <div

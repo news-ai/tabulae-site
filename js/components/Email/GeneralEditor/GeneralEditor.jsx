@@ -75,27 +75,10 @@ const icon = {
   style: {width: 28, height: 28, padding: 7, position: 'fixed'}
 };
 
-const decorator = new CompositeDecorator([
-  {
-    strategy: findEntities.bind(null, 'LINK'),
-    component: Link
-  },
-  {
-    strategy: findEntities.bind(null, 'PROPERTY'),
-    component: Property
-  },
-  {
-    strategy: curlyStrategy,
-    component: CurlySpan
-  }
-]);
-
 const BodyEditorContainer = styled.div`
   width: ${props => props.width ? props.width : 400}px;
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
-
-const updateEntityLink = (contentState, entityKey, newUrl) => contentState.mergeEntityData(entityKey, {url: newUrl});
 
 const getVisibleSelectionRect = (global) => {
   const selection = global.getSelection();
@@ -161,10 +144,28 @@ class GeneralEditor extends React.Component {
       },
     };
 
+    this.decorator = new CompositeDecorator([
+      {
+        strategy: findEntities.bind(null, 'LINK'),
+        component: Link,
+        props: {
+          updateEntityLink: newContentState => this.onChange(EditorState.push(this.state.editorState, newContentState, 'activate-entity-data'), 'force-emit-html')
+        }
+      },
+      {
+        strategy: findEntities.bind(null, 'PROPERTY'),
+        component: Property
+      },
+      {
+        strategy: curlyStrategy,
+        component: CurlySpan
+      }
+    ]);
+
     this.state = {
       editorState: this.props.rawBodyContentState ?
-      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), decorator) :
-      EditorState.createEmpty(decorator),
+      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), this.decorator) :
+      EditorState.createEmpty(this.decorator),
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
@@ -255,7 +256,7 @@ class GeneralEditor extends React.Component {
       if (typeof this.props.bodyContent === 'string') {
         contentState = this.cleanHTMLToContentState(this.props.bodyContent);
       } else {
-        contentState = convertFromRaw(this.props.bodyContent, decorator);
+        contentState = convertFromRaw(this.props.bodyContent, this.decorator);
       }
       editorState = EditorState.push(this.state.editorState, contentState, 'insert-fragment');
       this.onChange(editorState);
@@ -449,10 +450,7 @@ class GeneralEditor extends React.Component {
       'http://',
       (e, url) => {
         const entityKey = contentState
-        .createEntity('LINK', 'MUTABLE', {
-          url,
-          updateEntityLink: (...args) => this.onChange(EditorState.push(this.state.editorState, updateEntityLink(...args), 'activate-entity-data'), 'force-emit-html')
-        }).getLastCreatedEntityKey();
+        .createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey), 'force-emit-html');
       },
       _ => {});

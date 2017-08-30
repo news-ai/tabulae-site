@@ -33,10 +33,10 @@ class Subject extends Component {
   constructor(props) {
     super(props);
     const decorator = new CompositeDecorator([
-      {
-        strategy: findEntities.bind(null, 'LINK'),
-        component: Link
-      },
+      // {
+      //   strategy: findEntities.bind(null, 'LINK'),
+      //   component: Link
+      // },
       {
         strategy: findEntities.bind(null, 'PROPERTY'),
         component: Property
