@@ -48,7 +48,7 @@ class Subject extends Component {
     ]);
 
     this.state = {
-      editorState: this.props.rawSubjectContentState ?
+      editorState: !!this.props.rawSubjectContentState ?
       EditorState.createWithContent(convertFromRaw(this.props.rawSubjectContentState), decorator) :
       EditorState.createEmpty(decorator),
       subjectString: null,
@@ -192,6 +192,7 @@ class Subject extends Component {
     const containerStyle = props.style ?
     Object.assign({}, styles.container, props.style, {width: this.props.width}) :
     Object.assign({}, styles.container, { width: this.props.width,});
+
     return (
       <div style={containerStyle}>
       {props.fieldsmap &&
@@ -213,6 +214,7 @@ class Subject extends Component {
         className='subject-draft-container'
         style={{
           height: 32,
+          minWidth: 150,
           overflowX: 'scroll',
         }}
         onClick={this.focus}
@@ -226,7 +228,7 @@ class Subject extends Component {
           ref='subjectEditor'
           />
         </div>
-        <div>
+        <div style={{padding: '0 10px'}} >
           <span className='text' style={styles.lengthLabel}>{padZeros(subjectLength, 3)}</span>
         {(props.fieldsmap || props.allowGeneralizedProperties) &&
           <IconButton
