@@ -71,3 +71,13 @@
 .left {
   float: left;
 }
+
+.tooltipStay {
+  pointer-events: auto !important;
+}
+
+.tooltipStay:hover {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+

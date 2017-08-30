@@ -15,7 +15,7 @@ import Draft, {
   convertFromRaw,
   CompositeDecorator,
   Modifier,
-  getVisibleSelectionRect
+  // getVisibleSelectionRect
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
@@ -49,6 +49,7 @@ import ExternalControls from 'components/Email/EmailPanel/components/ExternalCon
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import ColorPicker from 'components/Email/EmailPanel/components/ColorPicker';
 import alertify from 'alertifyjs';
+// import alertify from 'utils/alertify';
 import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
@@ -94,6 +95,28 @@ const BodyEditorContainer = styled.div`
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
 
+const updateEntityLink = (contentState, entityKey, newUrl) => contentState.mergeEntityData(entityKey, {url: newUrl});
+
+const getVisibleSelectionRect = (global) => {
+  const selection = global.getSelection();
+  if (!selection.rangeCount) {
+    return null;
+  }
+
+  const range = selection.getRangeAt(0);
+  if (range === null) return null;
+  const boundingRect = range.getBoundingClientRect();
+  const {top, right, bottom, left} = boundingRect;
+
+  // When a re-render leads to a node being removed, the DOM selection will
+  // temporarily be placed on an ancestor node, which leads to an invalid
+  // bounding rect. Discard this state.
+  if (top === 0 && right === 0 && bottom === 0 && left === 0) {
+    return null;
+  }
+
+  return boundingRect;
+}
 
 
 class GeneralEditor extends React.Component {
@@ -215,16 +238,13 @@ class GeneralEditor extends React.Component {
         (evt, value) => this.onInsertProperty(value),
         function() {});
     };
-    this.onShowToolbar = e => {
-      e.preventDefault();
-      this.setState({showToolbar: true});
-    };
     this.getPropertyIconLocation = debounce(_ => {
       const currentFocusPosition = this.getSelectDOMRect();
       if (currentFocusPosition !== null) this.setState({currentFocusPosition});
     }, 2);
 
     this.removePropertyLocation = _ => this.setState({currentFocusPosition: null});
+
   }
 
   componentWillMount() {
@@ -386,6 +406,7 @@ class GeneralEditor extends React.Component {
     );
   }
 
+
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -427,7 +448,11 @@ class GeneralEditor extends React.Component {
       'Enter a URL',
       'http://',
       (e, url) => {
-        const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
+        const entityKey = contentState
+        .createEntity('LINK', 'MUTABLE', {
+          url,
+          updateEntityLink: (...args) => this.onChange(EditorState.push(this.state.editorState, updateEntityLink(...args), 'activate-entity-data'), 'force-emit-html')
+        }).getLastCreatedEntityKey();
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey), 'force-emit-html');
       },
       _ => {});
@@ -709,7 +734,6 @@ class GeneralEditor extends React.Component {
             onChange={this.onChange}
             placeholder={props.placeholder || placeholder}
             onBlur={e => {
-              console.log('onblur');
               e.preventDefault();
                if (editorState.getSelection().isCollapsed() && !state.onHoverToolbar) this.setState({showToolbar: false});
             }}
@@ -719,7 +743,7 @@ class GeneralEditor extends React.Component {
           </div>
         </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
-        <Paper onClick={this.onShowToolbar} zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
+        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}

@@ -97,6 +97,7 @@ const TabButton = styled.span`
   text-align: center;
   font-size: 0.8em;
   cursor: pointer;
+  white-space: nowrap;
   &:hover {
     background-color: ${props => !props.active && blue50};
   }
@@ -191,7 +192,7 @@ class Workspace extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.params.templateId !== nextProps.params.templateId && nextProps.params.templateId !== 'new-template') {
-      this.handleTemplateChange(nextProps.template.id);
+      this.handleTemplateChange(nextProps.template.id, nextProps.templates);
     }
     if (nextProps.template && this.props.template !== nextProps.template) {
       this.handleTemplateChange(nextProps.template.id, nextProps.templates);
