@@ -30,7 +30,7 @@ class ToolBar extends Component {
         {props.diableToolbar ?
           <span className='smalltext' style={styles.disabledText}>Image Toolbar disabled at Preview.</span> :
           <div className='vertical-center'>
-            <span className='smalltext' style={styles.sliderText}>{`${state.sliderValue}%`}</span>
+            <span style={styles.sliderText}>{`${state.sliderValue}%`}</span>
             <Slider
             min={0} max={100} step={1}
             style={styles.slider}
@@ -42,7 +42,7 @@ class ToolBar extends Component {
             color={props.imageLink.length > 1 ? blue400 : grey800}
             hoverColor={props.imageLink.length > 1 ? blue200 : grey400}
             onClick={props.imageLink.length > 1 ? unsetLink : setLink}
-            style={styles.icon}
+            style={Object.assign({}, styles.icon, {marginLeft: 10})}
             className='fa fa-link span-button pointer'
             />
             <FontIcon
@@ -87,7 +87,7 @@ const styles = {
   icon: {fontSize: '14px', margin: '0 4px'},
   slider: {width: 70, margin: '0 5px'},
   disabledText: {color: grey800},
-  sliderText: {width: 30}
+  sliderText: {width: 30, whiteSpace: 'nowrap', fontSize: '0.7em'}
 };
 
 export default ToolBar;

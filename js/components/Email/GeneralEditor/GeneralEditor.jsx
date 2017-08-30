@@ -99,9 +99,11 @@ const getSelectDOMRect = () => {
   if (rect === null) {
     const node = window.getSelection().focusNode;
     if (node === null) return null;
+    const nodeAttribute = node.getAttribute('data-offset-key');
+    if (nodeAttribute === null) return null;
     rect = node.getBoundingClientRect();
   }
-  return {top: rect.top - 18, bottom: rect.bottom, left: rect.left, right: rect.right} ;
+  return {top: rect.top - 10, bottom: rect.bottom, left: rect.left, right: rect.right} ;
 };
 
 class GeneralEditor extends React.Component {
@@ -205,7 +207,6 @@ class GeneralEditor extends React.Component {
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onPropertyIconClick = e => {
-      console.log('hello');
       alertify.prompt('Name the Property to be Inserted', '', '',
         (evt, value) => this.onInsertProperty(value),
         function() {});
@@ -214,10 +215,10 @@ class GeneralEditor extends React.Component {
       e.preventDefault();
       this.setState({showToolbar: true});
     };
-    this.getPropertyIconLocation = _ => {
+    this.getPropertyIconLocation = debounce(_ => {
       const currentFocusPosition = getSelectDOMRect();
       if (currentFocusPosition !== null) this.setState({currentFocusPosition});
-    };
+    }, 5);
 
     this.removePropertyLocation = _ => this.setState({currentFocusPosition: null});
   }
@@ -570,7 +571,12 @@ class GeneralEditor extends React.Component {
     
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
+    if (this.outerContainer) {
 
+    // console.log(this.outerContainer.offsetTop - document.body.scrollTop);
+    // console.log(controlsStyle);
+
+    }
 
     return (
       <div ref={ref => this.outerContainer = ref} >
