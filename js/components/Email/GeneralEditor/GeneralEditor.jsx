@@ -222,7 +222,7 @@ class GeneralEditor extends React.Component {
     this.getPropertyIconLocation = debounce(_ => {
       const currentFocusPosition = this.getSelectDOMRect();
       if (currentFocusPosition !== null) this.setState({currentFocusPosition});
-    }, 5);
+    }, 2);
 
     this.removePropertyLocation = _ => this.setState({currentFocusPosition: null});
   }

@@ -37,7 +37,7 @@ const ListItem = styled.div.attrs({
 `;
 
 const TemplateManager = props => {
-  const {templates} = props;
+  const {templates, toggleArchiveTemplate} = props;
   return (
     <div className='row horizontal-center'>
       <div className='large-10 medium-10 small-12 columns'>
@@ -60,19 +60,19 @@ const TemplateManager = props => {
         <div style={{marginBottom: 50, marginTop: 50}}>
         {templates.map((template, i) => (
           <ListItem className='row vertical-center'>
-            <div className='large-10 medium-10 small-12 columns'>
+            <div className='large-10 medium-10 small-9 columns'>
               <Link to={`/workspace/${template.id}`} style={{textTransform: 'none'}} >
               {template.name.length > 0 ? template.name : template.subject}
               </Link>
             </div>
-            <div className='large-2 medium-2 columns'>
+            <div className='large-2 medium-2 small-3 columns'>
               <IconButton
               iconClassName='fa fa-trash'
               iconStyle={styles.smallIcon}
               style={styles.small}
               tooltip='Trash'
               tooltipPosition='top-center'
-              onClick={_ => this.props.toggleArchiveTemplate(template.id)}
+              onClick={_ => toggleArchiveTemplate(template.id)}
               />
             </div> 
           </ListItem>

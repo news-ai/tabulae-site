@@ -353,7 +353,7 @@ class Workspace extends Component {
             </div>}
           </div>
           <div className='vertical-center'>
-            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`Width ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
+            <span style={{fontSize: '0.7em', color: blueGrey800}} >{`Viewport ${(state.width/state.screenWidth * 100).toFixed(0)}%`}</span>
             <div style={{display: 'block', width: 120, marginRight: 10, marginLeft: 5}} > 
               <Slider
               min={200} max={state.screenWidth} step={1}
