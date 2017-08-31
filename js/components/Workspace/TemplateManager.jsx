@@ -7,6 +7,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Link from 'react-router/lib/Link';
 import styled from 'styled-components';
 import {grey50, grey700, blue500} from 'material-ui/styles/colors';
+import isJSON from 'validator/lib/isJSON';
+import Workspace from './Workspace';
 
 const styles = {
   smallIcon: {
@@ -35,7 +37,7 @@ const ListItem = styled.div.attrs({
 `;
 
 const TemplateManager = props => {
-  const {templates} = props;
+  const {templates, toggleArchiveTemplate} = props;
   return (
     <div className='row horizontal-center'>
       <div className='large-10 medium-10 small-12 columns'>
@@ -58,19 +60,19 @@ const TemplateManager = props => {
         <div style={{marginBottom: 50, marginTop: 50}}>
         {templates.map((template, i) => (
           <ListItem className='row vertical-center'>
-            <div className='large-10 medium-10 small-12 columns'>
+            <div className='large-10 medium-10 small-9 columns'>
               <Link to={`/workspace/${template.id}`} style={{textTransform: 'none'}} >
               {template.name.length > 0 ? template.name : template.subject}
               </Link>
             </div>
-            <div className='large-2 medium-2 columns'>
+            <div className='large-2 medium-2 small-3 columns'>
               <IconButton
               iconClassName='fa fa-trash'
               iconStyle={styles.smallIcon}
               style={styles.small}
               tooltip='Trash'
               tooltipPosition='top-center'
-              onClick={_ => this.props.toggleArchiveTemplate(template.id)}
+              onClick={_ => toggleArchiveTemplate(template.id)}
               />
             </div> 
           </ListItem>
@@ -87,13 +89,23 @@ class TemplateManagerContainer extends Component {
   }
 
   render() {
+    if (this.props.location.pathname === '/workspace/new-template' || this.props.params.templateId) return <Workspace {...this.props} />
     return <TemplateManager {...this.props} />;
   }
 }
 
 export default connect(
   state => ({
-    templates: state.templateReducer.received.map(id => state.templateReducer[id]).filter(template => !template.archived)
+    templates: state.templateReducer.received
+    .map(id => state.templateReducer[id])
+    .filter(template => !template.archived)
+    .reduce((saved, template) => {
+      if (isJSON(template.body) && JSON.parse(template.body).date) {
+      } else {
+        saved = [...saved, template];
+      }
+      return saved;
+    }, []),
   }),
   dispatch => ({
     fetchTemplates: _ => dispatch(templateActions.getTemplates()),

@@ -71,3 +71,16 @@
 .left {
   float: left;
 }
+
+.tooltipStay {
+  pointer-events: auto !important;
+}
+
+/*
+ set higher than https://github.com/callemall/material-ui/blob/master/src/styles/zIndex.js
+*/
+.tooltipStay:hover {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+

@@ -15,6 +15,7 @@ import Draft, {
   convertFromRaw,
   CompositeDecorator,
   Modifier,
+  // getVisibleSelectionRect
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
@@ -48,6 +49,7 @@ import ExternalControls from 'components/Email/EmailPanel/components/ExternalCon
 import PositionStyleControls from 'components/Email/EmailPanel/components/PositionStyleControls';
 import ColorPicker from 'components/Email/EmailPanel/components/ColorPicker';
 import alertify from 'alertifyjs';
+// import alertify from 'utils/alertify';
 import sanitizeHtml from 'sanitize-html';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
@@ -73,25 +75,32 @@ const icon = {
   style: {width: 28, height: 28, padding: 7, position: 'fixed'}
 };
 
-const decorator = new CompositeDecorator([
-  {
-    strategy: findEntities.bind(null, 'LINK'),
-    component: Link
-  },
-  {
-    strategy: findEntities.bind(null, 'PROPERTY'),
-    component: Property
-  },
-  {
-    strategy: curlyStrategy,
-    component: CurlySpan
-  }
-]);
-
 const BodyEditorContainer = styled.div`
   width: ${props => props.width ? props.width : 400}px;
   height: ${props => props.height !== 'unlimited' && `${props.height}px`};
 `;
+
+const getVisibleSelectionRect = (global) => {
+  const selection = global.getSelection();
+  if (!selection.rangeCount) {
+    return null;
+  }
+
+  const range = selection.getRangeAt(0);
+  if (range === null) return null;
+  const boundingRect = range.getBoundingClientRect();
+  const {top, right, bottom, left} = boundingRect;
+
+  // When a re-render leads to a node being removed, the DOM selection will
+  // temporarily be placed on an ancestor node, which leads to an invalid
+  // bounding rect. Discard this state.
+  if (top === 0 && right === 0 && bottom === 0 && left === 0) {
+    return null;
+  }
+
+  return boundingRect;
+}
+
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -135,10 +144,28 @@ class GeneralEditor extends React.Component {
       },
     };
 
+    this.decorator = new CompositeDecorator([
+      {
+        strategy: findEntities.bind(null, 'LINK'),
+        component: Link,
+        props: {
+          updateEntityLink: newContentState => this.onChange(EditorState.push(this.state.editorState, newContentState, 'activate-entity-data'), 'force-emit-html')
+        }
+      },
+      {
+        strategy: findEntities.bind(null, 'PROPERTY'),
+        component: Property
+      },
+      {
+        strategy: curlyStrategy,
+        component: CurlySpan
+      }
+    ]);
+
     this.state = {
       editorState: this.props.rawBodyContentState ?
-      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), decorator) :
-      EditorState.createEmpty(decorator),
+      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), this.decorator) :
+      EditorState.createEmpty(this.decorator),
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
       isStyleBlockOpen: true,
@@ -147,7 +174,8 @@ class GeneralEditor extends React.Component {
       imagePanelOpen: false,
       imageLink: '',
       showToolbar: false,
-      onHoverToolbar: false
+      onHoverToolbar: false,
+      currentFocusPosition: null
     };
 
     this.focus = () => {
@@ -192,15 +220,32 @@ class GeneralEditor extends React.Component {
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
+    this.getSelectDOMRect = () => {
+      let rect = getVisibleSelectionRect(window);
+      if (rect === null) {
+        const node = window.getSelection().focusNode;
+        if (node === null) return null;
+        const nodeAttribute = node.getAttribute('data-offset-key');
+        if (nodeAttribute === null) return null;
+        rect = node.getBoundingClientRect();
+      }
+      // prevent showing property icon for Subject
+      // TODO: use the same buttom to add property for Subject eventually
+      if (!this.state.editorState.getSelection().isCollapsed() || !this.state.editorState.getSelection().getHasFocus()) return null;
+      return {top: rect.top - 10, bottom: rect.bottom, left: rect.left, right: rect.right} ;
+    };
     this.onPropertyIconClick = e => {
       alertify.prompt('Name the Property to be Inserted', '', '',
         (evt, value) => this.onInsertProperty(value),
         function() {});
     };
-    this.onShowToolbar = e => {
-      e.preventDefault();
-      this.setState({showToolbar: true});
-    }
+    this.getPropertyIconLocation = debounce(_ => {
+      const currentFocusPosition = this.getSelectDOMRect();
+      if (currentFocusPosition !== null) this.setState({currentFocusPosition});
+    }, 2);
+
+    this.removePropertyLocation = _ => this.setState({currentFocusPosition: null});
+
   }
 
   componentWillMount() {
@@ -211,11 +256,15 @@ class GeneralEditor extends React.Component {
       if (typeof this.props.bodyContent === 'string') {
         contentState = this.cleanHTMLToContentState(this.props.bodyContent);
       } else {
-        contentState = convertFromRaw(this.props.bodyContent, decorator);
+        contentState = convertFromRaw(this.props.bodyContent, this.decorator);
       }
       editorState = EditorState.push(this.state.editorState, contentState, 'insert-fragment');
       this.onChange(editorState);
     }
+  }
+
+  componentDidMount() {
+    if (this.props.allowGeneralizedProperties) window.addEventListener('scroll', this.getPropertyIconLocation);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -232,6 +281,10 @@ class GeneralEditor extends React.Component {
       }
       this.onChange(editorState);
     }
+  }
+
+  componentWillUnmount() {
+    if (this.props.allowGeneralizedProperties) window.removeEventListener('scroll', this.getPropertyIconLocation);
   }
 
   _cleanHTMLToContentState(html) {
@@ -283,6 +336,7 @@ class GeneralEditor extends React.Component {
   _onChange(editorState, onChangeType) {
     let newEditorState = editorState;
     this.setState({editorState: newEditorState});
+    this.getPropertyIconLocation();
 
     let previousContent = this.state.editorState.getCurrentContent();
 
@@ -353,6 +407,7 @@ class GeneralEditor extends React.Component {
     );
   }
 
+
   _manageLink() {
     const {editorState} = this.state;
     const selection = editorState.getSelection();
@@ -394,7 +449,8 @@ class GeneralEditor extends React.Component {
       'Enter a URL',
       'http://',
       (e, url) => {
-        const entityKey = contentState.createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
+        const entityKey = contentState
+        .createEntity('LINK', 'MUTABLE', {url}).getLastCreatedEntityKey();
         this.onChange(RichUtils.toggleLink(editorState, selection, entityKey), 'force-emit-html');
       },
       _ => {});
@@ -519,7 +575,8 @@ class GeneralEditor extends React.Component {
       Modifier.insertText(contentStateWithEntity, selection, propertyType, undefined, entityKey),
       'insert-fragment'
       );
-    this.onChange(newEditorState);
+    this.onChange(newEditorState, 'force-emit-html');
+    setTimeout(_ => this.setState({currentFocusPosition: null}), 5);
   }
 
   render() {
@@ -529,8 +586,11 @@ class GeneralEditor extends React.Component {
 
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
-    const className = cn(props.containerClassName || 'RichEditor-editor', {
-      'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'});
+    const containerClassName = props.containerClassName || 'RichEditor-editor';
+    const className = cn(
+      containerClassName,
+      {'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'}
+      );
     let customStyleMap = styleMap;
     if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
 
@@ -538,9 +598,15 @@ class GeneralEditor extends React.Component {
     
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
+    if (this.outerContainer) {
+
+    // console.log(this.outerContainer.offsetTop - document.body.scrollTop);
+    // console.log(controlsStyle);
+
+    }
 
     return (
-      <div>
+      <div ref={ref => this.outerContainer = ref} >
         <Dialog actions={[<FlatButton label='Close' onClick={_ => this.setState({imagePanelOpen: false})}/>]}
         autoScrollBodyContent title='Upload Image' open={state.imagePanelOpen} onRequestClose={_ => this.setState({imagePanelOpen: false})}>
           <div style={{margin: '10px 0'}} className='horizontal-center'>Drag n' Drop the image file into the editor</div>
@@ -630,19 +696,21 @@ class GeneralEditor extends React.Component {
         fieldsmap={props.fieldsmap}
         rawSubjectContentState={props.rawSubjectContentState}
         />}
+      {props.allowGeneralizedProperties && state.currentFocusPosition !== null &&
+        <div style={{
+          position: 'fixed',
+          top: state.currentFocusPosition.top,
+          left: this.outerContainer.getBoundingClientRect().left - 50,
+        }} >
+          <IconButton
+          tooltip='Insert Property'
+          tooltipPosition='bottom-center'
+          iconClassName='fa fa-plus-square-o'
+          onClick={this.onPropertyIconClick}
+          />
+        </div>}
         <BodyEditorContainer width={props.width} height={props.height} >
           <div className={className} onClick={this.focus}>
-          {props.allowGeneralizedProperties &&
-            <div className='right'>
-              <IconButton
-              tooltip='Insert Property to Body'
-              tooltipPosition='bottom-center'
-              iconClassName='fa fa-plus-square-o'
-              iconStyle={icon.iconStyle}
-              style={icon.style}
-              onClick={this.onPropertyIconClick}
-              />
-            </div>}
             <Editor
             blockStyleFn={getBlockStyle}
             blockRendererFn={
@@ -673,7 +741,7 @@ class GeneralEditor extends React.Component {
           </div>
         </BodyEditorContainer>
       {(!props.controlsPosition || props.controlsPosition === 'bottom') &&
-        <Paper onClick={this.onShowToolbar} zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
+        <Paper zDepth={1} className='row vertical-center clearfix' style={controlsStyle} >
           <InlineStyleControls
           editorState={editorState}
           onToggle={this.toggleInlineStyle}

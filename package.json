@@ -62,7 +62,7 @@
     "react-tag-input": "^4.4.0",
     "react-tap-event-plugin": "^2.0.1",
     "react-textarea-autosize": "^5.0.6",
-    "react-tooltip": "^3.2.7",
+    "react-tooltip": "^3.3.0",
     "react-virtualized": "^8.11.4",
     "react-virtualized-select": "^3.0.1",
     "recharts": "^0.22.0",
