@@ -181,6 +181,7 @@ const customBlocks = {
 
 export const customStyleFn = style => {
   const styleNames = style.toJS();
+  // console.log(styleNames);
   return styleNames.reduce((styles, styleName) => {
     if (styleName.startsWith('COLOR-')) {
       styles.color = styleName.split('COLOR-')[1];

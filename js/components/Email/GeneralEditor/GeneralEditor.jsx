@@ -473,6 +473,7 @@ class GeneralEditor extends React.Component {
 
     if (html) {
       console.log('pasted', 'html');
+      // console.log(html);
       const saneHtml = sanitizeHtml(html, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
         allowedAttributes: {
@@ -480,6 +481,19 @@ class GeneralEditor extends React.Component {
           div: ['style'],
           span: ['style'],
           a: ['href']
+        },
+        transformTags: {
+          'font': function(tagName, attribs) {
+            // console.log(tagName);
+            // console.log(attribs);
+            if (attribs.color) {
+              attribs.style += `color: ${attribs.color};`;
+            }
+            return {
+              tagName: 'span',
+              attribs
+            };
+          }
         }
       });
       // console.log(saneHtml);
