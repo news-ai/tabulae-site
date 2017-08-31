@@ -482,7 +482,7 @@ class GeneralEditor extends React.Component {
           a: ['href']
         }
       });
-      // console.log(saneHtml);
+      console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
       blockMap = contentState.getBlockMap();
     } else {

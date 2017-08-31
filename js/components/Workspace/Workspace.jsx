@@ -172,8 +172,8 @@ class Workspace extends Component {
     const templateId = value || null;
     this.setState({currentTemplateId: value});
 
-    if (!!templateId && !!templates) {
-      const template = find(templates, tmp => templateId === tmp.id);
+    const template = find(templates, tmp => templateId === tmp.id);
+    if (!!template && !!templates) {
       let subject = template.subject;
       this.setState({subject, mutatingSubject: subject, useExisting: true});
       if (isJSON(template.body)) {

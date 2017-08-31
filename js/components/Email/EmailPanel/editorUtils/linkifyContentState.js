@@ -13,6 +13,7 @@ function _removeWhiteSpace(editorState) {
   let newEditorState = editorState;
   newEditorState.getCurrentContent().getBlockMap().forEach(block => {
     let text = block.getText();
+    // console.log(text);
     text = text.replace(/^\s+/, '').replace(/\s+$/, '');
     if (text === '') {
       // console.log('hit empty block');
