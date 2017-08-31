@@ -102,6 +102,28 @@ const getVisibleSelectionRect = (global) => {
   return boundingRect;
 }
 
+const sanitizeHtmlConfigs = {
+  allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span', 'img']),
+  allowedAttributes: {
+    p: ['style'],
+    div: ['style'],
+    span: ['style'],
+    a: ['href'],
+    img: ['src']
+  },
+  transformTags: {
+    'font': function(tagName, attribs) {
+      if (attribs.color) {
+        if (attribs.style) attribs.style += `color: ${attribs.color};`;
+        else attribs.style = `color: ${attribs.color};`;
+      }
+      return {
+        tagName: 'span',
+        attribs
+      };
+    },
+  }
+};
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -492,38 +514,15 @@ class GeneralEditor extends React.Component {
     if (html) {
       console.log('pasted', 'html');
       // console.log(html);
-      const saneHtml = sanitizeHtml(html, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span', 'img']),
-        allowedAttributes: {
-          p: ['style'],
-          div: ['style'],
-          span: ['style'],
-          a: ['href'],
-          img: ['src']
-        },
-        transformTags: {
-          'font': function(tagName, attribs) {
-            if (attribs.color) {
-              if (attribs.style) attribs.style += `color: ${attribs.color};`;
-              else attribs.style = `color: ${attribs.color};`;
-            }
-            return {
-              tagName: 'span',
-              attribs
-            };
-          },
-        }
-      });
+      const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
-      // blockMap = contentState.getBlockMap();
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
-      // blockMap = contentState.blockMap;
     }
 
-    console.log(convertToRaw(contentState));
+    // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
     // console.log(convertToRaw(contentState));
 

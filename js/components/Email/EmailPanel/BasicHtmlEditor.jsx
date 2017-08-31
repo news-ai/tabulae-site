@@ -43,6 +43,7 @@ import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkify
 import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtils/stripSelectedInlineTagBlocks';
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
+import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -78,6 +79,29 @@ import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/str
 const placeholder = 'Tip: Use column names as variables in your template email by clicking on "Insert Property" or "+" icon in Subject, Body, or Toolbar.';
 
 const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
+
+const sanitizeHtmlConfigs = {
+  allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span', 'img']),
+  allowedAttributes: {
+    p: ['style'],
+    div: ['style'],
+    span: ['style'],
+    a: ['href'],
+    img: ['src']
+  },
+  transformTags: {
+    'font': function(tagName, attribs) {
+      if (attribs.color) {
+        if (attribs.style) attribs.style += `color: ${attribs.color};`;
+        else attribs.style = `color: ${attribs.color};`;
+      }
+      return {
+        tagName: 'span',
+        attribs
+      };
+    },
+  }
+};
 
 class BasicHtmlEditor extends Component {
   constructor(props) {
@@ -452,23 +476,14 @@ class BasicHtmlEditor extends Component {
 
     if (html) {
       console.log('pasted', 'html');
-      const saneHtml = sanitizeHtml(html, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
-        allowedAttributes: {
-          p: ['style'],
-          div: ['style'],
-          span: ['style'],
-          a: ['href']
-        }
-      });
+      const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
-      blockMap = contentState.getBlockMap();
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
-      blockMap = contentState.blockMap;
     }
 
+    contentState = handleLineBreaks(contentState);
     const newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);
