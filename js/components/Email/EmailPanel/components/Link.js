@@ -40,20 +40,21 @@ export default function Link(props) {
       <ReactTooltip
       id={props.entityKey}
       className='tooltipStay'
-      place='top'
+      place='right'
       type='dark'
       effect='solid'
-      delayHide={700}
+      offset={{top: 10}}
+      delayHide={500}
       wrapper='span'
       getContent={() => (
-        <div>
+        <span style={{zIndex: 10000}} >
           <span>{href}</span>
         {!isDecoratedText &&
           <IconButton
           className='fa fa-edit'
           onClick={onSubmit}
           />}
-        </div>
+        </span>
         )}
       />
     </span>
