@@ -29,6 +29,7 @@ import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLast
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
+import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -126,7 +127,7 @@ class GeneralEditor extends React.Component {
           if (node.firstElementChild === null) {
             // LINK ENTITY
             return Entity.create('LINK', 'MUTABLE', {url: node.href});
-          } else if (node.firstElementChild.nodeName === 'IMG') {
+          } else if (node.firstElementChild.nodeName === 'IMG' || node.firstElementChild.nodeName === 'img') {
             // IMG ENTITY
             const imgNode = node.firstElementChild;
             const src = imgNode.src;
@@ -141,6 +142,23 @@ class GeneralEditor extends React.Component {
             return entityKey;
           }
         }
+        // if (nodeName === 'img') {
+        //   const imgNode = node;
+        //   const src = imgNode.src;
+        //   let size = 100;
+        //   // const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
+        //   // const imageLink = node.href;
+        //   console.log(src);
+        //   const entityKey = Entity.create('IMAGE', 'MUTABLE', {
+        //     src,
+        //     size: `${size}%`,
+        //     imageLink: '#',
+        //     align: 'left'
+        //   });
+        //   console.log(entityKey);
+        //   this.props.saveImageData(src);
+        //   return entityKey;
+        // }
       },
     };
 
@@ -475,35 +493,39 @@ class GeneralEditor extends React.Component {
       console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span', 'img']),
         allowedAttributes: {
           p: ['style'],
           div: ['style'],
           span: ['style'],
-          a: ['href']
+          a: ['href'],
+          img: ['src']
         },
         transformTags: {
           'font': function(tagName, attribs) {
-            // console.log(tagName);
-            // console.log(attribs);
             if (attribs.color) {
-              attribs.style += `color: ${attribs.color};`;
+              if (attribs.style) attribs.style += `color: ${attribs.color};`;
+              else attribs.style = `color: ${attribs.color};`;
             }
             return {
               tagName: 'span',
               attribs
             };
-          }
+          },
         }
       });
       // console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
-      blockMap = contentState.getBlockMap();
+      // blockMap = contentState.getBlockMap();
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
-      blockMap = contentState.blockMap;
+      // blockMap = contentState.blockMap;
     }
+
+    console.log(convertToRaw(contentState));
+    contentState = handleLineBreaks(contentState);
+    // console.log(convertToRaw(contentState));
 
     const newEditorState = linkifyContentState(editorState, contentState);
 
@@ -618,6 +640,8 @@ class GeneralEditor extends React.Component {
     // console.log(controlsStyle);
 
     }
+
+    // console.log(convertToRaw(editorState.getCurrentContent()));
 
     return (
       <div ref={ref => this.outerContainer = ref} >
