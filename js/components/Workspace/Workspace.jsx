@@ -3,13 +3,9 @@ import {connect} from 'react-redux';
 import {actions as templateActions} from 'components/Email/Template';
 import withRouter from 'react-router/lib/withRouter';
 import GeneralEditor from 'components/Email/GeneralEditor';
-import Select from 'react-select';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-import DropDownMenu from 'material-ui/DropDownMenu';
-import Popover from 'material-ui/Popover';
 import FontIcon from 'material-ui/FontIcon';
-import Paper from 'components/Paper';
 import Collapse from 'react-collapse';
 import Slider from 'rc-slider';
 import alertify from 'utils/alertify';
@@ -22,54 +18,6 @@ import {convertToRaw} from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import TextField from 'material-ui/TextField';
-
-const ItemContainer = styled.div`
-  height: 40px;
-  background-color: ${blueGrey100};
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Menu = styled.ul`
-  margin-left: 0px;
-  padding-left: 0px;
-  max-height: 200px;
-  overflow: hidden;
-  overflow-y: scroll;
-  border-bottom: 1px solid lightgrey;
-  width: 100%;
-`;
-
-const MenuItem = styled.li`
-  list-style: none;
-  width: 100%;
-  padding: 7px;
-  cursor: pointer;
-  font-size: 0.9em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${props => props.current && blueGrey50};
-  &:hover {
-    border: 3px solid ${blueGrey100};
-    padding: 4px;
-  }
-`;
-
-const RemoveButton = styled.i.attrs({
-  className: props => props.className
-})`
-  color: ${blueGrey400};
-  padding: 5px;
-  margin-right: 10px;
-  &:hover {
-    color: ${blueGrey800};
-    border: 1px solid ${blueGrey800};
-    padding: 4px;
-  }
-`;
 
 const MainSection = styled.div`
   display: flex;
@@ -87,7 +35,6 @@ const SideSection = styled.div`
   order: -1;
   z-index: 100;
 `;
-
 
 const TabButton = styled.span`
   flex: 1;
@@ -110,14 +57,10 @@ const TopBar = styled.div`
   margin-top: 10px;
 `;
 
-const ToolbarPaper = Paper.extend`
-  height: 600px;
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  order: 1;
-  z-index: 600;
-  background-color: #fff;
+const LoadingIcon = styled.i.attrs({
+  className: 'fa fa-spin fa-spinner'
+})`
+  color: ${blueGrey600};
 `;
 
 function createMarkUp(html) {
@@ -172,6 +115,7 @@ class Workspace extends Component {
     this.onClearEditor = this.onClearEditor.bind(this);
     this.onSaveNewTemplateClick = this.onSaveNewTemplateClick.bind(this);
     this.onSaveCurrentTemplateClick = this.onSaveCurrentTemplateClick.bind(this);
+    this.saveNameOnBlur = this.saveNameOnBlur.bind(this);
 
     // window.onresize = _ => {
     //   const screenWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -292,6 +236,13 @@ class Workspace extends Component {
       );
   }
 
+  saveNameOnBlur(e) {
+    const defaultName = this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subject;
+    if (this.templateName.getValue() !== defaultName) {
+      this.props.changeTemplateName(this.props.template.id, this.templateName.getValue());
+    }
+  }
+
   render() {
     const state = this.state;
     const props = this.props;
@@ -324,15 +275,10 @@ class Workspace extends Component {
               ref={ref => this.templateName = ref}
               defaultValue={this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subject}
               floatingLabelText='Template Name'
-              onBlur={e => {
-                const defaultName = this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subjectl
-                if (this.templateName.getValue() !== defaultName) {
-                  this.props.changeTemplateName(this.props.template.id, this.templateName.getValue());
-                }
-              }}
+              onBlur={this.saveNameOnBlur}
               />
             {this.props.isLoading &&
-              <i style={{color: blueGrey600}} className='fa fa-spin fa-spinner' />}
+              <LoadingIcon />}
             </div>}
           </div>
           <div className='vertical-center'>
@@ -350,9 +296,7 @@ class Workspace extends Component {
             </div>
           </div>
         </TopBar>
-        <div style={{
-          display: 'flex',
-        }}>
+        <div style={{display: 'flex'}}>
           <MainSection>
             <div style={{display: state.mode === 'writing' ? 'block' : 'none'}} >
               <GeneralEditor
