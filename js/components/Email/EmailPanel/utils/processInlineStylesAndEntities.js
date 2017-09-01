@@ -138,6 +138,7 @@ export default function processInlineStylesAndEntities({
       cuts.add(range.offset + range.length);
     });
     const sortedCuts = Array.from(cuts).sort((a, b) => a - b);
+    // console.log(sortedCuts);
 
     let currCut;
     let nextCut;
@@ -147,7 +148,9 @@ export default function processInlineStylesAndEntities({
       const results = itree.search((currCut + nextCut) / 2);
       const styles = results.map(result => result.id.substring(0, result.id.length - 10));
       // only allow span to be combinable for now
+      // console.log(styles);
       const styleString = styles.map(style => combinableInlineFn(style)[0]).join('');
+      // console.log(styleString);
       if (!tagInsertMap[currCut]) {
         tagInsertMap[currCut] = [];
       }

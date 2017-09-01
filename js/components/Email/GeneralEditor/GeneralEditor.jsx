@@ -231,11 +231,11 @@ class GeneralEditor extends React.Component {
       });
     };
     function emitHTML(editorState) {
-      const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
+      let contentState = editorState.getCurrentContent();
+      // contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
       let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       // console.log(raw);
-      // console.log(html);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -317,7 +317,7 @@ class GeneralEditor extends React.Component {
         else newContent = convertFromRaw(nextProps.bodyContent);
         editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       } else {
-        editorState = EditorState.createEmpty(decorator);
+        editorState = EditorState.createEmpty(this.decorator);
       }
       this.onChange(editorState);
     }
@@ -515,16 +515,16 @@ class GeneralEditor extends React.Component {
       console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
-      // console.log(saneHtml);
+      console.log(saneHtml);
       contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
     }
 
-    // console.log(convertToRaw(contentState));
+    console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
-    // console.log(convertToRaw(contentState));
+    console.log(convertToRaw(contentState));
 
     const newEditorState = linkifyContentState(editorState, contentState);
 
@@ -633,14 +633,14 @@ class GeneralEditor extends React.Component {
     
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
-    if (this.outerContainer) {
+    // if (this.outerContainer) {
 
     // console.log(this.outerContainer.offsetTop - document.body.scrollTop);
     // console.log(controlsStyle);
 
-    }
-
-    // console.log(convertToRaw(editorState.getCurrentContent()));
+    // }
+    // console.log(editorState.getCurrentInlineStyle().toJS());
+    // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
 
     return (
       <div ref={ref => this.outerContainer = ref} >
