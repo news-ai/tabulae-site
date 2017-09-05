@@ -67,12 +67,12 @@ export default function processInlineStylesAndEntities({
   });
 
 
+
   /*
    * FIX INVALID TAG NESTING ADJUSTMENT
    */
 
   var tagStack = [];
-  // console.log(tagInsertMap);
 
   Object.keys(tagInsertMap).forEach(key => {
     let newInsertMap = [];
@@ -122,7 +122,15 @@ export default function processInlineStylesAndEntities({
   });
 
   // process combinable inline styles into html-valid string
+
+  // const processCombinableInlineStyles = () => {
+  //   const itree = IT.IntervalTree();
+
+  // };
+
   if (sortedInlineStyleRanges.length > 0) {
+    // let min = Infinity; 
+    // let max = -Infinity;
     const lastRange = sortedInlineStyleRanges[sortedInlineStyleRanges.length - 1];
     let itree = new IntervalTree(lastRange.offset + lastRange.length);
     sortedInlineStyleRanges.map(range => {

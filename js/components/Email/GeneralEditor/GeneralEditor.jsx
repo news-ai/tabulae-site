@@ -19,7 +19,7 @@ import Draft, {
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
-import {convertFromHTML} from 'draft-convert';
+import {convertFromHTML, convertToHTML} from 'draft-convert';
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap, customStyleFn} from 'components/Email/EmailPanel/utils/renderers';
@@ -164,23 +164,6 @@ class GeneralEditor extends React.Component {
             return entityKey;
           }
         }
-        // if (nodeName === 'img') {
-        //   const imgNode = node;
-        //   const src = imgNode.src;
-        //   let size = 100;
-        //   // const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
-        //   // const imageLink = node.href;
-        //   console.log(src);
-        //   const entityKey = Entity.create('IMAGE', 'MUTABLE', {
-        //     src,
-        //     size: `${size}%`,
-        //     imageLink: '#',
-        //     align: 'left'
-        //   });
-        //   console.log(entityKey);
-        //   this.props.saveImageData(src);
-        //   return entityKey;
-        // }
       },
     };
 
@@ -235,6 +218,7 @@ class GeneralEditor extends React.Component {
       // contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
       let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
+      console.log(html);
       // console.log(raw);
       this.props.onBodyChange(html, raw);
     }
@@ -522,9 +506,9 @@ class GeneralEditor extends React.Component {
       contentState = ContentState.createFromText(text.trim());
     }
 
-    console.log(convertToRaw(contentState));
+    // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
-    console.log(convertToRaw(contentState));
+    // console.log(convertToRaw(contentState));
 
     const newEditorState = linkifyContentState(editorState, contentState);
 

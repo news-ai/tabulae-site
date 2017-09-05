@@ -59,6 +59,11 @@ let combinableInlineTagMap = {
   'Impact': ['font-family:Impact, Charcoal, sans-serif;', 'span'],
   'Avenir': ['font-family:&#39;Avenir Next&#39;, sans-serif;', 'span'],
   'Nunito': ['font-family:Nunito;', 'span'],
+  'BOLD': ['font-weight:bold;', 'span'],
+  'ITALIC': ['font-style:italic;', 'span'],
+  'UNDERLINE': ['text-decoration:underline;', 'span'],
+  // 'CODE': ['<code>','</code>'],
+  'STRIKETHROUGH': ['text-decoration:line-through;', 'span'],
 }
 
 let entityTagMap = {
