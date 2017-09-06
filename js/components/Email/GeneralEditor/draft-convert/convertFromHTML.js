@@ -691,7 +691,6 @@ const convertFromHTML = ({
   let contentState = ContentState.createFromText('');
   const createEntityWithContentState = (...args) => {
     if (contentState.createEntity) {
-      console.log('im in createEntity');
       contentState = contentState.createEntity(...args);
       return contentState.getLastCreatedEntityKey();
     }

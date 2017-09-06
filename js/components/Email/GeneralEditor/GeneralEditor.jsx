@@ -31,6 +31,7 @@ import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkify
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
+// import convertImageEntitiesToAtomicBlocks from 'components/Email/EmailPanel/editorUtils/convertImageEntitiesToAtomicBlocks';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -63,7 +64,6 @@ import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/str
 import styled from 'styled-components';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
-const fucked = {"entityMap":{"0":{"type":"LINK","mutability":"MUTABLE","data":{"url":"http://www.imdb.com/name/nm1491631/"}},"1":{"type":"LINK","mutability":"MUTABLE","data":{"url":"http://www.becauseofgracia.com/"}}},"blocks":[{"key":"7hf5j","text":"Hi Mike,","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":8,"style":"COLOR-#000000"},{"offset":0,"length":8,"style":"SIZE-9.5"}],"entityRanges":[],"data":{}},{"key":"63s1g","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}},{"key":"8kfd2","text":"Happy Wednesday! I wanted to check in with you to let you know we have actor and Minneapolis native Chris Massoglia available for interviews promoting his new film Because of Gracia, in theaters nationwide September 15th + set to premiere in your AMC Arbor Lakes 16. Chris rose to stardom from his childhood acting career which began in the Midwest and has worked with some of the finest actors and Academy Award winners in television shows such as: NBC's \"Law and Order: CI\" + TNT's \"Wanted\" + TBS' \"Boy's Life\".","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":513,"style":"COLOR-#000000"},{"offset":0,"length":247,"style":"SIZE-9.5"},{"offset":265,"length":7,"style":"SIZE-9.5"},{"offset":353,"length":160,"style":"SIZE-9.5"},{"offset":164,"length":18,"style":"ITALIC"},{"offset":247,"length":18,"style":"BOLD"}],"entityRanges":[{"offset":100,"length":15,"key":0},{"offset":164,"length":17,"key":1}],"data":{}},{"key":"2ltof","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]};
 
 const defaultControlsStyle = {
   height: 40,
@@ -194,7 +194,11 @@ class GeneralEditor extends React.Component {
       let contentState = editorState.getCurrentContent();
       // contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
       let raw = convertToRaw(contentState);
-      let html = draftRawToHtml(raw);
+      let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
+        if (block.type === 'atomic') block.text = ' ';
+        return block;
+      })});
+      let html = draftRawToHtml(rawToHtml);
       console.log(html);
       console.log(raw);
       this.props.onBodyChange(html, raw);
@@ -486,6 +490,7 @@ class GeneralEditor extends React.Component {
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
+    // contentState = convertImageEntitiesToAtomicBlocks(contentState);
     // console.log(convertToRaw(contentState));
 
     const newEditorState = linkifyContentState(editorState, contentState);
@@ -692,7 +697,7 @@ class GeneralEditor extends React.Component {
         fieldsmap={props.fieldsmap}
         rawSubjectContentState={props.rawSubjectContentState}
         />}
-      {props.allowGeneralizedProperties && state.currentFocusPosition !== null &&
+      {props.allowGeneralizedProperties && state.currentFocusPosition !== null && this.outerContainer !== null &&
         <div style={{
           position: 'fixed',
           top: state.currentFocusPosition.top,
