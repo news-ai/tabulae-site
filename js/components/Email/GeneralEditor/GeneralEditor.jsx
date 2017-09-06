@@ -31,7 +31,6 @@ import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkify
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
-// import convertImageEntitiesToAtomicBlocks from 'components/Email/EmailPanel/editorUtils/convertImageEntitiesToAtomicBlocks';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -111,7 +110,7 @@ const sanitizeHtmlConfigs = {
     div: ['style'],
     span: ['style'],
     a: ['href'],
-    img: ['src']
+    img: ['src', 'style']
   },
   transformTags: {
     'font': function(tagName, attribs) {

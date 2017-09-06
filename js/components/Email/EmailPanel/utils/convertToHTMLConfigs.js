@@ -27,19 +27,7 @@ export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
     }
   }
   if (nodeName.toLowerCase() === 'img') {
-    // insert placeholder 'a' that is cleaned up post-convertsion
-    // console.log(node);
-    // const src = node.getAttribute('src');
-    // console.log(src);
-    // const size = 1;
-    // const entityKey = createEntity('IMAGE', 'IMMUTABLE', {
-    //   src,
-    //   size: '100%',
-    //   imageLink: '#',
-    //   align: 'left'
-    // });
-    // console.log(entityKey);
-    // return entityKey;
+    console.log(node);
     return {
       type: 'atomic',
       data: {}

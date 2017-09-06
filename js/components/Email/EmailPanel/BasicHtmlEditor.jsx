@@ -19,7 +19,7 @@ import Draft, {
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
-import {convertFromHTML} from 'draft-convert';
+import convertFromHTML from 'components/Email/GeneralEditor/draft-convert/convertFromHTML'; // HACK!! using pull request that hasn't been merged into the package yet
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {
   INLINE_STYLES,
@@ -36,7 +36,7 @@ import {
   fontsizeMap,
   customStyleFn
 } from 'components/Email/EmailPanel/utils/renderers';
-import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
+import {CONVERT_CONFIGS} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
@@ -144,38 +144,9 @@ class BasicHtmlEditor extends Component {
       },
     ];
 
-    this.CONVERT_CONFIGS = {
-      htmlToStyle: htmlToStyle,
-      htmlToBlock: htmlToBlock,
-      htmlToEntity: (nodeName, node) => {
-        if (nodeName === 'a') {
-          if (node.firstElementChild === null) {
-            // LINK ENTITY
-            return Entity.create('LINK', 'MUTABLE', {url: node.href});
-          } else if (node.firstElementChild.nodeName === 'IMG') {
-            // IMG ENTITY
-            const imgNode = node.firstElementChild;
-            const src = imgNode.src;
-            const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
-            const imageLink = node.href;
-            const align = node.parentNode.style['text-align'];
-            const entityKey = Entity.create('IMAGE', 'MUTABLE', {
-              src,
-              size: `${size}%`,
-              imageLink: imageLink || '#',
-              align: align || 'left',
-            });
-
-            this.props.saveImageData(src);
-            return entityKey;
-          }
-        }
-      },
-    };
-
     this.state = {
       editorState: !isEmpty(this.props.bodyHtml) ?
-        EditorState.createWithContent(convertFromHTML(this.CONVERT_CONFIGS)(this.props.bodyHtml), this.decorator) :
+        EditorState.createWithContent(convertFromHTML(CONVERT_CONFIGS)(this.props.bodyHtml), this.decorator) :
         EditorState.createEmpty(this.decorator),
       bodyHtml: this.props.bodyHtml || null,
       variableMenuOpen: false,
@@ -192,7 +163,11 @@ class BasicHtmlEditor extends Component {
     function emitHTML(editorState) {
       const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
       let raw = convertToRaw(contentState);
-      let html = draftRawToHtml(raw);
+      let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
+        if (block.type === 'atomic') block.text = ' ';
+        return block;
+      })});
+      let html = draftRawToHtml(rawToHtml);
       // console.log(raw);
       // console.log(html);
       this.props.onBodyChange(html, raw);
@@ -302,7 +277,7 @@ class BasicHtmlEditor extends Component {
 
   _cleanHTMLToContentState(html) {
     let editorState;
-    const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
+    const configuredContent = convertFromHTML(CONVERT_CONFIGS)(html);
     // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
     editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
     // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
@@ -477,7 +452,7 @@ class BasicHtmlEditor extends Component {
     if (html) {
       console.log('pasted', 'html');
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
-      contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
+      contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
