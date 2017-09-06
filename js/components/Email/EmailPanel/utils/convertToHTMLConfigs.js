@@ -1,7 +1,7 @@
 import find from 'lodash/find';
 import {FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import tinycolor from 'tinycolor2';
-export const htmlToBlock = (nodeName, node) => {
+export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
   if (nodeName === 'figure') return;
   if (nodeName === 'p' || nodeName === 'div') {
     if (node.style.textAlign === 'center') {
@@ -25,6 +25,25 @@ export const htmlToBlock = (nodeName, node) => {
         data: {}
       };
     }
+  }
+  if (nodeName.toLowerCase() === 'img') {
+    // insert placeholder 'a' that is cleaned up post-convertsion
+    // console.log(node);
+    // const src = node.getAttribute('src');
+    // console.log(src);
+    // const size = 1;
+    // const entityKey = createEntity('IMAGE', 'IMMUTABLE', {
+    //   src,
+    //   size: '100%',
+    //   imageLink: '#',
+    //   align: 'left'
+    // });
+    // console.log(entityKey);
+    // return entityKey;
+    return {
+      type: 'atomic',
+      data: {}
+    };
   }
 };
 
@@ -70,9 +89,9 @@ export const htmlToEntity = (nodeName, node, createEntity) => {
     }
   }
   if (nodeName.toLowerCase() === 'img') {
-    console.log(node);
+    // console.log(node);
     const src = node.getAttribute('src');
-    console.log(src);
+    // console.log(src);
     const size = 1;
     const entityKey = createEntity('IMAGE', 'IMMUTABLE', {
       src,
@@ -80,7 +99,7 @@ export const htmlToEntity = (nodeName, node, createEntity) => {
       imageLink: '#',
       align: 'left'
     });
-    console.log(entityKey);
+    // console.log(entityKey);
     return entityKey;
   }
 }
