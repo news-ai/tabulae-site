@@ -198,8 +198,8 @@ class GeneralEditor extends React.Component {
         return block;
       })});
       let html = draftRawToHtml(rawToHtml);
-      console.log(html);
-      console.log(raw);
+      // console.log(html);
+      // console.log(raw);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -479,9 +479,9 @@ class GeneralEditor extends React.Component {
       console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
-      console.log(saneHtml);
+      // console.log(saneHtml);
       contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
-      console.log(convertToRaw(contentState));
+      // console.log(convertToRaw(contentState));
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
@@ -489,7 +489,6 @@ class GeneralEditor extends React.Component {
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
-    // contentState = convertImageEntitiesToAtomicBlocks(contentState);
     // console.log(convertToRaw(contentState));
 
     const newEditorState = linkifyContentState(editorState, contentState);
