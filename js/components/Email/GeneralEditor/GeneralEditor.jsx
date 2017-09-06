@@ -7,7 +7,6 @@ import Draft, {
   Editor,
   EditorState,
   ContentState,
-  SelectionState,
   Entity,
   RichUtils,
   AtomicBlockUtils,
@@ -31,6 +30,7 @@ import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkify
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
+import checkConsistentBlockFontSize from 'components/Email/EmailPanel/editorUtils/checkConsistentBlockFontSize';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -489,9 +489,10 @@ class GeneralEditor extends React.Component {
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
+    contentState = checkConsistentBlockFontSize(contentState);
     // console.log(convertToRaw(contentState));
 
-    const newEditorState = linkifyContentState(editorState, contentState);
+    let newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);
     return 'handled';
