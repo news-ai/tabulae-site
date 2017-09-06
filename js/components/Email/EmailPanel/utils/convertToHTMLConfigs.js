@@ -50,4 +50,45 @@ export const htmlToStyle = (nodeName, node, currentStyle) => {
   }
 };
 
+export const htmlToEntity = (nodeName, node, createEntity) => {
+  if (nodeName === 'a') {
+    if (node.firstElementChild === null) {
+      // LINK ENTITY
+      return createEntity('LINK', 'MUTABLE', {url: node.href});
+    } else if (node.firstElementChild.nodeName === 'IMG' || node.firstElementChild.nodeName === 'img') {
+      // IMG ENTITY
+      const imgNode = node.firstElementChild;
+      const src = imgNode.src;
+      const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10) || 1;
+      const imageLink = node.href;
+      const entityKey = createEntity('IMAGE', 'MUTABLE', {src,
+        size: `${size}%`,
+        imageLink: imageLink || '#',
+        align: 'left'
+      });
+      return entityKey;
+    }
+  }
+  if (nodeName.toLowerCase() === 'img') {
+    console.log(node);
+    const src = node.getAttribute('src');
+    console.log(src);
+    const size = 1;
+    const entityKey = createEntity('IMAGE', 'IMMUTABLE', {
+      src,
+      size: '100%',
+      imageLink: '#',
+      align: 'left'
+    });
+    console.log(entityKey);
+    return entityKey;
+  }
+}
+
+
+export const CONVERT_CONFIGS = {
+      htmlToStyle: htmlToStyle,
+      htmlToBlock: htmlToBlock,
+      htmlToEntity: htmlToEntity,
+    };
 

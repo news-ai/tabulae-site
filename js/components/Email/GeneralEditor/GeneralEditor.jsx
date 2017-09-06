@@ -19,11 +19,12 @@ import Draft, {
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
-import {convertFromHTML, convertToHTML} from 'draft-convert';
+import {convertToHTML} from 'draft-convert';
+import convertFromHTML from './draft-convert/convertFromHTML'; // HACK!! using pull request that hasn't been merged into the package yet
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap, customStyleFn} from 'components/Email/EmailPanel/utils/renderers';
-import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
+import {CONVERT_CONFIGS} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
@@ -62,6 +63,7 @@ import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/str
 import styled from 'styled-components';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
+const fucked = {"entityMap":{"0":{"type":"LINK","mutability":"MUTABLE","data":{"url":"http://www.imdb.com/name/nm1491631/"}},"1":{"type":"LINK","mutability":"MUTABLE","data":{"url":"http://www.becauseofgracia.com/"}}},"blocks":[{"key":"7hf5j","text":"Hi Mike,","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":8,"style":"COLOR-#000000"},{"offset":0,"length":8,"style":"SIZE-9.5"}],"entityRanges":[],"data":{}},{"key":"63s1g","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}},{"key":"8kfd2","text":"Happy Wednesday! I wanted to check in with you to let you know we have actor and Minneapolis native Chris Massoglia available for interviews promoting his new film Because of Gracia, in theaters nationwide September 15th + set to premiere in your AMC Arbor Lakes 16. Chris rose to stardom from his childhood acting career which began in the Midwest and has worked with some of the finest actors and Academy Award winners in television shows such as: NBC's \"Law and Order: CI\" + TNT's \"Wanted\" + TBS' \"Boy's Life\".","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":513,"style":"COLOR-#000000"},{"offset":0,"length":247,"style":"SIZE-9.5"},{"offset":265,"length":7,"style":"SIZE-9.5"},{"offset":353,"length":160,"style":"SIZE-9.5"},{"offset":164,"length":18,"style":"ITALIC"},{"offset":247,"length":18,"style":"BOLD"}],"entityRanges":[{"offset":100,"length":15,"key":0},{"offset":164,"length":17,"key":1}],"data":{}},{"key":"2ltof","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]};
 
 const defaultControlsStyle = {
   height: 40,
@@ -141,31 +143,6 @@ class GeneralEditor extends React.Component {
       }
     ];
 
-    this.CONVERT_CONFIGS = {
-      htmlToStyle: htmlToStyle,
-      htmlToBlock: htmlToBlock,
-      htmlToEntity: (nodeName, node) => {
-        if (nodeName === 'a') {
-          if (node.firstElementChild === null) {
-            // LINK ENTITY
-            return Entity.create('LINK', 'MUTABLE', {url: node.href});
-          } else if (node.firstElementChild.nodeName === 'IMG' || node.firstElementChild.nodeName === 'img') {
-            // IMG ENTITY
-            const imgNode = node.firstElementChild;
-            const src = imgNode.src;
-            const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
-            const imageLink = node.href;
-            const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
-              size: `${size}%`,
-              imageLink: imageLink || '#',
-              align: 'left'
-            });
-            this.props.saveImageData(src);
-            return entityKey;
-          }
-        }
-      },
-    };
 
     this.decorator = new CompositeDecorator([
       {
@@ -219,7 +196,7 @@ class GeneralEditor extends React.Component {
       let raw = convertToRaw(contentState);
       let html = draftRawToHtml(raw);
       console.log(html);
-      // console.log(raw);
+      console.log(raw);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -313,7 +290,7 @@ class GeneralEditor extends React.Component {
 
   _cleanHTMLToContentState(html) {
     let editorState;
-    const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
+    const configuredContent = convertFromHTML(CONVERT_CONFIGS)(html);
     // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
     editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
     // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
@@ -500,7 +477,8 @@ class GeneralEditor extends React.Component {
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       console.log(saneHtml);
-      contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
+      contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
+      console.log(convertToRaw(contentState));
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
@@ -518,14 +496,12 @@ class GeneralEditor extends React.Component {
 
   _handleImage(url) {
     const {editorState} = this.state;
-    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
     const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
       src: url,
       size: '100%',
       imageLink: '#',
       align: 'left'
     }).getLastCreatedEntityKey();
-    // this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -557,11 +533,10 @@ class GeneralEditor extends React.Component {
 
   _onOnlineImageUpload() {
     const props = this.props;
-    const state = this.state;
-    if (isURL(state.imageLink)) {
-      props.saveImageData(state.imageLink);
+    const imageLink = this.state.imageLink;
+    if (isURL(imageLink)) {
       setTimeout(_ => {
-        const newEditorState = this.handleImage(state.imageLink);
+        const newEditorState = this.handleImage(imageLink);
         this.onChange(newEditorState);
         this.setState({imageLink: ''});
       }, 50);
@@ -822,7 +797,7 @@ const mapDispatchToProps = (dispatch, props) => {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
     uploadImage: file => dispatch(imgActions.uploadImage(file)),
-    saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
+    // saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'}),
     clearCacheBodyHtml: _ => dispatch({type: 'CLEAR_CACHE_BODYHTML'})
