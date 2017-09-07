@@ -7,7 +7,6 @@ import Draft, {
   Editor,
   EditorState,
   ContentState,
-  SelectionState,
   Entity,
   RichUtils,
   AtomicBlockUtils,
@@ -15,20 +14,24 @@ import Draft, {
   convertFromRaw,
   CompositeDecorator,
   Modifier,
+  SelectionState
   // getVisibleSelectionRect
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
-import {convertFromHTML} from 'draft-convert';
+import {convertToHTML} from 'draft-convert';
+import convertFromHTML from './draft-convert/convertFromHTML'; // HACK!! using pull request that hasn't been merged into the package yet
 import {actions as imgActions} from 'components/Email/EmailPanel/Image';
 import {INLINE_STYLES, BLOCK_TYPES, POSITION_TYPES, FONTSIZE_TYPES, TYPEFACE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import {mediaBlockRenderer, getBlockStyle, blockRenderMap, styleMap, fontsizeMap, typefaceMap, customStyleFn} from 'components/Email/EmailPanel/utils/renderers';
-import {htmlToStyle, htmlToBlock} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
+import {CONVERT_CONFIGS} from 'components/Email/EmailPanel/utils/convertToHTMLConfigs';
 
 import linkifyLastWord from 'components/Email/EmailPanel/editorUtils/linkifyLastWord';
 import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkifyContentState';
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
+import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
+import checkConsistentBlockFontSize from 'components/Email/EmailPanel/editorUtils/checkConsistentBlockFontSize';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -101,6 +104,28 @@ const getVisibleSelectionRect = (global) => {
   return boundingRect;
 }
 
+const sanitizeHtmlConfigs = {
+  allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span', 'img']),
+  allowedAttributes: {
+    p: ['style'],
+    div: ['style'],
+    span: ['style'],
+    a: ['href'],
+    img: ['src', 'style']
+  },
+  transformTags: {
+    'font': function(tagName, attribs) {
+      if (attribs.color) {
+        if (attribs.style) attribs.style += `color: ${attribs.color};`;
+        else attribs.style = `color: ${attribs.color};`;
+      }
+      return {
+        tagName: 'span',
+        attribs
+      };
+    },
+  }
+};
 
 class GeneralEditor extends React.Component {
   constructor(props) {
@@ -118,31 +143,6 @@ class GeneralEditor extends React.Component {
       }
     ];
 
-    this.CONVERT_CONFIGS = {
-      htmlToStyle: htmlToStyle,
-      htmlToBlock: htmlToBlock,
-      htmlToEntity: (nodeName, node) => {
-        if (nodeName === 'a') {
-          if (node.firstElementChild === null) {
-            // LINK ENTITY
-            return Entity.create('LINK', 'MUTABLE', {url: node.href});
-          } else if (node.firstElementChild.nodeName === 'IMG') {
-            // IMG ENTITY
-            const imgNode = node.firstElementChild;
-            const src = imgNode.src;
-            const size = parseInt(imgNode.style['max-height'].slice(0, -1), 10);
-            const imageLink = node.href;
-            const entityKey = Entity.create('IMAGE', 'MUTABLE', {src,
-              size: `${size}%`,
-              imageLink: imageLink || '#',
-              align: 'left'
-            });
-            this.props.saveImageData(src);
-            return entityKey;
-          }
-        }
-      },
-    };
 
     this.decorator = new CompositeDecorator([
       {
@@ -191,11 +191,16 @@ class GeneralEditor extends React.Component {
       });
     };
     function emitHTML(editorState) {
-      const contentState = applyDefaultFontSizeInlineStyle(editorState.getCurrentContent(), 'SIZE-10.5');
+      let contentState = editorState.getCurrentContent();
+      // contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
       let raw = convertToRaw(contentState);
-      let html = draftRawToHtml(raw);
-      // console.log(raw);
+      let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
+        if (block.type === 'atomic') block.text = ' ';
+        return block;
+      })});
+      let html = draftRawToHtml(rawToHtml);
       // console.log(html);
+      // console.log(raw);
       this.props.onBodyChange(html, raw);
     }
     this.emitHTML = debounce(emitHTML, this.props.debounce);
@@ -277,7 +282,7 @@ class GeneralEditor extends React.Component {
         else newContent = convertFromRaw(nextProps.bodyContent);
         editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       } else {
-        editorState = EditorState.createEmpty(decorator);
+        editorState = EditorState.createEmpty(this.decorator);
       }
       this.onChange(editorState);
     }
@@ -289,7 +294,7 @@ class GeneralEditor extends React.Component {
 
   _cleanHTMLToContentState(html) {
     let editorState;
-    const configuredContent = convertFromHTML(this.CONVERT_CONFIGS)(html);
+    const configuredContent = convertFromHTML(CONVERT_CONFIGS)(html);
     // need to process all image entities into ATOMIC blocks because draft-convert doesn't have access to contentState
     editorState = EditorState.push(this.state.editorState, configuredContent, 'insert-fragment');
     // FIRST PASS TO REPLACE IMG WITH ATOMIC BLOCKS
@@ -473,40 +478,56 @@ class GeneralEditor extends React.Component {
 
     if (html) {
       console.log('pasted', 'html');
-      const saneHtml = sanitizeHtml(html, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span']),
-        allowedAttributes: {
-          p: ['style'],
-          div: ['style'],
-          span: ['style'],
-          a: ['href']
-        }
-      });
+      // console.log(html);
+      const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       // console.log(saneHtml);
-      contentState = convertFromHTML(this.CONVERT_CONFIGS)(saneHtml);
-      blockMap = contentState.getBlockMap();
+      contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
+      // console.log(convertToRaw(contentState));
     } else {
       console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
-      blockMap = contentState.blockMap;
     }
 
-    const newEditorState = linkifyContentState(editorState, contentState);
+    // console.log(convertToRaw(contentState));
+    contentState = handleLineBreaks(contentState);
+    // console.log(convertToRaw(contentState));
 
-    this.onChange(newEditorState);
+    let newEditorState = linkifyContentState(editorState, contentState);
+
+    this.onChange(newEditorState, 'force-emit-html');
+    // setTimeout(_ => {
+    //   const DEFAULT_FONTSIZE = 'SIZE-10.5';
+    //   const FONT_PREFIX = 'SIZE-';
+    //   this.state.editorState.getCurrentContent().getBlockMap().forEach((block, i) => {
+    //     const countMap = {};
+    //     block.getCharacterList().forEach((char, j) => {
+    //       const fontsize = char.getStyle()
+    //       .filter(fontsize => fontsize.substring(0, FONT_PREFIX.length) === FONT_PREFIX).first() || DEFAULT_FONTSIZE;
+    //       if (countMap[fontsize]) countMap[fontsize]++;
+    //       else countMap[fontsize] = 1;
+    //     });
+    //     const maxUsedSize = Object.keys(countMap).reduce(({fontsize, count}, nextFontsize) =>
+    //       countMap[nextFontsize] > count ? {fontsize: nextFontsize, count: countMap[nextFontsize]} : {fontsize, count},
+    //       {fontsize: DEFAULT_FONTSIZE, count: 0}).fontsize;
+    //     console.log(maxUsedSize);
+
+    //     const selection = SelectionState.createEmpty(block.getKey()).merge({anchorOffset: 0, focusOffset: block.getLength()});
+    //     const editorState = EditorState.forceSelection(this.state.editorState, selection);
+    //     // this.onChange(editorState, 'force-emit-html');
+    //     this.onChange(toggleSingleInlineStyle(editorState, maxUsedSize, undefined, 'SIZE-'), 'force-emit-html');
+    //   });
+    // }, 1500);
     return 'handled';
   }
 
   _handleImage(url) {
     const {editorState} = this.state;
-    // const url = 'http://i.dailymail.co.uk/i/pix/2016/05/18/15/3455092D00000578-3596928-image-a-20_1463582580468.jpg';
     const entityKey = editorState.getCurrentContent().createEntity('IMAGE', 'MUTABLE', {
       src: url,
       size: '100%',
       imageLink: '#',
       align: 'left'
     }).getLastCreatedEntityKey();
-    // this.props.saveImageEntityKey(url, entityKey);
 
     const newEditorState = AtomicBlockUtils.insertAtomicBlock(editorState, entityKey, ' ');
     return newEditorState;
@@ -538,11 +559,10 @@ class GeneralEditor extends React.Component {
 
   _onOnlineImageUpload() {
     const props = this.props;
-    const state = this.state;
-    if (isURL(state.imageLink)) {
-      props.saveImageData(state.imageLink);
+    const imageLink = this.state.imageLink;
+    if (isURL(imageLink)) {
       setTimeout(_ => {
-        const newEditorState = this.handleImage(state.imageLink);
+        const newEditorState = this.handleImage(imageLink);
         this.onChange(newEditorState);
         this.setState({imageLink: ''});
       }, 50);
@@ -592,18 +612,20 @@ class GeneralEditor extends React.Component {
       {'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'}
       );
     let customStyleMap = styleMap;
-    if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
+    // if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
 
     let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
     
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
     if (props.allowToolbarDisappearOnBlur) controlsStyle.display = showToolbar ? 'flex' : 'none';
-    if (this.outerContainer) {
+    // if (this.outerContainer) {
 
     // console.log(this.outerContainer.offsetTop - document.body.scrollTop);
     // console.log(controlsStyle);
 
-    }
+    // }
+    // console.log(editorState.getCurrentInlineStyle().toJS());
+    // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
 
     return (
       <div ref={ref => this.outerContainer = ref} >
@@ -696,7 +718,7 @@ class GeneralEditor extends React.Component {
         fieldsmap={props.fieldsmap}
         rawSubjectContentState={props.rawSubjectContentState}
         />}
-      {props.allowGeneralizedProperties && state.currentFocusPosition !== null &&
+      {props.allowGeneralizedProperties && state.currentFocusPosition !== null && this.outerContainer !== null &&
         <div style={{
           position: 'fixed',
           top: state.currentFocusPosition.top,
@@ -801,7 +823,7 @@ const mapDispatchToProps = (dispatch, props) => {
     setAttachments: files => dispatch({type: 'SET_ATTACHMENTS', files}),
     clearAttachments: _ => dispatch({type: 'CLEAR_ATTACHMENTS'}),
     uploadImage: file => dispatch(imgActions.uploadImage(file)),
-    saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
+    // saveImageData: src => dispatch({type: 'IMAGE_UPLOAD_RECEIVE', src}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
     turnOffTemplateChange: _ => dispatch({type: 'TEMPLATE_CHANGE_OFF'}),
     clearCacheBodyHtml: _ => dispatch({type: 'CLEAR_CACHE_BODYHTML'})

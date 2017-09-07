@@ -6,7 +6,7 @@
     "alertifyjs": "^1.10.0",
     "axios": "^0.9.1",
     "classnames": "^2.2.5",
-    "draft-convert": "^1.4.7",
+    "draft-convert": "^1.4.9",
     "draft-js": "^0.10.1",
     "es6-promise": "^4.0.5",
     "es6-promise-debounce": "^1.0.1",
@@ -73,7 +73,7 @@
     "rxjs": "^5.4.2",
     "sanitize-html": "^1.14.1",
     "styled-components": "^2.1.2",
-    "tinycolor": "0.0.1",
+    "tinycolor2": "^1.4.1",
     "tlds": "^1.157.0",
     "validator": "^5.5.0"
   },
