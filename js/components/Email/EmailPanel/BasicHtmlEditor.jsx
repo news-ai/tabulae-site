@@ -78,7 +78,7 @@ import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/str
 
 const placeholder = 'Tip: Use column names as variables in your template email by clicking on "Insert Property" or "+" icon in Subject, Body, or Toolbar.';
 
-const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
+// const ENTITY_SKIP_TYPES = ['EMAIL_SIGNATURE'];
 
 const sanitizeHtmlConfigs = {
   allowedTags: sanitizeHtml.defaults.allowedTags.concat(['span', 'img']),

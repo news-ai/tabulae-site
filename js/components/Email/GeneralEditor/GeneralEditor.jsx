@@ -14,6 +14,7 @@ import Draft, {
   convertFromRaw,
   CompositeDecorator,
   Modifier,
+  SelectionState
   // getVisibleSelectionRect
 } from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
@@ -479,7 +480,7 @@ class GeneralEditor extends React.Component {
       console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
-      // console.log(saneHtml);
+      console.log(saneHtml);
       contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
       // console.log(convertToRaw(contentState));
     } else {
@@ -489,12 +490,33 @@ class GeneralEditor extends React.Component {
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
-    contentState = checkConsistentBlockFontSize(contentState);
     // console.log(convertToRaw(contentState));
 
     let newEditorState = linkifyContentState(editorState, contentState);
 
-    this.onChange(newEditorState);
+    this.onChange(newEditorState, 'force-emit-html');
+    // setTimeout(_ => {
+    //   const DEFAULT_FONTSIZE = 'SIZE-10.5';
+    //   const FONT_PREFIX = 'SIZE-';
+    //   this.state.editorState.getCurrentContent().getBlockMap().forEach((block, i) => {
+    //     const countMap = {};
+    //     block.getCharacterList().forEach((char, j) => {
+    //       const fontsize = char.getStyle()
+    //       .filter(fontsize => fontsize.substring(0, FONT_PREFIX.length) === FONT_PREFIX).first() || DEFAULT_FONTSIZE;
+    //       if (countMap[fontsize]) countMap[fontsize]++;
+    //       else countMap[fontsize] = 1;
+    //     });
+    //     const maxUsedSize = Object.keys(countMap).reduce(({fontsize, count}, nextFontsize) =>
+    //       countMap[nextFontsize] > count ? {fontsize: nextFontsize, count: countMap[nextFontsize]} : {fontsize, count},
+    //       {fontsize: DEFAULT_FONTSIZE, count: 0}).fontsize;
+    //     console.log(maxUsedSize);
+
+    //     const selection = SelectionState.createEmpty(block.getKey()).merge({anchorOffset: 0, focusOffset: block.getLength()});
+    //     const editorState = EditorState.forceSelection(this.state.editorState, selection);
+    //     // this.onChange(editorState, 'force-emit-html');
+    //     this.onChange(toggleSingleInlineStyle(editorState, maxUsedSize, undefined, 'SIZE-'), 'force-emit-html');
+    //   });
+    // }, 1500);
     return 'handled';
   }
 
@@ -590,7 +612,7 @@ class GeneralEditor extends React.Component {
       {'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'}
       );
     let customStyleMap = styleMap;
-    if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
+    // if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
 
     let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
     

@@ -186,9 +186,12 @@ export const customStyleFn = style => {
     if (styleName.startsWith('COLOR-')) {
       styles.color = styleName.split('COLOR-')[1];
     }
+    if (styleName.startsWith('SIZE-')) {
+      styles.fontSize = styleName.split('SIZE-')[1] + 'pt';
+    }
     return styles;
   }, {});
 }
 
 // Custom overrides for "code" style.
-export const styleMap = Object.assign({}, fontsizeMap, customBlocks, typefaceMap, specialMap);
+export const styleMap = Object.assign({}, customBlocks, typefaceMap, specialMap);

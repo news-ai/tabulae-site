@@ -3,7 +3,7 @@ import {FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import tinycolor from 'tinycolor2';
 export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
   if (nodeName === 'figure') return;
-  if (nodeName === 'p' || nodeName === 'div') {
+  if (nodeName.toLowerCase() === 'p' || nodeName.toLowerCase() === 'div') {
     if (node.style.textAlign === 'center') {
       return {
         type: 'center-align',
