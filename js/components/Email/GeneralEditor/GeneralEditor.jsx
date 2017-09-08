@@ -612,7 +612,7 @@ class GeneralEditor extends React.Component {
       {'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'}
       );
     let customStyleMap = styleMap;
-    // if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
+    if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
 
     let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
     

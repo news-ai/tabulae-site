@@ -318,8 +318,10 @@ class Workspace extends Component {
               onBodyChange={this.onBodyChange}
               onSubjectChange={this.onSubjectChange}
               placeholder='Start building your template here...'
-              extendStyleMap={customFontSizes}
               />
+            {/*
+              extendStyleMap={customFontSizes}
+            */}
             </div>
           {state.mode === 'preview' &&
             <div style={{marginTop: EDITOR_DISTANCE_FROM_TOP}} >

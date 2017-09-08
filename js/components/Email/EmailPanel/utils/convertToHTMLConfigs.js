@@ -27,7 +27,7 @@ export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
     }
   }
   if (nodeName.toLowerCase() === 'img') {
-    console.log(node);
+    // console.log(node);
     return {
       type: 'atomic',
       data: {}
