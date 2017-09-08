@@ -127,6 +127,7 @@ const sanitizeHtmlConfigs = {
   }
 };
 
+
 class GeneralEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -612,8 +613,6 @@ class GeneralEditor extends React.Component {
       {'RichEditor-hidePlaceholder': editorState.getCurrentContent().hasText() && editorState.getCurrentContent().getBlockMap().first().getType() !== 'unstyled'}
       );
     let customStyleMap = styleMap;
-    if (props.extendStyleMap) customStyleMap = Object.assign({}, styleMap, props.extendStyleMap);
-
     let controlsStyle = props.controlsStyle ? Object.assign({}, defaultControlsStyle, props.controlsStyle): defaultControlsStyle;
     
     const showToolbar = props.allowToolbarDisappearOnBlur ? state.showToolbar : true;
@@ -743,7 +742,7 @@ class GeneralEditor extends React.Component {
               })}
             blockRenderMap={extendedBlockRenderMap}
             customStyleMap={customStyleMap}
-            customStyleFn={customStyleFn}
+            customStyleFn={props.overwriteCustomStyleFn || customStyleFn}
             editorState={editorState}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.handleReturn}

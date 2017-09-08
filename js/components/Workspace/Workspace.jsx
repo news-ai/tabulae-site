@@ -67,16 +67,19 @@ function createMarkUp(html) {
   return { __html: html };
 }
 
-const customFontSizes = FONTSIZE_TYPES
-  .map(font => font.style)
-  .reduce((acc, font) => {
-    const size = parseFloat(font.split('SIZE-')[1]);
-    acc[font] = ({
-      fontSize: `${size + 4}pt`,
-      // lineHeight: 1.3
-    });
-    return acc;
+const overwriteCustomStyleFn = style => {
+  const styleNames = style.toJS();
+  // console.log(styleNames);
+  return styleNames.reduce((styles, styleName) => {
+    if (styleName.startsWith('COLOR-')) {
+      styles.color = styleName.split('COLOR-')[1];
+    }
+    if (styleName.startsWith('SIZE-')) {
+      styles.fontSize = parseFloat(styleName.split('SIZE-')[1]) + 4 + 'pt';
+    }
+    return styles;
   }, {});
+}
 
 const EDITOR_DISTANCE_FROM_TOP = 80;
 
@@ -318,9 +321,9 @@ class Workspace extends Component {
               onBodyChange={this.onBodyChange}
               onSubjectChange={this.onSubjectChange}
               placeholder='Start building your template here...'
+              overwriteCustomStyleFn={overwriteCustomStyleFn}
               />
             {/*
-              extendStyleMap={customFontSizes}
             */}
             </div>
           {state.mode === 'preview' &&
