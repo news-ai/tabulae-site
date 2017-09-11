@@ -688,11 +688,11 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    // console.log(props.listData.contacts.length);
 
     let total = Math.floor(props.received.length / this.state.pageSize);
     if (props.received.length % this.state.pageSize !== 0) total += 1;
     let rowCount = this.state.currentPage < total ? this.state.pageSize : props.received.length % this.state.pageSize;
+    if (rowCount === 0) rowCount = this.state.pageSize;
     if (this.state.pageSize === -1) rowCount = props.received.length;
     return (
       <div style={styles.container}>
