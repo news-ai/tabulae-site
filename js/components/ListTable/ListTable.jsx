@@ -426,7 +426,7 @@ class ListTable extends Component {
 
     let contentBody;
     let contentBody2 = null;
-    if (fieldObj.tableOnly) {
+    if (fieldObj.tableOnly && contacts[rIndex]) {
       const rowData = contacts[rIndex];
       switch (fieldObj.value) {
         case 'index':
@@ -577,21 +577,46 @@ class ListTable extends Component {
     .then(
       _ => {
         const newListContacts = difference(this.props.listData.contacts, selected);
-        this.props.deleteContacts(selected);
-        this.setState({isDeleting: true});
-        this.props.patchList({
+
+        // if deleted contact is the only one in a page then move page back
+        const getTotal = (listLength, pageSize) => {
+          let total = Math.floor(listLength / pageSize);
+          if (listLength % pageSize !== 0) total += 1;
+          if (pageSize === -1) total = 1;
+          return total;
+        };
+        let currentPage = this.state.currentPage;
+        let oldTotal = getTotal(this.props.listData.contacts.length, this.state.pageSize);
+        let newTotal = getTotal(newListContacts.length, this.state.pageSize);
+        if (currentPage > newTotal) currentPage = newTotal;
+
+        // ListTable skips to top when deleting the bottom contacts of non-first pages
+        // get rowPosition of smallest selected contact
+        // or sorted
+        const getContactListPosition = (id, list, pageSize) => {
+          const pos = list.indexOf(id);
+          return pos ? pos % pageSize : pos;
+        };
+        const ids = this.state.onSort ? this.state.sortedIds : this.props.listData.contacts;
+        const minListPosition = Math.min(...selected.map(id => getContactListPosition(id, ids, this.state.pageSize)).filter(pos => pos));
+
+        // backend requires deleteContacts first before patchList to prevent race condition
+        this.setState({isDeleting: true, currentPage});
+        this.props.deleteContacts(selected)
+        .then(_ => this.props.patchList({
           listId: this.props.listId,
           contacts: newListContacts,
           name: this.props.listData.name,
-        }).then(_ => this.setState({isDeleting: false}));
+        }))
+        .then(_ => {
+          // clean up contacts after list to prevent list rendering undefined contacts
+          this.setState({isDeleting: false, scrollToRow: minListPosition === 0 ? 0 : minListPosition - 1});
+        });
+
         if (this.state.onSort) {
-          this.setState({
-            sortedIds: difference(this.state.sortedIds, selected),
-            selected: []
-          });
-        } else {
-          this.setState({selected: []});
+          this.setState({sortedIds: difference(this.state.sortedIds, selected)});
         }
+        this.setState({selected: []});
       },
       _ => {}
       );
@@ -688,12 +713,13 @@ class ListTable extends Component {
   render() {
     const props = this.props;
     const state = this.state;
-    // console.log(props.listData.contacts.length);
 
     let total = Math.floor(props.received.length / this.state.pageSize);
     if (props.received.length % this.state.pageSize !== 0) total += 1;
     let rowCount = this.state.currentPage < total ? this.state.pageSize : props.received.length % this.state.pageSize;
-    if (this.state.pageSize === -1) rowCount = props.received.length;
+    if (rowCount === 0) rowCount = this.state.pageSize;
+    if (state.pageSize === -1) rowCount = props.received.length;
+    if (state.isDeleting) rowCount = 0;
     return (
       <div style={styles.container}>
         {
@@ -936,6 +962,10 @@ class ListTable extends Component {
                 overscanColumnCount={3}
                 />
               </div>
+            {state.isDeleting &&
+              <div style={{backgroundColor: grey50, display: 'flex', alignItems: 'stretch', justifyContent: 'center', height: '100%'}} >
+                <span className='text' style={{color: grey500}} >Contact(s) are deleting...</span> 
+              </div>}
               <Grid
               ref={ref => this.setDataGridRef(ref)}
               className='BodyGrid'
