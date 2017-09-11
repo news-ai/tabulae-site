@@ -590,7 +590,7 @@ class ListTable extends Component {
         let newTotal = getTotal(newListContacts.length, this.state.pageSize);
         if (currentPage > newTotal) currentPage = newTotal;
 
-        // TODO: ListTable skips to top when deleting the bottom contacts of non-first pages
+        // ListTable skips to top when deleting the bottom contacts of non-first pages
         // get rowPosition of smallest selected contact
         // or sorted
         const getContactListPosition = (id, list, pageSize) => {
@@ -600,14 +600,16 @@ class ListTable extends Component {
         const ids = this.state.onSort ? this.state.sortedIds : this.props.listData.contacts;
         const minListPosition = Math.min(...selected.map(id => getContactListPosition(id, ids, this.state.pageSize)).filter(pos => pos));
 
+        // backend requires deleteContacts first before patchList to prevent race condition
         this.setState({isDeleting: true, currentPage});
-        this.props.patchList({
+        this.props.deleteContacts(selected)
+        .then(_ => this.props.patchList({
           listId: this.props.listId,
           contacts: newListContacts,
           name: this.props.listData.name,
-        }).then(_ => {
+        }))
+        .then(_ => {
           // clean up contacts after list to prevent list rendering undefined contacts
-          this.props.deleteContacts(selected);
           this.setState({isDeleting: false, scrollToRow: minListPosition === 0 ? 0 : minListPosition - 1});
         });
 
@@ -716,7 +718,8 @@ class ListTable extends Component {
     if (props.received.length % this.state.pageSize !== 0) total += 1;
     let rowCount = this.state.currentPage < total ? this.state.pageSize : props.received.length % this.state.pageSize;
     if (rowCount === 0) rowCount = this.state.pageSize;
-    if (this.state.pageSize === -1) rowCount = props.received.length;
+    if (state.pageSize === -1) rowCount = props.received.length;
+    if (state.isDeleting) rowCount = 0;
     return (
       <div style={styles.container}>
         {
@@ -959,6 +962,10 @@ class ListTable extends Component {
                 overscanColumnCount={3}
                 />
               </div>
+            {state.isDeleting &&
+              <div style={{backgroundColor: grey50, display: 'flex', alignItems: 'stretch', justifyContent: 'center', height: '100%'}} >
+                <span className='text' style={{color: grey500}} >Contact(s) are deleting...</span> 
+              </div>}
               <Grid
               ref={ref => this.setDataGridRef(ref)}
               className='BodyGrid'
