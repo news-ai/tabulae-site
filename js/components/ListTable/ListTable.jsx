@@ -593,7 +593,12 @@ class ListTable extends Component {
         // TODO: ListTable skips to top when deleting the bottom contacts of non-first pages
         // get rowPosition of smallest selected contact
         // or sorted
-
+        const getContactListPosition = (id, list, pageSize) => {
+          const pos = list.indexOf(id);
+          return pos ? pos % pageSize : pos;
+        };
+        const ids = this.state.onSort ? this.state.sortedIds : this.props.listData.contacts;
+        const minListPosition = Math.min(...selected.map(id => getContactListPosition(id, ids, this.state.pageSize)).filter(pos => pos));
 
         this.setState({isDeleting: true, currentPage});
         this.props.patchList({
@@ -603,11 +608,11 @@ class ListTable extends Component {
         }).then(_ => {
           // clean up contacts after list to prevent list rendering undefined contacts
           this.props.deleteContacts(selected);
-          this.setState({isDeleting: false});
+          this.setState({isDeleting: false, scrollToRow: minListPosition === 0 ? 0 : minListPosition - 1});
         });
 
         if (this.state.onSort) {
-          this.setState({sortedIds: difference(this.state.sortedIds)});
+          this.setState({sortedIds: difference(this.state.sortedIds, selected)});
         }
         this.setState({selected: []});
       },
