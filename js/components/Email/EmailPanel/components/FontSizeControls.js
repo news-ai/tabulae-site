@@ -20,7 +20,6 @@ export default function FontSizeControls(props) {
     // more than one fontSize selected
     value = PLACEHOLDER;
   }
-  // console.log(currentFontsize);
   const menuItems = [
     <MenuItem
     key={`fontsize-select-default`}
@@ -37,6 +36,9 @@ export default function FontSizeControls(props) {
       label={type.label}
       />)
   ];
+  /*
+  getSelection and then blocks within those selections find areas not applied with selected style and applied them
+   */
 
   return (
     <DropDownMenu

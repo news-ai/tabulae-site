@@ -62,6 +62,7 @@ import ValidationHOC from 'components/ValidationHOC';
 import {grey300, grey400, grey500, grey600, grey700} from 'material-ui/styles/colors';
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 import styled from 'styled-components';
+import {List} from 'immutable';
 
 const placeholder = 'Tip: Use column names as variables in your template email. E.g. "Hi {firstname}! It was so good to see you at {location} the other day...';
 
@@ -222,7 +223,7 @@ class GeneralEditor extends React.Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, newFontsize, undefined, 'SIZE-'), 'force-emit-html');
+    this.onFontSizeToggle = this.onFontSizeToggle.bind(this);
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
@@ -291,6 +292,52 @@ class GeneralEditor extends React.Component {
 
   componentWillUnmount() {
     if (this.props.allowGeneralizedProperties) window.removeEventListener('scroll', this.getPropertyIconLocation);
+  }
+
+  onFontSizeToggle(selectedSize)  {
+    const FONT_PREFIX = 'SIZE-';
+    const {editorState} = this.state;
+    const selection = editorState.getSelection();
+    const anchorKey = selection.getAnchorKey();
+    const focusKey = selection.getFocusKey();
+    const selectionStart = selection.getStartOffset();
+    const selectionEnd = selection.getEndOffset();
+    let selectedBlocks = new List();
+    let inBlock = false;
+    console.log(anchorKey);
+    console.log(focusKey);
+    console.log(selectionStart);
+    console.log(selectionEnd);
+    editorState.getCurrentContent().getBlockMap().forEach(block => {
+      if (block.getKey() === anchorKey) inBlock = true;
+      if (inBlock) selectedBlocks = selectedBlocks.push(block);
+      if (block.getKey() === focusKey) {
+        inBlock = false;
+        return;
+      }
+    });
+    console.log(selectedBlocks.toJS());
+    selectedBlocks.map((block, i) => {
+      let blockStart = 0;
+      let blockEnd = block.getLength();
+      if (i === 0) blockStart = selectionStart; // first block
+      if (i === selectedBlocks.size - 1) blockEnd = selectionEnd; // last block
+
+      // DESELECT ALL SELECTED WITH FONTSIZE
+      block.findStyleRanges(
+        char => {
+          if (char.hasStyle(selectedSize)) return false; // selected fontsize is already applied to this character
+          return true;
+        },
+        (start, end) => {
+
+
+        });
+
+      // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
+    });
+
+    this.onChange(toggleSingleInlineStyle(this.state.editorState, selectedSize, undefined, 'SIZE-'), 'force-emit-html');
   }
 
   _cleanHTMLToContentState(html) {
