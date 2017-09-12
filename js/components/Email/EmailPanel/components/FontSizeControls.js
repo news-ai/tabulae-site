@@ -2,23 +2,22 @@ import React from 'react';
 import MenuItem from 'material-ui/MenuItem';
 import find from 'lodash/find';
 import DropDownMenu from 'material-ui/DropDownMenu';
+import findAllFontSizesInSelection from 'components/Email/EmailPanel/editorUtils/findAllFontSizesInSelection';
 
 const PLACEHOLDER = '---';
 const FONT_PREFIX = 'SIZE-';
 
 export default function FontSizeControls(props) {
   const {inlineStyles} = props;
-  const currentStyle = props.editorState.getCurrentInlineStyle();
-  const currentType = find(inlineStyles, type => currentStyle.has(type.style));
-  const selection = props.editorState.getSelection();
-  const currentFontsize = currentStyle.toJS().filter(font => font.substring(0, FONT_PREFIX.length) === FONT_PREFIX)[0];
+  const currentFontSizes = findAllFontSizesInSelection(props.editorState);
   let value = '10.5';
-  if (currentType) {
-    value = currentType.label;
-  }
-  if (!selection.isCollapsed() && selection.getHasFocus() && !currentType && selection.getEndOffset() - selection.getStartOffset() > 0) {
+  // console.log(currentFontSizes);
+  if (currentFontSizes.length > 1) {
     // more than one fontSize selected
     value = PLACEHOLDER;
+  } else if (currentFontSizes.length === 1) {
+    const currentType = find(inlineStyles, type => currentFontSizes[0] === type.style);
+    value = currentType.label;
   }
   const menuItems = [
     <MenuItem
@@ -47,7 +46,7 @@ export default function FontSizeControls(props) {
     value={value}
     onChange={(e, index, newValue) => {
       const selectStyle = inlineStyles[index - 1].style;
-      if (selectStyle !== currentFontsize) props.onToggle(selectStyle);
+      props.onToggle(selectStyle);
     }}
     >
     {menuItems}

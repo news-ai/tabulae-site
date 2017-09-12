@@ -31,7 +31,7 @@ import linkifyContentState from 'components/Email/EmailPanel/editorUtils/linkify
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
-import checkConsistentBlockFontSize from 'components/Email/EmailPanel/editorUtils/checkConsistentBlockFontSize';
+import applyFontSize from 'components/Email/EmailPanel/editorUtils/applyFontSize';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -223,7 +223,7 @@ class GeneralEditor extends React.Component {
     this.handleBeforeInput = this._handleBeforeInput.bind(this);
     this.getEditorState = () => this.state.editorState;
     this.handleDrop = this._handleDrop.bind(this);
-    this.onFontSizeToggle = this.onFontSizeToggle.bind(this);
+    this.onFontSizeToggle = selectedSize => this.onChange(applyFontSize(this.state.editorState, selectedSize), 'force-emit-html');
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
@@ -292,88 +292,6 @@ class GeneralEditor extends React.Component {
 
   componentWillUnmount() {
     if (this.props.allowGeneralizedProperties) window.removeEventListener('scroll', this.getPropertyIconLocation);
-  }
-
-  onFontSizeToggle(selectedSize)  {
-    const FONT_PREFIX = 'SIZE-';
-    let editorState = this.state.editorState;
-    let contentState = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const anchorKey = selection.getIsBackward() ? selection.getFocusKey() : selection.getAnchorKey();
-    const focusKey = selection.getIsBackward() ? selection.getAnchorKey() : selection.getFocusKey();
-    const selectionStart = selection.getStartOffset();
-    const selectionEnd = selection.getEndOffset();
-    let selectedBlocks = [];
-    let inBlock = false;
-    // console.log('-------------');
-    // console.log('anchorKey', anchorKey);
-    // console.log('focusKey', focusKey);
-    // console.log('selectionStart', selectionStart);
-    // console.log('selectionEnd', selectionEnd);
-    // console.log('serialize', selection.serialize());
-    editorState.getCurrentContent().getBlockMap().forEach(block => {
-      // console.log(block.getKey());
-      if (block.getKey() === anchorKey) inBlock = true;
-      if (inBlock) selectedBlocks.push(block);
-      if (block.getKey() === focusKey) inBlock = false;
-    });
-    // console.log(selectedBlocks);
-    selectedBlocks.map((block, i) => {
-      const blockKey = block.getKey();
-
-      // DESELECT ALL SELECTED WITH FONTSIZE
-      let font = undefined;
-      block.findStyleRanges(
-        char => {
-          const charFont = char.getStyle().toJS().filter(font => font.substring(0, FONT_PREFIX.length) === FONT_PREFIX)[0];
-          font = charFont;
-          if (charFont) return true;
-          return false;
-        },
-        (styleStart, styleEnd) => {
-          // console.log(font);
-          // console.log('styleStart', styleStart);
-          // console.log('styleEnd', styleEnd);
-          if (selection.hasEdgeWithin(blockKey, styleStart, styleEnd)) {
-            let start = styleStart;
-            let end = styleEnd;
-            if (anchorKey === blockKey) start = selectionStart;
-            if (focusKey === blockKey) end = selectionEnd;
-            // console.log('hasEdgeWithin')
-            // console.log(blockKey);
-            // console.log(font);
-            // console.log('start', start);
-            // console.log('end', end);
-            // console.log('---');
-
-            contentState = Modifier.removeInlineStyle(
-              contentState,
-              SelectionState.createEmpty().merge({
-                anchorKey: blockKey,
-                focusKey: blockKey,
-                anchorOffset: start,
-                focusOffset: end
-              }),
-              font
-              )
-          }
-        });
-    });
-     // // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
-    contentState = Modifier.applyInlineStyle(
-      contentState,
-      selection,
-      selectedSize
-      );
-    // console.log(selectedSize);
-    editorState = EditorState.push(
-      editorState,
-      contentState,
-      'change-inline-style'
-    );
-    this.onChange(editorState, 'force-emit-html');
-
-    // this.onChange(toggleSingleInlineStyle(this.state.editorState, selectedSize, undefined, 'SIZE-'), 'force-emit-html');
   }
 
   _cleanHTMLToContentState(html) {
@@ -574,33 +492,10 @@ class GeneralEditor extends React.Component {
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
-    // console.log(convertToRaw(contentState));
 
     let newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState, 'force-emit-html');
-    // setTimeout(_ => {
-    //   const DEFAULT_FONTSIZE = 'SIZE-10.5';
-    //   const FONT_PREFIX = 'SIZE-';
-    //   this.state.editorState.getCurrentContent().getBlockMap().forEach((block, i) => {
-    //     const countMap = {};
-    //     block.getCharacterList().forEach((char, j) => {
-    //       const fontsize = char.getStyle()
-    //       .filter(fontsize => fontsize.substring(0, FONT_PREFIX.length) === FONT_PREFIX).first() || DEFAULT_FONTSIZE;
-    //       if (countMap[fontsize]) countMap[fontsize]++;
-    //       else countMap[fontsize] = 1;
-    //     });
-    //     const maxUsedSize = Object.keys(countMap).reduce(({fontsize, count}, nextFontsize) =>
-    //       countMap[nextFontsize] > count ? {fontsize: nextFontsize, count: countMap[nextFontsize]} : {fontsize, count},
-    //       {fontsize: DEFAULT_FONTSIZE, count: 0}).fontsize;
-    //     console.log(maxUsedSize);
-
-    //     const selection = SelectionState.createEmpty(block.getKey()).merge({anchorOffset: 0, focusOffset: block.getLength()});
-    //     const editorState = EditorState.forceSelection(this.state.editorState, selection);
-    //     // this.onChange(editorState, 'force-emit-html');
-    //     this.onChange(toggleSingleInlineStyle(editorState, maxUsedSize, undefined, 'SIZE-'), 'force-emit-html');
-    //   });
-    // }, 1500);
     return 'handled';
   }
 
