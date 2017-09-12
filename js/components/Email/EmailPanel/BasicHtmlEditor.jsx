@@ -44,6 +44,7 @@ import stripSelectedInlineTagBlocks from 'components/Email/EmailPanel/editorUtil
 import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorUtils/applyDefaultFontSizeInlineStyle';
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
+import applyFontSize from 'components/Email/EmailPanel/editorUtils/applyFontSize';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -197,7 +198,7 @@ class BasicHtmlEditor extends Component {
     this.onVariableMenuOpen = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
     this.onImageDropzoneOpen = _ => this.imgDropzone.open();
     this.onImagePanelOpen = _ => this.setState({imagePanelOpen: false});
-    this.onFontSizeToggle = newFontsize => this.onChange(toggleSingleInlineStyle(this.state.editorState, undefined, 'SIZE-'), 'force-emit-html');
+    this.onFontSizeToggle = selectedSize => this.onChange(applyFontSize(this.state.editorState, selectedSize), 'force-emit-html');
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
   }
