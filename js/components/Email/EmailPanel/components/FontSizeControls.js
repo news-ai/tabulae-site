@@ -11,12 +11,14 @@ export default function FontSizeControls(props) {
   const {inlineStyles} = props;
   const currentFontSizes = findAllFontSizesInSelection(props.editorState);
   let value = '10.5';
+  let currentType = {label: '10.5', value: 'SIZE-10.5'};
   // console.log(currentFontSizes);
   if (currentFontSizes.length > 1) {
     // more than one fontSize selected
     value = PLACEHOLDER;
+    currentType = undefined;
   } else if (currentFontSizes.length === 1) {
-    const currentType = find(inlineStyles, type => currentFontSizes[0] === type.style);
+    currentType = find(inlineStyles, type => currentFontSizes[0] === type.style);
     value = currentType.label;
   }
   const menuItems = [
@@ -46,7 +48,7 @@ export default function FontSizeControls(props) {
     value={value}
     onChange={(e, index, newValue) => {
       const selectStyle = inlineStyles[index - 1].style;
-      props.onToggle(selectStyle);
+      if (!currentType || currentType.label !== selectStyle) props.onToggle(selectStyle);
     }}
     >
     {menuItems}
