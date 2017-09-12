@@ -297,6 +297,7 @@ class GeneralEditor extends React.Component {
   onFontSizeToggle(selectedSize)  {
     const FONT_PREFIX = 'SIZE-';
     let editorState = this.state.editorState;
+    let contentState = editorState.getCurrentContent();
     const selection = editorState.getSelection();
     const anchorKey = selection.getIsBackward() ? selection.getFocusKey() : selection.getAnchorKey();
     const focusKey = selection.getIsBackward() ? selection.getAnchorKey() : selection.getFocusKey();
@@ -304,18 +305,18 @@ class GeneralEditor extends React.Component {
     const selectionEnd = selection.getEndOffset();
     let selectedBlocks = [];
     let inBlock = false;
-    console.log(anchorKey);
-    console.log(focusKey);
-    console.log(selectionStart);
-    console.log(selectionEnd);
-    console.log(selection.serialize());
+    // console.log('anchorKey', anchorKey);
+    // console.log('focusKey', focusKey);
+    // console.log('selectionStart', selectionStart);
+    // console.log('selectionEnd', selectionEnd);
+    // console.log('serialize', selection.serialize());
     editorState.getCurrentContent().getBlockMap().forEach(block => {
-      console.log(block.getKey());
+      // console.log(block.getKey());
       if (block.getKey() === anchorKey) inBlock = true;
       if (inBlock) selectedBlocks.push(block);
       if (block.getKey() === focusKey) inBlock = false;
     });
-    console.log(selectedBlocks);
+    // console.log(selectedBlocks);
     selectedBlocks.map((block, i) => {
       const blockKey = block.getKey();
 
@@ -329,36 +330,47 @@ class GeneralEditor extends React.Component {
           return false;
         },
         (styleStart, styleEnd) => {
-          let start = styleStart;
-          let end = styleEnd;
-          let execute = true;
-          if (blockKey === anchorKey && blockKey === focusKey) { // selectionStart to selectionEnd is selected
-            if (end < selectionStart || start > selectionEnd) execute = false
-            if (start < selectionStart) {
-              if (end < selectionEnd) start = selectionStart;
-              else end = selectionEnd;
-            }
-            // if (start >= selectionStart) {} // do nothing
-            // if (end < selectionStart) {} // do nothing
-          } else if (blockKey === anchorKey && blockKey !== focusKey) { // selectionStart to rest of block is selected
-            if (end < selectionStart) execute = false
-            if (start < selectionStart) {
-              if (end < selectionEnd) start = selectionStart;
-            }
-          } else if (blockKey !== anchorKey && blockKey === focusKey) { // start to selectionEnd is selected
-            if (start > selectionEnd) execute = false
-            if (end >= selectionEnd) {
-              if (start < selectionEnd) end = selectionEnd;
-            }
-          }
-          if (execute) {
-            const selection = SelectionState.createEmpty(block.getKey()).merge({anchorOffset: start, focusOffset: end});
-            editorState = EditorState.acceptSelection(editorState, selection);
-            editorState = toggleSingleInlineStyle(editorState, font, undefined, 'SIZE-')
+          if (selection.hasEdgeWithin(blockKey, styleStart, styleEnd)) {
+            let start = styleStart;
+            let end = styleEnd;
+            if (anchorKey === blockKey) start = selectionStart;
+            if (focusKey === blockKey) end = selectionEnd;
+            // console.log(blockKey);
+            // console.log(font);
+            // console.log('styleStart', styleStart);
+            // console.log('styleEnd', styleEnd);
+            // console.log('start', start);
+            // console.log('end', end);
+
+            contentState = Modifier.removeInlineStyle(
+              contentState,
+              SelectionState.createEmpty().merge({
+                anchorKey: blockKey,
+                focusKey: blockKey,
+                anchorOffset: start,
+                focusOffset: end
+              }),
+              font
+              )
           }
         });
 
-      // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
+      // // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
+      contentState = Modifier.applyInlineStyle(
+        contentState,
+        SelectionState.createEmpty().merge({
+          anchorKey: selection.getAnchorKey(),
+          focusKey: selection.getFocusKey(),
+          anchorOffset: selection.getStartOffset(),
+          focusOffset: selection.getEndOffset()
+        }),
+        selectedSize
+        )
+      editorState = EditorState.push(
+        editorState,
+        contentState,
+        'change-inline-style'
+      );
     });
     this.onChange(editorState, 'force-emit-html');
 
