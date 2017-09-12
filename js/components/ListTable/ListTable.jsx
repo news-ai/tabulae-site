@@ -646,6 +646,7 @@ class ListTable extends Component {
         if (scrollToFirstPosition % this.state.pageSize === 0) currentPage -= 1;
       }
       if (currentPage <= 1) currentPage = 1;
+      if (!scrollToFirstPosition) currentPage = this.state.currentPage;
       scrollToFirstPosition = this.state.pageSize === -1 ? scrollToFirstPosition : scrollToFirstPosition % this.state.pageSize;
       mixpanel.track('listtable_search', {num_results: ids.length, list_size: props.listData.contacts.length});
       this.setState({
