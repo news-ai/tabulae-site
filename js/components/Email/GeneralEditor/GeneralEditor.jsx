@@ -305,18 +305,19 @@ class GeneralEditor extends React.Component {
     const selectionEnd = selection.getEndOffset();
     let selectedBlocks = [];
     let inBlock = false;
-    // console.log('anchorKey', anchorKey);
-    // console.log('focusKey', focusKey);
-    // console.log('selectionStart', selectionStart);
-    // console.log('selectionEnd', selectionEnd);
-    // console.log('serialize', selection.serialize());
+    console.log('-------------');
+    console.log('anchorKey', anchorKey);
+    console.log('focusKey', focusKey);
+    console.log('selectionStart', selectionStart);
+    console.log('selectionEnd', selectionEnd);
+    console.log('serialize', selection.serialize());
     editorState.getCurrentContent().getBlockMap().forEach(block => {
       // console.log(block.getKey());
       if (block.getKey() === anchorKey) inBlock = true;
       if (inBlock) selectedBlocks.push(block);
       if (block.getKey() === focusKey) inBlock = false;
     });
-    // console.log(selectedBlocks);
+    console.log(selectedBlocks);
     selectedBlocks.map((block, i) => {
       const blockKey = block.getKey();
 
@@ -330,17 +331,20 @@ class GeneralEditor extends React.Component {
           return false;
         },
         (styleStart, styleEnd) => {
+          console.log(font);
+          console.log('styleStart', styleStart);
+          console.log('styleEnd', styleEnd);
           if (selection.hasEdgeWithin(blockKey, styleStart, styleEnd)) {
             let start = styleStart;
             let end = styleEnd;
             if (anchorKey === blockKey) start = selectionStart;
             if (focusKey === blockKey) end = selectionEnd;
-            // console.log(blockKey);
-            // console.log(font);
-            // console.log('styleStart', styleStart);
-            // console.log('styleEnd', styleEnd);
-            // console.log('start', start);
-            // console.log('end', end);
+            console.log('hasEdgeWithin')
+            console.log(blockKey);
+            console.log(font);
+            console.log('start', start);
+            console.log('end', end);
+            console.log('---');
 
             contentState = Modifier.removeInlineStyle(
               contentState,
@@ -354,24 +358,19 @@ class GeneralEditor extends React.Component {
               )
           }
         });
-
-      // // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
-      contentState = Modifier.applyInlineStyle(
-        contentState,
-        SelectionState.createEmpty().merge({
-          anchorKey: selection.getAnchorKey(),
-          focusKey: selection.getFocusKey(),
-          anchorOffset: selection.getStartOffset(),
-          focusOffset: selection.getEndOffset()
-        }),
-        selectedSize
-        )
-      editorState = EditorState.push(
-        editorState,
-        contentState,
-        'change-inline-style'
-      );
     });
+     // // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
+    contentState = Modifier.applyInlineStyle(
+      contentState,
+      selection,
+      selectedSize
+      );
+    console.log(selectedSize);
+    editorState = EditorState.push(
+      editorState,
+      contentState,
+      'change-inline-style'
+    );
     this.onChange(editorState, 'force-emit-html');
 
     // this.onChange(toggleSingleInlineStyle(this.state.editorState, selectedSize, undefined, 'SIZE-'), 'force-emit-html');
@@ -707,7 +706,7 @@ class GeneralEditor extends React.Component {
     // console.log(controlsStyle);
 
     // }
-    // console.log(editorState.getCurrentInlineStyle().toJS());
+    console.log(editorState.getCurrentInlineStyle().toJS());
     // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
 
     return (
