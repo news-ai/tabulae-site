@@ -296,48 +296,73 @@ class GeneralEditor extends React.Component {
 
   onFontSizeToggle(selectedSize)  {
     const FONT_PREFIX = 'SIZE-';
-    const {editorState} = this.state;
+    let editorState = this.state.editorState;
     const selection = editorState.getSelection();
-    const anchorKey = selection.getAnchorKey();
-    const focusKey = selection.getFocusKey();
+    const anchorKey = selection.getIsBackward() ? selection.getFocusKey() : selection.getAnchorKey();
+    const focusKey = selection.getIsBackward() ? selection.getAnchorKey() : selection.getFocusKey();
     const selectionStart = selection.getStartOffset();
     const selectionEnd = selection.getEndOffset();
-    let selectedBlocks = new List();
+    let selectedBlocks = [];
     let inBlock = false;
     console.log(anchorKey);
     console.log(focusKey);
     console.log(selectionStart);
     console.log(selectionEnd);
+    console.log(selection.serialize());
     editorState.getCurrentContent().getBlockMap().forEach(block => {
+      console.log(block.getKey());
       if (block.getKey() === anchorKey) inBlock = true;
-      if (inBlock) selectedBlocks = selectedBlocks.push(block);
-      if (block.getKey() === focusKey) {
-        inBlock = false;
-        return;
-      }
+      if (inBlock) selectedBlocks.push(block);
+      if (block.getKey() === focusKey) inBlock = false;
     });
-    console.log(selectedBlocks.toJS());
+    console.log(selectedBlocks);
     selectedBlocks.map((block, i) => {
-      let blockStart = 0;
-      let blockEnd = block.getLength();
-      if (i === 0) blockStart = selectionStart; // first block
-      if (i === selectedBlocks.size - 1) blockEnd = selectionEnd; // last block
+      const blockKey = block.getKey();
 
       // DESELECT ALL SELECTED WITH FONTSIZE
+      let font = undefined;
       block.findStyleRanges(
         char => {
-          if (char.hasStyle(selectedSize)) return false; // selected fontsize is already applied to this character
-          return true;
+          const charFont = char.getStyle().toJS().filter(font => font.substring(0, FONT_PREFIX.length) === FONT_PREFIX)[0];
+          font = charFont;
+          if (charFont) return true;
+          return false;
         },
-        (start, end) => {
-
-
+        (styleStart, styleEnd) => {
+          let start = styleStart;
+          let end = styleEnd;
+          let execute = true;
+          if (blockKey === anchorKey && blockKey === focusKey) { // selectionStart to selectionEnd is selected
+            if (end < selectionStart || start > selectionEnd) execute = false
+            if (start < selectionStart) {
+              if (end < selectionEnd) start = selectionStart;
+              else end = selectionEnd;
+            }
+            // if (start >= selectionStart) {} // do nothing
+            // if (end < selectionStart) {} // do nothing
+          } else if (blockKey === anchorKey && blockKey !== focusKey) { // selectionStart to rest of block is selected
+            if (end < selectionStart) execute = false
+            if (start < selectionStart) {
+              if (end < selectionEnd) start = selectionStart;
+            }
+          } else if (blockKey !== anchorKey && blockKey === focusKey) { // start to selectionEnd is selected
+            if (start > selectionEnd) execute = false
+            if (end >= selectionEnd) {
+              if (start < selectionEnd) end = selectionEnd;
+            }
+          }
+          if (execute) {
+            const selection = SelectionState.createEmpty(block.getKey()).merge({anchorOffset: start, focusOffset: end});
+            editorState = EditorState.acceptSelection(editorState, selection);
+            editorState = toggleSingleInlineStyle(editorState, font, undefined, 'SIZE-')
+          }
         });
 
       // APPLY SELECTED SIZE TO CLEANED SELECTED REGION
     });
+    this.onChange(editorState, 'force-emit-html');
 
-    this.onChange(toggleSingleInlineStyle(this.state.editorState, selectedSize, undefined, 'SIZE-'), 'force-emit-html');
+    // this.onChange(toggleSingleInlineStyle(this.state.editorState, selectedSize, undefined, 'SIZE-'), 'force-emit-html');
   }
 
   _cleanHTMLToContentState(html) {
