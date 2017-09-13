@@ -35,13 +35,19 @@ export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
   }
 };
 
+const roundToHalf = (num) => (Math.round(num * 2) / 2).toFixed(1);
+
 export const htmlToStyle = (nodeName, node, currentStyle) => {
   let newStyle = currentStyle;
   if (nodeName === 'span') {
     if (!!node.style.fontSize) {
       const fontSize = node.style.fontSize.substring(0, node.style.fontSize.length - 2);
+      const roundedFontSize = roundToHalf(parseFloat(fontSize));
+      // console.log(roundedFontSize);
       const foundType = find(FONTSIZE_TYPES, type => type.label === fontSize);
       if (foundType) newStyle = newStyle.add(foundType.style);
+      else newStyle = newStyle.add(`SIZE-${roundedFontSize}`)
+      // newStyle = newStyle.add(`SIZE-${roundedFontSize}`)
     }
 
     if (!!node.style.color) {
