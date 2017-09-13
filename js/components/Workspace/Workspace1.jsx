@@ -325,11 +325,15 @@ class Workspace extends Component {
           />
           <div style={{marginTop: EDITOR_DISTANCE_FROM_TOP}} >
             <div
-            style={{width: state.width, minHeight: 32, borderBottom: '2px solid gray', paddingBottom: 10, marginBottom: 10}}
+            style={{width: state.width, minHeight: 34, borderBottom: '2px solid gray', paddingBottom: 8, marginBottom: 10}}
             dangerouslySetInnerHTML={createMarkUp(state.mutatingSubject)}
             />
             <div
-            style={{width: state.width}}
+            style={{
+              width: state.width,
+              margin: '0 auto',
+              overflowWrap: 'break-word'
+            }}
             dangerouslySetInnerHTML={createMarkUp(state.mutatingBody)}
             />
           </div>
