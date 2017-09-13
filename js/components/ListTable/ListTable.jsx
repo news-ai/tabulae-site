@@ -713,7 +713,6 @@ class ListTable extends Component {
     if (state.pageSize === -1) rowCount = props.received.length;
     if (state.isDeleting) rowCount = 0;
 
-    console.log(props.listData.searchResults);
     return (
       <div style={styles.container}>
         {
