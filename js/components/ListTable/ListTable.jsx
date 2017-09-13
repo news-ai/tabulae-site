@@ -421,9 +421,8 @@ class ListTable extends Component {
       'cell',
       {evenRow: contact && !contact.isSearchResult && rIndex % 2 === 0},
       {oddRow: contact && !contact.isSearchResult && rIndex % 2 === 0},
-      {findresult: contact && contacts[rIndex].isSearchResult}
+      {findresult: contact && contact.isSearchResult}
       );
-
     let contentBody;
     let contentBody2 = null;
     if (fieldObj.tableOnly && contacts[rIndex]) {
@@ -630,25 +629,17 @@ class ListTable extends Component {
     window.Intercom('trackEvent', 'listtable_search');
     props.searchListContacts(props.listId, searchValue)
     .then(({searchContactMap, ids}) => {
+      const existIds = ids.filter(id => props.listData.contacts.indexOf(id) !== -1);
       // find where first search result is in the list
-      let scrollToFirstPosition;
-      if (ids.length > 0) {
-        for (let i = 0; props.listData.contacts.length; i++) {
-          if (props.listData.contacts[i] === ids[0]) {
-            scrollToFirstPosition = i;
-            break;
-          }
-        }
-      }
-      let currentPage = 1;
-      if (this.state.pageSize !== -1) {
+      let scrollToFirstPosition = props.listData.contacts.indexOf(existIds[0]);
+      let currentPage = this.state.currentPage;
+      if (this.state.pageSize !== -1 && scrollToFirstPosition !== -1) {
         currentPage =  Math.floor(scrollToFirstPosition / this.state.pageSize) + 1;
         if (scrollToFirstPosition % this.state.pageSize === 0) currentPage -= 1;
       }
       if (currentPage <= 1) currentPage = 1;
-      if (!scrollToFirstPosition) currentPage = this.state.currentPage;
       scrollToFirstPosition = this.state.pageSize === -1 ? scrollToFirstPosition : scrollToFirstPosition % this.state.pageSize;
-      mixpanel.track('listtable_search', {num_results: ids.length, list_size: props.listData.contacts.length});
+      mixpanel.track('listtable_search', {num_results: existIds.length, list_size: props.listData.contacts.length});
       this.setState({
         isSearchOn: true,
         currentSearchIndex: 0,
@@ -721,6 +712,8 @@ class ListTable extends Component {
     if (rowCount === 0) rowCount = this.state.pageSize;
     if (state.pageSize === -1) rowCount = props.received.length;
     if (state.isDeleting) rowCount = 0;
+
+    console.log(props.listData.searchResults);
     return (
       <div style={styles.container}>
         {
@@ -1038,7 +1031,7 @@ const mapStateToProps = (state, props) => {
     listData.contacts.map((contactId, i) => {
       if (state.contactReducer[contactId]) {
         let contact = state.contactReducer[contactId];
-        if (searchQuery && listData.searchResults && listData.searchResults.some(id => contactId === id)) {
+        if (searchQuery && listData.searchResults && listData.searchResults.filter(id => contactId === id).length > 0) {
           contact.isSearchResult = true;
         } else {
           contact.isSearchResult = false;
