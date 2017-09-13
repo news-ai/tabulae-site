@@ -21,7 +21,7 @@ import TextField from 'material-ui/TextField';
 
 const MainSection = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   padding-bottom: 40px;
   margin: 0 10px;
 `;
@@ -307,8 +307,8 @@ class Workspace extends Component {
           allowReplacement
           allowGeneralizedProperties
           allowToolbarDisappearOnBlur
-          containerClassName='RichEditor-editor-workspace'
-          width={state.width}
+          containerClassName='RichEditor-editor'
+          width={state.width - 15}
           height='unlimited'
           debounce={500}
           bodyContent={state.body}
@@ -321,8 +321,10 @@ class Workspace extends Component {
           onBodyChange={this.onBodyChange}
           onSubjectChange={this.onSubjectChange}
           placeholder='Start building your template here...'
-          overwriteCustomStyleFn={overwriteCustomStyleFn}
           />
+        {/*
+          overwriteCustomStyleFn={overwriteCustomStyleFn}
+        */}
           <div style={{marginTop: EDITOR_DISTANCE_FROM_TOP}} >
             <div
             style={{width: state.width, minHeight: 34, borderBottom: '2px solid gray', paddingBottom: 8, marginBottom: 10}}

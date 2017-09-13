@@ -36,15 +36,34 @@ export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
 };
 
 const roundToHalf = (num) => (Math.round(num * 2) / 2).toFixed(1);
+const isNumeric = (n) => !isNaN(parseFloat(n)) && isFinite(n);
+
+const parseMixedNumberString = string => {
+  let numString = [];
+  let unitString = [];
+  for (let char of string) (isNumeric(char) || char === '.') ? numString.push(char) : unitString.push(char);
+  return {fontSize: numString.join(''), fontUnit: unitString.join('')};
+}
 
 export const htmlToStyle = (nodeName, node, currentStyle) => {
   let newStyle = currentStyle;
   if (nodeName === 'span') {
     if (!!node.style.fontSize) {
-      const fontSize = node.style.fontSize.substring(0, node.style.fontSize.length - 2);
-      const roundedFontSize = roundToHalf(parseFloat(fontSize));
-      // console.log(roundedFontSize);
-      const foundType = find(FONTSIZE_TYPES, type => type.label === fontSize);
+      const fontSizeString = node.style.fontSize;
+      const {fontSize, fontUnit} = parseMixedNumberString(fontSizeString);
+      console.log(fontSize);
+      console.log(fontUnit);
+
+      // convert different font-size units to pt
+      let convertedSize = parseFloat(fontSize);
+      if (fontUnit === 'px') convertedSize = 3/4 * convertedSize;
+      else if (fontUnit === 'em') convertedSize = 12 * convertedSize;
+      else if (fontUnit === '%') convertedSize = 3/25 * convertedSize;
+      console.log(convertedSize)
+
+      const roundedFontSize = roundToHalf(convertedSize);
+      console.log(roundedFontSize);
+      const foundType = find(FONTSIZE_TYPES, type => type.label === roundedFontSize);
       if (foundType) newStyle = newStyle.add(foundType.style);
       else newStyle = newStyle.add(`SIZE-${roundedFontSize}`)
       // newStyle = newStyle.add(`SIZE-${roundedFontSize}`)

@@ -482,7 +482,7 @@ class GeneralEditor extends React.Component {
       console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
-      // console.log(saneHtml);
+      console.log(saneHtml);
       contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
       // console.log(convertToRaw(contentState));
     } else {
@@ -699,7 +699,7 @@ class GeneralEditor extends React.Component {
         <div style={{
           position: 'fixed',
           top: state.currentFocusPosition.top,
-          left: this.outerContainer.getBoundingClientRect().left - 50,
+          left: this.outerContainer.getBoundingClientRect().left - 40,
         }} >
           <IconButton
           tooltip='Insert Property'

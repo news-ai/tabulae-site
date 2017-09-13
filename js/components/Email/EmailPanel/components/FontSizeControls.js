@@ -25,14 +25,14 @@ export default function FontSizeControls(props) {
     currentType = find(options, option => currentFontSizes[0] === option.value);
     if (!currentType) {
       const notInListType = currentFontSizes[0].split(FONT_PREFIX)[1];
-      console.log(notInListType)
+      // console.log(notInListType)
       currentType = {label: notInListType, value: currentFontSizes[0]};
     }
   } else {
     currentType = {label: '---', value: undefined} ;
   }
  
-  console.log(currentType);
+  // console.log(currentType);
 
   return (
     <div className='vertical-center'>
