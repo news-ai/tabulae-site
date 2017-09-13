@@ -51,18 +51,16 @@ export const htmlToStyle = (nodeName, node, currentStyle) => {
     if (!!node.style.fontSize) {
       const fontSizeString = node.style.fontSize;
       const {fontSize, fontUnit} = parseMixedNumberString(fontSizeString);
-      console.log(fontSize);
-      console.log(fontUnit);
 
       // convert different font-size units to pt
       let convertedSize = parseFloat(fontSize);
       if (fontUnit === 'px') convertedSize = 3/4 * convertedSize;
       else if (fontUnit === 'em') convertedSize = 12 * convertedSize;
       else if (fontUnit === '%') convertedSize = 3/25 * convertedSize;
-      console.log(convertedSize)
 
-      const roundedFontSize = roundToHalf(convertedSize);
-      console.log(roundedFontSize);
+      let roundedFontSize = roundToHalf(convertedSize);
+      if (Math.floor(roundedFontSize) === Math.ceil(roundedFontSize)) roundedFontSize = Math.ceil(roundedFontSize);
+
       const foundType = find(FONTSIZE_TYPES, type => type.label === roundedFontSize);
       if (foundType) newStyle = newStyle.add(foundType.style);
       else newStyle = newStyle.add(`SIZE-${roundedFontSize}`)

@@ -3,48 +3,56 @@ import MenuItem from 'material-ui/MenuItem';
 import find from 'lodash/find';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import findAllFontSizesInSelection from 'components/Email/EmailPanel/editorUtils/findAllFontSizesInSelection';
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
 
 const PLACEHOLDER = '---';
 const FONT_PREFIX = 'SIZE-';
 
 export default function FontSizeControls(props) {
   const {inlineStyles} = props;
-  const options = [
-    {label: '---', value: undefined},
-    ...inlineStyles.map(val => ({label: val.label, value: val.style}))
-  ];
   const currentFontSizes = findAllFontSizesInSelection(props.editorState);
+  let value = '10.5';
   let currentType = {label: '10.5', value: 'SIZE-10.5'};
-  console.log(currentFontSizes);
+  // console.log(currentFontSizes);
   if (currentFontSizes.length > 1) {
     // more than one fontSize selected
-    currentType = {label: '---', value: undefined} ;
+    value = PLACEHOLDER;
+    currentType = undefined;
   } else if (currentFontSizes.length === 1) {
-    currentType = find(options, option => currentFontSizes[0] === option.value);
-    if (!currentType) {
-      const notInListType = currentFontSizes[0].split(FONT_PREFIX)[1];
-      // console.log(notInListType)
-      currentType = {label: notInListType, value: currentFontSizes[0]};
-    }
-  } else {
-    currentType = {label: '---', value: undefined} ;
+    currentType = find(inlineStyles, type => currentFontSizes[0] === type.style);
+    value = currentType.label;
   }
- 
-  // console.log(currentType);
+  console.log(currentFontSizes);
+  const menuItems = [
+    <MenuItem
+    key={`fontsize-select-default`}
+    value={PLACEHOLDER}
+    labelStyle={{paddingLeft: 0}}
+    primaryText={PLACEHOLDER}
+    label={PLACEHOLDER}
+    />,
+    ...inlineStyles.map(type =>
+      <MenuItem
+      key={`fontsize-select-${type.label}`}
+      value={type.label}
+      primaryText={type.label}
+      label={type.label}
+      />)
+  ];
+  /*
+  getSelection and then blocks within those selections find areas not applied with selected style and applied them
+   */
 
   return (
-    <div className='vertical-center'>
-      <Select.Creatable
-      options={options}
-      labelKey='label'
-      valueKey='value'
-      value={currentType.value}
-      onChange={option => {
-        if (!currentType.value || currentType.value !== option.value) props.onToggle(option.value);
-      }}
-      />
-    </div>
+    <DropDownMenu
+    style={{fontSize: '0.9em'}}
+    underlineStyle={{display: 'none', margin: 0}}
+    value={value}
+    onChange={(e, index, newValue) => {
+      const selectStyle = inlineStyles[index - 1].style;
+      if (!currentType || currentType.label !== selectStyle) props.onToggle(selectStyle);
+    }}
+    >
+    {menuItems}
+    </DropDownMenu>
   );
 }
