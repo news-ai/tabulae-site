@@ -630,31 +630,33 @@ class ListTable extends Component {
     window.Intercom('trackEvent', 'listtable_search');
     props.searchListContacts(props.listId, searchValue)
     .then(({searchContactMap, ids}) => {
+      console.log('huh');
+      console.log('searchContactMap', searchContactMap);
+      console.log('wtf');
+      console.log(ids);
+      console.log(props.listData.contacts);
       // find where first search result is in the list
-      let scrollToFirstPosition;
-      if (ids.length > 0) {
-        for (let i = 0; props.listData.contacts.length; i++) {
-          if (props.listData.contacts[i] === ids[0]) {
-            scrollToFirstPosition = i;
-            break;
-          }
-        }
-      }
+      let scrollToFirstPosition = props.listData.contacts.indexOf(ids[0]);
+      console.log(scrollToFirstPosition);
       let currentPage = 1;
       if (this.state.pageSize !== -1) {
         currentPage =  Math.floor(scrollToFirstPosition / this.state.pageSize) + 1;
         if (scrollToFirstPosition % this.state.pageSize === 0) currentPage -= 1;
       }
+      console.log('2 hey');
       if (currentPage <= 1) currentPage = 1;
       if (!scrollToFirstPosition) currentPage = this.state.currentPage;
       scrollToFirstPosition = this.state.pageSize === -1 ? scrollToFirstPosition : scrollToFirstPosition % this.state.pageSize;
       mixpanel.track('listtable_search', {num_results: ids.length, list_size: props.listData.contacts.length});
+      console.log('setState');
+      console.log(scrollToFirstPosition);
+      console.log(currentPage);
       this.setState({
         isSearchOn: true,
         currentSearchIndex: 0,
         scrollToRow: scrollToFirstPosition,
         currentPage,
-      });
+      }, _ => console.log('post setState'));
     });
   }
 
