@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import {grey50, grey700, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import Workspace from './Workspace';
+import InfiniteScroll from 'components/InfiniteScroll';
 import alertify from 'alertifyjs';
 import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
@@ -41,7 +42,7 @@ const ListItem = styled.div.attrs({
 const TemplateManager = props => {
   const {templates, toggleArchiveTemplate} = props;
   return (
-    <div className='row horizontal-center'>
+    <InfiniteScroll className='row horizontal-center' onScrollBottom={props.fetchTemplates}>
       <div className='large-10 medium-10 small-12 columns'>
         <div className='row' style={{marginTop: 20}} >
           <div className='large-9 medium-9 small-6 columns'>
@@ -88,7 +89,7 @@ const TemplateManager = props => {
           ))}
         </div>
       </div>
-    </div>
+    </InfiniteScroll>
     );
 };
 
