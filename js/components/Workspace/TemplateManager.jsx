@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import {grey50, grey700, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import Workspace from './Workspace';
+import Workspace1 from './Workspace1';
 
 const styles = {
   smallIcon: {
@@ -90,6 +91,7 @@ class TemplateManagerContainer extends Component {
 
   render() {
     if (this.props.location.pathname === '/workspace/new-template' || this.props.params.templateId) return <Workspace {...this.props} />
+    else if (this.props.location.pathname === '/workspace/new-template1') return <Workspace1 {...this.props} />
     return <TemplateManager {...this.props} />;
   }
 }

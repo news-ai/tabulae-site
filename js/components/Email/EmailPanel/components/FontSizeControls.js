@@ -12,15 +12,24 @@ export default function FontSizeControls(props) {
   const currentFontSizes = findAllFontSizesInSelection(props.editorState);
   let value = '10.5';
   let currentType = {label: '10.5', value: 'SIZE-10.5'};
-  // console.log(currentFontSizes);
+  // filling in custom sizing to dropdown from pasted HTML if found
+  const leftover = currentFontSizes
+  .map(font => font.split(FONT_PREFIX)[1])
+  .filter(size => inlineStyles.filter(style => style.label === size).length === 0);
+  const inlineStylesWithExtraStyles = [
+  ...inlineStyles,
+  ...leftover.map(size => ({inlineType: 'size', label: size, style: `SIZE-${size}`}))
+  ].sort((a, b) => parseFloat(a.label) - parseFloat(b.label));
+  
   if (currentFontSizes.length > 1) {
     // more than one fontSize selected
     value = PLACEHOLDER;
     currentType = undefined;
   } else if (currentFontSizes.length === 1) {
-    currentType = find(inlineStyles, type => currentFontSizes[0] === type.style);
+    currentType = find(inlineStylesWithExtraStyles, type => currentFontSizes[0] === type.style);
     value = currentType.label;
   }
+
   const menuItems = [
     <MenuItem
     key={`fontsize-select-default`}
@@ -29,7 +38,7 @@ export default function FontSizeControls(props) {
     primaryText={PLACEHOLDER}
     label={PLACEHOLDER}
     />,
-    ...inlineStyles.map(type =>
+    ...inlineStylesWithExtraStyles.map(type =>
       <MenuItem
       key={`fontsize-select-${type.label}`}
       value={type.label}
@@ -47,7 +56,7 @@ export default function FontSizeControls(props) {
     underlineStyle={{display: 'none', margin: 0}}
     value={value}
     onChange={(e, index, newValue) => {
-      const selectStyle = inlineStyles[index - 1].style;
+      const selectStyle = `SIZE-${newValue}`;
       if (!currentType || currentType.label !== selectStyle) props.onToggle(selectStyle);
     }}
     >

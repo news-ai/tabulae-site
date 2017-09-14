@@ -699,7 +699,7 @@ class GeneralEditor extends React.Component {
         <div style={{
           position: 'fixed',
           top: state.currentFocusPosition.top,
-          left: this.outerContainer.getBoundingClientRect().left - 50,
+          left: this.outerContainer.getBoundingClientRect().left - 40,
         }} >
           <IconButton
           tooltip='Insert Property'
