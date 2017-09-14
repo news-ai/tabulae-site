@@ -21,4 +21,4 @@ deployment:
     branch: master
     commands:
       - ssh $SSHU "source ~/.profile && cd $DIR && git pull origin master && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/npm install && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/npm run build && /home/ubuntu/.nvm/versions/node/v6.11.0/bin/pm2 restart server.prod"
-      - cd $HOME/$CIRCLE_PROJECT_REPONAME && aws s3 sync . s3://internal.newsai.org --delete
+      - cd $HOME/$CIRCLE_PROJECT_REPONAME && aws s3 sync build s3://internal.newsai.org --delete
