@@ -49,6 +49,7 @@ export default function FontSizeControls(props) {
   /*
   getSelection and then blocks within those selections find areas not applied with selected style and applied them
    */
+  console.log(currentFontSizes);
 
   return (
     <DropDownMenu
@@ -57,7 +58,7 @@ export default function FontSizeControls(props) {
     value={value}
     onChange={(e, index, newValue) => {
       const selectStyle = `SIZE-${newValue}`;
-      if (!currentType || currentType.label !== selectStyle) props.onToggle(selectStyle);
+      props.onToggle(selectStyle);
     }}
     >
     {menuItems}

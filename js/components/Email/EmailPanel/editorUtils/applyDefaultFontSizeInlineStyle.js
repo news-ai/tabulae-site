@@ -3,14 +3,13 @@ import {SelectionState, Modifier} from 'draft-js';
 
 const fontInlineStyles = Object.keys(fontsizeMap);
 
+const FONT_PREFIX = 'SIZE-';
+
 function applyDefaultFontSizeInlineStyle(contentState, defaultInlineStyle) {
   let newContentState = contentState;
   contentState.getBlockMap().forEach(block => {
     block.findStyleRanges(
-        (character) => {
-          const currentStyle = character.getStyle();
-          return !fontInlineStyles.some(style => currentStyle.has(style));
-        },
+        char => char.getStyle().toJS().filter(style => style.substring(0, FONT_PREFIX.length) === FONT_PREFIX).length === 0,
         (start, end) => {
           // console.log(start, end);
           const selection = SelectionState
