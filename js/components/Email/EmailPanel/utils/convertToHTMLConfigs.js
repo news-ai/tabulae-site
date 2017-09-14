@@ -51,6 +51,7 @@ export const htmlToStyle = (nodeName, node, currentStyle) => {
     if (!!node.style.fontSize) {
       const fontSizeString = node.style.fontSize;
       const {fontSize, fontUnit} = parseMixedNumberString(fontSizeString);
+      if (!isNumeric(fontSize)) return currentStyle;
 
       // convert different font-size units to pt
       let convertedSize = parseFloat(fontSize);
