@@ -49,7 +49,6 @@ export default function FontSizeControls(props) {
   /*
   getSelection and then blocks within those selections find areas not applied with selected style and applied them
    */
-  console.log(currentFontSizes);
 
   return (
     <DropDownMenu

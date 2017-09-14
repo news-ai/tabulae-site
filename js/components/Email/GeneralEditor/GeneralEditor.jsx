@@ -32,6 +32,7 @@ import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorU
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
 import applyFontSize from 'components/Email/EmailPanel/editorUtils/applyFontSize';
+import stripDuplicateFontSize from 'components/Email/EmailPanel/editorUtils/stripDuplicateFontSize';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -166,7 +167,7 @@ class GeneralEditor extends React.Component {
 
     this.state = {
       editorState: this.props.rawBodyContentState ?
-      EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), this.decorator) :
+      stripDuplicateFontSize(EditorState.createWithContent(convertFromRaw(this.props.rawBodyContentState), this.decorator)) :
       EditorState.createEmpty(this.decorator),
       variableMenuOpen: false,
       variableMenuAnchorEl: null,
@@ -263,7 +264,7 @@ class GeneralEditor extends React.Component {
       if (typeof this.props.bodyContent === 'string') {
         contentState = this.cleanHTMLToContentState(this.props.bodyContent);
       } else {
-        contentState = convertFromRaw(this.props.bodyContent, this.decorator);
+        contentState = convertFromRaw(this.props.bodyContent);
       }
       editorState = EditorState.push(this.state.editorState, contentState, 'insert-fragment');
       this.onChange(editorState);
@@ -282,7 +283,7 @@ class GeneralEditor extends React.Component {
       if (nextProps.bodyContent) {
         if (typeof nextProps.bodyContent === 'string') newContent = this.cleanHTMLToContentState(nextProps.bodyContent);
         else newContent = convertFromRaw(nextProps.bodyContent);
-        editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
+        editorState = stripDuplicateFontSize(EditorState.push(this.state.editorState, newContent, 'insert-fragment'));
       } else {
         editorState = EditorState.createEmpty(this.decorator);
       }
@@ -603,7 +604,7 @@ class GeneralEditor extends React.Component {
     // }
     // console.log(editorState.getCurrentInlineStyle().toJS());
     // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
-    // console.log(this.props.rawBodyContentState);
+    // console.log(this.props.bodyContent);
 
     return (
       <div ref={ref => this.outerContainer = ref} >

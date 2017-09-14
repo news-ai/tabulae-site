@@ -102,7 +102,6 @@ class Workspace extends Component {
       body: '',
       mutatingBody: '',
       bodyContentState: '',
-      currentTemplateId: null,
       open: false,
       anchorEl: null,
       useExisting: false,
@@ -128,21 +127,17 @@ class Workspace extends Component {
   }
 
   componentWillMount() {
-    // this.props.fetchTemplates();
   }
 
   componentDidMount() {
     if (this.props.template) {
-      this.handleTemplateChange(this.props.template.id);
+      this.handleTemplateChange(this.props.template);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.params.templateId !== nextProps.params.templateId && nextProps.params.templateId !== 'new-template') {
-      this.handleTemplateChange(nextProps.template.id, nextProps.templates);
-    }
     if (nextProps.template && this.props.template !== nextProps.template) {
-      this.handleTemplateChange(nextProps.template.id, nextProps.templates);
+      this.handleTemplateChange(nextProps.template);
     }
   }
 
@@ -163,7 +158,6 @@ class Workspace extends Component {
       mutatingBody: '',
       bodyContentState: '',
       useExisting: false,
-      currentTemplateId: null
     },
     _ => {
       // Hack!! add something to editor then clearing it to triggle in componentWillReceiveProps
@@ -171,12 +165,8 @@ class Workspace extends Component {
     });
   }
 
-  handleTemplateChange(value, templates=this.props.templates) {
-    const templateId = value || null;
-    this.setState({currentTemplateId: value});
-
-    const template = find(templates, tmp => templateId === tmp.id);
-    if (!!template && !!templates) {
+  handleTemplateChange(template) {
+    if (!!template) {
       let subject = template.subject;
       this.setState({subject, mutatingSubject: subject, useExisting: true});
       if (isJSON(template.body)) {
@@ -250,7 +240,6 @@ class Workspace extends Component {
     const state = this.state;
     const props = this.props;
 
-    const currentTemplate = find(this.props.templates, tmp => state.currentTemplateId === tmp.id);
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
         <TopBar>
@@ -354,7 +343,6 @@ export default connect(
     template: props.params.templateId !== 'new-template' && state.templateReducer[parseInt(props.params.templateId)],
   }),
   dispatch => ({
-    fetchTemplates: _ => dispatch(templateActions.getTemplates()),
     saveCurrentTemplate: (id, subject, body) => dispatch(templateActions.patchTemplate(id, subject, body)),
     changeTemplateName: (id, name) => dispatch(templateActions.patchTemplateName(id, name)),
     createTemplate: (name, subject, body) => dispatch(templateActions.createTemplate(name, subject, body)),

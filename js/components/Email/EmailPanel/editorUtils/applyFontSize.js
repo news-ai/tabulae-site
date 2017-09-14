@@ -8,8 +8,6 @@ const applyFontSize = (editorState, selectedSize) => {
   const endKey = selection.getEndKey();
   const selectionStart = selection.getStartOffset();
   const selectionEnd = selection.getEndOffset();
-  console.log(selectionStart);
-  console.log(selectionEnd);
   let selectedBlocks = [];
   let inBlock = false;
   editorState.getCurrentContent().getBlockMap().forEach(block => {
@@ -21,13 +19,16 @@ const applyFontSize = (editorState, selectedSize) => {
     const blockKey = block.getKey();
 
     // DESELECT ALL SELECTED WITH FONTSIZE
-    let font = undefined;
+    let extraFont;
     block.findStyleRanges(
       char => {
-        const charFont = char.getStyle().toJS().filter(font => font.substring(0, FONT_PREFIX.length) === FONT_PREFIX)[0];
-        font = charFont;
-        if (charFont) return true;
-        return false;
+        const charFonts = char.getStyle().toJS().filter(font => font.substring(0, FONT_PREFIX.length) === FONT_PREFIX);
+        if (charFonts.length <= 1) return false;
+        else {
+          if (!extraFont) {
+            extraFont = charFonts[charFonts.length - 1];
+          }
+        }
       },
       (styleStart, styleEnd) => {
         if (
