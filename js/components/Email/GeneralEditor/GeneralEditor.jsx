@@ -263,7 +263,7 @@ class GeneralEditor extends React.Component {
       if (typeof this.props.bodyContent === 'string') {
         contentState = this.cleanHTMLToContentState(this.props.bodyContent);
       } else {
-        contentState = convertFromRaw(this.props.bodyContent, this.decorator);
+        contentState = convertFromRaw(this.props.bodyContent);
       }
       editorState = EditorState.push(this.state.editorState, contentState, 'insert-fragment');
       this.onChange(editorState);
@@ -603,7 +603,7 @@ class GeneralEditor extends React.Component {
     // }
     // console.log(editorState.getCurrentInlineStyle().toJS());
     // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
-    // console.log(this.props.rawBodyContentState);
+    // console.log(this.props.bodyContent);
 
     return (
       <div ref={ref => this.outerContainer = ref} >
