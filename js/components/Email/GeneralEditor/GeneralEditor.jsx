@@ -194,7 +194,7 @@ class GeneralEditor extends React.Component {
     };
     function emitHTML(editorState) {
       let contentState = editorState.getCurrentContent();
-      // contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
+      contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
       let raw = convertToRaw(contentState);
       let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
         if (block.type === 'atomic') block.text = ' ';
@@ -603,6 +603,7 @@ class GeneralEditor extends React.Component {
     // }
     // console.log(editorState.getCurrentInlineStyle().toJS());
     // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
+    // console.log(this.props.rawBodyContentState);
 
     return (
       <div ref={ref => this.outerContainer = ref} >
