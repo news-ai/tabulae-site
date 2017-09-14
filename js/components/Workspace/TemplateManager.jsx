@@ -95,6 +95,7 @@ const TemplateManager = props => {
 class TemplateManagerContainer extends Component {
   componentWillMount() {
     this.props.fetchTemplates();
+    mixpanel.track('access_template_manager');
   }
 
   render() {
