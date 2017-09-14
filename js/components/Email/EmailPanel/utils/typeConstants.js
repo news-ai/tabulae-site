@@ -41,7 +41,7 @@ export const FONTSIZE_TYPES = [
   {inlineType: 'size', label: '9', style: 'SIZE-9'},
   {inlineType: 'size', label: '9.5', style: 'SIZE-9.5'},
   {inlineType: 'size', label: '10', style: 'SIZE-10'},
-  // {inlineType: 'size', label: '10.5', style: 'SIZE-10.5'},
+  {inlineType: 'size', label: '10.5', style: 'SIZE-10.5'},
   {inlineType: 'size', label: '11', style: 'SIZE-11'},
   {inlineType: 'size', label: '12', style: 'SIZE-12'},
   {inlineType: 'size', label: '14', style: 'SIZE-14'},
