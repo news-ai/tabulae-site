@@ -9,6 +9,8 @@ import styled from 'styled-components';
 import {grey50, grey700, blue500} from 'material-ui/styles/colors';
 import isJSON from 'validator/lib/isJSON';
 import Workspace from './Workspace';
+import alertify from 'alertifyjs';
+import 'node_modules/alertifyjs/build/css/alertify.min.css';
 
 const styles = {
   smallIcon: {
@@ -72,7 +74,14 @@ const TemplateManager = props => {
               style={styles.small}
               tooltip='Trash'
               tooltipPosition='top-center'
-              onClick={_ => toggleArchiveTemplate(template.id)}
+              onClick={_ => {
+                alertify.confirm(
+                  'Are you sure?',
+                  `Trashed templates are irreversible. Are you sure you want to delete template: ${template.name.length > 0 ? template.name : template.subject}?`,
+                  _ => toggleArchiveTemplate(template.id),
+                  _ => {}
+                  );
+              }}
               />
             </div> 
           </ListItem>
