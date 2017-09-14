@@ -210,6 +210,7 @@ class Workspace extends Component {
       )
     .then(
       name => {
+        mixpanel.track('save_new_template_from_workspace');
         this.props.createTemplate(
           name,
           this.state.mutatingSubject || this.state.subject,
@@ -222,6 +223,7 @@ class Workspace extends Component {
   }
 
   onSaveCurrentTemplateClick() {
+    mixpanel.track('edit_template_from_workspace');
     this.props.saveCurrentTemplate(
       this.state.currentTemplateId,
       this.state.mutatingSubject,
