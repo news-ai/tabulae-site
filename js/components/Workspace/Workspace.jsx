@@ -166,7 +166,6 @@ class Workspace extends Component {
   }
 
   handleTemplateChange(template) {
-    console.log(template);
     if (!!template) {
       let subject = template.subject;
       this.setState({subject, mutatingSubject: subject, useExisting: true});
