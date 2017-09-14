@@ -1,19 +1,21 @@
-import {EditorState, SelectionState, Modifier} from 'draft-js';
+import {EditorState, SelectionState, Modifier, convertToRaw} from 'draft-js';
 
 const applyFontSize = (editorState, selectedSize) => {
   const FONT_PREFIX = 'SIZE-';
   let contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
-  const anchorKey = selection.getIsBackward() ? selection.getFocusKey() : selection.getAnchorKey();
-  const focusKey = selection.getIsBackward() ? selection.getAnchorKey() : selection.getFocusKey();
+  const startKey = selection.getStartKey();
+  const endKey = selection.getEndKey();
   const selectionStart = selection.getStartOffset();
   const selectionEnd = selection.getEndOffset();
+  console.log(selectionStart);
+  console.log(selectionEnd);
   let selectedBlocks = [];
   let inBlock = false;
   editorState.getCurrentContent().getBlockMap().forEach(block => {
-    if (block.getKey() === anchorKey) inBlock = true;
+    if (block.getKey() === startKey) inBlock = true;
     if (inBlock) selectedBlocks.push(block);
-    if (block.getKey() === focusKey) inBlock = false;
+    if (block.getKey() === endKey) inBlock = false;
   });
   selectedBlocks.map((block, i) => {
     const blockKey = block.getKey();
@@ -28,11 +30,14 @@ const applyFontSize = (editorState, selectedSize) => {
         return false;
       },
       (styleStart, styleEnd) => {
-        if (selection.hasEdgeWithin(blockKey, styleStart, styleEnd)) {
+        if (
+          !(blockKey === startKey && styleEnd < selectionStart) && // first block: style range is before
+          !(blockKey === endKey && styleStart > selectionEnd) // last block: style range is after
+          ) {
           let start = styleStart;
           let end = styleEnd;
-          if (anchorKey === blockKey) start = selectionStart;
-          if (focusKey === blockKey) end = selectionEnd;
+          if (startKey === blockKey && selectionStart > start && selectionStart < end) start = selectionStart;
+          if (endKey === blockKey && selectionEnd < end && selectionEnd > start) end = selectionEnd;
 
           contentState = Modifier.removeInlineStyle(
             contentState,
