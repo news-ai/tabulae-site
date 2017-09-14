@@ -72,7 +72,6 @@ import ClientDirectory from './components/ClientDirectories/ClientDirectory.jsx'
 import Publication from './components/Publications/Publication.jsx';
 import ContactTags from './components/Contacts/ContactTags/ContactTags.jsx';
 import Workspace from './components/Workspace/Workspace.jsx';
-import Workspace1 from './components/Workspace/Workspace1.jsx';
 import TemplateManager from './components/Workspace/TemplateManager.jsx';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -137,7 +136,6 @@ ReactDOM.render(
             <Route path='team' name='Team Lists' component={TeamListsContainer} />
             <Route path='settings' name='Settings' component={UserProfile} />
             <Route path='workspace' name='Template Manager' component={TemplateManager}>
-              <Route path='new-template1' staticName name='New Template1' component={Workspace1} />
               <Route path='new-template' staticName name='New Template' component={Workspace} />
               <Route path=':templateId' staticName name='Saved Template' component={Workspace} />
             </Route>
