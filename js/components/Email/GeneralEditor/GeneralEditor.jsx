@@ -14,9 +14,12 @@ import Draft, {
   convertFromRaw,
   CompositeDecorator,
   Modifier,
-  SelectionState
+  SelectionState,
+  getDefaultKeyBinding,
+  KeyBindingUtil,
   // getVisibleSelectionRect
 } from 'draft-js';
+import keycode from 'keycode';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 // import htmlToContent from './utils/htmlToContent';
 import {convertToHTML} from 'draft-convert';
@@ -33,6 +36,7 @@ import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/tog
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
 import applyFontSize from 'components/Email/EmailPanel/editorUtils/applyFontSize';
 import stripDuplicateFontSize from 'components/Email/EmailPanel/editorUtils/stripDuplicateFontSize';
+import getSelectedSplitBlocks from 'components/Email/EmailPanel/editorUtils/getSelectedSplitBlocks';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -128,6 +132,13 @@ const sanitizeHtmlConfigs = {
     },
   }
 };
+
+const myKeyBindingFn = (e) => {
+  if (keycode(e) === 'c' && KeyBindingUtil.hasCommandModifier(e)) {
+    return 'body-editor-copy';
+  }
+  return getDefaultKeyBinding(e);
+}
 
 
 class GeneralEditor extends React.Component {
@@ -390,11 +401,29 @@ class GeneralEditor extends React.Component {
   _handleKeyCommand(command) {
     const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
+    if (command === 'body-editor-copy') {
+      const selectedAsContentState = getSelectedSplitBlocks(editorState);
+      const raw = convertToRaw(selectedAsContentState);
+      let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
+        if (block.type === 'atomic') block.text = ' ';
+        return block;
+      })});
+      let html = draftRawToHtml(rawToHtml);
+      const handler = e => {
+        e.clipboardData.setData('text/plain', selectedAsContentState.getPlainText());
+        e.clipboardData.setData('text/html', html);
+        e.preventDefault();
+        document.removeEventListener('copy', handler, true);
+      }
+      document.addEventListener('copy', handler, true);
+      document.execCommand('copy');
+      return 'handled';
+    }
     if (newState) {
       this.onChange(newState);
-      return true;
+      return 'handled';
     }
-    return false;
+    return 'not-handled';
   }
 
   _toggleBlockType(blockType) {
@@ -736,6 +765,7 @@ class GeneralEditor extends React.Component {
               e.preventDefault();
                if (editorState.getSelection().isCollapsed() && !state.onHoverToolbar) this.setState({showToolbar: false});
             }}
+            keyBindingFn={myKeyBindingFn}
             ref='editor'
             spellCheck
             />

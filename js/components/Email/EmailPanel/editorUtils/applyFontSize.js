@@ -8,8 +8,6 @@ const applyFontSize = (editorState, selectedSize) => {
   const endKey = selection.getEndKey();
   const selectionStart = selection.getStartOffset();
   const selectionEnd = selection.getEndOffset();
-  console.log(selectionStart);
-  console.log(selectionEnd);
   let selectedBlocks = [];
   let inBlock = false;
   editorState.getCurrentContent().getBlockMap().forEach(block => {
