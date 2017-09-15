@@ -68,14 +68,14 @@ class FontSizeControls extends Component {
       <MenuItem
       key={`fontsize-select-default`}
       value={PLACEHOLDER}
-      labelStyle={styles.menuLabel}
+      style={styles.menuLabel}
       primaryText={PLACEHOLDER}
       label={PLACEHOLDER}
       />,
       <MenuItem
       key={`fontsize-select-custom`}
       value='custom'
-      labelStyle={styles.menuLabel}
+      style={styles.menuCustomLabel}
       primaryText='Custom'
       label='Custom Size'
       />,
@@ -116,8 +116,9 @@ class FontSizeControls extends Component {
 const styles = {
   underlineStyle: {display: 'none', margin: 0},
   dropdownStyle: {fontSize: '0.9em'},
-  textfield: {width: 35},
-  menuLabel: {paddingLeft: 0}
+  textfield: {width: 40},
+  menuLabel: {padding: 0},
+  menuCustomLabel: {padding: 0, fontSize: '0.8em'},
 };
 
 export default FontSizeControls;
