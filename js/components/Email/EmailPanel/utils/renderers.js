@@ -32,13 +32,14 @@ const Media = props => {
   let media;
   if (type === 'IMAGE') {
     // const realEntity = props.blockProps.getEditorState().getCurrentContent().getEntity(block.getEntityAt(0));
-    const {src, align, imageLink, size} = entity.getData();
+    const {src, align, imageLink, size, wrap} = entity.getData();
     media = (
       <Image
       align={align}
       imageLink={imageLink}
       size={size}
       src={src}
+      wrap={wrap}
       onDragStart={_ => {
         props.blockProps.propagateDragTarget(blockKey);
       }}
@@ -64,6 +65,15 @@ const Media = props => {
         const editorState = props.blockProps.getEditorState();
         const newContent = editorState.getCurrentContent()
         .mergeEntityData(block.getEntityAt(0), {align: newAlign});
+
+        const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
+        const selection = newEditorState.getSelection();
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
+      }}
+      onToggleImageWrap={wrap => {
+        const editorState = props.blockProps.getEditorState();
+        const newContent = editorState.getCurrentContent()
+        .mergeEntityData(block.getEntityAt(0), {wrap: wrap});
 
         const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
         const selection = newEditorState.getSelection();
