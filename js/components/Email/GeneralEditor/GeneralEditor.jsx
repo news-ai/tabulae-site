@@ -402,10 +402,6 @@ class GeneralEditor extends React.Component {
     const {editorState} = this.state;
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (command === 'body-editor-copy') {
-      // Perform a request to save your contents, set
-      // a new `editorState`, etc.
-      console.log('COPPPYYYYYYYYY');
-
       const selectedAsContentState = getSelectedSplitBlocks(editorState);
       const raw = convertToRaw(selectedAsContentState);
       let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
