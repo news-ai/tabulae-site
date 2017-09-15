@@ -21,11 +21,23 @@ class FontSizeControls extends Component {
     };
     this.onSubmit = e => {
       const value = parseFloat(this.state.value);
-      if (!value) this.setState({value: '', show: false});
+      if (isNaN(value) || value === 0) {
+        this.setState({value: '', show: false});
+        return;
+      }
       const selectStyle = `SIZE-${value}`;
       this.props.onToggle(selectStyle);
       this.setState({value: '', show: false});
-    }
+    };
+    this.onDropDownChange = (e, index, newValue) => {
+      if (newValue === '---') return;
+      if (newValue === 'custom') {
+        this.setState({show: true}, _ => setTimeout(_ => this.fontSizeCustom.focus(), 300));
+        return;
+      }
+      const selectStyle = `SIZE-${newValue}`;
+      this.props.onToggle(selectStyle);
+    };
   }
 
   render() {
@@ -56,14 +68,14 @@ class FontSizeControls extends Component {
       <MenuItem
       key={`fontsize-select-default`}
       value={PLACEHOLDER}
-      labelStyle={{paddingLeft: 0}}
+      labelStyle={styles.menuLabel}
       primaryText={PLACEHOLDER}
       label={PLACEHOLDER}
       />,
       <MenuItem
       key={`fontsize-select-custom`}
       value='custom'
-      labelStyle={{paddingLeft: 0}}
+      labelStyle={styles.menuLabel}
       primaryText='Custom'
       label='Custom Size'
       />,
@@ -79,26 +91,19 @@ class FontSizeControls extends Component {
     const renderNodes = this.state.show ? (
       <TextField
       id='fontsize-custom'
+      ref={ref => this.fontSizeCustom = ref}
       value={this.state.value}
       onChange={this.onChange}
       onKeyDown={this.onKeyDown}
       onBlur={this.onSubmit}
-      style={{width: 23}}
+      style={styles.textfield}
       />
       ) : (
         <DropDownMenu
-        style={{fontSize: '0.9em'}}
-        underlineStyle={{display: 'none', margin: 0}}
+        style={styles.dropdownStyle}
+        underlineStyle={styles.underlineStyle}
         value={value}
-        onChange={(e, index, newValue) => {
-          if (newValue === '---') return;
-          if (newValue === 'custom') {
-            this.setState({show: true});
-            return;
-          }
-          const selectStyle = `SIZE-${newValue}`;
-          props.onToggle(selectStyle);
-        }}
+        onChange={this.onDropDownChange}
         >
         {menuItems}
         </DropDownMenu>
@@ -107,6 +112,13 @@ class FontSizeControls extends Component {
     return renderNodes;
   }
 }
+
+const styles = {
+  underlineStyle: {display: 'none', margin: 0},
+  dropdownStyle: {fontSize: '0.9em'},
+  textfield: {width: 35},
+  menuLabel: {paddingLeft: 0}
+};
 
 export default FontSizeControls;
 
