@@ -242,6 +242,7 @@ class GeneralEditor extends React.Component {
     this.onTypefaceToggle = newTypeface => this.onChange(toggleSingleInlineStyle(this.state.editorState, newTypeface, typefaceMap), 'force-emit-html');
     this.onColorToggle = color => this.onChange(toggleSingleInlineStyle(this.state.editorState, color, undefined, 'COLOR-'), 'force-emit-html');
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
+    this.onTab = this._onTab.bind(this);
     this.getSelectDOMRect = () => {
       let rect = getVisibleSelectionRect(window);
       if (rect === null) {
@@ -389,6 +390,11 @@ class GeneralEditor extends React.Component {
     this.onChange(newEditorState);
   }
 
+  _onTab(e) {
+    const newEditorState = RichUtils.onTab(e, this.state.editorState, 6);
+    this.onChange(newEditorState, 'force-emit-html');
+  }
+
   _handleReturn(e) {
     let handled = 'not-handled';
     if (e.key === 'Enter') {
@@ -434,7 +440,8 @@ class GeneralEditor extends React.Component {
       RichUtils.toggleBlockType(
         this.state.editorState,
         blockType
-      )
+      ),
+      'force-emit-html'
     );
   }
 
@@ -443,7 +450,8 @@ class GeneralEditor extends React.Component {
       RichUtils.toggleInlineStyle(
         this.state.editorState,
         inlineStyle
-      )
+      ),
+      'force-emit-html'
     );
   }
 
@@ -762,6 +770,7 @@ class GeneralEditor extends React.Component {
             handleDroppedFiles={this.handleDroppedFiles}
             handleBeforeInput={this.handleBeforeInput}
             handleDrop={this.handleDrop}
+            onTab={this.onTab}
             onChange={this.onChange}
             placeholder={props.placeholder || placeholder}
             onBlur={e => {
