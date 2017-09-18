@@ -212,8 +212,11 @@ class GeneralEditor extends React.Component {
         if (block.type === 'atomic') block.text = ' ';
         return block;
       })});
+      console.log(rawToHtml);
+      console.log(JSON.stringify(rawToHtml));
       let html = draftRawToHtml(rawToHtml);
-      // console.log(html);
+      const escapedHtml = html.replace(/"/g, "&quot;").replace(/'/g, "\\'").replace(/\n/g, '\\n');
+      console.log(escapedHtml);
       // console.log(raw);
       this.props.onBodyChange(html, raw);
     }

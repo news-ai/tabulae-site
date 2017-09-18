@@ -110,7 +110,7 @@
     "html-webpack-plugin": "^2.24.1",
     "identity-obj-proxy": "^3.0.0",
     "ip": "1.1.0",
-    "jest": "^19.0.2",
+    "jest": "^21.1.0",
     "json-loader": "^0.5.2",
     "loader-utils": "^1.1.0",
     "mocha": "^2.3.2",
@@ -145,7 +145,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "node --harmony_proxies node_modules/.bin/jest",
+    "test": "node --harmony_proxies node_modules/.bin/jest --no-cache",
     "test:watch": "node --harmony_proxies node_modules/.bin/jest --watch",
     "test:coverage": "node --harmony_proxies node_modules/.bin/jest --coverage",
     "start": "cross-env NODE_ENV=development node server.dev.js",

@@ -25,7 +25,7 @@ let inlineTagMap = {
   'UNDERLINE': ['<u>','</u>'],
   'CODE': ['<code>','</code>'],
   'STRIKETHROUGH': ['<del>', '</del>'],
-  'default': ['<span style="font-size:10.5pt;" >','</span>'],
+  'default': ['<span style="font-size:10.5pt;">','</span>'],
 };
 
 const match = (word, prefix) => word.substring(0, prefix.length) === prefix;
@@ -127,15 +127,20 @@ export default function(raw) {
     } else {
        // close tag if not consecutive same nested
       if (nestLevel.length > 0 && nestLevel[0] !== block.type) {
+        // console.log('1', block);
         let type = nestLevel.shift();
         html += nestedTagMap[type][1] + '\n';
       }
 
       // open tag if nested
-      if ( nestedTagMap[block.type] && nestLevel[0] !== block.type) {
+      if (nestedTagMap[block.type] && nestLevel[0] !== block.type) {
+        // console.log('2', block);
         html += nestedTagMap[block.type][0] + '\n';
         nestLevel.unshift(block.type);
       }
+
+      // console.log(block.type);
+      // console.log('depth', block.depth);
 
       let blockTag = blockTagMap[block.type];
 
@@ -150,8 +155,8 @@ export default function(raw) {
 
     // close any unclosed blocks if we've processed all the blocks
     if (index === lastIndex && nestLevel.length > 0 ) {
-      while(nestLevel.length > 0 ) {
-        html += nestedTagMap[ nestLevel.shift() ][1];
+      while (nestLevel.length > 0 ) {
+        html += nestedTagMap[nestLevel.shift()][1];
       }
     }
   });
