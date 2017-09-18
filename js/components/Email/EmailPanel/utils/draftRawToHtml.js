@@ -102,8 +102,8 @@ let entityTagMap = {
 }
 
 let nestedTagMap = {
-  'ordered-list-item': ['<ol>', '</ol>'],
-  'unordered-list-item': ['<ul>', '</ul>']
+  'ordered-list-item': ['\n<ol>', '</ol>\n'],
+  'unordered-list-item': ['\n<ul>', '</ul>\n']
 };
 
 // transform entity data at html compile stage
@@ -123,30 +123,39 @@ export default function(raw) {
 
   raw.blocks.forEach(function(block, index) {
     if (block.text.length === 0) {
+      // clean up from nested blocks when escape into normal grafs
+      while (st.length > 0) html += st.pop();
       html += '<br>';
     } else {
       if (nestedTagMap[block.type]) {
         const prevBlock = raw.blocks[index - 1];
         const nextBlock = raw.blocks[index + 1];
         const nestedBlockType = nestedTagMap[block.type];
-        console.log(nestedBlockType);
         const content = processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap});
-        if (!prevBlock) {
+        if (!prevBlock || !nestedTagMap[prevBlock.type]) {
           html += nestedBlockType[0];
           st.push(nestedBlockType[1]);
           // html += '\n<ul>\n';
           // st.push('</ul>\n')
         }
-        if (nextBlock) {
+        if (nextBlock && nestedTagMap[nextBlock.type]) {
           if (block.depth < nextBlock.depth) {
             html += '<li>' + content;
             // html += '\n<ul>\n';
-            html += nestedBlockType[0]
+            html += nestedTagMap[nextBlock.type][0]
             st.push('</li>\n');
-            st.push(nestedBlockType[1]);
+            st.push(nestedTagMap[nextBlock.type][1]);
             // st.push('</ul>\n');
           } else if (block.depth === nextBlock.depth) {
-            html += '<li>' + content + '</li>\n';
+            if (block.type !== nextBlock.type) {
+              console.log([...st]);
+              console.log(html);
+              html += '<li>' + content + '</li>\n';
+              html += st.pop();
+              html += nestedTagMap[nextBlock.type][0];
+              st.push(nestedTagMap[nextBlock.type][1]);
+            }
+            else html += '<li>' + content + '</li>\n';
           } else {
             html += '<li>' + content + '</li>\n';
             let diff = block.depth - nextBlock.depth;

@@ -140,16 +140,20 @@ const myKeyBindingFn = (e) => {
   return getDefaultKeyBinding(e);
 }
 
+// only unordered
 // 2 levels
 const testJSON = {"entityMap":{},"blocks":[{"key":"e86u1","text":"A","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"efob3","text":"B","type":"unordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}}]};
 
 // cascade
 const testJSON1 = {"entityMap":{},"blocks":[{"key":"fnnd6","text":"A","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"bo154","text":"B","type":"unordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"anuab","text":"C","type":"unordered-list-item","depth":2,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}}]};
-// triangle
+// pyramid
 const testJSON2 = {"entityMap":{},"blocks":[{"key":"22vlk","text":"A","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"10q7u","text":"B","type":"unordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"223ub","text":"C","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}}]};
 
-// complex nested + normal blocks
+// complex nested blocks + normal last block
 const testJSON3 = {"entityMap":{},"blocks":[{"key":"e86u1","text":"A","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"d0ich","text":"B","type":"unordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"efob3","text":"C ","type":"unordered-list-item","depth":2,"inlineStyleRanges":[{"offset":0,"length":2,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"7l08k","text":"D","type":"unordered-list-item","depth":2,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"6c31t","text":"E","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"fcabt","text":"F","type":"unordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"3dot0","text":"werwerwer","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":9,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"418pi","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}]};
+
+// pyramid, middle one is ordered
+const testJSON4 = {"entityMap":{},"blocks":[{"key":"2390u","text":"A","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"6sbs2","text":"B","type":"ordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"323hf","text":"C","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}}]};
 
 
 class GeneralEditor extends React.Component {
