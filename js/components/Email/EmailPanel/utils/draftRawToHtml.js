@@ -118,45 +118,60 @@ const entityDataConversionMap = {
 
 export default function(raw) {
   let html = '';
-  let nestLevel = [];
   let lastIndex = raw.blocks.length - 1;
+  let st = [];
 
   raw.blocks.forEach(function(block, index) {
     if (block.text.length === 0) {
       html += '<br>';
     } else {
-       // close tag if not consecutive same nested
-      if (nestLevel.length > 0 && nestLevel[0] !== block.type) {
-        // console.log('1', block);
-        let type = nestLevel.shift();
-        html += nestedTagMap[type][1] + '\n';
-      }
+      if (nestedTagMap[block.type]) {
+        const prevBlock = raw.blocks[index - 1];
+        const nextBlock = raw.blocks[index + 1];
+        const nestedBlockType = nestedTagMap[block.type];
+        console.log(nestedBlockType);
+        const content = processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap});
+        if (!prevBlock) {
+          html += nestedBlockType[0];
+          st.push(nestedBlockType[1]);
+          // html += '\n<ul>\n';
+          // st.push('</ul>\n')
+        }
+        if (nextBlock) {
+          if (block.depth < nextBlock.depth) {
+            html += '<li>' + content;
+            // html += '\n<ul>\n';
+            html += nestedBlockType[0]
+            st.push('</li>\n');
+            st.push(nestedBlockType[1]);
+            // st.push('</ul>\n');
+          } else if (block.depth === nextBlock.depth) {
+            html += '<li>' + content + '</li>\n';
+          } else {
+            html += '<li>' + content + '</li>\n';
+            let diff = block.depth - nextBlock.depth;
+            while (diff > 0) {
+              html += st.pop();
+              html += st.pop();
+              diff -= 1;
+            }
+          }
+        } else {
+          html += '<li>' + content + '</li>\n';
+          while (st.length > 0) html += st.pop();
+        }
+      } else {
+        // clean up from nested blocks when escape into normal grafs
+        while (st.length > 0) html += st.pop();
 
-      // open tag if nested
-      if (nestedTagMap[block.type] && nestLevel[0] !== block.type) {
-        // console.log('2', block);
-        html += nestedTagMap[block.type][0] + '\n';
-        nestLevel.unshift(block.type);
-      }
-
-      // console.log(block.type);
-      // console.log('depth', block.depth);
-
-      let blockTag = blockTagMap[block.type];
-
-      html += blockTag ?
-        blockTag[0] +
-          processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap}) +
-          blockTag[1] :
-        blockTagMap['default'][0] +
-          processInlineStylesAndEntities({inlineTagMap, block, combinableInlineFn, entityDataConversionMap}) +
-          blockTagMap['default'][1];
-    }
-
-    // close any unclosed blocks if we've processed all the blocks
-    if (index === lastIndex && nestLevel.length > 0 ) {
-      while (nestLevel.length > 0 ) {
-        html += nestedTagMap[nestLevel.shift()][1];
+        let blockTag = blockTagMap[block.type];
+        html += blockTag ?
+          blockTag[0] +
+            processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap}) +
+            blockTag[1] :
+          blockTagMap['default'][0] +
+            processInlineStylesAndEntities({inlineTagMap, block, combinableInlineFn, entityDataConversionMap}) +
+            blockTagMap['default'][1];
       }
     }
   });

@@ -8,5 +8,7 @@ export const testResult2 = '<div><span style=&quot;color:#000000;font-size:9.5pt
 export const testJson3 = {"entityMap":{},"blocks":[{"key":"ag2pg","text":"wekrjwklerwer","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":13,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"cqkhj","text":"werwerwerwer","type":"center-align","depth":0,"inlineStyleRanges":[{"offset":0,"length":12,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"dqm2d","text":"werwerwerwer","type":"right-align","depth":0,"inlineStyleRanges":[{"offset":0,"length":12,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}}]};
 export const testResult3 = '<div><span style=&quot;font-size:10.5pt;&quot;>wekrjwklerwer</span></div>\n<div style=&quot;text-align:center&quot;><span style=&quot;font-size:10.5pt;&quot;>werwerwerwer</span></div>\n<div style=&quot;text-align:right&quot;><span style=&quot;font-size:10.5pt;&quot;>werwerwerwer</span></div>\n';
 
+export const testJson4 = {"entityMap":{},"blocks":[{"key":"fnnd6","text":"A","type":"unordered-list-item","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"bo154","text":"B","type":"unordered-list-item","depth":1,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}},{"key":"anuab","text":"C","type":"unordered-list-item","depth":2,"inlineStyleRanges":[{"offset":0,"length":1,"style":"SIZE-10.5"}],"entityRanges":[],"data":{}}]};
+
 
 
