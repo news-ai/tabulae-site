@@ -25,7 +25,7 @@ let inlineTagMap = {
   'UNDERLINE': ['<u>','</u>'],
   'CODE': ['<code>','</code>'],
   'STRIKETHROUGH': ['<del>', '</del>'],
-  'default': ['<span style="font-size:10.5pt;" >','</span>'],
+  'default': ['<span style="font-size:10.5pt;">','</span>'],
 };
 
 const match = (word, prefix) => word.substring(0, prefix.length) === prefix;
@@ -118,40 +118,72 @@ const entityDataConversionMap = {
 
 export default function(raw) {
   let html = '';
-  let nestLevel = [];
   let lastIndex = raw.blocks.length - 1;
+  let st = [];
 
   raw.blocks.forEach(function(block, index) {
     if (block.text.length === 0) {
+      // clean up from nested blocks when escape into normal grafs
+      while (st.length > 0) html += st.pop();
       html += '<br>';
     } else {
-       // close tag if not consecutive same nested
-      if (nestLevel.length > 0 && nestLevel[0] !== block.type) {
-        let type = nestLevel.shift();
-        html += nestedTagMap[type][1] + '\n';
-      }
+      if (nestedTagMap[block.type]) {
+        const prevBlock = raw.blocks[index - 1];
+        const nextBlock = raw.blocks[index + 1];
+        const nestedBlockType = nestedTagMap[block.type];
+        const content = processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap});
+        if (!prevBlock || !nestedTagMap[prevBlock.type]) {
+          html += nestedBlockType[0];
+          st.push(nestedBlockType[1]);
+        }
+        if (nextBlock && nestedTagMap[nextBlock.type]) {
+          if (block.depth < nextBlock.depth) {
+            html += '<li>' + content;
+            html += nestedTagMap[nextBlock.type][0]
+            st.push('</li>');
+            st.push(nestedTagMap[nextBlock.type][1]);
+          } else if (block.depth === nextBlock.depth) {
+            if (block.type !== nextBlock.type) {
+              html += '<li>' + content + '</li>';
+              html += st.pop();
+              html += nestedTagMap[nextBlock.type][0];
+              st.push(nestedTagMap[nextBlock.type][1]);
+            }
+            else html += '<li>' + content + '</li>';
+          } else {
+            html += '<li>' + content + '</li>';
+            let diff = block.depth - nextBlock.depth;
+            while (diff > 0) {
+              html += st.pop();
+              html += st.pop();
+              diff -= 1;
+            }
+            // force-break ordering to make consistent with draft-js rendering
+            // which breaks ordering when mixing ordered-list-items and unordered-list-items
+            // if (block.type === 'unordered-list-item' && nextBlock.type === 'ordered-list-item') {
+            if (nextBlock.type === 'ordered-list-item') {
+              html += st.pop() || '';
+              html += st.pop() || '';
+              html += nestedTagMap[nextBlock.type][0];
+              st.push(nestedTagMap[nextBlock.type][1]);
+            }
+          }
+        } else {
+          html += '<li>' + content + '</li>';
+          while (st.length > 0) html += st.pop();
+        }
+      } else {
+        // clean up from nested blocks when escape into normal grafs
+        while (st.length > 0) html += st.pop();
 
-      // open tag if nested
-      if ( nestedTagMap[block.type] && nestLevel[0] !== block.type) {
-        html += nestedTagMap[block.type][0] + '\n';
-        nestLevel.unshift(block.type);
-      }
-
-      let blockTag = blockTagMap[block.type];
-
-      html += blockTag ?
-        blockTag[0] +
-          processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap}) +
-          blockTag[1] :
-        blockTagMap['default'][0] +
-          processInlineStylesAndEntities({inlineTagMap, block, combinableInlineFn, entityDataConversionMap}) +
-          blockTagMap['default'][1];
-    }
-
-    // close any unclosed blocks if we've processed all the blocks
-    if (index === lastIndex && nestLevel.length > 0 ) {
-      while(nestLevel.length > 0 ) {
-        html += nestedTagMap[ nestLevel.shift() ][1];
+        let blockTag = blockTagMap[block.type];
+        html += blockTag ?
+          blockTag[0] +
+            processInlineStylesAndEntities({inlineTagMap, entityTagMap, entityMap: raw.entityMap, block, combinableInlineFn, entityDataConversionMap}) +
+            blockTag[1] :
+          blockTagMap['default'][0] +
+            processInlineStylesAndEntities({inlineTagMap, block, combinableInlineFn, entityDataConversionMap}) +
+            blockTagMap['default'][1];
       }
     }
   });
