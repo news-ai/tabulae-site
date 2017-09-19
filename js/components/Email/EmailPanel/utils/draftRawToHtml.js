@@ -102,8 +102,8 @@ let entityTagMap = {
 }
 
 let nestedTagMap = {
-  'ordered-list-item': ['\n<ol>', '</ol>\n'],
-  'unordered-list-item': ['\n<ul>', '</ul>\n']
+  'ordered-list-item': ['\n<ol>\n', '\n</ol>\n'],
+  'unordered-list-item': ['\n<ul>\n', '\n</ul>\n']
 };
 
 // transform entity data at html compile stage
@@ -135,21 +135,15 @@ export default function(raw) {
         if (!prevBlock || !nestedTagMap[prevBlock.type]) {
           html += nestedBlockType[0];
           st.push(nestedBlockType[1]);
-          // html += '\n<ul>\n';
-          // st.push('</ul>\n')
         }
         if (nextBlock && nestedTagMap[nextBlock.type]) {
           if (block.depth < nextBlock.depth) {
             html += '<li>' + content;
-            // html += '\n<ul>\n';
             html += nestedTagMap[nextBlock.type][0]
             st.push('</li>\n');
             st.push(nestedTagMap[nextBlock.type][1]);
-            // st.push('</ul>\n');
           } else if (block.depth === nextBlock.depth) {
             if (block.type !== nextBlock.type) {
-              // console.log([...st]);
-              // console.log(html);
               html += '<li>' + content + '</li>\n';
               html += st.pop();
               html += nestedTagMap[nextBlock.type][0];
@@ -163,6 +157,16 @@ export default function(raw) {
               html += st.pop();
               html += st.pop();
               diff -= 1;
+            }
+            // force-break ordering to make consistent with draft-js rendering
+            // which breaks ordering when mixing ordered-list-items and unordered-list-items
+            if (block.type === 'unordered-list-item' && nextBlock.type === 'ordered-list-item') {
+              // while (st.length > 0) html += st.pop();
+              // console.log([...st]);
+              html += st.pop() || '';
+              html += st.pop() || '';
+              html += nestedTagMap[nextBlock.type][0];
+              st.push(nestedTagMap[nextBlock.type][1]);
             }
           }
         } else {
