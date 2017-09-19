@@ -260,7 +260,7 @@ class Workspace extends Component {
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
         <TopBar>
-          <div className='vertical-center' >
+          <div className='vertical-center' style={{marginTop: 10}} >
             <PlainIconButton
             label='Clear Editor'
             className='fa fa-eraser'
@@ -274,13 +274,14 @@ class Workspace extends Component {
             label='Save'
             style={{margin: '3px 20px'}}
             />
+          {this.props.template &&
             <PlainIconButton
             className='fa fa-file-o'
             disabled={!state.bodyContentState || !state.subjectContentState}
             onClick={this.onSaveNewTemplateClick}
             label='Save New'
             style={{margin: '3px 30px 3px 0px'}}
-            />
+            />}
           {this.props.template &&
             <div>
               <TextField
