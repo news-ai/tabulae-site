@@ -102,8 +102,8 @@ let entityTagMap = {
 }
 
 let nestedTagMap = {
-  'ordered-list-item': ['\n<ol>\n', '\n</ol>\n'],
-  'unordered-list-item': ['\n<ul>\n', '\n</ul>\n']
+  'ordered-list-item': ['<ol>', '</ol>'],
+  'unordered-list-item': ['<ul>', '</ul>']
 };
 
 // transform entity data at html compile stage
@@ -140,18 +140,18 @@ export default function(raw) {
           if (block.depth < nextBlock.depth) {
             html += '<li>' + content;
             html += nestedTagMap[nextBlock.type][0]
-            st.push('</li>\n');
+            st.push('</li>');
             st.push(nestedTagMap[nextBlock.type][1]);
           } else if (block.depth === nextBlock.depth) {
             if (block.type !== nextBlock.type) {
-              html += '<li>' + content + '</li>\n';
+              html += '<li>' + content + '</li>';
               html += st.pop();
               html += nestedTagMap[nextBlock.type][0];
               st.push(nestedTagMap[nextBlock.type][1]);
             }
-            else html += '<li>' + content + '</li>\n';
+            else html += '<li>' + content + '</li>';
           } else {
-            html += '<li>' + content + '</li>\n';
+            html += '<li>' + content + '</li>';
             let diff = block.depth - nextBlock.depth;
             while (diff > 0) {
               html += st.pop();
@@ -161,8 +161,6 @@ export default function(raw) {
             // force-break ordering to make consistent with draft-js rendering
             // which breaks ordering when mixing ordered-list-items and unordered-list-items
             if (block.type === 'unordered-list-item' && nextBlock.type === 'ordered-list-item') {
-              // while (st.length > 0) html += st.pop();
-              // console.log([...st]);
               html += st.pop() || '';
               html += st.pop() || '';
               html += nestedTagMap[nextBlock.type][0];
@@ -170,7 +168,7 @@ export default function(raw) {
             }
           }
         } else {
-          html += '<li>' + content + '</li>\n';
+          html += '<li>' + content + '</li>';
           while (st.length > 0) html += st.pop();
         }
       } else {
