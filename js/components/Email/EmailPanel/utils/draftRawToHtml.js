@@ -148,8 +148,8 @@ export default function(raw) {
             // st.push('</ul>\n');
           } else if (block.depth === nextBlock.depth) {
             if (block.type !== nextBlock.type) {
-              console.log([...st]);
-              console.log(html);
+              // console.log([...st]);
+              // console.log(html);
               html += '<li>' + content + '</li>\n';
               html += st.pop();
               html += nestedTagMap[nextBlock.type][0];
