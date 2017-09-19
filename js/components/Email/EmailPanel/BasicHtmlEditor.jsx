@@ -191,6 +191,7 @@ class BasicHtmlEditor extends Component {
     this.handleDrop = this._handleDrop.bind(this);
     this.cleanHTMLToContentState = this._cleanHTMLToContentState.bind(this);
     this.onInsertProperty = this.onInsertProperty.bind(this);
+    this.onTab = this._onTab.bind(this);
 
     // cleanups
     this.onInsertPropertyClick = e => this.setState({variableMenuOpen: true, variableMenuAnchorEl: e.currentTarget});
@@ -386,6 +387,11 @@ class BasicHtmlEditor extends Component {
       ),
     'force-emit-html'
     );
+  }
+  
+  _onTab(e) {
+    const newEditorState = RichUtils.onTab(e, this.state.editorState, 6);
+    this.onChange(newEditorState, 'force-emit-html');
   }
 
   _manageLink() {
@@ -603,6 +609,7 @@ class BasicHtmlEditor extends Component {
                   propagateDragTarget: blockKey => this.setState({currentDragTarget: blockKey})
                 })}
               blockRenderMap={extendedBlockRenderMap}
+              onTab={this.onTab}
               customStyleFn={customStyleFn}
               customStyleMap={styleMap}
               editorState={editorState}
