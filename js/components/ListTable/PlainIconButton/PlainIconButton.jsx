@@ -26,9 +26,9 @@ const PlainIconButtonLabel = styled.span`
   color: ${props => props.disabled ? grey500 : grey700};
 `;
 
-const PlainIconButton = ({label, onClick, disabled, className, style}) => {
+const PlainIconButton = ({label, onClick, disabled, className, margin}) => {
   return (
-  <PlainIconButtonContainer margin={style.margin} disabled={disabled} onClick={e => !disabled && onClick(e)}>
+  <PlainIconButtonContainer margin={margin} disabled={disabled} onClick={e => !disabled && onClick(e)}>
     <PlainFontIcon className={className} disabled={disabled} />
     <PlainIconButtonLabel disabled={disabled} >{label}</PlainIconButtonLabel>
   </PlainIconButtonContainer>

@@ -265,14 +265,14 @@ class Workspace extends Component {
             label='Clear Editor'
             className='fa fa-eraser'
             onClick={this.onClearEditor}
-            style={{margin: '3px 0px 3px 30px'}}
+            margin='3px 0px 3px 30px'
             />
             <PlainIconButton
             className='fa fa-file-text-o'
             disabled={!state.bodyContentState || !state.subjectContentState}
             onClick={props.template ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
             label='Save'
-            style={{margin: '3px 20px'}}
+            margin='3px 20px'
             />
           {this.props.template &&
             <PlainIconButton
@@ -280,7 +280,7 @@ class Workspace extends Component {
             disabled={!state.bodyContentState || !state.subjectContentState}
             onClick={this.onSaveNewTemplateClick}
             label='Save New'
-            style={{margin: '3px 30px 3px 0px'}}
+            margin='3px 30px 3px 0px'
             />}
           {this.props.template &&
             <div>

@@ -160,7 +160,8 @@ export default function(raw) {
             }
             // force-break ordering to make consistent with draft-js rendering
             // which breaks ordering when mixing ordered-list-items and unordered-list-items
-            if (block.type === 'unordered-list-item' && nextBlock.type === 'ordered-list-item') {
+            // if (block.type === 'unordered-list-item' && nextBlock.type === 'ordered-list-item') {
+            if (nextBlock.type === 'ordered-list-item') {
               html += st.pop() || '';
               html += st.pop() || '';
               html += nestedTagMap[nextBlock.type][0];
