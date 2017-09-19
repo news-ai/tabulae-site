@@ -18,6 +18,10 @@ import {convertToRaw} from 'draft-js';
 import draftRawToHtml from 'components/Email/EmailPanel/utils/draftRawToHtml';
 import {FONTSIZE_TYPES} from 'components/Email/EmailPanel/utils/typeConstants';
 import TextField from 'material-ui/TextField';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
+import PlainIconButton from 'components/ListTable/PlainIconButton';
 
 const MainSection = styled.div`
   display: flex;
@@ -110,6 +114,7 @@ class Workspace extends Component {
       height: height,
       mode: 'writing',
       screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 900),
+      templateName: ''
     };
     this.onSubjectChange = this.onSubjectChange.bind(this);
     this.onBodyChange = this.onBodyChange.bind(this);
@@ -137,6 +142,10 @@ class Workspace extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.template && this.props.template !== nextProps.template) {
+      this.handleTemplateChange(nextProps.template);
+    }
+
+    if (nextProps.template && this.props.params.templateId !== nextProps.params.templateI) {
       this.handleTemplateChange(nextProps.template);
     }
   }
@@ -168,7 +177,12 @@ class Workspace extends Component {
   handleTemplateChange(template) {
     if (!!template) {
       let subject = template.subject;
-      this.setState({subject, mutatingSubject: subject, useExisting: true});
+      this.setState({
+        subject,
+        mutatingSubject: subject,
+        useExisting: true,
+        templateName: template.name.length > 0 ? template.name : template.subject
+      });
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
         if (templateJSON.subjectData) subject = templateJSON.subjectData;
@@ -233,8 +247,9 @@ class Workspace extends Component {
 
   saveNameOnBlur(e) {
     const defaultName = this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subject;
-    if (this.templateName.getValue() !== defaultName) {
-      this.props.changeTemplateName(this.props.template.id, this.templateName.getValue());
+    const newName = this.state.templateName;
+    if (newName !== defaultName) {
+      this.props.changeTemplateName(this.props.template.id, newName);
     }
   }
 
@@ -245,29 +260,34 @@ class Workspace extends Component {
     return (
       <div style={{display: 'flex', flexDirection: 'column'}} >
         <TopBar>
-          <div className='vertical-center'>
-            <FlatButton
-            secondary
-            style={{margin: '0 5px'}}
+          <div className='vertical-center' >
+            <PlainIconButton
             label='Clear Editor'
-            labelStyle={styles.transformNone}
-            onTouchTap={this.onClearEditor}
+            className='fa fa-eraser'
+            onClick={this.onClearEditor}
+            style={{margin: '3px 0px 3px 30px'}}
             />
-            <FlatButton
-            primary
-            style={{margin: '0 5px'}}
+            <PlainIconButton
+            className='fa fa-file-text-o'
             disabled={!state.bodyContentState || !state.subjectContentState}
+            onClick={props.template ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
             label='Save'
-            labelStyle={styles.transformNone}
-            onTouchTap={props.template ? this.onSaveCurrentTemplateClick : this.onSaveNewTemplateClick}
+            style={{margin: '3px 20px'}}
+            />
+            <PlainIconButton
+            className='fa fa-file-o'
+            disabled={!state.bodyContentState || !state.subjectContentState}
+            onClick={this.onSaveNewTemplateClick}
+            label='Save New'
+            style={{margin: '3px 30px 3px 0px'}}
             />
           {this.props.template &&
             <div>
               <TextField
               floatingLabelFixed
               name='template-name'
-              ref={ref => this.templateName = ref}
-              defaultValue={this.props.template.name.length > 0 ? this.props.template.name : this.props.template.subject}
+              value={state.templateName}
+              onChange={e => this.setState({templateName: e.target.value})}
               floatingLabelText='Template Name'
               onBlur={this.saveNameOnBlur}
               />

@@ -17,7 +17,7 @@ const PlainIconButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  margin: 3px 8px;
+  margin: ${props => props.margin || '3px 8px'};
 `;
 
 const PlainIconButtonLabel = styled.span`
@@ -26,11 +26,13 @@ const PlainIconButtonLabel = styled.span`
   color: ${props => props.disabled ? grey500 : grey700};
 `;
 
-const PlainIconButton = ({label, onClick, disabled, className}) => (
-  <PlainIconButtonContainer disabled={disabled} onClick={e => !disabled && onClick(e)}>
+const PlainIconButton = ({label, onClick, disabled, className, style}) => {
+  return (
+  <PlainIconButtonContainer margin={style.margin} disabled={disabled} onClick={e => !disabled && onClick(e)}>
     <PlainFontIcon className={className} disabled={disabled} />
     <PlainIconButtonLabel disabled={disabled} >{label}</PlainIconButtonLabel>
   </PlainIconButtonContainer>
   );
+}
 
 export default PlainIconButton;
