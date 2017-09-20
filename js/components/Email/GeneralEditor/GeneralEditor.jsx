@@ -37,6 +37,7 @@ import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLine
 import applyFontSize from 'components/Email/EmailPanel/editorUtils/applyFontSize';
 import stripDuplicateFontSize from 'components/Email/EmailPanel/editorUtils/stripDuplicateFontSize';
 import getSelectedSplitBlocks from 'components/Email/EmailPanel/editorUtils/getSelectedSplitBlocks';
+import normalizeListDepths from 'components/Email/EmailPanel/editorUtils/normalizeListDepths';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
@@ -534,6 +535,7 @@ class GeneralEditor extends React.Component {
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
+    contentState = normalizeListDepths(contentState);
 
     let newEditorState = linkifyContentState(editorState, contentState);
 
