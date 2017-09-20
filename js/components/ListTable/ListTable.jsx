@@ -512,7 +512,7 @@ class ListTable extends Component {
       ) {
       window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
       mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
-      return props.loadAllContacts(props.listId);
+      return this.state.pageSize === -1 ? props.loadAllContacts(props.listId) : props.fetchManyContacts(props.listId, this.state.pageSize);
     }
     return Promise.resolve(true);
   }
@@ -916,9 +916,12 @@ class ListTable extends Component {
           currentPage={state.currentPage}
           pageSize={state.pageSize}
           onPageSizeChange={pageSize => this.setState({pageSize, currentPage: 1})} 
-          listLength={props.contacts.length}
+          listLength={props.listData.contacts.length}
           onPrev={currentPage => this.setState({currentPage, scrollToRow: 0})}
-          onNext={currentPage => this.setState({currentPage, scrollToRow: 0})}
+          onNext={currentPage => {
+            if (props.contacts.length < currentPage * state.pageSize) this.fetchOperations(this.props);
+            this.setState({currentPage, scrollToRow: 0});
+          }}
           />
         </div>
         <div>
@@ -1079,6 +1082,7 @@ const mapDispatchToProps = (dispatch, props) => {
     deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
     loadAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
     removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser()),
+    fetchManyContacts: (listId, amount) => dispatch(contactActions.fetchManyContacts(listId, amount)),
   };
 };
 
