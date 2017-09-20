@@ -522,7 +522,7 @@ class GeneralEditor extends React.Component {
 
     if (html) {
       console.log('pasted', 'html');
-      console.log(html);
+      // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       console.log(saneHtml);
       contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
