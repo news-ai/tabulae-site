@@ -20,6 +20,29 @@ export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
         data: {}
       };
     } else {
+      if (node.style) {
+        const {msoStyles} = node.outerHTML.split('\"').reduce(({prevIsStyle, msoStyles}, block, i) => {
+          if (prevIsStyle) {
+            msoStyles.push(block);
+            prevIsStyle = false;
+          } else {
+            if (block.split('style=').length === 2) prevIsStyle = true;
+          }
+          return {prevIsStyle, msoStyles};
+        }, {prevIsStyle: false, msoStyles: []});
+        const msoString = 'mso-list';
+        const styleBlock = msoStyles[0].split(';').filter(style => style.substring(0, msoString.length) === msoString)[0];
+        const actualStyle = styleBlock.split(':')[1];
+        const depth = parseInt(actualStyle.split(' ')[1].split('level')[1]);
+        console.log(depth);
+        if (!isNaN(depth)) {
+          return {
+            type: 'unordered-list-item',
+            data: {}
+          };
+        }
+
+      }
       return {
         type: 'unstyled',
         data: {}
