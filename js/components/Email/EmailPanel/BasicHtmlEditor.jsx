@@ -45,6 +45,7 @@ import applyDefaultFontSizeInlineStyle from 'components/Email/EmailPanel/editorU
 import toggleSingleInlineStyle from 'components/Email/EmailPanel/editorUtils/toggleSingleInlineStyle';
 import handleLineBreaks from 'components/Email/EmailPanel/editorUtils/handleLineBreaks';
 import applyFontSize from 'components/Email/EmailPanel/editorUtils/applyFontSize';
+import normalizeListDepths from 'components/Email/EmailPanel/editorUtils/normalizeListDepths';
 
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
@@ -466,6 +467,7 @@ class BasicHtmlEditor extends Component {
     }
 
     contentState = handleLineBreaks(contentState);
+    contentState = normalizeListDepths(contentState);
     const newEditorState = linkifyContentState(editorState, contentState);
 
     this.onChange(newEditorState);

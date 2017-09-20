@@ -32,6 +32,7 @@ const Media = props => {
   let media;
   if (type === 'IMAGE') {
     // const realEntity = props.blockProps.getEditorState().getCurrentContent().getEntity(block.getEntityAt(0));
+    // const {src, align, imageLink, size, wrap} = entity.getData();
     const {src, align, imageLink, size} = entity.getData();
     media = (
       <Image
@@ -70,6 +71,17 @@ const Media = props => {
         props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
       }}
       />);
+    /*
+      onToggleImageWrap={wrap => {
+        const editorState = props.blockProps.getEditorState();
+        const newContent = editorState.getCurrentContent()
+        .mergeEntityData(block.getEntityAt(0), {wrap: wrap});
+
+        const newEditorState = EditorState.push(editorState, newContent, 'activate-entity-data');
+        const selection = newEditorState.getSelection();
+        props.blockProps.onChange(EditorState.forceSelection(newEditorState, selection), 'force-emit-html');
+      }}
+     */
   }
   return media;
 };

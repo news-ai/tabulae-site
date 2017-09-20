@@ -95,6 +95,7 @@ class CopyToHOC extends Component {
               {props.selectedContacts &&
                 <span>{
                   props.selectedContacts
+                  .filter(contact => contact)
                   .map(contact => contact.firstname || contact.lastname || contact.email || contact.id)
                   .join(', ')
               }</span>}

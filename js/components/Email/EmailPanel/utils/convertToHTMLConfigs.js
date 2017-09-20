@@ -20,6 +20,32 @@ export const htmlToBlock = (nodeName, node, lastList, inBlock) => {
         data: {}
       };
     } else {
+      if (node.style) {
+        // Handle MS Word lists special case that outputs <p> tags with custom css instead of <ol>/<ul>
+        const {msoStyles} = node.outerHTML.split('\"').reduce(({prevIsStyle, msoStyles}, block, i) => {
+          if (prevIsStyle) {
+            msoStyles.push(block);
+            prevIsStyle = false;
+          } else {
+            if (block.split('style=').length === 2) prevIsStyle = true;
+          }
+          return {prevIsStyle, msoStyles};
+        }, {prevIsStyle: false, msoStyles: []});
+        const msoString = 'mso-list';
+        const styleBlock = msoStyles[0].split(';').filter(style => style.substring(0, msoString.length) === msoString)[0];
+        const actualStyle = styleBlock.split(':')[1];
+        const depth = parseInt(actualStyle.split(' ')[1].split('level')[1]);
+        const isUnordered = !!node.firstChild.style.fontFamily;
+        // mutate node to remove msoIgnore node
+        node.removeChild(node.firstChild);
+        if (!isNaN(depth)) {
+          return {
+            type: isUnordered ? 'unordered-list-item' : 'ordered-list-item',
+            depth: depth - 1,
+            data: {}
+          };
+        }
+      }
       return {
         type: 'unstyled',
         data: {}

@@ -401,6 +401,8 @@ function genFragment(
   } else {
     blockType = typeof blockInfo === 'string' ? blockInfo : blockInfo.type;
     blockDataMap = blockInfo.data ? Map(blockInfo.data) : Map();
+    // assign depth if given one
+    if ((blockType === 'unordered-list-item' || blockType === 'ordered-list-item') && blockInfo.depth) depth = blockInfo.depth;
   }
   if (!inBlock && (fragmentBlockTags.indexOf(nodeName) !== -1 || blockType)) {
     chunk = getBlockDividerChunk(
