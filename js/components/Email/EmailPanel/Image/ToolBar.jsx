@@ -66,6 +66,7 @@ class ToolBar extends Component {
             style={styles.icon}
             className='fa fa-align-right span-button pointer'
             />
+          {/*
             <span
             style={{
               userSelect: 'none',
@@ -75,6 +76,7 @@ class ToolBar extends Component {
             }}
             onClick={_ => props.onToggleImageWrap(!props.wrap)}
             >wrap</span>
+          */}
         </div>}
       </div>
       );
@@ -91,7 +93,7 @@ const styles = {
     border: `solid 1px ${grey400}`,
     borderRadius: 5,
     zIndex: 500,
-    width: 250
+    width: 230
   },
   icon: {fontSize: '14px', margin: '0 4px'},
   slider: {width: 70, margin: '0 5px'},
