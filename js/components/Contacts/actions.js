@@ -19,7 +19,7 @@ const contactSchema = new Schema('contacts', { idAttribute: 'id' });
 const publicationSchema = new Schema('publications', { idAttribute: 'id' });
 const listSchema = new Schema('lists', { idAttribute: 'id' });
 
-const PAGE_LIMIT = 200;
+const PAGE_LIMIT = 100;
 
 function requestContact() {
   return {
@@ -203,7 +203,7 @@ export function fetchManyContacts(listId, amount) {
     if (contacts === null) return;
     const contactCount = contacts.filter(id => getState().contactReducer[id]).length;
     if (offset === null || isReceiving || contactCount === contacts.length) return;
-    dispatch({type: 'FETCH_MANY_CONTACTS', listId});
+    dispatch({type: 'FETCH_MANY_CONTACTS', listId, amount});
     dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
     const startPage = offset / PAGE_LIMIT;
     const endPage = offset + amount >= contacts.length ? (contacts.length / PAGE_LIMIT) : (offset + amount) / PAGE_LIMIT;
