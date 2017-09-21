@@ -18,7 +18,8 @@ class CopyToHOC extends Component {
     super(props);
     this.state = {
       open: false,
-      value: []
+      value: [],
+      isReceiving: false
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onNewSheetSubmit = this._onNewSheetSubmit.bind(this);
@@ -31,10 +32,16 @@ class CopyToHOC extends Component {
 
   _onSubmit() {
     if (this.state.value.length === 0 || this.props.selectedContacts.length === 0) return;
+    if (this.props.selectedContacts.length === this.props.list.contacts.length) {
+      alertify.alert('All Contacts Selected', 'It seems like you are trying to copy the whole list. Try Method 2: Copy Whole List. It\'s faster.');
+      return;
+    }
     const selectedLists = this.state.value.map(obj => this.props.listReducer[obj.value]);
     // selectedLists.map(list => props.addContactsThenPatchList(props.selectedContacts, list));
     const contacts = this.props.selectedContacts.map(contact => contact.id);
-    selectedLists.map(list => this.props.copyContactsToList(contacts, list.id));
+    this.setState({isReceiving: true});
+    selectedLists.map(list => this.props.copyContactsToList(contacts, list.id).then(_ => this.setState({isReceiving: false})));
+
     window.Intercom('trackEvent', 'copy_to_existing_sheet');
     mixpanel.track('copy_to_existing_sheet');
   }
@@ -44,6 +51,7 @@ class CopyToHOC extends Component {
     const includeCustom = this.includeCustomCheckbox.checked;
     let listname = val.length > 0 ? val : `${this.props.list.name} (Copy)`;
     const contacts = this.props.selectedContacts.map(contact => contact.id);
+    this.setState({isReceiving: true});
     if (includeCustom) {
       this.props.copyToNewList(
         contacts,
@@ -51,9 +59,11 @@ class CopyToHOC extends Component {
         this.props.list.fieldsmap
         .filter(field => field.customfield && !field.readonly)
         .map(({name, value, customfield, hidden}) => ({name, value, customfield, hidden}))
-        );
+        )
+      .then(_ => this.setState({isReceiving: false}));
     } else {
-      this.props.copyToNewList(contacts, listname);
+      this.props.copyToNewList(contacts, listname)
+      .then(_ => this.setState({isReceiving: false}));
     }
     window.Intercom('trackEvent', 'copy_to_new_sheet');
     mixpanel.track('copy_to_new_sheet');
@@ -64,7 +74,9 @@ class CopyToHOC extends Component {
     let name;
     if (val.length > 0) name = val;
     else name = `${this.props.list.name} (Copy)`;
-    this.props.copyEntireList(this.props.list.id, name);
+    this.setState({isReceiving: true});
+    this.props.copyEntireList(this.props.list.id, name)
+    .then(_ => this.setState({isReceiving: false}));
     window.Intercom('trackEvent', 'copy_whole_sheet');
     mixpanel.track('copy_whole_sheet');
   }
@@ -115,7 +127,7 @@ class CopyToHOC extends Component {
               <RaisedButton
               label='Submit'
               primary
-              disabled={!props.selectedContacts || state.value.length === 0 || props.isReceiving}
+              disabled={!props.selectedContacts || state.value.length === 0 || state.isReceiving}
               icon={props.selectedContacts && state.value.length > 0 && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-clone'} />}
               onClick={this.onSubmit}
               />
@@ -146,7 +158,7 @@ class CopyToHOC extends Component {
               disabled={state.value.length > 0 || !props.selectedContacts}
               label='Copy to New List'
               onClick={this.onNewSheetSubmit}
-              icon={state.value.length === 0 && props.selectedContacts && <FontIcon className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
+              icon={state.value.length === 0 && props.selectedContacts && <FontIcon className={state.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
               />
             </div>
             <strong>Method 2: Copy the Whole List</strong>
@@ -161,7 +173,7 @@ class CopyToHOC extends Component {
                 <RaisedButton
                 label='Copy Whole List'
                 onClick={this.onWholeSheetCopy}
-                disabled={props.isListReceiving || props.isReceiving}
+                disabled={props.isListReceiving || state.isReceiving}
                 primary
                 icon={<FontIcon className={props.isListReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-table'}/>}
                 />
