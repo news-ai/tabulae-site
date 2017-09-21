@@ -91,6 +91,18 @@ const EditorContainer = styled.div.attrs({className: 'RichEditor-root'})`
   padding: 0 10px;
 `;
 
+const TopBarContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  zIndex: 500;
+  padding: 5px 20px;
+  backgroundColor: ${blueGrey50};
+  position: fixed;
+  top: 0;
+  width: 100%;
+`;
+
 class EmailPanel extends Component {
   constructor(props) {
     super(props);
@@ -562,7 +574,7 @@ class EmailPanel extends Component {
       <div style={styles.container} >
         <EditorShowingContainer isPreveiwOpen={state.isPreveiwOpen} >
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose} />
-          <div className='vertical-center' style={styles.topbarContainer} >
+          <TopBarContainer>
             <span style={styles.sentFromText} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
             <div style={styles.clearEditorBtn}>
@@ -587,25 +599,11 @@ class EmailPanel extends Component {
               icon={<FontIcon color='#ffffff' className={props.isReceiving || state.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
               />
             </div>
-          </div>
+          </TopBarContainer>
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
         {state.isReceiving &&
           <PauseOverlay message={state.isReceivingLabel} width='100%' height={580} />}
-        {/*
-          <div style={{
-            backgroundColor: grey800,
-            borderSizing: 'border-box',
-            zIndex: 300,
-            position: 'absolute',
-            opacity: 0.7,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }} >
-            <span style={{fontSize: '1.5em', color: '#fff'}}>Image is Loading...</span>
-          </div>
-        */}
           <EditorContainer width={props.width}>
             <BasicHtmlEditor
             listId={props.listId}
@@ -713,14 +711,6 @@ const styles = {
     margin: '0 15px',
   },
   imageLoading: {margin: '0 3px', fontSize: '14px'},
-  topbarContainer: {
-    zIndex: 500,
-    padding: '5px 20px',
-    backgroundColor: blueGrey50,
-    position: 'fixed',
-    top: 0,
-    width: '100%'
-  },
   hidePanelBtn: {
     position: 'fixed',
     bottom: 5,

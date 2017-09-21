@@ -19,6 +19,8 @@ const contactSchema = new Schema('contacts', { idAttribute: 'id' });
 const publicationSchema = new Schema('publications', { idAttribute: 'id' });
 const listSchema = new Schema('lists', { idAttribute: 'id' });
 
+const PAGE_LIMIT = 200;
+
 function requestContact() {
   return {
     type: contactConstant.REQUEST
@@ -127,7 +129,7 @@ export function deleteContacts(ids) {
 
 // used to lazy-load a page, keeps track of the last offset
 export function fetchPaginatedContacts(listId) {
-  const PAGE_LIMIT = 50;
+  // const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
     const OFFSET = getState().listReducer[listId].offset;
@@ -168,7 +170,7 @@ function fetchContactsPage(listId, pageLimit, offset) {
 }
 
 export function loadAllContacts(listId) {
-  const PAGE_LIMIT = 50;
+  // const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
     const contacts = getState().listReducer[listId].contacts;
@@ -193,7 +195,7 @@ export function loadAllContacts(listId) {
 }
 
 export function fetchManyContacts(listId, amount) {
-  const PAGE_LIMIT = 50;
+  // const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const contacts = getState().listReducer[listId].contacts;
     const offset = getState().listReducer[listId].offset || 0;
