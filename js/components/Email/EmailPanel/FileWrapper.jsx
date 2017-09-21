@@ -5,6 +5,7 @@ import Dialog from 'material-ui/Dialog';
 import Dropzone from 'react-dropzone';
 import AttachmentPreview from '../EmailAttachment/AttachmentPreview.jsx';
 import FlatButton from 'material-ui/FlatButton';
+import alertify from 'alertifyjs';
 
 class FileWrapper extends Component {
   onDrop: (acceptedFiles: Array<Object>, rejectedFiles: Array<Object>) => void;
@@ -14,6 +15,9 @@ class FileWrapper extends Component {
   }
 
   _onDrop(acceptedFiles: Array<Object>, rejectedFiles: Array<Object>):void {
+    if (rejectedFiles.length > 0) {
+      alertify.warning(`File size cannot exceed 5MB. The file(s) dropped: ${rejectedFiles.map(file => (file.size / 1000000).toFixed(2) + 'MB').join(', ')}.`);
+    }
     const files = [...this.props.files, ...acceptedFiles];
     this.props.setAttachments(files);
   }
