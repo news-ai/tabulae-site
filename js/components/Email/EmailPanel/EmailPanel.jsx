@@ -360,8 +360,8 @@ class EmailPanel extends Component {
   _loadAllContactsIfRequired() {
     const bodyContentState = this.state.bodyContentState;
     const subjectContentState = this.state.subjectContentState;
-    console.log(bodyContentState);
-    console.log(subjectContentState);
+    // console.log(bodyContentState);
+    // console.log(subjectContentState);
     return new Promise((resolve, reject) => {
       const bodyPropertyNum = Object.keys(bodyContentState.entityMap)
       .map(i => bodyContentState.entityMap[i])

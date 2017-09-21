@@ -228,6 +228,7 @@ class ListTable extends Component {
     const props = this.props;
     window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
     mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
+    setInterval(_ => this.fetchOperations(this.props, 'partial', 50), 20000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -297,7 +298,7 @@ class ListTable extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.contactIsReceiving && nextProps.contactIsReceiving && !this.state.isEmailPanelOpen) return false;
+    // if (this.props.contactIsReceiving && nextProps.contactIsReceiving && !this.state.isEmailPanelOpen) return false;
     return true;
   }
 
@@ -524,12 +525,12 @@ class ListTable extends Component {
       );
   }
 
-  _fetchOperations(props, fetchType) {
+  _fetchOperations(props, fetchType, amount) {
     if (
       props.listData.contacts !== null &&
       props.received.length < props.listData.contacts.length
       ) {
-      if (fetchType === 'partial' && this.state.pageSize !== -1) return props.fetchManyContacts(props.listId, this.state.pageSize);
+      if (fetchType === 'partial' && this.state.pageSize !== -1) return props.fetchManyContacts(props.listId, amount || this.state.pageSize);
       else if (fetchType === 'all') return props.loadAllContacts(props.listId);
       return this.state.pageSize === -1 ? props.loadAllContacts(props.listId) : props.fetchManyContacts(props.listId, this.state.pageSize);
     }
