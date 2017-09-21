@@ -147,7 +147,17 @@ class ListTable extends Component {
     this.onExportClick = this._onExportClick.bind(this);
     this.onHeaderDragStart = this._onHeaderDragStart.bind(this);
     this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
-    this.onSort = this._onSort.bind(this);
+    this.onSort = columnIndex => {
+      return new Promise((resolve, reject) => {
+        if (this.props.contacts.length < this.props.listData.contacts.length) {
+          return this.fetchOperations(this.props, 'all')
+          .then(_ => this._onSort(columnIndex));
+        } else {
+          this._onSort(columnIndex);
+        }
+      });
+    };
+    this._onSort = this._onSort.bind(this);
     this.onRemoveContacts = this._onRemoveContacts.bind(this);
     this.setDataGridRef = ref => (this._DataGrid = ref);
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
