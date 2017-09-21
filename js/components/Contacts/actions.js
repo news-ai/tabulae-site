@@ -196,6 +196,7 @@ export function loadAllContacts(listId) {
 
 export function fetchManyContacts(listId, amount) {
   // const PAGE_LIMIT = 50;
+  if (amount < PAGE_LIMIT) amount = PAGE_LIMIT;
   return (dispatch, getState) => {
     const contacts = getState().listReducer[listId].contacts;
     const offset = getState().listReducer[listId].offset || 0;
@@ -215,6 +216,9 @@ export function fetchManyContacts(listId, amount) {
           // poll how many received
           const contactReducer = getState().contactReducer;
           const count = contacts.filter(id => contactReducer[id]).length;
+          console.log(count);
+          console.log(offset + amount);
+          console.log('-----');
           if (offset + amount >= contacts.length && count === contacts.length) {
             dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
             return dispatch({type: listConstant.SET_OFFSET, listId, offset: null});

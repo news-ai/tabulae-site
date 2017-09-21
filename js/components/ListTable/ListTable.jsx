@@ -65,6 +65,7 @@ import './Table.css';
 
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
+let INTERVAL_ID = undefined;
 
 class ListTable extends Component {
   constructor(props) {
@@ -228,8 +229,8 @@ class ListTable extends Component {
     const props = this.props;
     window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
     mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
-    this.intervalId = setInterval(_ => {
-      if (!this.state.isEmailPanelOpen) this.fetchOperations(this.props, 'partial', 50);
+    INTERVAL_ID = setInterval(_ => {
+      if (!this.state.isEmailPanelOpen) this.fetchOperations(this.props, 'partial', 100);
     }, 20000);
   }
 
@@ -308,7 +309,7 @@ class ListTable extends Component {
   componentWillUnmount() {
     window.onresize = undefined;
     window.document.title = DEFAULT_WINDOW_TITLE;
-    clearInterval(this.intervalId);
+    clearInterval(INTERVAL_ID);
   }
 
   _checkEmailDupes() {
