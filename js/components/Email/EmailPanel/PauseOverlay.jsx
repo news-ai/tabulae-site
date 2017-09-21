@@ -22,7 +22,7 @@ const styles = {
 const PauseOverlay = ({message, width, height}) => (
   <div style={Object.assign({}, {width, height}, emailPanelPauseOverlay)}>
     <div style={styles.container}>
-      <span style={styles.text}>Image is loading</span>
+      <span style={styles.text}>{message || 'Loading...'}</span>
       <FontIcon style={styles.icon} color='#ffffff' className='fa fa-spin fa-spinner' />
     </div>
   </div>);

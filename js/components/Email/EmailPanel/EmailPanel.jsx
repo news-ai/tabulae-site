@@ -87,7 +87,7 @@ const EditorShowingContainer = styled.div`
 
 const EditorContainer = styled.div.attrs({className: 'RichEditor-root'})`
   width: ${props => props.width - 20}px;
-  height: 600px;
+  height: 580px;
   padding: 0 10px;
 `;
 
@@ -107,7 +107,8 @@ class EmailPanel extends Component {
       isPreveiwOpen: false,
       dirty: false,
       isReceiving: false,
-      tempPreviewLabel: undefined
+      tempPreviewLabel: undefined,
+      isReceivingLabel: undefined,
     };
     this.checkMembershipLimit = this.checkMembershipLimit.bind(this);
     this.updateBodyHtml = (html, rawContentState) => {
@@ -129,9 +130,38 @@ class EmailPanel extends Component {
 
     // cleanups
     this.onEmailSendClick = _ => this.checkMembershipLimit()
+    .then(_ => new Promise(resolve => {
+      this.setState({
+        isReceiving: true,
+        isReceivingLabel: 'Loading Contacts...'
+      });
+      resolve(true);
+    }))
     .then(this.loadAllContactsIfRequired)
+    .then(_ => new Promise(resolve => {
+      this.setState({
+        isReceiving: true,
+        isReceivingLabel: 'Checking Email Validity...'
+      });
+      resolve(true);
+    }))
     .then(this.checkEmailDupes)
-    .then(this.onPreviewEmailsClick);
+    .then(_ => new Promise(resolve => {
+      this.setState({
+        isReceiving: true,
+        isReceivingLabel: 'Generating Preview...'
+      });
+      resolve(true);
+    }))
+    .then(this.onPreviewEmailsClick)
+    .then(_ => new Promise(resolve => {
+      this.setState({isReceiving: false, isReceivingLabel: undefined})
+      resolve(true);
+    }))
+    .catch(err => this.setState({
+      isReceiving: false,
+      isReceivingLabel: undefined
+    }))
   }
 
   componentWillMount() {
@@ -330,9 +360,8 @@ class EmailPanel extends Component {
     return {contactEmails, emptyFields};
   }
 
-
   _sendGeneratedEmails(contactEmails) {
-    this.props.postEmails(contactEmails)
+    return this.props.postEmails(contactEmails)
     .then(
       _ => this.setState({isPreveiwOpen: true}),
       err => {
@@ -363,24 +392,12 @@ class EmailPanel extends Component {
     // console.log(bodyContentState);
     // console.log(subjectContentState);
     return new Promise((resolve, reject) => {
-      const bodyPropertyNum = Object.keys(bodyContentState.entityMap)
-      .map(i => bodyContentState.entityMap[i])
-      .filter(entity => entity.type === 'PROPERTY').length;
-      const subjectPropertyNum = Object.keys(subjectContentState.entityMap)
-      .map(i => subjectContentState.entityMap[i])
-      .filter(entity => entity.type === 'PROPERTY').length;
-
-      console.log('LOADING CONTACTS');
       this.setState({isReceiving: true, tempPreviewLabel: 'Loading...'});
       this.props.loadAllContacts()
       .then(_ => {
         this.setState({isReceiving: false, tempPreviewLabel: undefined});
         resolve(true);
       });
-      // if (bodyPropertyNum > 0 || subjectPropertyNum > 0) {
-      // } else {
-      //   resolve(true);
-      // }
     });
   }
 
@@ -431,7 +448,7 @@ class EmailPanel extends Component {
     });
     const {contactEmails, emptyFields} = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
 
-    Promise.resolve()
+    return Promise.resolve()
     .then(_ =>
       new Promise((resolve, reject) => {
         if (emptyFields.length > 0) {
@@ -490,8 +507,7 @@ class EmailPanel extends Component {
     )
     .then(_ => {
       console.log('SENDING EMAILS');
-
-      if (contactEmails.length > 0) this.sendGeneratedEmails(contactEmails);
+      if (contactEmails.length > 0) return this.sendGeneratedEmails(contactEmails);
     })
     .catch(_ => {
       console.log('CANCELLED');
@@ -542,8 +558,6 @@ class EmailPanel extends Component {
       ]
     }
 
-    const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
-
     return (
       <div style={styles.container} >
         <EditorShowingContainer isPreveiwOpen={state.isPreveiwOpen} >
@@ -576,6 +590,22 @@ class EmailPanel extends Component {
           </div>
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
+        {state.isReceiving &&
+          <PauseOverlay message={state.isReceivingLabel} width='100%' height={580} />}
+        {/*
+          <div style={{
+            backgroundColor: grey800,
+            borderSizing: 'border-box',
+            zIndex: 300,
+            position: 'absolute',
+            opacity: 0.7,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }} >
+            <span style={{fontSize: '1.5em', color: '#fff'}}>Image is Loading...</span>
+          </div>
+        */}
           <EditorContainer width={props.width}>
             <BasicHtmlEditor
             listId={props.listId}
@@ -701,7 +731,7 @@ const styles = {
   clearEditorBtn: {
     margin: '0 5px'
   },
-  previewContainer: {marginBottom: 20, zIndex: 300},
+  previewContainer: {paddingBottom: 20, zIndex: 300},
   textTransformNone: {textTransform: 'none'},
   sentFromText: {color: grey800, marginRight: 10},
   sendButtonContainer: {position: 'fixed', right: 10},
