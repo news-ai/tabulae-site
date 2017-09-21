@@ -94,10 +94,9 @@ const EditorContainer = styled.div.attrs({className: 'RichEditor-root'})`
 const TopBarContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
   zIndex: 500;
   padding: 5px 20px;
-  backgroundColor: ${blueGrey50};
+  background-color: ${blueGrey50};
   position: fixed;
   top: 0;
   width: 100%;
@@ -603,7 +602,7 @@ class EmailPanel extends Component {
         {!state.isPreveiwOpen && props.isImageReceiving &&
           <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
         {state.isReceiving &&
-          <PauseOverlay message={state.isReceivingLabel} width='100%' height={580} />}
+          <PauseOverlay message={state.isReceivingLabel} width='100%' height='100%' />}
           <EditorContainer width={props.width}>
             <BasicHtmlEditor
             listId={props.listId}

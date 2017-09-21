@@ -230,7 +230,7 @@ class ListTable extends Component {
     window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
     mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
     INTERVAL_ID = setInterval(_ => {
-      if (!this.state.isEmailPanelOpen) this.fetchOperations(this.props, 'partial', 100);
+      if (!this.state.isEmailPanelOpen) this.fetchOperations(this.props, 'partial', 50);
     }, 20000);
   }
 
