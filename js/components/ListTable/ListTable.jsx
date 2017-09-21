@@ -102,9 +102,14 @@ class ListTable extends Component {
     // store outside of state to update synchronously for PanelOverlay
     this.showProfileTooltip = false;
     this.onTooltipPanel = false;
-    this.onShowEmailClick = _ => props.person.emailconfirmed ?
-      this.setState({isEmailPanelOpen: true, initializeEmailPanel: true}) :
-      alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {});
+    this.onShowEmailClick = _ => {
+      if (props.person.emailconfirmed) {
+        this.setState({isEmailPanelOpen: true, initializeEmailPanel: true});
+        // this.fetchOperations(this.props, 'all');
+      } else {
+        alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {});
+      }
+    }
 
     if (this.props.listData) {
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
@@ -210,6 +215,9 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
+    const props = this.props;
+    window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
+    mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -279,7 +287,7 @@ class ListTable extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
+    if (this.props.contactIsReceiving && nextProps.contactIsReceiving && !this.state.isEmailPanelOpen) return false;
     return true;
   }
 
@@ -388,7 +396,8 @@ class ListTable extends Component {
         className='pointer'
         checked={checked}
         onClick={_ => this.setState({selected: checked ? [] : this.props.listData.contacts.slice()})}
-        />);
+        />
+        );
     }
 
     return (
@@ -505,13 +514,13 @@ class ListTable extends Component {
       );
   }
 
-  _fetchOperations(props) {
+  _fetchOperations(props, fetchType) {
     if (
       props.listData.contacts !== null &&
       props.received.length < props.listData.contacts.length
       ) {
-      window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
-      mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
+      if (fetchType === 'partial' && this.state.pageSize !== -1) return props.fetchManyContacts(props.listId, this.state.pageSize);
+      else if (fetchType === 'all') return props.loadAllContacts(props.listId);
       return this.state.pageSize === -1 ? props.loadAllContacts(props.listId) : props.fetchManyContacts(props.listId, this.state.pageSize);
     }
     return Promise.resolve(true);
@@ -905,6 +914,7 @@ class ListTable extends Component {
           listId={props.listId}
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           onReset={this.forceEmailPanelRemount}
+          loadAllContacts={_ => this.fetchOperations(props, 'all')}
           />
         }
         </Drawer>

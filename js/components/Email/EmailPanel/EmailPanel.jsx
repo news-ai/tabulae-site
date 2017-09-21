@@ -100,17 +100,19 @@ class EmailPanel extends Component {
       subject: '',
       fieldsmap: [],
       currentTemplateId: 0,
-      bodyEditorState: null,
+      bodyContentState: null,
       bodyHtml: '',
       body: '',
       minimized: false,
       isPreveiwOpen: false,
       dirty: false,
+      isReceiving: false,
+      tempPreviewLabel: undefined
     };
     this.checkMembershipLimit = this.checkMembershipLimit.bind(this);
     this.updateBodyHtml = (html, rawContentState) => {
-      this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
-      this.props.saveEditorState(rawContentState);
+      this.setState({body: html, bodyContentState: rawContentState, dirty: true});
+      this.props.saveContentState(rawContentState);
     };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
@@ -123,9 +125,11 @@ class EmailPanel extends Component {
     this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
+    this.loadAllContactsIfRequired = this._loadAllContactsIfRequired.bind(this);
 
     // cleanups
     this.onEmailSendClick = _ => this.checkMembershipLimit()
+    .then(this.loadAllContactsIfRequired)
     .then(this.checkEmailDupes)
     .then(this.onPreviewEmailsClick);
   }
@@ -186,8 +190,8 @@ class EmailPanel extends Component {
     if (emailsignature && emailsignature !== null) {
       if (isJSON(emailsignature)) {
         const sign = JSON.parse(emailsignature);
-        this.setState({bodyEditorState: sign.data});
-        this.props.saveEditorState(sign.data);
+        this.setState({bodyContentState: sign.data});
+        this.props.saveContentState(sign.data);
       } else {
         this.props.setBodyHtml(emailsignature);
         this.setState({bodyHtml: emailsignature});
@@ -214,7 +218,7 @@ class EmailPanel extends Component {
         this.props.createTemplate(
           name,
           this.state.subject,
-          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
+          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
           )
         .then(currentTemplateId => {
           this.setState({currentTemplateId}, _ => {
@@ -232,7 +236,7 @@ class EmailPanel extends Component {
     this.props.onSaveCurrentTemplateClick(
       this.state.currentTemplateId,
       this.state.subject,
-      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
       );
     setTimeout(_ => this.setState({dirty: false}), 10);
   }
@@ -268,8 +272,8 @@ class EmailPanel extends Component {
         return triggerNewEntityFormatWarning(templateJSON.data)
         .then(rawContentState => {
           // triggerNewEntityFOrmatWarning returns templateJSON.data if denied
-          this.setState({bodyEditorState: rawContentState});
-          this.props.saveEditorState(rawContentState);
+          this.setState({bodyContentState: rawContentState});
+          this.props.saveContentState(rawContentState);
           onPostTemplateProcessing();
           return;
         });
@@ -351,6 +355,33 @@ class EmailPanel extends Component {
         resolve(true);
       }
     })
+  }
+
+  _loadAllContactsIfRequired() {
+    const bodyContentState = this.state.bodyContentState;
+    const subjectContentState = this.state.subjectContentState;
+    console.log(bodyContentState);
+    console.log(subjectContentState);
+    return new Promise((resolve, reject) => {
+      const bodyPropertyNum = Object.keys(bodyContentState.entityMap)
+      .map(i => bodyContentState.entityMap[i])
+      .filter(entity => entity.type === 'PROPERTY').length;
+      const subjectPropertyNum = Object.keys(subjectContentState.entityMap)
+      .map(i => subjectContentState.entityMap[i])
+      .filter(entity => entity.type === 'PROPERTY').length;
+
+      console.log('LOADING CONTACTS');
+      this.setState({isReceiving: true, tempPreviewLabel: 'Loading...'});
+      this.props.loadAllContacts()
+      .then(_ => {
+        this.setState({isReceiving: false, tempPreviewLabel: undefined});
+        resolve(true);
+      });
+      // if (bodyPropertyNum > 0 || subjectPropertyNum > 0) {
+      // } else {
+      //   resolve(true);
+      // }
+    });
   }
 
   _checkEmailDupes() {
@@ -537,8 +568,9 @@ class EmailPanel extends Component {
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
               onClick={this.onEmailSendClick}
-              label='Preview'
-              icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
+              label={state.tempPreviewLabel || 'Preview'}
+              disabled={props.isReceiving || state.isReceiving}
+              icon={<FontIcon color='#ffffff' className={props.isReceiving || state.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
               />
             </div>
           </div>
@@ -724,7 +756,7 @@ const mapDispatchToProps = (dispatch, props) => {
     startEmailDraft: email => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email}),
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
-    saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
+    saveContentState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
     turnOnTemplateChange: (changeType, entityType) => dispatch({type: 'TEMPLATE_CHANGE_ON', changeType, entityType}),
     setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml}),
     getEmailMaxAllowance: _ => dispatch(loginActions.getEmailMaxAllowance())
