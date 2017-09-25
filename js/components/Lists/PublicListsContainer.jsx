@@ -28,7 +28,7 @@ class PublicListsContainer extends Component {
 }
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.publicLists.map(id => state.listReducer[id]);
+  const lists = state.listReducer.public.received.map(id => state.listReducer[id]);
   return {
     lists,
     isReceiving: lists === undefined ? true : false,

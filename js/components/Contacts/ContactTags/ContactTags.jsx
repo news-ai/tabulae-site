@@ -325,7 +325,7 @@ const mapStateToProps = (state, props) => {
     total = contacts.length;
   }
 
-  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+  const lists = state.listReducer.lists.received.map(id => state.listReducer[id]);
 
   return {
     isReceiving: state.contactTagReducer.isReceiving,

@@ -123,7 +123,7 @@ export function logout() {
 
 export function fetchUser(userId) {
   return (dispatch, getState) => {
-    if (getState().personReducer[userId]) return;
+    if (getState().personReducer[userId] || getState().currentFetchingUsers.some(id => id === userId)) return;
     dispatch({type: 'FETCH_USER', userId});
     return api.get(`/users/${userId}`)
     .then(response => dispatch({type: 'RECEIVE_USER', user: response.data}))
