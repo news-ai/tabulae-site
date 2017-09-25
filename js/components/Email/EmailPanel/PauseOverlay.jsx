@@ -17,7 +17,7 @@ const Container = styled.div`
 
 const styles = {
   container: {margin: 0},
-  text: {color: '#ffffff', fontSize: '1.3em'},
+  text: {color: '#ffffff', fontSize: '1.1em'},
   icon: {margin: '0 5px'}
 };
 

@@ -790,7 +790,7 @@ class ListTable extends Component {
           </Link>
         {(props.contactIsReceiving || props.listData === undefined) &&
           <div className='vertical-center' style={{padding: '5px 10px'}} >
-            <span className='text' style={{color: grey500, margin: '0 10px'}} >Contacts are loading</span>
+            <span className='text' style={{color: grey500, margin: '0 10px'}} >Loading Contacts</span>
             <FontIcon className='fa fa-spin fa-spinner smalltext' color={grey500} />
           </div>}
         </div>

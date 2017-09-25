@@ -144,7 +144,7 @@ class EmailPanel extends Component {
     .then(_ => new Promise(resolve => {
       this.setState({
         isReceiving: true,
-        isReceivingLabel: 'Loading Contacts...'
+        isReceivingLabel: 'Loading contacts...this step might take a while if list is large...'
       });
       resolve(true);
     }))
@@ -595,7 +595,7 @@ class EmailPanel extends Component {
               onClick={this.onEmailSendClick}
               label={state.tempPreviewLabel || 'Preview'}
               disabled={props.isReceiving || state.isReceiving}
-              icon={<FontIcon color='#ffffff' className={props.isReceiving || state.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
+              icon={<FontIcon color='#ffffff' className='fa fa-envelope' />}
               />
             </div>
           </TopBarContainer>
