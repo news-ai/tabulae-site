@@ -417,7 +417,7 @@ class ListTable extends Component {
 
     return (
       <div className='headercell' key={key} style={style}>
-        {customSpan || <span style={{whiteSpace: 'nowrap'}}>{content}</span>}
+        {customSpan || <span className='text' style={{whiteSpace: 'nowrap'}}>{content}</span>}
         {sortDirection !== 2 &&
           <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
           className={`${directionIcon} sort-icon`}
@@ -590,7 +590,8 @@ class ListTable extends Component {
   _onExportClick() {
     window.Intercom('trackEvent', 'on_export_click');
     mixpanel.track('on_export_click');
-    exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name);
+    this.fetchOperations(this.props, 'all')
+    .then(_ => exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name));
   }
 
   _onRemoveContacts() {
@@ -782,11 +783,17 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-
-        <Link style={{margin: '5px 15px'}} to={`/listfeeds/${props.listId}`}>
-          <i className='fa fa-arrow-right' />
-          <span className='text' style={{marginLeft: 10}} >List Feed</span>
-        </Link>
+        <div style={{display: 'flex', justifyContent: 'space-between'}} >
+          <Link style={{margin: '5px 15px'}} to={`/listfeeds/${props.listId}`}>
+            <i className='fa fa-arrow-right' />
+            <span className='text' style={{marginLeft: 10}} >List Feed</span>
+          </Link>
+        {(props.contactIsReceiving || props.listData === undefined) &&
+          <div className='vertical-center' style={{padding: '5px 10px'}} >
+            <span className='text' style={{color: grey500, margin: '0 10px'}} >Contacts are loading</span>
+            <FontIcon className='fa fa-spin fa-spinner smalltext' color={grey500} />
+          </div>}
+        </div>
         <div className='vertical-center' style={{marginTop: 5, justifyContent: 'space-between', flexWrap: 'wrap'}}>
           <div style={{display: 'flex', flexDirection: 'column', marginLeft: 15}} >
             <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
@@ -843,7 +850,10 @@ class ListTable extends Component {
               className='fa fa-edit'
               label='Edit'
               disabled={props.listData.readonly || state.selected.length < 2}
-              onClick={onRequestOpen}
+              onClick={_ => {
+                if (state.selected.length === props.listData.contacts.length) this.fetchOperations(this.props, 'all');
+                onRequestOpen();
+              }}
               />}
             </EditMultipleContactsHOC>
           </div>
@@ -930,10 +940,8 @@ class ListTable extends Component {
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           onReset={this.forceEmailPanelRemount}
           loadAllContacts={_ => this.fetchOperations(props, 'all')}
-          />
-        }
+          />}
         </Drawer>
-        <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='vertical-center' style={{margin: '10px 0', justifyContent: 'space-between'}}>
           <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
           <PaginateControls
@@ -950,10 +958,7 @@ class ListTable extends Component {
           />
         </div>
         <div>
-          <div>
-          {!isEmpty(props.listData.contacts) && props.contacts &&
-            <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
-          </div>
+          <div style={{borderBottom: `4px solid ${blue100}`, width: '100%'}} />
         {isEmpty(props.listData.contacts) &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
         {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&

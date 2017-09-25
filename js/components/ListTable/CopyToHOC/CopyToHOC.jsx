@@ -33,7 +33,10 @@ class CopyToHOC extends Component {
   _onSubmit() {
     if (this.state.value.length === 0 || this.props.selectedContacts.length === 0) return;
     if (this.props.selectedContacts.length === this.props.list.contacts.length) {
-      alertify.alert('All Contacts Selected', 'It seems like you are trying to copy the whole list. Try Method 2: Copy Whole List. It\'s faster.');
+      alertify.alert(
+        'All Contacts Selected',
+        '<div><p>It seems like you are trying to copy the whole list.</p><p>Scroll down and try <b>Method 2: Copy Whole List</b>. It\'s faster.</p></div>'
+        );
       return;
     }
     const selectedLists = this.state.value.map(obj => this.props.listReducer[obj.value]);
@@ -96,16 +99,16 @@ class CopyToHOC extends Component {
           <div className='row'>
             <div className='panel large-12 medium-12 small-12 columns' style={styles.panel} >
               <span className='smalltext'>
-              The bigger the migration, the slower it is! Don't navigate from the page during migration.
+              The bigger the migration, the slower it is! Don't navigate from the page while copying contacts.
               </span>
             </div>
             <strong>Method 1: Copy Selected Contacts to an Existing/New List</strong>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
-              <span className='bold' style={{marginRight: 8}}>Selected Contacts</span>
+              <span className='bold smalltext' style={{marginRight: 8}}>Selected Contacts ({props.selectedContacts.length || 0})</span>
             {props.selected.length === 0 &&
-              <span>none selected</span>}
+              <span className='smalltext'>none selected</span>}
               {props.selectedContacts &&
-                <span>{
+                <span className='smalltext'>{
                   props.selectedContacts
                   .filter(contact => contact)
                   .map(contact => contact.firstname || contact.lastname || contact.email || contact.id)
@@ -113,7 +116,7 @@ class CopyToHOC extends Component {
               }</span>}
             </div>
             <div className='large-12 medium-12 small-12 columns' style={{margin: '10px 0'}}>
-              <p>Select the List(s) to Copy these selected contacts to:</p>
+              <p>Choose list(s) to copy selected contacts to:</p>
               {props.lists &&
                 <Select
                 multi
