@@ -949,7 +949,7 @@ class ListTable extends Component {
           currentPage={state.currentPage}
           pageSize={state.pageSize}
           onPageSizeChange={pageSize => this.setState({pageSize, currentPage: 1})} 
-          listLength={props.listData.contacts.length}
+          listLength={!!props.listData.contacts ? props.listData.contacts.length : 0}
           onPrev={currentPage => this.setState({currentPage, scrollToRow: 0})}
           onNext={currentPage => {
             if (props.contacts.length < currentPage * state.pageSize) this.fetchOperations(this.props);
