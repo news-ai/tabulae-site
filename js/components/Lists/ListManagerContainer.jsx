@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
 import Link from 'react-router/lib/Link';
+import withRouter from 'react-router/lib/withRouter';
 import {connect} from 'react-redux';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -9,6 +10,7 @@ import FontIcon from 'material-ui/FontIcon';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
+import DropDownMenu from 'material-ui/DropDownMenu';
 
 import Lists from './Lists';
 import InfiniteScroll from 'components/InfiniteScroll';
@@ -30,6 +32,7 @@ class ListManagerContainer extends Component {
     this.onUploadFromNewClick = _ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`);
     this.onRequestClose = _ => this.setState({open: false});
     this.onRequestOpen = _ => this.setState({open: true});
+    this.onSortChange = (e, index, value) => value ? this.props.router.push({pathname: '/', query: {sort: value}}) : this.props.router.push('/');
   }
 
   componentDidMount() {
@@ -64,7 +67,8 @@ class ListManagerContainer extends Component {
         sortLabel = 'fa fa-sort-alpha-desc';
         break;
     }
-    // console.log(sortLabel);
+    console.log(sortLabel);
+    console.log(sortType);
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
@@ -92,24 +96,16 @@ class ListManagerContainer extends Component {
         </div>
         <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
           <div className='vertical-center' style={{justifyContent: 'flex-end'}} >
-            <IconMenu
-            iconButtonElement={<IconButton iconClassName={sortLabel} />}
-            anchorOrigin={origin}
-            targetOrigin={origin}
+            {/*iconButtonElement={<IconButton iconClassName={sortLabel} />} */ }
+            <DropDownMenu
+            value={sortType}
+            onChange={this.onSortChange}
             >
-              <Link to={{pathname: '/', query: {sort: 'alphabetical'}}}>
-                <MenuItem primaryText='Alphabetical +' leftIcon={<FontIcon className='fa fa-sort-alpha-asc' />}  />
-              </Link>
-              <Link to={{pathname: '/', query: {sort: 'antiAlphabetical'}}}>
-                <MenuItem primaryText='Alphabetical -' leftIcon={<FontIcon className='fa fa-sort-alpha-desc' />} />
-              </Link>
-              <Link to='/'>
-                <MenuItem primaryText='Most Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-asc' />}  />
-              </Link>
-              <Link to={{pathname: '/', query: {sort: 'leastRecentlyUsed'}}}>
-                <MenuItem primaryText='Least Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-desc' />} />
-              </Link>
-            </IconMenu>
+              <MenuItem value='alphabetical' primaryText='Alphabetical +' leftIcon={<FontIcon className='fa fa-sort-alpha-asc' />}  />
+              <MenuItem value='antiAlphabetical' primaryText='Alphabetical -' leftIcon={<FontIcon className='fa fa-sort-alpha-desc' />} />
+              <MenuItem value={undefined} primaryText='Most Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-asc' />}  />
+              <MenuItem value='leastRecentlyUsed' primaryText='Least Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-desc' />} />
+            </DropDownMenu>
           </div>
         </div>
         <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
@@ -183,4 +179,4 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListManagerContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ListManagerContainer));
