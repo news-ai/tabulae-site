@@ -11,7 +11,7 @@ const loading = {
 };
 
 const styles = {
-  listitemContainer: {marginBottom: 50, marginTop: 50}
+  listitemContainer: {marginBottom: 30, marginTop: 30}
 };
 
 

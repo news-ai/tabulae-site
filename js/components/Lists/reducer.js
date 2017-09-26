@@ -101,7 +101,7 @@ function listReducer(state = initialState.listReducer, action) {
         if (action.teamId === list.teamid) teamLists.push(id);
         obj[id] = Object.assign({}, obj[id], {offset: 0});
       });
-      obj.lists.received = unarchivedLists;
+      // obj.lists.received = unarchivedLists;
       obj.public.received = publicLists;
       obj.archived.received = archivedLists;
       obj.team.received = teamLists;

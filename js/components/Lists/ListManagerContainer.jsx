@@ -67,8 +67,6 @@ class ListManagerContainer extends Component {
         sortLabel = 'fa fa-sort-alpha-desc';
         break;
     }
-    console.log(sortLabel);
-    console.log(sortType);
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
@@ -97,14 +95,11 @@ class ListManagerContainer extends Component {
         <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
           <div className='vertical-center' style={{justifyContent: 'flex-end'}} >
             {/*iconButtonElement={<IconButton iconClassName={sortLabel} />} */ }
-            <DropDownMenu
-            value={sortType}
-            onChange={this.onSortChange}
-            >
-              <MenuItem value='alphabetical' primaryText='Alphabetical +' leftIcon={<FontIcon className='fa fa-sort-alpha-asc' />}  />
-              <MenuItem value='antiAlphabetical' primaryText='Alphabetical -' leftIcon={<FontIcon className='fa fa-sort-alpha-desc' />} />
+            <DropDownMenu value={sortType} onChange={this.onSortChange}>
               <MenuItem value={undefined} primaryText='Most Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-asc' />}  />
               <MenuItem value='leastRecentlyUsed' primaryText='Least Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-desc' />} />
+              <MenuItem value='alphabetical' primaryText='Alphabetical +' leftIcon={<FontIcon className='fa fa-sort-alpha-asc' />}  />
+              <MenuItem value='antiAlphabetical' primaryText='Alphabetical -' leftIcon={<FontIcon className='fa fa-sort-alpha-desc' />} />
             </DropDownMenu>
           </div>
         </div>
