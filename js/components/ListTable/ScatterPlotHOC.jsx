@@ -185,7 +185,7 @@ class ScatterPlotHOC extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    contacts: props.selected.map(id => state.contactReducer[id]).filter(contact => contact.instagram !== null)
+    contacts: props.selected.map(id => state.contactReducer[id]).filter(contact => contact && contact.instagram !== null)
   };
 };
 

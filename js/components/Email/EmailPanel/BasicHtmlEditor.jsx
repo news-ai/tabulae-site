@@ -593,7 +593,7 @@ class BasicHtmlEditor extends Component {
             <MenuItem key={i} primaryText={field.name} onClick={_ => this.onInsertProperty(field.name)}/>)}
           </Menu>
         </Popover>
-        <div style={{marginTop: 70}} >
+        <div style={{paddingTop: 70}} >
           <Subject
           width={props.width}
           onSubjectChange={props.onSubjectChange}

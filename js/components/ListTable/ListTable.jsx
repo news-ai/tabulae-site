@@ -65,6 +65,7 @@ import './Table.css';
 
 const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
+let INTERVAL_ID = undefined;
 
 class ListTable extends Component {
   constructor(props) {
@@ -102,9 +103,14 @@ class ListTable extends Component {
     // store outside of state to update synchronously for PanelOverlay
     this.showProfileTooltip = false;
     this.onTooltipPanel = false;
-    this.onShowEmailClick = _ => props.person.emailconfirmed ?
-      this.setState({isEmailPanelOpen: true, initializeEmailPanel: true}) :
-      alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {});
+    this.onShowEmailClick = _ => {
+      if (props.person.emailconfirmed) {
+        this.setState({isEmailPanelOpen: true, initializeEmailPanel: true});
+        // this.fetchOperations(this.props, 'all');
+      } else {
+        alertify.alert('Trial Alert', 'You can start using the Email feature after you confirmed your email. Look out for the confirmation email in your inbox.', function() {});
+      }
+    }
 
     if (this.props.listData) {
       window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
@@ -142,7 +148,17 @@ class ListTable extends Component {
     this.onExportClick = this._onExportClick.bind(this);
     this.onHeaderDragStart = this._onHeaderDragStart.bind(this);
     this.onHeaderDragStop = this._onHeaderDragStop.bind(this);
-    this.onSort = this._onSort.bind(this);
+    this.onSort = columnIndex => {
+      return new Promise((resolve, reject) => {
+        if (this.props.contacts.length < this.props.listData.contacts.length) {
+          return this.fetchOperations(this.props, 'all')
+          .then(_ => this._onSort(columnIndex));
+        } else {
+          this._onSort(columnIndex);
+        }
+      });
+    };
+    this._onSort = this._onSort.bind(this);
     this.onRemoveContacts = this._onRemoveContacts.bind(this);
     this.setDataGridRef = ref => (this._DataGrid = ref);
     this.setHeaderGridRef = ref => (this._HeaderGrid = ref);
@@ -210,6 +226,12 @@ class ListTable extends Component {
   }
 
   componentDidMount() {
+    const props = this.props;
+    window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
+    mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
+    INTERVAL_ID = setInterval(_ => {
+      if (!this.state.isEmailPanelOpen) this.fetchOperations(this.props, 'partial', 50);
+    }, 20000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -279,7 +301,7 @@ class ListTable extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.contactIsReceiving && nextProps.contactIsReceiving) return false;
+    // if (this.props.contactIsReceiving && nextProps.contactIsReceiving && !this.state.isEmailPanelOpen) return false;
     return true;
   }
 
@@ -287,6 +309,7 @@ class ListTable extends Component {
   componentWillUnmount() {
     window.onresize = undefined;
     window.document.title = DEFAULT_WINDOW_TITLE;
+    clearInterval(INTERVAL_ID);
   }
 
   _checkEmailDupes() {
@@ -388,12 +411,13 @@ class ListTable extends Component {
         className='pointer'
         checked={checked}
         onClick={_ => this.setState({selected: checked ? [] : this.props.listData.contacts.slice()})}
-        />);
+        />
+        );
     }
 
     return (
       <div className='headercell' key={key} style={style}>
-        {customSpan || <span style={{whiteSpace: 'nowrap'}}>{content}</span>}
+        {customSpan || <span className='text' style={{whiteSpace: 'nowrap'}}>{content}</span>}
         {sortDirection !== 2 &&
           <i style={{fontSize: sortDirection === 0 ? '0.5em' : '1em'}}
           className={`${directionIcon} sort-icon`}
@@ -505,14 +529,14 @@ class ListTable extends Component {
       );
   }
 
-  _fetchOperations(props) {
+  _fetchOperations(props, fetchType, amount) {
     if (
       props.listData.contacts !== null &&
       props.received.length < props.listData.contacts.length
       ) {
-      window.Intercom('trackEvent', 'opened_sheet', {listId: props.listData.id});
-      mixpanel.track('opened_sheet', {listId: props.listData.id, size: props.listData.contacts !== null ? props.listData.contacts.length : 0});
-      return props.loadAllContacts(props.listId);
+      if (fetchType === 'partial' && this.state.pageSize !== -1) return props.fetchManyContacts(props.listId, amount || this.state.pageSize);
+      else if (fetchType === 'all') return props.loadAllContacts(props.listId);
+      return this.state.pageSize === -1 ? props.loadAllContacts(props.listId) : props.fetchManyContacts(props.listId, this.state.pageSize);
     }
     return Promise.resolve(true);
   }
@@ -566,7 +590,8 @@ class ListTable extends Component {
   _onExportClick() {
     window.Intercom('trackEvent', 'on_export_click');
     mixpanel.track('on_export_click');
-    exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name);
+    this.fetchOperations(this.props, 'all')
+    .then(_ => exportOperations(this.props.contacts, this.props.fieldsmap, this.props.listData.name));
   }
 
   _onRemoveContacts() {
@@ -758,11 +783,17 @@ class ListTable extends Component {
           contactId={state.profileContactId}
           listId={props.listId}
           />}
-
-        <Link style={{margin: '5px 15px'}} to={`/listfeeds/${props.listId}`}>
-          <i className='fa fa-arrow-right' />
-          <span className='text' style={{marginLeft: 10}} >List Feed</span>
-        </Link>
+        <div style={{display: 'flex', justifyContent: 'space-between'}} >
+          <Link style={{margin: '5px 15px'}} to={`/listfeeds/${props.listId}`}>
+            <i className='fa fa-arrow-right' />
+            <span className='text' style={{marginLeft: 10}} >List Feed</span>
+          </Link>
+        {(props.contactIsReceiving || props.listData === undefined) &&
+          <div className='vertical-center' style={{padding: '5px 10px'}} >
+            <span className='text' style={{color: grey500, margin: '0 10px'}} >Loading Contacts</span>
+            <FontIcon className='fa fa-spin fa-spinner smalltext' color={grey500} />
+          </div>}
+        </div>
         <div className='vertical-center' style={{marginTop: 5, justifyContent: 'space-between', flexWrap: 'wrap'}}>
           <div style={{display: 'flex', flexDirection: 'column', marginLeft: 15}} >
             <span className='smalltext' style={{color: grey700}}>{props.listData.client}</span>
@@ -819,7 +850,10 @@ class ListTable extends Component {
               className='fa fa-edit'
               label='Edit'
               disabled={props.listData.readonly || state.selected.length < 2}
-              onClick={onRequestOpen}
+              onClick={_ => {
+                if (state.selected.length === props.listData.contacts.length) this.fetchOperations(this.props, 'all');
+                onRequestOpen();
+              }}
               />}
             </EditMultipleContactsHOC>
           </div>
@@ -905,10 +939,9 @@ class ListTable extends Component {
           listId={props.listId}
           onClose={_ => this.setState({isEmailPanelOpen: false})}
           onReset={this.forceEmailPanelRemount}
-          />
-        }
+          loadAllContacts={_ => this.fetchOperations(props, 'all')}
+          />}
         </Drawer>
-        <Waiting isReceiving={props.contactIsReceiving || props.listData === undefined} style={styles.loading} />
         <div className='vertical-center' style={{margin: '10px 0', justifyContent: 'space-between'}}>
           <Tags listId={props.listId} createLink={name => `/tags/${name}`} />
           <PaginateControls
@@ -916,16 +949,16 @@ class ListTable extends Component {
           currentPage={state.currentPage}
           pageSize={state.pageSize}
           onPageSizeChange={pageSize => this.setState({pageSize, currentPage: 1})} 
-          listLength={props.contacts.length}
+          listLength={props.listData.contacts.length}
           onPrev={currentPage => this.setState({currentPage, scrollToRow: 0})}
-          onNext={currentPage => this.setState({currentPage, scrollToRow: 0})}
+          onNext={currentPage => {
+            if (props.contacts.length < currentPage * state.pageSize) this.fetchOperations(this.props);
+            this.setState({currentPage, scrollToRow: 0});
+          }}
           />
         </div>
         <div>
-          <div>
-          {!isEmpty(props.listData.contacts) && props.contacts &&
-            <LinearProgress color={blue100} mode='determinate' value={props.contacts.length} min={0} max={props.listData.contacts.length}/>}
-          </div>
+          <div style={{borderBottom: `4px solid ${blue100}`, width: '100%'}} />
         {isEmpty(props.listData.contacts) &&
           <EmptyListStatement className='row horizontal-center vertical-center' style={{height: 400}} />}
         {!isEmpty(props.received) && !isEmpty(state.columnWidths) &&
@@ -1079,6 +1112,7 @@ const mapDispatchToProps = (dispatch, props) => {
     deleteContacts: ids => dispatch(contactActions.deleteContacts(ids)),
     loadAllContacts: listId => dispatch(contactActions.loadAllContacts(listId)),
     removeFirstTimeUser: _ => dispatch(loginActions.removeFirstTimeUser()),
+    fetchManyContacts: (listId, amount) => dispatch(contactActions.fetchManyContacts(listId, amount)),
   };
 };
 

@@ -19,6 +19,8 @@ const contactSchema = new Schema('contacts', { idAttribute: 'id' });
 const publicationSchema = new Schema('publications', { idAttribute: 'id' });
 const listSchema = new Schema('lists', { idAttribute: 'id' });
 
+const PAGE_LIMIT = 50;
+
 function requestContact() {
   return {
     type: contactConstant.REQUEST
@@ -127,7 +129,7 @@ export function deleteContacts(ids) {
 
 // used to lazy-load a page, keeps track of the last offset
 export function fetchPaginatedContacts(listId) {
-  const PAGE_LIMIT = 50;
+  // const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
     const OFFSET = getState().listReducer[listId].offset;
@@ -168,7 +170,7 @@ function fetchContactsPage(listId, pageLimit, offset) {
 }
 
 export function loadAllContacts(listId) {
-  const PAGE_LIMIT = 50;
+  // const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     if (getState().listReducer[listId].contacts === null) return;
     const contacts = getState().listReducer[listId].contacts;
@@ -193,7 +195,8 @@ export function loadAllContacts(listId) {
 }
 
 export function fetchManyContacts(listId, amount) {
-  const PAGE_LIMIT = 50;
+  // const PAGE_LIMIT = 50;
+  if (amount < PAGE_LIMIT) amount = PAGE_LIMIT;
   return (dispatch, getState) => {
     const contacts = getState().listReducer[listId].contacts;
     const offset = getState().listReducer[listId].offset || 0;
@@ -201,7 +204,7 @@ export function fetchManyContacts(listId, amount) {
     if (contacts === null) return;
     const contactCount = contacts.filter(id => getState().contactReducer[id]).length;
     if (offset === null || isReceiving || contactCount === contacts.length) return;
-    dispatch({type: 'FETCH_MANY_CONTACTS', listId});
+    dispatch({type: 'FETCH_MANY_CONTACTS', listId, amount});
     dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
     const startPage = offset / PAGE_LIMIT;
     const endPage = offset + amount >= contacts.length ? (contacts.length / PAGE_LIMIT) : (offset + amount) / PAGE_LIMIT;

@@ -87,8 +87,19 @@ const EditorShowingContainer = styled.div`
 
 const EditorContainer = styled.div.attrs({className: 'RichEditor-root'})`
   width: ${props => props.width - 20}px;
-  height: 600px;
+  height: 580px;
   padding: 0 10px;
+`;
+
+const TopBarContainer = styled.div`
+  display: flex;
+  align-items: center;
+  z-index: 700;
+  padding: 5px 20px;
+  background-color: ${blueGrey50};
+  position: fixed;
+  top: 0;
+  width: 100%;
 `;
 
 class EmailPanel extends Component {
@@ -100,17 +111,20 @@ class EmailPanel extends Component {
       subject: '',
       fieldsmap: [],
       currentTemplateId: 0,
-      bodyEditorState: null,
+      bodyContentState: null,
       bodyHtml: '',
       body: '',
       minimized: false,
       isPreveiwOpen: false,
       dirty: false,
+      isReceiving: false,
+      tempPreviewLabel: undefined,
+      isReceivingLabel: undefined,
     };
     this.checkMembershipLimit = this.checkMembershipLimit.bind(this);
     this.updateBodyHtml = (html, rawContentState) => {
-      this.setState({body: html, bodyEditorState: rawContentState, dirty: true});
-      this.props.saveEditorState(rawContentState);
+      this.setState({body: html, bodyContentState: rawContentState, dirty: true});
+      this.props.saveContentState(rawContentState);
     };
     this.handleTemplateChange = this.handleTemplateChange.bind(this);
     this.onPreviewEmailsClick = this._onPreviewEmailsClick.bind(this);
@@ -123,11 +137,42 @@ class EmailPanel extends Component {
     this.onClearClick = this._onClearClick.bind(this);
     this.checkEmailDupes = this._checkEmailDupes.bind(this);
     this.changeEmailSignature = this._changeEmailSignature.bind(this);
+    this.loadAllContactsIfRequired = this._loadAllContactsIfRequired.bind(this);
 
     // cleanups
     this.onEmailSendClick = _ => this.checkMembershipLimit()
+    .then(_ => new Promise(resolve => {
+      this.setState({
+        isReceiving: true,
+        isReceivingLabel: 'Loading contacts...this step might take a while if list is large...'
+      });
+      resolve(true);
+    }))
+    .then(this.loadAllContactsIfRequired)
+    .then(_ => new Promise(resolve => {
+      this.setState({
+        isReceiving: true,
+        isReceivingLabel: 'Checking Email Validity...'
+      });
+      resolve(true);
+    }))
     .then(this.checkEmailDupes)
-    .then(this.onPreviewEmailsClick);
+    .then(_ => new Promise(resolve => {
+      this.setState({
+        isReceiving: true,
+        isReceivingLabel: 'Generating Preview...'
+      });
+      resolve(true);
+    }))
+    .then(this.onPreviewEmailsClick)
+    .then(_ => new Promise(resolve => {
+      this.setState({isReceiving: false, isReceivingLabel: undefined})
+      resolve(true);
+    }))
+    .catch(err => this.setState({
+      isReceiving: false,
+      isReceivingLabel: undefined
+    }))
   }
 
   componentWillMount() {
@@ -186,8 +231,8 @@ class EmailPanel extends Component {
     if (emailsignature && emailsignature !== null) {
       if (isJSON(emailsignature)) {
         const sign = JSON.parse(emailsignature);
-        this.setState({bodyEditorState: sign.data});
-        this.props.saveEditorState(sign.data);
+        this.setState({bodyContentState: sign.data});
+        this.props.saveContentState(sign.data);
       } else {
         this.props.setBodyHtml(emailsignature);
         this.setState({bodyHtml: emailsignature});
@@ -214,7 +259,7 @@ class EmailPanel extends Component {
         this.props.createTemplate(
           name,
           this.state.subject,
-          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
+          JSON.stringify({type: 'DraftEditorState', data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
           )
         .then(currentTemplateId => {
           this.setState({currentTemplateId}, _ => {
@@ -232,7 +277,7 @@ class EmailPanel extends Component {
     this.props.onSaveCurrentTemplateClick(
       this.state.currentTemplateId,
       this.state.subject,
-      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyEditorState, subjectData: this.state.subjectContentState})
+      JSON.stringify({type: 'DraftEditorState' , data: this.state.bodyContentState, subjectData: this.state.subjectContentState})
       );
     setTimeout(_ => this.setState({dirty: false}), 10);
   }
@@ -268,8 +313,8 @@ class EmailPanel extends Component {
         return triggerNewEntityFormatWarning(templateJSON.data)
         .then(rawContentState => {
           // triggerNewEntityFOrmatWarning returns templateJSON.data if denied
-          this.setState({bodyEditorState: rawContentState});
-          this.props.saveEditorState(rawContentState);
+          this.setState({bodyContentState: rawContentState});
+          this.props.saveContentState(rawContentState);
           onPostTemplateProcessing();
           return;
         });
@@ -326,9 +371,8 @@ class EmailPanel extends Component {
     return {contactEmails, emptyFields};
   }
 
-
   _sendGeneratedEmails(contactEmails) {
-    this.props.postEmails(contactEmails)
+    return this.props.postEmails(contactEmails)
     .then(
       _ => this.setState({isPreveiwOpen: true}),
       err => {
@@ -351,6 +395,21 @@ class EmailPanel extends Component {
         resolve(true);
       }
     })
+  }
+
+  _loadAllContactsIfRequired() {
+    const bodyContentState = this.state.bodyContentState;
+    const subjectContentState = this.state.subjectContentState;
+    // console.log(bodyContentState);
+    // console.log(subjectContentState);
+    return new Promise((resolve, reject) => {
+      this.setState({isReceiving: true, tempPreviewLabel: 'Loading...'});
+      this.props.loadAllContacts()
+      .then(_ => {
+        this.setState({isReceiving: false, tempPreviewLabel: undefined});
+        resolve(true);
+      });
+    });
   }
 
   _checkEmailDupes() {
@@ -400,7 +459,7 @@ class EmailPanel extends Component {
     });
     const {contactEmails, emptyFields} = this.getGeneratedHtmlEmails(validEmailContacts, subject, body);
 
-    Promise.resolve()
+    return Promise.resolve()
     .then(_ =>
       new Promise((resolve, reject) => {
         if (emptyFields.length > 0) {
@@ -459,8 +518,7 @@ class EmailPanel extends Component {
     )
     .then(_ => {
       console.log('SENDING EMAILS');
-
-      if (contactEmails.length > 0) this.sendGeneratedEmails(contactEmails);
+      if (contactEmails.length > 0) return this.sendGeneratedEmails(contactEmails);
     })
     .catch(_ => {
       console.log('CANCELLED');
@@ -511,13 +569,11 @@ class EmailPanel extends Component {
       ]
     }
 
-    const emailPanelStyle = {width: props.width - 20, height: 600, padding: '0 10px'};
-
     return (
       <div style={styles.container} >
         <EditorShowingContainer isPreveiwOpen={state.isPreveiwOpen} >
           <FileWrapper open={props.isAttachmentPanelOpen} onRequestClose={props.onAttachmentPanelClose} />
-          <div className='vertical-center' style={styles.topbarContainer} >
+          <TopBarContainer>
             <span style={styles.sentFromText} className='text'>Emails are sent from: </span>
             <SwitchEmailDropDown listId={props.listId} />
             <div style={styles.clearEditorBtn}>
@@ -537,13 +593,16 @@ class EmailPanel extends Component {
               backgroundColor={lightBlue500}
               labelColor='#ffffff'
               onClick={this.onEmailSendClick}
-              label='Preview'
-              icon={<FontIcon color='#ffffff' className={props.isReceiving ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'} />}
+              label={state.tempPreviewLabel || 'Preview'}
+              disabled={props.isReceiving || state.isReceiving}
+              icon={<FontIcon color='#ffffff' className='fa fa-envelope' />}
               />
             </div>
-          </div>
+          </TopBarContainer>
         {!state.isPreveiwOpen && props.isImageReceiving &&
-          <PauseOverlay message='Image is loading.' width='100%' height='100%' />}
+          <PauseOverlay message='Image is loading.' />}
+        {state.isReceiving &&
+          <PauseOverlay message={state.isReceivingLabel} />}
           <EditorContainer width={props.width}>
             <BasicHtmlEditor
             listId={props.listId}
@@ -651,14 +710,6 @@ const styles = {
     margin: '0 15px',
   },
   imageLoading: {margin: '0 3px', fontSize: '14px'},
-  topbarContainer: {
-    zIndex: 500,
-    padding: '5px 20px',
-    backgroundColor: blueGrey50,
-    position: 'fixed',
-    top: 0,
-    width: '100%'
-  },
   hidePanelBtn: {
     position: 'fixed',
     bottom: 5,
@@ -669,7 +720,7 @@ const styles = {
   clearEditorBtn: {
     margin: '0 5px'
   },
-  previewContainer: {marginBottom: 20, zIndex: 300},
+  previewContainer: {paddingBottom: 20, zIndex: 300},
   textTransformNone: {textTransform: 'none'},
   sentFromText: {color: grey800, marginRight: 10},
   sendButtonContainer: {position: 'fixed', right: 10},
@@ -724,7 +775,7 @@ const mapDispatchToProps = (dispatch, props) => {
     startEmailDraft: email => dispatch({type: 'INITIALIZE_EMAIL_DRAFT', listId: props.listId, email}),
     onAttachmentPanelClose: _ => dispatch({type: 'TURN_OFF_ATTACHMENT_PANEL'}),
     onAttachmentPanelOpen: _ => dispatch({type: 'TURN_ON_ATTACHMENT_PANEL'}),
-    saveEditorState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
+    saveContentState: editorState => dispatch({type: 'SET_EDITORSTATE', editorState}),
     turnOnTemplateChange: (changeType, entityType) => dispatch({type: 'TEMPLATE_CHANGE_ON', changeType, entityType}),
     setBodyHtml: bodyHtml => dispatch({type: 'SET_BODYHTML', bodyHtml}),
     getEmailMaxAllowance: _ => dispatch(loginActions.getEmailMaxAllowance())

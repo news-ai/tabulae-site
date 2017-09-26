@@ -3,6 +3,11 @@ import {connect} from 'react-redux';
 import ListTable from './ListTable.jsx';
 import {actions as listActions} from 'components/Lists';
 
+const styles = {
+  container: {margin: 20},
+  loading: {margin: '0 10px'}
+};
+
 class ListFetchingContainer extends Component {
   constructor(props) {
     super(props);
@@ -15,12 +20,12 @@ class ListFetchingContainer extends Component {
   render() {
     let renderNode = this.props.list ?
     <ListTable {...this.props}/> : (
-      <div style={{margin: 20}}>
-        <span style={{margin: '0 10px'}}>LIST LOADING...</span>
-        <i className='fa fa-cog fa-spin'/>
+      <div style={styles.container}>
+        <span style={styles.loading}>LIST LOADING...</span>
+        <i className='fa fa-cog fa-spin' />
       </div>);
     if (this.props.didInvalidate) {
-      renderNode = <div style={{margin: 20}}>LIST NOT FOUND AT THIS TIME. Check to see if you are logged into the right account then hit Refresh. If refreshing the page didn't help, reach out to Support.</div>;
+      renderNode = <div style={styles.container}>LIST NOT FOUND AT THIS TIME. Check to see if you are logged into the right account then hit Refresh. If refreshing the page didn't help, reach out to Support.</div>;
     }
     return renderNode;
   }
