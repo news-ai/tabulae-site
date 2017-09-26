@@ -1,9 +1,14 @@
 import React, {Component} from 'react';
 import * as listActions from './actions';
 import browserHistory from 'react-router/lib/browserHistory';
+import Link from 'react-router/lib/Link';
 import {connect} from 'react-redux';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
+import FontIcon from 'material-ui/FontIcon';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
 
 import Lists from './Lists';
 import InfiniteScroll from 'components/InfiniteScroll';
@@ -14,6 +19,7 @@ import {grey500} from 'material-ui/styles/colors';
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
 import {tour} from './tour';
+const origin = {horizontal: 'left', vertical: 'top'};
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -38,16 +44,34 @@ class ListManagerContainer extends Component {
     if (nextProps.showGeneralGuide !== this.props.showGeneralGuide) {
       hopscotch.startTour(tour);
     }
+
+    if (this.props.location.query.sort !== nextProps.location.query.sort) {
+      nextProps.fetchLists();
+    }
   }
 
   render() {
+    const sortType = this.props.location.query.sort;
+    let sortLabel = 'fa fa-sort-amount-asc';
+    switch (sortType) {
+      case 'leastRecentlyUsed':
+        sortLabel = 'fa fa-sort-amount-desc';
+        break;
+      case 'alphabetical':
+        sortLabel = 'fa fa-sort-alpha-asc';
+        break;
+      case 'antiAlphabetical':
+        sortLabel = 'fa fa-sort-alpha-desc';
+        break;
+    }
+    // console.log(sortLabel);
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </Dialog>
-        <div className='large-offset-1 large-10 columns'>
-          <div style={styles.buttonContainer}>
+        <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
+          <div style={{marginTop: 10}}>
             <RaisedButton
             style={styles.uploadBtn}
             label='Add New List'
@@ -65,6 +89,30 @@ class ListManagerContainer extends Component {
             icon={<i style={styles.icon} className='fa fa-plus' aria-hidden='true' />}
             />
           </div>
+        </div>
+        <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
+          <div className='vertical-center' style={{justifyContent: 'flex-end'}} >
+            <IconMenu
+            iconButtonElement={<IconButton iconClassName={sortLabel} />}
+            anchorOrigin={origin}
+            targetOrigin={origin}
+            >
+              <Link to={{pathname: '/', query: {sort: 'alphabetical'}}}>
+                <MenuItem primaryText='Alphabetical +' leftIcon={<FontIcon className='fa fa-sort-alpha-asc' />}  />
+              </Link>
+              <Link to={{pathname: '/', query: {sort: 'antiAlphabetical'}}}>
+                <MenuItem primaryText='Alphabetical -' leftIcon={<FontIcon className='fa fa-sort-alpha-desc' />} />
+              </Link>
+              <Link to='/'>
+                <MenuItem primaryText='Most Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-asc' />}  />
+              </Link>
+              <Link to={{pathname: '/', query: {sort: 'leastRecentlyUsed'}}}>
+                <MenuItem primaryText='Least Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-desc' />} />
+              </Link>
+            </IconMenu>
+          </div>
+        </div>
+        <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
           <Lists {...this.props} />
         </div>
       </InfiniteScroll>
@@ -75,13 +123,14 @@ class ListManagerContainer extends Component {
 const styles = {
   uploadBtn: {margin: 10, float: 'right'},
   uploadBtnLabel: {textTransform: 'none'},
-  buttonContainer: {marginTop: 10},
   icon: {color: grey500}
 };
 
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
-  let lists = listReducer.lists.received.map(id => listReducer[id]).filter(list => list.createdby === state.personReducer.person.id);
+  const sortType = props.location.query.sort || 'lists';
+  let lists = listReducer[sortType].received.map(id => listReducer[id]).filter(list => list.createdby === state.personReducer.person.id);
+
   let untitledNum = 0;
   lists.map(list => {
     if (list.name.substring(0, 9) === 'untitled-') {
@@ -107,6 +156,7 @@ const mapStateToProps = (state, props) => {
 };
 
 const mapDispatchToProps = (dispatch, props) => {
+  const sortType = props.location.query.sort;
   return {
     onToggle: listId => {
       dispatch({type: 'IS_FETCHING', resource: 'lists', id: listId, fetchType: 'isArchiving'});
@@ -118,7 +168,18 @@ const mapDispatchToProps = (dispatch, props) => {
       dispatch(listActions.createEmptyList(untitledNum))
       .then(response => browserHistory.push(`/tables/${response.data.id}`));
     },
-    fetchLists: _ => dispatch(listActions.fetchLists())
+    fetchLists: _ => {
+      switch (sortType) {
+        case 'leastRecentlyUsed':
+          return dispatch(listActions.fetchLeastRecentlyUsedLists());
+        case 'alphabetical':
+          return dispatch(listActions.fetchAlphabeticalLists());
+        case 'antiAlphabetical':
+          return dispatch(listActions.fetchAntiAlphabeticalLists());
+        default:
+          return dispatch(listActions.fetchLists());
+      }
+    }
   };
 };
 

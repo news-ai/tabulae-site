@@ -17,12 +17,13 @@ function requestList(listId) {
   };
 }
 
-export function receiveLists(lists, ids, offset) {
+export function receiveLists(lists, ids, offset, order) {
   return {
     type: listConstant.RECEIVE_MULTIPLE,
     lists,
     ids,
-    offset
+    offset,
+    order
   };
 }
 
@@ -113,7 +114,55 @@ export function fetchLists() {
     .then(response => {
       const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
-      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset));
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset, 'lists'));
+    })
+    .catch(message => dispatch(requestListsFail(message)));
+  };
+}
+
+export function fetchLeastRecentlyUsedLists() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.leastRecentlyUsed.offset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    dispatch(requestLists());
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=Updated`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(listSchema)});
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset, 'leastRecentlyUsed'));
+    })
+    .catch(message => dispatch(requestListsFail(message)));
+  };
+}
+
+export function fetchAlphabeticalLists() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.alphabetical.offset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    dispatch(requestLists());
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=Name`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(listSchema)});
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset, 'alphabetical'));
+    })
+    .catch(message => dispatch(requestListsFail(message)));
+  };
+}
+
+export function fetchAntiAlphabeticalLists() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.antiAlphabetical.offset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    dispatch(requestLists());
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Name`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(listSchema)});
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset, 'antiAlphabetical'));
     })
     .catch(message => dispatch(requestListsFail(message)));
   };

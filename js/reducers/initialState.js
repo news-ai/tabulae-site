@@ -32,6 +32,18 @@ export const initialState = {
       received: [],
       offset: 0
     },
+    leastRecentlyUsed: {
+      received: [],
+      offset: 0
+    },
+    alphabetical: {
+      received: [],
+      offset: 0
+    },
+    antiAlphabetical: {
+      received: [],
+      offset: 0
+    },
     // lists: [],
     // archivedLists: [],
     // publicLists: [],

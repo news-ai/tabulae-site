@@ -68,23 +68,45 @@ function listReducer(state = initialState.listReducer, action) {
       return obj;
     case listConstant.RECEIVE_MULTIPLE:
       obj = assignToEmpty(state, action.lists);
-      const newLists = action.ids.filter(id => !state[id]);
-      obj.received = [...state.received, ...newLists];
-      newLists.map(id => {
+      const allLists = [...state.received, ...action.ids.filter(id => !state[id])];
+      obj.received = allLists;
+      obj.isReceiving = false;
+      obj.didInvalidate = false;
+
+      switch (action.order) {
+        case 'leastRecentlyUsed':
+          obj.leastRecentlyUsed.received = [...state.leastRecentlyUsed.received, ...action.ids];
+          obj.leastRecentlyUsed.offset = action.offset;
+          return obj;
+        case 'alphabetical':
+          obj.alphabetical.received = [...state.alphabetical.received, ...action.ids];
+          obj.alphabetical.offset = action.offset;
+          return obj;
+        case 'antiAlphabetical':
+          obj.antiAlphabetical.received = [...state.antiAlphabetical.received, ...action.ids];
+          obj.antiAlphabetical.offset = action.offset;
+          return obj;
+        case 'lists':
+          obj.lists.received = [...state.lists.received, ...action.ids];
+          obj.lists.offset = action.offset;
+          return obj;
+      }
+
+      // rebuild all lists
+      allLists.map(id => {
         const list = obj[id];
-        if (!list.archived && !list.publiclist) unarchivedLists.push(id);
+        // if (!list.archived && !list.publiclist) unarchivedLists.push(id);
         if (list.archived) archivedLists.push(id);
         if (list.publiclist) publicLists.push(id);
         if (action.teamId === list.teamid) teamLists.push(id);
         obj[id] = Object.assign({}, obj[id], {offset: 0});
       });
-      obj.lists.received = [...obj.lists.received, ...unarchivedLists];
-      obj.public.received = [...obj.public.received, ...publicLists];
-      obj.archived.received = [...obj.archived.received, ...archivedLists];
-      obj.team.received = [...obj.team.received, ...teamLists];
-      obj.isReceiving = false;
-      obj.didInvalidate = false;
-      if (action.offset !== undefined) obj.lists.offset = action.offset;
+      obj.lists.received = unarchivedLists;
+      obj.public.received = publicLists;
+      obj.archived.received = archivedLists;
+      obj.team.received = teamLists;
+
+      // if (action.offset !== undefined) obj.lists.offset = action.offset;
       if (action.archivedOffset !== undefined) obj.archived.offset = action.archivedOffset;
       if (action.publicOffset !== undefined) obj.public.offset = action.publicOffset;
       if (action.teamOffset !== undefined) obj.team.offset = action.teamOffset;
