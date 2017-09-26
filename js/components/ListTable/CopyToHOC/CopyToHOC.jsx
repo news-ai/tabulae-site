@@ -32,16 +32,9 @@ class CopyToHOC extends Component {
 
   _onSubmit() {
     if (this.state.value.length === 0 || this.props.selectedContacts.length === 0) return;
-    // if (this.props.selectedContacts.length === this.props.list.contacts.length) {
-    //   alertify.alert(
-    //     'All Contacts Selected',
-    //     '<div><p>It seems like you are trying to copy the whole list.</p><p>Scroll down and try <b>Method 2: Copy Whole List</b>. It\'s faster.</p></div>'
-    //     );
-    //   return;
-    // }
     const selectedLists = this.state.value.map(obj => this.props.listReducer[obj.value]);
     // selectedLists.map(list => props.addContactsThenPatchList(props.selectedContacts, list));
-    const contacts = this.props.selectedContacts.map(contact => contact.id);
+    const contacts = this.props.selected;
     this.setState({isReceiving: true});
     selectedLists.map(list => this.props.copyContactsToList(contacts, list.id).then(_ => this.setState({isReceiving: false})));
 
