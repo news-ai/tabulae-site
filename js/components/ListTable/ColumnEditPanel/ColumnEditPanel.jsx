@@ -137,7 +137,7 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
-  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+  const lists = state.listReducer.lists.received.map(id => state.listReducer[id]);
   const listId = props.listId;
   const list = state.listReducer[listId];
 

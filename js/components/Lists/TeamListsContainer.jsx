@@ -34,7 +34,7 @@ class TeamListsContainer extends Component {
 }
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.teamLists.map(id => state.listReducer[id]).filter(list => list.createdby !== state.personReducer.person.id);
+  const lists = state.listReducer.team.received.map(id => state.listReducer[id]).filter(list => list.createdby !== state.personReducer.person.id);
   return {
     lists,
     isReceiving: lists === undefined ? true : false,
