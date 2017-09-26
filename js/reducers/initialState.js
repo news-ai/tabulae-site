@@ -16,7 +16,7 @@ export const initialState = {
   listReducer: {
     isReceiving: false,
     didInvalidate: false,
-    lists: {
+    lists: { // mostRecentlyUpdated
       received: [],
       offset: 0
     },
@@ -29,6 +29,14 @@ export const initialState = {
       offset: 0
     },
     team: {
+      received: [],
+      offset: 0
+    },
+    mostRecentlyCreated: {
+      received: [],
+      offset: 0
+    },
+    leastRecentlyCreated: {
       received: [],
       offset: 0
     },

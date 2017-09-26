@@ -74,6 +74,14 @@ function listReducer(state = initialState.listReducer, action) {
       obj.didInvalidate = false;
 
       switch (action.order) {
+        case 'mostRecentlyCreated':
+          obj.mostRecentlyCreated.received = [...state.mostRecentlyCreated.received, ...action.ids];
+          obj.mostRecentlyCreated.offset = action.offset;
+          return obj;
+        case 'leastRecentlyCreated':
+          obj.leastRecentlyCreated.received = [...state.leastRecentlyCreated.received, ...action.ids];
+          obj.leastRecentlyCreated.offset = action.offset;
+          return obj;
         case 'leastRecentlyUsed':
           obj.leastRecentlyUsed.received = [...state.leastRecentlyUsed.received, ...action.ids];
           obj.leastRecentlyUsed.offset = action.offset;

@@ -9,14 +9,16 @@ import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
+import Menu from 'material-ui/Menu';
 import IconButton from 'material-ui/IconButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
+import Popover from 'material-ui/Popover';
 
 import Lists from './Lists';
 import InfiniteScroll from 'components/InfiniteScroll';
 import DropFileWrapper from 'components/DropFile/DropFileWrapper.jsx';
 
-import {grey500} from 'material-ui/styles/colors';
+import {grey500, lightBlue300} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -27,7 +29,9 @@ class ListManagerContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false
+      open: false,
+      newListMenuOpen: false,
+      newListAnchorEl: null
     };
     this.onUploadFromNewClick = _ => this.props.newListOnClick(`untitled-${this.props.untitledNum}`);
     this.onRequestClose = _ => this.setState({open: false});
@@ -57,6 +61,12 @@ class ListManagerContainer extends Component {
     const sortType = this.props.location.query.sort;
     let sortLabel = 'fa fa-sort-amount-asc';
     switch (sortType) {
+      case 'mostRecentlyCreated':
+        sortLabel = 'fa fa-sort-asc';
+        break;
+      case 'leastRecentlyCreated':
+        sortLabel = 'fa fa-sort-desc';
+        break;
       case 'leastRecentlyUsed':
         sortLabel = 'fa fa-sort-amount-desc';
         break;
@@ -73,23 +83,26 @@ class ListManagerContainer extends Component {
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </Dialog>
         <div className='large-offset-1 large-10 small-12 columns'>
-          <div style={{marginTop: 10}}>
+          <div style={{marginTop: 10, float: 'right'}}>
             <RaisedButton
-            style={styles.uploadBtn}
-            label='Add New List'
-            onClick={this.onUploadFromNewClick}
-            labelStyle={styles.uploadBtnLabel}
-            icon={<i style={styles.icon} className='fa fa-plus' aria-hidden='true' />}
+            onClick={e => this.setState({newListAnchorEl: e.currentTarget, newListMenuOpen: true})}
+            backgroundColor={lightBlue300}
+            label='New'
+            icon={<FontIcon className='fa fa-plus' color='#fff' />}
+            labelColor='#fff'
             />
-            <RaisedButton
-            id='uploadButton'
-            className='right'
-            style={styles.uploadBtn}
-            label='Upload from Existing'
-            onClick={this.onRequestOpen}
-            labelStyle={styles.uploadBtnLabel}
-            icon={<i style={styles.icon} className='fa fa-plus' aria-hidden='true' />}
-            />
+            <Popover
+              open={this.state.newListMenuOpen}
+              anchorEl={this.state.newListAnchorEl}
+              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+              targetOrigin={{horizontal: 'right', vertical: 'top'}}
+              onRequestClose={e => this.setState({newListMenuOpen: false})}
+            >
+              <Menu desktop>
+                <MenuItem primaryText='Upload from Existing' onClick={this.onRequestOpen} />
+                <MenuItem primaryText='New List' onClick={this.onUploadFromNewClick} />
+              </Menu>
+            </Popover>
           </div>
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
@@ -98,6 +111,8 @@ class ListManagerContainer extends Component {
             <DropDownMenu value={sortType} onChange={this.onSortChange}>
               <MenuItem value={undefined} primaryText='Most Recently Used'  />
               <MenuItem value='leastRecentlyUsed' primaryText='Least Recently Used' />
+              <MenuItem value='mostRecentlyCreated' primaryText='Most Recently Created' />
+              <MenuItem value='leastRecentlyCreated' primaryText='Least Recently Created' />
               <MenuItem value='alphabetical' primaryText='Alphabetical +'  />
               <MenuItem value='antiAlphabetical' primaryText='Alphabetical -' />
             </DropDownMenu>
@@ -161,6 +176,10 @@ const mapDispatchToProps = (dispatch, props) => {
     },
     fetchLists: _ => {
       switch (sortType) {
+        case 'leastRecentlyCreated':
+          return dispatch(listActions.fetchLeastRecentlyCreatedLists());
+        case 'mostRecentlyCreated':
+          return dispatch(listActions.fetchMostRecentlyCreatedLists());
         case 'leastRecentlyUsed':
           return dispatch(listActions.fetchLeastRecentlyUsedLists());
         case 'alphabetical':

@@ -104,13 +104,45 @@ export function fetchList(listId) {
   };
 }
 
-export function fetchLists() {
+export function fetchLeastRecentlyCreatedLists() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.leastRecentlyCreated.offset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    dispatch(requestLists());
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(listSchema)});
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset, 'leastRecentlyCreated'));
+    })
+    .catch(message => dispatch(requestListsFail(message)));
+  };
+}
+
+export function fetchMostRecentlyCreatedLists() {
+  const PAGE_LIMIT = 50;
+  return (dispatch, getState) => {
+    const OFFSET = getState().listReducer.mostRecentlyCreated.offset;
+    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    dispatch(requestLists());
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
+    .then(response => {
+      const res = normalize(response, {data: arrayOf(listSchema)});
+      const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
+      return dispatch(receiveLists(res.entities.lists, res.result.data, newOffset, 'mostRecentlyCreated'));
+    })
+    .catch(message => dispatch(requestListsFail(message)));
+  };
+}
+
+export function fetchLists() { // fetchMostRecentlyUsedLists
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().listReducer.lists.offset;
     if (OFFSET === null || getState().listReducer.isReceiving) return;
     dispatch(requestLists());
-    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Created`)
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Updated`)
     .then(response => {
       const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
