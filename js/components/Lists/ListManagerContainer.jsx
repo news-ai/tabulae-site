@@ -72,7 +72,7 @@ class ListManagerContainer extends Component {
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </Dialog>
-        <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
+        <div className='large-offset-1 large-10 small-12 columns'>
           <div style={{marginTop: 10}}>
             <RaisedButton
             style={styles.uploadBtn}
@@ -92,18 +92,18 @@ class ListManagerContainer extends Component {
             />
           </div>
         </div>
-        <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
+        <div className='large-offset-1 large-10 small-12 columns'>
           <div className='vertical-center' style={{justifyContent: 'flex-end'}} >
             {/*iconButtonElement={<IconButton iconClassName={sortLabel} />} */ }
             <DropDownMenu value={sortType} onChange={this.onSortChange}>
-              <MenuItem value={undefined} primaryText='Most Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-asc' />}  />
-              <MenuItem value='leastRecentlyUsed' primaryText='Least Recently Used' leftIcon={<FontIcon className='fa fa-sort-amount-desc' />} />
-              <MenuItem value='alphabetical' primaryText='Alphabetical +' leftIcon={<FontIcon className='fa fa-sort-alpha-asc' />}  />
-              <MenuItem value='antiAlphabetical' primaryText='Alphabetical -' leftIcon={<FontIcon className='fa fa-sort-alpha-desc' />} />
+              <MenuItem value={undefined} primaryText='Most Recently Used'  />
+              <MenuItem value='leastRecentlyUsed' primaryText='Least Recently Used' />
+              <MenuItem value='alphabetical' primaryText='Alphabetical +'  />
+              <MenuItem value='antiAlphabetical' primaryText='Alphabetical -' />
             </DropDownMenu>
           </div>
         </div>
-        <div className='large-offset-1 medium-offset-1 large-10 medium-10 small-12 columns'>
+        <div className='large-offset-1 large-10 small-12 columns'>
           <Lists {...this.props} />
         </div>
       </InfiniteScroll>
