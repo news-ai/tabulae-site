@@ -196,11 +196,25 @@ class ListManagerContainer extends Component {
           </div>
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
+          <div className='row'>
+            <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
+            </div>
+            <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
+              <span style={{fontSize: '0.7em', color: grey500}} >Created</span>
+            </div>
+            <div className='small-4 medium-2 large-2 columns horizontal-center'>
+              <span style={{fontSize: '0.7em', color: grey500}} >Owner</span>
+            </div>
+            <div className='hide-for-small-only medium-3 large-2 columns'>
+            </div>
+          </div>
+        </div>
+        <div className='large-offset-1 large-10 small-12 columns'>
         {keys.map(key => {
           const bucket = buckets[key];
           return (
             <div>
-              <div style={{padding: 5}} >
+              <div style={{padding: '5px 0'}} >
                 <span style={{color: grey500, userSelect: 'none', cursor: 'default'}} >{key}</span>
               </div> 
               {bucket.map(list =>
@@ -254,6 +268,7 @@ const mapStateToProps = (state, props) => {
     showUploadGuide: state.joyrideReducer.showUploadGuide,
     showGeneralGuide: state.joyrideReducer.showGeneralGuide,
     firstTimeUser: state.personReducer.firstTimeUser,
+    person: state.personReducer.person,
   };
 };
 
