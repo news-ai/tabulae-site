@@ -311,7 +311,7 @@ const mapStateToProps = (state, props) => {
     placeholder: 'No emails found.',
     hasNext,
     listReceived: state.listReducer.received,
-    lists: state.listReducer.received.lists.map(id => state.listReducer[id]),
+    lists: state.listReducer.lists.map(id => state.listReducer[id]),
   };
 };
 
