@@ -13,6 +13,7 @@ import Menu from 'material-ui/Menu';
 import IconButton from 'material-ui/IconButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import Popover from 'material-ui/Popover';
+import moment from 'moment-timezone';
 
 import Lists from './Lists';
 import ListItem from './Lists/ListItem.jsx';
@@ -25,6 +26,67 @@ import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
 import {tour} from './tour';
 const origin = {horizontal: 'left', vertical: 'top'};
+
+const bucketListsByDate = (lists, selector) =>
+  lists.reduce(({buckets, keys}, list, i) => {
+    const prevList = lists[i - 1];
+    const m = moment(list[selector]).tz(moment.tz.guess());
+    const key = `${m.year()}-${m.month()}`;
+    if (!prevList) {
+      buckets[key] = [list];
+      keys.push(key);
+      return {buckets, keys};
+    }
+    const n = moment(prevList[selector]).tz(moment.tz.guess());
+    if (m.year() === n.year() && m.month() === n.month()) {
+      buckets[key] = [...buckets[key], list];
+    } else {
+      buckets[key] = [list];
+      keys.push(key);
+    }
+    return {buckets, keys};
+  }, {buckets: {}, keys: []});
+
+
+const isAlpha = str => /^[a-zA-Z]+$/.test(str);
+const bucketListsByAlphabet = (lists) =>
+  lists.reduce(({buckets, keys}, list, i) => {
+    const prevList = lists[i - 1];
+    const firstChar = list.name.substring(0, 1);
+    const numKey = '0-10';
+    if (!prevList) {
+      if (isAlpha(firstChar)) {
+        buckets[firstChar.toUpperCase()] = [list];
+        keys.push(firstChar.toUpperCase());
+      } else {
+        buckets[numKey] = [list];
+        keys.push(numKey);
+      }
+      return {buckets, keys};
+    }
+
+    const firstCharPrev = prevList.name.substring(0, 1);
+    if (!isAlpha(firstChar)) {
+      if (!isAlpha(firstChar) && !isAlpha(firstCharPrev)) {
+        buckets[numKey] = [...buckets[numKey], list];
+      } else {
+        buckets[numKey] = [list];
+        keys.push(numKey);
+      }
+
+    } else {
+      if (isAlpha(firstChar) && isAlpha(firstCharPrev)) {
+        const firstCharUp = firstChar.toUpperCase();
+        if (firstCharUp === firstCharPrev.toUpperCase()) {
+          buckets[firstCharUp] = [...buckets[firstCharUp], list];
+        } else {
+          buckets[firstCharUp] = [list];
+          keys.push(firstCharUp);
+        }
+      }
+    }
+    return {buckets, keys};
+  }, {buckets: {}, keys: []});
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -61,23 +123,32 @@ class ListManagerContainer extends Component {
   render() {
     const sortType = this.props.location.query.sort;
     let sortLabel = 'fa fa-sort-amount-asc';
+    let bucketObj = bucketListsByDate(this.props.lists, 'updated');
     switch (sortType) {
       case 'mostRecentlyCreated':
         sortLabel = 'fa fa-sort-asc';
+        bucketObj = bucketListsByDate(this.props.lists, 'created');
         break;
       case 'leastRecentlyCreated':
         sortLabel = 'fa fa-sort-desc';
+        bucketObj = bucketListsByDate(this.props.lists, 'created');
         break;
       case 'leastRecentlyUsed':
         sortLabel = 'fa fa-sort-amount-desc';
+        bucketObj = bucketListsByDate(this.props.lists, 'updated');
         break;
       case 'alphabetical':
         sortLabel = 'fa fa-sort-alpha-asc';
+        bucketObj = bucketListsByAlphabet(this.props.lists);
         break;
       case 'antiAlphabetical':
         sortLabel = 'fa fa-sort-alpha-desc';
+        bucketObj = bucketListsByAlphabet(this.props.lists);
         break;
     }
+    const {buckets, keys} = bucketObj;
+    console.log(buckets);
+    console.log(keys);
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
@@ -120,9 +191,20 @@ class ListManagerContainer extends Component {
           </div>
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
-        {this.props.lists.map((list, i) =>
-          <ListItem key={i} list={list} {...this.props} />
-          )}
+        {keys.map(key => {
+          const bucket = buckets[key];
+          return (
+            <div>
+              <div>{key}</div> 
+              {bucket.map(list =>
+                <ListItem key={list.id} list={list} {...this.props} iconName={this.props.listItemIcon} />
+                )}
+            </div>
+            )
+        })}
+        {/*this.props.lists.map((list, i) =>
+          <ListItem key={i} list={list} {...this.props} iconName={this.props.listItemIcon} />
+          )*/}
         {/*
           <Lists {...this.props} />
         */}
