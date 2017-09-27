@@ -216,14 +216,20 @@ export function fetchManyContacts(listId, amount) {
           // poll how many received
           const contactReducer = getState().contactReducer;
           const count = contacts.filter(id => contactReducer[id]).length;
+          // console.log('offset', offset);
+          // console.log('amount', amount);;
+          // console.log('length', contacts.length);
           if (offset + amount >= contacts.length && count === contacts.length) {
+            // console.log('why');
             dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
             return dispatch({type: listConstant.SET_OFFSET, listId, offset: null});
           } else if (count === offset + amount) {
+            // console.log('ok');
             dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_OFF});
             return dispatch({type: listConstant.SET_OFFSET, listId, offset: offset + amount});
-          } else {
-            return dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
+          // } else {
+          //   console.log('huh');
+          //   return dispatch({type: contactConstant.MANUALLY_SET_ISRECEIVING_ON});
           }
         })
         );
