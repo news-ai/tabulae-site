@@ -15,6 +15,7 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import Popover from 'material-ui/Popover';
 
 import Lists from './Lists';
+import ListItem from './Lists/ListItem.jsx';
 import InfiniteScroll from 'components/InfiniteScroll';
 import DropFileWrapper from 'components/DropFile/DropFileWrapper.jsx';
 
@@ -119,7 +120,12 @@ class ListManagerContainer extends Component {
           </div>
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
+        {this.props.lists.map((list, i) =>
+          <ListItem key={i} list={list} {...this.props} />
+          )}
+        {/*
           <Lists {...this.props} />
+        */}
         </div>
       </InfiniteScroll>
       );

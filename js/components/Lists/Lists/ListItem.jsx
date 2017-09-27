@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import Link from 'react-router/lib/Link';
 import withRouter from 'react-router/lib/withRouter';
-import {grey100, teal50, teal200, grey700, grey500, grey600} from 'material-ui/styles/colors';
+import {grey50, grey100, grey200, teal50, teal200, grey700, grey500, grey600} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import Tags from 'components/Tags/TagsContainer.jsx';
@@ -47,53 +47,59 @@ class ListItem extends Component {
   render() {
     const {list, onToggle, iconName, tooltip, router, nameString, person, isArchiving, extraIconButtons} = this.props;
     return (
-      <div className='row' style={{border: `1px solid ${grey700}`, marginBottom: 10}} >
-        <div
-        className={cn('small-8 large-7 columns pointer', {'medium-5': person.teamid > 0, 'medium-6': person.teamid === 0})}
-        id={list.name === 'My first list!' && 'listitem_table_hop'}
-        >
-          <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
-          <div className='right'>
-          {list.publiclist &&
-            <Tag
-            hideDelete
-            color={teal50}
-            borderColor={teal200}
-            key='public-tag'
-            text='Public'
-            link='/public'
-            />}
-          {!this.state.open &&
-            <Tags hideDelete createLink={name => `/tags/${name}`} listId={list.id} />}
+      <div style={{marginBottom: 10}} >
+        <div className='row vertical-center' style={{border: `1px solid ${grey700}`}} >
+          <div
+          className={cn('small-8 large-7 columns pointer', {'medium-5': person.teamid > 0, 'medium-6': person.teamid === 0})}
+          id={list.name === 'My first list!' && 'listitem_table_hop'}
+          >
+            <Link to={`/tables/${list.id}`}><span>{list.name}</span></Link>
+            <div className='right'>
+            {list.publiclist &&
+              <Tag
+              hideDelete
+              color={teal50}
+              borderColor={teal200}
+              key='public-tag'
+              text='Public'
+              link='/public'
+              />}
+            {!this.state.open &&
+              <Tags hideDelete createLink={name => `/tags/${name}`} listId={list.id} />}
+            </div>
+          </div>
+          <div className={cn('large-3 small-12 columns', {'medium-4': person.teamid > 0, 'medium-3': person.teamid === 0})} >
+          </div>
+          <div className={cn('large-2 small-4 columns', {'medium-3': person.teamid > 0, 'medium-3': person.teamid === 0})} >
+            <div style={{padding: 3}} className='pointer' onClick={_ => this.setState({open: !this.state.open})}>
+              <FontIcon
+              style={{fontSize: '0.8em'}}
+              color={grey600}
+              hoverColor={grey700}
+              className={cn({'fa fa-minus': this.state.open, 'fa fa-plus': !this.state.open})}
+              />
+              <span style={{fontSize: '0.8em', color: grey600, margin: '0 8px', userSelect: 'none'}} >{this.state.open ? 'Minimize' : 'Expand'}</span>
+            </div>
           </div>
         </div>
-        <div className={cn('large-5 small-4 columns', {'medium-7': person.teamid > 0, 'medium-6': person.teamid === 0})} >
-          <div style={{padding: 3}} className='pointer' onClick={_ => this.setState({open: !this.state.open})}>
-            <FontIcon
-            style={{fontSize: '0.8em'}}
-            color={grey600}
-            hoverColor={grey700}
-            className={cn({'fa fa-minus': this.state.open, 'fa fa-plus': !this.state.open})}
-            />
-            <span style={{fontSize: '0.8em', color: grey600, margin: '0 8px', userSelect: 'none'}} >{this.state.open ? 'Minimize' : 'Expand'}</span>
-          </div>
+        <div className='row' style={{background: grey200, padding: '10px 0'}} >
+          <Collapse isOpened={this.state.open}>
+            <div className='large-12 medium-12 small-12 columns'>
+              <div style={{marginBottom: 5, marginLeft: 15, display: 'inline-block'}} >
+                <div style={{color: grey700, fontSize: '0.7em'}} >Created</div>
+                <span className='smalltext'>{moment(list.created).tz(moment.tz.guess()).format(FORMAT)} </span>
+              </div>
+              <div style={{marginBottom: 5, marginLeft: 15, display: 'inline-block'}} >
+                <div style={{color: grey700, fontSize: '0.7em'}} >Updated</div>
+                <span className='smalltext'>{moment(list.updated).tz(moment.tz.guess()).format(FORMAT)} </span>
+              </div>
+              <div style={{marginBottom: 5, marginLeft: 15, display: 'inline-block'}} >
+                <div style={{color: grey700, fontSize: '0.7em', display: 'absolute', top: 0}} >Tags</div>
+                <Tags hideDelete createLink={name => `/tags/${name}`} listId={list.id} />
+              </div>
+            </div>
+          </Collapse>
         </div>
-        <Collapse isOpened={this.state.open}>
-          <div className='large-12 medium-12 small-12 columns'>
-            <div style={{marginBottom: 5, marginLeft: 15, display: 'inline-block'}} >
-              <div style={{color: grey700, fontSize: '0.7em'}} >Created</div>
-              <span className='smalltext'>{moment(list.created).tz(moment.tz.guess()).format(FORMAT)} </span>
-            </div>
-            <div style={{marginBottom: 5, marginLeft: 15, display: 'inline-block'}} >
-              <div style={{color: grey700, fontSize: '0.7em'}} >Updated</div>
-              <span className='smalltext'>{moment(list.updated).tz(moment.tz.guess()).format(FORMAT)} </span>
-            </div>
-            <div style={{marginBottom: 5, marginLeft: 15, display: 'inline-block'}} >
-              <div style={{color: grey700, fontSize: '0.7em'}} >Tags</div>
-              <Tags hideDelete createLink={name => `/tags/${name}`} listId={list.id} />
-            </div>
-          </div>
-        </Collapse>
       </div>
       );
   }
