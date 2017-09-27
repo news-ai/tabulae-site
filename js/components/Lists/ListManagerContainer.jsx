@@ -31,7 +31,7 @@ const bucketListsByDate = (lists, selector) =>
   lists.reduce(({buckets, keys}, list, i) => {
     const prevList = lists[i - 1];
     const m = moment(list[selector]).tz(moment.tz.guess());
-    const key = `${m.year()}-${m.month()}`;
+    const key = `${m.year()} ${m.format('MMMM')}`;
     if (!prevList) {
       buckets[key] = [list];
       keys.push(key);
@@ -154,28 +154,33 @@ class ListManagerContainer extends Component {
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
           <DropFileWrapper defaultValue={`untitled-${this.props.untitledNum}`} />
         </Dialog>
-        <div className='large-offset-1 large-10 small-12 columns'>
-          <div style={{marginTop: 10, float: 'right'}}>
-            <RaisedButton
-            onClick={e => this.setState({newListAnchorEl: e.currentTarget, newListMenuOpen: true})}
-            backgroundColor={lightBlue300}
-            label='New'
-            icon={<FontIcon className='fa fa-plus' color='#fff' />}
-            labelColor='#fff'
-            />
-            <Popover
-              open={this.state.newListMenuOpen}
-              anchorEl={this.state.newListAnchorEl}
-              anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
-              targetOrigin={{horizontal: 'right', vertical: 'top'}}
-              onRequestClose={e => this.setState({newListMenuOpen: false})}
-            >
-              <Menu desktop>
-                <MenuItem primaryText='Upload from Existing' onClick={this.onRequestOpen} />
-                <MenuItem primaryText='New List' onClick={this.onUploadFromNewClick} />
-              </Menu>
-            </Popover>
-          </div>
+        <div className='large-offset-1 large-10 small-12 columns' style={{marginTop: 15}} >
+          <span style={styles.text}>{this.props.title}</span>
+          {this.props.backRoute && this.props.backRouteTitle &&
+            <Link to={this.props.backRoute}>
+            <span>{this.props.backRouteTitle}</span>
+            <i className='fa fa-angle-right fa-fw' aria-hidden='true'></i>
+          </Link>}
+          <RaisedButton
+          onClick={e => this.setState({newListAnchorEl: e.currentTarget, newListMenuOpen: true})}
+          backgroundColor={lightBlue300}
+          label='New'
+          icon={<FontIcon className='fa fa-plus' color='#fff' />}
+          labelColor='#fff'
+          style={{float: 'right'}}
+          />
+          <Popover
+          open={this.state.newListMenuOpen}
+          anchorEl={this.state.newListAnchorEl}
+          anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+          targetOrigin={{horizontal: 'right', vertical: 'top'}}
+          onRequestClose={e => this.setState({newListMenuOpen: false})}
+          >
+            <Menu desktop>
+              <MenuItem primaryText='Upload from Existing' onClick={this.onRequestOpen} />
+              <MenuItem primaryText='New List' onClick={this.onUploadFromNewClick} />
+            </Menu>
+          </Popover>
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
           <div className='vertical-center' style={{justifyContent: 'flex-end'}} >
@@ -195,7 +200,9 @@ class ListManagerContainer extends Component {
           const bucket = buckets[key];
           return (
             <div>
-              <div>{key}</div> 
+              <div style={{padding: 5}} >
+                <span style={{color: grey500, userSelect: 'none', cursor: 'default'}} >{key}</span>
+              </div> 
               {bucket.map(list =>
                 <ListItem key={list.id} list={list} {...this.props} iconName={this.props.listItemIcon} />
                 )}
@@ -217,7 +224,8 @@ class ListManagerContainer extends Component {
 const styles = {
   uploadBtn: {margin: 10, float: 'right'},
   uploadBtnLabel: {textTransform: 'none'},
-  icon: {color: grey500}
+  icon: {color: grey500},
+  text: {fontSize: '2em', marginRight: 10}
 };
 
 const mapStateToProps = (state, props) => {
