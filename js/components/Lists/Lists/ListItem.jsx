@@ -33,7 +33,7 @@ const styles = {
     height: 36,
     padding: 2,
   },
-  text: {fontSize: '0.8em', fontColor: grey500},
+  text: {fontSize: '0.7em', color: grey500},
 };
 
 // class ListItem extends Component {
@@ -108,6 +108,7 @@ const styles = {
 
 function ListItem({list, onToggle, iconName, tooltip, router, nameString, person, isArchiving, extraIconButtons}) {
   const updatedDate = new Date(list.updated);
+  const createdDate = new Date(list.created);
   const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
     <div key='parent' className='row align-middle hovergray' style={styles.parent}>
@@ -129,11 +130,14 @@ function ListItem({list, onToggle, iconName, tooltip, router, nameString, person
             <Tags hideDelete createLink={name => `/tags/${name}`} listId={list.id}/>
           </div>
       </div>
-      <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
+      <div className='hide-for-small-only medium-1 large-1 columns'>
         <span style={styles.text}>{updatedDate.toLocaleDateString()}</span>
       </div>
+      <div className='hide-for-small-only medium-1 large-1 columns'>
+        <span style={{fontSize: '0.7em', color: grey500}}>{createdDate.toLocaleDateString()}</span>
+      </div>
     {person.teamid > 0 &&
-      <div className='small-4 medium-2 large-2 columns horizontal-center'>
+      <div className='small-4 medium-2 large-1 columns horizontal-center'>
         <span style={styles.text}>{nameString}</span>
       </div>}
       <div className='hide-for-small-only medium-3 large-2 columns'>

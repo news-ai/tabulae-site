@@ -196,13 +196,17 @@ class ListManagerContainer extends Component {
           </div>
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
-          <div className='row'>
+          <div className='row vertical-center'>
             <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
+              <span style={{fontSize: '0.7em', color: grey500}} >List Name</span>
             </div>
-            <div className='hide-for-small-only medium-2 large-1 columns horizontal-center'>
+            <div className='hide-for-small-only medium-1 large-1 columns'>
+              <span style={{fontSize: '0.7em', color: grey500}} >Updated</span>
+            </div>
+            <div className='hide-for-small-only medium-1 large-1 columns'>
               <span style={{fontSize: '0.7em', color: grey500}} >Created</span>
             </div>
-            <div className='small-4 medium-2 large-2 columns horizontal-center'>
+            <div className='small-4 medium-2 large-1 columns horizontal-center'>
               <span style={{fontSize: '0.7em', color: grey500}} >Owner</span>
             </div>
             <div className='hide-for-small-only medium-3 large-2 columns'>
