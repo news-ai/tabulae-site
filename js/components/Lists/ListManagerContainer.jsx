@@ -14,13 +14,14 @@ import IconButton from 'material-ui/IconButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import Popover from 'material-ui/Popover';
 import moment from 'moment-timezone';
+import styled from 'styled-components';
 
 import Lists from './Lists';
 import ListItem from './Lists/ListItem.jsx';
 import InfiniteScroll from 'components/InfiniteScroll';
 import DropFileWrapper from 'components/DropFile/DropFileWrapper.jsx';
 
-import {grey500, lightBlue300} from 'material-ui/styles/colors';
+import {grey300, grey500, lightBlue300} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -87,6 +88,24 @@ const bucketListsByAlphabet = (lists) =>
     }
     return {buckets, keys};
   }, {buckets: {}, keys: []});
+
+
+const HoverSourceContainer = styled.div.attrs({
+  className: props => props.className
+})`
+  border-bottom: 1px solid ${grey300};
+  margin-bottom: 5px;
+`;
+
+const HoverSpan = styled.div.attrs({
+  className: props => props.className
+})`
+  font-size: 0.7em;
+  color: #fff;
+  ${HoverSourceContainer}:hover & {
+    color: ${grey500};
+  }
+`;
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -195,6 +214,7 @@ class ListManagerContainer extends Component {
             </DropDownMenu>
           </div>
         </div>
+      {/*
         <div className='large-offset-1 large-10 small-12 columns'>
           <div className='row vertical-center'>
             <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
@@ -213,14 +233,28 @@ class ListManagerContainer extends Component {
             </div>
           </div>
         </div>
+      */}
         <div className='large-offset-1 large-10 small-12 columns'>
         {keys.map(key => {
           const bucket = buckets[key];
           return (
-            <div>
-              <div style={{padding: '5px 0'}} >
-                <span style={{color: grey500, userSelect: 'none', cursor: 'default'}} >{key}</span>
-              </div> 
+            <div style={{marginTop: 15}} >
+              <HoverSourceContainer className='row vertical-center'>
+                <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
+                  <span style={{color: grey500, userSelect: 'none', cursor: 'default'}} >{key}</span>
+                </div>
+                <HoverSpan
+                className='hide-for-small-only medium-1 large-1 columns'
+                >Updated</HoverSpan>
+                <HoverSpan
+                className='hide-for-small-only medium-1 large-1 columns'
+                >Created</HoverSpan>
+                <HoverSpan
+                className='small-4 medium-2 large-1 columns horizontal-center'
+                >Owner</HoverSpan>
+                <div className='hide-for-small-only medium-3 large-2 columns'>
+                </div>
+              </HoverSourceContainer>
               {bucket.map(list =>
                 <ListItem key={list.id} list={list} {...this.props} iconName={this.props.listItemIcon} />
                 )}
