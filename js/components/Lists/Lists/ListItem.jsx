@@ -46,6 +46,15 @@ const ParentContainer = styled.div.attrs({
   }
 `;
 
+const MockSpan = styled.h2`
+  font-size: 1rem;
+  font-weight: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #0000EE;
+`;
+
 const ListItem = ({list, onToggle, iconName, tooltip, router, nameString, person, isArchiving, extraIconButtons}) => {
   const updatedDate = new Date(list.updated);
   const createdDate = new Date(list.created);
@@ -62,17 +71,9 @@ const ListItem = ({list, onToggle, iconName, tooltip, router, nameString, person
           flex: 1,
           minWidth: 0,
         }} >
-          <h2
-          style={{
-            fontSize: '1rem',
-            fontWeight: 'normal',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            color: '#0000EE',
-          }} >
+          <MockSpan>
             <Link to={`/tables/${list.id}`}>{list.name}</Link>
-          </h2>
+          </MockSpan>
         </div>
         <div
         className='right'

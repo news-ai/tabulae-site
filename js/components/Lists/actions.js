@@ -111,7 +111,7 @@ export function fetchLeastRecentlyCreatedLists() {
     const OFFSET = getState().listReducer.leastRecentlyCreated.offset;
     if (OFFSET === null || getState().listReducer.isReceiving) return;
     dispatch(requestLists());
-    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
+    return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=Created`)
     .then(response => {
       const res = normalize(response, {data: arrayOf(listSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;

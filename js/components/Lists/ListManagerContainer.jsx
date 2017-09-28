@@ -26,6 +26,7 @@ import {grey50, grey300, grey500, grey700, lightBlue300} from 'material-ui/style
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
 import {tour} from './tour';
+import uniq from 'lodash/uniq';
 const origin = {horizontal: 'left', vertical: 'top'};
 
 const bucketListsByDate = (lists, selector) =>
@@ -45,6 +46,7 @@ const bucketListsByDate = (lists, selector) =>
       buckets[key] = [list];
       keys.push(key);
     }
+    // keys = uniq(keys);
     return {buckets, keys};
   }, {buckets: {}, keys: []});
 
@@ -170,7 +172,7 @@ class ListManagerContainer extends Component {
     const {buckets, keys} = bucketObj;
     // console.log(buckets);
     // console.log(keys);
-    // console.log(this.props.lists);
+    console.log(this.props.lists);
     const person = this.props.person;
     // person.teamid = 0;
     return (
