@@ -145,7 +145,7 @@ class Workspace extends Component {
       this.handleTemplateChange(nextProps.template);
     }
 
-    if (nextProps.template && this.props.params.templateId !== nextProps.params.templateI) {
+    if (nextProps.template && this.props.params.templateId !== nextProps.params.templateId) {
       this.handleTemplateChange(nextProps.template);
     }
   }
@@ -181,7 +181,8 @@ class Workspace extends Component {
         subject,
         mutatingSubject: subject,
         useExisting: true,
-        templateName: template.name.length > 0 ? template.name : template.subject
+        templateName: template.name.length > 0 ? template.name : template.subject,
+        currentTemplateId: template.id
       });
       if (isJSON(template.body)) {
         const templateJSON = JSON.parse(template.body);
