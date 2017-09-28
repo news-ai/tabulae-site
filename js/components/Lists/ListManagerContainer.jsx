@@ -94,7 +94,7 @@ const HoverSourceContainer = styled.div.attrs({
   className: props => props.className
 })`
   border-bottom: 1px solid ${grey300};
-  margin-bottom: 7px;
+  margin-bottom: 10px;
 `;
 
 const HoverSpan = styled.div.attrs({
