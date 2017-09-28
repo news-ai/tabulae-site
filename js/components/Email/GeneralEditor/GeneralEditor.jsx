@@ -655,7 +655,7 @@ class GeneralEditor extends React.Component {
     // console.log(controlsStyle);
 
     // }
-    console.log(editorState.getCurrentInlineStyle().toJS());
+    // console.log(editorState.getCurrentInlineStyle().toJS());
     // console.log(draftRawToHtml(convertToRaw(editorState.getCurrentContent())));
     // console.log(this.props.bodyContent);
 
