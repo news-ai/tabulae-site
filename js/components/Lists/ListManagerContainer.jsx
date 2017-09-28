@@ -102,6 +102,8 @@ const HoverSpan = styled.div.attrs({
 })`
   font-size: 0.7em;
   color: #fff;
+  user-select: none;
+  cursor: default;
   ${HoverSourceContainer}:hover & {
     color: ${grey700};
   }
