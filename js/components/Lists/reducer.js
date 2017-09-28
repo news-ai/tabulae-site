@@ -133,6 +133,10 @@ function listReducer(state = initialState.listReducer, action) {
         alphabetical: {offset: 0, received: []}, 
         antiAlphabetical: {offset: 0, received: []}, 
       });
+    case 'RESET_LIST_REDUCER_ORDER':
+      return assignToEmpty(state, {
+        [action.order] : {offset: 0, received: []},
+      });
     case listConstant.REQUEST_FAIL:
       obj = assignToEmpty(state, {});
       obj.isReceiving = false;

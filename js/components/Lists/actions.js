@@ -345,6 +345,7 @@ export function archiveListToggle(listId) {
     return api.patch(`/lists/${listId}`, listBody)
     .then(response => {
       const res = normalize(response.data, listSchema);
+      dispatch({type: 'RESET_LIST_REDUCER_ORDER', order: 'archived'});
       return dispatch(receiveList(res.entities.lists, res.result));
     })
     .catch( message => console.log(message));

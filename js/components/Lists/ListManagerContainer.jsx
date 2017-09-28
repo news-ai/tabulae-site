@@ -124,7 +124,6 @@ class ListManagerContainer extends Component {
   }
 
   componentDidMount() {
-    console.log('MOUNTING');
     this.props.fetchLists();
   }
 
@@ -263,7 +262,10 @@ const styles = {
 const mapStateToProps = (state, props) => {
   const listReducer = state.listReducer;
   const sortType = props.location.query.sort || 'lists';
-  let lists = listReducer[sortType].received.map(id => listReducer[id]).filter(list => list.createdby === state.personReducer.person.id);
+  let lists = listReducer[sortType].received
+  .map(id => listReducer[id])
+  .filter(list => list.createdby === state.personReducer.person.id)
+  .filter(list => !list.archived);
 
   let untitledNum = 0;
   lists.map(list => {
