@@ -124,6 +124,15 @@ function listReducer(state = initialState.listReducer, action) {
         obj.tagQuery = action.tagQuery;
       }
       return obj;
+    case 'RESET_LIST_REDUCER_ORDERS':
+      return assignToEmpty(state, {
+        lists: Object.assign({}, initialState.lists),
+        leastRecentlyUsed: Object.assign({}, initialState.listReducer.leastRecentlyUsed),
+        mostRecentlyCreated: Object.assign({}, initialState.listReducer.mostRecentlyCreated),
+        leastRecentlyCreated: Object.assign({}, initialState.listReducer.leastRecentlyCreated),
+        alphabetical: Object.assign({}, initialState.listReducer.alphabetical),
+        antiAlphabetical: Object.assign({}, initialState.listReducer.antiAlphabetical),
+      });
     case listConstant.REQUEST_FAIL:
       obj = assignToEmpty(state, {});
       obj.isReceiving = false;
@@ -137,13 +146,14 @@ function listReducer(state = initialState.listReducer, action) {
       obj = assignToEmpty(state, action.list);
       obj.isReceiving = false;
       if (!state.received.some(id => id === action.id)) obj.received = [action.id, ...state.received];
-      obj.received.map(id => {
-        const list = obj[id];
-        if (!list.archived) unarchivedLists.push(list.id);
-        if (list.archived) archivedLists.push(list.id);
-      });
-      obj.lists.received = unarchivedLists;
-      obj.archived.received = archivedLists;
+      // obj.received.map(id => {
+      //   const list = obj[id];
+      //   if (!list.archived) unarchivedLists.push(list.id);
+      //   if (list.archived) archivedLists.push(list.id);
+      // });
+      // obj.lists.received = unarchivedLists;
+      // obj.archived.received = archivedLists;
+
       obj.didInvalidate = false;
       return obj;
     case listConstant.PATCH:

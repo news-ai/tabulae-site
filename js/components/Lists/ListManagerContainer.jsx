@@ -168,8 +168,9 @@ class ListManagerContainer extends Component {
         break;
     }
     const {buckets, keys} = bucketObj;
-    // console.log(buckets);
-    // console.log(keys);
+    console.log(buckets);
+    console.log(keys);
+    console.log(this.props.lists);
     const person = this.props.person;
     // person.teamid = 0;
     return (
@@ -240,7 +241,7 @@ class ListManagerContainer extends Component {
                 </div>
               </HoverSourceContainer>
               {bucket.map(list =>
-                <ListItem key={list.id} list={list} {...this.props} iconName={this.props.listItemIcon} />
+                <ListItem key={`list-${list.id}`} list={list} {...this.props} iconName={this.props.listItemIcon} />
                 )}
             </div>
             )

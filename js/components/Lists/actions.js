@@ -98,7 +98,8 @@ export function fetchList(listId) {
     return api.get(`/lists/${listId}`)
     .then(response => {
       const res = normalize(response.data, listSchema);
-      return dispatch(receiveList(res.entities.lists, res.result));
+      dispatch(receiveList(res.entities.lists, res.result));
+      return dispatch({type: 'RESET_LIST_REDUCER_ORDERS'});
     })
     .catch( message => dispatch(requestListFail(message)));
   };
