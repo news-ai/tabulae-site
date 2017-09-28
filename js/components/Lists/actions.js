@@ -141,7 +141,6 @@ export function fetchLists() { // fetchMostRecentlyUsedLists
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().listReducer.lists.offset;
-    console.log('offset', OFFSET);
     if (OFFSET === null || getState().listReducer.isReceiving) return;
     dispatch(requestLists());
     return api.get(`/lists?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Updated`)
