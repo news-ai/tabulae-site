@@ -17,14 +17,6 @@ import styled from 'styled-components';
 const FORMAT = 'ddd, MMM Do Y, hh:mm A';
 
 const styles = {
-  parent: {
-    // marginBottom: 10,
-    borderRadius: '1.5em',
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 3,
-    paddingBottom: 3,
-  },
   smallIcon: {
     fontSize: 16,
     color: grey700
@@ -45,8 +37,8 @@ const ParentContainer = styled.div.attrs({
   margin-top: 3px;
   margin-bottom: 3px;
   &:hover {
-    border-left: 4px double black;
-    border-right: 4px double black;
+    border-left: 4px double ${grey600};
+    border-right: 4px double ${grey600};
     padding-left: 11px;
     padding-right: 11px;
   }

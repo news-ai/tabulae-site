@@ -21,7 +21,7 @@ import ListItem from './Lists/ListItem.jsx';
 import InfiniteScroll from 'components/InfiniteScroll';
 import DropFileWrapper from 'components/DropFile/DropFileWrapper.jsx';
 
-import {grey300, grey500, lightBlue300} from 'material-ui/styles/colors';
+import {grey300, grey500, grey700, lightBlue300} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -94,7 +94,7 @@ const HoverSourceContainer = styled.div.attrs({
   className: props => props.className
 })`
   border-bottom: 1px solid ${grey300};
-  margin-bottom: 5px;
+  margin-bottom: 7px;
 `;
 
 const HoverSpan = styled.div.attrs({
@@ -103,7 +103,7 @@ const HoverSpan = styled.div.attrs({
   font-size: 0.7em;
   color: #fff;
   ${HoverSourceContainer}:hover & {
-    color: ${grey500};
+    color: ${grey700};
   }
 `;
 
@@ -214,31 +214,11 @@ class ListManagerContainer extends Component {
             </DropDownMenu>
           </div>
         </div>
-      {/*
-        <div className='large-offset-1 large-10 small-12 columns'>
-          <div className='row vertical-center'>
-            <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
-              <span style={{fontSize: '0.7em', color: grey500}} >List Name</span>
-            </div>
-            <div className='hide-for-small-only medium-1 large-1 columns'>
-              <span style={{fontSize: '0.7em', color: grey500}} >Updated</span>
-            </div>
-            <div className='hide-for-small-only medium-1 large-1 columns'>
-              <span style={{fontSize: '0.7em', color: grey500}} >Created</span>
-            </div>
-            <div className='small-4 medium-2 large-1 columns horizontal-center'>
-              <span style={{fontSize: '0.7em', color: grey500}} >Owner</span>
-            </div>
-            <div className='hide-for-small-only medium-3 large-2 columns'>
-            </div>
-          </div>
-        </div>
-      */}
         <div className='large-offset-1 large-10 small-12 columns'>
         {keys.map(key => {
           const bucket = buckets[key];
           return (
-            <div style={{marginTop: 15}} >
+            <div style={{marginTop: 20}} >
               <HoverSourceContainer className='row vertical-center'>
                 <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
                   <span style={{color: grey500, userSelect: 'none', cursor: 'default'}} >{key}</span>
