@@ -21,7 +21,7 @@ import ListItem from './Lists/ListItem.jsx';
 import InfiniteScroll from 'components/InfiniteScroll';
 import DropFileWrapper from 'components/DropFile/DropFileWrapper.jsx';
 
-import {grey300, grey500, grey700, lightBlue300} from 'material-ui/styles/colors';
+import {grey50, grey300, grey500, grey700, lightBlue300} from 'material-ui/styles/colors';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -166,8 +166,10 @@ class ListManagerContainer extends Component {
         break;
     }
     const {buckets, keys} = bucketObj;
-    console.log(buckets);
-    console.log(keys);
+    // console.log(buckets);
+    // console.log(keys);
+    const person = this.props.person;
+    // person.teamid = 0;
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >
@@ -203,7 +205,6 @@ class ListManagerContainer extends Component {
         </div>
         <div className='large-offset-1 large-10 small-12 columns'>
           <div className='vertical-center' style={{justifyContent: 'flex-end'}} >
-            {/*iconButtonElement={<IconButton iconClassName={sortLabel} />} */ }
             <DropDownMenu value={sortType} onChange={this.onSortChange}>
               <MenuItem value={undefined} primaryText='Most Recently Used'  />
               <MenuItem value='leastRecentlyUsed' primaryText='Least Recently Used' />
@@ -220,8 +221,8 @@ class ListManagerContainer extends Component {
           return (
             <div style={{marginTop: 20}} >
               <HoverSourceContainer className='row vertical-center'>
-                <div className={this.props.person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
-                  <span style={{color: grey500, userSelect: 'none', cursor: 'default'}} >{key}</span>
+                <div className={person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
+                  <span style={{color: grey700, userSelect: 'none', cursor: 'default'}} >{key}</span>
                 </div>
                 <HoverSpan
                 className='hide-for-small-only medium-1 large-1 columns'
@@ -229,9 +230,10 @@ class ListManagerContainer extends Component {
                 <HoverSpan
                 className='hide-for-small-only medium-1 large-1 columns'
                 >Created</HoverSpan>
+              {person.teamid > 0 &&
                 <HoverSpan
                 className='small-4 medium-2 large-1 columns horizontal-center'
-                >Owner</HoverSpan>
+                >Owner</HoverSpan>}
                 <div className='hide-for-small-only medium-3 large-2 columns'>
                 </div>
               </HoverSourceContainer>
@@ -241,12 +243,6 @@ class ListManagerContainer extends Component {
             </div>
             )
         })}
-        {/*this.props.lists.map((list, i) =>
-          <ListItem key={i} list={list} {...this.props} iconName={this.props.listItemIcon} />
-          )*/}
-        {/*
-          <Lists {...this.props} />
-        */}
         </div>
       </InfiniteScroll>
       );
