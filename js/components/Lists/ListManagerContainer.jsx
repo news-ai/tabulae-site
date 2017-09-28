@@ -124,6 +124,7 @@ class ListManagerContainer extends Component {
   }
 
   componentDidMount() {
+    console.log('MOUNTING');
     this.props.fetchLists();
   }
 

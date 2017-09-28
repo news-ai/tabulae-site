@@ -126,12 +126,12 @@ function listReducer(state = initialState.listReducer, action) {
       return obj;
     case 'RESET_LIST_REDUCER_ORDERS':
       return assignToEmpty(state, {
-        lists: Object.assign({}, initialState.lists),
-        leastRecentlyUsed: Object.assign({}, initialState.listReducer.leastRecentlyUsed),
-        mostRecentlyCreated: Object.assign({}, initialState.listReducer.mostRecentlyCreated),
-        leastRecentlyCreated: Object.assign({}, initialState.listReducer.leastRecentlyCreated),
-        alphabetical: Object.assign({}, initialState.listReducer.alphabetical),
-        antiAlphabetical: Object.assign({}, initialState.listReducer.antiAlphabetical),
+        lists: {offset: 0, received: []},
+        leastRecentlyUsed: {offset: 0, received: []}, 
+        mostRecentlyCreated: {offset: 0, received: []}, 
+        leastRecentlyCreated: {offset: 0, received: []}, 
+        alphabetical: {offset: 0, received: []}, 
+        antiAlphabetical: {offset: 0, received: []}, 
       });
     case listConstant.REQUEST_FAIL:
       obj = assignToEmpty(state, {});
@@ -153,7 +153,6 @@ function listReducer(state = initialState.listReducer, action) {
       // });
       // obj.lists.received = unarchivedLists;
       // obj.archived.received = archivedLists;
-
       obj.didInvalidate = false;
       return obj;
     case listConstant.PATCH:

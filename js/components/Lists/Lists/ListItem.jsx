@@ -52,7 +52,7 @@ const ListItem = ({list, onToggle, iconName, tooltip, router, nameString, person
   // person.teamid = 0;
   const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
-    <ParentContainer className='row align-middle'>
+    <ParentContainer className='row vertical-center'>
       <div
       id={list.name === 'My first list!' && 'listitem_table_hop'}
       className={listClassName}
@@ -62,15 +62,6 @@ const ListItem = ({list, onToggle, iconName, tooltip, router, nameString, person
           flex: 1,
           minWidth: 0,
         }} >
-      {/*
-          <link
-          to={`/tables/${list.id}`}
-          style={{
-            textoverflow: 'ellipsis',
-            whitespace: 'nowrap',
-            overflow: 'hidden'
-          }} >{list.name}</link>
-      */}
           <h2
           style={{
             fontSize: '1rem',
