@@ -12,6 +12,7 @@ import * as joyrideActions from './Joyride/actions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import NotificationBadge  from 'react-notification-badge';
+import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs.jsx';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
@@ -45,26 +46,6 @@ function matchNoNavBar(pathname) {
 
 let DEFAULT_WINDOW_TITLE = window.document.title;
     // window.document.title = DEFAULT_WINDOW_TITLE;
-
-class BreadCrumbs extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-
-  }
-
-  render() {
-    console.log(this.props);
-
-    return (
-      <span></span>
-      );
-  }
-}
-
-const BreadCrumbsWithRouter = withRouter(BreadCrumbs);
 
 class App extends Component {
   constructor(props) {
@@ -129,12 +110,12 @@ class App extends Component {
       }
     }
 
-    if (this.props.location.pathname !== nextProps.location.pathname) {
-      console.log(this.props.location.pathname);
-      console.log(nextProps.location.pathname);
-      console.log(nextProps.location);
-      console.log('---------');
-    }
+    // if (this.props.location.pathname !== nextProps.location.pathname) {
+    //   console.log(this.props.location.pathname);
+    //   console.log(nextProps.location.pathname);
+    //   console.log(nextProps.location);
+    //   console.log('---------');
+    // }
   }
 
   onNotificationPanelOpen(e) {
@@ -223,7 +204,7 @@ class App extends Component {
             <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs routes={props.routes} params={props.params} separator=' > '/>
             {/*
-              <BreadCrumbsWithRouter />
+              <BreadCrumbs />
             */}
             </div>
           </div>

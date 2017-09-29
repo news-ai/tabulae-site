@@ -119,14 +119,14 @@ ReactDOM.render(
           <Route path='/' name='Home' component={App}>
             <IndexRoute component={ListManagerContainer} />
             <Route path='lists' name='List Manager' component={ListManagerContainer} />
-            <Route path='contacts' name='Contacts' component={ContactTags}/>
+            <Route path='contacts' name='Contacts' component={ContactTags} />
             <Route path='tables/:listId' staticName name='Table'>
-              <IndexRoute component={ListFetchingContainer}/>
+              <IndexRoute component={ListFetchingContainer} />
               <Route path=':contactId' staticName name='Profile' component={ContactProfile} />
             </Route>
-            <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer}/>
+            <Route path='tags/:tag' staticName name='Tag Search' component={TagListsContainer} />
             <Route path='clients' staticName name='Clients' component={ClientDirectories}>
-              <Route path=':clientname' component={ClientDirectory}/>
+              <Route path=':clientname' component={ClientDirectory} />
             </Route>
             <Route path='listfeeds/:listId' staticName name='List Feed' component={ListFeed} />
             <Route path='publications/:publicationId' staticName name='Publication' component={Publication} />
@@ -144,9 +144,9 @@ ReactDOM.render(
               <Route path='all' name='All Sent Emails' component={AllSentEmailsContainer} />
               <Route path='trash' name='Trash' component={TrashSentEmailsContainer} />
               <Route path='scheduled' name='Scheduled' component={ScheduledEmails} />
-              <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer}/>
-              <Route path='search(/:searchQuery)' staticName name='Search' component={SearchSentEmails}/>
-              <Route path='charts' staticName name='Charts' component={EmailStatsContainer}/>
+              <Route path='lists/:listId' staticName name='List' component={ListSentEmailsContainer} />
+              <Route path='search(/:searchQuery)' staticName name='Search' component={SearchSentEmails} />
+              <Route path='charts' staticName name='Charts' component={EmailStatsContainer} />
             </Route>
             <Route path='search' name='Search' component={SearchBar} />
             <Route path='*' staticName name='Not Found' component={NotFound} />
