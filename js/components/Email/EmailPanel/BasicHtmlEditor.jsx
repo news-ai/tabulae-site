@@ -337,12 +337,30 @@ class BasicHtmlEditor extends Component {
     }
   }
 
-  _handleBeforeInput(lastInsertedChar) {
+  _handleBeforeInput(lastInsertedChar, editorState) {
     let handled = 'not-handled';
+
+    // console.log(editorState.getCurrentInlineStyle().toJS());
+    if (editorState.getCurrentInlineStyle().has('EMAIL_SIGNATURE')) {
+      let contentState = editorState.getCurrentContent();
+      contentState = Modifier.removeInlineStyle(
+            contentState,
+            SelectionState.createEmpty().merge({
+              anchorKey: contentState.getFirstBlock().getKey(),
+              focusKey: contentState.getLastBlock().getKey(),
+              anchorOffset: 0,
+              focusOffset: contentState.getLastBlock().getLength()
+            }),
+            'EMAIL_SIGNATURE'
+            );
+      this.onChange(EditorState.push(editorState, contentState, 'change-inline-style'), 'force-emit-html');
+      handled = 'handled';
+    }
+
     if (lastInsertedChar === ' ') {
       const editorState = linkifyLastWord(' ', this.state.editorState);
       if (editorState) {
-        this.onChange(editorState);
+        this.onChange(editorState, 'force-emit-html');
         handled = 'handled';
       }
     }
