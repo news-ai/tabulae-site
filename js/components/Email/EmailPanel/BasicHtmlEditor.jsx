@@ -361,6 +361,12 @@ class BasicHtmlEditor extends Component {
             }),
             'EMAIL_SIGNATURE'
             );
+      contentState = Modifier.insertText(
+        contentState,
+        editorState.getSelection(),
+        lastInsertedChar,
+        editorState.getCurrentInlineStyle().remove('EMAIL_SIGNATURE')
+        );
       const newEditorState = EditorState.push(editorState, contentState, 'insert-fragment');
 
       this.onChange(
@@ -377,7 +383,6 @@ class BasicHtmlEditor extends Component {
         return 'handled';
       }
     }
-
   
     return 'not-handled';
   }
