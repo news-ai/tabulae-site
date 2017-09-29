@@ -350,7 +350,6 @@ class BasicHtmlEditor extends Component {
 
   _handleBeforeInput(lastInsertedChar, editorState) {
     if (editorState.getCurrentInlineStyle().has('EMAIL_SIGNATURE')) {
-      console.log('has signature');
       let contentState = editorState.getCurrentContent();
       contentState = Modifier.removeInlineStyle(
             contentState,
@@ -362,7 +361,6 @@ class BasicHtmlEditor extends Component {
             }),
             'EMAIL_SIGNATURE'
             );
-      console.log(convertToRaw(contentState));
       const newEditorState = EditorState.push(editorState, contentState, 'insert-fragment');
 
       this.onChange(
@@ -373,11 +371,9 @@ class BasicHtmlEditor extends Component {
     }
 
     if (lastInsertedChar === ' ') {
-      console.log('why');
       const newEditorState = linkifyLastWord(' ', editorState);
       if (newEditorState) {
-        console.log('handled');
-        this.onChange(editorState);
+        this.onChange(newEditorState, 'force-emit-html');
         return 'handled';
       }
     }
