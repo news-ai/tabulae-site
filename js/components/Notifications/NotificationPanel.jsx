@@ -39,7 +39,6 @@ const NotificationPanel = ({notifications}) => {
         }
       })
     }
-
     {notifications.length === 0 &&
       <div className='vertical-center horizontal-center' style={styles.empty.container}>
         <span className='smalltext' style={styles.empty.text}>No new notifications.</span>

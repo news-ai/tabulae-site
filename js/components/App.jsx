@@ -43,6 +43,29 @@ function matchNoNavBar(pathname) {
   return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length - 1 ]);
 }
 
+let DEFAULT_WINDOW_TITLE = window.document.title;
+    // window.document.title = DEFAULT_WINDOW_TITLE;
+
+class BreadCrumbs extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+
+  }
+
+  render() {
+    console.log(this.props);
+
+    return (
+      <span></span>
+      );
+  }
+}
+
+const BreadCrumbsWithRouter = withRouter(BreadCrumbs);
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -94,6 +117,23 @@ class App extends Component {
       this.setState({showNavBar: false});
     } else {
       this.setState({showNavBar: true});
+    }
+
+    if (this.props.numUnreadNotification !== nextProps.numUnreadNotification) {
+      if (nextProps.numUnreadNotification === 0) {
+        // remove notification #
+        const title = window.document.title;
+        window.document.title = title.split(' ').filter((_, i) => i > 0).join(' ');
+      } else if (this.props.numUnreadNotification === 0) {
+        window.document.title = `(${nextProps.numUnreadNotification}) ${window.document.title}`;
+      }
+    }
+
+    if (this.props.location.pathname !== nextProps.location.pathname) {
+      console.log(this.props.location.pathname);
+      console.log(nextProps.location.pathname);
+      console.log(nextProps.location);
+      console.log('---------');
     }
   }
 
@@ -150,7 +190,8 @@ class App extends Component {
             <div style={{margin: 30}}>
               <div onClick={_ => this.setState({feedbackPanelOpen: true})} className='horizontal-center pointer'>
                 <p style={{fontSize: 14}}>We are always looking for ways to improve. Let us know how the experience was for you!
-                <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down'/></p>
+                  <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down' />
+                </p>
               </div>
             {state.feedbackPanelOpen &&
               <FeedbackPanel />}
@@ -181,6 +222,9 @@ class App extends Component {
             </div>
             <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs routes={props.routes} params={props.params} separator=' > '/>
+            {/*
+              <BreadCrumbsWithRouter />
+            */}
             </div>
           </div>
           <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>

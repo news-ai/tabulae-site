@@ -172,7 +172,7 @@ class ListManagerContainer extends Component {
     const {buckets, keys} = bucketObj;
     // console.log(buckets);
     // console.log(keys);
-    console.log(this.props.lists);
+    // console.log(this.props.lists);
     const person = this.props.person;
     // person.teamid = 0;
     return (
