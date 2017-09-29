@@ -8,6 +8,7 @@ import {ContentState} from 'draft-js';
  * @return {ContentState}                Clean ContentState without selected inlineStyle blocks
  */
 function stripSelectedInlineTagBlocks(contentState, overwriteStyle) {
+  if (!overwriteStyle) return contentState;
   // used to strip EMAIL_SIGNATURE inline style when switching emails
   let truncatedBlocks = [];
   const blocks = contentState.getBlockMap();
