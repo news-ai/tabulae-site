@@ -75,6 +75,7 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import isURL from 'validator/lib/isURL';
 import ValidationHOC from 'components/ValidationHOC';
+import {OrderedSet} from 'immutable';
 
 import {curlyStrategy, findEntities} from 'components/Email/EmailPanel/utils/strategies';
 
@@ -223,31 +224,41 @@ class BasicHtmlEditor extends Component {
         // email signature should append to existing content
         let oldContent = this.state.editorState.getCurrentContent();
         oldContent = stripSelectedInlineTagBlocks(oldContent, nextProps.templateEntityType);
-        const blocks = newContent.getBlockMap();
         const newContentSelection = SelectionState
           .createEmpty()
           .merge({
-            anchorKey: blocks.first().getKey(),
+            anchorKey: newContent.getFirstBlock().getKey(),
             anchorOffset: 0,
-            focusKey: blocks.last().getKey(),
-            focusOffset: blocks.last().getLength()
+            focusKey: newContent.getLastBlock().getKey(),
+            focusOffset: newContent.getLastBlock().getLength()
           });
-
-        // build newContentState with current ContentState and newContent to be appended
-        let mergedBlocks = [];
-        oldContent.getBlockMap().forEach(block => mergedBlocks.push(block));
-        newContent.getBlockMap().forEach(block => mergedBlocks.push(block));
-        newContent = ContentState.createFromBlockArray(mergedBlocks);
+        newContent = Modifier.applyInlineStyle(
+          newContent,
+          newContentSelection,
+          'EMAIL_SIGNATURE'
+          );
+        newContent = Modifier.splitBlock(
+            newContent,
+            SelectionState.createEmpty().merge({
+              anchorKey: newContent.getFirstBlock().getKey(),
+              anchorOffset: 0,
+              focusKey: newContent.getFirstBlock().getKey(),
+              focusOffset: 0
+            })
+          );
+        newContent = Modifier.replaceWithFragment(
+            newContent,
+            SelectionState.createEmpty().merge({
+              anchorKey: newContent.getFirstBlock().getKey(),
+              anchorOffset: 0,
+              focusKey: newContent.getFirstBlock().getKey(),
+              focusOffset: 0
+            }),
+            oldContent.getBlockMap()
+          );
 
         // merge content to editorState first
         editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
-        // apply selection to turn on inline style since it cant be done via contentState
-        editorState = EditorState.acceptSelection(editorState, newContentSelection);
-        const currentStyle = editorState.getCurrentInlineStyle();
-        if (!currentStyle.has('EMAIL_SIGNATURE')) {
-          editorState = RichUtils.toggleInlineStyle(editorState, 'EMAIL_SIGNATURE');
-        }
-        // console.log(convertToRaw(editorState.getCurrentContent()));
       } else {
         editorState = EditorState.push(this.state.editorState, newContent, 'insert-fragment');
       }
@@ -337,16 +348,43 @@ class BasicHtmlEditor extends Component {
     }
   }
 
-  _handleBeforeInput(lastInsertedChar) {
-    let handled = 'not-handled';
+  _handleBeforeInput(lastInsertedChar, editorState) {
+    if (editorState.getCurrentInlineStyle().has('EMAIL_SIGNATURE')) {
+      let contentState = editorState.getCurrentContent();
+      contentState = Modifier.removeInlineStyle(
+            contentState,
+            SelectionState.createEmpty().merge({
+              anchorKey: contentState.getFirstBlock().getKey(),
+              focusKey: contentState.getLastBlock().getKey(),
+              anchorOffset: 0,
+              focusOffset: contentState.getLastBlock().getLength()
+            }),
+            'EMAIL_SIGNATURE'
+            );
+      contentState = Modifier.insertText(
+        contentState,
+        editorState.getSelection(),
+        lastInsertedChar,
+        editorState.getCurrentInlineStyle().remove('EMAIL_SIGNATURE')
+        );
+      const newEditorState = EditorState.push(editorState, contentState, 'insert-fragment');
+
+      this.onChange(
+        newEditorState,
+        'force-emit-html'
+        );
+      return 'handled';
+    }
+
     if (lastInsertedChar === ' ') {
-      const editorState = linkifyLastWord(' ', this.state.editorState);
-      if (editorState) {
-        this.onChange(editorState);
-        handled = 'handled';
+      const newEditorState = linkifyLastWord(' ', editorState);
+      if (newEditorState) {
+        this.onChange(newEditorState, 'force-emit-html');
+        return 'handled';
       }
     }
-    return handled;
+  
+    return 'not-handled';
   }
 
   _handleReturn(e) {
