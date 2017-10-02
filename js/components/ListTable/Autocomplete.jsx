@@ -106,7 +106,7 @@ class Autocomplete extends Component {
       (option, i) =>
         <MenuItem
           key={option + i}
-          onTouchTap={_ => this.onSelect(option)}
+          onClick={_ => this.onSelect(option)}
           primaryText={option}
         />
       );

@@ -63,8 +63,8 @@ class ColumnEditPanel extends Component {
   render() {
     const state = this.state;
     const actions = [
-      <FlatButton primary label='Cancel' disabled={state.isUpdating} onTouchTap={this.props.onRequestClose} />,
-      <FlatButton primary label={state.isUpdating ? 'Updating...' : 'Submit'} disabled={state.isUpdating || !state.dirty} onTouchTap={this.onSubmit} />,
+      <FlatButton primary label='Cancel' disabled={state.isUpdating} onClick={this.props.onRequestClose} />,
+      <FlatButton primary label={state.isUpdating ? 'Updating...' : 'Submit'} disabled={state.isUpdating || !state.dirty} onClick={this.onSubmit} />,
     ];
 
     // console.log(this.props.fieldsmap);

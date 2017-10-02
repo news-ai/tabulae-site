@@ -73,13 +73,13 @@ class AddTagHOC extends Component {
     const actions = [
       <FlatButton
       label='Cancel'
-      onTouchTap={this.onRequestClose}
+      onClick={this.onRequestClose}
       />,
       <FlatButton
       label='Submit'
       primary
       keyboardFocused
-      onTouchTap={this.onSubmit}
+      onClick={this.onSubmit}
     />,
     ];
     return (

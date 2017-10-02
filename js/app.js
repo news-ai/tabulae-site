@@ -75,8 +75,6 @@ import Workspace from './components/Workspace/Workspace.jsx';
 import TemplateManager from './components/Workspace/TemplateManager.jsx';
 
 import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-injectTapEventPlugin();
 
 // Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
 import '../css/main.css';

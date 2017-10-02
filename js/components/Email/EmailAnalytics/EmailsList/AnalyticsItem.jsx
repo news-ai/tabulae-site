@@ -139,14 +139,14 @@ class AnalyticsItem extends Component {
           {(!bounced && delivered) && !isScrolling &&
             <OpenAnalyticsHOC emailId={id} count={opened}>
             {({onRequestOpen}) => (
-              <CountViewItem onTouchTap={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o' />)}
+              <CountViewItem onClick={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o' />)}
             </OpenAnalyticsHOC>}
           </div>
           <div className='small-12 medium-1 large-1 columns horizontal-center' style={styles.tagContainer}>
           {(!bounced && delivered) && !isScrolling &&
             <LinkAnalyticsHOC emailId={id} count={clicked}>
             {({onRequestOpen}) => (
-              <CountViewItem onTouchTap={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o' />)}
+              <CountViewItem onClick={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o' />)}
             </LinkAnalyticsHOC>}
           </div>
         {bounced &&

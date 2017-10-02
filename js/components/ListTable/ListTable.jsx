@@ -894,17 +894,17 @@ class ListTable extends Component {
                     <MenuItem
                     primaryText='Twitter Contacts'
                     leftIcon={<FontIcon className='fa fa-twitter'/>}
-                    onTouchTap={twt.onRequestOpen}
+                    onClick={twt.onRequestOpen}
                     />
                     <MenuItem
                     primaryText='Instagram Contacts'
                     leftIcon={<FontIcon className='fa fa-instagram'/>}
-                    onTouchTap={inst.onRequestOpen}
+                    onClick={inst.onRequestOpen}
                     />
                     <MenuItem
                     primaryText='Trendline'
                     leftIcon={<FontIcon className='fa fa-area-chart'/>}
-                    onTouchTap={sc.onRequestOpen}
+                    onClick={sc.onRequestOpen}
                     disabled={state.selected.length === 0}
                     />
                   </IconMenu>)}
