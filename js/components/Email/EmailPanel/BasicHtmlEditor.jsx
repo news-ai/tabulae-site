@@ -376,6 +376,18 @@ class BasicHtmlEditor extends Component {
       return 'handled';
     }
 
+    if (lastInsertedChar === ' ') {
+      const newEditorState = linkifyLastWord(' ', editorState);
+      if (newEditorState) {
+        this.onChange(newEditorState, 'force-emit-html');
+        return 'handled';
+      }
+    }
+  
+    return 'not-handled';
+  }
+
+
   _handleReturn(e) {
     let handled = 'not-handled';
     if (e.key === 'Enter') {
