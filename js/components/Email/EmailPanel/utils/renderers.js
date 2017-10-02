@@ -22,14 +22,14 @@ export function stripATextNodeFromContent(content) {
 const Media = props => {
   const {block, contentState} = props;
   const entityKey = block.getEntityAt(0);
-  if (entityKey === null) return;
+  if (entityKey === null) return null;
   // console.log(block.getEntityAt(0));
   const entity = contentState.getEntity(entityKey);
   // console.log(entity.getData());
   const type = entity.getType();
   const blockKey = block.getKey();
 
-  let media;
+  let media = null;
   if (type === 'IMAGE') {
     // const realEntity = props.blockProps.getEditorState().getCurrentContent().getEntity(block.getEntityAt(0));
     // const {src, align, imageLink, size, wrap} = entity.getData();
