@@ -53,19 +53,22 @@ const MockSpan = styled.h2`
   white-space: nowrap;
   overflow: hidden;
   color: #0000EE;
+  padding: 0;
+  margin: 0;
 `;
 
 const ListItem = ({list, onToggle, iconName, tooltip, router, nameString, person, isArchiving, extraIconButtons}) => {
   const updatedDate = new Date(list.updated);
   const createdDate = new Date(list.created);
   // person.teamid = 0;
-  const listClassName = person.teamid > 0 ? 'small-8 medium-5 large-7 columns pointer' : 'small-8 medium-6 large-7 columns pointer';
   return (
     <ParentContainer className='row vertical-center'>
       <div
       id={list.name === 'My first list!' && 'listitem_table_hop'}
-      className={listClassName}
-      style={{display: 'flex', alignItems: 'center'}}
+      className={cn('pointer', 'small-8', 'large-7', 'columns', {
+        'medium-5': person.teamid > 0,
+        'medium-6': person.teamid === 0
+      })}
       >
         <div style={{
           flex: 1,
