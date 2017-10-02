@@ -65,7 +65,7 @@ const ListItem = ({list, onToggle, iconName, tooltip, router, nameString, person
     <ParentContainer className='row vertical-center'>
       <div
       id={list.name === 'My first list!' && 'listitem_table_hop'}
-      className={cn('pointer', 'small-8', 'large-7', 'columns', {
+      className={cn('pointer', 'small-8', 'large-7', 'vertical-center', 'columns', {
         'medium-5': person.teamid > 0,
         'medium-6': person.teamid === 0
       })}

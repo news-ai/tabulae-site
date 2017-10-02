@@ -337,7 +337,7 @@ export function createEmptyListObject({name, fieldsmap, tags, client}) {
   };
 }
 
-export function archiveListToggle(listId) {
+export function archiveListToggle(listId, order='archived') {
   return (dispatch, getState) => {
     dispatch({ type: ARCHIVE_LIST, listId});
     let listBody = getState().listReducer[listId];
@@ -345,7 +345,7 @@ export function archiveListToggle(listId) {
     return api.patch(`/lists/${listId}`, listBody)
     .then(response => {
       const res = normalize(response.data, listSchema);
-      dispatch({type: 'RESET_LIST_REDUCER_ORDER', order: 'archived'});
+      dispatch({type: 'RESET_LIST_REDUCER_ORDER', order});
       return dispatch(receiveList(res.entities.lists, res.result));
     })
     .catch( message => console.log(message));

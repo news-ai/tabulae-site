@@ -2,6 +2,7 @@ import React from 'react';
 import ListItem from './ListItem.jsx';
 import ListsTitle from './ListsTitle.jsx';
 import Waiting from '../../Waiting';
+import ListLabelBar from 'components/Lists/Labels/ListLabelBar';
 
 const loading = {
   zIndex: 160,
@@ -11,7 +12,7 @@ const loading = {
 };
 
 const styles = {
-  listitemContainer: {marginBottom: 30, marginTop: 30}
+  listitemContainer: {marginBottom: 30, marginTop: 15}
 };
 
 
@@ -21,6 +22,7 @@ const Lists = ({isReceiving, title, lists, statementIfEmpty, onToggle, listItemI
     <div>
       <Waiting isReceiving={isReceiving} style={loading} />
       <ListsTitle title={title} route={backRoute} iconName='fa fa-angle-right fa-fw' backRouteTitle={backRouteTitle} />
+      <ListLabelBar />
       <div style={styles.listitemContainer}>
        {lists.length === 0 &&
         <span>{statementIfEmpty}</span>}

@@ -22,6 +22,7 @@ import InfiniteScroll from 'components/InfiniteScroll';
 import DropFileWrapper from 'components/DropFile/DropFileWrapper.jsx';
 
 import {grey50, grey300, grey500, grey700, lightBlue300} from 'material-ui/styles/colors';
+import ListLabelBar from './Labels/ListLabelBar';
 
 import hopscotch from 'hopscotch';
 import 'node_modules/hopscotch/dist/css/hopscotch.min.css';
@@ -90,26 +91,6 @@ const bucketListsByAlphabet = (lists) =>
     }
     return {buckets, keys};
   }, {buckets: {}, keys: []});
-
-
-const HoverSourceContainer = styled.div.attrs({
-  className: props => props.className
-})`
-  border-bottom: 1px solid ${grey300};
-  margin-bottom: 10px;
-`;
-
-const HoverSpan = styled.div.attrs({
-  className: props => props.className
-})`
-  font-size: 0.7em;
-  color: #fff;
-  user-select: none;
-  cursor: default;
-  ${HoverSourceContainer}:hover & {
-    color: ${grey700};
-  }
-`;
 
 class ListManagerContainer extends Component {
   constructor(props) {
@@ -225,23 +206,7 @@ class ListManagerContainer extends Component {
           const bucket = buckets[key];
           return (
             <div style={{marginTop: 20}} >
-              <HoverSourceContainer className='row vertical-center'>
-                <div className={person.teamid > 0 ? 'small-8 medium-5 large-7 columns' : 'small-8 medium-6 large-7 columns'}>
-                  <span style={{color: grey700, userSelect: 'none', cursor: 'default'}} >{key}</span>
-                </div>
-                <HoverSpan
-                className='hide-for-small-only medium-1 large-1 columns'
-                >Updated</HoverSpan>
-                <HoverSpan
-                className='hide-for-small-only medium-1 large-1 columns'
-                >Created</HoverSpan>
-              {person.teamid > 0 &&
-                <HoverSpan
-                className='small-4 medium-2 large-1 columns horizontal-center'
-                >Owner</HoverSpan>}
-                <div className='hide-for-small-only medium-3 large-2 columns'>
-                </div>
-              </HoverSourceContainer>
+              <ListLabelBar listNameLabel={key} />
               {bucket.map(list =>
                 <ListItem key={`list-${list.id}`} list={list} {...this.props} iconName={this.props.listItemIcon} />
                 )}
