@@ -77,7 +77,6 @@ const bucketListsByAlphabet = (lists) =>
         buckets[numKey] = [list];
         keys.push(numKey);
       }
-
     } else {
       if (isAlpha(firstChar) && isAlpha(firstCharPrev)) {
         const firstCharUp = firstChar.toUpperCase();
@@ -150,12 +149,10 @@ class ListManagerContainer extends Component {
         bucketObj = bucketListsByAlphabet(this.props.lists);
         break;
     }
-    const {buckets, keys} = bucketObj;
-    // console.log(buckets);
-    // console.log(keys);
-    // console.log(this.props.lists);
+    let {buckets, keys} = bucketObj;
+    if (sortType === 'alphabetical') keys = keys.sort((a, b) => a < b ? -1 : a > b ? 1 : 0 : 0);
+    if (sortType === 'antiAlphabetical') keys = keys.sort((a, b) => a < b ? 1 : a > b ? -1 : 0 : 0);
     const person = this.props.person;
-    // person.teamid = 0;
     return (
       <InfiniteScroll className='row' onScrollBottom={this.props.fetchLists}>
         <Dialog title='Import File' open={this.state.open} onRequestClose={this.onRequestClose} >

@@ -85,7 +85,7 @@ export function deleteList(listId) {
     dispatch({type: 'DELETE_LIST_INITIATE', listId});
     return api.deleteRequest(`/lists/${listId}`)
     .then(response => {
-      console.log(response);
+      // console.log(response);
       return dispatch({type: 'DELETE_LIST_COMPLETE', listId});
     })
     .catch( message => dispatch(requestListFail(message)));
