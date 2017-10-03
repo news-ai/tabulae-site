@@ -316,7 +316,7 @@ const styles = {
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
-  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+  const lists = state.listReducer.lists.received.map(id => state.listReducer[id]);
 
   return {
     listId,

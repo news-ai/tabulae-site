@@ -188,13 +188,13 @@ class AddContactHOC extends Component {
       <FlatButton
         label='Cancel'
         primary
-        onTouchTap={_ => this.setState({open: false, rssfeedsTextarea: ''})}
+        onClick={_ => this.setState({open: false, rssfeedsTextarea: ''})}
       />,
       <FlatButton
         label='Submit'
         primary
         keyboardFocused
-        onTouchTap={this.onSubmit}
+        onClick={this.onSubmit}
       />,
     ];
     return (

@@ -6,9 +6,9 @@ import {blue200, blue50} from 'material-ui/styles/colors';
 
 const fontIconStyle = {fontSize: 16};
 
-function CountViewItem({label, count, iconName, onTouchTap, style}) {
+function CountViewItem({label, count, iconName, onClick, style}) {
   return (
-      <Chip style={style} backgroundColor={blue50} onTouchTap={onTouchTap}>
+      <Chip style={style} backgroundColor={blue50} onClick={onClick}>
         <Avatar
         size={25}
         backgroundColor={blue200}

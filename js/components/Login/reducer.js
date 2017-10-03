@@ -41,7 +41,13 @@ function personReducer(state=initialState.personReducer, action) {
         feedbackDidInvalidate: true
       });
     case 'RECEIVE_USER':
-      return assignToEmpty(state, {[action.user.id]: action.user});
+      return assignToEmpty(state, {[action.user.id]: action.user, currentFetchingUsers: state.currentFetchingUsers.filter(id => id !== action.user.id)});
+    case 'FETCH_USER':
+      if (!state.currentFetchingUsers.some(id => id === action.userId)) {
+        return assignToEmpty(state, {currentFetchingUsers: [...state.currentFetchingUsers, action.userId]});
+      } else {
+        return state;
+      }
     case 'RECEIVE_EMAIL_MAX_ALLOWANCE':
       return assignToEmpty(state, {
         allowance: action.allowance,

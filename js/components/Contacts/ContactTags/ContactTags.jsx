@@ -160,8 +160,8 @@ class ContactTags extends Component {
     const props = this.props;
     const state = this.state;
     const actions = [
-      <FlatButton label='Cancel' onTouchTap={this.onRequestClose}/>,
-      <FlatButton label='Submit' primary onTouchTap={this.onSubmit} />
+      <FlatButton label='Cancel' onClick={this.onRequestClose}/>,
+      <FlatButton label='Submit' primary onClick={this.onSubmit} />
     ];
 
     const total = props.total;
@@ -325,7 +325,7 @@ const mapStateToProps = (state, props) => {
     total = contacts.length;
   }
 
-  const lists = state.listReducer.lists.map(id => state.listReducer[id]);
+  const lists = state.listReducer.lists.received.map(id => state.listReducer[id]);
 
   return {
     isReceiving: state.contactTagReducer.isReceiving,

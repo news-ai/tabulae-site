@@ -75,7 +75,7 @@ class AddEmployerHOC extends Component {
     const actions = [
       <FlatButton
       label='Cancel'
-      onTouchTap={this.onRequestClose}
+      onClick={this.onRequestClose}
       />,
       <FlatButton
       label='Submit'
@@ -84,7 +84,7 @@ class AddEmployerHOC extends Component {
       disabled={
         (!pubId && !state.publicationFormOpen) ||
         (state.publicationFormOpen && (!state.publicationObj.name || !isURL(state.publicationObj.url)))}
-      onTouchTap={this.onSubmit}
+      onClick={this.onSubmit}
     />,
     ];
     return (

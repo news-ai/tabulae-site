@@ -25,7 +25,7 @@ class TeamListsContainer extends Component {
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
         <div className='row' style={styles.container}>
           <div className='large-offset-1 large-10 columns'>
-          <Lists {...this.props}/>
+            <Lists {...this.props}/>
           </div>
         </div>
       </InfiniteScroll>
@@ -34,7 +34,7 @@ class TeamListsContainer extends Component {
 }
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.teamLists.map(id => state.listReducer[id]).filter(list => list.createdby !== state.personReducer.person.id);
+  const lists = state.listReducer.team.received.map(id => state.listReducer[id]).filter(list => list.createdby !== state.personReducer.person.id);
   return {
     lists,
     isReceiving: lists === undefined ? true : false,

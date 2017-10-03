@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'react-router/lib/Link';
 
 const styles = {
-  container: {marginTop: 20},
+  container: {marginTop: 10, marginBottom: 10},
   text: {fontSize: '2em', marginRight: 10}
 };
 

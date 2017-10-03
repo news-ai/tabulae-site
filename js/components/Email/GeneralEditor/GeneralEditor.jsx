@@ -207,6 +207,16 @@ class GeneralEditor extends React.Component {
     function emitHTML(editorState) {
       let contentState = editorState.getCurrentContent();
       contentState = applyDefaultFontSizeInlineStyle(contentState, 'SIZE-10.5');
+      contentState = Modifier.removeInlineStyle(
+            contentState,
+            SelectionState.createEmpty().merge({
+              anchorKey: contentState.getFirstBlock().getKey(),
+              focusKey: contentState.getLastBlock().getKey(),
+              anchorOffset: 0,
+              focusOffset: contentState.getLastBlock().getLength()
+            }),
+            'EMAIL_SIGNATURE'
+            );
       let raw = convertToRaw(contentState);
       let rawToHtml = Object.assign({}, raw, {blocks: raw.blocks.map(block => {
         if (block.type === 'atomic') block.text = ' ';

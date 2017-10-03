@@ -8,6 +8,7 @@ import Waiting from 'components/Waiting';
 import InfiniteScroll from 'components/InfiniteScroll';
 import IconButton from 'material-ui/IconButton';
 import {grey700} from 'material-ui/styles/colors';
+import ListLabelBar from './Labels/ListLabelBar';
 
 const styles = {
   smallIcon: {
@@ -40,15 +41,16 @@ class ArchiveContainer extends Component {
   }
 
   render() {
-    const {isReceiving, backRoute, backRouteTitle, title, lists, statementIfEmpty, onToggle, deleteList, listItemIcon, tooltip} = this.props;
+    const {isReceiving, backRoute, backRouteTitle, title, lists, statementIfEmpty, onToggle, deleteList, listItemIcon, tooltip, person} = this.props;
     return (
       <InfiniteScroll onScrollBottom={this.props.fetchLists}>
         <div className='row' style={{marginTop: 10}}>
           <div className='large-offset-1 large-10 columns'>
-           <div>
-            <Waiting isReceiving={isReceiving} style={loading} />
+            <div>
+              <Waiting isReceiving={isReceiving} style={loading} />
               <ListsTitle title={title} route={backRoute} iconName='fa fa-angle-right fa-fw' backRouteTitle={backRouteTitle} />
               <div style={styles.listitemContainer}>
+              <ListLabelBar />
               {lists.length === 0 && <span>{statementIfEmpty}</span>}
               {
                 lists.map((list, i) =>
@@ -85,7 +87,7 @@ class ArchiveContainer extends Component {
 
 
 const mapStateToProps = state => {
-  const lists = state.listReducer.archivedLists.map(id => state.listReducer[id]);
+  const lists = state.listReducer.archived.received.map(id => state.listReducer[id]);
   return {
     lists: lists,
     isReceiving: lists === undefined ? true : false,
@@ -95,6 +97,7 @@ const mapStateToProps = state => {
     backRouteTitle: 'Media Lists',
     title: 'Archive',
     tooltip: 'put back',
+    person: state.personReducer.person,
   };
 };
 
@@ -102,9 +105,10 @@ const mapDispatchToProps = dispatch => {
   return {
     onToggle: listId => {
       dispatch({type: 'IS_FETCHING', resource: 'lists', id: listId, fetchType: 'isArchiving'});
-      return dispatch(listActions.archiveListToggle(listId))
-      .then(_ => dispatch(listActions.fetchLists()))
-      .then(_ =>dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: listId, fetchType: 'isArchiving'}));
+      return dispatch(listActions.archiveListToggle(listId, 'lists'))
+      .then(_ => dispatch({type: 'IS_FETCHING_DONE', resource: 'lists', id: listId, fetchType: 'isArchiving'}))
+      .then(_ => dispatch(listActions.fetchArchivedLists()))
+      .then(_ => dispatch(listActions.fetchLists()));
     },
     fetchLists: _ => dispatch(listActions.fetchArchivedLists()),
     deleteList: listId => dispatch(listActions.deleteList(listId)),

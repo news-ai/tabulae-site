@@ -12,6 +12,7 @@ import * as joyrideActions from './Joyride/actions';
 import Login from './Login';
 import Breadcrumbs from 'react-breadcrumbs';
 import NotificationBadge  from 'react-notification-badge';
+import BreadCrumbs from 'components/BreadCrumbs/BreadCrumbs.jsx';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import Drawer from 'material-ui/Drawer';
@@ -42,6 +43,9 @@ function matchNoNavBar(pathname) {
   const pathblocks = pathname.split('/');
   return noNavBarLocations.some(loc => loc === pathblocks[pathblocks.length - 1 ]);
 }
+
+let DEFAULT_WINDOW_TITLE = window.document.title;
+    // window.document.title = DEFAULT_WINDOW_TITLE;
 
 class App extends Component {
   constructor(props) {
@@ -95,6 +99,23 @@ class App extends Component {
     } else {
       this.setState({showNavBar: true});
     }
+
+    if (this.props.numUnreadNotification !== nextProps.numUnreadNotification) {
+      // if (nextProps.numUnreadNotification === 0) {
+      //   // remove notification #
+      //   const title = window.document.title;
+      //   window.document.title = title.split(' ').filter((_, i) => i > 0).join(' ');
+      // } else if (this.props.numUnreadNotification === 0) {
+      //   window.document.title = `(${nextProps.numUnreadNotification}) ${window.document.title}`;
+      // }
+    }
+
+    // if (this.props.location.pathname !== nextProps.location.pathname) {
+    //   console.log(this.props.location.pathname);
+    //   console.log(nextProps.location.pathname);
+    //   console.log(nextProps.location);
+    //   console.log('---------');
+    // }
   }
 
   onNotificationPanelOpen(e) {
@@ -150,7 +171,8 @@ class App extends Component {
             <div style={{margin: 30}}>
               <div onClick={_ => this.setState({feedbackPanelOpen: true})} className='horizontal-center pointer'>
                 <p style={{fontSize: 14}}>We are always looking for ways to improve. Let us know how the experience was for you!
-                <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down'/></p>
+                  <FontIcon style={{margin: '0 5px', fontSize: '0.9em'}} color={blue600} hoverColor={blue300} className='fa fa-chevron-down' />
+                </p>
               </div>
             {state.feedbackPanelOpen &&
               <FeedbackPanel />}
@@ -158,18 +180,18 @@ class App extends Component {
           </Dialog>
         }
         <Drawer docked={false} open={state.isDrawerOpen} onRequestChange={this.onDrawerChange} >
-          <Link to='/'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-home'/>}>Home</MenuItem></Link>
-          <Link to='/clients'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-folder'/>}>Client Directory</MenuItem></Link>
-          <Link to='/search'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-search'/>}>Search</MenuItem></Link>
-          <Link to='/emailstats'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-envelope'/>}>Sent & Scheduled Emails</MenuItem></Link>
-          <Link to='/workspace'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-desktop'/>}>Template Manager</MenuItem></Link>
-          <Link to='/public'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
+          <Link to='/'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-home'/>}>Home</MenuItem></Link>
+          <Link to='/clients'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-folder'/>}>Client Directory</MenuItem></Link>
+          <Link to='/search'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-search'/>}>Search</MenuItem></Link>
+          <Link to='/emailstats'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-envelope'/>}>Sent & Scheduled Emails</MenuItem></Link>
+          <Link to='/workspace'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-desktop'/>}>Template Manager</MenuItem></Link>
+          <Link to='/public'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-table'/>}>Public Lists</MenuItem></Link>
         {props.person.teamid > 0 &&
-          <Link to='/team'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
-          <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
-          <MenuItem onTouchTap={this.closeDrawer} onClick={this.goToBilling} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
-          <a href='https://help.newsai.co' target='_blank'><MenuItem onTouchTap={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
-          <Link to='/settings'><MenuItem onTouchTap={this.closeDrawer}>Refer a Colleague</MenuItem></Link>
+          <Link to='/team'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-users'/>}>Team Lists</MenuItem></Link>}
+          <Link to='/settings'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-cogs'/>}>Settings</MenuItem></Link>
+          <MenuItem onClick={this.closeDrawer} onClick={this.goToBilling} rightIcon={<FontIcon className='fa fa-credit-card'/>}>Billing</MenuItem>
+          <a href='https://help.newsai.co' target='_blank'><MenuItem onClick={this.closeDrawer} rightIcon={<FontIcon className='fa fa-question'/>}>Help Center</MenuItem></a>
+          <Link to='/settings'><MenuItem onClick={this.closeDrawer}>Refer a Colleague</MenuItem></Link>
         </Drawer>
         <div className='u-full-width row noprint vertical-center' style={navStyle}>
           <div className='small-6 medium-1 large-1 columns vertical-center'>
@@ -181,6 +203,9 @@ class App extends Component {
             </div>
             <div id='breadcrumbs_hop' style={{marginTop: 16}}>
               <Breadcrumbs routes={props.routes} params={props.params} separator=' > '/>
+            {/*
+              <BreadCrumbs />
+            */}
             </div>
           </div>
           <div className='small-6 medium-2 large-2 columns vertical-center horizontal-center clearfix'>
@@ -191,7 +216,7 @@ class App extends Component {
               style={styles.notificationBadge}
               effect={[null, null, {top:'-5px'}, {top:'0px'}]}
               />}
-              <IconButton iconStyle={styles.notificationBell} onTouchTap={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
+              <IconButton iconStyle={styles.notificationBell} onClick={this.onNotificationPanelOpen} iconClassName='fa fa-bell' />
             </div>
             <Popover
               open={state.notificationPanelOpen}

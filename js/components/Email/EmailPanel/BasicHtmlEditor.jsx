@@ -387,6 +387,7 @@ class BasicHtmlEditor extends Component {
     return 'not-handled';
   }
 
+
   _handleReturn(e) {
     let handled = 'not-handled';
     if (e.key === 'Enter') {

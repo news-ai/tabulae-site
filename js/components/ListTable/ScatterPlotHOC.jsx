@@ -163,7 +163,7 @@ class ScatterPlotHOC extends Component {
                 style={{margin: 2}}
                 backgroundColor={c.blue200}
                 key={`chip-${obj.id}`}
-                onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                onClick={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
                 {obj.username}
                 </Chip>)}
               {state.below && state.below.map(obj =>
@@ -171,7 +171,7 @@ class ScatterPlotHOC extends Component {
                 style={{margin: 2}}
                 backgroundColor={c.red200}
                 key={`chip-${obj.id}`}
-                onTouchTap={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
+                onClick={_ => props.router.push(`/tables/${props.listId}/${obj.id}`)}>
                 {obj.username}
                 </Chip>)}
             </div>

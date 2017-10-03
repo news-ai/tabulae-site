@@ -50,7 +50,7 @@ class FeedsController extends Component {
             <FlatButton
             label='Add'
             primary
-            onTouchTap={this.addFeedClick}
+            onClick={this.addFeedClick}
             />
           </div>
           <span style={{fontSize: '0.9em'}}>* feeds will begin aggregating in a few minutes</span>

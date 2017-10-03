@@ -5,7 +5,8 @@ export const initialState = {
     firstTimeUser: false,
     feedback: false,
     feedbackDidInvalidate: false,
-    feedbackIsReceiving: false
+    feedbackIsReceiving: false,
+    currentFetchingUsers: []
   },
   contactReducer: {
     isReceiving: false,
@@ -15,15 +16,51 @@ export const initialState = {
   listReducer: {
     isReceiving: false,
     didInvalidate: false,
-    lists: [],
-    archivedLists: [],
-    publicLists: [],
-    teamLists: [],
+    lists: { // mostRecentlyUpdated
+      received: [],
+      offset: 0
+    },
+    archived: {
+      received: [],
+      offset: 0
+    },
+    public: {
+      received: [],
+      offset: 0
+    },
+    team: {
+      received: [],
+      offset: 0
+    },
+    mostRecentlyCreated: {
+      received: [],
+      offset: 0
+    },
+    leastRecentlyCreated: {
+      received: [],
+      offset: 0
+    },
+    leastRecentlyUsed: {
+      received: [],
+      offset: 0
+    },
+    alphabetical: {
+      received: [],
+      offset: 0
+    },
+    antiAlphabetical: {
+      received: [],
+      offset: 0
+    },
+    // lists: [],
+    // archivedLists: [],
+    // publicLists: [],
+    // teamLists: [],
     received: [],
-    offset: 0,
-    archivedOffset: 0,
-    publicOffset: 0,
-    teamOffset: 0,
+    // offset: 0,
+    // archivedOffset: 0,
+    // publicOffset: 0,
+    // teamOffset: 0,
     tagLists: [],
     clientLists: [],
   },
