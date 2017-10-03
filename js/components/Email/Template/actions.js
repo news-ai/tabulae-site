@@ -81,7 +81,7 @@ export function getTemplates() {
     const OFFSET = getState().templateReducer.offset;
     if (OFFSET === null || getState().templateReducer.isReceiving) return;
     dispatch({type: templateConstant.REQUEST_MULTIPLE});
-    return api.get(`/templates?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
+    return api.get(`/templates?limit=${PAGE_LIMIT}&offset=${OFFSET}&order=-Updated`)
     .then(response => {
       const res = normalize(response, {data: arrayOf(templateSchema)});
       const newOffset = response.data.length < PAGE_LIMIT ? null : OFFSET + PAGE_LIMIT;
