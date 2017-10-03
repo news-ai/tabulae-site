@@ -982,7 +982,7 @@ class ListTable extends Component {
                 className='HeaderGrid'
                 cellRenderer={this.headerRenderer}
                 columnCount={props.fieldsmap.length}
-                columnWidth={this.getColumnWidth}
+                columnWidth={args => this.getColumnWidth(args) || 70}
                 height={45}
                 autoContainerWidth
                 width={state.screenWidth}
@@ -1001,7 +1001,7 @@ class ListTable extends Component {
               className='BodyGrid'
               cellRenderer={this.cellRenderer}
               columnCount={props.fieldsmap.length}
-              columnWidth={this.getColumnWidth}
+              columnWidth={args => this.getColumnWidth(args) || 70}
               overscanRowCount={10}
               height={state.leftoverHeight || 500}
               width={state.screenWidth}
