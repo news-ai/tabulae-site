@@ -10,7 +10,10 @@ function notificationReducer(state = initialState.notificationReducer, action) {
         messages: [Object.assign({}, action.message, {data: JSON.parse(action.message.data), unread: true}), ...state.messages]
       });
     case 'RECEIVE_NOTIFICATIONS':
-      const messages =  uniqBy([...action.messages.map(msg => Object.assign({}, msg, {data: JSON.parse(msg.data), unread: true})) , ...state.messages], msg => msg.data.resourceId);
+      const messages =  uniqBy([
+        ...action.messages.map(msg => Object.assign({}, msg, {data: JSON.parse(msg.data), unread: true})),
+        ...state.messages],
+        msg => msg.resourceId);
       return assignToEmpty(state, {
         messages
       });
