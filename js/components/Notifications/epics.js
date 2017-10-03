@@ -17,7 +17,7 @@ export let socket = io('https://live-1.newsai.org:443', {
 export const emitReadReceipt = action$ =>
   action$.ofType('READ_NOTIFICATIONS')
   .switchMap(() => {
-    console.log('EMIIIITTT');
+    // console.log('EMIIIITTT');
 
     socket.emit('notification', {notification: 'read'});
     return [];
@@ -50,7 +50,6 @@ export const connectToSocket = (action$, store) =>
     }, 5000);
 
     socket.on('message', msg => {
-      console.log('message');
       if (msg.type === 'auth') {
         if (msg.status === 'success') {
           // success, do nothing
@@ -66,8 +65,10 @@ export const connectToSocket = (action$, store) =>
           observable.next({type: 'CONNECTED_TO_SOCKET'});
         }
       } else {
-        // console.log(msg);
-        msg.map(message => observable.next({type: 'RECEIVE_NOTIFICATION', message}));
+        if (msg.length > 0) {
+          const cleanedMsgs = msg.filter(message => !!message && !!message.data)
+          observable.next({type: 'RECEIVE_NOTIFICATIONS', messages: cleanedMsgs});
+        }
       }
     });
     socket.on('disconnect', function() {
