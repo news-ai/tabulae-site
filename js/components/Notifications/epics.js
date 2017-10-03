@@ -50,7 +50,6 @@ export const connectToSocket = (action$, store) =>
     }, 5000);
 
     socket.on('message', msg => {
-      console.log('message');
       if (msg.type === 'auth') {
         if (msg.status === 'success') {
           // success, do nothing
@@ -66,8 +65,9 @@ export const connectToSocket = (action$, store) =>
           observable.next({type: 'CONNECTED_TO_SOCKET'});
         }
       } else {
-        // console.log(msg);
-        msg.map(message => observable.next({type: 'RECEIVE_NOTIFICATION', message}));
+        const cleanedMsgs = msg
+        .filter(message => !!message && !!message.data)
+        observable.next({type: 'RECEIVE_NOTIFICATIONS', messages: cleanedMsgs});
       }
     });
     socket.on('disconnect', function() {

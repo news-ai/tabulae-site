@@ -8,6 +8,10 @@ function notificationReducer(state = initialState.notificationReducer, action) {
       return assignToEmpty(state, {
         messages: [Object.assign({}, action.message, {data: JSON.parse(action.message.data), unread: true}), ...state.messages]
       });
+    case 'RECEIVE_NOTIFICATIONS':
+      return assignToEmpty(state, {
+        messages: [...action.messages.map(msg => Object.assign({}, msg, {data: JSON.parse(msg.data), unread: true})) , ...state.messages]
+      });
     case 'READ_NOTIFICATIONS':
       return assignToEmpty(state, {
         messages: state.messages.map(message => assignToEmpty(message, {unread: false}))
