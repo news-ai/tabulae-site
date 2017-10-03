@@ -136,6 +136,14 @@ class ListTable extends Component {
       }
     };
     this.clearColumnStorage = columnWidths => localStorage.setItem(this.props.listId, undefined);
+    this.getColumnWidth = ({index}) => {
+      const wid = this.state.columnWidths[index];
+      if (!wid) {
+        this.clearColumnStorage();
+        return 70;
+      }
+      return wid + 10;
+    };
     this.fetchOperations = this._fetchOperations.bind(this);
     this.onCheckSelected = this._onCheckSelected.bind(this);
     this.onCheck = this._onCheck.bind(this);
@@ -948,7 +956,10 @@ class ListTable extends Component {
           containerClassName='vertical-center'
           currentPage={state.currentPage}
           pageSize={state.pageSize}
-          onPageSizeChange={pageSize => this.setState({pageSize, currentPage: 1})} 
+          onPageSizeChange={pageSize => {
+            if (pageSize === -1) this.fetchOperations(this.props, 'all');
+            this.setState({pageSize, currentPage: 1});
+          }} 
           listLength={!!props.listData.contacts ? props.listData.contacts.length : 0}
           onPrev={currentPage => this.setState({currentPage, scrollToRow: 0})}
           onNext={currentPage => {
@@ -971,14 +982,7 @@ class ListTable extends Component {
                 className='HeaderGrid'
                 cellRenderer={this.headerRenderer}
                 columnCount={props.fieldsmap.length}
-                columnWidth={({index}) => {
-                  const wid = state.columnWidths[index];
-                  if (!wid) {
-                    this.clearColumnStorage();
-                    return 70;
-                  }
-                  return wid + 10;
-                }}
+                columnWidth={this.getColumnWidth}
                 height={45}
                 autoContainerWidth
                 width={state.screenWidth}
@@ -990,21 +994,14 @@ class ListTable extends Component {
               </div>
             {state.isDeleting &&
               <div style={{backgroundColor: grey50, display: 'flex', alignItems: 'stretch', justifyContent: 'center', height: '100%'}} >
-                <span className='text' style={{color: grey500}} >Contact(s) are deleting...</span> 
+                <span className='text' style={{color: grey500}} >Deleting Contact(s)...</span> 
               </div>}
               <Grid
               ref={ref => this.setDataGridRef(ref)}
               className='BodyGrid'
               cellRenderer={this.cellRenderer}
               columnCount={props.fieldsmap.length}
-              columnWidth={({index}) => {
-                const wid = state.columnWidths[index];
-                if (!wid) {
-                  this.clearColumnStorage();
-                  return 70;
-                }
-                return wid + 10;
-              }}
+              columnWidth={this.getColumnWidth}
               overscanRowCount={10}
               height={state.leftoverHeight || 500}
               width={state.screenWidth}
