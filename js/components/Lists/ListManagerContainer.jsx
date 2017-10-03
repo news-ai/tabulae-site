@@ -202,8 +202,8 @@ class ListManagerContainer extends Component {
         {keys.map(key => {
           const bucket = buckets[key];
           return (
-            <div style={{marginTop: 20}} >
-              <ListLabelBar listNameLabel={key} />
+            <div key={`bucket-${key}`} style={{marginTop: 20}} >
+              <ListLabelBar key={`title-${key}`} listNameLabel={key} />
               {bucket.map(list =>
                 <ListItem key={`list-${list.id}`} list={list} {...this.props} iconName={this.props.listItemIcon} />
                 )}
