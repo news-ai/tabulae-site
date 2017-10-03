@@ -191,7 +191,10 @@ const styles = {
 };
 
 const mapStateToProps = (state, props) => {
-  const lists = state.listReducer.lists.received.map(id => state.listReducer[id]);
+  const person = state.personReducer.person;
+  const lists = state.listReducer.received
+  .map(id => state.listReducer[id])
+  .filter(list => list.createdby === person.id);
   
   return {
     lists,
@@ -220,18 +223,23 @@ const mapDispatchToProps = (dispatch, props) => {
     copyToNewList: (contacts, name, fieldsmap) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_new');
       mixpanel.track('copy_some_contacts_to_new');
+      dispatch({type: 'RESET_LIST_REDUCER_ORDER', order: 'lists'});
       return dispatch(listActions.createEmptyList(name, fieldsmap))
       .then(response => copyContactsToList(contacts, response.data.id));
     },
-    copyEntireList: (id, name) => dispatch(listActions.copyEntireList(id, name))
-    .then(_ => {
-      window.Intercom('trackEvent', 'copy_all_contacts_to_new');
-      mixpanel.track('copy_all_contacts_to_new');
-      alertify.notify('Copy completed!', 'custom', 2, function(){});
-    }),
+    copyEntireList: (id, name) => {
+      dispatch({type: 'RESET_LIST_REDUCER_ORDER', order: 'lists'});
+      return dispatch(listActions.copyEntireList(id, name))
+      .then(_ => {
+        window.Intercom('trackEvent', 'copy_all_contacts_to_new');
+        mixpanel.track('copy_all_contacts_to_new');
+        alertify.notify('Copy completed!', 'custom', 2, function(){});
+      });
+    },
     copyContactsToList: (contacts, listid) => {
       window.Intercom('trackEvent', 'copy_some_contacts_to_existing');
       mixpanel.track('copy_some_contacts_to_existing');
+      dispatch({type: 'RESET_LIST_REDUCER_ORDER', order: 'lists'});
       return copyContactsToList(contacts, listid);
     },
   };
