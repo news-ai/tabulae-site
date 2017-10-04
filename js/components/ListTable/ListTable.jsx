@@ -69,10 +69,7 @@ let INTERVAL_ID = undefined;
 
 
 const applyDocumentTitle = name => {
-  // LIST Title
-  // LIST Title with notif
-  // NORMAL Title
-  // NORMAL Title with notif
+  // change document title to list name and show # of unread notifications
   const currentTitle = window.document.title;
   if (currentTitle.split(' --- ').length > 1) { // List Title
     const regExp = /\(([^)]+)\)/;
@@ -343,7 +340,6 @@ class ListTable extends Component {
   componentWillUnmount() {
     window.onresize = undefined;
     // clear out list title
-    // TODO: potential bug!! if the list title has () as first part of title
     const title = window.document.title;
     const regExp = /\(([^)]+)\)/;
     const matches = regExp.exec(title);
