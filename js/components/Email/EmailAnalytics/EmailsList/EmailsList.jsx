@@ -5,7 +5,7 @@ import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
-import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
 // import EmailDateContainer from './EmailDateContainer.jsx';
 import {fromJS} from 'immutable';
 import AnalyticsItem from './AnalyticsItem.jsx';
@@ -15,7 +15,7 @@ import moment from 'moment-timezone';
 import find from 'lodash/find';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
-
+const cache = new CellMeasurerCache({fixedWidth: true});
 
 const reformatEmails = (emails, prevDateOrder) => {
   if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}, reformattedEmails: []};
@@ -86,12 +86,10 @@ class EmailsList extends Component {
     };
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
-    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onOpenContainer = this._onOpenContainer.bind(this);
     window.onresize = () => {
       if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
     };
@@ -106,7 +104,6 @@ class EmailsList extends Component {
   componentDidMount() {
     setTimeout(_ => {
       if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
     }, 2000);
@@ -118,10 +115,6 @@ class EmailsList extends Component {
 
   _listRef(ref) {
     this._list = ref;
-  }
-
-  _listCellMeasurerRef(ref) {
-    this._listCellMeasurer = ref;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -154,7 +147,6 @@ class EmailsList extends Component {
     });
     this.setState({dateOrder, reformattedEmails}, _ => {
       if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
     });
@@ -205,27 +197,28 @@ class EmailsList extends Component {
         {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <CellMeasurer
-              ref={this._listCellMeasurerRef}
-              cellRenderer={this.cellRenderer}
-              columnCount={1}
-              rowCount={state.reformattedEmails.length}
+              <List
+              ref={this._listRef}
+              autoHeight
               width={width}
-              >
-              {({getRowHeight}) =>
-                <List
-                ref={this._listRef}
-                autoHeight
-                width={width}
-                height={height}
-                rowHeight={getRowHeight}
-                rowCount={state.reformattedEmails.length}
-                rowRenderer={this.rowRenderer}
-                scrollTop={scrollTop}
-                isScrolling={isScrolling}
-                />
+              height={height}
+              rowHeight={cache.rowHeight}
+              rowCount={state.reformattedEmails.length}
+              deferredMeasurementCache={cache}
+              rowRenderer={rowProps => (
+                <CellMeasurer
+                cache={cache}
+                columnIndex={0}
+                key={rowProps.key}
+                parent={rowProps.parent}
+                rowIndex={rowProps.rowIndex}
+                >
+                {this.rowRenderer(rowProps)}
+                </CellMeasurer>)
               }
-              </CellMeasurer>
+              scrollTop={scrollTop}
+              isScrolling={isScrolling}
+              />
             }
             </AutoSizer>
           }

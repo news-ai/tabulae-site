@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import ContactItemContainer from './ContactItemContainer.jsx';
 
 // NO NEED FOR VIRTUALIZED IF PAGINATED
+const cache = new CellMeasurerCache({fixedWidth: true});
 
 class ContactTags extends Component {
   constructor(props) {
@@ -13,11 +14,9 @@ class ContactTags extends Component {
     this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
-    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onResize = _ => {
       if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
     };
@@ -50,10 +49,6 @@ class ContactTags extends Component {
     this._list = ref;
   }
 
-  _listCellMeasurerRef(ref) {
-    this._listCellMeasurer = ref;
-  }
-
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const contact = this.props.contacts[index];
     const checked = this.props.selected.some(contactId => contactId === contact.id);
@@ -74,27 +69,28 @@ class ContactTags extends Component {
         {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <CellMeasurer
-              ref={this._listCellMeasurerRef}
-              cellRenderer={this.cellRenderer}
-              columnCount={1}
-              rowCount={props.contacts.length}
+              <List
+              ref={this._listRef}
+              autoHeight
               width={width}
-              >
-              {({getRowHeight}) =>
-                <List
-                ref={this._listRef}
-                autoHeight
-                width={width}
-                height={height}
-                rowHeight={getRowHeight}
-                rowCount={props.contacts.length}
-                rowRenderer={this.rowRenderer}
-                scrollTop={scrollTop}
-                isScrolling={isScrolling}
-                />
+              height={height}
+              rowHeight={cache.rowHeight}
+              rowCount={props.contacts.length}
+              deferredMeasurementCache={cache}
+              rowRenderer={rowProps => (
+                <CellMeasurer
+                cache={cache}
+                columnIndex={0}
+                key={rowProps.key}
+                parent={rowProps.parent}
+                rowIndex={rowProps.rowIndex}
+                >
+                {this.rowRenderer(rowProps)}
+                </CellMeasurer>)
               }
-              </CellMeasurer>
+              scrollTop={scrollTop}
+              isScrolling={isScrolling}
+              />
             }
             </AutoSizer>
           }
