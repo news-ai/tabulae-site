@@ -101,13 +101,17 @@ class App extends Component {
     }
 
     if (this.props.numUnreadNotification !== nextProps.numUnreadNotification) {
-      // if (nextProps.numUnreadNotification === 0) {
-      //   // remove notification #
-      //   const title = window.document.title;
-      //   window.document.title = title.split(' ').filter((_, i) => i > 0).join(' ');
-      // } else if (this.props.numUnreadNotification === 0) {
-      //   window.document.title = `(${nextProps.numUnreadNotification}) ${window.document.title}`;
-      // }
+      const title = window.document.title;
+      if (nextProps.numUnreadNotification === 0) {
+        // remove notification #
+        window.document.title = title.split(' ').filter((_, i) => i > 0).join(' ');
+      } else if (this.props.numUnreadNotification === 0) {
+        window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
+      } else { // increase or decrease in notif count but not zero
+        const titleWithoutCount = title.split(' ').filter((_, i) => i > 0).join(' ');
+        window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
+      }
+
     }
 
     // if (this.props.location.pathname !== nextProps.location.pathname) {
