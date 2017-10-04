@@ -77,7 +77,6 @@ const applyDocumentTitle = name => {
   if (currentTitle.split(' --- ').length > 1) { // List Title
     const regExp = /\(([^)]+)\)/;
     const matches = regExp.exec(currentTitle);
-    console.log(matches);
     if (matches === null) { // no notif
       window.document.title = `${name} --- NewsAI Tabulae`;
     } else {
@@ -348,7 +347,6 @@ class ListTable extends Component {
     const title = window.document.title;
     const regExp = /\(([^)]+)\)/;
     const matches = regExp.exec(title);
-    console.log(matches);
     if (matches === null) { // no notif
       window.document.title = `NewsAI Tabulae`;
     } else {

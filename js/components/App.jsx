@@ -107,7 +107,11 @@ class App extends Component {
         window.document.title = title.split(' ').filter((_, i) => i > 0).join(' ');
       } else if (this.props.numUnreadNotification === 0) {
         window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
+      } else { // increase or decrease in notif count but not zero
+        const titleWithoutCount = title.split(' ').filter((_, i) => i > 0).join(' ');
+        window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
       }
+
     }
 
     // if (this.props.location.pathname !== nextProps.location.pathname) {
