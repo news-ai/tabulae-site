@@ -67,6 +67,32 @@ const localStorage = window.localStorage;
 let DEFAULT_WINDOW_TITLE = window.document.title;
 let INTERVAL_ID = undefined;
 
+
+const applyDocumentTitle = name => {
+  // LIST Title
+  // LIST Title with notif
+  // NORMAL Title
+  // NORMAL Title with notif
+  const currentTitle = window.document.title;
+  if (currentTitle.split(' --- ').length > 1) { // List Title
+    const regExp = /\(([^)]+)\)/;
+    const matches = regExp.exec(currentTitle);
+    console.log(matches);
+    if (matches === null) { // no notif
+      window.document.title = `${name} --- NewsAI Tabulae`;
+    } else {
+      window.document.title = `(${matches[1]}) ${name} --- NewsAI Tabulae`;
+    }
+  } else { // normal title
+    const currentTitleArray = currentTitle.split(' ');
+    if (currentTitleArray[0] === 'NewsAI') { // no notifs default
+      window.document.title = `${name} --- NewsAI Tabulae`;
+    } else { // has notif count in title
+      window.document.title = `${currentTitleArray[0]} ${name} --- NewsAI Tabulae`;
+    }
+  }
+};
+
 class ListTable extends Component {
   constructor(props) {
     super(props);
@@ -112,8 +138,9 @@ class ListTable extends Component {
       }
     }
 
+
     if (this.props.listData) {
-      window.document.title = `${this.props.listData.name} --- NewsAI Tabulae`;
+      applyDocumentTitle(this.props.listData.name);
     }
     this.onSearchClick = this.onSearchClick.bind(this);
 
@@ -248,7 +275,7 @@ class ListTable extends Component {
     }
 
     if (nextProps.listData) {
-      window.document.title = `${nextProps.listData.name} --- NewsAI Tabulae`;
+      applyDocumentTitle(nextProps.listData.name);
     }
 
     if (nextProps.listId !== this.props.listId) {
@@ -316,7 +343,17 @@ class ListTable extends Component {
 
   componentWillUnmount() {
     window.onresize = undefined;
-    window.document.title = DEFAULT_WINDOW_TITLE;
+    // clear out list title
+    // TODO: potential bug!! if the list title has () as first part of title
+    const title = window.document.title;
+    const regExp = /\(([^)]+)\)/;
+    const matches = regExp.exec(title);
+    console.log(matches);
+    if (matches === null) { // no notif
+      window.document.title = `NewsAI Tabulae`;
+    } else {
+      window.document.title = `(${matches[1]}) NewsAI Tabulae`;
+    }
     clearInterval(INTERVAL_ID);
   }
 
