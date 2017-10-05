@@ -17,7 +17,6 @@ const defaultStyle = {
 const Tweet = ({style, text, username, createdat, tweetidstr}) => {
   const date = new Date(createdat);
   const containerStyle = style ? Object.assign({}, defaultStyle, style) : Object.assign({}, defaultStyle);
-  if (!text) console.log(text);
   return (
     <div className='row' style={containerStyle}>
       <div className='large-12 medium-12 small-12 columns'>
@@ -27,7 +26,7 @@ const Tweet = ({style, text, username, createdat, tweetidstr}) => {
         </span>
       </div>
       <div className='large-12 medium-12 small-12 columns'>
-        {text !== null && text && text
+        {!!text && text
         .split(' ')
         .map((block, i) => <a key={`${tweetidstr}-${i}`} style={{color: grey800}} target='_blank' href={isURL(block) ? block : `https://twitter.com/statuses/${tweetidstr}`}>{block} </a>)}
       </div>
