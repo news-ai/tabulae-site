@@ -89,10 +89,11 @@ class CampaignContainer extends Component {
         </div>
       {props.campaigns && props.campaigns.length > 0 &&
         <WindowScroller>
-        {({height, isScrolling, scrollTop}) =>
+        {({height, isScrolling, onChildScroll, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
               <List
+              autoHeight
               ref={this._campaignRef}
               width={width}
               height={height}
@@ -102,6 +103,7 @@ class CampaignContainer extends Component {
               rowRenderer={this.rowRenderer}
               scrollTop={scrollTop}
               isScrolling={isScrolling}
+              onScroll={onChildScroll}
               />
             }
             </AutoSizer>
