@@ -127,12 +127,4 @@ const styles = {
 };
 
 
-const mapStateToProps = (state, props) => {
-  return {};
-};
-
-const mapDispatchToProps = (dispatch, props) => {
-  return {};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PlainEmailsList);
+export default PlainEmailsList;

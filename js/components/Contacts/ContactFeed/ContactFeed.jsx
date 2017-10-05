@@ -5,16 +5,20 @@ import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import ContactItemContainer from './ContactItemContainer.jsx';
 
-// NO NEED FOR VIRTUALIZED IF PAGINATED
-const cache = new CellMeasurerCache({fixedWidth: true});
+// DEPRECIATEDDDDDDD
 
-class ContactTags extends Component {
+// NO NEED FOR VIRTUALIZED IF PAGINATED
+const cache = new CellMeasurerCache({
+  fixedWidth: true,
+  minHeight: 50
+});
+
+class ContactFeed extends Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
-    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onResize = _ => {
       if (this._list) {
         this._list.recomputeRowHeights();
@@ -32,11 +36,10 @@ class ContactTags extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.selected.length !== this.props.selected.length) {
-      this._list.forceUpdateGrid();
+      this.onResize();
     }
 
-    if (nextProps.contacts !== this.props.contacts) {
-      console.log('hit not the smae');
+    if (this.props.contacts.length !== nextProps.contacts.length) {
       this.onResize();
     }
   }
@@ -55,9 +58,18 @@ class ContactTags extends Component {
     const renderNode = <ContactItemContainer index={index} checked={checked} onSelect={this.props.onSelect} {...contact}/>
 
     return (
-      <div style={Object.assign({}, style, {padding: 5})} key={key}>
-      {renderNode}
-      </div>);
+      <CellMeasurer
+      cache={this._cache}
+      columnIndex={0}
+      key={key}
+      rowIndex={index}
+      parent={parent}
+      >
+        <div style={Object.assign({}, style, {padding: 5})} key={key}>
+        {renderNode}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -66,7 +78,7 @@ class ContactTags extends Component {
     // console.log(props.contacts);
     return (
         <WindowScroller>
-        {({height, isScrolling, scrollTop}) =>
+        {({height, isScrolling, scrollTop, onChildScroll}) =>
           <AutoSizer disableHeight>
             {({width}) =>
               <List
@@ -77,17 +89,8 @@ class ContactTags extends Component {
               rowHeight={cache.rowHeight}
               rowCount={props.contacts.length}
               deferredMeasurementCache={cache}
-              rowRenderer={rowProps => (
-                <CellMeasurer
-                cache={cache}
-                columnIndex={0}
-                key={rowProps.key}
-                parent={rowProps.parent}
-                rowIndex={rowProps.rowIndex}
-                >
-                {this.rowRenderer(rowProps)}
-                </CellMeasurer>)
-              }
+              onScroll={onChildScroll}
+              rowRenderer={this.rowRenderer}
               scrollTop={scrollTop}
               isScrolling={isScrolling}
               />
@@ -98,4 +101,4 @@ class ContactTags extends Component {
       );
   }
 }
-export default ContactTags;
+export default ContactFeed;

@@ -11,38 +11,32 @@ const styleEmptyRow = {
   marginBottom: 20,
 };
 
-const cache = new CellMeasurerCache({fixedWidth: true});
-
 class BasicFeed extends Component {
   constructor(props) {
     super(props);
   }
 
+  componentWillReceiveProps(nextProps) {
+
+  }
+
   render() {
     const props = this.props;
+    console.log(props.cache.rowHeight(0));
     return (
       <List
       ref={ref => props.setRef(ref)}
       width={props.containerWidth || 500}
       height={props.containerHeight}
       rowCount={props.feed.length}
-      rowHeight={cache.rowHeight}
-      deferredMeasurementCache={cache}
-      rowRenderer={rowProps => (
-        <CellMeasurer
-        cache={cache}
-        columnIndex={0}
-        key={rowProps.key}
-        parent={rowProps.parent}
-        rowIndex={rowProps.rowIndex}
-        >
-        {props.rowRenderer(rowProps)}
-        </CellMeasurer>)
-      }
+      rowHeight={props.cache.rowHeight}
+      deferredMeasurementCache={props.cache}
+      rowRenderer={props.rowRenderer}
       scrollTop={props.scrollTop}
       overscanRowCount={5}
       onScroll={args => {
         if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchFeed();
+        if (props.onScroll) props.onScroll(args);
       }}
       />)
   }
@@ -63,7 +57,7 @@ class GenericFeed extends Component {
     const limitedHeightList = props.feed && <BasicFeed {...props}/>;
     const windowScrollableList = props.feed && (
        <WindowScroller>
-        {({height, scrollTop}) => (<BasicFeed {...props} containerHeight={height} scrollTop={scrollTop}/>)}
+        {({height, scrollTop, onChildScroll}) => (<BasicFeed onScroll={onChildScroll} {...props} containerHeight={height} scrollTop={scrollTop}/>)}
         </WindowScroller>);
     const autoSizedList = props.feed && (
         <AutoSizer>

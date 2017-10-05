@@ -3,6 +3,7 @@ import Tweet from '../Tweets/Tweet.jsx';
 import HeadlineItem from '../Headlines/HeadlineItem.jsx';
 import InstagramItem from '../Instagram/InstagramItem.jsx';
 import GenericFeed from '../GenericFeed.jsx';
+import {CellMeasurerCache, CellMeasurer} from 'react-virtualized';
 
 class MixedFeed extends Component {
   constructor(props) {
@@ -12,6 +13,7 @@ class MixedFeed extends Component {
       this._mixedList = ref;
     };
     this.rowRenderer = this._rowRenderer.bind(this);
+    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
   }
 
   componentDidMount() {
@@ -27,6 +29,10 @@ class MixedFeed extends Component {
       if (this._mixedList && this._mixedListCellMeasurer) {
         this._mixedList.recomputeRowHeights();
       }
+    }
+
+    if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
+      this._mixedList.recomputeRowHeights();
     }
   }
 
@@ -51,12 +57,21 @@ class MixedFeed extends Component {
         row = <HeadlineItem screenWidth={this.props.containerWidth} style={this.props.rowStyle} {...feedItem} />;
     }
 
-    let newstyle = style;
+    let newstyle = Object.assign({}, style);
     if (newstyle) newstyle.padding = '0 18px';
     return (
-      <div className='vertical-center' key={key} style={newstyle}>
-        {row}
-      </div>);
+      <CellMeasurer
+      cache={this._cache}
+      columnIndex={0}
+      key={key}
+      parent={parent}
+      rowIndex={index}
+      >
+        <div className='vertical-center' key={key} style={newstyle}>
+          {row}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -66,6 +81,7 @@ class MixedFeed extends Component {
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       title='RSS/Twitter/Instagram'
+      cache={this._cache}
       {...props}
       />);
   }
