@@ -15,14 +15,26 @@ class TweetFeed extends Component {
     this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
   }
 
+  componentDidMount() {
+    this.recomputeIntervalTimer = setInterval(_ => {
+      if (this._tweetList) {
+        this._tweetList.recomputeRowHeights();
+      }
+    }, 5000);
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
       if (this._tweetList) setTimeout(_ => this._tweetList.recomputeRowHeights(), 1000);
     }
 
     if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
-      if (this._tweetList) setTimeout(_ => this._tweetList.recomputeRowHeights(), 100);
+      if (this._tweetList) setTimeout(_ => this._tweetList.recomputeRowHeights(), 1000);
     }
+  }
+  
+  componentWillUnmount() {
+    clearInterval(this.recomputeIntervalTimer);
   }
 
   _rowRenderer({key, index, style, parent}) {

@@ -14,6 +14,14 @@ class Headlines extends Component {
     };
     this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
   }
+  
+  componentDidMount() {
+    this.recomputeIntervalTimer = setInterval(_ => {
+      if (this._headlineList) {
+        this._headlineList.recomputeRowHeights();
+      }
+    }, 5000);
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
@@ -23,6 +31,10 @@ class Headlines extends Component {
     if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
       if (this._headlineList) setTimeout(_ => this._headlineList.recomputeRowHeights(), 100);
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.recomputeIntervalTimer);
   }
 
   _rowRenderer({key, index, style, parent}) {
