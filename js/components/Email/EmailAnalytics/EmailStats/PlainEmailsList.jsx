@@ -11,7 +11,10 @@ const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
 const iconButtonIconStyle = {color: grey600};
 const placeholder = 'No emails found.';
-const cache = new CellMeasurerCache({fixedWidth: true});
+const cache = new CellMeasurerCache({
+  fixedWidth: true,
+  minHeight: 50
+});
 
 class PlainEmailsList extends Component {
   constructor(props) {

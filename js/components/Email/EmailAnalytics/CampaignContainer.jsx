@@ -18,20 +18,34 @@ const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
 const iconButtonIconStyle = {color: grey600};
 const pageTitleSpan = {fontSize: '1.5em'};
-const cache = new CellMeasurerCache({fixedWidth: true});
 
 class CampaignContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this._cache = new CellMeasurerCache({
+      fixedWidth: true,
+      minHeight: 50,
+      keyMapper: () => 1
+    });
     this.rowRenderer = this._rowRenderer.bind(this);
     this._campaignRef = this._campaignRef.bind(this);
-    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     window.onresize = () => {
       if (this._campaign) {
+        // this._cache.clearAll();
         this._campaign.recomputeRowHeights();
       }
     };
+  }
+
+  componentWillMount() {
+    this.props.fetchCampaignStats();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.campaigns.length !== nextProps.campaigns.length) {
+      setTimeout(_ => this._campaign && this._campaign.recomputeRowHeights(), 100);
+    }
   }
 
   componentWillUnmount() {
@@ -42,15 +56,20 @@ class CampaignContainer extends Component {
     this._campaign = ref;
   }
 
-  componentWillMount() {
-    this.props.fetchCampaignStats();
-  }
-
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     return (
-      <div style={style} key={key}>
-        <Campaign {...this.props.campaigns[index]}/>
-      </div>);
+      <CellMeasurer
+      cache={this._cache}
+      columnIndex={0}
+      key={key}
+      rowIndex={index}
+      parent={parent}
+      >
+        <div style={style} key={key}>
+          <Campaign {...this.props.campaigns[index]}/>
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -64,34 +83,23 @@ class CampaignContainer extends Component {
             <span style={pageTitleSpan}>Opens/Clicks History</span>
           </div>
         </div>
-        <EmailStats/>
+        <EmailStats />
         <div className='row'>
           <span style={pageTitleSpan}>Campaigns</span>
         </div>
-      {props.campaigns && 
+      {props.campaigns && props.campaigns.length > 0 &&
         <WindowScroller>
         {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
               <List
               ref={this._campaignRef}
-              autoHeight
               width={width}
               height={height}
-              rowHeight={cache.rowHeight}
+              rowHeight={() => this._cache.rowHeight(0)}
               rowCount={props.campaigns.length}
-              deferredMeasurementCache={cache}
-              rowRenderer={rowProps => (
-                <CellMeasurer
-                cache={cache}
-                columnIndex={0}
-                key={rowProps.key}
-                parent={rowProps.parent}
-                rowIndex={rowProps.rowIndex}
-                >
-                {this.rowRenderer(rowProps)}
-                </CellMeasurer>)
-              }
+              deferredMeasurementCache={this._cache}
+              rowRenderer={this.rowRenderer}
               scrollTop={scrollTop}
               isScrolling={isScrolling}
               />
