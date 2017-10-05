@@ -21,7 +21,9 @@ class MixedFeed extends Component {
       if (this._mixedList) {
         this._mixedList.recomputeRowHeights();
       }
-    }, 5000);
+    }, 4000);
+
+    setTimeout(_ => this._cache && this._cache.clearAll(), 5000);
   }
 
   componentWillReceiveProps(nextProps) {
