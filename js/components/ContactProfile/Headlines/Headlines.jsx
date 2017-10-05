@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import HeadlineItem from './HeadlineItem.jsx';
 import * as headlineActions from './actions';
 import GenericFeed from '../GenericFeed.jsx';
+import {CellMeasurerCache, CellMeasurer} from 'react-virtualized';
 
 class Headlines extends Component {
   constructor(props) {
@@ -11,26 +12,38 @@ class Headlines extends Component {
     this.setRef = ref => {
       this._headlineList = ref;
     };
+    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
       // if (this._headlineList) this._headlineList.recomputeRowHeights();
     }
+
+    if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
+      if (this._headlineList) setTimeout(_ => this._headlineList.recomputeRowHeights(), 100);
+    }
   }
 
-  _rowRenderer({key, index, style}) {
+  _rowRenderer({key, index, style, parent}) {
     const feedItem = this.props.feed[index];
     const row = <HeadlineItem {...feedItem} />;
 
-    let newstyle = style;
-    if (newstyle) {
-      newstyle.padding = '0 18px';
-    }
+    let newstyle = Object.assign({}, style);
+    if (newstyle) newstyle.padding = '0 18px';
     return (
-      <div className='vertical-center' key={key} style={newstyle}>
-        {row}
-      </div>);
+      <CellMeasurer
+      cache={this._cache}
+      columnIndex={0}
+      key={key}
+      parent={parent}
+      rowIndex={index}
+      >
+        <div className='vertical-center' key={key} style={newstyle}>
+          {row}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -40,6 +53,7 @@ class Headlines extends Component {
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       title='RSS'
+      cache={this._cache}
       {...props}
       />);
   }

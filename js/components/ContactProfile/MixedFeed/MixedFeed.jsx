@@ -32,7 +32,7 @@ class MixedFeed extends Component {
     }
 
     if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
-      this._mixedList.recomputeRowHeights();
+      if (this._mixedList) setTimeout(_ => this._mixedList.recomputeRowHeights(), 100);
     }
   }
 
@@ -40,7 +40,7 @@ class MixedFeed extends Component {
     clearInterval(this.recomputeIntervalTimer);
   }
 
-  _rowRenderer({key, index, style}) {
+  _rowRenderer({key, index, style, parent}) {
     const feedItem = this.props.feed[index];
     let row;
     switch (feedItem.type) {

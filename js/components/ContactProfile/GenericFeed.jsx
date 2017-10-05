@@ -16,10 +16,6 @@ class BasicFeed extends Component {
     super(props);
   }
 
-  componentWillReceiveProps(nextProps) {
-
-  }
-
   render() {
     const props = this.props;
     return (
