@@ -30,7 +30,9 @@ class BasicFeed extends Component {
       scrollTop={props.scrollTop}
       overscanRowCount={5}
       onScroll={args => {
-        if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchFeed();
+        if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) {
+          props.fetchFeed();
+        }
         if (props.onScroll) props.onScroll(args);
       }}
       />)

@@ -46,7 +46,7 @@ class ListFeed extends Component {
 
   componentDidMount() {
     this.getPosition();
-    window.Intercom('trackEvent', 'check_list_feed', {listId: this.props.listId});
+    if (window.Intercom) window.Intercom('trackEvent', 'check_list_feed', {listId: this.props.listId});
     mixpanel.track('check_list_feed', {listId: this.props.listId});
   }
 
