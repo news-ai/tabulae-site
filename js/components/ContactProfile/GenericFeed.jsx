@@ -22,7 +22,6 @@ class BasicFeed extends Component {
 
   render() {
     const props = this.props;
-    console.log(props.cache.rowHeight(0));
     return (
       <List
       ref={ref => props.setRef(ref)}
