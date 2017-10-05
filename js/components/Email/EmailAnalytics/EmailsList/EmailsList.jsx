@@ -109,6 +109,12 @@ class EmailsList extends Component {
     }, 2000);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.emails.length !== nextProps.emails.length) {
+      setTimeout(_ => this._list && this._list.recomputeRowHeights(), 100);
+    }
+  }
+
   componentWillUnmount() {
     window.onresize = undefined;
   }
@@ -124,7 +130,6 @@ class EmailsList extends Component {
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
         if (this._list) {
-          this._listCellMeasurer.resetMeasurements();
           this._list.recomputeRowHeights();
         }
       });
@@ -165,9 +170,18 @@ class EmailsList extends Component {
       renderNode = <DatestringDivider onOpenClick={this.onOpenContainer} {...node} />;
     }
     return (
-      <div style={style} key={key}>
-        {renderNode}
-      </div>);
+      <CellMeasurer
+      cache={cache}
+      columnIndex={0}
+      key={key}
+      rowIndex={index}
+      parent={parent}
+      >
+        <div style={style} key={key}>
+          {renderNode}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -194,7 +208,7 @@ class EmailsList extends Component {
       }
         <div style={style}>
         <WindowScroller>
-        {({height, isScrolling, scrollTop}) =>
+        {({height, isScrolling, onChildScroll, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
               <List
@@ -205,19 +219,10 @@ class EmailsList extends Component {
               rowHeight={cache.rowHeight}
               rowCount={state.reformattedEmails.length}
               deferredMeasurementCache={cache}
-              rowRenderer={rowProps => (
-                <CellMeasurer
-                cache={cache}
-                columnIndex={0}
-                key={rowProps.key}
-                parent={rowProps.parent}
-                rowIndex={rowProps.rowIndex}
-                >
-                {this.rowRenderer(rowProps)}
-                </CellMeasurer>)
-              }
+              rowRenderer={this.rowRenderer}
               scrollTop={scrollTop}
               isScrolling={isScrolling}
+              onScroll={onChildScroll}
               />
             }
             </AutoSizer>

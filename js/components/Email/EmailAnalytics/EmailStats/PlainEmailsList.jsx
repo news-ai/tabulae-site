@@ -25,7 +25,6 @@ class PlainEmailsList extends Component {
     this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     window.onresize = () => {
       if (this._list) {
-        cache.clearAll();
         this._list.recomputeRowHeights();
       }
     };
@@ -35,11 +34,15 @@ class PlainEmailsList extends Component {
     console.log('weeeeeee');
     setTimeout(_ => {
       if (this._list) {
-        console.log('hiiiiiiii');
-        cache.clearAll();
         this._list.recomputeRowHeights();
       }
     }, 2000);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.emails.length !== nextProps.emails.length) {
+      setTimeout(_ => this._list && this._list.recomputeRowHeights(), 100);
+    }
   }
 
   componentWillUnmount() {
@@ -58,9 +61,18 @@ class PlainEmailsList extends Component {
     <AnalyticsItem key={`email-analytics-${index}`} {...email}/>;
 
     return (
-      <div style={style} key={key}>
-      {renderNode}
-      </div>);
+      <CellMeasurer
+      cache={cache}
+      columnIndex={0}
+      key={key}
+      rowIndex={index}
+      parent={parent}
+      >
+        <div style={style} key={key}>
+        {renderNode}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -69,7 +81,7 @@ class PlainEmailsList extends Component {
     return (
       <div>
         <WindowScroller>
-        {({height, isScrolling, scrollTop}) =>
+        {({height, isScrolling, onChildScroll, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
               <List
@@ -80,17 +92,8 @@ class PlainEmailsList extends Component {
               rowHeight={cache.rowHeight}
               deferredMeasurementCache={cache}
               rowCount={props.emails.length}
-              rowRenderer={rowProps => (
-                <CellMeasurer
-                cache={cache}
-                columnIndex={0}
-                key={rowProps.key}
-                parent={rowProps.parent}
-                rowIndex={rowProps.rowIndex}
-                >
-                {this.rowRenderer(rowProps)}
-                </CellMeasurer>)
-              }
+              onScroll={onChildScroll}
+              rowRenderer={this.rowRenderer}
               scrollTop={scrollTop}
               isScrolling={isScrolling}
               />

@@ -32,7 +32,6 @@ class CampaignContainer extends Component {
     this._campaignRef = this._campaignRef.bind(this);
     window.onresize = () => {
       if (this._campaign) {
-        // this._cache.clearAll();
         this._campaign.recomputeRowHeights();
       }
     };
@@ -97,7 +96,7 @@ class CampaignContainer extends Component {
               ref={this._campaignRef}
               width={width}
               height={height}
-              rowHeight={() => this._cache.rowHeight(0)}
+              rowHeight={this._cache.rowHeight}
               rowCount={props.campaigns.length}
               deferredMeasurementCache={this._cache}
               rowRenderer={this.rowRenderer}
