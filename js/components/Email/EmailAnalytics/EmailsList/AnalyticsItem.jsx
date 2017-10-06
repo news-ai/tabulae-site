@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import CountViewItem from './CountViewItem.jsx';
 import Link from 'react-router/lib/Link';
-import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 import LinkAnalyticsHOC from './LinkAnalyticsHOC.jsx';
 import OpenAnalyticsHOC from './OpenAnalyticsHOC.jsx';
@@ -33,7 +32,6 @@ class AnalyticsItem extends Component {
       showEditPanel: false,
     };
     this.onPreviewOpen = this._onPreviewOpen.bind(this);
-    this.onPreviewClose = _ => this.setState({isPreviewOpen: false});
     this.onEditContactOpen = _ => this.setState({showEditPanel: true});
     this.onEditContactClose = _ => this.setState({showEditPanel: false});
   }
@@ -44,7 +42,7 @@ class AnalyticsItem extends Component {
 
   _onPreviewOpen() {
     this.props.fetchAttachments();
-    this.setState({isPreviewOpen: true});
+    this.props.onPreviewClick(this.props);
   }
 
   render() {
@@ -72,7 +70,8 @@ class AnalyticsItem extends Component {
       list,
       deleted,
       onOpenClick,
-      onLinkClick
+      onLinkClick,
+      onPreviewOpen
     } = this.props;
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
@@ -119,10 +118,6 @@ class AnalyticsItem extends Component {
             </div>
           </div>
         </div>
-      {!isScrolling &&
-        <Dialog autoScrollBodyContent open={state.isPreviewOpen} onRequestClose={this.onPreviewClose}>
-          <StaticEmailContent {...this.props} />
-        </Dialog>}
         <div className='row' style={styles.analytics}>
           <div className='small-12 medium-8 large-8 columns truncate-ellipsis' style={styles.toContainer}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText} >{subject || '(No Subject)'}</span>

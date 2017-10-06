@@ -16,6 +16,7 @@ import moment from 'moment-timezone';
 import find from 'lodash/find';
 import OpenAnalytics from './OpenAnalytics';
 import LinkAnalytics from './LinkAnalytics';
+import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
 const cache = new CellMeasurerCache({fixedWidth: true});
@@ -181,6 +182,11 @@ class EmailsList extends Component {
           dialogOpen: true,
           dialogContentType: 'click',
         })}
+        onPreviewClick={emailProps => this.setState({
+          dialogContentProps: emailProps,
+          dialogOpen: true,
+          dialogContentType: 'preview',
+        })}
         {...email}
         />;
     } else {
@@ -217,6 +223,9 @@ class EmailsList extends Component {
       case 'click':
         dialogContent = <LinkAnalytics {...state.dialogContentProps} />;
         dialogTitle = 'Link Click Count';
+        break;
+      case 'preview':
+        dialogContent = <StaticEmailContent {...state.dialogContentProps} />;
         break;
     }
 
