@@ -22,16 +22,15 @@ class PlainEmailsList extends Component {
     this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
-    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     window.onresize = () => {
       if (this._list) {
+        console.log('hey');
         this._list.recomputeRowHeights();
       }
     };
   }
 
   componentDidMount() {
-    console.log('weeeeeee');
     setTimeout(_ => {
       if (this._list) {
         this._list.recomputeRowHeights();
@@ -40,8 +39,11 @@ class PlainEmailsList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('------');
+    console.log(this.props.emails);
+    console.log(nextProps.emails);
     if (this.props.emails.length !== nextProps.emails.length) {
-      setTimeout(_ => this._list && this._list.recomputeRowHeights(), 100);
+      setTimeout(_ => this._list && this._list.recomputeRowHeights(), 1000);
     }
   }
 

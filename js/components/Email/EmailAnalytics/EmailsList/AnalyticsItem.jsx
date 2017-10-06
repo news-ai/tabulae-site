@@ -70,7 +70,9 @@ class AnalyticsItem extends Component {
       contact,
       contactId,
       list,
-      deleted
+      deleted,
+      onOpenClick,
+      onLinkClick
     } = this.props;
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
@@ -136,18 +138,12 @@ class AnalyticsItem extends Component {
             <p style={styles.bouncedReason}>{bouncedreason}</p>}
           </div>}
           <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
-          {(!bounced && delivered) && !isScrolling &&
-            <OpenAnalyticsHOC emailId={id} count={opened}>
-            {({onRequestOpen}) => (
-              <CountViewItem onClick={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o' />)}
-            </OpenAnalyticsHOC>}
+          {(!bounced && delivered) &&
+            <CountViewItem onClick={onOpenClick} label='Opened' count={opened} iconName='fa fa-paper-plane-o' />}
           </div>
           <div className='small-12 medium-1 large-1 columns horizontal-center' style={styles.tagContainer}>
-          {(!bounced && delivered) && !isScrolling &&
-            <LinkAnalyticsHOC emailId={id} count={clicked}>
-            {({onRequestOpen}) => (
-              <CountViewItem onClick={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o' />)}
-            </LinkAnalyticsHOC>}
+          {(!bounced && delivered) &&
+            <CountViewItem onClick={onLinkClick} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o' />}
           </div>
         {bounced &&
           <div className='small-12 medium-12 large-12 columns'>
