@@ -107,6 +107,7 @@ class EditContactDialog extends Component {
       });
     }
   }
+
   getMultiPublicationOptions(value, cb) {
     if (value.length > 0) this.props.requestPublication();
     return this.props.searchPublications(value)
@@ -339,7 +340,7 @@ class EditContactDialog extends Component {
           </div>))}
           <div className='large-12 medium-12 small-12 columns vertical-center'>
             <Label>Publication(s)</Label>
-            <div style={{minWidth: 200, marginLeft: 15}} >
+            <div style={{minWidth: 200, marginLeft: 15, marginTop: 10}} >
               <Select.Async
               multi
               name='publicationValues'
