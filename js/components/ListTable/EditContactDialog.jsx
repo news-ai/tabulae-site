@@ -13,14 +13,17 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Collapse from 'react-collapse';
 import PublicationFormStateful from './PublicationFormStateful.jsx';
 import {WithContext as ReactTags} from 'react-tag-input';
-import Autocomplete from './Autocomplete';
+// import Autocomplete from './Autocomplete';
+import Select from 'react-select';
 
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {fromJS} from 'immutable';
-import {grey400, blue700} from 'material-ui/styles/colors';
+import {grey400, blue700, blue500} from 'material-ui/styles/colors';
 import find from 'lodash/find';
 import alertify from 'utils/alertify';
+import styled from 'styled-components';
+import debounce from 'es6-promise-debounce';
 
 const textfieldStyle = {
   marginLeft: 10
@@ -54,30 +57,37 @@ const _getPublicationName = (contact, reducer) => {
 
 const columnClassname = 'large-6 medium-12 small-12 columns vertical-center';
 
+const Label = styled.span`
+  white-space: nowrap;
+  font-size: 0.9em;
+`;
 
 class EditContactDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      contactBody: this.props.contact && _getter(this.props.contact),
-      immutableContactBody: this.props.contact && fromJS(_getter(this.props.contact)),
-      customfields: this.props.contact ? this.props.contact.customfields : [],
+      contactBody: _getter(this.props.contact),
+      immutableContactBody: fromJS(_getter(this.props.contact)),
+      customfields: this.props.contact.customfields,
       rssfeedsTextarea: '',
-      pub1input: this.props.contact ? _getPublicationName(this.props.contact, this.props.publicationReducer) : '',
       addPublicationPanelOpen: false,
-      tags: this.props.contact && this.props.contact.tags !== null ? this.props.contact.tags : [],
+      tags: !!this.props.contact.tags ? this.props.contact.tags : [],
+      publicationValues: !!this.props.contact.employers ?
+      this.props.contact.employers
+      .filter(id => this.props.publicationReducer[id])
+      .map(id => ({label: this.props.publicationReducer[id].name, value: id})) : []
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
-    this.updateAutoInput = this._updateAutoInput.bind(this);
     this.handleAddition = this._handleAddition.bind(this);
     this.handleDelete = this._handleDelete.bind(this);
     this.handleDrag = this._handleDrag.bind(this);
     this.onRemoveContact = this._onRemoveContact.bind(this);
     this.onPublicationAddOpen = _ => this.setState({addPublicationPanelOpen: true});
     this.onPublicationAddClose = _ => this.setState({addPublicationPanelOpen: false});
+    this.getMultiPublicationOptions = debounce(this.getMultiPublicationOptions.bind(this), 750);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -87,8 +97,11 @@ class EditContactDialog extends Component {
         contactBody: _getter(nextProps.contact),
         immutableContactBody,
         customfields: nextProps.contact.customfields,
-        pub1input: _getPublicationName(nextProps.contact, nextProps.publicationReducer),
         tags: nextProps.contact.tags === null ? [] : nextProps.contact.tags.map((tag, i) => ({id: i, text: tag})),
+        publicationValues: !!nextProps.contact.employers ?
+        nextProps.contact.employers
+        .filter(id => nextProps.publicationReducer[id])
+        .map(id => ({label: nextProps.publicationReducer[id].name, value: id})) : []
       });
     }
 
@@ -97,11 +110,15 @@ class EditContactDialog extends Component {
         rssfeedsTextarea: nextProps.feeds ? nextProps.feeds.map(feed => feed.url).join('\n') : ''
       });
     }
+  }
 
-    // if (this.props.publicationAutocompleteCache !== nextProps.publicationAutocompleteCache) {
-    //   this.setState({publicationDataSource: nextProps.publicationAutocompleteCache});
-    // }
-
+  getMultiPublicationOptions(value, cb) {
+    if (value.length > 0) this.props.requestPublication();
+    return this.props.searchPublications(value)
+    .then(response => {
+      // console.log(response);
+      cb(null, {options: response.map(name => ({label: name, value: this.props.publicationReducer[name]}))});
+    });
   }
 
   _onSubmit() {
@@ -109,10 +126,10 @@ class EditContactDialog extends Component {
     if (this.state.customfields !== null && this.state.customfields.length > 0) {
       contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
     }
-    const pubId = this.props.publicationReducer[this.state.pub1input];
-    if (this.state.pub1input && pubId) {
-      contactBody.employers = this.props.contact.employers === null ? [pubId] : [pubId, ...this.props.contact.employers.filter((id, i) => i > 0)];
-    }
+
+    const employers = this.state.publicationValues.map(pub => pub.value);
+    contactBody.employers = employers.length > 0 ? employers : null;
+
     const tags = this.state.tags.map(tag => tag.text);
     contactBody.listid = this.props.listId;
     contactBody.tags = tags;
@@ -144,11 +161,6 @@ class EditContactDialog extends Component {
       .filter(line => line.length > 0 && isURL(line)));
     if (feeds.length === 0) return;
     this.props.addFeeds(id, feeds);
-  }
-
-  _updateAutoInput(val, dataSource, params) {
-    this.props.searchPublicationEpic(val);
-    this.setState({pub1input: val});
   }
 
   _onRemoveContact() {
@@ -207,18 +219,18 @@ class EditContactDialog extends Component {
       <FlatButton label='Cancel' onClick={props.onClose} />,
       <FlatButton primary label='Submit' onClick={this.onSubmit} />
     ];
+    // console.log(state.publicationValues);
 
     return (
       <Dialog autoScrollBodyContent modal actions={actions} open={props.open} title='Edit Contact' onRequestClose={props.onClose}>
       {props.isReceiving &&
-        <FontIcon className={'fa fa-spinner fa-spin'}/>}
-      {props.contactId &&
+        <FontIcon className='fa fa-spinner fa-spin'/>}
         <div className='row' style={{marginTop: 20}}>
           <div className='large-12 medium-12 small-12 columns right'>
             <div className='button' onClick={this.onRemoveContact}>Remove Contact from List</div>
           </div>
           <div className={columnClassname}>
-            <span style={{whiteSpace: 'nowrap'}}>First Name</span>
+            <Label>First Name</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.firstname || ''}
@@ -227,7 +239,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span style={{whiteSpace: 'nowrap'}}>Last Name</span>
+            <Label>Last Name</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.lastname || ''}
@@ -236,7 +248,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Email</span>
+            <Label>Email</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.email || ''}
@@ -245,7 +257,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Twitter</span>
+            <Label>Twitter</Label>
             <TextField
             hintText='adding will populate the feed'
             style={textfieldStyle}
@@ -255,7 +267,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Instagram</span>
+            <Label>Instagram</Label>
             <TextField
             hintText='adding will populate the feed'
             style={textfieldStyle}
@@ -265,7 +277,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>LinkedIn</span>
+            <Label>LinkedIn</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.linkedin || ''}
@@ -274,7 +286,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Phone #</span>
+            <Label>Phone #</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.phonenumber || ''}
@@ -283,7 +295,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Location</span>
+            <Label>Location</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.location || ''}
@@ -292,7 +304,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Blog</span>
+            <Label>Blog</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.blog || ''}
@@ -301,7 +313,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Website</span>
+            <Label>Website</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.website || ''}
@@ -310,7 +322,7 @@ class EditContactDialog extends Component {
             />
           </div>
           <div className={columnClassname}>
-            <span>Notes</span>
+            <Label>Notes</Label>
             <TextField
             style={textfieldStyle}
             value={state.contactBody.notes || ''}
@@ -323,7 +335,7 @@ class EditContactDialog extends Component {
         .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
         .map((fieldObj, i) => fieldObj.customfield && (
           <div key={i} className={columnClassname}>
-            <span>{fieldObj.name}</span>
+            <Label>{fieldObj.name}</Label>
             <TextField
             value={state.customfields === null || !state.customfields.some(field => field.name === fieldObj.value) ? '' : find(state.customfields, field => field.name === fieldObj.value).value}
             style={textfieldStyle}
@@ -332,33 +344,38 @@ class EditContactDialog extends Component {
             onChange={e => this.onCustomChange(fieldObj.value, e.target.value)}
             />
           </div>))}
-         <div className='large-12 medium-12 small-12 columns vertical-center'>
-            <span style={{whiteSpace: 'nowrap'}}>Publication</span>
-            <div style={textfieldStyle} >
-              <Autocomplete
-              onInputUpdate={this.updateAutoInput}
-              options={props.publicationAutocompleteCache}
-              onOptionSelect={pub1input => this.setState({pub1input})}
+          <div className='large-12 medium-12 small-12 columns vertical-center'>
+            <Label>Publication(s)</Label>
+            <div style={{minWidth: 200, marginLeft: 15, marginTop: 10}} >
+              <Select.Async
+              multi
+              name='publicationValues'
+              loadOptions={this.getMultiPublicationOptions}
+              value={state.publicationValues}
+              onChange={publicationValues => this.setState({publicationValues})}
+              isLoading={props.publicationIsReceiving}
               />
             </div>
-          {props.publicationIsReceiving &&
-            <FontIcon style={{color: grey400}} className='fa fa-spinner fa-spin'/>}
           </div>
           <div className='large-12 medium-12 small-12 columns vertical-center'>
-          {state.pub1input.length > 0 && !props.publicationReducer[state.pub1input] && !props.publicationIsReceiving && !state.addPublicationPanelOpen &&
-            <div className='text'>
-              <span>Can't find publication you are looking for? </span>
-              <span style={{color: blue700}} className='pointer text' onClick={this.onPublicationAddOpen}>Add Publication</span>
-            </div>}
+            {!state.addPublicationPanelOpen &&
+            <div style={{marginTop: 5, marginLeft: 5}}>
+              <span className='smalltext'>Don't see a publication you need? </span>
+              <span
+              className='pointer smalltext'
+              style={{color: blue500}}
+              onClick={_ => this.setState({addPublicationPanelOpen: true})}
+              >Add one here</span>
+              </div>}
             <Collapse isOpened={state.addPublicationPanelOpen}>
               <PublicationFormStateful
               onHide={this.onPublicationAddClose}
-              bubbleUpValue={pub1input => this.setState({pub1input})}
+              bubbleUpValue={response => this.setState({publicationValues: [...state.publicationValues, {label: response.name, value: response.id}]})}
               />
             </Collapse>
           </div>
           <div className='large-12 medium-12 small-12 columns vertical-center'>
-            <span>Tags</span>
+            <Label>Tags</Label>
             <div style={{margin: '10px 15px'}} >
               <ReactTags
               tags={state.tags}
@@ -369,19 +386,20 @@ class EditContactDialog extends Component {
               />
             </div>
           </div>
-        </div>}
+        </div>
       </Dialog>
       );
   }
 }
 
+
 const mapStateToProps = (state, props) => {
   const feeds = state.feedReducer[props.contactId] && state.feedReducer[props.contactId].map(id => state.feedReducer[id]);
   return {
-    contact: props.contactId ? state.contactReducer[props.contactId] : undefined,
+    contact: state.contactReducer[props.contactId],
     list: state.listReducer[props.listId],
     publicationReducer: state.publicationReducer,
-    publicationAutocompleteCache: state.publicationReducer.searchCache.map(id => state.publicationReducer[id].name),
+    publicationIsReceiving: state.publicationReducer.isReceiving,
     feeds,
   };
 };
@@ -401,4 +419,9 @@ const mapDispatchToProps = (dispatch, props) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditContactDialog);
+const EditContactDialogContainer = connect(mapStateToProps, mapDispatchToProps)(EditContactDialog);
+
+const ShowDialogIfContactExists = props => props.contactId ? <EditContactDialogContainer {...props} /> : null;
+
+export default ShowDialogIfContactExists;
+

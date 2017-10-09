@@ -96,7 +96,7 @@ export function createPublication(data) {
   return (dispatch) => {
     dispatch(requestPublication());
     return api.post(`/publications`, data)
-    .then( response => {
+    .then(response => {
       dispatch(receivePublication(response.data));
       return response;
     })

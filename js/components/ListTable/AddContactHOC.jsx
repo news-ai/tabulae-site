@@ -57,27 +57,24 @@ class AddContactHOC extends Component {
     this.state = {
       open: false,
       contactBody: {},
-      pub1input: '',
-      employerAutocompleteList: [],
       rssfeedsTextarea: '',
       addPublicationPanelOpen: false,
-      tags: []
+      tags: [],
+      publicationValues: []
     };
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
-    this.updateAutoInput = this._updateAutoInput.bind(this);
     this.handleRSSTextarea = this._handleRSSTextarea.bind(this);
     this.handleAddition = this._handleAddition.bind(this);
     this.handleDelete = this._handleDelete.bind(this);
     this.handleDrag = this._handleDrag.bind(this);
-    this.getPublicationOptions = debounce(this.getPublicationOptions.bind(this), 750);
+    this.getMultiPublicationOptions = debounce(this.getMultiPublicationOptions.bind(this), 750);
   }
 
   _onSubmit() {
     let customRow = [];
     let contactBody = this.state.contactBody;
     const list = this.props.list;
-    const pub1input = this.state.pub1input;
     list.fieldsmap
     .filter(fieldObj => fieldObj.customfield && !fieldObj.readonly)
     .map(fieldObj => {
@@ -88,14 +85,11 @@ class AddContactHOC extends Component {
     });
     if (customRow.length > 0) contactBody.customfields = customRow;
     contactBody.listid = list.id;
-    if (pub1input && this.props.publicationReducer[pub1input]) {
-      const pubId = this.props.publicationReducer[pub1input];
-      contactBody.employers = [pubId];
-    }
 
-    if (this.state.tags.length > 0) {
-      contactBody.tags = this.state.tags.map(tag => tag.text);
-    }
+    if (this.state.tags.length > 0) contactBody.tags = this.state.tags.map(tag => tag.text);
+    
+    const employers = this.state.publicationValues.map(pub => pub.value);
+    contactBody.employers = employers.length > 0 ? employers : null;
 
     this.props.addContacts([contactBody])
     .then(contacts => {
@@ -107,7 +101,16 @@ class AddContactHOC extends Component {
         contacts: list.contacts === null ? ids : [...list.contacts, ...ids]
       };
       this.props.patchList(listBody);
-      this.setState({open: false, contactBody: {}, rssfeedsTextarea: '', pub1input: null});
+      this.setState({open: false, contactBody: {}, rssfeedsTextarea: '', publicationValues: []});
+    });
+  }
+
+  getMultiPublicationOptions(value, cb) {
+    if (value.length > 0) this.props.requestPublication();
+    return this.props.searchPublications(value)
+    .then(response => {
+      // console.log(response);
+      cb(null, {options: response.map(name => ({label: name, value: this.props.publicationReducer[name]}))});
     });
   }
 
@@ -115,30 +118,6 @@ class AddContactHOC extends Component {
     const content = validator ? validator(value) : value;
     this.setState({
       contactBody: Object.assign({}, this.state.contactBody, {[name]: content})
-    });
-  }
-
-  // _updateAutoInput(val) {
-  //   if (val.length > 0) this.props.requestPublication();
-  //   this.setState({pub1input: val}, _ => {
-  //     this.props.searchPublications(this.state.pub1input)
-  //     .then(response => this.setState({
-  //       employerAutocompleteList: response,
-  //     }));
-  //   });
-  // }
-
-  _updateAutoInput(val, dataSource, params) {
-    this.props.searchPublicationEpic(val);
-    this.setState({pub1input: val});
-  }
-
-  getPublicationOptions(value, cb) {
-    if (value.length > 0) this.props.requestPublication();
-    return this.props.searchPublications(value)
-    .then(response => {
-      // console.log(response);
-      cb(null, {options: response.map(name => ({value: name}))});
     });
   }
 
@@ -316,34 +295,14 @@ class AddContactHOC extends Component {
               <Label>{fieldObj.name}</Label><TextField style={textfieldStyle} ref={fieldObj.value} name={fieldObj.value} />
             </div>))}
             <div className='large-12 medium-12 small-12 columns vertical-center'>
-              <Label>Publication</Label>
-            {/*
-              <div>
-                <Autocomplete
-                onInputUpdate={this.updateAutoInput}
-                options={props.publicationAutocompleteCache}
-                onOptionSelect={pub1input => this.setState({pub1input})}
-                />
-              </div>
-            */}
-            {/*
-              <AutoComplete
-              id='pub1input'
-              style={textfieldStyle}
-              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            */}
-              <div style={{width: 200, marginLeft: 15}} >
+              <Label>Publication(s)</Label>
+              <div style={{minWidth: 200, marginLeft: 15, marginTop: 10}} >
                 <Select.Async
-                name='pub1input'
-                loadOptions={this.getPublicationOptions}
-                labelKey='value'
-                value={{value: state.pub1input}}
-                onChange={obj => this.setState({pub1input: obj === null ? null : obj.value})}
+                multi
+                name='publicationValues'
+                loadOptions={this.getMultiPublicationOptions}
+                value={state.publicationValues}
+                onChange={publicationValues => this.setState({publicationValues})}
                 isLoading={props.publicationIsReceiving}
                 />
               </div>
@@ -361,7 +320,7 @@ class AddContactHOC extends Component {
               <Collapse isOpened={state.addPublicationPanelOpen}>
                 <PublicationFormStateful
                 onHide={_ => this.setState({addPublicationPanelOpen: false})}
-                bubbleUpValue={pub1input => this.setState({pub1input})}
+                bubbleUpValue={response => this.setState({publicationValues: [...state.publicationValues, {label: response.name, value: response.id}]})}
                 />
               </Collapse>
             </div>
@@ -411,7 +370,6 @@ const mapStateToProps = (state, props) => {
     list: state.listReducer[props.listId],
     publicationReducer: state.publicationReducer,
     publicationIsReceiving: state.publicationReducer.isReceiving,
-    publicationAutocompleteCache: state.publicationReducer.searchCache.map(id => state.publicationReducer[id].name),
   };
 };
 
