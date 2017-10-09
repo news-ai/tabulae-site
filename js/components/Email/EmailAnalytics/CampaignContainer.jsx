@@ -55,7 +55,7 @@ class CampaignContainer extends Component {
     this._campaign = ref;
   }
 
-  _rowRenderer({key, index, isScrolling, isVisible, style}) {
+  _rowRenderer({key, index, isScrolling, isVisible, style, parent}) {
     return (
       <CellMeasurer
       cache={this._cache}

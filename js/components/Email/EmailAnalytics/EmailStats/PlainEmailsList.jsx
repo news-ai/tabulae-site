@@ -18,7 +18,8 @@ const iconButtonIconStyle = {color: grey600};
 const placeholder = 'No emails found.';
 const cache = new CellMeasurerCache({
   fixedWidth: true,
-  minHeight: 50
+  minHeight: 50,
+  keyMapper: () => 1
 });
 
 class PlainEmailsList extends Component {
@@ -42,29 +43,26 @@ class PlainEmailsList extends Component {
   }
 
   componentDidMount() {
-    this.recomputeIntervalTimer = setInterval(_ => {
-      if (this._list) {
-        this._list.recomputeRowHeights();
-      }
-    }, 5000);
+    // this.recomputeIntervalTimer = setInterval(_ => {
+    //   if (this._list) {
+    //     this._list.recomputeRowHeights();
+    //   }
+    // }, 5000);
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log(this.props.emails);
-    // console.log(nextProps.emails);
     if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
       setTimeout(_ => {
         if (this._list) {
           this._list.recomputeRowHeights();
         }
       }, 1000);
-      // setTimeout(_ => cache.clearAll(), 1000);
     }
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
-    clearInterval(this.recomputeIntervalTimer);
+    // clearInterval(this.recomputeIntervalTimer);
   }
 
   _listRef(ref) {

@@ -19,7 +19,6 @@ import LinkAnalytics from './LinkAnalytics.jsx';
 import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
-const cache = new CellMeasurerCache({fixedWidth: true});
 
 const reformatEmails = (emails, prevDateOrder) => {
   if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}, reformattedEmails: []};
@@ -81,8 +80,6 @@ const DatestringDivider = ({isClosed, datestring, onOpenClick}) => (
 class EmailsList extends Component {
   constructor(props) {
     super(props);
-    console.log('EmailsList');
-    console.log('init', this.props.emails);
     const {dateOrder, emailMap, reformattedEmails} = reformatEmails(this.props.emails);
     this.state = {
       dateOrder,
@@ -98,7 +95,12 @@ class EmailsList extends Component {
     this.onOpenContainer = this._onOpenContainer.bind(this);
     this.onDialogRequestClose = _ => this.setState({dialogOpen: false, dialogContentType: undefined});
     this.onDialogRequestOpen = _ => this.setState({dialogOpen: true});
+    this._cache = new CellMeasurerCache({
+      fixedWidth: true,
+      defaultHeight: 100,
+    });
     window.onresize = () => {
+      this._cache.clearAll();
       if (this._list) this._list.recomputeRowHeights();
     };
   }
@@ -110,14 +112,13 @@ class EmailsList extends Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount', this.props.emails);
-    setTimeout(_ => {
-      if (this._list) this._list.recomputeRowHeights();
-    }, 2000);
+    this._cache.clearAll();
+    if (this._list) this._list.recomputeRowHeights();
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
+    // clearInterval(this.recomputeIntervalTimer);
   }
 
   _listRef(ref) {
@@ -125,15 +126,13 @@ class EmailsList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(this.props.emails);
-    console.log(nextProps.emails);
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
     if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
-      console.log('hit');
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
-        console.log('recomp');
         setTimeout(_ => {
+          // console.log('CLEARRRRR');
+          this._cache.clearAll();
           if (this._list) this._list.recomputeRowHeights();
         }, 1000);
       });
@@ -156,12 +155,14 @@ class EmailsList extends Component {
     });
     this.setState({dateOrder, reformattedEmails}, _ => {
       if (this._list) {
-        this._list.recomputeRowHeights();
+        // console.log('CLEARRRRR');
+        // this._list.measureAllRows();
+        this._cache.clearAll();
       }
     });
   }
 
-  _rowRenderer({key, index, isScrolling, isVisible, style}) {
+  _rowRenderer({key, index, isScrolling, isVisible, style, parent}) {
     const node = this.state.reformattedEmails[index];
     const rightNow = new Date();
     let renderNode;
@@ -198,7 +199,7 @@ class EmailsList extends Component {
     }
     return (
       <CellMeasurer
-      cache={cache}
+      cache={this._cache}
       columnIndex={0}
       key={key}
       rowIndex={index}
@@ -232,6 +233,7 @@ class EmailsList extends Component {
         dialogContent = <StaticEmailContent {...state.dialogContentProps} />;
         break;
     }
+    console.log(this._cache.rowHeight(0))
 
     return (
       <div>
@@ -261,9 +263,10 @@ class EmailsList extends Component {
                 autoHeight
                 width={width}
                 height={height}
-                rowHeight={cache.rowHeight}
+                rowHeight={this._cache.rowHeight}
+                overscanRowCount={10}
                 rowCount={state.reformattedEmails.length}
-                deferredMeasurementCache={cache}
+                deferredMeasurementCache={this._cache}
                 rowRenderer={this.rowRenderer}
                 scrollTop={scrollTop}
                 isScrolling={isScrolling}
