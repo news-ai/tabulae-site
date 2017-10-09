@@ -131,7 +131,9 @@ class EmailsList extends Component {
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
         console.log('recomp');
-        if (this._list) this._list.recomputeRowHeights();
+        setTimeout(_ => {
+          if (this._list) this._list.recomputeRowHeights();
+        }, 2000);
       });
     }
   }
@@ -240,16 +242,11 @@ class EmailsList extends Component {
             className='right'
             iconClassName={`fa fa-refresh ${props.isReceiving ? 'fa-spin' : ''}`}
             tooltip='Refresh'
-            tooltipPosition='top-left'
+            tooltipPosition='bottom-left'
             />
           </div>
         </div>}
-        <Dialog
-        autoScrollBodyContent
-        title={dialogTitle}
-        open={state.dialogOpen}
-        onRequestClose={this.onDialogRequestClose}
-        >
+        <Dialog autoScrollBodyContent title={dialogTitle} open={state.dialogOpen} onRequestClose={this.onDialogRequestClose}>
         {dialogContent}
         </Dialog>
         <div style={style}>
