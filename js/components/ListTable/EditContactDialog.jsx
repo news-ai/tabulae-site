@@ -77,7 +77,6 @@ class EditContactDialog extends Component {
       .filter(id => this.props.publicationReducer[id])
       .map(id => ({label: this.props.publicationReducer[id].name, value: id})) : []
     };
-    console.log(this.props.contact);
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
@@ -134,7 +133,6 @@ class EditContactDialog extends Component {
     const tags = this.state.tags.map(tag => tag.text);
     contactBody.listid = this.props.listId;
     contactBody.tags = tags;
-    console.log(contactBody);
     this.props.patchContact(this.props.contact.id, contactBody)
     .then(_ => this.props.onClose());
   }
@@ -360,15 +358,19 @@ class EditContactDialog extends Component {
             </div>
           </div>
           <div className='large-12 medium-12 small-12 columns vertical-center'>
-          {!state.addPublicationPanelOpen &&
-            <div className='text'>
-              <span>Can't find publication you are looking for? </span>
-              <span style={{color: blue700}} className='pointer text' onClick={this.onPublicationAddOpen}>Add Publication</span>
-            </div>}
+            {!state.addPublicationPanelOpen &&
+            <div style={{marginTop: 5, marginLeft: 5}}>
+              <span className='smalltext'>Don't see a publication you need? </span>
+              <span
+              className='pointer smalltext'
+              style={{color: blue500}}
+              onClick={_ => this.setState({addPublicationPanelOpen: true})}
+              >Add one here</span>
+              </div>}
             <Collapse isOpened={state.addPublicationPanelOpen}>
               <PublicationFormStateful
               onHide={this.onPublicationAddClose}
-              bubbleUpValue={name => this.setState({publicationValues: [...state.publicationValues, {label: name, value: props.publicationReducer[name]}]})}
+              bubbleUpValue={response => this.setState({publicationValues: [...state.publicationValues, {label: response.name, value: response.id}]})}
               />
             </Collapse>
           </div>

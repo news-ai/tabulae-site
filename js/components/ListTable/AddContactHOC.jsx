@@ -320,7 +320,7 @@ class AddContactHOC extends Component {
               <Collapse isOpened={state.addPublicationPanelOpen}>
                 <PublicationFormStateful
                 onHide={_ => this.setState({addPublicationPanelOpen: false})}
-                bubbleUpValue={name => this.setState({publicationValues: [...state.publicationValues, {label: name, value: props.publicationReducer[name]}]})}
+                bubbleUpValue={response => this.setState({publicationValues: [...state.publicationValues, {label: response.name, value: response.id}]})}
                 />
               </Collapse>
             </div>
