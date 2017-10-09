@@ -103,14 +103,11 @@ class App extends Component {
     if (this.props.numUnreadNotification !== nextProps.numUnreadNotification) {
       const title = window.document.title;
       if (nextProps.numUnreadNotification === 0) {
-        console.log(1);
         // remove notification #
         window.document.title = title.split(' ').filter((_, i) => i > 0).join(' ');
       } else if (this.props.numUnreadNotification === 0) {
-        console.log(2);
         window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
       } else { // increase or decrease in notif count but not zero
-        console.log(3);
         const titleWithoutCount = title.split(' ').filter((_, i) => i > 0).join(' ');
         window.document.title = `(${nextProps.numUnreadNotification}) ${titleWithoutCount}`;
       }
