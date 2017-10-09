@@ -118,16 +118,6 @@ class AddContactHOC extends Component {
     });
   }
 
-  // _updateAutoInput(val) {
-  //   if (val.length > 0) this.props.requestPublication();
-  //   this.setState({pub1input: val}, _ => {
-  //     this.props.searchPublications(this.state.pub1input)
-  //     .then(response => this.setState({
-  //       employerAutocompleteList: response,
-  //     }));
-  //   });
-  // }
-
   _updateAutoInput(val, dataSource, params) {
     this.props.searchPublicationEpic(val);
     this.setState({pub1input: val});
@@ -317,26 +307,6 @@ class AddContactHOC extends Component {
             </div>))}
             <div className='large-12 medium-12 small-12 columns vertical-center'>
               <Label>Publication</Label>
-            {/*
-              <div>
-                <Autocomplete
-                onInputUpdate={this.updateAutoInput}
-                options={props.publicationAutocompleteCache}
-                onOptionSelect={pub1input => this.setState({pub1input})}
-                />
-              </div>
-            */}
-            {/*
-              <AutoComplete
-              id='pub1input'
-              style={textfieldStyle}
-              filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
-              onUpdateInput={this.updateAutoInput}
-              onNewRequest={pub1input => this.setState({pub1input, employerAutocompleteList: []})}
-              openOnFocus
-              dataSource={state.employerAutocompleteList}
-              />
-            */}
               <div style={{width: 200, marginLeft: 15}} >
                 <Select.Async
                 name='pub1input'
