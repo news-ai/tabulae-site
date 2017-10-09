@@ -19,7 +19,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import isURL from 'validator/lib/isURL';
 import {fromJS} from 'immutable';
-import {grey400, blue700} from 'material-ui/styles/colors';
+import {grey400, blue700, blue500} from 'material-ui/styles/colors';
 import find from 'lodash/find';
 import alertify from 'utils/alertify';
 import styled from 'styled-components';
