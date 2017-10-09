@@ -75,8 +75,8 @@ class PublicationFormStateful extends Component {
           }}
           onClick={_ => {
             props.createPublication({name: state.name, url: state.url})
-            .then(() => {
-              props.bubbleUpValue(state.name);
+            .then(response => {
+              props.bubbleUpValue(response.data);
               props.onHide();
             });
           }}
