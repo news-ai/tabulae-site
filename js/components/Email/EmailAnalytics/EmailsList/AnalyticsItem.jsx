@@ -94,7 +94,7 @@ class AnalyticsItem extends Component {
                 <Link to={`/tables/${listid}`}>{listNameString}</Link>
               </span>
             {attachments !== null &&
-              <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip'/>}
+              <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip' />}
             {!archived ?
               <FontIcon
               className='pointer fa fa-trash'

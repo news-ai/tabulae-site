@@ -14,8 +14,8 @@ import ScheduledEmailItem from './ScheduledEmailItem.jsx';
 import Link from 'react-router/lib/Link';
 import moment from 'moment-timezone';
 import find from 'lodash/find';
-import OpenAnalytics from './OpenAnalytics';
-import LinkAnalytics from './LinkAnalytics';
+import OpenAnalytics from './OpenAnalytics.jsx';
+import LinkAnalytics from './LinkAnalytics.jsx';
 import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
