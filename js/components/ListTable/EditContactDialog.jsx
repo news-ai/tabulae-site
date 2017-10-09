@@ -73,8 +73,11 @@ class EditContactDialog extends Component {
       addPublicationPanelOpen: false,
       tags: !!this.props.contact.tags ? this.props.contact.tags : [],
       publicationValues: !!this.props.contact.employers ?
-      this.props.contact.employers.map(id => ({label: this.props.publicationReducer[id].name, value: id})) : []
+      this.props.contact.employers
+      .filter(id => this.props.publicationReducer[id])
+      .map(id => ({label: this.props.publicationReducer[id].name, value: id})) : []
     };
+    console.log(this.props.contact);
     this.onSubmit = this._onSubmit.bind(this);
     this.onChange = this._onChange.bind(this);
     this.onCustomChange = this._onCustomChange.bind(this);
@@ -97,7 +100,9 @@ class EditContactDialog extends Component {
         customfields: nextProps.contact.customfields,
         tags: nextProps.contact.tags === null ? [] : nextProps.contact.tags.map((tag, i) => ({id: i, text: tag})),
         publicationValues: !!nextProps.contact.employers ?
-        nextProps.contact.employers.map(id => ({label: nextProps.publicationReducer[id].name, value: id})) : []
+        nextProps.contact.employers
+        .filter(id => nextProps.publicationReducer[id])
+        .map(id => ({label: nextProps.publicationReducer[id].name, value: id})) : []
       });
     }
 
@@ -122,11 +127,14 @@ class EditContactDialog extends Component {
     if (this.state.customfields !== null && this.state.customfields.length > 0) {
       contactBody.customfields = this.state.customfields.filter(field => !this.props.list.fieldsmap.some(fieldObj => fieldObj.readonly && fieldObj.value === field.name));
     }
-    contactBody.employers = this.state.publicationValues.map(pub => pub.value);
+
+    const employers = this.state.publicationValues.map(pub => pub.value);
+    contactBody.employers = employers.length > 0 ? employers : null;
 
     const tags = this.state.tags.map(tag => tag.text);
     contactBody.listid = this.props.listId;
     contactBody.tags = tags;
+    console.log(contactBody);
     this.props.patchContact(this.props.contact.id, contactBody)
     .then(_ => this.props.onClose());
   }
