@@ -125,6 +125,8 @@ class EmailsList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log(this.props.emails);
+    console.log(nextProps.emails);
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
     if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
       console.log('hit');
@@ -133,7 +135,7 @@ class EmailsList extends Component {
         console.log('recomp');
         setTimeout(_ => {
           if (this._list) this._list.recomputeRowHeights();
-        }, 2000);
+        }, 1000);
       });
     }
   }

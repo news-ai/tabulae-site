@@ -10,6 +10,7 @@ import ScheduledEmailItem from 'components/Email/EmailAnalytics/EmailsList/Sched
 import OpenAnalytics from 'components/Email/EmailAnalytics/EmailsList/OpenAnalytics.jsx';
 import LinkAnalytics from 'components/Email/EmailAnalytics/EmailsList/LinkAnalytics.jsx';
 import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
+import {fromJS} from 'immutable';
 
 const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
@@ -35,28 +36,35 @@ class PlainEmailsList extends Component {
     this.onDialogRequestOpen = _ => this.setState({dialogOpen: true});
     window.onresize = () => {
       if (this._list) {
-        console.log('hey');
         this._list.recomputeRowHeights();
       }
     };
   }
 
   componentDidMount() {
-    setTimeout(_ => {
+    this.recomputeIntervalTimer = setInterval(_ => {
       if (this._list) {
         this._list.recomputeRowHeights();
       }
-    }, 2000);
+    }, 5000);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.emails.length !== nextProps.emails.length) {
-      setTimeout(_ => this._list && this._list.recomputeRowHeights(), 1000);
+    // console.log(this.props.emails);
+    // console.log(nextProps.emails);
+    if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
+      setTimeout(_ => {
+        if (this._list) {
+          this._list.recomputeRowHeights();
+        }
+      }, 1000);
+      // setTimeout(_ => cache.clearAll(), 1000);
     }
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
+    clearInterval(this.recomputeIntervalTimer);
   }
 
   _listRef(ref) {
