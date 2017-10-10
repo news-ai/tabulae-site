@@ -400,16 +400,18 @@ class EmailPanel extends Component {
   _loadAllContactsIfRequired() {
     const bodyContentState = this.state.bodyContentState;
     const subjectContentState = this.state.subjectContentState;
-    // console.log(bodyContentState);
-    // console.log(subjectContentState);
-    return new Promise((resolve, reject) => {
-      this.setState({isReceiving: true, tempPreviewLabel: 'Loading...'});
-      this.props.loadAllContacts()
-      .then(_ => {
-        this.setState({isReceiving: false, tempPreviewLabel: undefined});
-        resolve(true);
+    if (this.props.selectedContacts.length === this.props.selected.length) {
+      return Promise.resolve(true);
+    } else {
+      return new Promise((resolve, reject) => {
+        this.setState({isReceiving: true, tempPreviewLabel: 'Loading...'});
+        this.props.loadAllContacts()
+        .then(_ => {
+          this.setState({isReceiving: false, tempPreviewLabel: undefined});
+          resolve(true);
+        });
       });
-    });
+    }
   }
 
   _checkEmailDupes() {
@@ -744,7 +746,7 @@ const mapStateToProps = (state, props) => {
     .filter(email => !email.issent),
     stagingReducer: state.stagingReducer,
     templates: templates,
-    selectedContacts: props.selectedContacts ? props.selectedContacts : props.selected.map(id => state.contactReducer[id]),
+    selectedContacts: props.selected.reduce((acc, id) => state.contactReducer[id] ? [...acc, state.contactReducer[id]] : acc, []),
     attachedfiles: state.emailAttachmentReducer.attached,
     isAttaching: state.emailAttachmentReducer.isReceiving,
     emailsignature: person.emailsignature || null,
