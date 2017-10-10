@@ -1,16 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
-import Dialog from 'material-ui/Dialog';
 import AnalyticsItem from 'components/Email/EmailAnalytics/EmailsList/AnalyticsItem.jsx';
 import ScheduledEmailItem from 'components/Email/EmailAnalytics/EmailsList/ScheduledEmailItem.jsx';
-import OpenAnalytics from 'components/Email/EmailAnalytics/EmailsList/OpenAnalytics.jsx';
-import LinkAnalytics from 'components/Email/EmailAnalytics/EmailsList/LinkAnalytics.jsx';
-import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
-import {fromJS} from 'immutable';
 
 const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
@@ -20,139 +15,83 @@ const placeholder = 'No emails found.';
 class PlainEmailsList extends Component {
   constructor(props) {
     super(props);
-    console.log('PlainEmailsList');
-    this.state = {
-      dialogOpen: false,
-      dialogContentType: undefined,
-      dialogContentProps: {}
-    };
+    this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
-    this.onDialogRequestClose = _ => this.setState({dialogOpen: false, dialogContentType: undefined});
-    this.onDialogRequestOpen = _ => this.setState({dialogOpen: true});
-
-    this._cache = new CellMeasurerCache({
-      fixedWidth: true,
-      defaultHeight: 100,
-    });
+    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     window.onresize = () => {
-      console.log('resize');
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
     };
   }
 
-  componentDidMount() {
-    console.log('cdm');
-    this._cache.clearAll();
-    if (this._list) this._list.recomputeRowHeights();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
-      setTimeout(_ => {
-        this._cache.clearAll();
-        if (this._list) this._list.recomputeRowHeights();
-      }, 1000);
-    }
+  componentWillMount() {
+    setTimeout(_ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
-    // clearInterval(this.recomputeIntervalTimer);
   }
 
   _listRef(ref) {
     this._list = ref;
   }
 
-  _rowRenderer({key, index, isScrolling, isVisible, style, parent}) {
+  _listCellMeasurerRef(ref) {
+    this._listCellMeasurer = ref;
+  }
+
+  _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const rightNow = new Date();
     const email = this.props.emails[index];
     const renderNode = new Date(email.sendat) > rightNow ?
-    <ScheduledEmailItem key={`email-analytics-${index}`} {...email} /> :
-    <AnalyticsItem
-    key={`email-analytics-${index}`}
-        onOpenClick={_ => this.setState({
-          dialogContentProps: {emailId: email.id, count: email.opened},
-          dialogOpen: true,
-          dialogContentType: 'open',
-        })}
-        onLinkClick={_ => this.setState({
-          dialogContentProps: {emailId: email.id, count: email.clicked},
-          dialogOpen: true,
-          dialogContentType: 'click',
-        })}
-        onPreviewClick={emailProps => this.setState({
-          dialogContentProps: emailProps,
-          dialogOpen: true,
-          dialogContentType: 'preview',
-        })}
-    {...email}
-    />;
+    <ScheduledEmailItem key={`email-analytics-${index}`} {...email}/> :
+    <AnalyticsItem key={`email-analytics-${index}`} {...email}/>;
 
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      rowIndex={index}
-      parent={parent}
-      >
-        <div style={style} key={key}>
-        {renderNode}
-        </div>
-      </CellMeasurer>
-      );
+      <div style={style} key={key}>
+      {renderNode}
+      </div>);
   }
 
   render() {
     const props = this.props;
     const state = this.state;
-
-    let dialogContent = null;
-    let dialogTitle = undefined;
-    switch (state.dialogContentType) {
-      case 'open':
-        dialogContent = <OpenAnalytics {...state.dialogContentProps} />;
-        dialogTitle = 'Open Timeline';
-        break;
-      case 'click':
-        dialogContent = <LinkAnalytics {...state.dialogContentProps} />;
-        dialogTitle = 'Link Click Count';
-        break;
-      case 'preview':
-        dialogContent = <StaticEmailContent {...state.dialogContentProps} />;
-        break;
-    }
     return (
       <div>
-        <Dialog
-        autoScrollBodyContent
-        title={dialogTitle}
-        open={state.dialogOpen}
-        onRequestClose={this.onDialogRequestClose}
-        >
-        {dialogContent}
-        </Dialog>
         <WindowScroller>
-        {({height, isScrolling, onChildScroll, scrollTop}) =>
+        {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <List
-              ref={this._listRef}
-              autoHeight
-              width={width}
-              height={height}
-              rowHeight={this._cache.rowHeight}
-              overscanRowCount={20}
+              <CellMeasurer
+              ref={this._listCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
               rowCount={props.emails.length}
-              deferredMeasurementCache={this._cache}
-              rowRenderer={this.rowRenderer}
-              scrollTop={scrollTop}
-              isScrolling={isScrolling}
-              onScroll={onChildScroll}
-              />
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._listRef}
+                autoHeight
+                width={width}
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={props.emails.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
+              }
+              </CellMeasurer>
             }
             </AutoSizer>
           }
@@ -183,4 +122,12 @@ const styles = {
 };
 
 
-export default PlainEmailsList;
+const mapStateToProps = (state, props) => {
+  return {};
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PlainEmailsList);

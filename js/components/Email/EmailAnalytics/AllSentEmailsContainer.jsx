@@ -132,6 +132,7 @@ class AllSentEmailsContainer extends Component {
         ));
     // console.log(props.router.location);
     const routeKey = props.router.location.pathname;
+    // console.log(props.emails);
     return (
       <div>
       {props.lists &&

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import CountViewItem from './CountViewItem.jsx';
 import Link from 'react-router/lib/Link';
+import Dialog from 'material-ui/Dialog';
 import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 import LinkAnalyticsHOC from './LinkAnalyticsHOC.jsx';
 import OpenAnalyticsHOC from './OpenAnalyticsHOC.jsx';
@@ -32,6 +33,7 @@ class AnalyticsItem extends Component {
       showEditPanel: false,
     };
     this.onPreviewOpen = this._onPreviewOpen.bind(this);
+    this.onPreviewClose = _ => this.setState({isPreviewOpen: false});
     this.onEditContactOpen = _ => this.setState({showEditPanel: true});
     this.onEditContactClose = _ => this.setState({showEditPanel: false});
   }
@@ -42,7 +44,7 @@ class AnalyticsItem extends Component {
 
   _onPreviewOpen() {
     this.props.fetchAttachments();
-    this.props.onPreviewClick(this.props);
+    this.setState({isPreviewOpen: true});
   }
 
   render() {
@@ -68,10 +70,7 @@ class AnalyticsItem extends Component {
       contact,
       contactId,
       list,
-      deleted,
-      onOpenClick,
-      onLinkClick,
-      onPreviewOpen
+      deleted
     } = this.props;
     const state = this.state;
     const wrapperStyle = (bounced || !delivered) ? Object.assign({}, styles.wrapper, {backgroundColor: deepOrange100}) : styles.wrapper;
@@ -94,7 +93,7 @@ class AnalyticsItem extends Component {
                 <Link to={`/tables/${listid}`}>{listNameString}</Link>
               </span>
             {attachments !== null &&
-              <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip' />}
+              <FontIcon style={styles.attachmentIcon} className='fa fa-paperclip'/>}
             {!archived ?
               <FontIcon
               className='pointer fa fa-trash'
@@ -118,6 +117,10 @@ class AnalyticsItem extends Component {
             </div>
           </div>
         </div>
+      {!isScrolling &&
+        <Dialog autoScrollBodyContent open={state.isPreviewOpen} onRequestClose={this.onPreviewClose}>
+          <StaticEmailContent {...this.props} />
+        </Dialog>}
         <div className='row' style={styles.analytics}>
           <div className='small-12 medium-8 large-8 columns truncate-ellipsis' style={styles.toContainer}>
             <span className='pointer' onClick={this.onPreviewOpen} style={styles.subjectText} >{subject || '(No Subject)'}</span>
@@ -133,12 +136,18 @@ class AnalyticsItem extends Component {
             <p style={styles.bouncedReason}>{bouncedreason}</p>}
           </div>}
           <div className='small-12 medium-2 large-2 columns horizontal-center' style={styles.tagContainer}>
-          {(!bounced && delivered) &&
-            <CountViewItem onClick={onOpenClick} label='Opened' count={opened} iconName='fa fa-paper-plane-o' />}
+          {(!bounced && delivered) && !isScrolling &&
+            <OpenAnalyticsHOC emailId={id} count={opened}>
+            {({onRequestOpen}) => (
+              <CountViewItem onClick={onRequestOpen} label='Opened' count={opened} iconName='fa fa-paper-plane-o' />)}
+            </OpenAnalyticsHOC>}
           </div>
           <div className='small-12 medium-1 large-1 columns horizontal-center' style={styles.tagContainer}>
-          {(!bounced && delivered) &&
-            <CountViewItem onClick={onLinkClick} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o' />}
+          {(!bounced && delivered) && !isScrolling &&
+            <LinkAnalyticsHOC emailId={id} count={clicked}>
+            {({onRequestOpen}) => (
+              <CountViewItem onClick={onRequestOpen} label='Clicked' count={clicked} iconName='fa fa-hand-pointer-o' />)}
+            </LinkAnalyticsHOC>}
           </div>
         {bounced &&
           <div className='small-12 medium-12 large-12 columns'>

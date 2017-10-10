@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import Tooltip from 'components/Tooltip';
+import {Tooltip} from 'react-lightweight-tooltip';
 
 import Link from 'react-router/lib/Link';
 import FontIcon from 'material-ui/FontIcon';

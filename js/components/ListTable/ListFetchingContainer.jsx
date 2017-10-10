@@ -19,7 +19,7 @@ class ListFetchingContainer extends Component {
 
   render() {
     let renderNode = this.props.list ?
-    <ListTable {...this.props} /> : (
+    <ListTable {...this.props}/> : (
       <div style={styles.container}>
         <span style={styles.loading}>LIST LOADING...</span>
         <i className='fa fa-cog fa-spin' />

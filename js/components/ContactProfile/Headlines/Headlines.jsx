@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import HeadlineItem from './HeadlineItem.jsx';
 import * as headlineActions from './actions';
 import GenericFeed from '../GenericFeed.jsx';
-import {CellMeasurerCache, CellMeasurer} from 'react-virtualized';
 
 class Headlines extends Component {
   constructor(props) {
@@ -12,50 +11,26 @@ class Headlines extends Component {
     this.setRef = ref => {
       this._headlineList = ref;
     };
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
-  }
-  
-  componentDidMount() {
-    this.recomputeIntervalTimer = setInterval(_ => {
-      if (this._headlineList) {
-        this._headlineList.recomputeRowHeights();
-      }
-    }, 5000);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
       // if (this._headlineList) this._headlineList.recomputeRowHeights();
     }
-
-    if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
-      if (this._headlineList) setTimeout(_ => this._headlineList.recomputeRowHeights(), 100);
-    }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.recomputeIntervalTimer);
-  }
-
-  _rowRenderer({key, index, style, parent}) {
+  _rowRenderer({key, index, style}) {
     const feedItem = this.props.feed[index];
     const row = <HeadlineItem {...feedItem} />;
 
-    let newstyle = Object.assign({}, style);
-    if (newstyle) newstyle.padding = '0 18px';
+    let newstyle = style;
+    if (newstyle) {
+      newstyle.padding = '0 18px';
+    }
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      parent={parent}
-      rowIndex={index}
-      >
-        <div className='vertical-center' key={key} style={newstyle}>
-          {row}
-        </div>
-      </CellMeasurer>
-      );
+      <div className='vertical-center' key={key} style={newstyle}>
+        {row}
+      </div>);
   }
 
   render() {
@@ -65,7 +40,6 @@ class Headlines extends Component {
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       title='RSS'
-      cache={this._cache}
       {...props}
       />);
   }
