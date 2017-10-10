@@ -4,7 +4,7 @@ import EmailStats from './EmailStats/EmailStats.jsx';
 import {actions as campaignActions} from './Campaign';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-import {Tooltip} from 'react-lightweight-tooltip';
+import Tooltip from 'components/Tooltip';
 
 import withRouter from 'react-router/lib/withRouter';
 import IconButton from 'material-ui/IconButton';
