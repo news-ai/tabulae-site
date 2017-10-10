@@ -4,6 +4,7 @@ import Link from 'react-router/lib/Link';
 import {blue800, teal400, teal900, grey50, grey300, grey700, grey800, grey500} from 'material-ui/styles/colors';
 // import ContactItem from 'components/Search/ContactItem.jsx';
 import Tag from 'components/Tags/Tag.jsx';
+// import {Tooltip} from 'react-lightweight-tooltip';
 
 const spanStyle = {color: grey700};
 

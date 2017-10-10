@@ -26,7 +26,7 @@ const Tweet = ({style, text, username, createdat, tweetidstr}) => {
         </span>
       </div>
       <div className='large-12 medium-12 small-12 columns'>
-        {!!text && text
+        {text !== null && text
         .split(' ')
         .map((block, i) => <a key={`${tweetidstr}-${i}`} style={{color: grey800}} target='_blank' href={isURL(block) ? block : `https://twitter.com/statuses/${tweetidstr}`}>{block} </a>)}
       </div>

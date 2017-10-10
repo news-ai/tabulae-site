@@ -1,26 +1,23 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import ContactItemContainer from './ContactItemContainer.jsx';
 
-// DEPRECIATEDDDDDDD
-
 // NO NEED FOR VIRTUALIZED IF PAGINATED
-const cache = new CellMeasurerCache({
-  fixedWidth: true,
-  minHeight: 50
-});
 
-class ContactFeed extends Component {
+class ContactTags extends Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
+    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onResize = _ => {
       if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
         this._list.recomputeRowHeights();
       }
     };
@@ -36,10 +33,11 @@ class ContactFeed extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.selected.length !== this.props.selected.length) {
-      this.onResize();
+      this._list.forceUpdateGrid();
     }
 
-    if (this.props.contacts.length !== nextProps.contacts.length) {
+    if (nextProps.contacts !== this.props.contacts) {
+      console.log('hit not the smae');
       this.onResize();
     }
   }
@@ -52,24 +50,19 @@ class ContactFeed extends Component {
     this._list = ref;
   }
 
+  _listCellMeasurerRef(ref) {
+    this._listCellMeasurer = ref;
+  }
+
   _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const contact = this.props.contacts[index];
     const checked = this.props.selected.some(contactId => contactId === contact.id);
     const renderNode = <ContactItemContainer index={index} checked={checked} onSelect={this.props.onSelect} {...contact}/>
 
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      rowIndex={index}
-      parent={parent}
-      >
-        <div style={Object.assign({}, style, {padding: 5})} key={key}>
-        {renderNode}
-        </div>
-      </CellMeasurer>
-      );
+      <div style={Object.assign({}, style, {padding: 5})} key={key}>
+      {renderNode}
+      </div>);
   }
 
   render() {
@@ -78,22 +71,30 @@ class ContactFeed extends Component {
     // console.log(props.contacts);
     return (
         <WindowScroller>
-        {({height, isScrolling, scrollTop, onChildScroll}) =>
+        {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <List
-              ref={this._listRef}
-              autoHeight
-              width={width}
-              height={height}
-              rowHeight={cache.rowHeight}
+              <CellMeasurer
+              ref={this._listCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
               rowCount={props.contacts.length}
-              deferredMeasurementCache={cache}
-              onScroll={onChildScroll}
-              rowRenderer={this.rowRenderer}
-              scrollTop={scrollTop}
-              isScrolling={isScrolling}
-              />
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._listRef}
+                autoHeight
+                width={width}
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={props.contacts.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
+              }
+              </CellMeasurer>
             }
             </AutoSizer>
           }
@@ -101,4 +102,4 @@ class ContactFeed extends Component {
       );
   }
 }
-export default ContactFeed;
+export default ContactTags;

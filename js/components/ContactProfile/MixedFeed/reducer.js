@@ -1,7 +1,6 @@
 import {mixedConstant} from './constants';
 import {initialState} from '../../../reducers/initialState';
 import {assignToEmpty} from '../../../utils/assign';
-import uniq from 'lodash/uniq';
 
 function mixedReducer(state = initialState.mixedReducer, action) {
   if (process.env.NODE_ENV === 'development') Object.freeze(state);
@@ -16,10 +15,10 @@ function mixedReducer(state = initialState.mixedReducer, action) {
       obj = assignToEmpty(state, {});
       const oldContact = state[action.contactId] || {received: []};
       obj[action.contactId] = assignToEmpty(state[action.contactId], {
-        received: uniq([
+        received: [
           ...oldContact.received,
           ...action.feed
-        ]),
+        ],
         offset: action.offset
       });
       obj.isReceiving = false;

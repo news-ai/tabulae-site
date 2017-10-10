@@ -12,11 +12,11 @@
       ]
     },
     "test": {
-      "presets": ["env", "react", "stage-2"]
+      "presets": ["es2015", "react", "stage-2"]
     }
   },
   "presets": [
-    ["env", {"loose": true, "modules": false}],
+    ["es2015", {"loose": true, "modules": false}],
     "react",
     "stage-2"
   ]
