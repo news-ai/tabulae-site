@@ -90,6 +90,7 @@ module.exports = function(options) {
       { loader: 'sass-loader' }
     ];
     plugins = [
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
         template: 'index.html',
@@ -147,6 +148,7 @@ module.exports = function(options) {
         'components': __dirname + '/js/components',
         'reducers': __dirname + '/js/reducers',
         'utils': __dirname + '/js/utils',
+        moment$: 'moment/moment.js',
       }
     },
     plugins: plugins,
