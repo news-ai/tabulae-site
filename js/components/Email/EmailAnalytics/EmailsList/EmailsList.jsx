@@ -118,7 +118,6 @@ class EmailsList extends Component {
 
   componentWillUnmount() {
     window.onresize = undefined;
-    // clearInterval(this.recomputeIntervalTimer);
   }
 
   _listRef(ref) {
@@ -131,7 +130,6 @@ class EmailsList extends Component {
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
         setTimeout(_ => {
-          // console.log('CLEARRRRR');
           this._cache.clearAll();
           if (this._list) this._list.recomputeRowHeights();
         }, 1000);
@@ -155,8 +153,6 @@ class EmailsList extends Component {
     });
     this.setState({dateOrder, reformattedEmails}, _ => {
       if (this._list) {
-        // console.log('CLEARRRRR');
-        // this._list.measureAllRows();
         this._cache.clearAll();
       }
     });
@@ -233,7 +229,7 @@ class EmailsList extends Component {
         dialogContent = <StaticEmailContent {...state.dialogContentProps} />;
         break;
     }
-    console.log(this._cache.rowHeight(0))
+    // console.log(this._cache.rowHeight(0))
 
     return (
       <div>

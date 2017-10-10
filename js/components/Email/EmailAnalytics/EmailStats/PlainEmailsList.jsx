@@ -16,11 +16,6 @@ const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
 const iconButtonIconStyle = {color: grey600};
 const placeholder = 'No emails found.';
-const cache = new CellMeasurerCache({
-  fixedWidth: true,
-  minHeight: 50,
-  keyMapper: () => 1
-});
 
 class PlainEmailsList extends Component {
   constructor(props) {
@@ -35,27 +30,29 @@ class PlainEmailsList extends Component {
     this._listRef = this._listRef.bind(this);
     this.onDialogRequestClose = _ => this.setState({dialogOpen: false, dialogContentType: undefined});
     this.onDialogRequestOpen = _ => this.setState({dialogOpen: true});
+
+    this._cache = new CellMeasurerCache({
+      fixedWidth: true,
+      defaultHeight: 100,
+    });
     window.onresize = () => {
-      if (this._list) {
-        this._list.recomputeRowHeights();
-      }
+      console.log('resize');
+      this._cache.clearAll();
+      if (this._list) this._list.recomputeRowHeights();
     };
   }
 
   componentDidMount() {
-    // this.recomputeIntervalTimer = setInterval(_ => {
-    //   if (this._list) {
-    //     this._list.recomputeRowHeights();
-    //   }
-    // }, 5000);
+    console.log('cdm');
+    this._cache.clearAll();
+    if (this._list) this._list.recomputeRowHeights();
   }
 
   componentWillReceiveProps(nextProps) {
     if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
       setTimeout(_ => {
-        if (this._list) {
-          this._list.recomputeRowHeights();
-        }
+        this._cache.clearAll();
+        if (this._list) this._list.recomputeRowHeights();
       }, 1000);
     }
   }
@@ -69,7 +66,7 @@ class PlainEmailsList extends Component {
     this._list = ref;
   }
 
-  _rowRenderer({key, index, isScrolling, isVisible, style}) {
+  _rowRenderer({key, index, isScrolling, isVisible, style, parent}) {
     const rightNow = new Date();
     const email = this.props.emails[index];
     const renderNode = new Date(email.sendat) > rightNow ?
@@ -96,7 +93,7 @@ class PlainEmailsList extends Component {
 
     return (
       <CellMeasurer
-      cache={cache}
+      cache={this._cache}
       columnIndex={0}
       key={key}
       rowIndex={index}
@@ -147,13 +144,14 @@ class PlainEmailsList extends Component {
               autoHeight
               width={width}
               height={height}
-              rowHeight={cache.rowHeight}
-              deferredMeasurementCache={cache}
+              rowHeight={this._cache.rowHeight}
+              overscanRowCount={20}
               rowCount={props.emails.length}
-              onScroll={onChildScroll}
+              deferredMeasurementCache={this._cache}
               rowRenderer={this.rowRenderer}
               scrollTop={scrollTop}
               isScrolling={isScrolling}
+              onScroll={onChildScroll}
               />
             }
             </AutoSizer>
