@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import * as tweetActions from './actions';
 import Tweet from './Tweet.jsx';
 import GenericFeed from '../GenericFeed.jsx';
+import {CellMeasurerCache, CellMeasurer} from 'react-virtualized';
 
 class TweetFeed extends Component {
   constructor(props) {
@@ -11,27 +12,53 @@ class TweetFeed extends Component {
     this.setRef = ref => {
       this._tweetList = ref;
     };
+    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
+  }
+
+  componentDidMount() {
+    this.recomputeIntervalTimer = setInterval(_ => {
+      if (this._tweetList) {
+        this._tweetList.recomputeRowHeights();
+      }
+    }, 5000);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.containerWidth !== this.props.containerWidth) {
-      if (this._tweetList) this._tweetList.recomputeRowHeights();
+      if (this._tweetList) setTimeout(_ => this._tweetList.recomputeRowHeights(), 1000);
+    }
+
+    if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
+      if (this._tweetList) setTimeout(_ => this._tweetList.recomputeRowHeights(), 1000);
     }
   }
+  
+  componentWillUnmount() {
+    clearInterval(this.recomputeIntervalTimer);
+  }
 
-  _rowRenderer({key, index, style}) {
+  _rowRenderer({key, index, style, parent}) {
     const feedItem = this.props.feed[index];
     const row = <Tweet screenWidth={this.props.containerWidth} {...feedItem} />;
 
-    let newstyle = style;
+    let newstyle = Object.assign({}, style);
     if (newstyle) newstyle.padding = '0 18px';
     return (
-      <div
-      className='vertical-center'
+      <CellMeasurer
+      cache={this._cache}
+      columnIndex={0}
       key={key}
-      style={newstyle}>
-        {row}
-      </div>);
+      parent={parent}
+      rowIndex={index}
+      >
+        <div
+        className='vertical-center'
+        key={key}
+        style={newstyle}>
+          {row}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -41,6 +68,7 @@ class TweetFeed extends Component {
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       title='Twitter'
+      cache={this._cache}
       {...props}
       />);
   }

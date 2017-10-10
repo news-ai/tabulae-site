@@ -4,8 +4,9 @@ import InfiniteScroll from 'components/InfiniteScroll';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/Dialog';
 import Collapse from 'react-collapse';
-import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
 // import EmailDateContainer from './EmailDateContainer.jsx';
 import {fromJS} from 'immutable';
 import AnalyticsItem from './AnalyticsItem.jsx';
@@ -13,9 +14,11 @@ import ScheduledEmailItem from './ScheduledEmailItem.jsx';
 import Link from 'react-router/lib/Link';
 import moment from 'moment-timezone';
 import find from 'lodash/find';
+import OpenAnalytics from './OpenAnalytics.jsx';
+import LinkAnalytics from './LinkAnalytics.jsx';
+import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
-
 
 const reformatEmails = (emails, prevDateOrder) => {
   if (!emails || emails.length === 0) return {dateOrder: [], emailMap: {}, reformattedEmails: []};
@@ -82,18 +85,23 @@ class EmailsList extends Component {
       dateOrder,
       emailMap,
       isClosedMap: {},
-      reformattedEmails
+      reformattedEmails,
+      dialogOpen: false,
+      dialogContentType: undefined,
+      dialogContentProps: {}
     };
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
-    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
-    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     this.onOpenContainer = this._onOpenContainer.bind(this);
+    this.onDialogRequestClose = _ => this.setState({dialogOpen: false, dialogContentType: undefined});
+    this.onDialogRequestOpen = _ => this.setState({dialogOpen: true});
+    this._cache = new CellMeasurerCache({
+      fixedWidth: true,
+      defaultHeight: 100,
+    });
     window.onresize = () => {
-      if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
-        this._list.recomputeRowHeights();
-      }
+      this._cache.clearAll();
+      if (this._list) this._list.recomputeRowHeights();
     };
   }
 
@@ -104,12 +112,8 @@ class EmailsList extends Component {
   }
 
   componentDidMount() {
-    setTimeout(_ => {
-      if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
-        this._list.recomputeRowHeights();
-      }
-    }, 2000);
+    this._cache.clearAll();
+    if (this._list) this._list.recomputeRowHeights();
   }
 
   componentWillUnmount() {
@@ -120,20 +124,15 @@ class EmailsList extends Component {
     this._list = ref;
   }
 
-  _listCellMeasurerRef(ref) {
-    this._listCellMeasurer = ref;
-  }
-
   componentWillReceiveProps(nextProps) {
     if (this.props.listId !== nextProps.listId) this.props.fetchListEmails(nextProps.listId);
     if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
-      console.log('hit');
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
-        if (this._list) {
-          this._listCellMeasurer.resetMeasurements();
-          this._list.recomputeRowHeights();
-        }
+        setTimeout(_ => {
+          this._cache.clearAll();
+          if (this._list) this._list.recomputeRowHeights();
+        }, 1000);
       });
     }
   }
@@ -154,28 +153,59 @@ class EmailsList extends Component {
     });
     this.setState({dateOrder, reformattedEmails}, _ => {
       if (this._list) {
-        this._listCellMeasurer.resetMeasurements();
-        this._list.recomputeRowHeights();
+        this._cache.clearAll();
       }
     });
   }
 
-  _rowRenderer({key, index, isScrolling, isVisible, style}) {
+  _rowRenderer({key, index, isScrolling, isVisible, style, parent}) {
     const node = this.state.reformattedEmails[index];
     const rightNow = new Date();
     let renderNode;
     if (node.type === 'emails') {
       const email = node;
       renderNode = new Date(email.sendat) > rightNow ?
-        <ScheduledEmailItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/> :
-        <AnalyticsItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/>;
+        <ScheduledEmailItem
+        isScrolling={isScrolling}
+        key={`email-analytics-${index}`}
+        {...email}
+        /> :
+        <AnalyticsItem
+        isScrolling={isScrolling}
+        key={`email-analytics-${index}`}
+        onOpenClick={_ => this.setState({
+          dialogContentProps: {emailId: email.id, count: email.opened},
+          dialogOpen: true,
+          dialogContentType: 'open',
+        })}
+        onLinkClick={_ => this.setState({
+          dialogContentProps: {emailId: email.id, count: email.clicked},
+          dialogOpen: true,
+          dialogContentType: 'click',
+        })}
+        onPreviewClick={emailProps => this.setState({
+          dialogContentProps: emailProps,
+          dialogOpen: true,
+          dialogContentType: 'preview',
+        })}
+        {...email}
+        />;
     } else {
       renderNode = <DatestringDivider onOpenClick={this.onOpenContainer} {...node} />;
     }
     return (
-      <div style={style} key={key}>
-        {renderNode}
-      </div>);
+      <CellMeasurer
+      cache={this._cache}
+      columnIndex={0}
+      key={key}
+      rowIndex={index}
+      parent={parent}
+      >
+        <div style={style} key={key}>
+          {renderNode}
+        </div>
+      </CellMeasurer>
+      );
   }
 
   render() {
@@ -183,6 +213,23 @@ class EmailsList extends Component {
     const state = this.state;
     const props = this.props;
     if (this.props.containerHeight) style.height = props.containerHeight;
+
+    let dialogContent = null;
+    let dialogTitle = undefined;
+    switch (state.dialogContentType) {
+      case 'open':
+        dialogContent = <OpenAnalytics {...state.dialogContentProps} />;
+        dialogTitle = 'Open Timeline';
+        break;
+      case 'click':
+        dialogContent = <LinkAnalytics {...state.dialogContentProps} />;
+        dialogTitle = 'Link Click Count';
+        break;
+      case 'preview':
+        dialogContent = <StaticEmailContent {...state.dialogContentProps} />;
+        break;
+    }
+    // console.log(this._cache.rowHeight(0))
 
     return (
       <div>
@@ -195,41 +242,36 @@ class EmailsList extends Component {
             className='right'
             iconClassName={`fa fa-refresh ${props.isReceiving ? 'fa-spin' : ''}`}
             tooltip='Refresh'
-            tooltipPosition='top-left'
+            tooltipPosition='bottom-left'
             />
           </div>
-        </div>
-      }
+        </div>}
+        <Dialog autoScrollBodyContent title={dialogTitle} open={state.dialogOpen} onRequestClose={this.onDialogRequestClose}>
+        {dialogContent}
+        </Dialog>
         <div style={style}>
-        <WindowScroller>
-        {({height, isScrolling, scrollTop}) =>
-          <AutoSizer disableHeight>
-            {({width}) =>
-              <CellMeasurer
-              ref={this._listCellMeasurerRef}
-              cellRenderer={this.cellRenderer}
-              columnCount={1}
-              rowCount={state.reformattedEmails.length}
-              width={width}
-              >
-              {({getRowHeight}) =>
+          <WindowScroller>
+          {({height, isScrolling, onChildScroll, scrollTop}) =>
+            <AutoSizer disableHeight>
+              {({width}) =>
                 <List
                 ref={this._listRef}
                 autoHeight
                 width={width}
                 height={height}
-                rowHeight={getRowHeight}
+                rowHeight={this._cache.rowHeight}
+                overscanRowCount={10}
                 rowCount={state.reformattedEmails.length}
+                deferredMeasurementCache={this._cache}
                 rowRenderer={this.rowRenderer}
                 scrollTop={scrollTop}
                 isScrolling={isScrolling}
+                onScroll={onChildScroll}
                 />
               }
-              </CellMeasurer>
+              </AutoSizer>
             }
-            </AutoSizer>
-          }
-        </WindowScroller>
+          </WindowScroller>
         {props.emails && props.emails.length === 0 &&
           <span style={styles.placeholder}>{props.placeholder || placeholder}</span>}
         </div>

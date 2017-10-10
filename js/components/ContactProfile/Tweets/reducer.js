@@ -12,12 +12,12 @@ function tweetReducer(state = initialState.tweetReducer, action) {
       obj.isReceiving = true;
       return obj;
     case tweetConstant.RECEIVE_MULTIPLE:
-      obj = assignToEmpty(obj, action.tweets);
+      obj = assignToEmpty(state, action.tweets);
       const oldContact = state[action.contactId] || {received: []};
       obj[action.contactId] = assignToEmpty(state[action.contactId], {
         received: [
           ...oldContact.received,
-          ...action.ids.filter(id => !oldContact[id])
+          ...action.ids.filter(id => !state[id])
         ],
         offset: action.offset
       });

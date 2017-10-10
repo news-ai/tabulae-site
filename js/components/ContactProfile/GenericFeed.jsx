@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-import {List, CellMeasurer, WindowScroller, AutoSizer} from 'react-virtualized';
+import {List, CellMeasurer, CellMeasurerCache, WindowScroller, AutoSizer} from 'react-virtualized';
 import {grey700} from 'material-ui/styles/colors';
 
 const styleEmptyRow = {
@@ -11,29 +11,33 @@ const styleEmptyRow = {
   marginBottom: 20,
 };
 
-const BasicFeed = props => (
-  <CellMeasurer
-  ref={props.setCellRef}
-  cellRenderer={({rowIndex, ...rest}) => props.rowRenderer({index: rowIndex, ...rest})}
-  columnCount={1}
-  rowCount={props.feed.length}
-  width={props.containerWidth}
-  >
-  {({getRowHeight}) => (
-    <List
-    ref={ref => props.setRef(ref)}
-    width={props.containerWidth || 500}
-    height={props.containerHeight}
-    rowCount={props.feed.length}
-    rowHeight={getRowHeight}
-    rowRenderer={props.rowRenderer}
-    scrollTop={props.scrollTop}
-    overscanRowCount={5}
-    onScroll={args => {
-      if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchFeed();
-    }}
-    />)}
-  </CellMeasurer>);
+class BasicFeed extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const props = this.props;
+    return (
+      <List
+      ref={ref => props.setRef(ref)}
+      width={props.containerWidth || 500}
+      height={props.containerHeight}
+      rowCount={props.feed.length}
+      rowHeight={props.cache.rowHeight}
+      deferredMeasurementCache={props.cache}
+      rowRenderer={props.rowRenderer}
+      scrollTop={props.scrollTop}
+      overscanRowCount={5}
+      onScroll={args => {
+        if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) {
+          props.fetchFeed();
+        }
+        if (props.onScroll) props.onScroll(args);
+      }}
+      />)
+  }
+}
 
 class GenericFeed extends Component {
   constructor(props) {
@@ -50,7 +54,7 @@ class GenericFeed extends Component {
     const limitedHeightList = props.feed && <BasicFeed {...props}/>;
     const windowScrollableList = props.feed && (
        <WindowScroller>
-        {({height, scrollTop}) => (<BasicFeed {...props} containerHeight={height} scrollTop={scrollTop}/>)}
+        {({height, scrollTop, onChildScroll}) => (<BasicFeed onScroll={onChildScroll} {...props} containerHeight={height} scrollTop={scrollTop}/>)}
         </WindowScroller>);
     const autoSizedList = props.feed && (
         <AutoSizer>
