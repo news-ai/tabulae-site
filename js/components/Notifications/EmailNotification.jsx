@@ -15,9 +15,16 @@ const styles = {
   textContainer: {marginTop: 5}
 };
 
+moment.fn.fromNowOrNow = function (a) {
+  if (Math.abs(moment().diff(this)) < 1000 * 60 * 2) { // 1000 milliseconds
+    return 'just now';
+  }
+  return this.fromNow(a);
+}
+
 const EmailNotification = ({resourceName, resourceId, resourceAction, data, isReceiving, createdAt, unread}) => {
   const m = moment.utc(createdAt).local();
-  const fromNowDateString = m.fromNow();
+  const fromNowDateString = m.fromNowOrNow();
 
   const clickableToLabel = <Link to={`/tables/${data.listid}/${data.contactId}`} style={styles.link} >{data.to}</Link>;
   const containerStyle = unread ? Object.assign({}, styles.container, {backgroundColor: grey50}) : styles.container;
