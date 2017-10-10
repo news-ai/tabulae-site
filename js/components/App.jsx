@@ -109,7 +109,7 @@ class App extends Component {
         window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
       } else { // increase or decrease in notif count but not zero
         const titleWithoutCount = title.split(' ').filter((_, i) => i > 0).join(' ');
-        window.document.title = `(${nextProps.numUnreadNotification}) ${title}`;
+        window.document.title = `(${nextProps.numUnreadNotification}) ${titleWithoutCount}`;
       }
 
     }
