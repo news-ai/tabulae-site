@@ -205,7 +205,7 @@ export function fetchPublicLists() {
   const PAGE_LIMIT = 50;
   return (dispatch, getState) => {
     const OFFSET = getState().listReducer.public.offset;
-    if (OFFSET === null || getState().listReducer.isReceiving) return;
+    if (OFFSET === null || getState().listReducer.isReceiving) return Promise.resolve();
     dispatch(requestLists());
     return api.get(`/lists/public?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {
