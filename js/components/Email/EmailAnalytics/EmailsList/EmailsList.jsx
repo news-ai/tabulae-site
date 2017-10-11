@@ -54,7 +54,6 @@ const dividerStyles = {
   linkSpan: {fontSize: '1.2em'},
   iconButtonIcon: {width: 14, height: 14, fontSize: '14px', color: grey600},
   iconButton: {width: 28, height: 28, padding: 7, margin: '0 5px'},
-  container: {marginTop: 25},
 };
 
 function reformatDatestring(datestring) {
@@ -87,7 +86,7 @@ class EmailsList extends Component {
     this.onOpenContainer = this._onOpenContainer.bind(this);
     this.rowRenderer = this._rowRenderer.bind(this);
     this.setRef = ref => (this._list = ref);
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 100});
+    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 10});
     window.onresize = () => {
       console.log('resize');
       this._cache.clearAll();
@@ -174,7 +173,6 @@ class EmailsList extends Component {
     const state = this.state;
     const props = this.props;
     if (this.props.containerHeight) style.height = props.containerHeight;
-    console.log(props.emails);
 
     return (
       <div>

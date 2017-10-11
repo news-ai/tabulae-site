@@ -19,7 +19,7 @@ class PlainEmailsList extends Component {
     this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
     this.setRef = ref => (this._list = ref);
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 100});
+    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 10});
     window.onresize = () => {
       console.log('resize');
       this._cache.clearAll();
