@@ -33,7 +33,7 @@ class MixedFeed extends Component {
       setTimeout(_ => {
         this._cache.clearAll();
         if (this._list) this._list.recomputeRowHeights();
-      }, 100);
+      }, 1000);
     }
   }
 

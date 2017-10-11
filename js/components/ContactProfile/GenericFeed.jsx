@@ -44,7 +44,7 @@ class GenericFeed extends Component {
     const props = this.props;
     const limitedHeightList = props.feed && <BasicFeed {...props}/>;
     const windowScrollableList = props.feed && (
-       <WindowScroller>
+       <WindowScroller scrollElement={props.scrollElement} >
         {({height, scrollTop, onChildScroll}) => (<BasicFeed {...props} containerHeight={height} scrollTop={scrollTop} onScroll={onChildScroll} />)}
         </WindowScroller>);
     const autoSizedList = props.feed && (

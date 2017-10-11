@@ -5,12 +5,12 @@ import MixedFeed from './MixedFeed.jsx';
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
   const contactId = props.contactId;
-  const feed = state.mixedReducer[contactId] && state.mixedReducer[contactId].received;
+  const feed = (state.mixedReducer[contactId] && state.mixedReducer[contactId].received) || [];
   return {
     listId,
     contactId,
     isReceiving: state.mixedReducer.isReceiving,
-    feed: feed || [],
+    feed,
     didInvalidate: state.mixedReducer.didInvalidate,
     offset: state.mixedReducer[contactId] && state.mixedReducer[contactId].offset
   };
