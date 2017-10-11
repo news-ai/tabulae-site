@@ -174,6 +174,7 @@ class EmailsList extends Component {
     const state = this.state;
     const props = this.props;
     if (this.props.containerHeight) style.height = props.containerHeight;
+    console.log(props.emails);
 
     return (
       <div>
