@@ -109,7 +109,7 @@ class ListFeed extends Component {
 const styles = {
   // container: {paddingTop: 30},
   text: {color: grey700},
-  emptyContainer: {height: 400},
+  emptyContainer: {height: 400, padding: 30},
   btn: {
     label: {textTransform: 'none', color: grey400},
     style: {marginLeft: 20}
