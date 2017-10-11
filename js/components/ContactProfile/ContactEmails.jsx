@@ -19,9 +19,10 @@ class ContactEmails extends Component {
 
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
-  const contactId = props.contactId;
-  const emails = state.stagingReducer.received.map(id => state.stagingReducer[id])
-  .filter(email => email.contactId === contactId)
+  const contactId = parseInt(props.contactId, 10);
+  const contact = state.contactReducer[contactId];
+  let emails = state.stagingReducer.received.map(id => state.stagingReducer[id])
+  .filter(email => email.to === contact.email)
   .filter(email => email.issent)
   .filter(email => email.delivered);
   return {
