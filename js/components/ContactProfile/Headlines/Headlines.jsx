@@ -74,9 +74,9 @@ class Headlines extends Component {
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
   const contactId = props.contactId;
-  const feed = state.headlineReducer[contactId]
-  && state.headlineReducer[contactId].received
-  && state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]);
+  const feed = (state.headlineReducer[contactId]
+  && state.headlineReducer[contactId].received)
+  ? state.headlineReducer[contactId].received.map(id => state.headlineReducer[id]) : [];
   return {
     listId,
     contactId,

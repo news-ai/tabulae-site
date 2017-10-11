@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import * as tweetActions from './actions';
 import Tweet from './Tweet.jsx';
 import GenericFeed from '../GenericFeed.jsx';
+import {CellMeasurerCache, CellMeasurer} from 'react-virtualized';
 
 class TweetFeed extends Component {
   constructor(props) {
@@ -29,8 +30,10 @@ class TweetFeed extends Component {
     }
 
     if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
+      setTimeout(_ => {
+        this._cache.clearAll();
+        if (this._list) this._list.recomputeRowHeights();
+      }, 100);
     }
   }
   
@@ -77,9 +80,9 @@ class TweetFeed extends Component {
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
   const contactId = props.contactId;
-  const feed = state.tweetReducer[contactId]
-  && state.tweetReducer[contactId].received
-  && state.tweetReducer[contactId].received.map(id => state.tweetReducer[id]);
+  const feed = (state.tweetReducer[contactId]
+  && state.tweetReducer[contactId].received)
+  ? state.tweetReducer[contactId].received.map(id => state.tweetReducer[id]) : [];
 
   return {
     listId,

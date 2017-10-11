@@ -29,9 +29,11 @@ class MixedFeed extends Component {
       if (this._list) this._list.recomputeRowHeights();
     }
 
-    if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
+    if (this.props.feed.length !== nextProps.feed.length) {
+      setTimeout(_ => {
+        this._cache.clearAll();
+        if (this._list) this._list.recomputeRowHeights();
+      }, 100);
     }
   }
 

@@ -82,9 +82,9 @@ class InstagramFeed extends Component {
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
   const contactId = props.contactId;
-  const feed = state.instagramReducer[contactId]
-  && state.instagramReducer[contactId].received
-  && state.instagramReducer[contactId].received.map(id => state.instagramReducer[id]);
+  const feed = (state.instagramReducer[contactId]
+  && state.instagramReducer[contactId].received)
+  ? state.instagramReducer[contactId].received.map(id => state.instagramReducer[id]) : [];
   return {
     listId,
     contactId,
