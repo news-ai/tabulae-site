@@ -715,7 +715,7 @@ class ListTable extends Component {
 
   onSearchClick(e) {
     const searchValue = this.searchValue.getValue();
-    if (searchValue.length === 0) {
+    if (!!searchValue === false) {
       this.props.router.push(`/tables/${this.props.listId}`);
       this.onSearchClearClick();
     } else if (this.state.isSearchOn && searchValue === this.state.searchValue && this.props.listData.searchResults.length > 0) {
