@@ -562,6 +562,7 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
   // day format: YYYY-MM-DD
   return dispatch => {
     dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS', query, offset, limit});
+    dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_ON'});
     const url = createQueryUrl(query);
 
     return api.get(`${url}&limit=${limit}&offset=${offset}`)
@@ -586,11 +587,14 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
           // console.log(offset);
           // console.log(limit);
           // console.log(threshold);
+          dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
           return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold || response.data.length === 0, total: response.summary.total});
         }
       },
-      error => dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message})
-      );
+      error => {
+        dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
+        return dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message});
+      });
   };
 }
 
