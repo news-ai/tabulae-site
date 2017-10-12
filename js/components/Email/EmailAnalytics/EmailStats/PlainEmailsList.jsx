@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import AnalyticsItem from 'components/Email/EmailAnalytics/EmailsList/AnalyticsItem.jsx';
 import ScheduledEmailItem from 'components/Email/EmailAnalytics/EmailsList/ScheduledEmailItem.jsx';
-import {fromJS} from 'immutable';
 
 const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
@@ -18,34 +17,39 @@ class PlainEmailsList extends Component {
     super(props);
     this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
-    this.setRef = ref => (this._list = ref);
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 10});
+    this._listRef = this._listRef.bind(this);
+    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     window.onresize = () => {
-      console.log('resize');
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    };
   }
 
-  componentDidMount() {
-    this._cache.clearAll();
-    if (this._list) this._list.recomputeRowHeights();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
-      setTimeout(_ => {
-        this._cache.clearAll();
-        if (this._list) this._list.recomputeRowHeights();
-      }, 100);
-    }
+  componentWillMount() {
+    setTimeout(_ => {
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
   }
 
-  _rowRenderer({key, index, isScrolling, style, parent}) {
+  _listRef(ref) {
+    this._list = ref;
+  }
+
+  _listCellMeasurerRef(ref) {
+    this._listCellMeasurer = ref;
+  }
+
+  _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const rightNow = new Date();
     const email = this.props.emails[index];
     const renderNode = new Date(email.sendat) > rightNow ?
@@ -53,18 +57,9 @@ class PlainEmailsList extends Component {
     <AnalyticsItem key={`email-analytics-${index}`} {...email}/>;
 
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      rowIndex={index}
-      parent={parent}
-      >
-        <div style={style} key={key}>
-        {renderNode}
-        </div>
-      </CellMeasurer>
-      );
+      <div style={style} key={key}>
+      {renderNode}
+      </div>);
   }
 
   render() {
@@ -73,23 +68,30 @@ class PlainEmailsList extends Component {
     return (
       <div>
         <WindowScroller>
-        {({height, isScrolling, scrollTop, onChildScroll}) =>
+        {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <List
-              autoHeight
-              ref={this.setRef}
-              width={width}
-              height={height}
-              rowHeight={this._cache.rowHeight}
-              deferredMeasurementCache={this._cache}
+              <CellMeasurer
+              ref={this._listCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
               rowCount={props.emails.length}
-              rowRenderer={this.rowRenderer}
-              overscanRowCount={15}
-              scrollTop={scrollTop}
-              isScrolling={isScrolling}
-              onScroll={onChildScroll}
-              />
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._listRef}
+                autoHeight
+                width={width}
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={props.emails.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
+              }
+              </CellMeasurer>
             }
             </AutoSizer>
           }

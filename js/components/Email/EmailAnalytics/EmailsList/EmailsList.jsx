@@ -5,7 +5,7 @@ import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Collapse from 'react-collapse';
-import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 // import EmailDateContainer from './EmailDateContainer.jsx';
 import {fromJS} from 'immutable';
 import AnalyticsItem from './AnalyticsItem.jsx';
@@ -54,6 +54,7 @@ const dividerStyles = {
   linkSpan: {fontSize: '1.2em'},
   iconButtonIcon: {width: 14, height: 14, fontSize: '14px', color: grey600},
   iconButton: {width: 28, height: 28, padding: 7, margin: '0 5px'},
+  container: {marginTop: 25},
 };
 
 function reformatDatestring(datestring) {
@@ -83,15 +84,17 @@ class EmailsList extends Component {
       isClosedMap: {},
       reformattedEmails
     };
-    this.onOpenContainer = this._onOpenContainer.bind(this);
     this.rowRenderer = this._rowRenderer.bind(this);
-    this.setRef = ref => (this._list = ref);
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 10});
+    this._listRef = this._listRef.bind(this);
+    this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
+    this.onOpenContainer = this._onOpenContainer.bind(this);
     window.onresize = () => {
-      console.log('resize');
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    };
   }
 
   componentWillMount() {
@@ -102,13 +105,23 @@ class EmailsList extends Component {
 
   componentDidMount() {
     setTimeout(_ => {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }, 1000);
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
+    }, 2000);
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
+  }
+
+  _listRef(ref) {
+    this._list = ref;
+  }
+
+  _listCellMeasurerRef(ref) {
+    this._listCellMeasurer = ref;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -117,10 +130,10 @@ class EmailsList extends Component {
       console.log('hit');
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
-        setTimeout(_ => {
-          this._cache.clearAll();
-          if (this._list) this._list.recomputeRowHeights();
-        }, 1000);
+        if (this._list) {
+          this._listCellMeasurer.resetMeasurements();
+          this._list.recomputeRowHeights();
+        }
       });
     }
   }
@@ -140,12 +153,14 @@ class EmailsList extends Component {
       }
     });
     this.setState({dateOrder, reformattedEmails}, _ => {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
+      if (this._list) {
+        this._listCellMeasurer.resetMeasurements();
+        this._list.recomputeRowHeights();
+      }
     });
   }
 
-  _rowRenderer({key, index, isScrolling, style, parent}) {
+  _rowRenderer({key, index, isScrolling, isVisible, style}) {
     const node = this.state.reformattedEmails[index];
     const rightNow = new Date();
     let renderNode;
@@ -158,18 +173,9 @@ class EmailsList extends Component {
       renderNode = <DatestringDivider onOpenClick={this.onOpenContainer} {...node} />;
     }
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      rowIndex={index}
-      parent={parent}
-      >
-        <div style={style} key={key}>
-          {renderNode}
-        </div>
-      </CellMeasurer>
-      );
+      <div style={style} key={key}>
+        {renderNode}
+      </div>);
   }
 
   render() {
@@ -189,30 +195,37 @@ class EmailsList extends Component {
             className='right'
             iconClassName={`fa fa-refresh ${props.isReceiving ? 'fa-spin' : ''}`}
             tooltip='Refresh'
-            tooltipPosition='bottom-left'
+            tooltipPosition='top-left'
             />
           </div>
         </div>
       }
         <div style={style}>
         <WindowScroller>
-        {({height, isScrolling, scrollTop, onChildScroll}) =>
+        {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <List
-              autoHeight
-              ref={this.setRef}
-              width={width}
-              height={height}
-              rowHeight={this._cache.rowHeight}
-              deferredMeasurementCache={this._cache}
+              <CellMeasurer
+              ref={this._listCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
               rowCount={state.reformattedEmails.length}
-              overscanRowCount={15}
-              rowRenderer={this.rowRenderer}
-              scrollTop={scrollTop}
-              isScrolling={isScrolling}
-              onScroll={onChildScroll}
-              />
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._listRef}
+                autoHeight
+                width={width}
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={state.reformattedEmails.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
+              }
+              </CellMeasurer>
             }
             </AutoSizer>
           }
