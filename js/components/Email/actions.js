@@ -20,6 +20,7 @@ const emailSchema = new Schema('emails');
 const contactSchema = new Schema('contacts');
 import {actions as contactActions} from 'components/Contacts';
 
+
 export function archiveEmail(emailId) {
   return dispatch => {
     dispatch({type: 'ARCHIVE_EMAIL', emailId});
@@ -530,9 +531,20 @@ export function fetchSpecificDayEmails(day) {
 
 // -------------------------------------------------
 
+// const isDataURL = s => !!s.match(/^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*)\s*$/i);
+const encodeURIComponentExactlyOnce = s => {
+  try {
+    const s1 = decodeURIComponent(s);
+    if (s === s1) return encodeURIComponent(s);
+    else return encodeURIComponentExactlyOnce(s1);
+  } catch (e) {
+    return encodeURIComponent(s);
+  }
+}
+
 function createQueryUrl(query) {
-  if (query.baseSubject) query.baseSubject = encodeURIComponent(query.baseSubject);
-  if (query.subject) query.subject = encodeURIComponent(query.subject);
+  if (query.baseSubject) query.baseSubject = encodeURIComponentExactlyOnce(query.baseSubject);
+  if (query.subject) query.subject = encodeURIComponentExactlyOnce(query.subject);
   let keys = Object.keys(query);
   if (keys.some(key => key === 'subject')) {
     keys = [...keys.filter(key => key !== 'subject'), 'subject'];

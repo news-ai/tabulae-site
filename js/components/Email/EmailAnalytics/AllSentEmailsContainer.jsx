@@ -200,7 +200,7 @@ class AllSentEmailsContainer extends Component {
           fetchEmails={props.fetchEmails}
           hasNext={props.hasNext}
           /> :
-          <EmailsList {...this.props}/>}
+          <EmailsList {...this.props} />}
         </div>
       </div>);
   }

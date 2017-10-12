@@ -101,8 +101,10 @@ class EmailsList extends Component {
   }
 
   componentDidMount() {
-    this._cache.clearAll();
-    if (this._list) this._list.recomputeRowHeights();
+    setTimeout(_ => {
+      this._cache.clearAll();
+      if (this._list) this._list.recomputeRowHeights();
+    }, 1000);
   }
 
   componentWillUnmount() {
@@ -115,8 +117,10 @@ class EmailsList extends Component {
       console.log('hit');
       const {dateOrder, emailMap, reformattedEmails} = reformatEmails(nextProps.emails, this.state.dateOrder);
       this.setState({reformattedEmails, dateOrder, emailMap}, _ => {
-        this._cache.clearAll();
-        if (this._list) this._list.recomputeRowHeights();
+        setTimeout(_ => {
+          this._cache.clearAll();
+          if (this._list) this._list.recomputeRowHeights();
+        }, 1000);
       });
     }
   }
