@@ -7,7 +7,7 @@ export function fetchListFeed(listId) {
     const listObj = getState().listfeedReducer[listId];
     const OFFSET = listObj ? listObj.offset : 0;
     const isReceiving = getState().listfeedReducer.isReceiving;
-    if (OFFSET === null || isReceiving) return;
+    if (OFFSET === null || isReceiving) return Promise.resolve();
     dispatch({type: listfeedConstant.REQUEST_MULTIPLE, listId});
     return api.get(`/lists/${listId}/feed?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
     .then(response => {

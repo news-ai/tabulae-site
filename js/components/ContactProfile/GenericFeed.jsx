@@ -12,33 +12,28 @@ const styleEmptyRow = {
 };
 
 const BasicFeed = props => (
-  <CellMeasurer
-  ref={props.setCellRef}
-  cellRenderer={({rowIndex, ...rest}) => props.rowRenderer({index: rowIndex, ...rest})}
-  columnCount={1}
+  <List
+  ref={ref => props.setRef(ref)}
+  width={props.containerWidth || 500}
+  height={props.containerHeight}
   rowCount={props.feed.length}
-  width={props.containerWidth}
-  >
-  {({getRowHeight}) => (
-    <List
-    ref={ref => props.setRef(ref)}
-    width={props.containerWidth || 500}
-    height={props.containerHeight}
-    rowCount={props.feed.length}
-    rowHeight={getRowHeight}
-    rowRenderer={props.rowRenderer}
-    scrollTop={props.scrollTop}
-    overscanRowCount={5}
-    onScroll={args => {
-      if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) props.fetchFeed();
-    }}
-    />)}
-  </CellMeasurer>);
+  rowHeight={props.cache.rowHeight}
+  deferredMeasurementCache={props.cache}
+  rowRenderer={props.rowRenderer}
+  scrollTop={props.scrollTop}
+  overscanRowCount={5}
+  onScroll={args => {
+    if (((args.scrollHeight - args.scrollTop) / args.clientHeight) < 2) {
+      props.fetchFeed();
+    }
+    if (props.onScroll) props.onScroll(args);
+  }}
+  />);
+
 
 class GenericFeed extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
   }
 
   componentWillMount() {
@@ -49,12 +44,12 @@ class GenericFeed extends Component {
     const props = this.props;
     const limitedHeightList = props.feed && <BasicFeed {...props}/>;
     const windowScrollableList = props.feed && (
-       <WindowScroller>
-        {({height, scrollTop}) => (<BasicFeed {...props} containerHeight={height} scrollTop={scrollTop}/>)}
+       <WindowScroller scrollElement={props.scrollElement} >
+        {({height, scrollTop, onChildScroll}) => (<BasicFeed {...props} containerHeight={height} scrollTop={scrollTop} onScroll={onChildScroll} />)}
         </WindowScroller>);
     const autoSizedList = props.feed && (
         <AutoSizer>
-        {({height}) => (<BasicFeed {...props} containerHeight={height}/>)}
+        {({height}) => (<BasicFeed {...props} containerHeight={height} />)}
         </AutoSizer>);
     const renderNode = (
       <div>
