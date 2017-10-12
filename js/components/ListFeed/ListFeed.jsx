@@ -16,6 +16,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import {grey400, grey700} from 'material-ui/styles/colors';
 import Dialog from 'material-ui/Dialog';
+import 'react-virtualized/styles.css';
 
 const FEED_PADDING = 20;
 
@@ -37,6 +38,7 @@ class ListFeed extends Component {
     this.onTableClick = _ => this.props.router.push(`/tables/${this.props.listId}`);
     this.turnOnFirstTime = _ => _ => this.setState({firsttime: false}, _ => hopscotch.startTour(tour));
     this.turnOffFirstTime = _ => this.setState({firsttime: false});
+    this.setScrollRef = ref => (this.scrollRef = ref)
   }
 
   componentWillMount() {
@@ -46,7 +48,7 @@ class ListFeed extends Component {
 
   componentDidMount() {
     this.getPosition();
-    window.Intercom('trackEvent', 'check_list_feed', {listId: this.props.listId});
+    if (window.Intercom) window.Intercom('trackEvent', 'check_list_feed', {listId: this.props.listId});
     mixpanel.track('check_list_feed', {listId: this.props.listId});
   }
 
@@ -63,20 +65,18 @@ class ListFeed extends Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div style={styles.container}>
-        {
-          props.firstTimeUser &&
-          <Dialog open={state.firsttime} modal onRequestClose={this.turnOffFirstTime}>
-            <div style={styles.firsttime.container}>
-              <span style={styles.firsttime.bold}>List Feed</span> is a master feed all the attached social feeds and RSS feeds from all your contacts in a <span style={styles.firsttime.bold}>Table</span>.
-              Scroll down to check it out!
-            </div>
-            <div className='horizontal-center' style={styles.firsttime.btnContainer}>
-              <RaisedButton primary label='OK' onClick={this.turnOnFirstTime}/>
-            </div>
-          </Dialog>
-        }
-        <div ref='listfeedNameContainer' className='row horizontal-center'>
+      <div ref={this.setScrollRef} >
+      {props.firstTimeUser &&
+        <Dialog open={state.firsttime} modal onRequestClose={this.turnOffFirstTime}>
+          <div style={styles.firsttime.container}>
+            <span style={styles.firsttime.bold}>List Feed</span> is a master feed all the attached social feeds and RSS feeds from all your contacts in a <span style={styles.firsttime.bold}>Table</span>.
+            Scroll down to check it out!
+          </div>
+          <div className='horizontal-center' style={styles.firsttime.btnContainer}>
+            <RaisedButton primary label='OK' onClick={this.turnOnFirstTime}/>
+          </div>
+        </Dialog>}
+        <div ref='listfeedNameContainer' className='horizontal-center' style={{marginTop: 20}} >
           <h4>{props.list ? props.list.name : 'List Feed'}</h4>
           <FlatButton
           id='read_only_btn_hop'
@@ -85,15 +85,16 @@ class ListFeed extends Component {
           style={styles.btn.style}
           onClick={this.onTableClick}
           labelStyle={styles.btn.label}
-          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}/>
+          icon={<FontIcon className='fa fa-arrow-right' color={grey400} />}
+          />
         </div>
-        {props.feed && props.feed.length === 0 &&
-          <div className='row horizontal-center vertical-center' style={styles.emptyContainer}>
-            <span style={styles.text}>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to contacts in Table to see a master feed of all the posts here.</span>
-          </div>}
-        <div className='row horizontal-center'>
+      {props.feed.length === 0 &&
+        <div className='horizontal-center vertical-center' style={styles.emptyContainer}>
+          <span style={styles.text}>You are not tracking any RSS, Twitter, or Instagram in the contacts in your Sheet. Start adding some to contacts in Table to see a master feed of all the posts here.</span>
+        </div>}
+        <div className='horizontal-center'>
           <MixedFeed
-          containerHeight={state.height}
+          scrollElement={this.scrollRef}
           rowStyle={{width: state.screenWidth < 800 ? state.screenWidth - 5 : 795}}
           containerWidth={state.screenWidth < 800 ? state.screenWidth : 800}
           fetchFeed={props.fetchListFeed}
@@ -106,9 +107,9 @@ class ListFeed extends Component {
 }
 
 const styles = {
-  container: {paddingTop: 30},
+  // container: {paddingTop: 30},
   text: {color: grey700},
-  emptyContainer: {height: 400},
+  emptyContainer: {height: 400, padding: 30},
   btn: {
     label: {textTransform: 'none', color: grey400},
     style: {marginLeft: 20}
@@ -122,10 +123,11 @@ const styles = {
 
 const mapStateToProps = (state, props) => {
   const listId = parseInt(props.params.listId, 10);
+  const feed = (state.listfeedReducer[listId] && state.listfeedReducer[listId].received) || [];
   return {
     listId,
     list: state.listReducer[listId],
-    feed: state.listfeedReducer[listId] && state.listfeedReducer[listId].received,
+    feed,
     didInvalidate: state.listfeedReducer.didInvalidate,
     offset: state.listfeedReducer[listId] && state.listfeedReducer[listId].offset,
     firstTimeUser: state.personReducer.firstTimeUser
