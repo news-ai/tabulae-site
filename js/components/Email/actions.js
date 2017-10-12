@@ -20,7 +20,6 @@ const emailSchema = new Schema('emails');
 const contactSchema = new Schema('contacts');
 import {actions as contactActions} from 'components/Contacts';
 
-
 export function archiveEmail(emailId) {
   return dispatch => {
     dispatch({type: 'ARCHIVE_EMAIL', emailId});
@@ -451,7 +450,7 @@ export function fetchContactEmails(contactId) {
   return (dispatch, getState) => {
     let OFFSET = getState().stagingReducer.contactOffsets[contactId];
     const isReceiving = getState().stagingReducer.isReceiving;
-    if (OFFSET === null || isReceiving) return Promise.resolve();
+    if (OFFSET === null || isReceiving) return;
     if (!OFFSET) OFFSET = 0;
     dispatch({type: REQUEST_MULTIPLE_EMAILS}, contactId);
     return api.get(`/contacts/${contactId}/emails?limit=${PAGE_LIMIT}&offset=${OFFSET}`)
@@ -531,20 +530,9 @@ export function fetchSpecificDayEmails(day) {
 
 // -------------------------------------------------
 
-// const isDataURL = s => !!s.match(/^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*)\s*$/i);
-const encodeURIComponentExactlyOnce = s => {
-  try {
-    const s1 = decodeURIComponent(s);
-    if (s === s1) return encodeURIComponent(s);
-    else return encodeURIComponentExactlyOnce(s1);
-  } catch (e) {
-    return encodeURIComponent(s);
-  }
-}
-
 function createQueryUrl(query) {
-  if (query.baseSubject) query.baseSubject = encodeURIComponentExactlyOnce(query.baseSubject);
-  if (query.subject) query.subject = encodeURIComponentExactlyOnce(query.subject);
+  if (query.baseSubject) query.baseSubject = encodeURIComponent(query.baseSubject);
+  if (query.subject) query.subject = encodeURIComponent(query.subject);
   let keys = Object.keys(query);
   if (keys.some(key => key === 'subject')) {
     keys = [...keys.filter(key => key !== 'subject'), 'subject'];
@@ -562,7 +550,6 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
   // day format: YYYY-MM-DD
   return dispatch => {
     dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS', query, offset, limit});
-    dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_ON'});
     const url = createQueryUrl(query);
 
     return api.get(`${url}&limit=${limit}&offset=${offset}`)
@@ -587,14 +574,11 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
           // console.log(offset);
           // console.log(limit);
           // console.log(threshold);
-          dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
           return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold || response.data.length === 0, total: response.summary.total});
         }
       },
-      error => {
-        dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
-        return dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message});
-      });
+      error => dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS_FAIL', message: error.message})
+      );
   };
 }
 

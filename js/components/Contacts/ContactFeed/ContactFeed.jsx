@@ -6,7 +6,6 @@ import IconButton from 'material-ui/IconButton';
 import ContactItemContainer from './ContactItemContainer.jsx';
 
 // NO NEED FOR VIRTUALIZED IF PAGINATED
-// DEPRECIATED
 
 class ContactTags extends Component {
   constructor(props) {
