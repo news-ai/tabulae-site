@@ -1,9 +1,8 @@
-
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import EmailStats from './EmailStats/EmailStats.jsx';
 import {actions as campaignActions} from './Campaign';
-import {List, AutoSizer, CellMeasurer, CellMeasurerCache, WindowScroller} from 'react-virtualized';
+import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 import Tooltip from 'components/Tooltip';
 
@@ -15,6 +14,9 @@ import Paper from 'material-ui/Paper';
 import {grey400, grey600, grey700, grey500, grey800, blue800} from 'material-ui/styles/colors';
 import Campaign from './Campaign/Campaign.jsx';
 
+const styles = {
+};
+
 const fontIconStyle = {color: grey400};
 const isReceivingContainerStyle = {margin: '10px 0'};
 const iconButtonIconStyle = {color: grey600};
@@ -23,55 +25,40 @@ const pageTitleSpan = {fontSize: '1.5em'};
 class CampaignContainer extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
     this.rowRenderer = this._rowRenderer.bind(this);
-    this.setRef = ref => (this._list = ref);
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
+    this._campaignRef = this._campaignRef.bind(this);
+    this._campaignCellMeasurerRef = this._campaignCellMeasurerRef.bind(this);
+    this.cellRenderer = ({rowIndex, ...rest}) => this.rowRenderer({index: rowIndex, ...rest});
     window.onresize = () => {
-      console.log('resize');
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
-  }
-  
-  componentWillMount() {
-    this.props.fetchCampaignStats();
-  }
- 
-  componentDidMount() {
-    this._cache.clearAll();
-    if (this._list) this._list.recomputeRowHeights();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.containerWidth !== this.props.containerWidth) {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
-
-    if (this.props.campaigns.length !== nextProps.campaigns.length) {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
+      if (this._campaign) {
+        this._campaignCellMeasurer.resetMeasurements();
+        this._campaign.recomputeRowHeights();
+      }
+    };
   }
 
   componentWillUnmount() {
     window.onresize = undefined;
   }
 
-  _rowRenderer({key, index, style, parent}) {
+  _campaignRef(ref) {
+    this._campaign = ref;
+  }
+
+  _campaignCellMeasurerRef(ref) {
+    this._campaignCellMeasurer = ref;
+  }
+
+  componentWillMount() {
+    this.props.fetchCampaignStats();
+  }
+
+  _rowRenderer({key, index, isScrolling, isVisible, style}) {
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      rowIndex={index}
-      parent={parent}
-      >
-        <div style={style} key={key}>
-          <Campaign {...this.props.campaigns[index]}/>
-        </div>
-      </CellMeasurer>
-      );
+      <div style={style} key={key}>
+        <Campaign {...this.props.campaigns[index]}/>
+      </div>);
   }
 
   render() {
@@ -89,24 +76,32 @@ class CampaignContainer extends Component {
         <div className='row'>
           <span style={pageTitleSpan}>Campaigns</span>
         </div>
-      {props.campaigns && props.campaigns.length > 0 &&
+      {props.campaigns && 
         <WindowScroller>
-        {({height, isScrolling, scrollTop, onChildScroll}) =>
+        {({height, isScrolling, scrollTop}) =>
           <AutoSizer disableHeight>
             {({width}) =>
-              <List
-              autoHeight
-              ref={this.setRef}
-              width={width}
-              height={height}
-              rowHeight={this._cache.rowHeight}
-              deferredMeasurementCache={this._cache}
+              <CellMeasurer
+              ref={this._campaignCellMeasurerRef}
+              cellRenderer={this.cellRenderer}
+              columnCount={1}
               rowCount={props.campaigns.length}
-              rowRenderer={this.rowRenderer}
-              scrollTop={scrollTop}
-              isScrolling={isScrolling}
-              onScroll={onChildScroll}
-              />
+              width={width}
+              >
+              {({getRowHeight}) =>
+                <List
+                ref={this._campaignRef}
+                autoHeight
+                width={width}
+                height={height}
+                rowHeight={getRowHeight}
+                rowCount={props.campaigns.length}
+                rowRenderer={this.rowRenderer}
+                scrollTop={scrollTop}
+                isScrolling={isScrolling}
+                />
+              }
+              </CellMeasurer>
             }
             </AutoSizer>
           }
@@ -145,4 +140,3 @@ const mapDispatchToProps = (dispatch, props) => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CampaignContainer));
-
