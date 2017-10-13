@@ -201,7 +201,7 @@ class AllSentEmailsContainer extends Component {
           hasNext={props.hasNext}
           isReceiving={props.isReceiving}
           /> :
-          <EmailsList {...this.props} />}
+          <EmailsList {...this.props}/>}
         </div>
       </div>);
   }

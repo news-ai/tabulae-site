@@ -3,43 +3,21 @@ import {connect} from 'react-redux';
 import InstagramItem from './InstagramItem.jsx';
 import * as instagramActions from './actions';
 import GenericFeed from '../GenericFeed.jsx';
-import {CellMeasurerCache, CellMeasurer} from 'react-virtualized';
 
 class InstagramFeed extends Component {
   constructor(props) {
     super(props);
     this.rowRenderer = this._rowRenderer.bind(this);
-    this.setRef = ref => (this._list = ref);
-    this._cache = new CellMeasurerCache({fixedWidth: true, minHeight: 50});
-    window.onresize = () => {
-      console.log('resize');
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
-  }
-
-  componentDidMount() {
-    this._cache.clearAll();
-    if (this._list) this._list.recomputeRowHeights();
+    this.setRef = ref => {
+      this._instagramList = ref;
+    };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.containerWidth !== this.props.containerWidth) {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
-
-    if (this.props.feed && nextProps.feed && this.props.feed.length !== nextProps.feed.length) {
-      this._cache.clearAll();
-      if (this._list) this._list.recomputeRowHeights();
-    }
-  }
-  
-  componentWillUnmount() {
-    window.onresize = undefined;
+    // if (nextProps.containerWidth !== this.props.containerWidth) {}
   }
 
-  _rowRenderer({key, index, style, parent}) {
+  _rowRenderer({key, index, style}) {
     const feedItem = this.props.feed[index];
     const transformFeedItem = Object.assign({}, feedItem, {
       instagramlikes: feedItem.likes,
@@ -51,20 +29,12 @@ class InstagramFeed extends Component {
     });
     const row = <InstagramItem {...transformFeedItem} />;
 
-    let newstyle = Object.assign({}, style, {padding: '0 18px'});
+    let newstyle = style;
+    if (newstyle) newstyle.padding = '0 18px';
     return (
-      <CellMeasurer
-      cache={this._cache}
-      columnIndex={0}
-      key={key}
-      rowIndex={index}
-      parent={parent}
-      >
-        <div className='vertical-center horizontal-center' key={key} style={newstyle}>
-          {row}
-        </div>
-      </CellMeasurer>
-      );
+      <div className='vertical-center horizontal-center' key={key} style={newstyle}>
+        {row}
+      </div>);
   }
 
   render() {
@@ -74,7 +44,6 @@ class InstagramFeed extends Component {
       setRef={this.setRef}
       rowRenderer={this.rowRenderer}
       title='Instagram'
-      cache={this._cache}
       {...props}
       />);
   }
@@ -82,9 +51,9 @@ class InstagramFeed extends Component {
 const mapStateToProps = (state, props) => {
   const listId = props.listId;
   const contactId = props.contactId;
-  const feed = (state.instagramReducer[contactId]
-  && state.instagramReducer[contactId].received)
-  ? state.instagramReducer[contactId].received.map(id => state.instagramReducer[id]) : [];
+  const feed = state.instagramReducer[contactId]
+  && state.instagramReducer[contactId].received
+  && state.instagramReducer[contactId].received.map(id => state.instagramReducer[id]);
   return {
     listId,
     contactId,
