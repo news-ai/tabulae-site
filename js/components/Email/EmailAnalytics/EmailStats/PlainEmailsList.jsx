@@ -32,15 +32,6 @@ class PlainEmailsList extends Component {
     if (this._list) this._list.recomputeRowHeights();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!fromJS(this.props.emails).equals(fromJS(nextProps.emails))) {
-      setTimeout(_ => {
-        this._cache.clearAll();
-        if (this._list) this._list.recomputeRowHeights();
-      }, 100);
-    }
-  }
-
   componentWillUnmount() {
     window.onresize = undefined;
   }
@@ -49,8 +40,8 @@ class PlainEmailsList extends Component {
     const rightNow = new Date();
     const email = this.props.emails[index];
     const renderNode = new Date(email.sendat) > rightNow ?
-    <ScheduledEmailItem key={`email-analytics-${index}`} {...email}/> :
-    <AnalyticsItem key={`email-analytics-${index}`} {...email}/>;
+    <ScheduledEmailItem key={`email-analytics-${index}`} {...email} /> :
+    <AnalyticsItem key={`email-analytics-${index}`} {...email} />;
 
     return (
       <CellMeasurer
@@ -96,7 +87,7 @@ class PlainEmailsList extends Component {
         </WindowScroller>
       {props.isReceiving &&
         <div className='horizontal-center' style={isReceivingContainerStyle}>
-          <FontIcon style={fontIconStyle} className='fa fa-spinner fa-spin'/>
+          <FontIcon style={fontIconStyle} className='fa fa-spinner fa-spin' />
         </div>}
       {props.emails && props.emails.length === 0 &&
         <span style={styles.placeholder}>{props.placeholder || placeholder}</span>}
