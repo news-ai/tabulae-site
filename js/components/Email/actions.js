@@ -422,7 +422,7 @@ export function fetchSearchSentEmails(queryString) {
   return (dispatch, getState) => {
     let OFFSET = 0;
     const isReceiving = getState().stagingReducer.isReceiving;
-    if (OFFSET === null || isReceiving) return;
+    if (OFFSET === null || isReceiving) return Promise.resolve();
     if (!OFFSET) OFFSET = 0;
     dispatch({type: REQUEST_MULTIPLE_EMAILS, query: queryString});
     return api.get(`/emails/search?q="${queryString}"`)
@@ -559,7 +559,6 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
   // day format: YYYY-MM-DD
   return dispatch => {
     dispatch({type: 'REQUEST_LIMITED_QUERY_SENT_EMAILS', query, offset, limit});
-    dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_ON'});
     const url = createQueryUrl(query);
 
     return api.get(`${url}&limit=${limit}&offset=${offset}`)
@@ -572,7 +571,7 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
           contacts: arrayOf(contactSchema)
         });
         dispatch(contactActions.receiveContacts(res.entities.contacts, res.result.contacts));
-        dispatch({type: RECEIVE_MULTIPLE_EMAILS, emails: res.entities.emails, ids: res.result.data});
+        dispatch({type: 'RECEIVE_MULTIPLE_EMAILS_MANUAL', emails: res.entities.emails, ids: res.result.data});
 
         const newAccumulator = [...accumulator, ...res.result.data];
         if (response.data.length === limit && offset + limit < threshold) {
@@ -580,11 +579,6 @@ export function fetchLimitedQueryEmails(query, offset, limit, accumulator, thres
           return dispatch(fetchLimitedQueryEmails(query, offset + limit, limit, newAccumulator, threshold));
         } else {
           const hitThreshold = offset + limit >= threshold;
-          // console.log(hitThreshold);
-          // console.log(offset);
-          // console.log(limit);
-          // console.log(threshold);
-          dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
           return Promise.resolve({data: newAccumulator, hitThreshold: offset + limit >= threshold || response.data.length === 0, total: response.summary.total});
         }
       },
@@ -600,6 +594,7 @@ export function fetchFilterQueryEmails(query) {
   const LIMIT_SIZE = 50;
   return (dispatch, getState) => {
     dispatch({type: REQUEST_QUERY_EMAILS, query});
+    dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_ON'});
     const limit = LIMIT_SIZE;
     const received = getState().stagingReducer.filterQuery.received || [];
     const offset = received.length > 0 ? received.length : 0;
@@ -611,6 +606,7 @@ export function fetchFilterQueryEmails(query) {
         // console.log(data);
         const ids = received.length > 0 ? [...received, ...data] : data;
         dispatch({type: RECEIVE_QUERY_EMAILS, ids, query, hitThreshold, total});
+        dispatch({type: 'STAGING_MANUALLY_SET_ISRECEIVING_OFF'});
         return Promise.resolve(ids.map(id => getState().stagingReducer[id]));
       },
       error => dispatch({type: 'REQUEST_QUERY_SENT_EMAILS_FAIL', message: error.message})
