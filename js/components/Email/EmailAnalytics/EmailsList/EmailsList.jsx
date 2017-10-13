@@ -7,7 +7,6 @@ import IconButton from 'material-ui/IconButton';
 import Dialog from 'material-ui/Dialog';
 import Collapse from 'react-collapse';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
-// import EmailDateContainer from './EmailDateContainer.jsx';
 import {fromJS} from 'immutable';
 import AnalyticsItem from './AnalyticsItem.jsx';
 import ScheduledEmailItem from './ScheduledEmailItem.jsx';
