@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import CountViewItem from './CountViewItem.jsx';
 import Link from 'react-router/lib/Link';
 import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
-import LinkAnalyticsHOC from './LinkAnalyticsHOC.jsx';
-import OpenAnalyticsHOC from './OpenAnalyticsHOC.jsx';
 import {
   deepOrange100, deepOrange700, deepOrange900,
   grey400, grey600, grey800
