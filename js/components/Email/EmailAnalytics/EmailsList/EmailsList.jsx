@@ -4,6 +4,7 @@ import InfiniteScroll from 'components/InfiniteScroll';
 import {grey400, grey600, grey700, grey500} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
+import Dialog from 'material-ui/Dialog';
 import Collapse from 'react-collapse';
 import {List, AutoSizer, CellMeasurer, WindowScroller} from 'react-virtualized';
 // import EmailDateContainer from './EmailDateContainer.jsx';
@@ -13,6 +14,9 @@ import ScheduledEmailItem from './ScheduledEmailItem.jsx';
 import Link from 'react-router/lib/Link';
 import moment from 'moment-timezone';
 import find from 'lodash/find';
+import OpenAnalytics from './OpenAnalytics.jsx';
+import LinkAnalytics from './LinkAnalytics.jsx';
+import StaticEmailContent from 'components/Email/PreviewEmails/StaticEmailContent.jsx';
 
 const DEFAULT_SENDAT = '0001-01-01T00:00:00Z';
 
@@ -82,8 +86,13 @@ class EmailsList extends Component {
       dateOrder,
       emailMap,
       isClosedMap: {},
-      reformattedEmails
+      reformattedEmails,
+      dialogOpen: false,
+      dialogContentType: undefined,
+      dialogContentProps: {}
     };
+    this.onDialogRequestClose = _ => this.setState({dialogOpen: false, dialogContentType: undefined});
+    this.onDialogRequestOpen = _ => this.setState({dialogOpen: true});
     this.rowRenderer = this._rowRenderer.bind(this);
     this._listRef = this._listRef.bind(this);
     this._listCellMeasurerRef = this._listCellMeasurerRef.bind(this);
@@ -167,8 +176,27 @@ class EmailsList extends Component {
     if (node.type === 'emails') {
       const email = node;
       renderNode = new Date(email.sendat) > rightNow ?
-        <ScheduledEmailItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/> :
-        <AnalyticsItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email}/>;
+        <ScheduledEmailItem isScrolling={isScrolling} key={`email-analytics-${index}`} {...email} /> :
+        <AnalyticsItem
+        isScrolling={isScrolling}
+        key={`email-analytics-${index}`}
+        onOpenClick={_ => this.setState({
+          dialogContentProps: {emailId: email.id, count: email.opened},
+          dialogOpen: true,
+          dialogContentType: 'open',
+        })}
+        onLinkClick={_ => this.setState({
+          dialogContentProps: {emailId: email.id, count: email.clicked},
+          dialogOpen: true,
+          dialogContentType: 'click',
+        })}
+        onPreviewClick={emailProps => this.setState({
+          dialogContentProps: emailProps,
+          dialogOpen: true,
+          dialogContentType: 'preview',
+        })}
+        {...email}
+        />;
     } else {
       renderNode = <DatestringDivider onOpenClick={this.onOpenContainer} {...node} />;
     }
@@ -183,6 +211,22 @@ class EmailsList extends Component {
     const state = this.state;
     const props = this.props;
     if (this.props.containerHeight) style.height = props.containerHeight;
+
+    let dialogContent = null;
+    let dialogTitle = undefined;
+    switch (state.dialogContentType) {
+      case 'open':
+        dialogContent = <OpenAnalytics {...state.dialogContentProps} />;
+        dialogTitle = 'Open Timeline';
+        break;
+      case 'click':
+        dialogContent = <LinkAnalytics {...state.dialogContentProps} />;
+        dialogTitle = 'Link Click Count';
+        break;
+      case 'preview':
+        dialogContent = <StaticEmailContent {...state.dialogContentProps} />;
+        break;
+    }
 
     return (
       <div>
@@ -200,6 +244,9 @@ class EmailsList extends Component {
           </div>
         </div>
       }
+        <Dialog autoScrollBodyContent title={dialogTitle} open={state.dialogOpen} onRequestClose={this.onDialogRequestClose}>
+        {dialogContent}
+        </Dialog>
         <div style={style}>
         <WindowScroller>
         {({height, isScrolling, scrollTop}) =>
