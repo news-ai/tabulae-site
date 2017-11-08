@@ -222,10 +222,10 @@ class GeneralEditor extends React.Component {
         if (block.type === 'atomic') block.text = ' ';
         return block;
       })});
-      console.log(rawToHtml);
+      // console.log(rawToHtml);
       // console.log(JSON.stringify(rawToHtml));
       let html = draftRawToHtml(rawToHtml);
-      console.log(html);
+      // console.log(html);
       // used to generate testable html string
       const escapedHtml = html.replace(/"/g, "&quot;").replace(/'/g, "\\'").replace(/\n/g, '\\n');
       // console.log(escapedHtml);
@@ -532,14 +532,14 @@ class GeneralEditor extends React.Component {
     let contentState;
 
     if (html) {
-      console.log('pasted', 'html');
+      // console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       // console.log(saneHtml);
       contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
       // console.log('convertFromHTML', convertToRaw(contentState));
     } else {
-      console.log('pasted', 'plain text');
+      // console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
       // console.log('plain text', convertToRaw(contentState));
     }
@@ -551,7 +551,7 @@ class GeneralEditor extends React.Component {
     // console.log('normalizeListDepths', convertToRaw(contentState));
 
     let newEditorState = linkifyContentState(editorState, contentState);
-    console.log('linkifyContentState', convertToRaw(newEditorState.getCurrentContent()));
+    // console.log('linkifyContentState', convertToRaw(newEditorState.getCurrentContent()));
 
     this.onChange(newEditorState, 'force-emit-html');
     return 'handled';
