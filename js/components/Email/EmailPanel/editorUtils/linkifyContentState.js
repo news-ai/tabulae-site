@@ -1,5 +1,5 @@
 import sanitizeHtml from 'sanitize-html';
-import {ContentState, Modifier, EditorState, RichUtils, SelectionState} from 'draft-js';
+import {ContentState, Modifier, EditorState, RichUtils, SelectionState, convertToRaw} from 'draft-js';
 import linkifyIt from 'linkify-it';
 import tlds from 'tlds';
 
@@ -11,7 +11,8 @@ linkify
 function _removeWhiteSpace(editorState) {
   // // HACK: remove empty character in empty block to have paragraph breaks
   let newEditorState = editorState;
-  newEditorState.getCurrentContent().getBlockMap().forEach(block => {
+  newEditorState.getCurrentContent().getBlockMap().map(block => {
+    if (block.getType() === 'atomic') return;
     let text = block.getText();
     // console.log(text);
     text = text.replace(/^\s+/, '').replace(/\s+$/, '');
