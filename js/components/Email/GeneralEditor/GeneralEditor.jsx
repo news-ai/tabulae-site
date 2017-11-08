@@ -532,22 +532,26 @@ class GeneralEditor extends React.Component {
     let contentState;
 
     if (html) {
-      console.log('pasted', 'html');
+      // console.log('pasted', 'html');
       // console.log(html);
       const saneHtml = sanitizeHtml(html, sanitizeHtmlConfigs);
       // console.log(saneHtml);
       contentState = convertFromHTML(CONVERT_CONFIGS)(saneHtml);
-      // console.log(convertToRaw(contentState));
+      // console.log('convertFromHTML', convertToRaw(contentState));
     } else {
-      console.log('pasted', 'plain text');
+      // console.log('pasted', 'plain text');
       contentState = ContentState.createFromText(text.trim());
+      // console.log('plain text', convertToRaw(contentState));
     }
 
     // console.log(convertToRaw(contentState));
     contentState = handleLineBreaks(contentState);
+    // console.log('handleLineBreaks', convertToRaw(contentState));
     contentState = normalizeListDepths(contentState);
+    // console.log('normalizeListDepths', convertToRaw(contentState));
 
     let newEditorState = linkifyContentState(editorState, contentState);
+    // console.log('linkifyContentState', convertToRaw(newEditorState.getCurrentContent()));
 
     this.onChange(newEditorState, 'force-emit-html');
     return 'handled';

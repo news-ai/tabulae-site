@@ -1,5 +1,10 @@
 import * as api from 'actions/api';
-import 'rxjs';
+// import 'rxjs';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/takeUntil';
 import {normalize, Schema, arrayOf} from 'normalizr';
 import {publicationConstant} from './constants';
 const publicationSchema = new Schema('publications');
